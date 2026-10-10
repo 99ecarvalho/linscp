@@ -8,21 +8,21 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 8 | 19 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P0 Foundation | 10 | 22 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 0 | 21 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **8** | **65** | |
+| **Total** | **10** | **68** | |
 
 ## Next three actions
 
 1. **P0-09** — compile `core/Common.cpp` against a minimal shim on Linux clang.
    Now the single most informative open task: converts the P1 shim estimate from
    a guess into a measurement.
-2. **P0-10** — install the mingw-w64 sysroot (apt line in the README) and add the
-   clang cross toolchain file, so `windows-gnu` builds past the "no `<string>`"
-   stage. Wine 10.0, podman, ninja, lld and Qt 6 dev are already present.
+2. **P0-10** — write the CMake toolchain file for the cross build. The sysroot is
+   installed and verified end to end: clang cross-compiles, lld static-links, and
+   the result runs under Wine.
 3. **P0-04** — verify C++Builder accepts macro-expanded `__property` (R1).
    Still blocked on Q-2; everything else in P0 can proceed without it.
 
@@ -41,7 +41,10 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | 2026-10-10 | `index=` properties handled by a `PROP_R_GI` macro rather than a patch | Removes the last 4 manual cases, so the transform covers 613/613 with an empty patch series |
 | 2026-10-10 | Far-NetBox used as reference; verbatim reuse deferred pending licence clarification | Its README says GPLv3 but it ships the GPLv2 text (Q-6) |
 | 2026-10-10 | Published as [99ecarvalho/linscp](https://github.com/99ecarvalho/linscp), public, GPL-3.0 | `main` is the released state; active work happens on `qt` |
-| 2026-10-10 | A PR-able branch against `winscp/winscp` will be **generated**, not hand-maintained | linscp shares no history with upstream, so its `qt` branch is not directly mergeable. Since the port is mechanical, the fork branch can be produced on demand (Q-7) |
+| 2026-10-10 | A PR-able branch against `winscp/winscp` will be **generated**, not hand-maintained | linscp shares no history with upstream, so its `qt` branch is not directly mergeable. Since the port is mechanical, the fork branch can be produced on demand (Q-7). Rehearsed end to end — see facts below |
+| 2026-10-10 | Transform must be byte-exact outside property lines | A full-file rewrite (CRLF loss) turned a 613-line change into 76,551. Now asserted by `verify_transform.py` |
+| 2026-10-10 | Field/accessor classification is convention-first, parens only as fallback | The parens heuristic false-positives on constructor initialiser lists; WinSCP's `F<Upper>` / `Get*`/`Set*` convention is airtight. Truly unclassifiable names now fail the run instead of producing a wrong-arity macro |
+| 2026-10-10 | Windows releases link statically via lld | `-fuse-ld=lld -static -L/usr/x86_64-w64-mingw32/lib`; leaves only KERNEL32 and msvcrt as deps |
 
 ## Open questions
 
@@ -76,7 +79,13 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | All 613 transformed declarations compile under clang | `check_properties.py`, exit 0 | 2026-10-10 |
 | Transform is idempotent and line-count-preserving across all 69 files | `transform.py`, second pass is a no-op | 2026-10-10 |
 | All 8 property shapes behave correctly at runtime (incl. validating setters, read-modify-write, indexed) | `vcl_property.h` self-test, assertions pass | 2026-10-10 |
-| `windows-gnu` target needs the mingw sysroot installed (`<string>` not found) | expected; P0-10 | 2026-10-10 |
+| Cross-built Windows PE32+ binary passes the full property suite under Wine | `clang --target=x86_64-w64-mingw32`, exit 0 | 2026-10-10 |
+| Static Windows link needs lld plus explicit `-L` for `libwinpthread` | GNU ld fails; lld leaves only KERNEL32 + msvcrt | 2026-10-10 |
+| Dynamic Wine runs need **two** DLL dirs on `WINEPATH` | `libwinpthread-1.dll` lives apart from libstdc++/libgcc | 2026-10-10 |
+| Importing linscp history into a winscp fork merges with **zero conflicts** | `git merge --allow-unrelated-histories`; 10,602 commits, both roots, all port commits preserved | 2026-10-10 |
+| Applied in-tree, the core transform is a **613-line diff across 23 files** | measured on the rehearsal fork | 2026-10-10 |
+| After conversion, an upstream release touching a property line conflicts in **1 file**, resolvable mechanically | simulated release; `checkout --theirs` + re-run transform; new upstream property transformed automatically | 2026-10-10 |
+| Transform is byte-exact outside property lines; CRLF fully preserved | 76,551 CRLF, 0 bare LF; `Terminal.h` 1003 = 1003 | 2026-10-10 |
 
 ## Task status
 
@@ -92,9 +101,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0-07 | Transform idempotence tests | done | idempotent + line-count parity asserted |
 | P0-08 | CMake skeleton | todo | |
 | P0-09 | Minimal shim for `core/Common.cpp` | todo | the real measurement |
-| P0-10 | mingw-w64 sysroot + clang toolchain file | todo | |
+| P0-10 | mingw-w64 sysroot + clang toolchain file | wip | sysroot installed and verified; CMake toolchain file outstanding |
 | P0-11 | CI matrix Linux + Windows cross | todo | |
-| P0-12 | Wine smoke tests in CI | todo | |
+| P0-12 | Wine smoke tests in CI | wip | verified locally; not wired into CI |
 | P0-13 | Golden-output harness | todo | highest leverage in P0 |
 | P0-14 | Protocol server containers | todo | |
 | P0-15 | Capture golden corpus from real WinSCP | blocked | Q-2: needs Windows host |
@@ -102,6 +111,8 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0-17 | Property compile-check harness | done | `check_properties.py`, 613 declarations, clang exit 0 |
 | P0-18 | HTML render of plan docs | done | `doc/qt/plan.html` via `build-html.sh` |
 | P0-19 | Publish repository, licence, root README | done | public at `99ecarvalho/linscp`; work on `qt` |
+| P0-21 | `verify_transform.py` upstream-diff audit | done | asserts line parity, byte-exactness and 1 macro per changed line |
+| P0-22 | Rehearse history import into a winscp fork | done | zero-conflict merge; 613-line in-tree diff; mechanical conflict resolution |
 
 ### P1 — Headless core
 | ID | Task | Status | Note |

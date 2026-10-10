@@ -20,6 +20,7 @@
   #define PROP_R_F(T, Name, Field)              __property T Name = { read = Field }
   #define PROP_R_G(T, Name, Getter)             __property T Name = { read = Getter }
   #define PROP_RW_FF(T, Name, Field)            __property T Name = { read = Field, write = Field }
+  #define PROP_RW_F2(T, Name, RField, WField)   __property T Name = { read = RField, write = WField }
   #define PROP_RW_FS(T, Name, Field, Setter)    __property T Name = { read = Field, write = Setter }
   #define PROP_RW_GF(T, Name, Getter, Field)    __property T Name = { read = Getter, write = Field }
   #define PROP_RW_GS(T, Name, Getter, Setter)   __property T Name = { read = Getter, write = Setter }
@@ -44,6 +45,12 @@
   #define PROP_RW_FF(T, Name, Field)                                          \
     T __gp_##Name() const { return Field; }                                   \
     void __sp_##Name(T __v) { Field = __v; }                                  \
+    __declspec(property(get = __gp_##Name, put = __sp_##Name)) T Name
+
+  // read = <field>, write = <a different field>
+  #define PROP_RW_F2(T, Name, RField, WField)                                 \
+    T __gp_##Name() const { return RField; }                                  \
+    void __sp_##Name(T __v) { WField = __v; }                                 \
     __declspec(property(get = __gp_##Name, put = __sp_##Name)) T Name
 
   // read = <field>, write = <method>

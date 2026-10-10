@@ -1543,8 +1543,8 @@ evaluation down and close it</td>
 <tbody>
 <tr class="odd">
 <td>P0 Foundation</td>
-<td>8</td>
-<td>19</td>
+<td>10</td>
+<td>22</td>
 <td><code>core/Common.cpp</code> compiles on Linux clang; VCL build
 green (R1)</td>
 </tr>
@@ -1574,8 +1574,8 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>8</strong></td>
-<td><strong>65</strong></td>
+<td><strong>10</strong></td>
+<td><strong>68</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -1586,11 +1586,9 @@ green (R1)</td>
 against a minimal shim on Linux clang. Now the single most informative
 open task: converts the P1 shim estimate from a guess into a
 measurement.</li>
-<li><strong>P0-10</strong> — install the mingw-w64 sysroot (apt line in
-the README) and add the clang cross toolchain file, so
-<code>windows-gnu</code> builds past the “no
-<code>&lt;string&gt;</code>” stage. Wine 10.0, podman, ninja, lld and Qt
-6 dev are already present.</li>
+<li><strong>P0-10</strong> — write the CMake toolchain file for the
+cross build. The sysroot is installed and verified end to end: clang
+cross-compiles, lld static-links, and the result runs under Wine.</li>
 <li><strong>P0-04</strong> — verify C++Builder accepts macro-expanded
 <code>__property</code> (R1). Still blocked on Q-2; everything else in
 P0 can proceed without it.</li>
@@ -1684,7 +1682,30 @@ public, GPL-3.0</td>
 <strong>generated</strong>, not hand-maintained</td>
 <td>linscp shares no history with upstream, so its <code>qt</code>
 branch is not directly mergeable. Since the port is mechanical, the fork
-branch can be produced on demand (Q-7)</td>
+branch can be produced on demand (Q-7). Rehearsed end to end — see facts
+below</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>Transform must be byte-exact outside property lines</td>
+<td>A full-file rewrite (CRLF loss) turned a 613-line change into
+76,551. Now asserted by <code>verify_transform.py</code></td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>Field/accessor classification is convention-first, parens only as
+fallback</td>
+<td>The parens heuristic false-positives on constructor initialiser
+lists; WinSCP’s <code>F&lt;Upper&gt;</code> /
+<code>Get*</code>/<code>Set*</code> convention is airtight. Truly
+unclassifiable names now fail the run instead of producing a wrong-arity
+macro</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>Windows releases link statically via lld</td>
+<td><code>-fuse-ld=lld -static -L/usr/x86_64-w64-mingw32/lib</code>;
+leaves only KERNEL32 and msvcrt as deps</td>
 </tr>
 </tbody>
 </table>
@@ -1865,9 +1886,48 @@ setters, read-modify-write, indexed)</td>
 <td>2026-10-10</td>
 </tr>
 <tr class="even">
-<td><code>windows-gnu</code> target needs the mingw sysroot installed
-(<code>&lt;string&gt;</code> not found)</td>
-<td>expected; P0-10</td>
+<td>Cross-built Windows PE32+ binary passes the full property suite
+under Wine</td>
+<td><code>clang --target=x86_64-w64-mingw32</code>, exit 0</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>Static Windows link needs lld plus explicit <code>-L</code> for
+<code>libwinpthread</code></td>
+<td>GNU ld fails; lld leaves only KERNEL32 + msvcrt</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>Dynamic Wine runs need <strong>two</strong> DLL dirs on
+<code>WINEPATH</code></td>
+<td><code>libwinpthread-1.dll</code> lives apart from
+libstdc++/libgcc</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>Importing linscp history into a winscp fork merges with <strong>zero
+conflicts</strong></td>
+<td><code>git merge --allow-unrelated-histories</code>; 10,602 commits,
+both roots, all port commits preserved</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>Applied in-tree, the core transform is a <strong>613-line diff
+across 23 files</strong></td>
+<td>measured on the rehearsal fork</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>After conversion, an upstream release touching a property line
+conflicts in <strong>1 file</strong>, resolvable mechanically</td>
+<td>simulated release; <code>checkout --theirs</code> + re-run
+transform; new upstream property transformed automatically</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>Transform is byte-exact outside property lines; CRLF fully
+preserved</td>
+<td>76,551 CRLF, 0 bare LF; <code>Terminal.h</code> 1003 = 1003</td>
 <td>2026-10-10</td>
 </tr>
 </tbody>
@@ -1948,8 +2008,9 @@ setters, read-modify-write, indexed)</td>
 <tr class="even">
 <td>P0-10</td>
 <td>mingw-w64 sysroot + clang toolchain file</td>
-<td>todo</td>
-<td></td>
+<td>wip</td>
+<td>sysroot installed and verified; CMake toolchain file
+outstanding</td>
 </tr>
 <tr class="odd">
 <td>P0-11</td>
@@ -1960,8 +2021,8 @@ setters, read-modify-write, indexed)</td>
 <tr class="even">
 <td>P0-12</td>
 <td>Wine smoke tests in CI</td>
-<td>todo</td>
-<td></td>
+<td>wip</td>
+<td>verified locally; not wired into CI</td>
 </tr>
 <tr class="odd">
 <td>P0-13</td>
@@ -2006,6 +2067,20 @@ setters, read-modify-write, indexed)</td>
 <td>done</td>
 <td>public at <code>99ecarvalho/linscp</code>; work on
 <code>qt</code></td>
+</tr>
+<tr class="even">
+<td>P0-21</td>
+<td><code>verify_transform.py</code> upstream-diff audit</td>
+<td>done</td>
+<td>asserts line parity, byte-exactness and 1 macro per changed
+line</td>
+</tr>
+<tr class="odd">
+<td>P0-22</td>
+<td>Rehearse history import into a winscp fork</td>
+<td>done</td>
+<td>zero-conflict merge; 613-line in-tree diff; mechanical conflict
+resolution</td>
 </tr>
 </tbody>
 </table>

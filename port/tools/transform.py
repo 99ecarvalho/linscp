@@ -46,10 +46,20 @@ def parse_body(body):
         out[k.strip()] = v.strip()
     return out
 
+class Ambiguous(Exception):
+    def __init__(self, name, parens, nfield, nmethod):
+        super().__init__(
+            f"cannot classify '{name}' as field or accessor "
+            f"(declared-with-parens={parens}, looks-like-field={nfield}, "
+            f"looks-like-accessor={nmethod})")
+        self.name = name
+
+
 class Transformer:
     def __init__(self):
         self.stats = Counter()
         self.unhandled = []
+        self.notes = []
 
     def transform_file(self, path, text):
         methods = set(re.findall(r'\b(\w+)\s*\(', text))
@@ -57,7 +67,13 @@ class Transformer:
         for lineno, line in enumerate(text.split('\n'), 1):
             if '__property' not in line or '#define' in line:
                 out.append(line); continue
-            new = self.transform_line(path, lineno, line, methods)
+            # CR is carried in <tail> on CRLF files, so line endings survive
+            try:
+                new = self.transform_line(path, lineno, line, methods)
+            except Ambiguous as e:
+                self.stats['ambiguous'] += 1
+                self.unhandled.append((path, lineno, f'{e}  ||  {line.strip()[:70]}'))
+                new = None
             out.append(new if new is not None else line)
         return '\n'.join(out)
 
@@ -79,9 +95,34 @@ class Transformer:
         ind, tail = m.group('indent'), m.group('tail')
 
         def kind(x, write=False):
-            if x in methods:
+            """Classify a read/write target as Field or Getter/Setter.
+
+            WinSCP's naming convention is the primary signal and is airtight:
+            fields are F<Upper>, accessors are Get*/Set*/Is*/Has*/Do*. A method is
+            never named F<Upper>.
+
+            Whether the file declares the name with parentheses is only a
+            fallback, because it false-positives on constructor initialiser lists
+            (`FSessionData(ASessionData)` looks like a call). An accessor the file
+            does not declare is recorded as a note, not an error: it may be
+            inherited from a base class, and if it genuinely does not exist the
+            compiler says so clearly.
+
+            Anything matching no convention and never declared with parentheses
+            raises, rather than being guessed into a wrong-arity macro call.
+            """
+            by_parens = x in methods
+            looks_field = bool(re.match(r'^F[A-Z_]', x))
+            looks_accessor = bool(re.match(r'^(Get|Set|Is|Has|Do)[A-Z_]', x))
+            if looks_accessor:
+                if not by_parens:
+                    self.notes.append((path, lineno, f"accessor '{x}' not declared in this file"))
                 return 'S' if write else 'G'
-            return 'F'
+            if looks_field:
+                return 'F'
+            if by_parens:
+                return 'S' if write else 'G'
+            raise Ambiguous(x, by_parens, looks_field, looks_accessor)
 
         if indexed:
             it = re.match(r'\[\s*([\w:<>\s*&]+?)\s+\w+\s*\]', m.group('idx'))
@@ -99,10 +140,17 @@ class Transformer:
             call = f'PROP_R_GI({typ}, {name}, {r}, {i})'
             self.stats['r_gi'] += 1
         elif r and w:
-            call = f'PROP_RW_{kind(r)}{kind(w, True)}({typ}, {name}, {r}, {w})'
-            if kind(r) == 'F' and kind(w, True) == 'F' and r == w:
-                call = f'PROP_RW_FF({typ}, {name}, {r})'
-            self.stats[f'rw_{kind(r)}{kind(w, True)}'] += 1
+            kr, kw = kind(r), kind(w, True)
+            if kr == 'F' and kw == 'F':
+                if r == w:
+                    call = f'PROP_RW_FF({typ}, {name}, {r})'
+                    self.stats['rw_FF'] += 1
+                else:
+                    call = f'PROP_RW_F2({typ}, {name}, {r}, {w})'
+                    self.stats['rw_F2'] += 1
+            else:
+                call = f'PROP_RW_{kr}{kw}({typ}, {name}, {r}, {w})'
+                self.stats[f'rw_{kr}{kw}'] += 1
         elif r:
             call = f'PROP_R_{kind(r)}({typ}, {name}, {r})'
             self.stats[f'r_{kind(r)}'] += 1
@@ -141,7 +189,7 @@ def main():
                 dst = os.path.join(a.out, rel)
                 if os.path.splitext(n)[1].lower() not in EXTS:
                     continue
-                text = open(src, encoding='utf-8', errors='surrogateescape').read()
+                text = open(src, encoding='utf-8', errors='surrogateescape', newline='').read()
                 new = t.transform_file(rel, text)
                 nlines_ok = len(text.split('\n')) == len(new.split('\n'))
                 if not nlines_ok:
@@ -149,11 +197,15 @@ def main():
                 nfiles += 1
                 if not a.check:
                     os.makedirs(os.path.dirname(dst), exist_ok=True)
-                    open(dst, 'w', encoding='utf-8', errors='surrogateescape').write(new)
+                    open(dst, 'w', encoding='utf-8', errors='surrogateescape', newline='').write(new)
 
     print(f'files processed: {nfiles}')
     for k, v in sorted(t.stats.items()):
         print(f'  {k:16} {v}')
+    if t.notes:
+        print(f'\nnotes ({len(t.notes)}) - accessors declared elsewhere:')
+        for p_, l, m in t.notes[:10]:
+            print(f'  {p_}:{l}: {m}')
     if t.unhandled:
         print(f'\nUNHANDLED ({len(t.unhandled)}):')
         for p, l, s in t.unhandled[:20]:
