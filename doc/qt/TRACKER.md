@@ -8,23 +8,22 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 10 | 23 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P0 Foundation | 14 | 25 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 0 | 21 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **10** | **69** | |
+| **Total** | **14** | **71** | |
 
 ## Next three actions
 
-1. **P0-09** — compile `core/Common.cpp` against a minimal shim on Linux clang.
-   Now the single most informative open task: converts the P1 shim estimate from
-   a guess into a measurement.
-2. **P0-10** — write the CMake toolchain file for the cross build. The sysroot is
-   installed and verified end to end: clang cross-compiles, lld static-links, and
-   the result runs under Wine.
-3. **P0-04** — verify C++Builder accepts macro-expanded `__property` (R1).
-   Still blocked on Q-2; everything else in P0 can proceed without it.
+1. **Q-8 / ADR 0001** — confirm the `wchar_t` width decision before any
+   `UnicodeString` code is written. It governs 6,248 references and reversing it
+   later is a rewrite. See [adr/0001-wchar-t-width.md](adr/0001-wchar-t-width.md).
+2. **P1-01** — implement `UnicodeString` with 1-based Delphi indexing plus a
+   test suite, once Q-8 is settled.
+3. **P0-13** — the golden-output harness. Still the highest-leverage item for
+   everything after P1, and it does not depend on Q-8.
 
 ## Decisions taken
 
@@ -45,6 +44,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | 2026-10-10 | Transform must be byte-exact outside property lines | A full-file rewrite (CRLF loss) turned a 613-line change into 76,551. Now asserted by `verify_transform.py` |
 | 2026-10-10 | Field/accessor classification is convention-first, parens only as fallback | The parens heuristic false-positives on constructor initialiser lists; WinSCP's `F<Upper>` / `Get*`/`Set*` convention is airtight. Truly unclassifiable names now fail the run instead of producing a wrong-arity macro |
 | 2026-10-10 | Windows releases link statically via lld | `-fuse-ld=lld -static -L/usr/x86_64-w64-mingw32/lib`; leaves only KERNEL32 and msvcrt as deps |
+| 2026-10-10 | CMake hard-fails on non-clang compilers | A clear configure-time error beats a confusing failure in the first transformed header |
+| 2026-10-10 | The transform stamp lives outside the generated tree | `verify_transform.py` treats any extra file as a violation, which is the behaviour we want; the stamp was the first thing it caught |
+| 2026-10-10 | Proposed (Q-8): `wchar_t` with `-fshort-wchar`, `std::wstring` banned in `port/` | Only option that leaves upstream's thousands of `L"..."` literals untouched. See ADR 0001 |
 
 ## Open questions
 
@@ -57,6 +59,7 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Q-5 | Approach the maintainer early for feedback, or after P1 lands? | social strategy, not architecture | — |
 | Q-6 | Far-NetBox licence: README says GPLv3, `LICENSE.txt` is the GPLv2 text | verbatim reuse of its shim (reference use is unaffected) | — |
 | Q-7 | Build the fork-branch generator now, or when there is something worth proposing upstream? | nothing today; recommend deferring until P1 lands | — |
+| Q-8 | Confirm ADR 0001: `wchar_t` + `-fshort-wchar` for `UnicodeString`? | **P1-01**; governs 6,248 references and is effectively irreversible | — |
 
 ## Verified facts (re-check if the environment changes)
 
@@ -86,6 +89,10 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Applied in-tree, the core transform is a **613-line diff across 23 files** | measured on the rehearsal fork | 2026-10-10 |
 | After conversion, an upstream release touching a property line conflicts in **1 file**, resolvable mechanically | simulated release; `checkout --theirs` + re-run transform; new upstream property transformed automatically | 2026-10-10 |
 | Transform is byte-exact outside property lines; CRLF fully preserved | 76,551 CRLF, 0 bare LF; `Terminal.h` 1003 = 1003 | 2026-10-10 |
+| linscp tracks **0** WinSCP source files; only the submodule gitlink | `git ls-files` | 2026-10-10 |
+| Both targets build and pass 4/4 tests; Windows runs under Wine via CTest | `ctest` on `build/linux` and `build/win` | 2026-10-10 |
+| VCL surface the core needs: ~45 real types, dominated by `UnicodeString` (6,248), `TStrings` (521), `Exception` (438), `TDateTime` (250) | `census.py`, resolved against real mingw/OpenSSL/stdlib headers | 2026-10-10 |
+| Core's Win32 headers (`shlobj`, `psapi`, `winioctl`…) are satisfied free on the mingw target | only VCL needs shimming for Windows | 2026-10-10 |
 
 ## Task status
 
@@ -99,15 +106,15 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0-05 | `transform.py` property rewriter | done | 613/613, 0 unhandled |
 | P0-06 | `transform.py` fastcall/closure/ARRAYOFCONST | todo | properties done; these three not started |
 | P0-07 | Transform idempotence tests | done | idempotent + line-count parity asserted |
-| P0-08 | CMake skeleton | todo | |
-| P0-09 | Minimal shim for `core/Common.cpp` | todo | the real measurement |
-| P0-10 | mingw-w64 sysroot + clang toolchain file | wip | sysroot installed and verified; CMake toolchain file outstanding |
+| P0-08 | CMake skeleton | done | transform+verify wired as a build step; CTest on both targets |
+| P0-09 | Minimal shim for `core/Common.cpp` | todo | scope now measured by P0-24; blocked on Q-8 |
+| P0-10 | mingw-w64 sysroot + clang toolchain file | done | `cmake/toolchain-mingw-w64.cmake`; clang + lld + Wine emulator |
 | P0-11 | CI matrix Linux + Windows cross | todo | |
-| P0-12 | Wine smoke tests in CI | wip | verified locally; not wired into CI |
+| P0-12 | Wine smoke tests in CI | wip | wired into CTest via `CMAKE_CROSSCOMPILING_EMULATOR`; GitHub Actions pending |
 | P0-13 | Golden-output harness | todo | highest leverage in P0 |
 | P0-14 | Protocol server containers | todo | |
 | P0-15 | Capture golden corpus from real WinSCP | blocked | Q-2: needs Windows host |
-| P0-16 | ADR log | todo | decisions table serves this for now |
+| P0-16 | ADR log | wip | `doc/qt/adr/` started with ADR 0001 |
 | P0-17 | Property compile-check harness | done | `check_properties.py`, 613 declarations, clang exit 0 |
 | P0-18 | HTML render of plan docs | done | `doc/qt/plan.html` via `build-html.sh` |
 | P0-19 | Publish repository, licence, root README | done | public at `99ecarvalho/linscp`; work on `qt` |
@@ -115,6 +122,8 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0-21 | `verify_transform.py` upstream-diff audit | done | asserts line parity, byte-exactness and 1 macro per changed line |
 | P0-22 | Rehearse history import into a winscp fork | done | zero-conflict merge; 613-line in-tree diff; mechanical conflict resolution |
 | P0-23 | `check_docs.py` TASKS/TRACKER consistency | done | found 3 drifts on first run |
+| P0-24 | VCL surface census | done | ~45 types; `build/shim_spec.txt` |
+| P0-25 | ADR 0001 character width | done | decision proposed, awaiting Q-8 confirmation |
 
 ### P1 — Headless core
 | ID | Task | Status | Note |

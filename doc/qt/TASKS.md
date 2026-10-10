@@ -35,6 +35,8 @@ Goal: prove the keystone works, with no behaviour change anywhere.
 | P0-21 | `verify_transform.py`: audit the generated tree against upstream | S | P0-05 | Byte-exactness is the invariant the whole model rests on |
 | P0-22 | Rehearse history import into a `winscp/winscp` fork | S | P0-05 | Validates Q-7 and measures the real conflict cost |
 | P0-23 | `check_docs.py`: keep TASKS and TRACKER consistent | S | — | Enforces the tracker rule mechanically rather than by discipline |
+| P0-24 | Measure the VCL surface the core requires (`census.py`) | S | P0-05 | Resolves core identifiers against real mingw/OpenSSL/stdlib headers |
+| P0-25 | ADR 0001: character width for `UnicodeString` | S | P0-24 | Q-8; blocks P1-01 and is effectively irreversible |
 
 ## P1 — Headless core on both platforms
 

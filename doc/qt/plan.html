@@ -1143,6 +1143,22 @@ upstream</td>
 <td>Enforces the tracker rule mechanically rather than by
 discipline</td>
 </tr>
+<tr class="even">
+<td>P0-24</td>
+<td>Measure the VCL surface the core requires
+(<code>census.py</code>)</td>
+<td>S</td>
+<td>P0-05</td>
+<td>Resolves core identifiers against real mingw/OpenSSL/stdlib
+headers</td>
+</tr>
+<tr class="odd">
+<td>P0-25</td>
+<td>ADR 0001: character width for <code>UnicodeString</code></td>
+<td>S</td>
+<td>P0-24</td>
+<td>Q-8; blocks P1-01 and is effectively irreversible</td>
+</tr>
 </tbody>
 </table>
 <h2 id="p1-headless-core-on-both-platforms">P1 — Headless core on both
@@ -1598,8 +1614,8 @@ evaluation down and close it</td>
 <tbody>
 <tr class="odd">
 <td>P0 Foundation</td>
-<td>10</td>
-<td>23</td>
+<td>14</td>
+<td>25</td>
 <td><code>core/Common.cpp</code> compiles on Linux clang; VCL build
 green (R1)</td>
 </tr>
@@ -1629,24 +1645,23 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>10</strong></td>
-<td><strong>69</strong></td>
+<td><strong>14</strong></td>
+<td><strong>71</strong></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <h2 id="next-three-actions">Next three actions</h2>
 <ol type="1">
-<li><strong>P0-09</strong> — compile <code>core/Common.cpp</code>
-against a minimal shim on Linux clang. Now the single most informative
-open task: converts the P1 shim estimate from a guess into a
-measurement.</li>
-<li><strong>P0-10</strong> — write the CMake toolchain file for the
-cross build. The sysroot is installed and verified end to end: clang
-cross-compiles, lld static-links, and the result runs under Wine.</li>
-<li><strong>P0-04</strong> — verify C++Builder accepts macro-expanded
-<code>__property</code> (R1). Still blocked on Q-2; everything else in
-P0 can proceed without it.</li>
+<li><strong>Q-8 / ADR 0001</strong> — confirm the <code>wchar_t</code>
+width decision before any <code>UnicodeString</code> code is written. It
+governs 6,248 references and reversing it later is a rewrite. See <a
+href="adr/0001-wchar-t-width.md">adr/0001-wchar-t-width.md</a>.</li>
+<li><strong>P1-01</strong> — implement <code>UnicodeString</code> with
+1-based Delphi indexing plus a test suite, once Q-8 is settled.</li>
+<li><strong>P0-13</strong> — the golden-output harness. Still the
+highest-leverage item for everything after P1, and it does not depend on
+Q-8.</li>
 </ol>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
@@ -1762,6 +1777,27 @@ macro</td>
 <td><code>-fuse-ld=lld -static -L/usr/x86_64-w64-mingw32/lib</code>;
 leaves only KERNEL32 and msvcrt as deps</td>
 </tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>CMake hard-fails on non-clang compilers</td>
+<td>A clear configure-time error beats a confusing failure in the first
+transformed header</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>The transform stamp lives outside the generated tree</td>
+<td><code>verify_transform.py</code> treats any extra file as a
+violation, which is the behaviour we want; the stamp was the first thing
+it caught</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>Proposed (Q-8): <code>wchar_t</code> with
+<code>-fshort-wchar</code>, <code>std::wstring</code> banned in
+<code>port/</code></td>
+<td>Only option that leaves upstream’s thousands of <code>L"..."</code>
+literals untouched. See ADR 0001</td>
+</tr>
 </tbody>
 </table>
 <h2 id="open-questions">Open questions</h2>
@@ -1823,6 +1859,14 @@ the GPLv2 text</td>
 <td>Build the fork-branch generator now, or when there is something
 worth proposing upstream?</td>
 <td>nothing today; recommend deferring until P1 lands</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>Q-8</td>
+<td>Confirm ADR 0001: <code>wchar_t</code> + <code>-fshort-wchar</code>
+for <code>UnicodeString</code>?</td>
+<td><strong>P1-01</strong>; governs 6,248 references and is effectively
+irreversible</td>
 <td>—</td>
 </tr>
 </tbody>
@@ -1985,6 +2029,33 @@ preserved</td>
 <td>76,551 CRLF, 0 bare LF; <code>Terminal.h</code> 1003 = 1003</td>
 <td>2026-10-10</td>
 </tr>
+<tr class="odd">
+<td>linscp tracks <strong>0</strong> WinSCP source files; only the
+submodule gitlink</td>
+<td><code>git ls-files</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>Both targets build and pass 4/4 tests; Windows runs under Wine via
+CTest</td>
+<td><code>ctest</code> on <code>build/linux</code> and
+<code>build/win</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>VCL surface the core needs: ~45 real types, dominated by
+<code>UnicodeString</code> (6,248), <code>TStrings</code> (521),
+<code>Exception</code> (438), <code>TDateTime</code> (250)</td>
+<td><code>census.py</code>, resolved against real mingw/OpenSSL/stdlib
+headers</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>Core’s Win32 headers (<code>shlobj</code>, <code>psapi</code>,
+<code>winioctl</code>…) are satisfied free on the mingw target</td>
+<td>only VCL needs shimming for Windows</td>
+<td>2026-10-10</td>
+</tr>
 </tbody>
 </table>
 <h2 id="task-status">Task status</h2>
@@ -2051,21 +2122,21 @@ preserved</td>
 <tr class="even">
 <td>P0-08</td>
 <td>CMake skeleton</td>
-<td>todo</td>
-<td></td>
+<td>done</td>
+<td>transform+verify wired as a build step; CTest on both targets</td>
 </tr>
 <tr class="odd">
 <td>P0-09</td>
 <td>Minimal shim for <code>core/Common.cpp</code></td>
 <td>todo</td>
-<td>the real measurement</td>
+<td>scope now measured by P0-24; blocked on Q-8</td>
 </tr>
 <tr class="even">
 <td>P0-10</td>
 <td>mingw-w64 sysroot + clang toolchain file</td>
-<td>wip</td>
-<td>sysroot installed and verified; CMake toolchain file
-outstanding</td>
+<td>done</td>
+<td><code>cmake/toolchain-mingw-w64.cmake</code>; clang + lld + Wine
+emulator</td>
 </tr>
 <tr class="odd">
 <td>P0-11</td>
@@ -2077,7 +2148,8 @@ outstanding</td>
 <td>P0-12</td>
 <td>Wine smoke tests in CI</td>
 <td>wip</td>
-<td>verified locally; not wired into CI</td>
+<td>wired into CTest via <code>CMAKE_CROSSCOMPILING_EMULATOR</code>;
+GitHub Actions pending</td>
 </tr>
 <tr class="odd">
 <td>P0-13</td>
@@ -2100,8 +2172,8 @@ outstanding</td>
 <tr class="even">
 <td>P0-16</td>
 <td>ADR log</td>
-<td>todo</td>
-<td>decisions table serves this for now</td>
+<td>wip</td>
+<td><code>doc/qt/adr/</code> started with ADR 0001</td>
 </tr>
 <tr class="odd">
 <td>P0-17</td>
@@ -2148,6 +2220,18 @@ resolution</td>
 <td><code>check_docs.py</code> TASKS/TRACKER consistency</td>
 <td>done</td>
 <td>found 3 drifts on first run</td>
+</tr>
+<tr class="even">
+<td>P0-24</td>
+<td>VCL surface census</td>
+<td>done</td>
+<td>~45 types; <code>build/shim_spec.txt</code></td>
+</tr>
+<tr class="odd">
+<td>P0-25</td>
+<td>ADR 0001 character width</td>
+<td>done</td>
+<td>decision proposed, awaiting Q-8 confirmation</td>
 </tr>
 </tbody>
 </table>
