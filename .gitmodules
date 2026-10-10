@@ -1,0 +1,3 @@
+[submodule "3rd-party/winscp"]
+	path = 3rd-party/winscp
+	url = https://github.com/winscp/winscp.git
