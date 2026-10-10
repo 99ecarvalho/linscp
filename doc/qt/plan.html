@@ -1,0 +1,2611 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>linscp — Qt port of WinSCP</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      background-color: #1a1a1a;
+      border: none;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <style>
+  :root{--bg:#fff;--fg:#1a1a1a;--mut:#596270;--bd:#d8dee9;--acc:#0b6bcb;--cbg:#f5f7fa;--th:#eef2f7}
+  @media(prefers-color-scheme:dark){:root{--bg:#14171c;--fg:#e4e7eb;--mut:#9aa4b2;--bd:#2c323c;--acc:#6ba9f0;--cbg:#1b1f26;--th:#1f242c}}
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;max-width:60rem;margin:0 auto;padding:2.5rem 1.5rem 6rem}
+  h1,h2,h3,h4{line-height:1.25;font-weight:650;margin:2.2em 0 .7em}
+  h1{font-size:1.9rem;border-bottom:2px solid var(--bd);padding-bottom:.35em;margin-top:3rem}
+  h1:first-of-type{margin-top:0}
+  h2{font-size:1.35rem;color:var(--fg)}h3{font-size:1.1rem}h4{font-size:1rem;color:var(--mut)}
+  a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
+  code{background:var(--cbg);border:1px solid var(--bd);border-radius:4px;padding:.1em .35em;font:.875em/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  pre{background:var(--cbg);border:1px solid var(--bd);border-radius:7px;padding:1rem 1.1rem;overflow-x:auto}
+  pre code{background:none;border:0;padding:0;font-size:.84rem;line-height:1.55}
+  table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:.92rem;display:block;overflow-x:auto}
+  th,td{border:1px solid var(--bd);padding:.5rem .7rem;text-align:left;vertical-align:top}
+  th{background:var(--th);font-weight:620;white-space:nowrap}
+  tbody tr:nth-child(even){background:color-mix(in srgb,var(--cbg) 55%,transparent)}
+  blockquote{border-left:3px solid var(--acc);margin:1.3em 0;padding:.2em 0 .2em 1.1rem;color:var(--mut)}
+  hr{border:0;border-top:1px solid var(--bd);margin:3rem 0}
+  ul,ol{padding-left:1.4rem}li{margin:.3em 0}
+  #TOC{background:var(--cbg);border:1px solid var(--bd);border-radius:9px;padding:1.1rem 1.4rem;margin:0 0 2.5rem}
+  #TOC>ul{padding-left:1.1rem;margin:.3em 0}#TOC ul ul{font-size:.92em}
+  #TOC::before{content:"Contents";display:block;font-weight:680;font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);margin-bottom:.5em}
+  .subtitle{color:var(--mut);font-size:1.02rem;margin-top:-.4em}
+  @media print{body{max-width:none;padding:0}#TOC{break-after:page}h1{break-before:page}h1:first-of-type{break-before:avoid}}
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">linscp — Qt port of WinSCP</h1>
+<p class="subtitle">Plan, tasks, tracker and estimates</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#linscp-qt-port-of-winscp"
+id="toc-linscp-qt-port-of-winscp">linscp — Qt port of WinSCP</a>
+<ul>
+<li><a href="#documents" id="toc-documents">Documents</a></li>
+<li><a href="#goal" id="toc-goal">Goal</a></li>
+<li><a href="#current-state-2026-10-10"
+id="toc-current-state-2026-10-10">Current state (2026-10-10)</a></li>
+<li><a href="#the-three-findings-the-plan-rests-on"
+id="toc-the-three-findings-the-plan-rests-on">The three findings the
+plan rests on</a></li>
+<li><a href="#non-negotiable-constraints"
+id="toc-non-negotiable-constraints">Non-negotiable constraints</a></li>
+</ul></li>
+<li><a href="#plan" id="toc-plan">Plan</a>
+<ul>
+<li><a href="#answers-to-the-four-framing-questions"
+id="toc-answers-to-the-four-framing-questions">1. Answers to the four
+framing questions</a>
+<ul>
+<li><a
+href="#q1-can-we-compile-the-windows-version-here-on-linux-and-test-it"
+id="toc-q1-can-we-compile-the-windows-version-here-on-linux-and-test-it">Q1
+— Can we compile the Windows version here on Linux and test it?</a></li>
+<li><a
+href="#q2-a-qt-branch-that-generates-windows-builds-and-tracks-upstream-cheaply"
+id="toc-q2-a-qt-branch-that-generates-windows-builds-and-tracks-upstream-cheaply">Q2
+— A Qt branch that generates Windows builds and tracks upstream
+cheaply</a></li>
+<li><a href="#q3-one-codebase-qt-both-platforms"
+id="toc-q3-one-codebase-qt-both-platforms">Q3 — One codebase, Qt, both
+platforms</a></li>
+<li><a
+href="#q4-shims-get-removed-once-the-maintainer-adopts-it-and-by-then-the-ui-must-be-100-ported"
+id="toc-q4-shims-get-removed-once-the-maintainer-adopts-it-and-by-then-the-ui-must-be-100-ported">Q4
+— “Shims get removed once the maintainer adopts it, and by then the UI
+must be 100% ported”</a></li>
+</ul></li>
+<li><a href="#architecture" id="toc-architecture">2. Architecture</a>
+<ul>
+<li><a href="#the-dual-target-macro-the-keystone-of-the-whole-plan"
+id="toc-the-dual-target-macro-the-keystone-of-the-whole-plan">The
+dual-target macro — the keystone of the whole plan</a></li>
+<li><a href="#win32-call-sites-in-core"
+id="toc-win32-call-sites-in-core">Win32 call sites in core</a></li>
+</ul></li>
+<li><a href="#upstream-tracking-model"
+id="toc-upstream-tracking-model">3. Upstream tracking model</a></li>
+<li><a href="#incremental-ui-strategy"
+id="toc-incremental-ui-strategy">4. Incremental UI strategy</a></li>
+<li><a href="#verification-strategy" id="toc-verification-strategy">5.
+Verification strategy</a></li>
+<li><a href="#risks" id="toc-risks">6. Risks</a></li>
+<li><a href="#phases" id="toc-phases">7. Phases</a></li>
+</ul></li>
+<li><a href="#tasks" id="toc-tasks">Tasks</a>
+<ul>
+<li><a href="#p0-foundation-proof" id="toc-p0-foundation-proof">P0 —
+Foundation &amp; proof</a></li>
+<li><a href="#p1-headless-core-on-both-platforms"
+id="toc-p1-headless-core-on-both-platforms">P1 — Headless core on both
+platforms</a></li>
+<li><a href="#p2-qt-shell-minimal-usable-client"
+id="toc-p2-qt-shell-minimal-usable-client">P2 — Qt shell: minimal usable
+client</a></li>
+<li><a href="#p3-qt-parity-incremental-independently-shippable"
+id="toc-p3-qt-parity-incremental-independently-shippable">P3 — Qt parity
+(incremental, independently shippable)</a></li>
+<li><a href="#p4-cleanup" id="toc-p4-cleanup">P4 — Cleanup</a></li>
+</ul></li>
+<li><a href="#tracker" id="toc-tracker">Tracker</a>
+<ul>
+<li><a href="#progress" id="toc-progress">Progress</a></li>
+<li><a href="#next-three-actions" id="toc-next-three-actions">Next three
+actions</a></li>
+<li><a href="#decisions-taken" id="toc-decisions-taken">Decisions
+taken</a></li>
+<li><a href="#open-questions" id="toc-open-questions">Open
+questions</a></li>
+<li><a href="#verified-facts-re-check-if-the-environment-changes"
+id="toc-verified-facts-re-check-if-the-environment-changes">Verified
+facts (re-check if the environment changes)</a></li>
+<li><a href="#task-status" id="toc-task-status">Task status</a>
+<ul>
+<li><a href="#p0-foundation" id="toc-p0-foundation">P0 —
+Foundation</a></li>
+<li><a href="#p1-headless-core" id="toc-p1-headless-core">P1 — Headless
+core</a></li>
+<li><a href="#p2-qt-shell" id="toc-p2-qt-shell">P2 — Qt shell</a></li>
+<li><a href="#p3-qt-parity" id="toc-p3-qt-parity">P3 — Qt
+parity</a></li>
+<li><a href="#p4-cleanup-1" id="toc-p4-cleanup-1">P4 — Cleanup</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#estimates" id="toc-estimates">Estimates</a>
+<ul>
+<li><a href="#assumptions" id="toc-assumptions">Assumptions</a></li>
+<li><a href="#where-ai-actually-multiplies-and-where-it-does-not"
+id="toc-where-ai-actually-multiplies-and-where-it-does-not">Where AI
+actually multiplies — and where it does not</a>
+<ul>
+<li><a href="#strong-fit-38" id="toc-strong-fit-38">Strong fit
+(3–8×)</a></li>
+<li><a href="#moderate-fit-1.52.5" id="toc-moderate-fit-1.52.5">Moderate
+fit (1.5–2.5×)</a></li>
+<li><a href="#weak-fit-11.5" id="toc-weak-fit-11.5">Weak fit
+(1–1.5×)</a></li>
+</ul></li>
+<li><a href="#per-phase-estimate" id="toc-per-phase-estimate">Per-phase
+estimate</a>
+<ul>
+<li><a href="#with-a-small-team" id="toc-with-a-small-team">With a small
+team</a></li>
+</ul></li>
+<li><a href="#the-binding-constraint"
+id="toc-the-binding-constraint">The binding constraint</a></li>
+<li><a href="#sensitivity" id="toc-sensitivity">Sensitivity</a></li>
+<li><a href="#honest-caveats" id="toc-honest-caveats">Honest
+caveats</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="linscp-qt-port-of-winscp">linscp — Qt port of WinSCP</h1>
+<p>A cross-platform (Linux + Windows) Qt frontend over WinSCP’s protocol
+core, built so that upstream WinSCP remains trackable with near-zero
+merge cost.</p>
+<h2 id="documents">Documents</h2>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="#plan">PLAN.md</a></td>
+<td>Architecture, strategy, repo/branch model, risks</td>
+</tr>
+<tr class="even">
+<td><a href="#tasks">TASKS.md</a></td>
+<td>Work breakdown with stable task IDs</td>
+</tr>
+<tr class="odd">
+<td><a href="#tracker">TRACKER.md</a></td>
+<td>Live status per task</td>
+</tr>
+<tr class="even">
+<td><a href="#estimates">ESTIMATES.md</a></td>
+<td>Effort model, including AI-assisted estimate</td>
+</tr>
+</tbody>
+</table>
+<h2 id="goal">Goal</h2>
+<p>One codebase. Qt UI. Builds and runs on Linux and Windows. No
+Embarcadero C++Builder in the toolchain.</p>
+<h2 id="current-state-2026-10-10">Current state (2026-10-10)</h2>
+<p>Phase 0 under way — 7 of 18 tasks done. Upstream pinned as a
+submodule at <code>3rd-party/winscp</code> — WinSCP
+<code>6.6.4-RC-3-gaaae9dcb5</code> (commit <code>aaae9dcb</code>,
+2026-10-09).</p>
+<p>Landed: the dual-target <code>__property</code> shim, the
+transformation script, and a compile-check harness. <strong>All 613
+<code>__property</code> declarations in WinSCP’s core transform with
+zero unhandled cases and compile under clang.</strong> The keystone of
+the plan is no longer theoretical.</p>
+<p>Next: <code>core/Common.cpp</code> against a minimal shim (P0-09) —
+the cheapest way to replace the Phase 1 estimate with a measurement.</p>
+<h2 id="the-three-findings-the-plan-rests-on">The three findings the
+plan rests on</h2>
+<ol type="1">
+<li><p><strong><code>__property</code> is emulatable.</strong> clang
+supports <code>__declspec(property)</code> under
+<code>-fms-extensions</code>, verified on this machine (Debian clang 19)
+for every form WinSCP uses: field-backed r/o, field-backed r/w,
+method-backed with validating setter, read-modify-write, and indexed.
+GCC does not — <strong>clang is mandatory</strong>. WinSCP’s own
+compiler is already clang-based, so this is not a compiler-family
+change.</p></li>
+<li><p><strong>Windows binaries can be produced on Linux.</strong> clang
+emits valid x86-64 COFF for both <code>x86_64-w64-windows-gnu</code> and
+<code>x86_64-pc-windows-msvc</code>, with property emulation intact.
+Verified locally.</p></li>
+<li><p><strong>The de-VCL’d core already exists and is
+maintained.</strong> <code>Far-NetBox</code> (last commit 2026-07-24,
+tracking WinSCP 6.5.6 — one minor behind our pin) builds WinSCP core
+with MSVC/CMake over a hand-written ~16.3k-line VCL replacement in
+<code>src/base/</code>. It is Win32-targeted and its frontend is useless
+to us, but it is a proven reference for the hardest subsystem.</p></li>
+</ol>
+<h2 id="non-negotiable-constraints">Non-negotiable constraints</h2>
+<ul>
+<li><strong>Zero modified copies of WinSCP source in this repo.</strong>
+Core changes are produced by a committed, re-runnable transformation
+script plus a small patch series. See <a href="#plan">PLAN.md</a>.</li>
+<li><strong>Transformations are line-preserving.</strong> Not an imposed
+constraint — all 613 core declarations are already single-line, so this
+costs nothing. The payoff is that <code>diff -u upstream gen</code>
+stays reviewable with zero offsets; it is asserted by a test rather than
+defended at any cost.</li>
+<li><strong>The C++Builder VCL build must stay green</strong> for as
+long as practical. This keeps upstream merges verifiable and keeps the
+door open with the maintainer.</li>
+<li><strong>CI builds Linux and Windows from the first commit.</strong>
+No “add Windows later”.</li>
+</ul>
+<h1 id="plan">Plan</h1>
+<h2 id="answers-to-the-four-framing-questions">1. Answers to the four
+framing questions</h2>
+<h3
+id="q1-can-we-compile-the-windows-version-here-on-linux-and-test-it">Q1
+— Can we compile the Windows version here on Linux and test it?</h3>
+<p>Two different questions, with two different answers.</p>
+<p><strong>Today’s VCL WinSCP: no.</strong> It requires Embarcadero
+C++Builder 11 (<code>bcc64</code>) plus MSBuild, the VCL runtime, and
+<code>.dfm</code> form compilation. The toolchain is Windows-only,
+proprietary, and has no cross-compiler. There is no path to building the
+current <code>WinSCP.groupproj</code> on Linux, and this will never
+change.</p>
+<p><strong>The Qt branch: yes.</strong> Verified on this machine:</p>
+<pre><code>clang++ --target=x86_64-w64-windows-gnu  -fms-extensions  -&gt; x86-64 COFF  OK
+clang++ --target=x86_64-pc-windows-msvc  -fms-extensions  -&gt; x86-64 COFF  OK
+clang++ --target=x86_64-pc-linux-gnu     -fms-extensions  -&gt; ELF 64-bit   OK</code></pre>
+<p>All three with <code>__declspec(property)</code> emulation working.
+So one compiler (clang) covers all targets, which matters because GCC
+cannot compile the property shim at all.</p>
+<p><strong>Toolchain decision: clang + mingw-w64
+(<code>*-windows-gnu</code>), not clang-cl.</strong> Rationale: no MSVC
+licence or <code>xwin</code> SDK download needed, a single
+libc++/libstdc++ story, and Debian ships the full <code>mingw-w64</code>
+sysroot in apt. Keep the <code>windows-msvc</code> target as a later
+option if MSVC ABI interop is ever required.</p>
+<p><strong>Two real gaps, both solvable:</strong></p>
+<ul>
+<li><code>g++-mingw-w64</code> is in apt but is <strong>useless to
+us</strong> — GCC rejects <code>__declspec(property)</code>. We need the
+mingw-w64 <em>headers, libs and binutils</em> and then drive them with
+<code>clang++ --target=x86_64-w64-mingw32</code>.</li>
+<li><strong>Qt6-for-mingw is not packaged in Debian.</strong>
+Cross-building the Qt GUI for Windows therefore needs Qt built once for
+mingw (a few hours, scriptable and cacheable in CI), or MXE. Phases 0–1
+are unaffected — they have no Qt dependency, so cross-compilation works
+immediately for core and CLI.</li>
+</ul>
+<p><strong>Testing:</strong> Wine 10.0 is in apt. Good enough for CLI
+smoke tests and most Qt GUI behaviour. It is <strong>not</strong>
+sufficient to certify a Windows release — a real Windows CI runner is
+required before shipping binaries.</p>
+<h3
+id="q2-a-qt-branch-that-generates-windows-builds-and-tracks-upstream-cheaply">Q2
+— A Qt branch that generates Windows builds and tracks upstream
+cheaply</h3>
+<p>See <a href="#3-upstream-tracking-model">§3 Upstream tracking
+model</a>. Short version: the port never contains a modified copy of
+WinSCP source. A committed script transforms the pinned submodule into a
+generated tree at build time.</p>
+<h3 id="q3-one-codebase-qt-both-platforms">Q3 — One codebase, Qt, both
+platforms</h3>
+<p>Endorsed as the end state, with one consequence worth stating
+plainly: Windows users lose the native-feeling VCL UI in exchange for a
+Qt one. That is the real cost of this project and the reason upstream
+would never undertake it. It also means C++Builder — a paid,
+proprietary, Windows-only compiler, and today the single largest barrier
+to outside contributors — leaves the toolchain entirely.</p>
+<h3
+id="q4-shims-get-removed-once-the-maintainer-adopts-it-and-by-then-the-ui-must-be-100-ported">Q4
+— “Shims get removed once the maintainer adopts it, and by then the UI
+must be 100% ported”</h3>
+<p>This is the one place the plan diverges from the brief. Three
+corrections.</p>
+<p><strong>(a) Most shims are not scaffolding — they are the permanent
+portability layer.</strong> The <code>UnicodeString</code> /
+<code>TStrings</code> / <code>TDateTime</code> shim is not a temporary
+adapter; it <em>is</em> the cross-platform RTL. Deleting it means
+replacing 5,178 <code>UnicodeString</code> and 497 <code>TStrings</code>
+uses across the core with <code>std::wstring</code>/<code>QString</code>
+and STL containers — a second project comparable in size to the first,
+with no user-visible benefit and a large regression risk.
+Recommendation: <strong>keep it permanently.</strong> A stable,
+well-tested 16k-line shim nobody has to look at is a feature, not
+debt.</p>
+<p>What <em>should</em> eventually be deleted is different and much
+cheaper: the VCL frontend, the Windows-only Pascal packages, and the
+dual-target <code>#ifdef __BORLANDC__</code> branches. That is Phase 4,
+and it is weeks of work.</p>
+<p><strong>(b) Do not couple cleanup to 100% UI parity.</strong> These
+are independent axes, and coupling them creates a trap: you would carry
+the dual-build burden for an extra year waiting on the last few
+preference dialogs. The correct trigger for retiring the VCL build is
+<em>parity on the features users actually depend on</em>, which lands
+well short of all 48 dialogs. Decoupling them also means a stall in UI
+work never blocks toolchain cleanup.</p>
+<p><strong>(c) Do not make an architectural decision contingent on a
+social outcome.</strong> The maintainer has publicly called a Qt rewrite
+an “inconceivable task”. Plan for this fork to stand alone and be
+sustainable indefinitely; treat upstream adoption as upside. The “keep
+the VCL build green” discipline in §3 is what maximises the chance of
+adoption — but the architecture must not depend on it.</p>
+<hr />
+<h2 id="architecture">2. Architecture</h2>
+<pre><code>┌─────────────────────────────────────────────────────────────┐
+│  qt/            Qt 6 frontend            (ours, new)        │
+│  vcl-frontend/  existing VCL UI          (upstream, frozen) │
+├─────────────────────────────────────────────────────────────┤
+│  core/Interface.h — the frontend contract (upstream, as-is)  │
+├─────────────────────────────────────────────────────────────┤
+│  WinSCP core: SFTP SCP FTP WebDAV S3     (upstream, as-is)  │
+│  PuTTY 0.85 · FileZilla FTP engine       (upstream, patched)│
+├─────────────────────────────────────────────────────────────┤
+│  port/shim/      VCL RTL replacement     (ours, permanent)  │
+│  port/platform/  POSIX + Win32 helpers   (ours, permanent)  │
+├─────────────────────────────────────────────────────────────┤
+│  OpenSSL · expat · neon · libs3          (system packages)  │
+└─────────────────────────────────────────────────────────────┘</code></pre>
+<p><code>core/Interface.h</code> already is a clean abstract frontend
+contract — free functions and virtuals
+(<code>ShowExtendedException</code>, <code>CopyToClipboard</code>,
+<code>ProcessGUI</code>, <code>CreateConfiguration</code>,
+<code>StartThread</code>). The core never calls the GUI directly.
+<code>ProcessGUI</code> is virtual on <code>TSessionUI</code>, so a
+headless frontend no-ops it. Config storage is already abstracted behind
+<code>THierarchicalStorage</code> with both registry and INI backends;
+Linux uses the INI path. <strong>We are filling in an existing seam, not
+cutting a new one.</strong></p>
+<h3 id="the-dual-target-macro-the-keystone-of-the-whole-plan">The
+dual-target macro — the keystone of the whole plan</h3>
+<p>The <code>__property</code> rewrite expands to <em>native VCL syntax
+on C++Builder</em> and to <code>__declspec(property)</code> everywhere
+else:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode cpp"><code class="sourceCode cpp"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="pp">#ifdef __BORLANDC__</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="pp">#define PROP_RW_GS</span><span class="op">(</span>T<span class="op">,</span><span class="pp"> </span>Name<span class="op">,</span><span class="pp"> </span>G<span class="op">,</span><span class="pp"> </span>S<span class="op">)</span><span class="pp"> </span>__property<span class="pp"> </span>T<span class="pp"> </span>Name<span class="pp"> </span><span class="op">=</span><span class="pp"> </span><span class="op">{</span><span class="pp"> </span>read<span class="pp"> </span><span class="op">=</span><span class="pp"> </span>G<span class="op">,</span><span class="pp"> </span>write<span class="pp"> </span><span class="op">=</span><span class="pp"> </span>S<span class="pp"> </span><span class="op">}</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="pp">#else</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="pp">#define PROP_RW_GS</span><span class="op">(</span>T<span class="op">,</span><span class="pp"> </span>Name<span class="op">,</span><span class="pp"> </span>G<span class="op">,</span><span class="pp"> </span>S<span class="op">)</span><span class="pp"> </span><span class="ex">__declspec(property(get=G, put=S)) T Name</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="pp">#endif</span></span></code></pre></div>
+<p>This makes the transformation <strong>non-destructive</strong>: the
+same transformed header compiles under C++Builder and under clang. That
+single property is what lets the VCL build stay green, what makes the
+diff theoretically acceptable upstream, and what keeps the port
+honest.</p>
+<p>Property forms in core, all mechanically rewritable:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Form</th>
+<th>Count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>read = FField</code></td>
+<td>576</td>
+</tr>
+<tr class="even">
+<td><code>write = SetX</code></td>
+<td>362</td>
+</tr>
+<tr class="odd">
+<td><code>read = GetX</code></td>
+<td>246</td>
+</tr>
+<tr class="even">
+<td><code>write = FField</code></td>
+<td>182</td>
+</tr>
+<tr class="odd">
+<td><code>index = …</code> (4 hand-written wrappers)</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td><code>default</code> / <code>nodefault</code> /
+<code>stored</code></td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>591 declarations across core headers; four exceptions. Everything
+else is a one-line-in, one-line-out substitution.</p>
+<p>Other Embarcadero extensions: <code>__fastcall</code> (5,277 sites)
+becomes an empty <code>#define</code> — zero diff.
+<code>__closure</code> (45 sites) becomes a macro over a
+<code>std::function</code>-alike. <code>ARRAYOFCONST</code> (29) needs a
+variadic shim. Delphi <code>Set&lt;&gt;</code> appears once in core.</p>
+<h3 id="win32-call-sites-in-core">Win32 call sites in core</h3>
+<p>Roughly 200 direct Win32 calls across ~40 distinct functions
+(<code>CreateFile</code>, <code>ReadFile</code>,
+<code>GetFileAttributes</code>, <code>FindFirstFile</code>,
+<code>WSAEventSelect</code>, <code>CreateEvent</code>, one
+<code>RegQueryValueEx</code>, one <code>SHGetFolderPath</code>). Rather
+than edit core, implement that subset in
+<code>port/platform/win32-on-posix/</code>. This keeps the core diff at
+zero at the cost of a contained, well-understood compatibility module.
+<code>WSAEventSelect</code> semantics are the awkward part; everything
+else is routine.</p>
+<p>Stored-password crypto is <strong>not</strong> DPAPI — core uses its
+own <code>Cryptography.cpp</code>, so it ports cleanly.</p>
+<hr />
+<h2 id="upstream-tracking-model">3. Upstream tracking model</h2>
+<p><strong>Generated-tree model.</strong> This repo contains zero
+modified WinSCP source.</p>
+<pre><code>linscp/
+├── 3rd-party/winscp/      submodule, pristine upstream, pinned to a tag
+├── port/
+│   ├── tools/transform.py committed, re-runnable, line-preserving
+│   ├── patches/*.patch    small series for what cannot be mechanised
+│   ├── shim/              VCL RTL replacement        (first-class source)
+│   └── platform/          POSIX + Win32-on-POSIX     (first-class source)
+├── qt/                    Qt 6 frontend              (first-class source)
+├── cmake/
+└── build/gen/             generated transformed tree (gitignored)</code></pre>
+<p>Build = <code>transform.py</code> reads the submodule → writes
+<code>build/gen/</code> → compile <code>build/gen/</code> +
+<code>port/</code> + <code>qt/</code>.</p>
+<p><strong>Updating to a new WinSCP release:</strong></p>
+<ol type="1">
+<li><code>git -C 3rd-party/winscp fetch &amp;&amp; checkout &lt;new tag&gt;</code></li>
+<li>Re-run <code>transform.py</code></li>
+<li>Re-apply the patch series; fix rejects</li>
+<li>CI runs the golden-output suite on Linux + Windows</li>
+</ol>
+<p>Your diff against upstream is <em>structurally</em> empty, so there
+is nothing to conflict. The maintenance burden is the script and the
+patch series, not 77k lines of forked code. Anything the script cannot
+express mechanically is a deliberate decision recorded as a patch —
+which keeps the patch series small by construction, because a growing
+series is an immediate, visible warning sign.</p>
+<p>This is exactly what the submodule you asked for is good for: a
+pristine upstream reference, not a vendored copy to edit.</p>
+<p><strong>Branches</strong></p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Branch</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>main</code></td>
+<td>the port: <code>port/</code>, <code>qt/</code>, <code>doc/</code>,
+submodule pin</td>
+</tr>
+<tr class="even">
+<td><code>upstream-pin/*</code></td>
+<td>tags recording which WinSCP commit each release was built
+against</td>
+</tr>
+</tbody>
+</table>
+<p>No long-lived divergent branch is needed, because there is no forked
+source to diverge. This is the structural reason to prefer this model
+over forking <code>winscp/winscp</code> outright.</p>
+<hr />
+<h2 id="incremental-ui-strategy">4. Incremental UI strategy</h2>
+<p><strong>Do not mix VCL and Qt in one process.</strong> It is
+technically possible on Windows and a maintenance disaster, and it is
+impossible on Linux where VCL does not exist. “Incremental” must mean
+something else.</p>
+<p>The workable model: <strong>two independent frontends over one ported
+core.</strong></p>
+<ul>
+<li><code>vcl-frontend/</code> — the existing UI, untouched, builds only
+on Windows with C++Builder. Stays shippable throughout.</li>
+<li><code>qt/</code> — starts minimal and grows feature by feature on
+both platforms.</li>
+</ul>
+<p>The Qt app becomes the default when it is good enough; the VCL build
+is retired in Phase 4. Users are never handed a half-ported UI, and UI
+work can stop and restart at any point without breaking anything.</p>
+<p>The <code>.dfm</code> designer files are an asset here, not an
+obstacle: each is a declarative spec of a dialog’s layout, widgets,
+captions and tab order, which makes <code>.dfm</code> → <code>.ui</code>
+conversion unusually tractable and reviewable.</p>
+<p>The 121k lines of Pascal component packages are <strong>deleted, not
+ported</strong> — all seven map onto functionality Qt already ships:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Deleted</th>
+<th>Replaced by</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Toolbar2000 + TBX (32k)</td>
+<td><code>QToolBar</code> / <code>QMenuBar</code></td>
+</tr>
+<tr class="even">
+<td><code>filemng</code> shell tree (14k)</td>
+<td><code>QFileSystemModel</code></td>
+</tr>
+<tr class="odd">
+<td>JCL (59k)</td>
+<td>utility code; drop</td>
+</tr>
+<tr class="even">
+<td>PngComponents (4.6k)</td>
+<td>Qt native image support</td>
+</tr>
+<tr class="odd">
+<td><code>dragndrop</code> (3.6k)</td>
+<td>Qt native drag &amp; drop</td>
+</tr>
+</tbody>
+</table>
+<p>Translations in <code>translations/</code> should be reused rather
+than rewritten; mapping WinSCP’s string tables onto Qt’s
+<code>tr()</code>/<code>.ts</code> pipeline is a task in its own right
+(P3-07) and is worth doing early enough to avoid hardcoded strings
+accumulating.</p>
+<hr />
+<h2 id="verification-strategy">5. Verification strategy</h2>
+<p>The thing that makes this port tractable to <em>verify</em>, not just
+write:</p>
+<p><strong>Golden-output differential testing.</strong> WinSCP’s
+scripting frontend emits deterministic XML session logs — the same
+protocol the <code>netstandard2.0</code> .NET assembly already consumes.
+So:</p>
+<ol type="1">
+<li>Build a corpus of scripts covering SFTP/SCP/FTP/FTPS/WebDAV/S3
+operations.</li>
+<li>Run each against <strong>real WinSCP on Windows</strong> → golden
+XML.</li>
+<li>Run each against <strong>the port</strong> → candidate XML.</li>
+<li>Normalise (timestamps, paths, session IDs) and diff.</li>
+</ol>
+<p>This gives a regression suite over the core port for a fraction of
+the cost of writing unit tests for 77k lines, and it is the single
+highest-leverage item in Phase 0. Protocol servers come from containers
+(OpenSSH, vsftpd, ProFTPD, Apache/WebDAV, MinIO) so the matrix runs in
+CI.</p>
+<p>Corollary benefit: the existing .NET assembly targets
+<code>netstandard2.0</code> already, so it will drive the Linux port
+unchanged once the CLI speaks the same protocol.</p>
+<hr />
+<h2 id="risks">6. Risks</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Risk</th>
+<th>Severity</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>R1</td>
+<td>C++Builder rejects <code>__property</code> produced by macro
+expansion, killing the dual-target keystone</td>
+<td><strong>High</strong></td>
+<td>Cheap to test — one header, one person with a licence, Phase 0.
+Macros expand before parsing and <code>bcc64</code> is clang-based, so
+confidence is high but it is <strong>unverified here</strong>. If it
+fails, the VCL build cannot stay green and §3’s upstream story weakens
+considerably. Test this first.</td>
+</tr>
+<tr class="even">
+<td>R2</td>
+<td>FileZilla <code>WSAAsyncSelect</code> → epoll rewrite introduces
+subtle async bugs</td>
+<td><strong>High</strong></td>
+<td>~1,700 lines of hidden-window message-pump state machine.
+Golden-output suite + a real FTP server zoo. Budget generously; this is
+the least mechanical task in Phase 1.</td>
+</tr>
+<tr class="odd">
+<td>R3</td>
+<td>No C++Builder licence and no Windows machine available locally</td>
+<td>Medium</td>
+<td>Windows CI runner; R1 needs a collaborator or a trial licence</td>
+</tr>
+<tr class="even">
+<td>R4</td>
+<td>Qt6-for-mingw not packaged; must be built once</td>
+<td>Medium</td>
+<td>Scripted, cached CI artifact; blocks only Phase 2+</td>
+</tr>
+<tr class="odd">
+<td>R5</td>
+<td>Qt UI parity is the dominant cost and may stall</td>
+<td>Medium</td>
+<td>Decouple from Phase 4 per Q4(b); ship a useful subset early</td>
+</tr>
+<tr class="even">
+<td>R6</td>
+<td><code>WSAEventSelect</code> emulation on POSIX proves awkward</td>
+<td>Medium</td>
+<td>Core’s socket use is mostly mediated by PuTTY/FileZilla; scope is
+small</td>
+</tr>
+<tr class="odd">
+<td>R7</td>
+<td>Upstream churn outpaces the transform script</td>
+<td>Low</td>
+<td>Script is declarative and line-preserving; patch-series growth is
+the early-warning signal</td>
+</tr>
+<tr class="even">
+<td>R8</td>
+<td>Protocol regressions reach users</td>
+<td>Medium</td>
+<td>Golden suite is a merge gate, not an afterthought</td>
+</tr>
+</tbody>
+</table>
+<p><strong>R1 is the project’s pivot point.</strong> Everything in §3 —
+the zero-diff upstream story, the green VCL build, the plausible path to
+maintainer adoption — rests on it. It is also among the cheapest things
+to test. Do it first, before any shim code is written.</p>
+<hr />
+<h2 id="phases">7. Phases</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Phase</th>
+<th>Outcome</th>
+<th>Gate to exit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>P0</strong> Foundation</td>
+<td>Transform script, CMake skeleton, CI on both platforms, golden
+harness</td>
+<td><code>core/Common.cpp</code> compiles on Linux clang; VCL build
+still green (R1 resolved)</td>
+</tr>
+<tr class="even">
+<td><strong>P1</strong> Headless core</td>
+<td>Core + CLI on Linux <em>and</em> Windows, one codebase</td>
+<td>Real SFTP/FTP/S3/WebDAV sessions pass the golden suite on both
+platforms</td>
+</tr>
+<tr class="odd">
+<td><strong>P2</strong> Qt shell</td>
+<td>Minimal usable GUI client: connect, browse, transfer, queue</td>
+<td>A user can do a day’s work in it</td>
+</tr>
+<tr class="even">
+<td><strong>P3</strong> Qt parity</td>
+<td>Commander, sync, editor, dialogs, i18n</td>
+<td>Parity on features users depend on</td>
+</tr>
+<tr class="odd">
+<td><strong>P4</strong> Cleanup</td>
+<td>VCL frontend retired, dual-target <code>#ifdef</code>s
+collapsed</td>
+<td>Single-toolchain build; C++Builder gone</td>
+</tr>
+</tbody>
+</table>
+<p>P0 targets <strong>Windows first</strong>, because Far-NetBox already
+proves the de-VCL’d core compiles for Windows. That separates “does the
+shim work” from “does POSIX work” instead of hitting both risks
+simultaneously.</p>
+<h1 id="tasks">Tasks</h1>
+<p>Stable IDs. Never renumber — append. Status lives in <a
+href="#tracker">TRACKER.md</a>.</p>
+<p>Size: <strong>S</strong> ≤ 2 days · <strong>M</strong> ≤ 1 week ·
+<strong>L</strong> ≤ 1 month · <strong>XL</strong> &gt; 1 month (split
+before starting)</p>
+<hr />
+<h2 id="p0-foundation-proof">P0 — Foundation &amp; proof</h2>
+<p>Goal: prove the keystone works, with no behaviour change
+anywhere.</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Task</th>
+<th>Size</th>
+<th>Depends</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P0-01</td>
+<td>Repo layout: <code>port/</code>, <code>qt/</code>,
+<code>cmake/</code>, <code>build/gen/</code> gitignored</td>
+<td>S</td>
+<td>—</td>
+<td>Per PLAN §3</td>
+</tr>
+<tr class="even">
+<td>P0-02</td>
+<td>Pin submodule to a release tag, not <code>master</code></td>
+<td>S</td>
+<td>P0-01</td>
+<td>Currently a <code>master</code> commit</td>
+</tr>
+<tr class="odd">
+<td>P0-03</td>
+<td><strong>Dual-target property macro header</strong>
+(<code>port/shim/vcl_property.h</code>)</td>
+<td>S</td>
+<td>—</td>
+<td>The keystone; PLAN §2</td>
+</tr>
+<tr class="even">
+<td>P0-04</td>
+<td><strong>Verify C++Builder accepts macro-expanded
+<code>__property</code></strong></td>
+<td>S</td>
+<td>P0-03</td>
+<td><strong>R1. Do this first.</strong> Needs a licence + Windows.
+Blocks the zero-diff story</td>
+</tr>
+<tr class="odd">
+<td>P0-05</td>
+<td><code>transform.py</code>: <code>__property</code> rewriter,
+line-preserving</td>
+<td>M</td>
+<td>P0-03</td>
+<td>591 decls, 4 forms + 4 manual</td>
+</tr>
+<tr class="even">
+<td>P0-06</td>
+<td><code>transform.py</code>: <code>__fastcall</code>,
+<code>__closure</code>, <code>ARRAYOFCONST</code></td>
+<td>S</td>
+<td>P0-05</td>
+<td><code>__fastcall</code> → empty define</td>
+</tr>
+<tr class="odd">
+<td>P0-07</td>
+<td>Transform idempotence + line-count assertion tests</td>
+<td>S</td>
+<td>P0-05</td>
+<td>Guards against silent drift</td>
+</tr>
+<tr class="even">
+<td>P0-08</td>
+<td>CMake skeleton: generate → compile one TU</td>
+<td>M</td>
+<td>P0-01, P0-05</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P0-09</td>
+<td>Minimal shim to compile <code>core/Common.cpp</code> on Linux
+clang</td>
+<td>M</td>
+<td>P0-08</td>
+<td>The real measurement of shim cost</td>
+</tr>
+<tr class="even">
+<td>P0-10</td>
+<td>Install + script mingw-w64 sysroot; clang <code>--target</code>
+toolchain file</td>
+<td>S</td>
+<td>P0-08</td>
+<td>GCC is unusable — clang only</td>
+</tr>
+<tr class="odd">
+<td>P0-11</td>
+<td>CI matrix: Linux native + Windows cross, both clang</td>
+<td>M</td>
+<td>P0-10</td>
+<td>From the first commit</td>
+</tr>
+<tr class="even">
+<td>P0-12</td>
+<td>Wine in CI for Windows smoke tests</td>
+<td>S</td>
+<td>P0-11</td>
+<td>Not release certification</td>
+</tr>
+<tr class="odd">
+<td>P0-13</td>
+<td>Golden-output harness: runner, XML normaliser, differ</td>
+<td>M</td>
+<td>—</td>
+<td>PLAN §5; highest leverage in P0</td>
+</tr>
+<tr class="even">
+<td>P0-14</td>
+<td>Protocol server containers (OpenSSH, vsftpd, ProFTPD, WebDAV,
+MinIO)</td>
+<td>M</td>
+<td>P0-13</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P0-15</td>
+<td>Capture golden XML corpus from real WinSCP on Windows</td>
+<td>M</td>
+<td>P0-13, P0-14</td>
+<td>Needs a Windows host</td>
+</tr>
+<tr class="even">
+<td>P0-16</td>
+<td>ADR log (<code>doc/qt/adr/</code>)</td>
+<td>S</td>
+<td>—</td>
+<td>Record toolchain/ABI choices as made</td>
+</tr>
+</tbody>
+</table>
+<h2 id="p1-headless-core-on-both-platforms">P1 — Headless core on both
+platforms</h2>
+<p>Goal: one codebase, core + CLI, Linux and Windows. No GUI.</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Task</th>
+<th>Size</th>
+<th>Depends</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P1-01</td>
+<td>Shim: <code>UnicodeString</code> + string routines</td>
+<td>L</td>
+<td>P0-09</td>
+<td>5,178 uses; crib from Far-NetBox
+<code>src/base/UnicodeString.hpp</code></td>
+</tr>
+<tr class="even">
+<td>P1-02</td>
+<td>Shim: <code>TObject</code>, <code>TList</code>,
+<code>TStrings</code>, <code>TStringList</code>,
+<code>Contnrs</code></td>
+<td>L</td>
+<td>P1-01</td>
+<td>497 <code>TStrings</code> uses</td>
+</tr>
+<tr class="odd">
+<td>P1-03</td>
+<td>Shim: <code>TDateTime</code>, <code>DateUtils</code>,
+<code>SysUtils</code>, <code>IOUtils</code>, <code>StrUtils</code></td>
+<td>L</td>
+<td>P1-01</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P1-04</td>
+<td>Shim: <code>Exception</code> hierarchy + Delphi exception
+semantics</td>
+<td>M</td>
+<td>P1-01</td>
+<td>Core has no <code>__try</code>/<code>__except</code> — simplifies
+this</td>
+</tr>
+<tr class="odd">
+<td>P1-05</td>
+<td>Shim: <code>TCriticalSection</code>, <code>TThread</code>,
+<code>SyncObjs</code></td>
+<td>M</td>
+<td>P1-02</td>
+<td><code>StartThread</code> is already abstracted in
+<code>Interface.h</code></td>
+</tr>
+<tr class="even">
+<td>P1-06</td>
+<td>Shim: <code>TStream</code>, <code>TMemIniFile</code>;
+<code>TRegistry</code> → file-backed</td>
+<td>M</td>
+<td>P1-02</td>
+<td>INI backend already exists in core</td>
+</tr>
+<tr class="odd">
+<td>P1-07</td>
+<td><code>port/platform/win32-on-posix</code>: ~40 functions</td>
+<td>L</td>
+<td>P1-06</td>
+<td>Keeps core diff at zero</td>
+</tr>
+<tr class="even">
+<td>P1-08</td>
+<td><code>WSAEventSelect</code> / socket-event emulation</td>
+<td>M</td>
+<td>P1-07</td>
+<td>R6</td>
+</tr>
+<tr class="odd">
+<td>P1-09</td>
+<td>PuTTY: re-import upstream <code>unix/</code> backend</td>
+<td>M</td>
+<td>P1-03</td>
+<td>Upstream maintains it; reconcile WinSCP’s patches</td>
+</tr>
+<tr class="even">
+<td>P1-10</td>
+<td>PuTTY: reconcile WinSCP deltas against vanilla 0.85</td>
+<td>M</td>
+<td>P1-09</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P1-11</td>
+<td>FileZilla: replace vendored MFC subset
+(<code>CString</code>/<code>CFile</code>/<code>CTime</code>)</td>
+<td>M</td>
+<td>P1-01</td>
+<td>Only 4 files in <code>libs/mfc</code></td>
+</tr>
+<tr class="even">
+<td>P1-12</td>
+<td><strong>FileZilla: <code>WSAAsyncSelect</code> hidden-window pump →
+epoll/poll</strong></td>
+<td>L</td>
+<td>P1-11</td>
+<td><strong>R2.</strong> ~1,700 lines; least mechanical task in P1</td>
+</tr>
+<tr class="odd">
+<td>P1-13</td>
+<td>Switch <code>libs/</code> to system OpenSSL, expat, neon, libs3</td>
+<td>M</td>
+<td>P0-08</td>
+<td>All vanilla upstream already</td>
+</tr>
+<tr class="even">
+<td>P1-14</td>
+<td>Drop <code>puttyvs</code> (MSVC wrapper, obsolete)</td>
+<td>S</td>
+<td>P1-09</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P1-15</td>
+<td><code>winscp.com</code> shared-memory IPC → plain stdio</td>
+<td>M</td>
+<td>P1-06</td>
+<td>Both platforms</td>
+</tr>
+<tr class="even">
+<td>P1-16</td>
+<td>Headless frontend implementing <code>Interface.h</code></td>
+<td>L</td>
+<td>P1-05, P1-15</td>
+<td>Derive from <code>ConsoleRunner.cpp</code> — it has zero
+<code>forms/</code> deps</td>
+</tr>
+<tr class="odd">
+<td>P1-17</td>
+<td>First link + first real SFTP session on Linux</td>
+<td>M</td>
+<td>P1-16</td>
+<td>Expect a long tail of link/ABI issues</td>
+</tr>
+<tr class="even">
+<td>P1-18</td>
+<td>Same core + CLI cross-built for Windows, Wine-smoked</td>
+<td>M</td>
+<td>P1-17, P0-12</td>
+<td>Proves “one codebase”</td>
+</tr>
+<tr class="odd">
+<td>P1-19</td>
+<td>Golden suite green across all six protocols, both platforms</td>
+<td>L</td>
+<td>P1-18, P0-15</td>
+<td><strong>P1 exit gate</strong></td>
+</tr>
+<tr class="even">
+<td>P1-20</td>
+<td>Verify stock <code>netstandard2.0</code> .NET assembly drives the
+Linux CLI</td>
+<td>S</td>
+<td>P1-19</td>
+<td>Should work unchanged</td>
+</tr>
+<tr class="odd">
+<td>P1-21</td>
+<td><code>#ifdef</code> out <code>dragext</code>,
+<code>Setup.cpp</code>, jump lists, file associations</td>
+<td>M</td>
+<td>P1-16</td>
+<td>Windows-only or dropped</td>
+</tr>
+</tbody>
+</table>
+<h2 id="p2-qt-shell-minimal-usable-client">P2 — Qt shell: minimal usable
+client</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Task</th>
+<th>Size</th>
+<th>Depends</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P2-01</td>
+<td>Build Qt6 for mingw; cache as CI artifact</td>
+<td>M</td>
+<td>P0-10</td>
+<td>R4; not in Debian repos</td>
+</tr>
+<tr class="even">
+<td>P2-02</td>
+<td>Qt app skeleton, CMake integration, both platforms</td>
+<td>M</td>
+<td>P2-01, P1-19</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P2-03</td>
+<td>Qt implementation of the <code>Interface.h</code> contract</td>
+<td>L</td>
+<td>P2-02</td>
+<td>Prompts, errors, progress, busy, <code>ProcessGUI</code></td>
+</tr>
+<tr class="even">
+<td>P2-04</td>
+<td>Session storage + site manager UI</td>
+<td>L</td>
+<td>P2-03</td>
+<td>INI-backed</td>
+</tr>
+<tr class="odd">
+<td>P2-05</td>
+<td>Login / authentication dialogs (incl. host key,
+keyboard-interactive)</td>
+<td>M</td>
+<td>P2-03</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P2-06</td>
+<td>Remote file panel: model/view, columns, sorting</td>
+<td>L</td>
+<td>P2-03</td>
+<td><code>QAbstractItemModel</code> over
+<code>TRemoteFileList</code></td>
+</tr>
+<tr class="odd">
+<td>P2-07</td>
+<td>Transfer engine wiring + queue UI</td>
+<td>L</td>
+<td>P2-06</td>
+<td>Over <code>TTerminalQueue</code></td>
+</tr>
+<tr class="even">
+<td>P2-08</td>
+<td>Local file panel</td>
+<td>M</td>
+<td>P2-06</td>
+<td><code>QFileSystemModel</code></td>
+</tr>
+<tr class="odd">
+<td>P2-09</td>
+<td>i18n pipeline: WinSCP string tables → Qt <code>.ts</code></td>
+<td>M</td>
+<td>P2-03</td>
+<td>Do early — avoids hardcoded strings</td>
+</tr>
+<tr class="even">
+<td>P2-10</td>
+<td>Packaging: AppImage/Flatpak + Windows installer</td>
+<td>M</td>
+<td>P2-07</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P2-11</td>
+<td><strong>P2 exit gate:</strong> a user can do a day’s work in it</td>
+<td>S</td>
+<td>P2-07, P2-10</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="p3-qt-parity-incremental-independently-shippable">P3 — Qt parity
+(incremental, independently shippable)</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Task</th>
+<th>Size</th>
+<th>Depends</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P3-01</td>
+<td><code>.dfm</code> → <code>.ui</code> assisted converter</td>
+<td>M</td>
+<td>P2-02</td>
+<td><code>.dfm</code> is a declarative layout spec — very tractable</td>
+</tr>
+<tr class="even">
+<td>P3-02</td>
+<td>Commander dual-pane: keyboard semantics, inline rename, custom
+columns</td>
+<td>L</td>
+<td>P2-08</td>
+<td>The main draw for most users</td>
+</tr>
+<tr class="odd">
+<td>P3-03</td>
+<td>Synchronization UI + <code>TSynchronizeChecklist</code> view</td>
+<td>L</td>
+<td>P2-07</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P3-04</td>
+<td>Preferences dialogs (largest single cluster)</td>
+<td>XL → split</td>
+<td>P3-01</td>
+<td>Split per page before starting</td>
+</tr>
+<tr class="odd">
+<td>P3-05</td>
+<td>Internal editor</td>
+<td>L</td>
+<td>P2-06</td>
+<td>Or delegate to <code>$EDITOR</code> / system editor</td>
+</tr>
+<tr class="even">
+<td>P3-06</td>
+<td>Remaining dialogs, batched in groups of ~8 of the 48</td>
+<td>XL → split</td>
+<td>P3-01</td>
+<td>Track as P3-06a…f</td>
+</tr>
+<tr class="odd">
+<td>P3-07</td>
+<td>Drag &amp; drop: Qt native + XDS on Linux</td>
+<td>M</td>
+<td>P3-02</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P3-08</td>
+<td>Shell integration: “open in terminal”, file associations</td>
+<td>M</td>
+<td>P3-02</td>
+<td>Per-platform</td>
+</tr>
+<tr class="odd">
+<td>P3-09</td>
+<td>Accessibility pass</td>
+<td>M</td>
+<td>P3-06</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P3-10</td>
+<td><strong>P3 exit gate:</strong> parity on features users depend
+on</td>
+<td>S</td>
+<td>P3-02, P3-03, P3-04</td>
+<td>Explicitly <em>not</em> 100% of 48 dialogs</td>
+</tr>
+</tbody>
+</table>
+<h2 id="p4-cleanup">P4 — Cleanup</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Task</th>
+<th>Size</th>
+<th>Depends</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P4-01</td>
+<td>Retire the VCL frontend; drop Pascal packages</td>
+<td>M</td>
+<td>P3-10</td>
+<td>176k lines deleted</td>
+</tr>
+<tr class="even">
+<td>P4-02</td>
+<td>Collapse <code>#ifdef __BORLANDC__</code> dual-target branches</td>
+<td>M</td>
+<td>P4-01</td>
+<td>Simplifies the transform script</td>
+</tr>
+<tr class="odd">
+<td>P4-03</td>
+<td>Fold the transform output into first-class source (optional)</td>
+<td>L</td>
+<td>P4-02</td>
+<td>Only once upstream tracking is no longer a goal — <strong>one-way
+door</strong></td>
+</tr>
+<tr class="even">
+<td>P4-04</td>
+<td>Evaluate full de-shimming</td>
+<td>S</td>
+<td>P4-02</td>
+<td><strong>Recommendation: do not.</strong> PLAN §1 Q4(a) — write the
+evaluation down and close it</td>
+</tr>
+</tbody>
+</table>
+<h1 id="tracker">Tracker</h1>
+<p>Last updated: <strong>2026-10-10</strong></p>
+<p>Legend: <code>todo</code> · <code>wip</code> · <code>blocked</code> ·
+<code>done</code> · <code>dropped</code></p>
+<h2 id="progress">Progress</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Phase</th>
+<th>Done</th>
+<th>Total</th>
+<th>Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P0 Foundation</td>
+<td>7</td>
+<td>18</td>
+<td><code>core/Common.cpp</code> compiles on Linux clang; VCL build
+green (R1)</td>
+</tr>
+<tr class="even">
+<td>P1 Headless core</td>
+<td>0</td>
+<td>21</td>
+<td>Golden suite green, six protocols, both platforms</td>
+</tr>
+<tr class="odd">
+<td>P2 Qt shell</td>
+<td>0</td>
+<td>11</td>
+<td>A user can do a day’s work in it</td>
+</tr>
+<tr class="even">
+<td>P3 Qt parity</td>
+<td>0</td>
+<td>10</td>
+<td>Parity on features users depend on</td>
+</tr>
+<tr class="odd">
+<td>P4 Cleanup</td>
+<td>0</td>
+<td>4</td>
+<td>Single toolchain; C++Builder gone</td>
+</tr>
+<tr class="even">
+<td><strong>Total</strong></td>
+<td><strong>7</strong></td>
+<td><strong>64</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="next-three-actions">Next three actions</h2>
+<ol type="1">
+<li><strong>P0-09</strong> — compile <code>core/Common.cpp</code>
+against a minimal shim on Linux clang. Now the single most informative
+open task: converts the P1 shim estimate from a guess into a
+measurement.</li>
+<li><strong>P0-10</strong> — install the mingw-w64 sysroot and add the
+clang cross toolchain file, so <code>windows-gnu</code> builds past the
+“no <code>&lt;string&gt;</code>” stage.</li>
+<li><strong>P0-04</strong> — verify C++Builder accepts macro-expanded
+<code>__property</code> (R1). Still blocked on Q-2; everything else in
+P0 can proceed without it.</li>
+</ol>
+<h2 id="decisions-taken">Decisions taken</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Date</th>
+<th>Decision</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>clang everywhere; GCC unsupported</td>
+<td>GCC cannot compile <code>__declspec(property)</code>; verified
+locally</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>mingw-w64 (<code>*-windows-gnu</code>) over clang-cl/MSVC</td>
+<td>No MSVC licence or SDK download; sysroot is in Debian apt</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>Generated-tree model, not a source fork</td>
+<td>Keeps the upstream diff structurally empty</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>Keep the VCL RTL shim permanently</td>
+<td>De-shimming is a second project of similar size with no user
+benefit</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>Decouple shim cleanup from 100% UI parity</td>
+<td>Coupling them would add ~a year of dual-build burden</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>Two frontends over one core; never mix VCL and Qt in-process</td>
+<td>Impossible on Linux, unmaintainable on Windows</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>Windows target first in P0</td>
+<td>Far-NetBox already proves the core compiles for Windows; separates
+the two risks</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>Line-preserving transform kept, but demoted from “constraint” to
+asserted property</td>
+<td>It costs nothing — all 591 core declarations are already single-line
+— and its real payoff is a reviewable zero-offset <code>diff</code>
+against upstream, not debugger ergonomics. Asserted by a test; abandon
+if it ever conflicts with something substantive</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td><code>index=</code> properties handled by a <code>PROP_R_GI</code>
+macro rather than a patch</td>
+<td>Removes the last 4 manual cases, so the transform covers 613/613
+with an empty patch series</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>Far-NetBox used as reference; verbatim reuse deferred pending
+licence clarification</td>
+<td>Its README says GPLv3 but it ships the GPLv2 text (Q-6)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="open-questions">Open questions</h2>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Question</th>
+<th>Blocks</th>
+<th>Owner</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Q-1</td>
+<td>P3 scope: faithful parity, or a deliberately narrower client?</td>
+<td>P3 estimate (swings ~2 years)</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>Q-2</td>
+<td>Access to a C++Builder 11 licence + Windows host?</td>
+<td>P0-04, P0-15, R1, R3</td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td>Q-3</td>
+<td>Internal editor, or delegate to the system editor?</td>
+<td>P3-05</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>Q-4</td>
+<td>Ship 32-bit Windows, or x86-64 and arm64 only?</td>
+<td>P0-10, packaging</td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td>Q-5</td>
+<td>Approach the maintainer early for feedback, or after P1 lands?</td>
+<td>social strategy, not architecture</td>
+<td>—</td>
+</tr>
+<tr class="even">
+<td>Q-6</td>
+<td>Far-NetBox licence: README says GPLv3, <code>LICENSE.txt</code> is
+the GPLv2 text</td>
+<td>verbatim reuse of its shim (reference use is unaffected)</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<h2 id="verified-facts-re-check-if-the-environment-changes">Verified
+facts (re-check if the environment changes)</h2>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Fact</th>
+<th>Evidence</th>
+<th>Date</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>clang 19 supports <code>__declspec(property)</code> on Linux under
+<code>-fms-extensions</code></td>
+<td>Local test: field r/o, field r/w, method+validating setter,
+read-modify-write, indexed — all pass</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>GCC 14 rejects it outright</td>
+<td><code>error: 'property' has not been declared</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>clang cross-emits x86-64 COFF for <code>windows-gnu</code> and
+<code>windows-msvc</code></td>
+<td>Local test, property emulation intact</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>Qt6 present on this host; Qt6-for-mingw absent from Debian</td>
+<td><code>apt-cache search</code> returns nothing for mingw+qt</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>Wine 10.0 installable from apt</td>
+<td><code>apt-cache policy wine</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>Core has 591 <code>__property</code> decls; 0 use
+<code>default</code>/<code>nodefault</code>/<code>stored</code></td>
+<td>grep over <code>source/core/*.h</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>Core has no <code>__try</code>/<code>__except</code></td>
+<td>grep</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td><code>ConsoleRunner.cpp</code> has zero <code>forms/</code>
+dependencies</td>
+<td>include analysis</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>Stored-password crypto is not DPAPI</td>
+<td>no DPAPI symbols in core</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>WinSCP’s own compiler is already clang-based</td>
+<td><code>#ifdef __clang__</code> in
+<code>source/core/Global.h:37</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>Far-NetBox tracks WinSCP 6.5.6, last commit 2026-07-24, ~16.3k-line
+VCL shim</td>
+<td>repo inspection</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>Core has 613 <code>__property</code> declarations across 69 files
+(<code>.h</code> and <code>.cpp</code>)</td>
+<td><code>transform.py --check</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>0 of 613 span multiple lines; 0 have comma-bearing or template
+types</td>
+<td>AST-free scan of <code>core/*.h</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>All 613 transform to 9 macro forms with <strong>0
+unhandled</strong></td>
+<td><code>transform.py</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>All 613 transformed declarations compile under clang</td>
+<td><code>check_properties.py</code>, exit 0</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>Transform is idempotent and line-count-preserving across all 69
+files</td>
+<td><code>transform.py</code>, second pass is a no-op</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>All 8 property shapes behave correctly at runtime (incl. validating
+setters, read-modify-write, indexed)</td>
+<td><code>vcl_property.h</code> self-test, assertions pass</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td><code>windows-gnu</code> target needs the mingw sysroot installed
+(<code>&lt;string&gt;</code> not found)</td>
+<td>expected; P0-10</td>
+<td>2026-10-10</td>
+</tr>
+</tbody>
+</table>
+<h2 id="task-status">Task status</h2>
+<h3 id="p0-foundation">P0 — Foundation</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Task</th>
+<th>Status</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P0-01</td>
+<td>Repo layout</td>
+<td>done</td>
+<td><code>port/{shim,platform,tools,patches}</code>, <code>qt/</code>,
+<code>cmake/</code></td>
+</tr>
+<tr class="even">
+<td>P0-02</td>
+<td>Pin submodule to a release tag</td>
+<td>todo</td>
+<td>currently a <code>master</code> commit</td>
+</tr>
+<tr class="odd">
+<td>P0-03</td>
+<td>Dual-target property macro header</td>
+<td>done</td>
+<td><code>port/shim/vcl_property.h</code>; 9 forms, self-tested</td>
+</tr>
+<tr class="even">
+<td>P0-04</td>
+<td>Verify C++Builder accepts the macro</td>
+<td>blocked</td>
+<td>Q-2: needs licence + Windows</td>
+</tr>
+<tr class="odd">
+<td>P0-05</td>
+<td><code>transform.py</code> property rewriter</td>
+<td>done</td>
+<td>613/613, 0 unhandled</td>
+</tr>
+<tr class="even">
+<td>P0-06</td>
+<td><code>transform.py</code> fastcall/closure/ARRAYOFCONST</td>
+<td>todo</td>
+<td>properties done; these three not started</td>
+</tr>
+<tr class="odd">
+<td>P0-07</td>
+<td>Transform idempotence tests</td>
+<td>done</td>
+<td>idempotent + line-count parity asserted</td>
+</tr>
+<tr class="even">
+<td>P0-08</td>
+<td>CMake skeleton</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P0-09</td>
+<td>Minimal shim for <code>core/Common.cpp</code></td>
+<td>todo</td>
+<td>the real measurement</td>
+</tr>
+<tr class="even">
+<td>P0-10</td>
+<td>mingw-w64 sysroot + clang toolchain file</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P0-11</td>
+<td>CI matrix Linux + Windows cross</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P0-12</td>
+<td>Wine smoke tests in CI</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P0-13</td>
+<td>Golden-output harness</td>
+<td>todo</td>
+<td>highest leverage in P0</td>
+</tr>
+<tr class="even">
+<td>P0-14</td>
+<td>Protocol server containers</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P0-15</td>
+<td>Capture golden corpus from real WinSCP</td>
+<td>blocked</td>
+<td>Q-2: needs Windows host</td>
+</tr>
+<tr class="even">
+<td>P0-16</td>
+<td>ADR log</td>
+<td>todo</td>
+<td>decisions table serves this for now</td>
+</tr>
+<tr class="odd">
+<td>P0-17</td>
+<td>Property compile-check harness</td>
+<td>done</td>
+<td><code>check_properties.py</code>, 613 declarations, clang exit
+0</td>
+</tr>
+<tr class="even">
+<td>P0-18</td>
+<td>HTML render of plan docs</td>
+<td>done</td>
+<td><code>doc/qt/plan.html</code> via <code>build-html.sh</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="p1-headless-core">P1 — Headless core</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Task</th>
+<th>Status</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P1-01</td>
+<td>Shim: <code>UnicodeString</code></td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P1-02</td>
+<td>Shim:
+<code>TObject</code>/<code>TList</code>/<code>TStrings</code></td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P1-03</td>
+<td>Shim:
+<code>TDateTime</code>/<code>SysUtils</code>/<code>IOUtils</code></td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P1-04</td>
+<td>Shim: exceptions</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P1-05</td>
+<td>Shim: threading/sync</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P1-06</td>
+<td>Shim: streams/INI/registry</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P1-07</td>
+<td>win32-on-posix subset</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P1-08</td>
+<td>Socket-event emulation</td>
+<td>todo</td>
+<td>R6</td>
+</tr>
+<tr class="odd">
+<td>P1-09</td>
+<td>PuTTY unix backend re-import</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P1-10</td>
+<td>PuTTY delta reconciliation</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P1-11</td>
+<td>FileZilla MFC subset replacement</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P1-12</td>
+<td>FileZilla epoll rewrite</td>
+<td>todo</td>
+<td><strong>R2</strong> — budget generously</td>
+</tr>
+<tr class="odd">
+<td>P1-13</td>
+<td>System libs</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P1-14</td>
+<td>Drop <code>puttyvs</code></td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P1-15</td>
+<td>Console IPC → stdio</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P1-16</td>
+<td>Headless <code>Interface.h</code> frontend</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P1-17</td>
+<td>First SFTP session on Linux</td>
+<td>todo</td>
+<td>long tail expected</td>
+</tr>
+<tr class="even">
+<td>P1-18</td>
+<td>Windows cross-build + Wine</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P1-19</td>
+<td>Golden suite green, both platforms</td>
+<td>todo</td>
+<td><strong>P1 gate</strong></td>
+</tr>
+<tr class="even">
+<td>P1-20</td>
+<td>.NET assembly drives Linux CLI</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P1-21</td>
+<td><code>#ifdef</code> out Windows-only subsystems</td>
+<td>todo</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="p2-qt-shell">P2 — Qt shell</h3>
+<table>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Task</th>
+<th>Status</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P2-01</td>
+<td>Qt6 for mingw</td>
+<td>todo</td>
+<td>R4</td>
+</tr>
+<tr class="even">
+<td>P2-02</td>
+<td>Qt app skeleton</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P2-03</td>
+<td>Qt <code>Interface.h</code> implementation</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P2-04</td>
+<td>Site manager</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P2-05</td>
+<td>Login/auth dialogs</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P2-06</td>
+<td>Remote file panel</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P2-07</td>
+<td>Transfer + queue UI</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P2-08</td>
+<td>Local file panel</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P2-09</td>
+<td>i18n pipeline</td>
+<td>todo</td>
+<td>do early</td>
+</tr>
+<tr class="even">
+<td>P2-10</td>
+<td>Packaging</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P2-11</td>
+<td>P2 exit gate</td>
+<td>todo</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="p3-qt-parity">P3 — Qt parity</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Task</th>
+<th>Status</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P3-01</td>
+<td><code>.dfm</code> → <code>.ui</code> converter</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P3-02</td>
+<td>Commander dual-pane</td>
+<td>todo</td>
+<td>the main draw</td>
+</tr>
+<tr class="odd">
+<td>P3-03</td>
+<td>Synchronization UI</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P3-04</td>
+<td>Preferences</td>
+<td>todo</td>
+<td>XL — split first</td>
+</tr>
+<tr class="odd">
+<td>P3-05</td>
+<td>Internal editor</td>
+<td>todo</td>
+<td>Q-3</td>
+</tr>
+<tr class="even">
+<td>P3-06</td>
+<td>Remaining 48 dialogs, batched</td>
+<td>todo</td>
+<td>XL — split into P3-06a…f</td>
+</tr>
+<tr class="odd">
+<td>P3-07</td>
+<td>Drag &amp; drop</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P3-08</td>
+<td>Shell integration</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P3-09</td>
+<td>Accessibility</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P3-10</td>
+<td>P3 exit gate</td>
+<td>todo</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="p4-cleanup-1">P4 — Cleanup</h3>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>ID</th>
+<th>Task</th>
+<th>Status</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P4-01</td>
+<td>Retire VCL frontend</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>P4-02</td>
+<td>Collapse dual-target <code>#ifdef</code>s</td>
+<td>todo</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>P4-03</td>
+<td>Fold generated tree into source</td>
+<td>todo</td>
+<td>optional, one-way door</td>
+</tr>
+<tr class="even">
+<td>P4-04</td>
+<td>De-shimming evaluation</td>
+<td>todo</td>
+<td>recommendation: do not</td>
+</tr>
+</tbody>
+</table>
+<h1 id="estimates">Estimates</h1>
+<h2 id="assumptions">Assumptions</h2>
+<ul>
+<li><strong>Human baseline:</strong> one senior C++ developer,
+full-time, familiar with Qt and cross-platform build systems, but
+<em>not</em> initially familiar with this codebase.</li>
+<li><strong>AI-assisted:</strong> the same developer driving Opus 5 as
+the primary implementer, reviewing everything that lands.</li>
+<li>Calendar months, full-time. Includes code review, debugging and
+testing — not just first-draft authoring.</li>
+<li>Access to a Windows CI runner and containerised protocol
+servers.</li>
+<li>Excludes project management, release engineering, docs for end
+users, and community/maintainer negotiation.</li>
+</ul>
+<h2 id="where-ai-actually-multiplies-and-where-it-does-not">Where AI
+actually multiplies — and where it does not</h2>
+<p>The multiplier is highly uneven across this project, and the uneven
+parts are what the estimate turns on.</p>
+<h3 id="strong-fit-38">Strong fit (3–8×)</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Work</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>transform.py</code> (P0-05/06)</td>
+<td>Mechanical, 4 regular forms, immediately self-testable by
+re-running</td>
+</tr>
+<tr class="even">
+<td>VCL RTL shim (P1-01…06)</td>
+<td>Well-specified APIs, a maintained reference to crib from (Far-NetBox
+<code>src/base/</code>), and unit-testable in isolation. The single
+largest chunk of P1 is also the best-suited</td>
+</tr>
+<tr class="odd">
+<td><code>win32-on-posix</code> (P1-07)</td>
+<td>~40 functions with precise documented semantics</td>
+</tr>
+<tr class="even">
+<td>CMake / CI / toolchain files (P0-08…12)</td>
+<td>High boilerplate, fast feedback</td>
+</tr>
+<tr class="odd">
+<td>PuTTY <code>unix/</code> re-import (P1-09)</td>
+<td>Mostly reconciling two known trees</td>
+</tr>
+<tr class="even">
+<td><code>.dfm</code> → <code>.ui</code> + dialog port
+(P3-01/04/06)</td>
+<td><code>.dfm</code> is a <em>declarative spec</em> of layout, widgets,
+captions and tab order. This is the biggest single AI win in the
+project, and it sits in the most expensive phase</td>
+</tr>
+</tbody>
+</table>
+<h3 id="moderate-fit-1.52.5">Moderate fit (1.5–2.5×)</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Work</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Qt <code>Interface.h</code> implementation, file panels, queue UI
+(P2-03…08)</td>
+<td>Real interaction logic and design judgment; AI drafts well, polish
+is human</td>
+</tr>
+<tr class="even">
+<td>Commander dual-pane semantics (P3-02)</td>
+<td>Deep keyboard-driven interaction behaviour users will notice
+immediately</td>
+</tr>
+<tr class="odd">
+<td>First successful link (P1-17)</td>
+<td>AI is excellent per-fix, but the iteration count is high and each
+cycle is gated on a working build</td>
+</tr>
+</tbody>
+</table>
+<h3 id="weak-fit-11.5">Weak fit (1–1.5×)</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Work</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>FileZilla epoll rewrite (P1-12)</strong></td>
+<td>~1,700 lines of subtle async state machine. Correctness is
+established by testing against real servers, not by reading code.
+Verification-bound</td>
+</tr>
+<tr class="even">
+<td><strong>Protocol correctness (P0-15, P1-19)</strong></td>
+<td>The FTP server zoo, SFTP extension quirks, S3 and WebDAV edge cases.
+Wall-clock bound by test infrastructure and real-world behaviour</td>
+</tr>
+<tr class="odd">
+<td>C++Builder / Windows-native tasks (P0-04, P0-15)</td>
+<td>No local access; bound on a collaborator or licence</td>
+</tr>
+<tr class="even">
+<td>UX parity judgment</td>
+<td>Deciding what “parity” means is not a code task</td>
+</tr>
+</tbody>
+</table>
+<h2 id="per-phase-estimate">Per-phase estimate</h2>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Phase</th>
+<th>Human (mo)</th>
+<th>+ Opus 5 (mo)</th>
+<th>Multiplier</th>
+<th>Confidence</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P0 Foundation</td>
+<td>2 – 3</td>
+<td>0.5 – 1.0</td>
+<td>~3–4×</td>
+<td><strong>High</strong> — scope is well understood and the keystone is
+already tested</td>
+</tr>
+<tr class="even">
+<td>P1 Headless core</td>
+<td>6 – 12</td>
+<td>2.5 – 4.0</td>
+<td>~2.4–3×</td>
+<td><strong>Medium</strong> — dominated by the shim (strong fit),
+dragged by P1-12 and P1-19 (weak fit)</td>
+</tr>
+<tr class="odd">
+<td>P2 Qt shell</td>
+<td>6 – 9</td>
+<td>2.0 – 3.0</td>
+<td>~3×</td>
+<td><strong>Medium</strong></td>
+</tr>
+<tr class="even">
+<td>P3 Qt parity</td>
+<td>18 – 36</td>
+<td>6.0 – 12.0</td>
+<td>~3×</td>
+<td><strong>Low</strong> — scope is undecided (Q-1) and this phase
+dominates the total</td>
+</tr>
+<tr class="odd">
+<td>P4 Cleanup</td>
+<td>1 – 2</td>
+<td>0.25 – 0.5</td>
+<td>~4×</td>
+<td>High</td>
+</tr>
+<tr class="even">
+<td><strong>Total</strong></td>
+<td><strong>33 – 62</strong></td>
+<td><strong>11 – 21</strong></td>
+<td><strong>~3×</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>One developer + Opus 5: roughly 11–21 months</strong>,
+against 2.8–5.2 years unassisted.</p>
+<h3 id="with-a-small-team">With a small team</h3>
+<p>P3 parallelises well — dialogs are largely independent — and P2
+moderately. P0 and P1-17 do not parallelise much, being serialised on a
+single build bring-up.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Config</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1 dev + Opus 5</td>
+<td>11 – 21 months</td>
+</tr>
+<tr class="even">
+<td>3 devs + Opus 5</td>
+<td>6 – 11 months</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-binding-constraint">The binding constraint</h2>
+<p><strong>Code generation is not the bottleneck; human review and
+real-world verification throughput are.</strong></p>
+<p>This matters for planning:</p>
+<ul>
+<li>Compute cost is not the limiter. Reviewer attention is. A reviewer
+who merges a 4,000-line shim without reading it has converted a 3×
+multiplier into a latent defect fund.</li>
+<li>The highest-leverage investment is therefore <strong>P0-13/14 (the
+golden-output harness and server containers)</strong>. It raises the
+trustworthy review rate for every phase that follows. Underfunding it
+caps the achievable multiplier for the whole project, which is why it
+sits in Phase 0 rather than “later”.</li>
+<li>Phases whose cost is dominated by <em>testing against reality</em>
+(P1-12, P1-19) barely move with AI. Do not plan as though they
+will.</li>
+</ul>
+<h2 id="sensitivity">Sensitivity</h2>
+<p>The estimate is dominated by one undecided question.</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>P3 scope (Q-1)</strong></td>
+<td>A deliberately narrower Qt client cuts P3 from 6–12 to ~3–5 months →
+<strong>total 8–14 months</strong>. This is the single largest lever in
+the plan</td>
+</tr>
+<tr class="even">
+<td><strong>R1 fails</strong> (C++Builder rejects the macro)</td>
+<td>P0 +0.5 mo, and the zero-diff upstream story weakens — higher
+ongoing merge cost, not a higher build cost</td>
+</tr>
+<tr class="odd">
+<td><strong>R2 worse than expected</strong> (FileZilla rewrite)</td>
+<td>P1 +1–2 mo. Mitigation: ship SFTP/SCP/S3/WebDAV first and treat FTP
+as a later deliverable</td>
+</tr>
+<tr class="even">
+<td><strong>No Windows host available</strong></td>
+<td>P0-04 and P0-15 stay blocked; the dual-target guarantee becomes
+unverified and Windows releases cannot be certified</td>
+</tr>
+</tbody>
+</table>
+<h2 id="honest-caveats">Honest caveats</h2>
+<ul>
+<li>These numbers come from <strong>static analysis only</strong>.
+Nothing here has been built. Line counts, grep results and the two
+compiler experiments are solid; the estimates derived from them are
+judgment.</li>
+<li>The usual failure mode for ports of this shape is a long tail of
+small incompatibilities discovered only at link and run time (P1-17).
+The P1 range is wide for that reason, and it is the range most likely to
+be exceeded.</li>
+<li><strong>P0-09 is the cheapest way to replace guesswork with
+measurement.</strong> Compiling one real core translation unit against a
+minimal shim will tell us more about the P1 estimate than any further
+analysis, and it is roughly a week of work.</li>
+</ul>
+</body>
+</html>

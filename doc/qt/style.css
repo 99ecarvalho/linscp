@@ -1,0 +1,24 @@
+:root{--bg:#fff;--fg:#1a1a1a;--mut:#596270;--bd:#d8dee9;--acc:#0b6bcb;--cbg:#f5f7fa;--th:#eef2f7}
+@media(prefers-color-scheme:dark){:root{--bg:#14171c;--fg:#e4e7eb;--mut:#9aa4b2;--bd:#2c323c;--acc:#6ba9f0;--cbg:#1b1f26;--th:#1f242c}}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;max-width:60rem;margin:0 auto;padding:2.5rem 1.5rem 6rem}
+h1,h2,h3,h4{line-height:1.25;font-weight:650;margin:2.2em 0 .7em}
+h1{font-size:1.9rem;border-bottom:2px solid var(--bd);padding-bottom:.35em;margin-top:3rem}
+h1:first-of-type{margin-top:0}
+h2{font-size:1.35rem;color:var(--fg)}h3{font-size:1.1rem}h4{font-size:1rem;color:var(--mut)}
+a{color:var(--acc);text-decoration:none}a:hover{text-decoration:underline}
+code{background:var(--cbg);border:1px solid var(--bd);border-radius:4px;padding:.1em .35em;font:.875em/1.4 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:var(--cbg);border:1px solid var(--bd);border-radius:7px;padding:1rem 1.1rem;overflow-x:auto}
+pre code{background:none;border:0;padding:0;font-size:.84rem;line-height:1.55}
+table{border-collapse:collapse;width:100%;margin:1.3em 0;font-size:.92rem;display:block;overflow-x:auto}
+th,td{border:1px solid var(--bd);padding:.5rem .7rem;text-align:left;vertical-align:top}
+th{background:var(--th);font-weight:620;white-space:nowrap}
+tbody tr:nth-child(even){background:color-mix(in srgb,var(--cbg) 55%,transparent)}
+blockquote{border-left:3px solid var(--acc);margin:1.3em 0;padding:.2em 0 .2em 1.1rem;color:var(--mut)}
+hr{border:0;border-top:1px solid var(--bd);margin:3rem 0}
+ul,ol{padding-left:1.4rem}li{margin:.3em 0}
+#TOC{background:var(--cbg);border:1px solid var(--bd);border-radius:9px;padding:1.1rem 1.4rem;margin:0 0 2.5rem}
+#TOC>ul{padding-left:1.1rem;margin:.3em 0}#TOC ul ul{font-size:.92em}
+#TOC::before{content:"Contents";display:block;font-weight:680;font-size:.78rem;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);margin-bottom:.5em}
+.subtitle{color:var(--mut);font-size:1.02rem;margin-top:-.4em}
+@media print{body{max-width:none;padding:0}#TOC{break-after:page}h1{break-before:page}h1:first-of-type{break-before:avoid}}
