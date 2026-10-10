@@ -8,20 +8,21 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 7 | 18 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P0 Foundation | 8 | 19 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 0 | 21 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **7** | **64** | |
+| **Total** | **8** | **65** | |
 
 ## Next three actions
 
 1. **P0-09** — compile `core/Common.cpp` against a minimal shim on Linux clang.
    Now the single most informative open task: converts the P1 shim estimate from
    a guess into a measurement.
-2. **P0-10** — install the mingw-w64 sysroot and add the clang cross toolchain
-   file, so `windows-gnu` builds past the "no `<string>`" stage.
+2. **P0-10** — install the mingw-w64 sysroot (apt line in the README) and add the
+   clang cross toolchain file, so `windows-gnu` builds past the "no `<string>`"
+   stage. Wine 10.0, podman, ninja, lld and Qt 6 dev are already present.
 3. **P0-04** — verify C++Builder accepts macro-expanded `__property` (R1).
    Still blocked on Q-2; everything else in P0 can proceed without it.
 
@@ -39,6 +40,8 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | 2026-10-10 | Line-preserving transform kept, but demoted from "constraint" to asserted property | It costs nothing — all 591 core declarations are already single-line — and its real payoff is a reviewable zero-offset `diff` against upstream, not debugger ergonomics. Asserted by a test; abandon if it ever conflicts with something substantive |
 | 2026-10-10 | `index=` properties handled by a `PROP_R_GI` macro rather than a patch | Removes the last 4 manual cases, so the transform covers 613/613 with an empty patch series |
 | 2026-10-10 | Far-NetBox used as reference; verbatim reuse deferred pending licence clarification | Its README says GPLv3 but it ships the GPLv2 text (Q-6) |
+| 2026-10-10 | Published as [99ecarvalho/linscp](https://github.com/99ecarvalho/linscp), public, GPL-3.0 | `main` is the released state; active work happens on `qt` |
+| 2026-10-10 | A PR-able branch against `winscp/winscp` will be **generated**, not hand-maintained | linscp shares no history with upstream, so its `qt` branch is not directly mergeable. Since the port is mechanical, the fork branch can be produced on demand (Q-7) |
 
 ## Open questions
 
@@ -50,6 +53,7 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Q-4 | Ship 32-bit Windows, or x86-64 and arm64 only? | P0-10, packaging | — |
 | Q-5 | Approach the maintainer early for feedback, or after P1 lands? | social strategy, not architecture | — |
 | Q-6 | Far-NetBox licence: README says GPLv3, `LICENSE.txt` is the GPLv2 text | verbatim reuse of its shim (reference use is unaffected) | — |
+| Q-7 | Build the fork-branch generator now, or when there is something worth proposing upstream? | nothing today; recommend deferring until P1 lands | — |
 
 ## Verified facts (re-check if the environment changes)
 
@@ -97,6 +101,7 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0-16 | ADR log | todo | decisions table serves this for now |
 | P0-17 | Property compile-check harness | done | `check_properties.py`, 613 declarations, clang exit 0 |
 | P0-18 | HTML render of plan docs | done | `doc/qt/plan.html` via `build-html.sh` |
+| P0-19 | Publish repository, licence, root README | done | public at `99ecarvalho/linscp`; work on `qt` |
 
 ### P1 — Headless core
 | ID | Task | Status | Note |

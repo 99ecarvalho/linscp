@@ -1543,8 +1543,8 @@ evaluation down and close it</td>
 <tbody>
 <tr class="odd">
 <td>P0 Foundation</td>
-<td>7</td>
-<td>18</td>
+<td>8</td>
+<td>19</td>
 <td><code>core/Common.cpp</code> compiles on Linux clang; VCL build
 green (R1)</td>
 </tr>
@@ -1574,8 +1574,8 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>7</strong></td>
-<td><strong>64</strong></td>
+<td><strong>8</strong></td>
+<td><strong>65</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -1586,9 +1586,11 @@ green (R1)</td>
 against a minimal shim on Linux clang. Now the single most informative
 open task: converts the P1 shim estimate from a guess into a
 measurement.</li>
-<li><strong>P0-10</strong> — install the mingw-w64 sysroot and add the
-clang cross toolchain file, so <code>windows-gnu</code> builds past the
-“no <code>&lt;string&gt;</code>” stage.</li>
+<li><strong>P0-10</strong> — install the mingw-w64 sysroot (apt line in
+the README) and add the clang cross toolchain file, so
+<code>windows-gnu</code> builds past the “no
+<code>&lt;string&gt;</code>” stage. Wine 10.0, podman, ninja, lld and Qt
+6 dev are already present.</li>
 <li><strong>P0-04</strong> — verify C++Builder accepts macro-expanded
 <code>__property</code> (R1). Still blocked on Q-2; everything else in
 P0 can proceed without it.</li>
@@ -1668,6 +1670,22 @@ with an empty patch series</td>
 licence clarification</td>
 <td>Its README says GPLv3 but it ships the GPLv2 text (Q-6)</td>
 </tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>Published as <a
+href="https://github.com/99ecarvalho/linscp">99ecarvalho/linscp</a>,
+public, GPL-3.0</td>
+<td><code>main</code> is the released state; active work happens on
+<code>qt</code></td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>A PR-able branch against <code>winscp/winscp</code> will be
+<strong>generated</strong>, not hand-maintained</td>
+<td>linscp shares no history with upstream, so its <code>qt</code>
+branch is not directly mergeable. Since the port is mechanical, the fork
+branch can be produced on demand (Q-7)</td>
+</tr>
 </tbody>
 </table>
 <h2 id="open-questions">Open questions</h2>
@@ -1722,6 +1740,13 @@ licence clarification</td>
 <td>Far-NetBox licence: README says GPLv3, <code>LICENSE.txt</code> is
 the GPLv2 text</td>
 <td>verbatim reuse of its shim (reference use is unaffected)</td>
+<td>—</td>
+</tr>
+<tr class="odd">
+<td>Q-7</td>
+<td>Build the fork-branch generator now, or when there is something
+worth proposing upstream?</td>
+<td>nothing today; recommend deferring until P1 lands</td>
 <td>—</td>
 </tr>
 </tbody>
@@ -1974,6 +1999,13 @@ setters, read-modify-write, indexed)</td>
 <td>HTML render of plan docs</td>
 <td>done</td>
 <td><code>doc/qt/plan.html</code> via <code>build-html.sh</code></td>
+</tr>
+<tr class="odd">
+<td>P0-19</td>
+<td>Publish repository, licence, root README</td>
+<td>done</td>
+<td>public at <code>99ecarvalho/linscp</code>; work on
+<code>qt</code></td>
 </tr>
 </tbody>
 </table>
