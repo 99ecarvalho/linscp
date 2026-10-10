@@ -8,12 +8,12 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 10 | 22 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P0 Foundation | 10 | 23 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 0 | 21 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **10** | **68** | |
+| **Total** | **10** | **69** | |
 
 ## Next three actions
 
@@ -111,8 +111,10 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0-17 | Property compile-check harness | done | `check_properties.py`, 613 declarations, clang exit 0 |
 | P0-18 | HTML render of plan docs | done | `doc/qt/plan.html` via `build-html.sh` |
 | P0-19 | Publish repository, licence, root README | done | public at `99ecarvalho/linscp`; work on `qt` |
+| P0-20 | Fork-branch generator | todo | deferred to P1-19 (Q-7); rehearsed manually in P0-22 |
 | P0-21 | `verify_transform.py` upstream-diff audit | done | asserts line parity, byte-exactness and 1 macro per changed line |
 | P0-22 | Rehearse history import into a winscp fork | done | zero-conflict merge; 613-line in-tree diff; mechanical conflict resolution |
+| P0-23 | `check_docs.py` TASKS/TRACKER consistency | done | found 3 drifts on first run |
 
 ### P1 — Headless core
 | ID | Task | Status | Note |

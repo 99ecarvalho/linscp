@@ -1088,6 +1088,61 @@ MinIO)</td>
 <td>—</td>
 <td>Record toolchain/ABI choices as made</td>
 </tr>
+<tr class="odd">
+<td>P0-17</td>
+<td><code>check_properties.py</code>: compile-test every transformed
+declaration</td>
+<td>S</td>
+<td>P0-05</td>
+<td>Validates macro arity across the real corpus without the full
+shim</td>
+</tr>
+<tr class="even">
+<td>P0-18</td>
+<td>HTML render of the plan docs (<code>build-html.sh</code>)</td>
+<td>S</td>
+<td>—</td>
+<td>pandoc, self-contained, light/dark</td>
+</tr>
+<tr class="odd">
+<td>P0-19</td>
+<td>Publish repository with licence and root README</td>
+<td>S</td>
+<td>—</td>
+<td>Public, GPL-3.0; <code>main</code> released, <code>qt</code>
+active</td>
+</tr>
+<tr class="even">
+<td>P0-20</td>
+<td>Generator for a PR-able branch against a <code>winscp/winscp</code>
+fork</td>
+<td>M</td>
+<td>P1-19</td>
+<td>Defer until there is something worth proposing (Q-7)</td>
+</tr>
+<tr class="odd">
+<td>P0-21</td>
+<td><code>verify_transform.py</code>: audit the generated tree against
+upstream</td>
+<td>S</td>
+<td>P0-05</td>
+<td>Byte-exactness is the invariant the whole model rests on</td>
+</tr>
+<tr class="even">
+<td>P0-22</td>
+<td>Rehearse history import into a <code>winscp/winscp</code> fork</td>
+<td>S</td>
+<td>P0-05</td>
+<td>Validates Q-7 and measures the real conflict cost</td>
+</tr>
+<tr class="odd">
+<td>P0-23</td>
+<td><code>check_docs.py</code>: keep TASKS and TRACKER consistent</td>
+<td>S</td>
+<td>—</td>
+<td>Enforces the tracker rule mechanically rather than by
+discipline</td>
+</tr>
 </tbody>
 </table>
 <h2 id="p1-headless-core-on-both-platforms">P1 — Headless core on both
@@ -1544,7 +1599,7 @@ evaluation down and close it</td>
 <tr class="odd">
 <td>P0 Foundation</td>
 <td>10</td>
-<td>22</td>
+<td>23</td>
 <td><code>core/Common.cpp</code> compiles on Linux clang; VCL build
 green (R1)</td>
 </tr>
@@ -1575,7 +1630,7 @@ green (R1)</td>
 <tr class="even">
 <td><strong>Total</strong></td>
 <td><strong>10</strong></td>
-<td><strong>68</strong></td>
+<td><strong>69</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -2069,18 +2124,30 @@ outstanding</td>
 <code>qt</code></td>
 </tr>
 <tr class="even">
+<td>P0-20</td>
+<td>Fork-branch generator</td>
+<td>todo</td>
+<td>deferred to P1-19 (Q-7); rehearsed manually in P0-22</td>
+</tr>
+<tr class="odd">
 <td>P0-21</td>
 <td><code>verify_transform.py</code> upstream-diff audit</td>
 <td>done</td>
 <td>asserts line parity, byte-exactness and 1 macro per changed
 line</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-22</td>
 <td>Rehearse history import into a winscp fork</td>
 <td>done</td>
 <td>zero-conflict merge; 613-line in-tree diff; mechanical conflict
 resolution</td>
+</tr>
+<tr class="odd">
+<td>P0-23</td>
+<td><code>check_docs.py</code> TASKS/TRACKER consistency</td>
+<td>done</td>
+<td>found 3 drifts on first run</td>
 </tr>
 </tbody>
 </table>

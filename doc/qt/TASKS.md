@@ -28,6 +28,13 @@ Goal: prove the keystone works, with no behaviour change anywhere.
 | P0-14 | Protocol server containers (OpenSSH, vsftpd, ProFTPD, WebDAV, MinIO) | M | P0-13 | |
 | P0-15 | Capture golden XML corpus from real WinSCP on Windows | M | P0-13, P0-14 | Needs a Windows host |
 | P0-16 | ADR log (`doc/qt/adr/`) | S | — | Record toolchain/ABI choices as made |
+| P0-17 | `check_properties.py`: compile-test every transformed declaration | S | P0-05 | Validates macro arity across the real corpus without the full shim |
+| P0-18 | HTML render of the plan docs (`build-html.sh`) | S | — | pandoc, self-contained, light/dark |
+| P0-19 | Publish repository with licence and root README | S | — | Public, GPL-3.0; `main` released, `qt` active |
+| P0-20 | Generator for a PR-able branch against a `winscp/winscp` fork | M | P1-19 | Defer until there is something worth proposing (Q-7) |
+| P0-21 | `verify_transform.py`: audit the generated tree against upstream | S | P0-05 | Byte-exactness is the invariant the whole model rests on |
+| P0-22 | Rehearse history import into a `winscp/winscp` fork | S | P0-05 | Validates Q-7 and measures the real conflict cost |
+| P0-23 | `check_docs.py`: keep TASKS and TRACKER consistent | S | — | Enforces the tracker rule mechanically rather than by discipline |
 
 ## P1 — Headless core on both platforms
 
