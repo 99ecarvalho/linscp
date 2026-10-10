@@ -1,0 +1,9 @@
+build/
+/gen/
+*.o
+*.obj
+*.so
+*.a
+*.exe
+.cache/
+compile_commands.json
