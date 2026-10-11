@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(linscp LANGUAGES CXX
+project(linscp LANGUAGES C CXX
         DESCRIPTION "Qt port of WinSCP for Linux and Windows")
 
 # ---------------------------------------------------------------------------
@@ -55,6 +55,8 @@ add_custom_command(
   COMMENT "Transforming upstream core and verifying the diff is property-only"
   VERBATIM)
 add_custom_target(transform ALL DEPENDS "${LINSCP_GEN_STAMP}")
+
+include(cmake/expat.cmake)
 
 add_subdirectory(port/shim)
 

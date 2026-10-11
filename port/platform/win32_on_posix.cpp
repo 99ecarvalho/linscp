@@ -60,6 +60,149 @@ long LocalOffsetSeconds(std::time_t Utc)
 
 }  // namespace
 
+// --- wide character functions ----------------------------------------------
+//
+// The macros in the header point the CRT names here. Written out rather than
+// delegating to glibc, whose versions take a 4-byte wint_t (ADR 0001).
+
+namespace linscp {
+
+wchar_t ToLower(wchar_t C)
+{
+  // ASCII only, deliberately. The Windows CRT's towlower is locale-dependent
+  // and folds only ASCII in the default locale, which a run of this test under
+  // Wine confirmed. Folding Latin-1 here would make the two platforms disagree,
+  // and a behaviour difference is worse than being narrow. Real Unicode folding
+  // is a separate job, recorded in the divergence table.
+  if (C >= L'A' && C <= L'Z')
+  {
+    return static_cast<wchar_t>(C - L'A' + L'a');
+  }
+  return C;
+}
+
+wchar_t ToUpper(wchar_t C)
+{
+  // ASCII only; see ToLower.
+  if (C >= L'a' && C <= L'z')
+  {
+    return static_cast<wchar_t>(C - L'a' + L'A');
+  }
+  return C;
+}
+
+std::size_t WideLength(const wchar_t * S)
+{
+  if (S == nullptr)
+  {
+    return 0;
+  }
+  std::size_t N = 0;
+  while (S[N] != L'\0')
+  {
+    ++N;
+  }
+  return N;
+}
+
+int WideCompare(const wchar_t * A, const wchar_t * B)
+{
+  while (*A != L'\0' && *A == *B)
+  {
+    ++A;
+    ++B;
+  }
+  // Unsigned, as the CRT compares, so ordering matches Windows.
+  const unsigned short X = static_cast<unsigned short>(*A);
+  const unsigned short Y = static_cast<unsigned short>(*B);
+  return X < Y ? -1 : (X > Y ? 1 : 0);
+}
+
+int WideCompareN(const wchar_t * A, const wchar_t * B, std::size_t N)
+{
+  for (std::size_t I = 0; I < N; ++I)
+  {
+    if (A[I] != B[I])
+    {
+      const unsigned short X = static_cast<unsigned short>(A[I]);
+      const unsigned short Y = static_cast<unsigned short>(B[I]);
+      return X < Y ? -1 : 1;
+    }
+    if (A[I] == L'\0')
+    {
+      break;
+    }
+  }
+  return 0;
+}
+
+wchar_t * WideFindChar(const wchar_t * S, wchar_t C)
+{
+  if (S == nullptr)
+  {
+    return nullptr;
+  }
+  for (; *S != L'\0'; ++S)
+  {
+    if (*S == C)
+    {
+      return const_cast<wchar_t *>(S);
+    }
+  }
+  // Searching for the terminator finds it, as the CRT does.
+  return C == L'\0' ? const_cast<wchar_t *>(S) : nullptr;
+}
+
+wchar_t * WideFindCharLast(const wchar_t * S, wchar_t C)
+{
+  if (S == nullptr)
+  {
+    return nullptr;
+  }
+  const wchar_t * Last = nullptr;
+  for (; *S != L'\0'; ++S)
+  {
+    if (*S == C)
+    {
+      Last = S;
+    }
+  }
+  if (C == L'\0')
+  {
+    return const_cast<wchar_t *>(S);
+  }
+  return const_cast<wchar_t *>(Last);
+}
+
+wchar_t * WideFindString(const wchar_t * Haystack, const wchar_t * Needle)
+{
+  if (Haystack == nullptr || Needle == nullptr)
+  {
+    return nullptr;
+  }
+  if (*Needle == L'\0')
+  {
+    return const_cast<wchar_t *>(Haystack);
+  }
+  for (; *Haystack != L'\0'; ++Haystack)
+  {
+    const wchar_t * H = Haystack;
+    const wchar_t * N = Needle;
+    while (*H != L'\0' && *H == *N)
+    {
+      ++H;
+      ++N;
+    }
+    if (*N == L'\0')
+    {
+      return const_cast<wchar_t *>(Haystack);
+    }
+  }
+  return nullptr;
+}
+
+}  // namespace linscp
+
 std::uint64_t FileTimeToTicks(const FILETIME & FileTime)
 {
   return (static_cast<std::uint64_t>(FileTime.dwHighDateTime) << 32) |

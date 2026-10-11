@@ -108,6 +108,48 @@ using HCURSOR = void *;
   #define FALSE 0
 #endif
 
+// --- wide character functions ----------------------------------------------
+//
+// Core calls these directly: towupper 9, wcslen 10, wcschr 10, towlower 4,
+// wcscmp 1. On Windows they come from the CRT with a 2-byte wchar_t. glibc's
+// take a 4-byte wint_t, so under -fshort-wchar calling them is the ABI mismatch
+// ADR 0001 describes: it links cleanly and then misbehaves.
+//
+// They are given distinct names and the CRT names redirected with macros,
+// rather than redeclared. A redeclaration is not possible -- <string> pulls in
+// <cwchar>, whose wcschr differs from ours only in return type -- and a macro
+// also guarantees core's calls reach these rather than glibc's.
+//
+// Case folding is ASCII only, matching what the Windows CRT does in the default
+// locale -- verified by running the same test against the real CRT under Wine.
+// Being wider on one platform would make the two disagree, which is worse than
+// being narrow. Real Unicode folding is a separate job; see the divergence
+// table in doc/qt/TRACKER.md.
+#include <cwchar>
+#include <cwctype>
+
+namespace linscp {
+
+wchar_t ToLower(wchar_t C);
+wchar_t ToUpper(wchar_t C);
+std::size_t WideLength(const wchar_t * S);
+int WideCompare(const wchar_t * A, const wchar_t * B);
+int WideCompareN(const wchar_t * A, const wchar_t * B, std::size_t N);
+wchar_t * WideFindChar(const wchar_t * S, wchar_t C);
+wchar_t * WideFindCharLast(const wchar_t * S, wchar_t C);
+wchar_t * WideFindString(const wchar_t * Haystack, const wchar_t * Needle);
+
+}  // namespace linscp
+
+#define towlower  ::linscp::ToLower
+#define towupper  ::linscp::ToUpper
+#define wcslen    ::linscp::WideLength
+#define wcscmp    ::linscp::WideCompare
+#define wcsncmp   ::linscp::WideCompareN
+#define wcschr    ::linscp::WideFindChar
+#define wcsrchr   ::linscp::WideFindCharLast
+#define wcsstr    ::linscp::WideFindString
+
 // --- time ------------------------------------------------------------------
 // FILETIME counts 100-nanosecond intervals since 1601-01-01 UTC. Core stores
 // file timestamps in these and compares them against remote times, so the

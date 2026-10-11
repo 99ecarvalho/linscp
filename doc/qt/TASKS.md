@@ -67,6 +67,8 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P1-05 | Shim: `TCriticalSection` + `SyncObjs` | M | P1-02 | Done; recursive, as Delphi's is |
 | P1-05b | Shim: `TThread` / `StartThread` | M | P1-05 | `Interface.h` already abstracts thread creation |
 | P1-08b | Shim: `Masks`, `TPath`, `TTimeSpan`, `TEncoding`, `TNotifyEvent`, env/version globals | M | P1-01b | Done. The long tail the census named after the big groups cleared |
+| P1-08c | Shim: XML DOM over vendored expat | M | P1-08b | Done. Real parsing, not a stub: a stub would silently import no sessions |
+| P1-07c | `port/platform`: wide-character functions | S | P1-07 | Done. glibc's take a 4-byte `wint_t`, so they cannot be called under `-fshort-wchar` |
 | P1-09b | `try`/`__finally` for POSIX | L | P1-08b | Done. **All 179 blocks** transformed, 0 unhandled, patch series still empty. Same expansion on both targets, so neither can rely on SEH |
 | P1-06 | Shim: `TStream`/`THandleStream`/`TMemoryStream` | M | P1-02 | ~31 uses each; now the largest non-closure group |
 | P1-06b | Shim: `TCustomIniFile`/`TMemIniFile`/`TRegistry` | M | P1-06 | Done. Real registry on Windows; on POSIX every key reports absent |
@@ -79,7 +81,7 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P1-10 | PuTTY: reconcile WinSCP deltas against vanilla 0.85 | M | P1-09 | |
 | P1-11 | FileZilla: replace vendored MFC subset (`CString`/`CFile`/`CTime`) | M | P1-01 | Only 4 files in `libs/mfc` |
 | P1-12 | **FileZilla: `WSAAsyncSelect` hidden-window pump → epoll/poll** | L | P1-11 | **R2.** ~1,700 lines; least mechanical task in P1 |
-| P1-13 | Switch `libs/` to system OpenSSL, expat, neon, libs3 | M | P0-08 | All vanilla upstream already |
+| P1-13 | Build `libs/` from the submodule, not system copies | M | P0-08 | expat done: the mingw sysroot has no expat, and upstream vendors it for exactly this reason. OpenSSL, neon, libs3 to follow |
 | P1-14 | Drop `puttyvs` (MSVC wrapper, obsolete) | S | P1-09 | |
 | P1-15 | `winscp.com` shared-memory IPC → plain stdio | M | P1-06 | Both platforms |
 | P1-16 | Headless frontend implementing `Interface.h` | L | P1-05, P1-15 | Derive from `ConsoleRunner.cpp` — it has zero `forms/` deps |

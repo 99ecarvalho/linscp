@@ -8,18 +8,18 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 208,
-        "missing_types": 13
+        "errors": 197,
+        "missing_types": 11
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 115,
-        "missing_types": 24
+        "errors": 104,
+        "missing_types": 23
       },
       "source/core/CopyParam.cpp": {
         "aborted": false,
-        "errors": 34,
-        "missing_types": 1
+        "errors": 24,
+        "missing_types": 0
       },
       "source/core/FileBuffer.cpp": {
         "aborted": false,
@@ -28,8 +28,8 @@
       },
       "source/core/FileMasks.cpp": {
         "aborted": false,
-        "errors": 13,
-        "missing_types": 1
+        "errors": 0,
+        "missing_types": 0
       },
       "source/core/NamedObjs.cpp": {
         "aborted": false,
@@ -43,8 +43,8 @@
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 126,
-        "missing_types": 5
+        "errors": 116,
+        "missing_types": 4
       }
     },
     "x86_64-w64-mingw32": {
@@ -55,18 +55,18 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 146,
-        "missing_types": 3
+        "errors": 137,
+        "missing_types": 2
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 39,
-        "missing_types": 2
+        "errors": 30,
+        "missing_types": 1
       },
       "source/core/CopyParam.cpp": {
         "aborted": false,
-        "errors": 34,
-        "missing_types": 1
+        "errors": 24,
+        "missing_types": 0
       },
       "source/core/FileBuffer.cpp": {
         "aborted": false,
@@ -75,8 +75,8 @@
       },
       "source/core/FileMasks.cpp": {
         "aborted": false,
-        "errors": 10,
-        "missing_types": 1
+        "errors": 0,
+        "missing_types": 0
       },
       "source/core/NamedObjs.cpp": {
         "aborted": false,
@@ -90,8 +90,8 @@
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 85,
-        "missing_types": 2
+        "errors": 75,
+        "missing_types": 1
       }
     }
   }

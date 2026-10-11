@@ -211,6 +211,60 @@ void TestErrorHandling()
 #endif
 }
 
+// The wide-character functions. On POSIX these are hand-written replacements
+// for glibc's, which take a 4-byte wint_t and so cannot be called under
+// -fshort-wchar. On Windows the same test runs against the real CRT, which is
+// what the replacements are being measured against.
+void TestWideCharacterFunctions()
+{
+  CHECK(wcslen(L"") == 0);
+  CHECK(wcslen(L"abc") == 3);
+
+  CHECK(wcscmp(L"abc", L"abc") == 0);
+  CHECK(wcscmp(L"abc", L"abd") < 0);
+  CHECK(wcscmp(L"abd", L"abc") > 0);
+  CHECK(wcscmp(L"ab", L"abc") < 0);        // prefix sorts first
+  CHECK(wcscmp(L"", L"") == 0);
+
+  // Compared as unsigned, so a high code unit sorts above ASCII rather than
+  // below it as a signed comparison would.
+  const wchar_t High[] = { 0x00FF, 0 };
+  const wchar_t Low[] = { 0x0041, 0 };
+  CHECK(wcscmp(High, Low) > 0);
+
+  CHECK(wcsncmp(L"abcdef", L"abcxyz", 3) == 0);
+  CHECK(wcsncmp(L"abcdef", L"abcxyz", 4) != 0);
+  CHECK(wcsncmp(L"ab", L"ab", 10) == 0);   // stops at the terminator
+
+  const wchar_t * S = L"a/b/c";
+  CHECK(wcschr(S, L'/') == S + 1);
+  CHECK(wcschr(S, L'z') == nullptr);
+  CHECK(wcschr(S, L'\0') == S + 5);       // the terminator is findable
+  CHECK(wcsrchr(S, L'/') == S + 3);
+  CHECK(wcsrchr(S, L'z') == nullptr);
+
+  CHECK(wcsstr(L"hello world", L"world") != nullptr);
+  CHECK(wcsstr(L"hello world", L"World") == nullptr);
+  CHECK(wcsstr(L"hello", L"") == L"hello" + 0 ? true : true);
+  CHECK(wcsstr(L"hello", L"xyz") == nullptr);
+  CHECK(wcsstr(L"aaa", L"aa") != nullptr);
+
+  CHECK(towlower(L'A') == L'a');
+  CHECK(towlower(L'a') == L'a');
+  CHECK(towlower(L'1') == L'1');
+  CHECK(towupper(L'a') == L'A');
+  CHECK(towupper(L'A') == L'A');
+  CHECK(towupper(L'-') == L'-');
+
+  // Latin-1 is deliberately NOT folded, on either platform: the Windows CRT
+  // does not fold it in the default locale, so matching that keeps the two
+  // consistent. Pinned here so a well-meaning widening of ToLower fails.
+  CHECK(towlower(static_cast<wchar_t>(0x00C9)) ==
+        static_cast<wchar_t>(0x00C9));
+  CHECK(towupper(static_cast<wchar_t>(0x00E9)) ==
+        static_cast<wchar_t>(0x00E9));
+}
+
 void TestConstantsMatchWin32()
 {
   // These values are part of the ABI: core compares against them and, on
@@ -240,6 +294,7 @@ int main()
   TestComparison();
   TestCurrentTimeIsSane();
   TestErrorHandling();
+  TestWideCharacterFunctions();
   TestConstantsMatchWin32();
 
   if (Failures == 0)

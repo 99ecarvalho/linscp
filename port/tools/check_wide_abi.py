@@ -41,6 +41,12 @@ def main():
                 if os.path.splitext(n)[1] not in EXTS:
                     continue
                 p = os.path.join(dp, n)
+                # win32_on_posix is where the replacements for those libc
+                # functions live, so it necessarily names them. Exempting it by
+                # path rather than loosening the patterns keeps the ban in force
+                # everywhere else.
+                if os.path.basename(p).startswith('win32_on_posix'):
+                    continue
                 scanned += 1
                 for i, line in enumerate(open(p, encoding='utf-8',
                                               errors='replace'), 1):

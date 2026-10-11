@@ -1386,6 +1386,22 @@ semantics</td>
 cleared</td>
 </tr>
 <tr class="even">
+<td>P1-08c</td>
+<td>Shim: XML DOM over vendored expat</td>
+<td>M</td>
+<td>P1-08b</td>
+<td>Done. Real parsing, not a stub: a stub would silently import no
+sessions</td>
+</tr>
+<tr class="odd">
+<td>P1-07c</td>
+<td><code>port/platform</code>: wide-character functions</td>
+<td>S</td>
+<td>P1-07</td>
+<td>Done. glibc’s take a 4-byte <code>wint_t</code>, so they cannot be
+called under <code>-fshort-wchar</code></td>
+</tr>
+<tr class="even">
 <td>P1-09b</td>
 <td><code>try</code>/<code>__finally</code> for POSIX</td>
 <td>L</td>
@@ -1482,10 +1498,11 @@ epoll/poll</strong></td>
 </tr>
 <tr class="even">
 <td>P1-13</td>
-<td>Switch <code>libs/</code> to system OpenSSL, expat, neon, libs3</td>
+<td>Build <code>libs/</code> from the submodule, not system copies</td>
 <td>M</td>
 <td>P0-08</td>
-<td>All vanilla upstream already</td>
+<td>expat done: the mingw sysroot has no expat, and upstream vendors it
+for exactly this reason. OpenSSL, neon, libs3 to follow</td>
 </tr>
 <tr class="odd">
 <td>P1-14</td>
@@ -1824,8 +1841,8 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td>P1 Headless core</td>
-<td>16</td>
-<td>34</td>
+<td>18</td>
+<td>36</td>
 <td>Golden suite green, six protocols, both platforms</td>
 </tr>
 <tr class="odd">
@@ -1848,8 +1865,8 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>42</strong></td>
-<td><strong>93</strong></td>
+<td><strong>44</strong></td>
+<td><strong>95</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -1876,17 +1893,17 @@ aborting.</p>
 targets:</strong> <code>Option.cpp</code>, <code>NamedObjs.cpp</code>
 and <code>FileBuffer.cpp</code>. Census is <strong>963 on mingw, 1,182
 on Linux</strong>.</p>
-<p>Census is <strong>314 on mingw, 496 on Linux</strong>, and
-<strong>four of nine units are clean on both targets</strong> for the
-first time. The two platforms are now within 180 errors of each other,
-down from a gap of 244.</p>
+<p>Census is <strong>266 on mingw, 441 on Linux</strong>, with
+<strong>five of nine units clean on both targets</strong>.</p>
 <ol type="1">
-<li><code>FileMasks.cpp</code> at <strong>10 / 13</strong> is next
-closest to clean.</li>
 <li><strong>P1-05b / <code>TThread</code></strong> and
 <code>StartThread</code>.</li>
-<li><code>Common.cpp</code> and <code>Terminal.cpp</code> carry most of
-what is left; neither has a single dominant cause any more.</li>
+<li><code>CopyParam.cpp</code> at <strong>24 / 24</strong> is next
+closest, and identical on both targets, so nothing platform-specific is
+left in it.</li>
+<li><code>Common.cpp</code> (137 / 202) and <code>Terminal.cpp</code>
+(75 / 116) hold most of the remainder. Their Linux-only excess is the
+next thing worth measuring.</li>
 </ol>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
@@ -2119,13 +2136,38 @@ compound literals. <code>ARRAYOFCONST((a, b))</code> becoming
 </tr>
 <tr class="even">
 <td>2026-10-11</td>
+<td>XML is parsed for real, using the expat upstream vendors, rather
+than stubbed</td>
+<td>A stub would silently import no FileZilla sessions. The mingw
+sysroot has no expat, so the vendored source is compiled for both
+targets, which also keeps them on one version</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>Wide-character functions are renamed and the CRT names redirected by
+macro</td>
+<td>They cannot be redeclared – <code>&lt;string&gt;</code> pulls in
+<code>&lt;cwchar&gt;</code>, whose <code>wcschr</code> differs from ours
+only in return type – and a macro also guarantees core’s calls reach
+ours rather than glibc’s</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td><code>towlower</code>/<code>towupper</code> fold ASCII only, on both
+platforms</td>
+<td>The Windows CRT folds only ASCII in the default locale, confirmed by
+running the test against it. Folding Latin-1 on POSIX alone would make
+the platforms disagree, which is worse than being narrow</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
 <td><code>try</code>/<code>__finally</code> uses the same lambda
 expansion on <em>both</em> targets</td>
 <td>SEH would work on mingw, but one code path on both platforms is
 worth more than relying on it, and it removes a way for the two to
 diverge in behaviour</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>The <code>try</code>/<code>__finally</code> transform measures brace
 depth on the <em>pristine</em> lines and applies every edit
@@ -2134,7 +2176,7 @@ afterwards</td>
 containing no brace, so editing in place miscounted the depth of any
 enclosing block – and core nests these</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td>One bare <code>return</code> inside a guarded body is permitted, by
 checked condition</td>
@@ -2143,7 +2185,7 @@ then falls off the end of the function, which is what Borland does – but
 only when the block ends the function and the return carries no value.
 Both are verified rather than assumed</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>Every property form routes through a generated public wrapper</td>
 <td>Borland’s <code>__property</code> grants access to a private
@@ -2153,7 +2195,7 @@ ordinary member call at the use site. The wrappers restore both
 behaviours, and the getter casts its result to the declared type because
 C++Builder is lax where the two differ in constness</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td><code>UnicodeString</code> accepts numbers implicitly, yielding
 their decimal text</td>
@@ -2161,7 +2203,7 @@ their decimal text</td>
 <code>UnicodeString s = 0;</code> gives <code>"0"</code> – but diverging
 would mean editing core</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>Globals that need dynamic initialisation are declared
 <em>before</em> the object that initialises them</td>
@@ -2170,13 +2212,13 @@ declaration order. Putting the initialiser first had its constructor
 assign to a <code>UnicodeString</code> that was not yet constructed,
 which segfaulted rather than failing to compile</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td><code>TMask</code> matching is case-insensitive</td>
 <td>Delphi’s is, and core uses it for file masks users type without
 regard to case</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>Closure call sites are <strong>compiler-discovered, committed, then
 replayed</strong></td>
@@ -2187,7 +2229,7 @@ so discovery records them to
 <code>transform.py</code> replays that list, failing loudly if a
 recorded site no longer holds the expected identifier</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td>A diagnostic inside a macro expansion is resolved to the macro
 <em>definition</em></td>
@@ -2196,7 +2238,7 @@ recorded site no longer holds the expected identifier</td>
 61 duplicate reports. Binding the definition once fixes every call site,
 and cut the work from 118 sites to 62</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td><code>TRegistry</code> on POSIX reports every key absent rather than
 empty</td>
@@ -2205,19 +2247,19 @@ actually set would look to them like their configuration had vanished.
 The INI backend, which core already supports, is the correct one there
 (P1-06d)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td>INI section and key names match case-insensitively</td>
 <td>Delphi’s do, and files written by WinSCP on Windows have
 inconsistent casing</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>INI sections and keys keep their file order</td>
 <td>Sorting them would churn the user’s configuration on every save and
 make diffs useless</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td><code>DynamicArray</code> shares its buffer on copy, as Delphi’s
 does</td>
@@ -2225,7 +2267,7 @@ does</td>
 <em>by value</em> and fills it for the caller. A deep-copying version
 would compile and silently return no data</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td><code>win32_on_posix.h</code> exposes <code>&lt;string.h&gt;</code>,
 <code>&lt;stdlib.h&gt;</code> and <code>&lt;stdio.h&gt;</code></td>
@@ -2233,7 +2275,7 @@ would compile and silently return no data</td>
 <code>strlen</code>, <code>strcmp</code> and <code>memmove</code>
 unqualified</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><strong>Resource strings: supply Win32 <code>LoadString</code>, not
 a <code>.res</code> loader, and do not patch core</strong></td>
@@ -2245,7 +2287,7 @@ additive change — the kind upstream could take rather than a fork of its
 own code. The table is generated from upstream’s <code>.rc</code> files,
 so the strings track the submodule automatically</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>UnicodeString::c_str()</code> has a non-const overload
 returning a writable buffer</td>
@@ -2254,7 +2296,7 @@ returning a writable buffer</td>
 <code>c_str()</code> to <code>LoadString</code> as the destination to
 fill</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>TList::Notify</code> is virtual and fires before a removal,
 after an addition</td>
@@ -2262,28 +2304,28 @@ after an addition</td>
 inside it, so a wrong <code>Action</code> means a leak or a double free,
 neither of which announces itself</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>Extract</code> reports <code>lnExtracted</code>, never
 <code>lnDeleted</code></td>
 <td>That is how Delphi lets a caller take ownership back without the
 list freeing the object</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>TList::Sort</code> is stable, where Delphi’s quicksort is
 not</td>
 <td>Relying on an unstable order would be a latent caller bug either
 way, and stable is the safer guarantee to provide</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>Derived streams re-expose the base’s legacy <code>Seek</code> with a
 using-declaration</td>
 <td>Overriding one overload hides the other. Core calls both on derived
 streams, so without this the legacy origins would stop resolving</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>Stream exceptions follow Delphi’s shape exactly</td>
 <td><code>EFilerError</code>, <code>EFOpenError</code> and
@@ -2291,7 +2333,7 @@ streams, so without this the legacy origins would stop resolving</td>
 with <code>EReadError</code>/<code>EWriteError</code> beneath
 <code>EFilerError</code>. Core catches at both levels</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>port/platform</code> headers refuse to compile on Windows, and
 are POSIX-only on the include path</td>
@@ -2299,20 +2341,20 @@ are POSIX-only on the include path</td>
 which presented as a 1,220 -&gt; 783 “improvement”. The
 <code>#error</code> makes that mistake loud</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>port/compat</code> is separate from
 <code>port/platform</code></td>
 <td><code>help.h</code> is missing from upstream itself rather than
 being a platform difference, so it is needed on every target</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>The ratchet records whether a unit aborted</td>
 <td>An aborted parse reports a floor. Treating that as a distinct state
 stops a new abort from reading as sudden progress</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>Format</code> keeps malformed input visible</td>
 <td>Delphi raises on a missing argument. Core routes user- and
@@ -3040,18 +3082,46 @@ closure, 28 template end, 62 binding, 537 try/finally (179 x 3)</td>
 <td>2026-10-11</td>
 </tr>
 <tr class="odd">
+<td><code>FileMasks.cpp</code> clean on both targets; <strong>5/9 units
+clean on both</strong></td>
+<td><code>compile_census.py</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="even">
+<td>Census: mingw <strong>266</strong>, Linux <strong>441</strong></td>
+<td><code>census_ratchet.py</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="odd">
+<td>Vendored expat compiles for both targets; the mingw sysroot has no
+expat</td>
+<td><code>cmake/expat.cmake</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="even">
+<td>The Windows CRT’s <code>towlower</code> folds only ASCII in the
+default locale</td>
+<td>the same test run against the real CRT under Wine</td>
+<td>2026-10-11</td>
+</tr>
+<tr class="odd">
+<td>24/24 tests pass on both targets</td>
+<td><code>ctest</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="even">
 <td>12/12 tests pass on Linux and on Windows under Wine</td>
 <td><code>ctest</code> both trees</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Directory search validated against both backends: real
 <code>FindFirstFileW</code> under Wine, and <code>dirent</code> +
 <code>fnmatch</code> on Linux</td>
 <td><code>test_sysutils</code> on both targets</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>__closure</code> scope: 44 distinct closure types, 16
 typedefs; call sites pass bare member-function names</td>
 <td>grep over generated core</td>
@@ -3402,6 +3472,18 @@ done; path routines next</td>
 <td>Shim: masks, paths, timespan, encoding, env</td>
 <td>done</td>
 <td>the census long tail</td>
+</tr>
+<tr class="even">
+<td>P1-08c</td>
+<td>Shim: XML DOM over expat</td>
+<td>done</td>
+<td>real parsing; FileZilla-shaped fixtures</td>
+</tr>
+<tr class="odd">
+<td>P1-07c</td>
+<td><code>port/platform</code> wide-char functions</td>
+<td>done</td>
+<td>ASCII folding, matching the Windows CRT</td>
 </tr>
 <tr class="even">
 <td>P1-09b</td>

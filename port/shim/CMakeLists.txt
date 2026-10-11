@@ -32,6 +32,7 @@ add_library(linscp-shim STATIC
   vcl_registry.cpp
   vcl_misc.cpp
   vcl_exceptions.cpp
+  vcl_xml.cpp
   "${CMAKE_BINARY_DIR}/gen_resources.cpp"
 )
 
@@ -49,5 +50,6 @@ target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 # Gaps in upstream itself, as opposed to platform emulation: needed on every
 # target, so unlike ../platform this is not guarded by NOT WIN32.
 target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../compat")
+target_link_libraries(linscp-shim PUBLIC linscp-expat)
 target_compile_features(linscp-shim PUBLIC cxx_std_17)
 target_compile_options(linscp-shim PUBLIC -fms-extensions -fshort-wchar)
