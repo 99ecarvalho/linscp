@@ -29,7 +29,8 @@ using Pointer  = void *;
 // Delphi aliases core uses in declarations.
 using TShortCut = Word;              // a virtual key plus shift-state bits
 using TThreadID = std::uint32_t;
-using TThreadFunc = unsigned (*)(void *);
+// Delphi: function(Parameter: Pointer): Integer. Core passes an int function.
+using TThreadFunc = int (*)(void *);
 
 // Pointer to a resource-string record. Core only ever passes these through to
 // the resource layer, so the record itself stays opaque.

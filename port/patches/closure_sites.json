@@ -115,6 +115,18 @@
       "identifier": "TerminalInitializeLog"
     },
     {
+      "file": "source/core/Queue.cpp",
+      "line": 2610,
+      "column": 13,
+      "identifier": "TerminalOpenEvent"
+    },
+    {
+      "file": "source/core/Queue.cpp",
+      "line": 2615,
+      "column": 13,
+      "identifier": "TerminalReopenEvent"
+    },
+    {
       "file": "source/core/ScpFileSystem.cpp",
       "line": 1516,
       "column": 54,

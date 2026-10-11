@@ -244,6 +244,86 @@ void SetLastError(DWORD Code);
 // comparisons against ERROR_* keep working.
 DWORD Win32ErrorFromErrno(int Err);
 
+// --- threads, events and waits --------------------------------------------
+// Kernel objects live in one process-wide handle table. Handle values are never
+// reused, so a use-after-CloseHandle fails with ERROR_INVALID_HANDLE instead of
+// silently reaching whatever object took the slot.
+//
+// Only what core uses is provided. SuspendThread is deliberately absent: a
+// running pthread cannot be suspended, and a missing declaration fails loudly
+// at compile time where a stub would fail silently at run time.
+#define WINAPI
+
+struct SECURITY_ATTRIBUTES;
+using LPSECURITY_ATTRIBUTES = SECURITY_ATTRIBUTES *;
+using LPTHREAD_START_ROUTINE = DWORD (WINAPI *)(LPVOID Parameter);
+
+#define INFINITE              0xFFFFFFFF
+#define WAIT_OBJECT_0         0x00000000
+#define WAIT_ABANDONED_0      0x00000080
+#define WAIT_TIMEOUT          0x00000102
+#define WAIT_FAILED           0xFFFFFFFF
+#define MAXIMUM_WAIT_OBJECTS  64
+#define STILL_ACTIVE          259
+#define CREATE_SUSPENDED      0x00000004
+
+#define THREAD_PRIORITY_IDLE          (-15)
+#define THREAD_PRIORITY_LOWEST        (-2)
+#define THREAD_PRIORITY_BELOW_NORMAL  (-1)
+#define THREAD_PRIORITY_NORMAL        0
+#define THREAD_PRIORITY_ABOVE_NORMAL  1
+#define THREAD_PRIORITY_HIGHEST       2
+#define THREAD_PRIORITY_TIME_CRITICAL 15
+#define THREAD_PRIORITY_ERROR_RETURN  0x7FFFFFFF
+
+// Named events would need to be shared across processes; core never names one,
+// so a non-null name fails with ERROR_NOT_SUPPORTED rather than quietly
+// creating a private event.
+HANDLE CreateEvent(LPSECURITY_ATTRIBUTES Attributes, BOOL ManualReset,
+  BOOL InitialState, LPCWSTR Name);
+BOOL SetEvent(HANDLE Event);
+BOOL ResetEvent(HANDLE Event);
+
+HANDLE CreateThread(LPSECURITY_ATTRIBUTES Attributes, SIZE_T StackSize,
+  LPTHREAD_START_ROUTINE StartAddress, LPVOID Parameter, DWORD CreationFlags,
+  LPDWORD ThreadId);
+// Returns the suspend count *before* the call, as Win32 does; core relies on
+// that, treating 1 as "this call started the thread".
+DWORD ResumeThread(HANDLE Thread);
+// Unwinds to the thread's entry point by exception, so unlike Win32 the
+// destructors on the way out do run. A catch (...) between the call and the
+// entry point would intercept it; core never calls this inside such a block.
+[[noreturn]] void ExitThread(DWORD ExitCode);
+BOOL GetExitCodeThread(HANDLE Thread, LPDWORD ExitCode);
+// Recorded and reported back, but has no scheduling effect. See the divergence
+// table in doc/qt/TRACKER.md.
+BOOL SetThreadPriority(HANDLE Thread, int Priority);
+int GetThreadPriority(HANDLE Thread);
+// Unique and non-zero per thread for the life of the process, and for threads
+// started by CreateThread equal to the id CreateThread reported -- core asserts
+// exactly that in TTerminalThread.
+DWORD GetCurrentThreadId();
+
+DWORD WaitForSingleObject(HANDLE Handle, DWORD Milliseconds);
+DWORD WaitForMultipleObjects(DWORD Count, const HANDLE * Handles, BOOL WaitAll,
+  DWORD Milliseconds);
+BOOL CloseHandle(HANDLE Object);
+void Sleep(DWORD Milliseconds);
+
+// Milliseconds on a monotonic clock. Wraps at 2^32 (about 49.7 days), as the
+// Win32 one does; core only ever subtracts two readings, which survives that.
+DWORD GetTickCount();
+ULONGLONG GetTickCount64();
+
+// --- COM -------------------------------------------------------------------
+// Core initialises COM per thread for MSXML, which on POSIX is expat with no
+// COM underneath. Counted per thread so the return values match: S_OK on a
+// thread's first call, S_FALSE after.
+#define S_OK     (static_cast<HRESULT>(0))
+#define S_FALSE  (static_cast<HRESULT>(1))
+HRESULT CoInitialize(LPVOID Reserved);
+void CoUninitialize();
+
 // --- registry access modes -------------------------------------------------
 // Present so declarations compile; the storage backend core actually uses on
 // Linux is the INI path, which already exists upstream.

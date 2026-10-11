@@ -9,6 +9,7 @@
 
 #include <cstdio>
 #include <thread>
+#include <type_traits>
 
 namespace {
 
@@ -30,6 +31,45 @@ void TestExceptionMessage()
 
   E.Message = UnicodeString(L"changed");       // Message is a writable property
   CHECK(E.Message == UnicodeString(L"changed"));
+}
+
+// Delphi: Exception = class(TObject). Core passes exceptions where a TObject
+// is expected, and downcasts them back.
+void TestExceptionIsATObject()
+{
+  TObject * O = new EAbort(UnicodeString(L"abort"));
+  CHECK(dynamic_cast<Exception *>(O) != nullptr);
+  CHECK(O->InheritsFrom<Exception>());
+  CHECK(!O->InheritsFrom<TPersistent>());
+  delete O;  // through the root, as SAFE_DESTROY does
+}
+
+// Only Exception is copyable -- C++ requires it of thrown types. Everything
+// else keeps TObject's protection against slicing.
+static_assert(!std::is_copy_constructible<TObject>::value, "TObject must not copy");
+static_assert(!std::is_copy_constructible<TPersistent>::value, "nor its descendants");
+static_assert(std::is_copy_constructible<Exception>::value, "Exception must copy");
+static_assert(std::is_copy_constructible<EAbort>::value, "and so its descendants");
+
+void TestExceptionCopyKeepsEveryMember()
+{
+  const Exception A(UnicodeString(L"msg"), 7);
+  const Exception B(A);
+  CHECK(B.Message == UnicodeString(L"msg"));
+  CHECK(B.HelpContext == 7);
+
+  Exception C(UnicodeString(L"other"));
+  C = A;
+  CHECK(C.Message == UnicodeString(L"msg"));
+  CHECK(C.HelpContext == 7);
+
+  // An lvalue throw copies; nothing may be lost on the way.
+  try { throw A; }
+  catch (const Exception & E)
+  {
+    CHECK(E.Message == UnicodeString(L"msg"));
+    CHECK(E.HelpContext == 7);
+  }
 }
 
 void TestExceptionHierarchy()
@@ -161,6 +201,8 @@ int main()
 {
   TestExceptionMessage();
   TestExceptionHierarchy();
+  TestExceptionIsATObject();
+  TestExceptionCopyKeepsEveryMember();
   TestObjectIsPolymorphic();
   TestCriticalSectionIsRecursive();
   TestCriticalSectionExcludesThreads();

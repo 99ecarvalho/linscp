@@ -35,7 +35,7 @@ UnicodeString FromUtf8(const char * S, int Len)
 // defined below, and a conversion to the interface needs the complete type.
 _di_IXMLNode MakeNode(const std::shared_ptr<TNode> & Data);
 
-class TXmlNodeList : public IXMLNodeList
+class TXmlNodeList : public Xml::Xmlintf::IXMLNodeList
 {
 public:
   explicit TXmlNodeList(std::vector<std::shared_ptr<TNode>> Items)
@@ -75,7 +75,7 @@ private:
   std::vector<std::shared_ptr<TNode>> FItems;
 };
 
-class TXmlNode : public IXMLNode
+class TXmlNode : public Xml::Xmlintf::IXMLNode
 {
 public:
   explicit TXmlNode(std::shared_ptr<TNode> Data) : FData(std::move(Data)) {}
@@ -177,7 +177,7 @@ void OnText(void * UserData, const XML_Char * S, int Len)
   }
 }
 
-class TXmlDocument : public IXMLDocument
+class TXmlDocument : public Xml::Xmlintf::IXMLDocument
 {
 public:
   bool LoadFromFile(const UnicodeString & FileName) override
@@ -242,7 +242,7 @@ private:
 
 }  // namespace
 
-_di_IXMLDocument NewXMLDocument()
+_di_IXMLDocument Xml::Xmlintf::NewXMLDocument()
 {
   return _di_IXMLDocument(std::make_shared<TXmlDocument>());
 }

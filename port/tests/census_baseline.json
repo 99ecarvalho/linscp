@@ -8,13 +8,13 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 197,
-        "missing_types": 11
+        "errors": 166,
+        "missing_types": 9
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 104,
-        "missing_types": 23
+        "errors": 90,
+        "missing_types": 18
       },
       "source/core/CopyParam.cpp": {
         "aborted": false,
@@ -41,9 +41,14 @@
         "errors": 0,
         "missing_types": 0
       },
+      "source/core/Queue.cpp": {
+        "aborted": false,
+        "errors": 0,
+        "missing_types": 0
+      },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 116,
+        "errors": 96,
         "missing_types": 4
       }
     },
@@ -55,12 +60,12 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 137,
+        "errors": 122,
         "missing_types": 2
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 30,
+        "errors": 25,
         "missing_types": 1
       },
       "source/core/CopyParam.cpp": {
@@ -88,9 +93,14 @@
         "errors": 0,
         "missing_types": 0
       },
+      "source/core/Queue.cpp": {
+        "aborted": false,
+        "errors": 0,
+        "missing_types": 0
+      },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 75,
+        "errors": 72,
         "missing_types": 1
       }
     }

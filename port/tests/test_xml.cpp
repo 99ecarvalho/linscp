@@ -4,9 +4,16 @@
 // fixtures below are shaped like those rather than being minimal XML. A stub
 // here would silently import no sessions, which is why this is parsed for real
 // and tested against text that looks like the real thing.
+#if defined(_WIN32)
+  // The COM IXMLDocument at global scope, which ours must coexist with.
+  #include <windows.h>
+  #include <objbase.h>
+  #include <msxml.h>
+#endif
 #include "vcl_xml.h"
 
 #include <cstdio>
+#include <type_traits>
 #include <filesystem>
 #include <fstream>
 #include <string>
@@ -182,6 +189,17 @@ void TestLoadFromFile()
 }
 
 }  // namespace
+
+// Core names the unit scope alone, as SessionData.cpp does with
+// interface_cast<Xmlintf::IXMLDocument>; and the _di_ aliases stay global.
+static_assert(std::is_same<_di_IXMLDocument,
+                           DelphiInterface<Xmlintf::IXMLDocument>>::value, "");
+static_assert(std::is_same<_di_IXMLNode,
+                           DelphiInterface<Xml::Xmlintf::IXMLNode>>::value, "");
+#if defined(_WIN32)
+static_assert(!std::is_same<::IXMLDocument, Xmlintf::IXMLDocument>::value,
+              "both exist, distinct, in one translation unit");
+#endif
 
 int main()
 {

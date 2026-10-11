@@ -16,6 +16,9 @@
     #define WIN32_LEAN_AND_MEAN
   #endif
   #include <windows.h>
+  // COM, which core initialises per thread (Queue.cpp). WIN32_LEAN_AND_MEAN
+  // drops it from <windows.h>, where Embarcadero's <vcl.h> has it.
+  #include <objbase.h>
 
   #include "vcl_win32_undef.h"
 #else
@@ -30,6 +33,7 @@
 #include "vcl_closure.h"
 #include "vcl_object.h"
 #include "vcl_syncobjs.h"
+#include "vcl_thread.h"
 #include "vcl_types.h"
 #include "vcl_unicodestring.h"
 #include "vcl_bytestring.h"

@@ -93,6 +93,22 @@ TDateTime Time();   // time of day only
 TDateTime IncYear(const TDateTime & DT, int Years = 1);
 TDateTime IncMonth(const TDateTime & DT, int Months = 1);
 TDateTime IncDay(const TDateTime & DT, int Days = 1);
+// Through a linear millisecond count, as Delphi's TTimeStamp route does, rather
+// than by adding a fraction to the serial: before 1899-12-30 the serial runs
+// backwards within a day, so float addition would move time the wrong way.
+TDateTime IncMilliSecond(const TDateTime & DT, __int64 MilliSeconds = 1);
+TDateTime IncSecond(const TDateTime & DT, __int64 Seconds = 1);
+TDateTime IncMinute(const TDateTime & DT, __int64 Minutes = 1);
+TDateTime IncHour(const TDateTime & DT, __int64 Hours = 1);
+
+// Delphi's return types, exactly. Core negates these to truncate a timestamp:
+// it casts the unsigned ones to int first, but negates MilliSecondOfTheYear
+// directly -- correct only because Delphi returns that one as signed Int64.
+Word MilliSecondOfTheSecond(const TDateTime & DT);
+Cardinal MilliSecondOfTheMinute(const TDateTime & DT);
+Cardinal MilliSecondOfTheHour(const TDateTime & DT);
+Cardinal MilliSecondOfTheDay(const TDateTime & DT);
+__int64 MilliSecondOfTheYear(const TDateTime & DT);
 int DayOfWeek(const TDateTime & DT);     // 1 = Sunday, as in Delphi
 bool IsLeapYear(Word Year);
 Word DaysInMonth(Word Year, Word Month);

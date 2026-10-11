@@ -59,7 +59,7 @@ struct TMethod
 // Delphi's exception hierarchy. Core catches these by type (see Exceptions.h),
 // so the shapes and inheritance must match or handlers silently stop matching.
 //---------------------------------------------------------------------------
-class Exception
+class Exception : public TObject
 {
 public:
   // C++Builder's full constructor set. Core's own Exceptions.h declares
@@ -87,6 +87,22 @@ public:
             int AHelpContext);
 
   virtual ~Exception() = default;
+
+  // TObject is deliberately non-copyable, but C++ requires a thrown type to be
+  // copy-constructible even when the copy is elided, and core throws by value.
+  // So Exception -- and only Exception -- re-enables copying, starting a fresh
+  // TObject base rather than copying one. Copies every member below; a test
+  // pins that, so a member added later cannot be silently dropped on rethrow.
+  Exception(const Exception & Other)
+    : TObject(), FMessage(Other.FMessage), FHelpContext(Other.FHelpContext)
+  {
+  }
+  Exception & operator=(const Exception & Other)
+  {
+    FMessage = Other.FMessage;
+    FHelpContext = Other.FHelpContext;
+    return *this;
+  }
 
   PROP_RW_FF(UnicodeString, Message, FMessage);
   PROP_RW_FF(int, HelpContext, FHelpContext);

@@ -78,11 +78,19 @@ find_package(Threads REQUIRED)
 target_link_libraries(test_object PRIVATE Threads::Threads)
 add_test(NAME object_exceptions COMMAND test_object)
 
+add_executable(test_thread test_thread.cpp)
+target_link_libraries(test_thread PRIVATE linscp-shim)
+add_test(NAME thread COMMAND test_thread)
+
+# Executable tests go above this line.
 # When cross-compiling, the toolchain points CMAKE_CROSSCOMPILING_EMULATOR at
 # wine; these tell wine where the mingw runtime DLLs live and keep its output
 # off the test log.
 if(LINSCP_WINE_DLLDIR_GCC)
-  set(_wine_tests property_forms unicodestring bytestring datetime object_exceptions strings sysutils closure strutils win32_on_posix streams containers resources storage dynarray misc tryfinally xml)
+  # Every test registered so far, rather than a hand-kept list: a list let a new
+  # test silently run without the DLL path. Script-driven tests are added below
+  # this block and run on the host, so they are excluded by position.
+  get_property(_wine_tests DIRECTORY PROPERTY TESTS)
   # The backslash-escaped ';' is a literal Windows path separator inside the
   # WINEPATH value; the unescaped ';' separates the two environment entries.
   set_tests_properties(${_wine_tests} PROPERTIES ENVIRONMENT

@@ -44,6 +44,40 @@ void SplitSerial(double V, long long & Days, double & DayFraction)
   DayFraction = std::fabs(V - T);
 }
 
+constexpr long long MSecsPerDayInt = 86400000LL;
+
+// A serial as signed milliseconds from 1899-12-30 00:00. Linear and monotonic
+// in real time, unlike the serial itself; -0.25 and 0.25 both denote 06:00 on
+// day zero, and both map to the same count.
+long long SerialToMSecs(double V)
+{
+  long long Days = 0;
+  double Frac = 0.0;
+  SplitSerial(V, Days, Frac);
+  return Days * MSecsPerDayInt + std::llround(Frac * MSecsPerDay);
+}
+
+double MSecsToSerial(long long MSecs)
+{
+  // Floor division, so the time of day comes out non-negative for any sign.
+  long long Days = MSecs / MSecsPerDayInt;
+  long long Rest = MSecs % MSecsPerDayInt;
+  if (Rest < 0)
+  {
+    Rest += MSecsPerDayInt;
+    --Days;
+  }
+  const double Time = static_cast<double>(Rest) / MSecsPerDay;
+  const double Date = static_cast<double>(Days);
+  return (Date < 0) ? (Date - Time) : (Date + Time);
+}
+
+long long MSecsOfDay(const TDateTime & DT)
+{
+  long long Rest = SerialToMSecs(DT.Val()) % MSecsPerDayInt;
+  return (Rest < 0) ? (Rest + MSecsPerDayInt) : Rest;
+}
+
 UnicodeString Pad(int Value, int Width)
 {
   wchar_t Buf[16];
@@ -246,6 +280,53 @@ TDateTime Time()
 TDateTime IncDay(const TDateTime & DT, int Days)
 {
   return TDateTime(DT.Val() + Days);
+}
+
+TDateTime IncMilliSecond(const TDateTime & DT, __int64 MilliSeconds)
+{
+  return TDateTime(MSecsToSerial(SerialToMSecs(DT.Val()) + MilliSeconds));
+}
+
+TDateTime IncSecond(const TDateTime & DT, __int64 Seconds)
+{
+  return IncMilliSecond(DT, Seconds * 1000);
+}
+
+TDateTime IncMinute(const TDateTime & DT, __int64 Minutes)
+{
+  return IncMilliSecond(DT, Minutes * 60 * 1000);
+}
+
+TDateTime IncHour(const TDateTime & DT, __int64 Hours)
+{
+  return IncMilliSecond(DT, Hours * 60 * 60 * 1000);
+}
+
+Word MilliSecondOfTheSecond(const TDateTime & DT)
+{
+  return static_cast<Word>(MSecsOfDay(DT) % 1000);
+}
+
+Cardinal MilliSecondOfTheMinute(const TDateTime & DT)
+{
+  return static_cast<Cardinal>(MSecsOfDay(DT) % (60 * 1000));
+}
+
+Cardinal MilliSecondOfTheHour(const TDateTime & DT)
+{
+  return static_cast<Cardinal>(MSecsOfDay(DT) % (60 * 60 * 1000));
+}
+
+Cardinal MilliSecondOfTheDay(const TDateTime & DT)
+{
+  return static_cast<Cardinal>(MSecsOfDay(DT));
+}
+
+__int64 MilliSecondOfTheYear(const TDateTime & DT)
+{
+  Word Y = 0, M = 0, D = 0;
+  ::DecodeDate(DT, Y, M, D);
+  return SerialToMSecs(DT.Val()) - SerialToMSecs(EncodeDate(Y, 1, 1).Val());
 }
 
 TDateTime IncMonth(const TDateTime & DT, int Months)

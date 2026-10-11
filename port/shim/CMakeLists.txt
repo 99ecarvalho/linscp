@@ -33,6 +33,7 @@ add_library(linscp-shim STATIC
   vcl_misc.cpp
   vcl_exceptions.cpp
   vcl_xml.cpp
+  vcl_thread.cpp
   "${CMAKE_BINARY_DIR}/gen_resources.cpp"
 )
 
@@ -41,6 +42,7 @@ add_library(linscp-shim STATIC
 if(NOT WIN32)
   target_sources(linscp-shim PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/../platform/win32_on_posix.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../platform/win32_kernel_posix.cpp"
   )
 endif()
 if(NOT WIN32)
@@ -51,5 +53,10 @@ target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 # target, so unlike ../platform this is not guarded by NOT WIN32.
 target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../compat")
 target_link_libraries(linscp-shim PUBLIC linscp-expat)
+find_package(Threads REQUIRED)
+target_link_libraries(linscp-shim PUBLIC Threads::Threads)
+if(WIN32)
+  target_link_libraries(linscp-shim PUBLIC ole32)
+endif()
 target_compile_features(linscp-shim PUBLIC cxx_std_17)
 target_compile_options(linscp-shim PUBLIC -fms-extensions -fshort-wchar)

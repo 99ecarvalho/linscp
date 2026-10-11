@@ -1,6 +1,6 @@
 # Tracker
 
-Last updated: **2026-10-10**
+Last updated: **2026-10-11**
 
 Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
@@ -9,43 +9,35 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 26 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 18 | 36 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 19 | 36 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **44** | **95** | |
+| **Total** | **45** | **95** | |
 
 ## Next three actions
 
 Driven by `compile_census.py` rather than by grep counts — the compiler names
-what is actually blocking `Common.cpp`, in dependency order.
+what is actually blocking each unit, in dependency order.
 
-**`source/core/Option.cpp` compiles cleanly on *both* targets** — Linux and
-Windows, 0 errors, 0 fatal. The two platforms are level again, which was the
-point of taking P1-07 ahead of the larger type groups.
+**Six of ten tracked units compile cleanly on both targets**, nothing aborting
+on either. Census: **243 errors on mingw, 376 on Linux.**
 
-Honest totals across the nine tracked units, with nothing aborting on either
-target: **1,334 errors on mingw, 1,575 on Linux**. Both are higher than the
-previously reported figures because the parse now runs to completion instead of
-stopping at a missing header.
+| Unit | mingw | Linux |
+|---|---|---|
+| `Bookmarks.cpp`, `FileBuffer.cpp`, `FileMasks.cpp`, `NamedObjs.cpp`, `Option.cpp` | 0 | 0 |
+| **`Queue.cpp`** — core's thread and queue machinery | **0** | **0** |
+| `CopyParam.cpp` | 24 | 24 |
+| `Configuration.cpp` | 25 | 90 |
+| `Terminal.cpp` | 72 | 96 |
+| `Common.cpp` | 122 | 166 |
 
-**Two core units now compile cleanly on both targets:** `Option.cpp` and
-`NamedObjs.cpp`. Census is **1,070 errors on mingw, 1,299 on Linux**, nothing
-aborting.
-
-Closest unit to clean next: `FileBuffer.cpp` (16 mingw / 24 Linux).
-
-**Three core units now compile cleanly on both targets:** `Option.cpp`,
-`NamedObjs.cpp` and `FileBuffer.cpp`. Census is **963 on mingw, 1,182 on Linux**.
-
-Census is **266 on mingw, 441 on Linux**, with **five of nine units clean on
-both targets**.
-
-1. **P1-05b / `TThread`** and `StartThread`.
-2. `CopyParam.cpp` at **24 / 24** is next closest, and identical on both
-   targets, so nothing platform-specific is left in it.
-3. `Common.cpp` (137 / 202) and `Terminal.cpp` (75 / 116) hold most of the
-   remainder. Their Linux-only excess is the next thing worth measuring.
+1. `CopyParam.cpp` at **24 / 24** is closest, and identical on both targets, so
+   nothing platform-specific is left in it.
+2. `Configuration.cpp` has the largest Linux-only excess (**65**). Measure what
+   it is before the generic work in `Common.cpp` absorbs it.
+3. `Common.cpp` (122 / 166) and `Terminal.cpp` (72 / 96) hold most of the
+   remainder.
 
 ## Decisions taken
 
@@ -63,6 +55,11 @@ both targets**.
 | 2026-10-10 | Far-NetBox used as reference; verbatim reuse deferred pending licence clarification | Its README says GPLv3 but it ships the GPLv2 text (Q-6) |
 | 2026-10-10 | Published as [99ecarvalho/linscp](https://github.com/99ecarvalho/linscp), public, GPL-3.0 | `main` is the released state; active work happens on `qt` |
 | 2026-10-11 | Compute cost recorded as measured token usage, not an estimate | The branch so far cost $297 of Opus 5 inference (99% of tokens are cache reads). Confirms compute is not the constraint, and shows Opus 5.5 would halve it — see [ESTIMATES.md](ESTIMATES.md) |
+| 2026-10-11 | VCL's `TThread` class not shimmed | Its only user, `KeyGen.cpp`, is in none of upstream's `.cbproj` files and `TKeyGenerator` is referenced nowhere else — dead code upstream. Core's own `TSimpleThread` uses `StartThread` and Win32 directly |
+| 2026-10-11 | P1-05b scoped as Win32 kernel objects on POSIX, plus Delphi `BeginThread`/`EndThread` on both targets | That is what core actually calls: 28 `CloseHandle`, 6 waits, 5 `CreateEvent`, 10 `GetCurrentThreadId`. `BeginThread` is written once over `CreateThread`, so upstream's frontend `StartThread` ports unchanged |
+| 2026-10-11 | POSIX kernel objects share one handle table, one lock and one condition variable; handle values are never reused | Makes `WaitForMultipleObjects` over mixed threads and events — including atomic `WaitAll` — correct by construction. Core has a handful of threads, so the coarse lock costs nothing measurable. Never reusing values turns use-after-close into `ERROR_INVALID_HANDLE` |
+| 2026-10-11 | Shim XML interfaces live in `Xml::Xmlintf`; only the `_di_` aliases are global | Embarcadero's own layout. At global scope ours collided on Windows with the COM `IXMLDocument` from `<msxml.h>`. Core names them only through `_di_` aliases and `Xmlintf::` |
+| 2026-10-11 | Closure-site discovery compiles a separately transformed, *unbound* tree | Compiling the ordinary tree saw the known sites already wrapped and "rediscovered" only new ones — it cut 62 sites to 2. Now idempotent: a second run is byte-identical |
 | 2026-10-10 | A PR-able branch against `winscp/winscp` will be **generated**, not hand-maintained | linscp shares no history with upstream, so its `qt` branch is not directly mergeable. Since the port is mechanical, the fork branch can be produced on demand (Q-7). Rehearsed end to end — see facts below |
 | 2026-10-10 | Transform must be byte-exact outside property lines | A full-file rewrite (CRLF loss) turned a 613-line change into 76,551. Now asserted by `verify_transform.py` |
 | 2026-10-10 | Field/accessor classification is convention-first, parens only as fallback | The parens heuristic false-positives on constructor initialiser lists; WinSCP's `F<Upper>` / `Get*`/`Set*` convention is airtight. Truly unclassifiable names now fail the run instead of producing a wrong-arity macro |
@@ -148,6 +145,10 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | Winsock error codes on POSIX | Keep their Winsock numeric values rather than mapping to `errno` | Core and the FileZilla layer compare them by name and store them in their own state |
 | `TRegistry` on Linux | Every key reports absent; nothing can be read or written | No registry exists. The INI backend is the correct one there, and failing visibly beats returning defaults for settings the user had set |
 | INI share modes | Windows share modes are ignored on POSIX rather than approximated | Advisory locking would change behaviour rather than match it |
+| `SetThreadPriority` on POSIX | Recorded and reported back by `GetThreadPriority`, but no scheduling effect | Core only lowers background queue threads; running them at normal priority is harmless |
+| `ExitThread` / `EndThread` on POSIX | Unwinds to the entry point by exception, so destructors run; Win32 skips them | A `catch (...)` between the call and the entry point would intercept it. Core calls it only as the last statement of a thread entry point |
+| Named events on POSIX | `CreateEvent` with a name fails with `ERROR_NOT_SUPPORTED` | Would need to be cross-process. Core never names one; refusing beats quietly creating a private event |
+| `SuspendThread` on POSIX | Not declared | A running pthread cannot be suspended. A missing declaration fails at compile time; a stub would fail silently. `CREATE_SUSPENDED` + `ResumeThread` is supported |
 
 ## Open questions
 
@@ -320,7 +321,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-03b | Shim: `SysUtils`/`IOUtils`/`StrUtils` paths | wip | `TSearchRec`, `FindFirst`/`FindNext`, `FileExists` done; path routines next |
 | P1-04 | Shim: exceptions | done | 17 Delphi classes; base and sibling matching tested |
 | P1-05 | Shim: `TCriticalSection`/`SyncObjs` | done | recursive; thread exclusion tested |
-| P1-05b | Shim: `TThread`/`StartThread` | todo | |
+| P1-05b | Shim: `TThread`/`StartThread` | done | Win32 threads, events and waits on POSIX; `BeginThread`/`EndThread` on both. Tested against the real kernel under Wine. `TThread` itself dropped — dead upstream |
 | P1-08b | Shim: masks, paths, timespan, encoding, env | done | the census long tail |
 | P1-08c | Shim: XML DOM over expat | done | real parsing; FileZilla-shaped fixtures |
 | P1-07c | `port/platform` wide-char functions | done | ASCII folding, matching the Windows CRT |

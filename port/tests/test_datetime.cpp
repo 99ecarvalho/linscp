@@ -14,6 +14,7 @@
 
 #include <cmath>
 #include <cstdio>
+#include <type_traits>
 
 namespace {
 
@@ -204,6 +205,77 @@ void TestNegativeComposition()
         EncodeDate(2024, 1, 1).Val() + EncodeTime(6, 0, 0, 0).Val());
 }
 
+// Exact to the millisecond, on both sides of day zero.
+bool IsMoment(const TDateTime & DT, int Y, int Mo, int D, int H, int Mi, int S,
+              int MS)
+{
+  Word yy = 0, mm = 0, dd = 0, hh = 0, nn = 0, ss = 0, zz = 0;
+  DecodeDate(DT, yy, mm, dd);
+  DecodeTime(DT, hh, nn, ss, zz);
+  return yy == Y && mm == Mo && dd == D && hh == H && nn == Mi && ss == S &&
+         zz == MS;
+}
+
+void TestIncrementsAreLinear()
+{
+  const TDateTime NewYear = EncodeDateTime(2024, 1, 1, 0, 0, 0, 0);
+  CHECK(IsMoment(IncSecond(NewYear, -1), 2023, 12, 31, 23, 59, 59, 0));
+  CHECK(IsMoment(IncMilliSecond(NewYear, -1), 2023, 12, 31, 23, 59, 59, 999));
+  CHECK(IsMoment(IncMinute(NewYear, 90), 2024, 1, 1, 1, 30, 0, 0));
+  CHECK(IsMoment(IncHour(NewYear, 25), 2024, 1, 2, 1, 0, 0, 0));
+  CHECK(IsMoment(IncSecond(NewYear), 2024, 1, 1, 0, 0, 1, 0));  // default 1
+
+  // Before day zero the serial runs backwards within a day. Float addition of
+  // one millisecond here moves time *back*; the linear route crosses forward.
+  const TDateTime LastMs = EncodeDateTime(1899, 12, 29, 23, 59, 59, 999);
+  CHECK(IsMoment(IncMilliSecond(LastMs, 1), 1899, 12, 30, 0, 0, 0, 0));
+  const TDateTime Naive(LastMs.Val() + 1.0 / 86400000.0);
+  CHECK(!IsMoment(Naive, 1899, 12, 30, 0, 0, 0, 0));  // the trap, pinned down
+
+  const TDateTime SixAm = EncodeDateTime(1899, 12, 29, 6, 0, 0, 0);  // -1.25
+  CHECK(IsMoment(IncHour(SixAm, 1), 1899, 12, 29, 7, 0, 0, 0));
+  CHECK(IsMoment(IncHour(SixAm, -7), 1899, 12, 28, 23, 0, 0, 0));
+  CHECK(IsMoment(IncHour(SixAm, 18), 1899, 12, 30, 0, 0, 0, 0));
+}
+
+void TestMilliSecondOf()
+{
+  const TDateTime DT = EncodeDateTime(2024, 3, 5, 13, 14, 15, 678);
+  CHECK(MilliSecondOfTheSecond(DT) == 678);
+  CHECK(MilliSecondOfTheMinute(DT) == 15678u);
+  CHECK(MilliSecondOfTheHour(DT) == (14 * 60 + 15) * 1000u + 678u);
+  CHECK(MilliSecondOfTheDay(DT) == ((13 * 60 + 14) * 60 + 15) * 1000u + 678u);
+  // 2024 is a leap year: 5 March is day 65.
+  CHECK(MilliSecondOfTheYear(DT) ==
+        64LL * 86400000LL + ((13 * 60 + 14) * 60 + 15) * 1000LL + 678LL);
+
+  // Negative serials report a positive time of day, as everywhere else.
+  CHECK(MilliSecondOfTheDay(EncodeDateTime(1899, 12, 29, 6, 0, 0, 0)) ==
+        6u * 60 * 60 * 1000);
+}
+
+// Delphi's types, because core's truncation idiom depends on them.
+static_assert(std::is_same<decltype(MilliSecondOfTheSecond(TDateTime())), Word>::value, "");
+static_assert(std::is_same<decltype(MilliSecondOfTheDay(TDateTime())), Cardinal>::value, "");
+static_assert(std::is_signed<decltype(MilliSecondOfTheYear(TDateTime()))>::value,
+              "core negates this without a cast");
+
+void TestCoreTruncationIdiom()
+{
+  // Exactly the expressions in Common.cpp's relative-date parser.
+  const TDateTime DT = EncodeDateTime(2024, 3, 5, 13, 14, 15, 678);
+  CHECK(IsMoment(IncMilliSecond(DT, -static_cast<int>(MilliSecondOfTheSecond(DT))),
+                 2024, 3, 5, 13, 14, 15, 0));
+  CHECK(IsMoment(IncMilliSecond(DT, -static_cast<int>(MilliSecondOfTheMinute(DT))),
+                 2024, 3, 5, 13, 14, 0, 0));
+  CHECK(IsMoment(IncMilliSecond(DT, -static_cast<int>(MilliSecondOfTheHour(DT))),
+                 2024, 3, 5, 13, 0, 0, 0));
+  CHECK(IsMoment(IncMilliSecond(DT, -static_cast<int>(MilliSecondOfTheDay(DT))),
+                 2024, 3, 5, 0, 0, 0, 0));
+  CHECK(IsMoment(IncMilliSecond(DT, -MilliSecondOfTheYear(DT)),
+                 2024, 1, 1, 0, 0, 0, 0));
+}
+
 void TestBetween()
 {
   TDateTime A = EncodeDate(2024, 1, 1);
@@ -295,6 +367,9 @@ int main()
   TestArithmetic();
   TestDayOfWeek();
   TestNegativeComposition();
+  TestIncrementsAreLinear();
+  TestMilliSecondOf();
+  TestCoreTruncationIdiom();
   TestBetween();
   TestFormatDateTime();
   TestStrToDateTime();

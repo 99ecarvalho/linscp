@@ -60,6 +60,12 @@ private:
   std::shared_ptr<T> FPtr;
 };
 
+// Embarcadero's layout: the interfaces live in unit Xml.XMLIntf. Declaring them
+// at global scope instead collided on Windows with the COM IXMLDocument that
+// <msxml.h> declares there, reached through <objbase.h>.
+namespace Xml {
+namespace Xmlintf {
+
 class IXMLNode;
 class IXMLNodeList;
 class IXMLDocument;
@@ -117,5 +123,18 @@ public:
 
 // Creates an empty document. Delphi spells this NewXMLDocument.
 _di_IXMLDocument NewXMLDocument();
+
+}  // namespace Xmlintf
+}  // namespace Xml
+
+// Core spells the unit scope alone (Xmlintf::IXMLDocument), and names the
+// interfaces only through their _di_ aliases. So those, and not the bare
+// interface names, are what is made visible globally -- which keeps the global
+// IXMLDocument free for the Windows COM one.
+namespace Xmlintf = Xml::Xmlintf;
+using Xml::Xmlintf::_di_IXMLNode;
+using Xml::Xmlintf::_di_IXMLNodeList;
+using Xml::Xmlintf::_di_IXMLDocument;
+using Xml::Xmlintf::NewXMLDocument;
 
 #endif // LINSCP_VCL_XML_H
