@@ -1038,13 +1038,12 @@ contract measured from core (<code>!= NULL</code> 62,
 </tr>
 <tr class="even">
 <td>P0-06c</td>
-<td><code>__closure</code>: bind the 116 bare-member-name call
-sites</td>
+<td><code>__closure</code>: bind the bare-member-name call sites</td>
 <td>M</td>
 <td>P0-06b</td>
-<td>Compiler-guided: clang reports each with an exact file/line/column,
-so the rewrite wraps that identifier in <code>CLOSURE(...)</code> rather
-than inferring the enclosing class by regex</td>
+<td>Done. 62 sites, compiler-discovered and committed to
+<code>port/patches/closure_sites.json</code>; resolving macro expansions
+to their definitions collapsed 118 reports to 62</td>
 </tr>
 <tr class="odd">
 <td>P0-07</td>
@@ -1790,7 +1789,7 @@ evaluation down and close it</td>
 <tbody>
 <tr class="odd">
 <td>P0 Foundation</td>
-<td>23</td>
+<td>24</td>
 <td>34</td>
 <td><code>core/Common.cpp</code> compiles on Linux clang; VCL build
 green (R1)</td>
@@ -1821,7 +1820,7 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>37</strong></td>
+<td><strong>38</strong></td>
 <td><strong>90</strong></td>
 <td></td>
 </tr>
@@ -1849,14 +1848,15 @@ aborting.</p>
 targets:</strong> <code>Option.cpp</code>, <code>NamedObjs.cpp</code>
 and <code>FileBuffer.cpp</code>. Census is <strong>963 on mingw, 1,182
 on Linux</strong>.</p>
+<p>Census is <strong>933 on mingw, 1,152 on Linux</strong>, 3 of 9 units
+clean.</p>
 <ol type="1">
-<li><strong>P0-06c / closure call sites</strong> — 116 bare
-member-function names. Now the largest single mechanical item left, and
-compiler-guided since clang reports each with an exact position.</li>
 <li><strong>P1-07b / Win32 file and handle functions</strong> —
 <code>CreateFile</code>, <code>ReadFile</code>, <code>CloseHandle</code>
 and the rest, as the census asks for them.</li>
-<li><code>Bookmarks.cpp</code> is next closest at 47 / 49.</li>
+<li><code>Bookmarks.cpp</code> is next closest at 43 / 45.</li>
+<li><strong>P1-05b / <code>TThread</code></strong> and the remaining
+event typedefs.</li>
 </ol>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
@@ -2086,6 +2086,26 @@ variadic call</td>
 <td>C++Builder builds an open array of <code>TVarRec</code>, which needs
 compound literals. <code>ARRAYOFCONST((a, b))</code> becoming
 <code>MakeFormatArgs(a, b)</code> is ordinary C++</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>Closure call sites are <strong>compiler-discovered, committed, then
+replayed</strong></td>
+<td>The sites cannot be inferred by regex: whether an argument is a
+closure depends on the callee’s signature. clang names each one exactly,
+so discovery records them to
+<code>port/patches/closure_sites.json</code> and
+<code>transform.py</code> replays that list, failing loudly if a
+recorded site no longer holds the expected identifier</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>A diagnostic inside a macro expansion is resolved to the macro
+<em>definition</em></td>
+<td>clang reports it at the expansion point, so
+<code>SessionInfo.cpp</code>’s <code>ADSTR</code> macro alone produced
+61 duplicate reports. Binding the definition once fixes every call site,
+and cut the work from 118 sites to 62</td>
 </tr>
 <tr class="even">
 <td>2026-10-11</td>
@@ -2834,18 +2854,47 @@ under Wine</td>
 <td>2026-10-11</td>
 </tr>
 <tr class="odd">
+<td>Closure call sites: <strong>62</strong>, not 118 — resolving
+macro-expansion diagnostics to their definitions collapsed the
+duplicates</td>
+<td><code>bind_closures.py --discover</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="even">
+<td><code>DynamicArray::Length</code> is a read/write property, not a
+method; 56 of the original 118 reports were this, not closures</td>
+<td><code>Buffer.Length = 10*1024</code> in core</td>
+<td>2026-10-11</td>
+</tr>
+<tr class="odd">
+<td>All 758 changed lines accounted for: 624 property + 44 closure
+typedef + 28 template end + 62 binding</td>
+<td><code>verify_transform.py</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="even">
+<td>Census after closure binding: mingw 933, Linux 1,152</td>
+<td><code>census_ratchet.py</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="odd">
+<td>21/21 tests pass on both targets</td>
+<td><code>ctest</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="even">
 <td>12/12 tests pass on Linux and on Windows under Wine</td>
 <td><code>ctest</code> both trees</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Directory search validated against both backends: real
 <code>FindFirstFileW</code> under Wine, and <code>dirent</code> +
 <code>fnmatch</code> on Linux</td>
 <td><code>test_sysutils</code> on both targets</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>__closure</code> scope: 44 distinct closure types, 16
 typedefs; call sites pass bare member-function names</td>
 <td>grep over generated core</td>
@@ -2918,8 +2967,8 @@ targets</td>
 <tr class="even">
 <td>P0-06c</td>
 <td><code>__closure</code> call-site binding</td>
-<td>todo</td>
-<td>116 sites, compiler-guided</td>
+<td>done</td>
+<td>62 sites; verified as a test</td>
 </tr>
 <tr class="odd">
 <td>P0-07</td>

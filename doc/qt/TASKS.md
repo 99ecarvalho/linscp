@@ -19,7 +19,7 @@ Goal: prove the keystone works, with no behaviour change anywhere.
 | P0-05 | `transform.py`: `__property` rewriter, line-preserving | M | P0-03 | 591 decls, 4 forms + 4 manual |
 | P0-06 | `transform.py`: `__fastcall`, `ARRAYOFCONST` | S | P0-05 | `__fastcall` is an empty define |
 | P0-06b | `__closure`: `TClosure` type + typedef transform | M | P0-06 | Done. 44 typedefs rewritten to `TClosure<Sig>`; contract measured from core (`!= NULL` 62, `== NULL` 31, `= NULL` 51) |
-| P0-06c | `__closure`: bind the 116 bare-member-name call sites | M | P0-06b | Compiler-guided: clang reports each with an exact file/line/column, so the rewrite wraps that identifier in `CLOSURE(...)` rather than inferring the enclosing class by regex |
+| P0-06c | `__closure`: bind the bare-member-name call sites | M | P0-06b | Done. 62 sites, compiler-discovered and committed to `port/patches/closure_sites.json`; resolving macro expansions to their definitions collapsed 118 reports to 62 |
 | P0-07 | Transform idempotence + line-count assertion tests | S | P0-05 | Guards against silent drift |
 | P0-08 | CMake skeleton: generate → compile one TU | M | P0-01, P0-05 | |
 | P0-09 | Minimal shim to compile `core/Common.cpp` on Linux clang | M | P0-08 | The real measurement of shim cost |

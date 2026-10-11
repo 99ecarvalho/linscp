@@ -40,7 +40,7 @@ UnicodeString Widen(const std::string & S)
 // Mirrors core's signature: taken by value, filled for the caller.
 void FillByValue(TBytes Buffer)
 {
-  for (int I = 0; I < Buffer.Length(); ++I)
+  for (int I = 0; I < Buffer.Length; ++I)
   {
     Buffer[I] = static_cast<System::Byte>(I + 1);
   }
@@ -49,12 +49,12 @@ void FillByValue(TBytes Buffer)
 void TestLengthAndIndexing()
 {
   TBytes A;
-  CHECK(A.Length() == 0);
+  CHECK(A.Length == 0);
   CHECK(A.IsEmpty());
   CHECK(A.data() == nullptr);
 
   A.set_length(4);
-  CHECK(A.Length() == 4);
+  CHECK(A.Length == 4);
   CHECK(!A.IsEmpty());
   CHECK(A.data() != nullptr);
 
@@ -65,7 +65,7 @@ void TestLengthAndIndexing()
   CHECK(A[3] == 40);
 
   A.set_length(2);
-  CHECK(A.Length() == 2);
+  CHECK(A.Length == 2);
   CHECK(A[0] == 10);              // surviving elements keep their values
 
   A.set_length(0);
@@ -74,7 +74,18 @@ void TestLengthAndIndexing()
   CHECK(A.IsEmpty());
 
   TBytes B(3);
-  CHECK(B.Length() == 3);
+  CHECK(B.Length == 3);
+
+  // The write form, which is how core resizes: `Buffer.Length = N`.
+  TBytes C;
+  C.Length = 5;
+  CHECK(C.Length == 5);
+  C[4] = 9;
+  CHECK(C[4] == 9);
+  C.Length = 2;
+  CHECK(C.Length == 2);
+  C.Length = 0;
+  CHECK(C.IsEmpty());
 }
 
 void TestSharesRatherThanCopies()

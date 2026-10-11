@@ -10,6 +10,8 @@ Asserts the invariants the whole upstream-tracking model depends on:
 A changed line must be one of:
   property  - contained __property, now emits exactly one PROP_* macro
   closure   - contained __closure, now declares a TClosure alias
+  binding   - a bare member-function name wrapped in CLOSURE(), recorded in
+              port/patches/closure_sites.json
   closeoff  - the line where a multi-line closure typedef ended, changed only
               by turning its ";" into ">;"
 
@@ -20,6 +22,44 @@ import os, re, sys
 MINE = re.compile(r'\bPROP_(R_F|R_G|R_GI|RW_FF|RW_FS|RW_GF|RW_GS|W_F|W_S|'
                   r'IDX_R_G|IDX_RW_GS)\(')
 
+import json as _json
+import re as _re
+
+
+def _recorded_sites():
+    """{(file, line): [(column, identifier), ...]} from the committed list."""
+    path = 'port/patches/closure_sites.json'
+    if not os.path.exists(path):
+        return {}
+    by_pos = {}
+    for site in _json.load(open(path))['sites']:
+        by_pos.setdefault((site['file'], site['line']), []).append(
+            (site['column'], site['identifier']))
+    return by_pos
+
+
+_SITES = _recorded_sites()
+
+
+def binding_of(rel_path, lineno, old_line):
+    """The expected rewrite of a line, using the recorded positions.
+
+    Position-based rather than a regex over identifiers: a line can mention a
+    recorded name more than once while only one occurrence is a closure site,
+    and a blanket substitution would wrap both.
+    """
+    sites = _SITES.get((rel_path, lineno))
+    if not sites:
+        return None
+    out = old_line
+    for col, ident in sorted(sites, reverse=True):
+        start = col - 1
+        if out[start:start + len(ident)] != ident:
+            return None
+        out = out[:start] + 'CLOSURE(' + ident + ')' + out[start + len(ident):]
+    return out
+
+
 def closeoff(old_line):
     """The expected rewrite of a line that merely closed a closure template."""
     k = old_line.rfind(';')
@@ -29,7 +69,7 @@ def closeoff(old_line):
 
 
 def main(gen='build/gen', src='3rd-party/winscp'):
-    changed = macros = files = closures = closeoffs = 0
+    changed = macros = files = closures = closeoffs = bindings = 0
     bad = []
     for dp, _, ns in os.walk(gen):
         for n in ns:
@@ -37,6 +77,7 @@ def main(gen='build/gen', src='3rd-party/winscp'):
             u = os.path.join(src, os.path.relpath(g, gen))
             if not os.path.exists(u):
                 bad.append(f'{g}: no upstream counterpart'); continue
+            rel_for_sites = os.path.relpath(g, gen).replace(os.sep, '/')
             a = open(u, newline='', encoding='utf-8', errors='surrogateescape').read().split('\n')
             b = open(g, newline='', encoding='utf-8', errors='surrogateescape').read().split('\n')
             if len(a) != len(b):
@@ -55,6 +96,8 @@ def main(gen='build/gen', src='3rd-party/winscp'):
                     closures += 1
                     if 'TClosure<' not in y:
                         bad.append(f'{u}:{i}: __closure not rewritten: {y.strip()[:80]}')
+                elif binding_of(rel_for_sites, i, x) == y:
+                    bindings += 1
                 elif y == closeoff(x):
                     closeoffs += 1
                 else:
@@ -66,6 +109,7 @@ def main(gen='build/gen', src='3rd-party/winscp'):
     print(f'  property:     {macros}')
     print(f'  closure:      {closures}')
     print(f'  template end: {closeoffs}')
+    print(f'  closure bind: {bindings}')
     if bad:
         print(f'\nVIOLATIONS ({len(bad)}):')
         for v in bad[:25]:

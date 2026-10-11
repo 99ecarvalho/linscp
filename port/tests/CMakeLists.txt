@@ -93,6 +93,15 @@ set_tests_properties(transform_verify transform_properties_compile docs_consiste
 # Locks in the compile-census numbers so shim progress cannot slip back
 # unnoticed: nothing in core compiles cleanly yet, so a reintroduced missing
 # type would otherwise look like a passing build.
+# The recorded closure sites must still match the source. An upstream change
+# that moves one of these lines fails here rather than silently wrapping the
+# wrong token.
+add_test(NAME closure_sites
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/bind_closures.py"
+          --gen "${LINSCP_GEN}")
+set_tests_properties(closure_sites
+  PROPERTIES WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+
 add_test(NAME census_ratchet
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/census_ratchet.py")
 set_tests_properties(census_ratchet

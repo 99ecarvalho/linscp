@@ -14,6 +14,7 @@
 #include <memory>
 #include <vector>
 
+#include "vcl_property.h"
 #include "vcl_types.h"
 
 namespace System {
@@ -33,9 +34,12 @@ public:
   DynamicArray(const DynamicArray &) = default;
   DynamicArray & operator=(const DynamicArray &) = default;
 
-  int Length() const
+  // Length is a read/write *property* in C++Builder, not a method: core writes
+  // `Buffer.Length = 10*1024` to resize and reads `Bytes.Length > 0`. A method
+  // would make the assignment form fail to compile, and the read form compile
+  // into a function-pointer test that is always true.
+  int get_length() const
     { return FData ? static_cast<int>(FData->size()) : 0; }
-  int get_length() const { return Length(); }
 
   void set_length(int Len)
   {
@@ -59,7 +63,9 @@ public:
   T * data() { return FData ? FData->data() : nullptr; }
   const T * data() const { return FData ? FData->data() : nullptr; }
 
-  bool IsEmpty() const { return Length() == 0; }
+  PROP_RW_GS(int, Length, get_length, set_length);
+
+  bool IsEmpty() const { return get_length() == 0; }
 
 private:
   std::shared_ptr<std::vector<T>> FData;

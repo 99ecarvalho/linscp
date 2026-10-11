@@ -1,0 +1,376 @@
+{
+  "sites": [
+    {
+      "file": "source/core/Http.cpp",
+      "line": 80,
+      "column": 34,
+      "identifier": "InitSslSession"
+    },
+    {
+      "file": "source/core/KeyGen.cpp",
+      "line": 100,
+      "column": 23,
+      "identifier": "DistributeProgressUpdate"
+    },
+    {
+      "file": "source/core/KeyGen.cpp",
+      "line": 122,
+      "column": 21,
+      "identifier": "DistributeProgressUpdate"
+    },
+    {
+      "file": "source/core/KeyGen.cpp",
+      "line": 149,
+      "column": 17,
+      "identifier": "DistributeProgressUpdate"
+    },
+    {
+      "file": "source/core/Queue.cpp",
+      "line": 1250,
+      "column": 30,
+      "identifier": "TerminalQueryUser"
+    },
+    {
+      "file": "source/core/Queue.cpp",
+      "line": 1251,
+      "column": 31,
+      "identifier": "TerminalPromptUser"
+    },
+    {
+      "file": "source/core/Queue.cpp",
+      "line": 1252,
+      "column": 42,
+      "identifier": "TerminalShowExtendedException"
+    },
+    {
+      "file": "source/core/Queue.cpp",
+      "line": 1253,
+      "column": 29,
+      "identifier": "OperationProgress"
+    },
+    {
+      "file": "source/core/Queue.cpp",
+      "line": 1254,
+      "column": 29,
+      "identifier": "OperationFinished"
+    },
+    {
+      "file": "source/core/Queue.cpp",
+      "line": 2527,
+      "column": 30,
+      "identifier": "TerminalInformation"
+    },
+    {
+      "file": "source/core/Queue.cpp",
+      "line": 2528,
+      "column": 28,
+      "identifier": "TerminalQueryUser"
+    },
+    {
+      "file": "source/core/Queue.cpp",
+      "line": 2529,
+      "column": 29,
+      "identifier": "TerminalPromptUser"
+    },
+    {
+      "file": "source/core/Queue.cpp",
+      "line": 2530,
+      "column": 40,
+      "identifier": "TerminalShowExtendedException"
+    },
+    {
+      "file": "source/core/Queue.cpp",
+      "line": 2531,
+      "column": 32,
+      "identifier": "TerminalDisplayBanner"
+    },
+    {
+      "file": "source/core/Queue.cpp",
+      "line": 2532,
+      "column": 34,
+      "identifier": "TerminalChangeDirectory"
+    },
+    {
+      "file": "source/core/Queue.cpp",
+      "line": 2533,
+      "column": 32,
+      "identifier": "TerminalReadDirectory"
+    },
+    {
+      "file": "source/core/Queue.cpp",
+      "line": 2534,
+      "column": 37,
+      "identifier": "TerminalStartReadDirectory"
+    },
+    {
+      "file": "source/core/Queue.cpp",
+      "line": 2535,
+      "column": 40,
+      "identifier": "TerminalReadDirectoryProgress"
+    },
+    {
+      "file": "source/core/Queue.cpp",
+      "line": 2536,
+      "column": 32,
+      "identifier": "TerminalInitializeLog"
+    },
+    {
+      "file": "source/core/ScpFileSystem.cpp",
+      "line": 1516,
+      "column": 54,
+      "identifier": "CustomCommandOnFile"
+    },
+    {
+      "file": "source/core/ScpFileSystem.cpp",
+      "line": 1555,
+      "column": 37,
+      "identifier": "CaptureOutput"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 517,
+      "column": 36,
+      "identifier": "LogOption"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 1174,
+      "column": 50,
+      "identifier": "TerminalCaptureLog"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 1235,
+      "column": 56,
+      "identifier": "DoCalculatedChecksum"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 2224,
+      "column": 36,
+      "identifier": "TerminalSynchronizeDirectory"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 2808,
+      "column": 38,
+      "identifier": "TerminalInformation"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 2809,
+      "column": 37,
+      "identifier": "TerminalPromptUser"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 2812,
+      "column": 35,
+      "identifier": "TerminalOperationProgress"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 2813,
+      "column": 35,
+      "identifier": "TerminalOperationFinished"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 2814,
+      "column": 40,
+      "identifier": "TerminalInitializeLog"
+    },
+    {
+      "file": "source/core/SecureShell.cpp",
+      "line": 1355,
+      "column": 43,
+      "identifier": "SendBuffer"
+    },
+    {
+      "file": "source/core/SecureShell.cpp",
+      "line": 1935,
+      "column": 49,
+      "identifier": "PoolForData"
+    },
+    {
+      "file": "source/core/SessionInfo.cpp",
+      "line": 939,
+      "column": 27,
+      "identifier": "DoAddToParent"
+    },
+    {
+      "file": "source/core/SessionInfo.cpp",
+      "line": 945,
+      "column": 27,
+      "identifier": "DoAddToSelf"
+    },
+    {
+      "file": "source/core/SessionInfo.cpp",
+      "line": 1206,
+      "column": 38,
+      "identifier": "DoAddToSelf"
+    },
+    {
+      "file": "source/core/SessionInfo.cpp",
+      "line": 1218,
+      "column": 22,
+      "identifier": "DoAddStartupInfoEntry"
+    },
+    {
+      "file": "source/core/SessionInfo.cpp",
+      "line": 1809,
+      "column": 35,
+      "identifier": "Log"
+    },
+    {
+      "file": "source/core/SftpFileSystem.cpp",
+      "line": 1428,
+      "column": 59,
+      "identifier": "ReceiveHandler"
+    },
+    {
+      "file": "source/core/SftpFileSystem.cpp",
+      "line": 1435,
+      "column": 55,
+      "identifier": "ReceiveHandler"
+    },
+    {
+      "file": "source/core/SftpFileSystem.cpp",
+      "line": 4124,
+      "column": 58,
+      "identifier": "ChangeFileProperties"
+    },
+    {
+      "file": "source/core/SftpFileSystem.cpp",
+      "line": 4789,
+      "column": 32,
+      "identifier": "SFTPOpenRemote"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 3871,
+      "column": 34,
+      "identifier": "DeleteFile"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 4359,
+      "column": 48,
+      "identifier": "DeleteFile"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 4384,
+      "column": 43,
+      "identifier": "DeleteLocalFile"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 4475,
+      "column": 42,
+      "identifier": "CustomCommandOnFile"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 4583,
+      "column": 43,
+      "identifier": "ChangeFileProperties"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 4720,
+      "column": 34,
+      "identifier": "CalculateFileSize"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 4757,
+      "column": 43,
+      "identifier": "DoCalculateFileSize"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 5069,
+      "column": 51,
+      "identifier": "MoveFile"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 5147,
+      "column": 47,
+      "identifier": "CopyFile"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 5456,
+      "column": 42,
+      "identifier": "Output"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 5795,
+      "column": 37,
+      "identifier": "MakeLocalFileList"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 5839,
+      "column": 45,
+      "identifier": "CalculateLocalFileSize"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 6204,
+      "column": 41,
+      "identifier": "SynchronizeCollectFile"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 6363,
+      "column": 47,
+      "identifier": "CollectCalculatedChecksum"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 6720,
+      "column": 59,
+      "identifier": "SynchronizeLocalTimestamp"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 6725,
+      "column": 59,
+      "identifier": "SynchronizeRemoteTimestamp"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 7015,
+      "column": 35,
+      "identifier": "FileFind"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 7119,
+      "column": 36,
+      "identifier": "LockFile"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 7132,
+      "column": 38,
+      "identifier": "UnlockFile"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 8284,
+      "column": 36,
+      "identifier": "SinkFile"
+    },
+    {
+      "file": "source/core/WebDAVFileSystem.cpp",
+      "line": 310,
+      "column": 24,
+      "identifier": "InitSslSession"
+    }
+  ]
+}

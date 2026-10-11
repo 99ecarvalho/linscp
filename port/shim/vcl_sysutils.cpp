@@ -342,7 +342,7 @@ int FileWrite(THandle Handle, const void * Buffer, int Count)
 
 int FileRead(THandle Handle, TBytes Buffer, int Offset, int Count)
 {
-  if (Offset < 0 || Count <= 0 || Offset + Count > Buffer.Length())
+  if (Offset < 0 || Count <= 0 || Offset + Count > Buffer.get_length())
   {
     return 0;
   }
@@ -351,7 +351,7 @@ int FileRead(THandle Handle, TBytes Buffer, int Offset, int Count)
 
 int FileWrite(THandle Handle, const TBytes Buffer, int Offset, int Count)
 {
-  if (Offset < 0 || Count <= 0 || Offset + Count > Buffer.Length())
+  if (Offset < 0 || Count <= 0 || Offset + Count > Buffer.get_length())
   {
     return 0;
   }

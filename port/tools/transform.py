@@ -73,11 +73,13 @@ class Transformer:
         self.stats = Counter()
         self.unhandled = []
         self.notes = []
+        self.closure_sites = load_closure_sites()
 
     def transform_file(self, path, text):
         methods = set(re.findall(r'\b(\w+)\s*\(', text))
         lines = text.split('\n')
         self.transform_closures(path, lines)
+        self.bind_closure_sites(path, lines)
         out = []
         for lineno, line in enumerate(lines, 1):
             if '__property' not in line or '#define' in line:
@@ -91,6 +93,32 @@ class Transformer:
                 new = None
             out.append(new if new is not None else line)
         return '\n'.join(out)
+
+    def bind_closure_sites(self, path, lines):
+        """Wrap bare member-function names in CLOSURE(), preserving lines."""
+        sites = self.closure_sites.get(path.replace(os.sep, '/'))
+        if not sites:
+            return
+        # Right to left within each line, so wrapping one site does not shift
+        # the recorded column of another on the same line.
+        for lineno, col, ident in sorted(sites, key=lambda s: (-s[0], -s[1])):
+            if lineno < 1 or lineno > len(lines):
+                self.stats['closure_site_out_of_range'] += 1
+                self.unhandled.append((path, lineno, f'line out of range for {ident}'))
+                continue
+            text = lines[lineno - 1]
+            start = col - 1
+            if text[start:start + len(ident)] != ident:
+                # An upstream change moved this site. Fail rather than wrap the
+                # wrong token: bind_closures.py --discover regenerates the list.
+                self.stats['closure_site_stale'] += 1
+                self.unhandled.append(
+                    (path, lineno,
+                     f'site no longer holds {ident!r}: {text.strip()[:60]}'))
+                continue
+            lines[lineno - 1] = (text[:start] + 'CLOSURE(' + ident + ')' +
+                                 text[start + len(ident):])
+            self.stats['closure_bound'] += 1
 
     def transform_closures(self, path, lines):
         """Rewrite __closure typedefs in place, preserving the line count."""
@@ -213,6 +241,24 @@ class Transformer:
         return f'{ind}{call};{tail}'
 
 EXTS = {'.h', '.hpp', '.cpp', '.c', '.inc'}
+
+# Call sites where core names a bare member function where a closure is
+# expected. Discovered by the compiler (port/tools/bind_closures.py), recorded,
+# and applied here so the result is reproducible rather than depending on a
+# compile. See that script for why this cannot be inferred by regex.
+CLOSURE_SITES = 'port/patches/closure_sites.json'
+
+
+def load_closure_sites():
+    """{relative path: [(line, column, identifier), ...]}"""
+    if not os.path.exists(CLOSURE_SITES):
+        return {}
+    import json
+    by_file = {}
+    for site in json.load(open(CLOSURE_SITES))['sites']:
+        by_file.setdefault(site['file'], []).append(
+            (site['line'], site['column'], site['identifier']))
+    return by_file
 
 def main():
     ap = argparse.ArgumentParser()

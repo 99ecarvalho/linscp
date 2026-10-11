@@ -8,12 +8,12 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 23 | 34 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P0 Foundation | 24 | 34 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 14 | 32 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **37** | **90** | |
+| **Total** | **38** | **90** | |
 
 ## Next three actions
 
@@ -38,12 +38,12 @@ Closest unit to clean next: `FileBuffer.cpp` (16 mingw / 24 Linux).
 **Three core units now compile cleanly on both targets:** `Option.cpp`,
 `NamedObjs.cpp` and `FileBuffer.cpp`. Census is **963 on mingw, 1,182 on Linux**.
 
-1. **P0-06c / closure call sites** — 116 bare member-function names. Now the
-   largest single mechanical item left, and compiler-guided since clang reports
-   each with an exact position.
-2. **P1-07b / Win32 file and handle functions** — `CreateFile`, `ReadFile`,
+Census is **933 on mingw, 1,152 on Linux**, 3 of 9 units clean.
+
+1. **P1-07b / Win32 file and handle functions** — `CreateFile`, `ReadFile`,
    `CloseHandle` and the rest, as the census asks for them.
-3. `Bookmarks.cpp` is next closest at 47 / 49.
+2. `Bookmarks.cpp` is next closest at 43 / 45.
+3. **P1-05b / `TThread`** and the remaining event typedefs.
 
 ## Decisions taken
 
@@ -80,6 +80,8 @@ Closest unit to clean next: `FileBuffer.cpp` (16 mingw / 24 Linux).
 | 2026-10-10 | Chained subscripts on indexed properties are unsupported | clang reads `Prop[i][j]` as a two-argument getter call. Core has 0 occurrences; `check_properties.py` fails if an upstream change adds one |
 | 2026-10-10 | Win32 A/W name macros are undone in `vcl_win32_undef.h` | `<windows.h>` renamed the *definition* of `ReplaceText` to `ReplaceTextW` while the header still declared `ReplaceText`. Both compiled; only the link failed, and only because a test called it. A link-time guard now references every colliding name |
 | 2026-10-10 | `ARRAYOFCONST` pastes its parenthesised list onto a variadic call | C++Builder builds an open array of `TVarRec`, which needs compound literals. `ARRAYOFCONST((a, b))` becoming `MakeFormatArgs(a, b)` is ordinary C++ |
+| 2026-10-11 | Closure call sites are **compiler-discovered, committed, then replayed** | The sites cannot be inferred by regex: whether an argument is a closure depends on the callee's signature. clang names each one exactly, so discovery records them to `port/patches/closure_sites.json` and `transform.py` replays that list, failing loudly if a recorded site no longer holds the expected identifier |
+| 2026-10-11 | A diagnostic inside a macro expansion is resolved to the macro *definition* | clang reports it at the expansion point, so `SessionInfo.cpp`'s `ADSTR` macro alone produced 61 duplicate reports. Binding the definition once fixes every call site, and cut the work from 118 sites to 62 |
 | 2026-10-11 | `TRegistry` on POSIX reports every key absent rather than empty | There is no registry, and returning defaults for settings a user had actually set would look to them like their configuration had vanished. The INI backend, which core already supports, is the correct one there (P1-06d) |
 | 2026-10-11 | INI section and key names match case-insensitively | Delphi's do, and files written by WinSCP on Windows have inconsistent casing |
 | 2026-10-11 | INI sections and keys keep their file order | Sorting them would churn the user's configuration on every save and make diffs useless |
@@ -225,6 +227,11 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | Census after storage and arrays: mingw 963, Linux 1,182, 0 aborting | `census_ratchet.py` | 2026-10-11 |
 | `TRegistry` round-trips against the real Windows registry under Wine | `test_storage` on the mingw target | 2026-10-11 |
 | 20/20 tests pass on both targets | `ctest` | 2026-10-11 |
+| Closure call sites: **62**, not 118 — resolving macro-expansion diagnostics to their definitions collapsed the duplicates | `bind_closures.py --discover` | 2026-10-11 |
+| `DynamicArray::Length` is a read/write property, not a method; 56 of the original 118 reports were this, not closures | `Buffer.Length = 10*1024` in core | 2026-10-11 |
+| All 758 changed lines accounted for: 624 property + 44 closure typedef + 28 template end + 62 binding | `verify_transform.py` | 2026-10-11 |
+| Census after closure binding: mingw 933, Linux 1,152 | `census_ratchet.py` | 2026-10-11 |
+| 21/21 tests pass on both targets | `ctest` | 2026-10-11 |
 | 12/12 tests pass on Linux and on Windows under Wine | `ctest` both trees | 2026-10-10 |
 | Directory search validated against both backends: real `FindFirstFileW` under Wine, and `dirent` + `fnmatch` on Linux | `test_sysutils` on both targets | 2026-10-10 |
 | `__closure` scope: 44 distinct closure types, 16 typedefs; call sites pass bare member-function names | grep over generated core | 2026-10-10 |
@@ -241,7 +248,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P0-05 | `transform.py` property rewriter | done | 613/613, 0 unhandled |
 | P0-06 | `transform.py` fastcall/ARRAYOFCONST | todo | `__closure` split out as P0-06b |
 | P0-06b | `__closure` type + typedef transform | done | 44 typedefs; `CLOSURE()` macro verified on both targets |
-| P0-06c | `__closure` call-site binding | todo | 116 sites, compiler-guided |
+| P0-06c | `__closure` call-site binding | done | 62 sites; verified as a test |
 | P0-07 | Transform idempotence tests | done | idempotent + line-count parity asserted |
 | P0-08 | CMake skeleton | done | transform+verify wired as a build step; CTest on both targets |
 | P0-09 | Minimal shim for `core/Common.cpp` | wip | 224 errors; `Option.cpp` is the first TU at 0 |
