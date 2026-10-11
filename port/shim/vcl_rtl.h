@@ -18,6 +18,11 @@
   #include <windows.h>
 
   #include "vcl_win32_undef.h"
+#else
+  // Same reasoning on POSIX: core's headers reference DWORD, FILETIME, HKEY and
+  // friends before anything includes a platform header explicitly, so the
+  // Win32 subset must be visible from <vcl.h> onwards.
+  #include "win32_on_posix.h"
 #endif
 
 #include "vcl_property.h"

@@ -11,12 +11,17 @@ This test pins the current count per translation unit. A regression fails. An
 improvement also fails, with the command to re-baseline -- a stale baseline is
 how a ratchet quietly stops ratcheting.
 
+Both targets are measured. Linux compiles core now too, and the whole point of
+the project is one codebase for both, so letting one platform drift ahead
+unnoticed is exactly the failure this guards against.
+
   census_ratchet.py            verify against port/tests/census_baseline.json
   census_ratchet.py --update   record the current numbers as the new baseline
 """
 import argparse, json, os, re, subprocess, sys
 
 BASELINE = 'port/tests/census_baseline.json'
+TARGETS = ['x86_64-w64-mingw32', 'x86_64-pc-linux-gnu']
 
 def measure(tu, target):
     r = subprocess.run(
@@ -31,56 +36,84 @@ def measure(tu, target):
     return {
         'errors': int(errors.group(1)),
         'missing_types': int(types[0]) if types else 0,
+        # An aborted parse yields a floor, not a total, so a unit that starts
+        # aborting would otherwise look like a sudden improvement.
+        'aborted': 'ABORTED EARLY' in out,
     }
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--update', action='store_true')
-    ap.add_argument('--target', default='x86_64-w64-mingw32')
     a = ap.parse_args()
 
     base = {}
     if os.path.exists(BASELINE):
         base = json.load(open(BASELINE))
-    tus = sorted(base.get('units', {})) or ['source/core/Common.cpp']
+    tus = sorted(base.get('targets', {}).get(TARGETS[0], {})) or \
+          sorted(base.get('units', {})) or ['source/core/Common.cpp']
 
-    current = {tu: measure(tu, a.target) for tu in tus}
+    current = {t: {tu: measure(tu, t) for tu in tus} for t in TARGETS}
 
     if a.update:
-        json.dump({'target': a.target, 'units': current},
-                  open(BASELINE, 'w'), indent=2, sort_keys=True)
+        json.dump({'targets': current}, open(BASELINE, 'w'),
+                  indent=2, sort_keys=True)
         open(BASELINE, 'a').write('\n')
         print(f'baseline updated ({BASELINE}):')
-        for tu, m in current.items():
-            print(f"  {tu}: {m['errors']} errors, {m['missing_types']} types")
+        for t in TARGETS:
+            total = sum(m['errors'] for m in current[t].values())
+            clean = sum(1 for m in current[t].values() if m['errors'] == 0)
+            aborted = sum(1 for m in current[t].values() if m.get('aborted'))
+            print(f'  {t}: {total} errors, {clean}/{len(tus)} clean, '
+                  f'{aborted} aborting')
         return 0
 
     if not base:
         sys.exit(f'no baseline; run: {sys.argv[0]} --update')
 
     failures = []
-    for tu, now in current.items():
-        was = base['units'].get(tu)
-        if was is None:
-            failures.append(f'{tu}: not in baseline')
+    for t in TARGETS:
+        was_t = base.get('targets', {}).get(t)
+        if was_t is None:
+            failures.append(f'{t}: not in baseline')
             continue
-        for key in ('errors', 'missing_types'):
-            if now[key] > was[key]:
+        total = sum(m['errors'] for m in current[t].values())
+        clean = sum(1 for m in current[t].values() if m['errors'] == 0)
+        aborted = sum(1 for m in current[t].values() if m.get('aborted'))
+        print(f'  {t}: {total} errors, {clean}/{len(tus)} clean, '
+              f'{aborted} aborting')
+        for tu, now in sorted(current[t].items()):
+            was = was_t.get(tu)
+            if was is None:
+                failures.append(f'{t} {tu}: not in baseline')
+                continue
+            if now.get('aborted') and not was.get('aborted'):
                 failures.append(
-                    f'{tu}: {key} REGRESSED {was[key]} -> {now[key]}')
-            elif now[key] < was[key]:
+                    f'{t} {tu}: now ABORTS early -- its count is a floor, not a '
+                    f'total, so any apparent improvement is not real')
+                continue
+            if was.get('aborted') and not now.get('aborted'):
                 failures.append(
-                    f'{tu}: {key} improved {was[key]} -> {now[key]} '
-                    f'(good -- re-baseline with: port/tools/census_ratchet.py --update)')
-        print(f"  {tu}: {now['errors']} errors, {now['missing_types']} missing types")
+                    f'{t} {tu}: no longer aborts (good -- re-baseline with: '
+                    f'port/tools/census_ratchet.py --update)')
+                continue
+            for key in ('errors', 'missing_types'):
+                if now[key] > was[key]:
+                    failures.append(
+                        f'{t} {tu}: {key} REGRESSED {was[key]} -> {now[key]}')
+                elif now[key] < was[key]:
+                    failures.append(
+                        f'{t} {tu}: {key} improved {was[key]} -> {now[key]} '
+                        f'(good -- re-baseline with: '
+                        f'port/tools/census_ratchet.py --update)')
 
     if failures:
         print('\nCENSUS RATCHET:')
         for f in failures:
             print('  ', f)
         return 1
-    print('\nOK: census matches baseline')
+    print('\nOK: census matches baseline on both targets')
     return 0
+
 
 if __name__ == '__main__':
     sys.exit(main())

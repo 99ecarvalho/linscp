@@ -8,28 +8,30 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 21 | 32 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 8 | 29 | Golden suite green, six protocols, both platforms |
+| P0 Foundation | 23 | 34 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P1 Headless core | 9 | 30 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **29** | **85** | |
+| **Total** | **32** | **88** | |
 
 ## Next three actions
 
 Driven by `compile_census.py` rather than by grep counts — the compiler names
 what is actually blocking `Common.cpp`, in dependency order.
 
-**`source/core/Option.cpp` compiles cleanly on the Windows target — 0 errors,
-0 fatal, exit 0.** The first real WinSCP core translation unit to build against
-the shim. Aggregate across the nine tracked TUs is **1,220 errors**, down from
-2,409.
+**`source/core/Option.cpp` compiles cleanly on *both* targets** — Linux and
+Windows, 0 errors, 0 fatal. The two platforms are level again, which was the
+point of taking P1-07 ahead of the larger type groups.
+
+Honest totals across the nine tracked units, with nothing aborting on either
+target: **1,334 errors on mingw, 1,575 on Linux**. Both are higher than the
+previously reported figures because the parse now runs to completion instead of
+stopping at a missing header.
 
 1. **P1-06 / streams** — `TStream`, `THandleStream`, `TMemoryStream`, ~31 uses
-   each, and the largest remaining type group.
-2. **P1-07 / `win32-on-posix`** — `Option.cpp` still fails on Linux with 10
-   errors, all Win32 types (`HKEY`, `HINSTANCE`, `LCID`). Until this lands, the
-   Windows target runs ahead of Linux, which is the opposite of the end goal.
+   each, and the largest remaining type group on both targets.
+2. **P1-02b / `TList`** and `TObjectList`, then `TCustomIniFile`/`TRegistry`.
 3. **P0-06c / closure call sites** — 116 bare member-function names, each
    reported by clang with an exact position, so the rewrite can be
    compiler-guided.
@@ -69,6 +71,9 @@ the shim. Aggregate across the nine tracked TUs is **1,220 errors**, down from
 | 2026-10-10 | Chained subscripts on indexed properties are unsupported | clang reads `Prop[i][j]` as a two-argument getter call. Core has 0 occurrences; `check_properties.py` fails if an upstream change adds one |
 | 2026-10-10 | Win32 A/W name macros are undone in `vcl_win32_undef.h` | `<windows.h>` renamed the *definition* of `ReplaceText` to `ReplaceTextW` while the header still declared `ReplaceText`. Both compiled; only the link failed, and only because a test called it. A link-time guard now references every colliding name |
 | 2026-10-10 | `ARRAYOFCONST` pastes its parenthesised list onto a variadic call | C++Builder builds an open array of `TVarRec`, which needs compound literals. `ARRAYOFCONST((a, b))` becoming `MakeFormatArgs(a, b)` is ordinary C++ |
+| 2026-10-10 | `port/platform` headers refuse to compile on Windows, and are POSIX-only on the include path | Putting them on a Windows target shadowed the genuine mingw headers, which presented as a 1,220 -> 783 "improvement". The `#error` makes that mistake loud |
+| 2026-10-10 | `port/compat` is separate from `port/platform` | `help.h` is missing from upstream itself rather than being a platform difference, so it is needed on every target |
+| 2026-10-10 | The ratchet records whether a unit aborted | An aborted parse reports a floor. Treating that as a distinct state stops a new abort from reading as sudden progress |
 | 2026-10-10 | `Format` keeps malformed input visible | Delphi raises on a missing argument. Core routes user- and server-supplied text through these into logs, so an unknown specifier is echoed and a missing argument renders as `<missing>` rather than throwing from a log path |
 
 ## Correction: the earlier "5 errors left" figure was wrong
@@ -103,6 +108,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | `FindFirst` pattern matching | Case-sensitive on Linux, case-insensitive on Windows | Each matches its host filesystem. A pattern that matches on Windows may not on Linux |
 | `faHidden` on Linux | Set from a leading dot in the name | POSIX has no hidden attribute; the dot convention is what users expect |
 | `TFormatSettings` defaults | ISO-8601 rather than system locale | Deterministic across machines. Anything user-facing should set them explicitly |
+| Null arguments to the Win32 time functions | Rejected on POSIX; real Win32 dereferences and faults | The hardening is deliberate, so the null-argument assertions run only on POSIX |
+| Winsock error codes on POSIX | Keep their Winsock numeric values rather than mapping to `errno` | Core and the FileZilla layer compare them by name and store them in their own state |
 
 ## Open questions
 
@@ -179,6 +186,11 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | `Format` handles width, alignment, precision and explicit argument indices; unknown specifiers and missing arguments stay visible instead of dropping text | `test_strutils` | 2026-10-10 |
 | 161 narrow string literals in core require `UnicodeString(const char *)` | grep over generated core | 2026-10-10 |
 | 14/14 tests pass on both targets | `ctest` | 2026-10-10 |
+| **`core/Option.cpp` compiles clean on Linux *and* Windows: 0 errors each** | direct clang runs on both targets | 2026-10-10 |
+| FILETIME conversions validated against the real Win32 API under Wine, using epoch anchors fixed by the format | `test_win32_posix` on both targets | 2026-10-10 |
+| Real Win32 `FileTimeToSystemTime` faults on a null argument; the POSIX version rejects it | Wine crash dump, `cmpq $0, (%rcx)` | 2026-10-10 |
+| Honest totals with 0 units aborting: mingw 1,334, Linux 1,575 | `census_ratchet.py`, both targets | 2026-10-10 |
+| 15/15 tests pass on both targets | `ctest` | 2026-10-10 |
 | 12/12 tests pass on Linux and on Windows under Wine | `ctest` both trees | 2026-10-10 |
 | Directory search validated against both backends: real `FindFirstFileW` under Wine, and `dirent` + `fnmatch` on Linux | `test_sysutils` on both targets | 2026-10-10 |
 | `__closure` scope: 44 distinct closure types, 16 typedefs; call sites pass bare member-function names | grep over generated core | 2026-10-10 |
@@ -219,7 +231,9 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P0-27 | `compile_census.py` | done | classifies clang diagnostics into shim gaps |
 | P0-29 | Legacy unqualified RTL header stubs | done | `Classes.hpp` etc.; absence was aborting most TUs |
 | P0-30 | Win32 A/W macro collisions undone | done | link-time guard test |
-| P0-28 | `census_ratchet.py` | done | baseline pinned at 30 errors / 5 types |
+| P0-31 | Ratchet both targets, track aborts | done | an abort is a distinct state, not a low number |
+| P0-32 | `port/compat` for upstream gaps | done | `help.h`; on every target, unlike `port/platform` |
+| P0-28 | `census_ratchet.py` | done | both targets; aborts tracked separately |
 
 ### P1 — Headless core
 | ID | Task | Status | Note |
@@ -238,7 +252,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-05b | Shim: `TThread`/`StartThread` | todo | |
 | P1-06 | Shim: streams | todo | `TStream`/`THandleStream`/`TMemoryStream`, ~31 uses each |
 | P1-06b | Shim: INI/registry storage | todo | `TRegistry` 29, `TCustomIniFile` 28 |
-| P1-07 | win32-on-posix subset | todo | |
+| P1-07 | `port/platform` Win32 subset | done | types, FILETIME/SYSTEMTIME, errors, winsock names |
+| P1-07b | `port/platform` Win32 file/handle functions | todo | as the census asks |
 | P1-08 | Socket-event emulation | todo | R6 |
 | P1-09 | PuTTY unix backend re-import | todo | |
 | P1-10 | PuTTY delta reconciliation | todo | |

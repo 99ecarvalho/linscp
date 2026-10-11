@@ -48,11 +48,16 @@ def main():
         'clang++', f'--target={a.target}', '-std=c++17', '-fsyntax-only',
         '-fms-extensions', '-fshort-wchar', f'-ferror-limit={a.max_errors}',
         '-I', 'port/shim',
+        '-I', 'port/compat',
+
         '-I', os.path.join(a.gen, 'source/core'),
         '-I', os.path.join(up, 'resource'),
         '-I', os.path.join(up, 'windows'),
         '-I', os.path.join(up, 'filezilla'),
         '-I', os.path.join(up, 'putty'),
+        # putty/windows supplies platform.h, which core reaches through
+        # PuttyIntf.h. It includes help.h, which WinSCP does not vendor; that
+        # gap is filled by port/compat below.
         '-I', os.path.join(up, 'putty/windows'),
         '-I', os.path.join(up, 'components'),
         '-I', '3rd-party/winscp/libs/openssl/include',
@@ -61,6 +66,12 @@ def main():
         '-Wno-everything',
         tu,
     ]
+    # port/platform holds POSIX stand-ins for Win32 headers. Offering them to a
+    # Windows target would shadow the real mingw headers, which looked like
+    # progress the first time it happened.
+    if 'windows' not in a.target and 'mingw' not in a.target:
+        cmd[1:1] = ['-I', 'port/platform']
+
     r = subprocess.run(cmd, capture_output=True, text=True)
     err = r.stderr
 

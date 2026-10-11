@@ -12,6 +12,20 @@ add_library(linscp-shim STATIC
   vcl_strutils.cpp
   vcl_format.cpp
 )
+
+# The Win32 subset core calls directly. Only built for non-Windows targets; on
+# Windows the real <windows.h> and its import libraries serve core instead.
+if(NOT WIN32)
+  target_sources(linscp-shim PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../platform/win32_on_posix.cpp"
+  )
+endif()
+if(NOT WIN32)
+  target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../platform")
+endif()
 target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+# Gaps in upstream itself, as opposed to platform emulation: needed on every
+# target, so unlike ../platform this is not guarded by NOT WIN32.
+target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../compat")
 target_compile_features(linscp-shim PUBLIC cxx_std_17)
 target_compile_options(linscp-shim PUBLIC -fms-extensions -fshort-wchar)

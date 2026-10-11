@@ -43,6 +43,8 @@ Goal: prove the keystone works, with no behaviour change anywhere.
 | P0-27 | `compile_census.py`: classify what a real core TU still needs | S | P0-09 | Lets the compiler enumerate the shim gap instead of grep |
 | P0-29 | Shim stubs for the unqualified legacy RTL header names | S | P0-27 | `Classes.hpp` etc.; their absence was aborting most TUs early |
 | P0-30 | Undo Win32 A/W name macros that collide with RTL names | S | P0-29 | `ReplaceText` broke this way: header declared it, `<windows.h>` renamed the definition, link failed. Guarded by a link-time test |
+| P0-31 | Ratchet both targets and track early aborts | S | P0-28 | Linux compiles core now; an aborting unit reports a floor, which once read as progress |
+| P0-32 | `port/compat` for headers missing from upstream itself | S | — | `help.h`, which PuTTY's `platform.h` includes but WinSCP does not vendor |
 | P0-28 | `census_ratchet.py`: pin the census so progress cannot slip back | S | P0-27 | Nothing in core compiles cleanly yet, so a reintroduced type would look like a passing build |
 
 ## P1 — Headless core on both platforms
@@ -65,7 +67,8 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P1-05b | Shim: `TThread` / `StartThread` | M | P1-05 | `Interface.h` already abstracts thread creation |
 | P1-06 | Shim: `TStream`/`THandleStream`/`TMemoryStream` | M | P1-02 | ~31 uses each; now the largest non-closure group |
 | P1-06b | Shim: `TMemIniFile`/`TCustomIniFile`; `TRegistry` → file-backed | M | P1-06 | `TRegistry` 29, `TCustomIniFile` 28. INI backend already exists in core |
-| P1-07 | `port/platform/win32-on-posix`: ~40 functions | L | P1-06 | Keeps core diff at zero |
+| P1-07 | `port/platform`: Win32 types, time and error subset | L | P1-06 | Done for the compiling surface: `Option.cpp` builds on Linux too |
+| P1-07b | `port/platform`: Win32 file and handle functions | L | P1-07 | `CreateFile`/`ReadFile`/`WriteFile`/`CloseHandle` etc., as the census asks |
 | P1-08 | `WSAEventSelect` / socket-event emulation | M | P1-07 | R6 |
 | P1-09 | PuTTY: re-import upstream `unix/` backend | M | P1-03 | Upstream maintains it; reconcile WinSCP's patches |
 | P1-10 | PuTTY: reconcile WinSCP deltas against vanilla 0.85 | M | P1-09 | |

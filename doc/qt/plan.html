@@ -431,24 +431,22 @@ merge cost.</p>
 <p>One codebase. Qt UI. Builds and runs on Linux and Windows. No
 Embarcadero C++Builder in the toolchain.</p>
 <h2 id="current-state-2026-10-10">Current state (2026-10-10)</h2>
-<p>Phase 0 is 21 of 32 done; Phase 1 is 8 of 29. Upstream is pinned to
+<p>Phase 0 is 23 of 34 done; Phase 1 is 9 of 30. Upstream is pinned to
 the latest <strong>stable</strong> release, <code>6.5.8</code>.</p>
 <p><strong><code>source/core/Option.cpp</code> compiles cleanly against
-the shim on the Windows target</strong> — the first real WinSCP core
-translation unit to build. Across the nine tracked units the count is
-<strong>1,220 errors</strong>, down from 2,409, ratcheted in CI so it
-can only fall.</p>
-<p>The shim now covers <code>UnicodeString</code>, the byte-string
-family with a UTF-8 codec, <code>TDateTime</code>, the Delphi exception
+the shim on Linux <em>and</em> Windows</strong> — the first real WinSCP
+core translation unit to build, on both platforms. Across the nine
+tracked units, with nothing aborting on either target, the counts are
+1,334 errors on Windows and 1,575 on Linux, ratcheted in CI per target
+so neither platform can drift ahead unnoticed.</p>
+<p>The shim covers <code>UnicodeString</code>, the byte-string family
+with a UTF-8 codec, <code>TDateTime</code>, the Delphi exception
 hierarchy, <code>TCriticalSection</code>,
-<code>TStrings</code>/<code>TStringList</code>, directory search on both
-Win32 and POSIX, <code>TClosure</code> for <code>__closure</code>, the
-free string/number/path routines, and
-<code>TVarRec</code>/<code>Format</code>. 14 test binaries pass on Linux
-and on Windows under Wine.</p>
-<p>The Windows target currently runs ahead of Linux: the same unit still
-fails there on Win32 types, which is what
-<code>port/platform/win32-on-posix</code> (P1-07) is for.</p>
+<code>TStrings</code>/<code>TStringList</code>, directory search,
+<code>TClosure</code> for <code>__closure</code>, the free
+string/number/path routines, <code>TVarRec</code>/<code>Format</code>,
+and a Win32 subset for POSIX. 15 test binaries pass on Linux and on
+Windows under Wine.</p>
 <h2 id="the-three-findings-the-plan-rests-on">The three findings the
 plan rests on</h2>
 <ol type="1">
@@ -1226,6 +1224,23 @@ early</td>
 Guarded by a link-time test</td>
 </tr>
 <tr class="even">
+<td>P0-31</td>
+<td>Ratchet both targets and track early aborts</td>
+<td>S</td>
+<td>P0-28</td>
+<td>Linux compiles core now; an aborting unit reports a floor, which
+once read as progress</td>
+</tr>
+<tr class="odd">
+<td>P0-32</td>
+<td><code>port/compat</code> for headers missing from upstream
+itself</td>
+<td>S</td>
+<td>—</td>
+<td><code>help.h</code>, which PuTTY’s <code>platform.h</code> includes
+but WinSCP does not vendor</td>
+</tr>
+<tr class="even">
 <td>P0-28</td>
 <td><code>census_ratchet.py</code>: pin the census so progress cannot
 slip back</td>
@@ -1372,33 +1387,42 @@ backend already exists in core</td>
 </tr>
 <tr class="odd">
 <td>P1-07</td>
-<td><code>port/platform/win32-on-posix</code>: ~40 functions</td>
+<td><code>port/platform</code>: Win32 types, time and error subset</td>
 <td>L</td>
 <td>P1-06</td>
-<td>Keeps core diff at zero</td>
+<td>Done for the compiling surface: <code>Option.cpp</code> builds on
+Linux too</td>
 </tr>
 <tr class="even">
+<td>P1-07b</td>
+<td><code>port/platform</code>: Win32 file and handle functions</td>
+<td>L</td>
+<td>P1-07</td>
+<td><code>CreateFile</code>/<code>ReadFile</code>/<code>WriteFile</code>/<code>CloseHandle</code>
+etc., as the census asks</td>
+</tr>
+<tr class="odd">
 <td>P1-08</td>
 <td><code>WSAEventSelect</code> / socket-event emulation</td>
 <td>M</td>
 <td>P1-07</td>
 <td>R6</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-09</td>
 <td>PuTTY: re-import upstream <code>unix/</code> backend</td>
 <td>M</td>
 <td>P1-03</td>
 <td>Upstream maintains it; reconcile WinSCP’s patches</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-10</td>
 <td>PuTTY: reconcile WinSCP deltas against vanilla 0.85</td>
 <td>M</td>
 <td>P1-09</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-11</td>
 <td>FileZilla: replace vendored MFC subset
 (<code>CString</code>/<code>CFile</code>/<code>CTime</code>)</td>
@@ -1406,7 +1430,7 @@ backend already exists in core</td>
 <td>P1-01</td>
 <td>Only 4 files in <code>libs/mfc</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-12</td>
 <td><strong>FileZilla: <code>WSAAsyncSelect</code> hidden-window pump →
 epoll/poll</strong></td>
@@ -1414,28 +1438,28 @@ epoll/poll</strong></td>
 <td>P1-11</td>
 <td><strong>R2.</strong> ~1,700 lines; least mechanical task in P1</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-13</td>
 <td>Switch <code>libs/</code> to system OpenSSL, expat, neon, libs3</td>
 <td>M</td>
 <td>P0-08</td>
 <td>All vanilla upstream already</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-14</td>
 <td>Drop <code>puttyvs</code> (MSVC wrapper, obsolete)</td>
 <td>S</td>
 <td>P1-09</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-15</td>
 <td><code>winscp.com</code> shared-memory IPC → plain stdio</td>
 <td>M</td>
 <td>P1-06</td>
 <td>Both platforms</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-16</td>
 <td>Headless frontend implementing <code>Interface.h</code></td>
 <td>L</td>
@@ -1443,28 +1467,28 @@ epoll/poll</strong></td>
 <td>Derive from <code>ConsoleRunner.cpp</code> — it has zero
 <code>forms/</code> deps</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-17</td>
 <td>First link + first real SFTP session on Linux</td>
 <td>M</td>
 <td>P1-16</td>
 <td>Expect a long tail of link/ABI issues</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-18</td>
 <td>Same core + CLI cross-built for Windows, Wine-smoked</td>
 <td>M</td>
 <td>P1-17, P0-12</td>
 <td>Proves “one codebase”</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-19</td>
 <td>Golden suite green across all six protocols, both platforms</td>
 <td>L</td>
 <td>P1-18, P0-15</td>
 <td><strong>P1 exit gate</strong></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-20</td>
 <td>Verify stock <code>netstandard2.0</code> .NET assembly drives the
 Linux CLI</td>
@@ -1472,7 +1496,7 @@ Linux CLI</td>
 <td>P1-19</td>
 <td>Should work unchanged</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-21</td>
 <td><code>#ifdef</code> out <code>dragext</code>,
 <code>Setup.cpp</code>, jump lists, file associations</td>
@@ -1751,15 +1775,15 @@ evaluation down and close it</td>
 <tbody>
 <tr class="odd">
 <td>P0 Foundation</td>
-<td>21</td>
-<td>32</td>
+<td>23</td>
+<td>34</td>
 <td><code>core/Common.cpp</code> compiles on Linux clang; VCL build
 green (R1)</td>
 </tr>
 <tr class="even">
 <td>P1 Headless core</td>
-<td>8</td>
-<td>29</td>
+<td>9</td>
+<td>30</td>
 <td>Golden suite green, six protocols, both platforms</td>
 </tr>
 <tr class="odd">
@@ -1782,8 +1806,8 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>29</strong></td>
-<td><strong>85</strong></td>
+<td><strong>32</strong></td>
+<td><strong>88</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -1792,20 +1816,21 @@ green (R1)</td>
 <p>Driven by <code>compile_census.py</code> rather than by grep counts —
 the compiler names what is actually blocking <code>Common.cpp</code>, in
 dependency order.</p>
-<p><strong><code>source/core/Option.cpp</code> compiles cleanly on the
-Windows target — 0 errors, 0 fatal, exit 0.</strong> The first real
-WinSCP core translation unit to build against the shim. Aggregate across
-the nine tracked TUs is <strong>1,220 errors</strong>, down from
-2,409.</p>
+<p><strong><code>source/core/Option.cpp</code> compiles cleanly on
+<em>both</em> targets</strong> — Linux and Windows, 0 errors, 0 fatal.
+The two platforms are level again, which was the point of taking P1-07
+ahead of the larger type groups.</p>
+<p>Honest totals across the nine tracked units, with nothing aborting on
+either target: <strong>1,334 errors on mingw, 1,575 on Linux</strong>.
+Both are higher than the previously reported figures because the parse
+now runs to completion instead of stopping at a missing header.</p>
 <ol type="1">
 <li><strong>P1-06 / streams</strong> — <code>TStream</code>,
 <code>THandleStream</code>, <code>TMemoryStream</code>, ~31 uses each,
-and the largest remaining type group.</li>
-<li><strong>P1-07 / <code>win32-on-posix</code></strong> —
-<code>Option.cpp</code> still fails on Linux with 10 errors, all Win32
-types (<code>HKEY</code>, <code>HINSTANCE</code>, <code>LCID</code>).
-Until this lands, the Windows target runs ahead of Linux, which is the
-opposite of the end goal.</li>
+and the largest remaining type group on both targets.</li>
+<li><strong>P1-02b / <code>TList</code></strong> and
+<code>TObjectList</code>, then
+<code>TCustomIniFile</code>/<code>TRegistry</code>.</li>
 <li><strong>P0-06c / closure call sites</strong> — 116 bare
 member-function names, each reported by clang with an exact position, so
 the rewrite can be compiler-guided.</li>
@@ -2041,6 +2066,27 @@ compound literals. <code>ARRAYOFCONST((a, b))</code> becoming
 </tr>
 <tr class="even">
 <td>2026-10-10</td>
+<td><code>port/platform</code> headers refuse to compile on Windows, and
+are POSIX-only on the include path</td>
+<td>Putting them on a Windows target shadowed the genuine mingw headers,
+which presented as a 1,220 -&gt; 783 “improvement”. The
+<code>#error</code> makes that mistake loud</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td><code>port/compat</code> is separate from
+<code>port/platform</code></td>
+<td><code>help.h</code> is missing from upstream itself rather than
+being a platform difference, so it is needed on every target</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>The ratchet records whether a unit aborted</td>
+<td>An aborted parse reports a floor. Treating that as a distinct state
+stops a new abort from reading as sudden progress</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
 <td><code>Format</code> keeps malformed input visible</td>
 <td>Delphi raises on a missing argument. Core routes user- and
 server-supplied text through these into logs, so an unknown specifier is
@@ -2114,6 +2160,19 @@ expect</td>
 <td>ISO-8601 rather than system locale</td>
 <td>Deterministic across machines. Anything user-facing should set them
 explicitly</td>
+</tr>
+<tr class="odd">
+<td>Null arguments to the Win32 time functions</td>
+<td>Rejected on POSIX; real Win32 dereferences and faults</td>
+<td>The hardening is deliberate, so the null-argument assertions run
+only on POSIX</td>
+</tr>
+<tr class="even">
+<td>Winsock error codes on POSIX</td>
+<td>Keep their Winsock numeric values rather than mapping to
+<code>errno</code></td>
+<td>Core and the FileZilla layer compare them by name and store them in
+their own state</td>
 </tr>
 </tbody>
 </table>
@@ -2554,18 +2613,46 @@ instead of dropping text</td>
 <td>2026-10-10</td>
 </tr>
 <tr class="odd">
+<td><strong><code>core/Option.cpp</code> compiles clean on Linux
+<em>and</em> Windows: 0 errors each</strong></td>
+<td>direct clang runs on both targets</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>FILETIME conversions validated against the real Win32 API under
+Wine, using epoch anchors fixed by the format</td>
+<td><code>test_win32_posix</code> on both targets</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>Real Win32 <code>FileTimeToSystemTime</code> faults on a null
+argument; the POSIX version rejects it</td>
+<td>Wine crash dump, <code>cmpq $0, (%rcx)</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>Honest totals with 0 units aborting: mingw 1,334, Linux 1,575</td>
+<td><code>census_ratchet.py</code>, both targets</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>15/15 tests pass on both targets</td>
+<td><code>ctest</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
 <td>12/12 tests pass on Linux and on Windows under Wine</td>
 <td><code>ctest</code> both trees</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Directory search validated against both backends: real
 <code>FindFirstFileW</code> under Wine, and <code>dirent</code> +
 <code>fnmatch</code> on Linux</td>
 <td><code>test_sysutils</code> on both targets</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>__closure</code> scope: 44 distinct closure types, 16
 typedefs; call sites pass bare member-function names</td>
 <td>grep over generated core</td>
@@ -2787,10 +2874,23 @@ resolution</td>
 <td>link-time guard test</td>
 </tr>
 <tr class="even">
+<td>P0-31</td>
+<td>Ratchet both targets, track aborts</td>
+<td>done</td>
+<td>an abort is a distinct state, not a low number</td>
+</tr>
+<tr class="odd">
+<td>P0-32</td>
+<td><code>port/compat</code> for upstream gaps</td>
+<td>done</td>
+<td><code>help.h</code>; on every target, unlike
+<code>port/platform</code></td>
+</tr>
+<tr class="even">
 <td>P0-28</td>
 <td><code>census_ratchet.py</code></td>
 <td>done</td>
-<td>baseline pinned at 30 errors / 5 types</td>
+<td>both targets; aborts tracked separately</td>
 </tr>
 </tbody>
 </table>
@@ -2907,89 +3007,95 @@ done; path routines next</td>
 </tr>
 <tr class="odd">
 <td>P1-07</td>
-<td>win32-on-posix subset</td>
-<td>todo</td>
-<td></td>
+<td><code>port/platform</code> Win32 subset</td>
+<td>done</td>
+<td>types, FILETIME/SYSTEMTIME, errors, winsock names</td>
 </tr>
 <tr class="even">
+<td>P1-07b</td>
+<td><code>port/platform</code> Win32 file/handle functions</td>
+<td>todo</td>
+<td>as the census asks</td>
+</tr>
+<tr class="odd">
 <td>P1-08</td>
 <td>Socket-event emulation</td>
 <td>todo</td>
 <td>R6</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-09</td>
 <td>PuTTY unix backend re-import</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-10</td>
 <td>PuTTY delta reconciliation</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-11</td>
 <td>FileZilla MFC subset replacement</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-12</td>
 <td>FileZilla epoll rewrite</td>
 <td>todo</td>
 <td><strong>R2</strong> — budget generously</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-13</td>
 <td>System libs</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-14</td>
 <td>Drop <code>puttyvs</code></td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-15</td>
 <td>Console IPC → stdio</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-16</td>
 <td>Headless <code>Interface.h</code> frontend</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-17</td>
 <td>First SFTP session on Linux</td>
 <td>todo</td>
 <td>long tail expected</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-18</td>
 <td>Windows cross-build + Wine</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-19</td>
 <td>Golden suite green, both platforms</td>
 <td>todo</td>
 <td><strong>P1 gate</strong></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-20</td>
 <td>.NET assembly drives Linux CLI</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-21</td>
 <td><code>#ifdef</code> out Windows-only subsystems</td>
 <td>todo</td>

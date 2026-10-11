@@ -19,22 +19,20 @@ C++Builder in the toolchain.
 
 ## Current state (2026-10-10)
 
-Phase 0 is 21 of 32 done; Phase 1 is 8 of 29. Upstream is pinned to the latest
+Phase 0 is 23 of 34 done; Phase 1 is 9 of 30. Upstream is pinned to the latest
 **stable** release, `6.5.8`.
 
-**`source/core/Option.cpp` compiles cleanly against the shim on the Windows
-target** — the first real WinSCP core translation unit to build. Across the nine
-tracked units the count is **1,220 errors**, down from 2,409, ratcheted in CI so
-it can only fall.
+**`source/core/Option.cpp` compiles cleanly against the shim on Linux *and*
+Windows** — the first real WinSCP core translation unit to build, on both
+platforms. Across the nine tracked units, with nothing aborting on either
+target, the counts are 1,334 errors on Windows and 1,575 on Linux, ratcheted in
+CI per target so neither platform can drift ahead unnoticed.
 
-The shim now covers `UnicodeString`, the byte-string family with a UTF-8 codec,
+The shim covers `UnicodeString`, the byte-string family with a UTF-8 codec,
 `TDateTime`, the Delphi exception hierarchy, `TCriticalSection`,
-`TStrings`/`TStringList`, directory search on both Win32 and POSIX, `TClosure`
-for `__closure`, the free string/number/path routines, and `TVarRec`/`Format`.
-14 test binaries pass on Linux and on Windows under Wine.
-
-The Windows target currently runs ahead of Linux: the same unit still fails there
-on Win32 types, which is what `port/platform/win32-on-posix` (P1-07) is for.
+`TStrings`/`TStringList`, directory search, `TClosure` for `__closure`, the free
+string/number/path routines, `TVarRec`/`Format`, and a Win32 subset for POSIX.
+15 test binaries pass on Linux and on Windows under Wine.
 
 ## The three findings the plan rests on
 
