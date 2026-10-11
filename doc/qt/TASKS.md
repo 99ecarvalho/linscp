@@ -39,6 +39,7 @@ Goal: prove the keystone works, with no behaviour change anywhere.
 | P0-25 | ADR 0001: character width for `UnicodeString` | S | P0-24 | Accepted: `-fshort-wchar`, `std::u16string` storage |
 | P0-26 | `check_wide_abi.py`: enforce ADR 0001 mechanically | S | P0-25 | Wrong-ABI code links cleanly then misbehaves, so grep it |
 | P0-27 | `compile_census.py`: classify what a real core TU still needs | S | P0-09 | Lets the compiler enumerate the shim gap instead of grep |
+| P0-28 | `census_ratchet.py`: pin the census so progress cannot slip back | S | P0-27 | Nothing in core compiles cleanly yet, so a reintroduced type would look like a passing build |
 
 ## P1 — Headless core on both platforms
 
@@ -50,9 +51,11 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P1-01b | Shim: free string routines (`Format`, `LoadStr`, `SameText`, `Pos`, `IntToStr`, …) | L | P1-01 | Measured: `LoadStr` 288, `SameText` 113, `Pos` 89, `CutToChar` 70, `IntToStr` 58 |
 | P1-01c | Shim: `AnsiString` / `UTF8String` / `RawByteString` + UTF-8 codec | M | P1-01 | Distinct code-page types; wire-format correctness lives here |
 | P1-02 | Shim: `TObject`, `TList`, `TStrings`, `TStringList`, `Contnrs` | L | P1-01 | 497 `TStrings` uses |
-| P1-03 | Shim: `TDateTime`, `DateUtils`, `SysUtils`, `IOUtils`, `StrUtils` | L | P1-01 | |
+| P1-03 | Shim: `TDateTime` + date/time RTL | L | P1-01 | Done. 30 of 70 `Common.cpp` errors |
+| P1-03b | Shim: `SysUtils` / `IOUtils` / `StrUtils` file and path routines | L | P1-03 | `IncludeTrailingBackslash` 39, `ExtractFileName` 29 |
 | P1-04 | Shim: `Exception` hierarchy + Delphi exception semantics | M | P1-01 | Core has no `__try`/`__except` — simplifies this |
-| P1-05 | Shim: `TCriticalSection`, `TThread`, `SyncObjs` | M | P1-02 | `StartThread` is already abstracted in `Interface.h` |
+| P1-05 | Shim: `TCriticalSection` + `SyncObjs` | M | P1-02 | Done; recursive, as Delphi's is |
+| P1-05b | Shim: `TThread` / `StartThread` | M | P1-05 | `Interface.h` already abstracts thread creation |
 | P1-06 | Shim: `TStream`, `TMemIniFile`; `TRegistry` → file-backed | M | P1-02 | INI backend already exists in core |
 | P1-07 | `port/platform/win32-on-posix`: ~40 functions | L | P1-06 | Keeps core diff at zero |
 | P1-08 | `WSAEventSelect` / socket-event emulation | M | P1-07 | R6 |

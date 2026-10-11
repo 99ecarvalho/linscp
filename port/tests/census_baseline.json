@@ -1,0 +1,9 @@
+{
+  "target": "x86_64-w64-mingw32",
+  "units": {
+    "source/core/Common.cpp": {
+      "errors": 30,
+      "missing_types": 5
+    }
+  }
+}

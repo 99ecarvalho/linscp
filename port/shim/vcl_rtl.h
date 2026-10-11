@@ -18,9 +18,12 @@
 #endif
 
 #include "vcl_property.h"
+#include "vcl_object.h"
+#include "vcl_syncobjs.h"
 #include "vcl_types.h"
 #include "vcl_unicodestring.h"
 #include "vcl_bytestring.h"
+#include "vcl_datetime.h"
 
 // Embarcadero calling-convention and closure keywords. __fastcall is a pure
 // calling convention and means nothing to us on x86-64; __closure becomes a

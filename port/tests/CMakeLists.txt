@@ -12,11 +12,21 @@ add_executable(test_bytestring test_bytestring.cpp)
 target_link_libraries(test_bytestring PRIVATE linscp-shim)
 add_test(NAME bytestring COMMAND test_bytestring)
 
+add_executable(test_datetime test_datetime.cpp)
+target_link_libraries(test_datetime PRIVATE linscp-shim)
+add_test(NAME datetime COMMAND test_datetime)
+
+add_executable(test_object test_object.cpp)
+target_link_libraries(test_object PRIVATE linscp-shim)
+find_package(Threads REQUIRED)
+target_link_libraries(test_object PRIVATE Threads::Threads)
+add_test(NAME object_exceptions COMMAND test_object)
+
 # When cross-compiling, the toolchain points CMAKE_CROSSCOMPILING_EMULATOR at
 # wine; these tell wine where the mingw runtime DLLs live and keep its output
 # off the test log.
 if(LINSCP_WINE_DLLDIR_GCC)
-  set(_wine_tests property_forms unicodestring bytestring)
+  set(_wine_tests property_forms unicodestring bytestring datetime object_exceptions)
   # The backslash-escaped ';' is a literal Windows path separator inside the
   # WINEPATH value; the unescaped ';' separates the two environment entries.
   set_tests_properties(${_wine_tests} PROPERTIES ENVIRONMENT
@@ -36,6 +46,14 @@ set_tests_properties(transform_verify transform_properties_compile docs_consiste
   PROPERTIES WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
 # ADR 0001 enforcement: the wide-character ABI must stay uniform.
+# Locks in the compile-census numbers so shim progress cannot slip back
+# unnoticed: nothing in core compiles cleanly yet, so a reintroduced missing
+# type would otherwise look like a passing build.
+add_test(NAME census_ratchet
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/census_ratchet.py")
+set_tests_properties(census_ratchet
+  PROPERTIES WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+
 add_test(NAME shim_no_wide_abi
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/check_wide_abi.py")
 set_tests_properties(shim_no_wide_abi

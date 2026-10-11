@@ -8,24 +8,24 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 16 | 27 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 2 | 23 | Golden suite green, six protocols, both platforms |
+| P0 Foundation | 17 | 28 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P1 Headless core | 5 | 25 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **18** | **75** | |
+| **Total** | **22** | **78** | |
 
 ## Next three actions
 
 Driven by `compile_census.py` rather than by grep counts — the compiler names
 what is actually blocking `Common.cpp`, in dependency order.
 
-1. **P1-03 / `TDateTime`** — 30 of the 70 remaining errors in `Common.cpp`, the
-   single largest blocker.
-2. **P1-02 / `TStrings` + `TStringList`** — 17 more, and 521 uses across core.
-3. **P1-04 / `Exception`**, plus `TCriticalSection`, `TSearchRec`,
-   `TFormatSettings`, `TMethod` and the `DELPHI_PACKAGE` macro: 12 errors
-   between them, all small.
+1. **P1-02 / `TStrings` + `TStringList`** — now the dominant blocker: 17 of the
+   30 remaining errors in `Common.cpp`, and 521 uses across core.
+2. **P0-06 / `__closure`** — `TProcessLocalFileEvent` and `TLogOptionEvent` are
+   closure typedefs. A bare `#define` makes them parse but breaks every
+   assignment site, so they need the `std::function` transform rule.
+3. **P1-03b / `TSearchRec`** plus `FindFirst`/`FindNext` — 3 errors, small.
 
 ## Decisions taken
 
@@ -54,6 +54,9 @@ what is actually blocking `Common.cpp`, in dependency order.
 | 2026-10-10 | `vcl.h` transitively exposes the Win32 API | Matches C++Builder, which upstream's `CorePCH.h` depends on: it includes `<vcl.h>` and core's headers before `<Winapi.Windows.hpp>`. Fixing this alone removed 9 of 24 missing types |
 | 2026-10-10 | UTF-8 decoding substitutes one U+FFFD per maximal subpart | Unicode's recommended practice. The first implementation emitted one per byte; a test on truncated input caught it |
 | 2026-10-10 | Byte strings keep C++Builder's code-page template shape | Core relies on `RawByteString` and `UTF8String` being distinct types; collapsing them would let byte reinterpretation happen silently |
+| 2026-10-10 | Date and time are combined only through `ComposeDateTime` | Delphi keeps the time of day positive for negative dates, so `Date + Time` lands a day late at the mirrored time. Correct for file timestamps, wrong in general and wrong silently |
+| 2026-10-10 | `TCriticalSection` wraps `std::recursive_mutex` | Delphi's is re-entrant; a plain `std::mutex` would deadlock on core's re-entrant paths rather than fail a test |
+| 2026-10-10 | Compile-census numbers are ratcheted in CI | No core TU compiles cleanly yet, so a reintroduced missing type would otherwise present as a passing build |
 
 ## Open questions
 
@@ -107,6 +110,11 @@ what is actually blocking `Common.cpp`, in dependency order.
 | **A real core TU compiles against the shim with 70 errors from 12 distinct missing VCL types** (was 109 / 24) | `compile_census.py` on `core/Common.cpp`, mingw target | 2026-10-10 |
 | On the mingw target every remaining diagnostic is a VCL gap, not a platform one | Win32 types all resolve via the real mingw headers | 2026-10-10 |
 | 7/7 tests pass on both targets after the byte-string family | `ctest` | 2026-10-10 |
+| `Common.cpp` down to **30 errors / 5 distinct missing types** (from 109 / 24) | `compile_census.py` | 2026-10-10 |
+| 10/10 tests pass on Linux and on Windows under Wine | `ctest` both trees | 2026-10-10 |
+| The ratchet detects a regression: baseline 25 against actual 30 fails | simulated baseline, exit 1 | 2026-10-10 |
+| `TDateTime` matches Delphi's four documented anchors, including -1.25 = 1899-12-29 06:00 | `test_datetime` | 2026-10-10 |
+| Delphi's `DayOfWeek` offset verified independently against five known dates | standalone cross-check, k=6 | 2026-10-10 |
 
 ## Task status
 
@@ -121,7 +129,7 @@ what is actually blocking `Common.cpp`, in dependency order.
 | P0-06 | `transform.py` fastcall/closure/ARRAYOFCONST | todo | properties done; these three not started |
 | P0-07 | Transform idempotence tests | done | idempotent + line-count parity asserted |
 | P0-08 | CMake skeleton | done | transform+verify wired as a build step; CTest on both targets |
-| P0-09 | Minimal shim for `core/Common.cpp` | wip | 109 -> 70 errors; 12 distinct types left, all named |
+| P0-09 | Minimal shim for `core/Common.cpp` | wip | 109 -> 30 errors; 5 distinct types left |
 | P0-10 | mingw-w64 sysroot + clang toolchain file | done | `cmake/toolchain-mingw-w64.cmake`; clang + lld + Wine emulator |
 | P0-11 | CI matrix Linux + Windows cross | todo | |
 | P0-12 | Wine smoke tests in CI | wip | wired into CTest via `CMAKE_CROSSCOMPILING_EMULATOR`; GitHub Actions pending |
@@ -140,6 +148,7 @@ what is actually blocking `Common.cpp`, in dependency order.
 | P0-25 | ADR 0001 character width | done | accepted: `-fshort-wchar` + `std::u16string` |
 | P0-26 | `check_wide_abi.py` ADR enforcement | done | `shim_no_wide_abi` test |
 | P0-27 | `compile_census.py` | done | classifies clang diagnostics into shim gaps |
+| P0-28 | `census_ratchet.py` | done | baseline pinned at 30 errors / 5 types |
 
 ### P1 — Headless core
 | ID | Task | Status | Note |
@@ -147,10 +156,12 @@ what is actually blocking `Common.cpp`, in dependency order.
 | P1-01 | Shim: `UnicodeString` class | done | 1-based API, UTF-16, 9 test groups incl. surrogate pairs |
 | P1-01b | Shim: free string routines | todo | ranked by measured use |
 | P1-01c | Shim: byte-string family + UTF-8 codec | done | malformed-input behaviour tested explicitly |
-| P1-02 | Shim: `TObject`/`TList`/`TStrings` | todo | |
-| P1-03 | Shim: `TDateTime`/`SysUtils`/`IOUtils` | todo | |
-| P1-04 | Shim: exceptions | todo | |
-| P1-05 | Shim: threading/sync | todo | |
+| P1-02 | Shim: `TObject`/`TList`/`TStrings` | wip | `TObject`/`TPersistent` done; `TStrings` next |
+| P1-03 | Shim: `TDateTime` + date/time RTL | done | documented anchors, negative composition, `FormatDateTime` |
+| P1-03b | Shim: `SysUtils`/`IOUtils`/`StrUtils` paths | todo | |
+| P1-04 | Shim: exceptions | done | 17 Delphi classes; base and sibling matching tested |
+| P1-05 | Shim: `TCriticalSection`/`SyncObjs` | done | recursive; thread exclusion tested |
+| P1-05b | Shim: `TThread`/`StartThread` | todo | |
 | P1-06 | Shim: streams/INI/registry | todo | |
 | P1-07 | win32-on-posix subset | todo | |
 | P1-08 | Socket-event emulation | todo | R6 |

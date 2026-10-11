@@ -1175,6 +1175,15 @@ needs</td>
 <td>P0-09</td>
 <td>Lets the compiler enumerate the shim gap instead of grep</td>
 </tr>
+<tr class="even">
+<td>P0-28</td>
+<td><code>census_ratchet.py</code>: pin the census so progress cannot
+slip back</td>
+<td>S</td>
+<td>P0-27</td>
+<td>Nothing in core compiles cleanly yet, so a reintroduced type would
+look like a passing build</td>
+</tr>
 </tbody>
 </table>
 <h2 id="p1-headless-core-on-both-platforms">P1 — Headless core on both
@@ -1235,13 +1244,21 @@ platforms</h2>
 </tr>
 <tr class="odd">
 <td>P1-03</td>
-<td>Shim: <code>TDateTime</code>, <code>DateUtils</code>,
-<code>SysUtils</code>, <code>IOUtils</code>, <code>StrUtils</code></td>
+<td>Shim: <code>TDateTime</code> + date/time RTL</td>
 <td>L</td>
 <td>P1-01</td>
-<td></td>
+<td>Done. 30 of 70 <code>Common.cpp</code> errors</td>
 </tr>
 <tr class="even">
+<td>P1-03b</td>
+<td>Shim: <code>SysUtils</code> / <code>IOUtils</code> /
+<code>StrUtils</code> file and path routines</td>
+<td>L</td>
+<td>P1-03</td>
+<td><code>IncludeTrailingBackslash</code> 39,
+<code>ExtractFileName</code> 29</td>
+</tr>
+<tr class="odd">
 <td>P1-04</td>
 <td>Shim: <code>Exception</code> hierarchy + Delphi exception
 semantics</td>
@@ -1250,14 +1267,19 @@ semantics</td>
 <td>Core has no <code>__try</code>/<code>__except</code> — simplifies
 this</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-05</td>
-<td>Shim: <code>TCriticalSection</code>, <code>TThread</code>,
-<code>SyncObjs</code></td>
+<td>Shim: <code>TCriticalSection</code> + <code>SyncObjs</code></td>
 <td>M</td>
 <td>P1-02</td>
-<td><code>StartThread</code> is already abstracted in
-<code>Interface.h</code></td>
+<td>Done; recursive, as Delphi’s is</td>
+</tr>
+<tr class="odd">
+<td>P1-05b</td>
+<td>Shim: <code>TThread</code> / <code>StartThread</code></td>
+<td>M</td>
+<td>P1-05</td>
+<td><code>Interface.h</code> already abstracts thread creation</td>
 </tr>
 <tr class="even">
 <td>P1-06</td>
@@ -1648,15 +1670,15 @@ evaluation down and close it</td>
 <tbody>
 <tr class="odd">
 <td>P0 Foundation</td>
-<td>16</td>
-<td>27</td>
+<td>17</td>
+<td>28</td>
 <td><code>core/Common.cpp</code> compiles on Linux clang; VCL build
 green (R1)</td>
 </tr>
 <tr class="even">
 <td>P1 Headless core</td>
-<td>2</td>
-<td>23</td>
+<td>5</td>
+<td>25</td>
 <td>Golden suite green, six protocols, both platforms</td>
 </tr>
 <tr class="odd">
@@ -1679,8 +1701,8 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>18</strong></td>
-<td><strong>75</strong></td>
+<td><strong>22</strong></td>
+<td><strong>78</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -1690,17 +1712,17 @@ green (R1)</td>
 the compiler names what is actually blocking <code>Common.cpp</code>, in
 dependency order.</p>
 <ol type="1">
-<li><strong>P1-03 / <code>TDateTime</code></strong> — 30 of the 70
-remaining errors in <code>Common.cpp</code>, the single largest
-blocker.</li>
 <li><strong>P1-02 / <code>TStrings</code> +
-<code>TStringList</code></strong> — 17 more, and 521 uses across
+<code>TStringList</code></strong> — now the dominant blocker: 17 of the
+30 remaining errors in <code>Common.cpp</code>, and 521 uses across
 core.</li>
-<li><strong>P1-04 / <code>Exception</code></strong>, plus
-<code>TCriticalSection</code>, <code>TSearchRec</code>,
-<code>TFormatSettings</code>, <code>TMethod</code> and the
-<code>DELPHI_PACKAGE</code> macro: 12 errors between them, all
-small.</li>
+<li><strong>P0-06 / <code>__closure</code></strong> —
+<code>TProcessLocalFileEvent</code> and <code>TLogOptionEvent</code> are
+closure typedefs. A bare <code>#define</code> makes them parse but
+breaks every assignment site, so they need the
+<code>std::function</code> transform rule.</li>
+<li><strong>P1-03b / <code>TSearchRec</code></strong> plus
+<code>FindFirst</code>/<code>FindNext</code> — 3 errors, small.</li>
 </ol>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
@@ -1870,6 +1892,27 @@ per byte; a test on truncated input caught it</td>
 <td>Core relies on <code>RawByteString</code> and
 <code>UTF8String</code> being distinct types; collapsing them would let
 byte reinterpretation happen silently</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>Date and time are combined only through
+<code>ComposeDateTime</code></td>
+<td>Delphi keeps the time of day positive for negative dates, so
+<code>Date + Time</code> lands a day late at the mirrored time. Correct
+for file timestamps, wrong in general and wrong silently</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td><code>TCriticalSection</code> wraps
+<code>std::recursive_mutex</code></td>
+<td>Delphi’s is re-entrant; a plain <code>std::mutex</code> would
+deadlock on core’s re-entrant paths rather than fail a test</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>Compile-census numbers are ratcheted in CI</td>
+<td>No core TU compiles cleanly yet, so a reintroduced missing type
+would otherwise present as a passing build</td>
 </tr>
 </tbody>
 </table>
@@ -2173,6 +2216,35 @@ platform one</td>
 <td><code>ctest</code></td>
 <td>2026-10-10</td>
 </tr>
+<tr class="even">
+<td><code>Common.cpp</code> down to <strong>30 errors / 5 distinct
+missing types</strong> (from 109 / 24)</td>
+<td><code>compile_census.py</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>10/10 tests pass on Linux and on Windows under Wine</td>
+<td><code>ctest</code> both trees</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>The ratchet detects a regression: baseline 25 against actual 30
+fails</td>
+<td>simulated baseline, exit 1</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td><code>TDateTime</code> matches Delphi’s four documented anchors,
+including -1.25 = 1899-12-29 06:00</td>
+<td><code>test_datetime</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>Delphi’s <code>DayOfWeek</code> offset verified independently
+against five known dates</td>
+<td>standalone cross-check, k=6</td>
+<td>2026-10-10</td>
+</tr>
 </tbody>
 </table>
 <h2 id="task-status">Task status</h2>
@@ -2246,7 +2318,7 @@ platform one</td>
 <td>P0-09</td>
 <td>Minimal shim for <code>core/Common.cpp</code></td>
 <td>wip</td>
-<td>109 -&gt; 70 errors; 12 distinct types left, all named</td>
+<td>109 -&gt; 30 errors; 5 distinct types left</td>
 </tr>
 <tr class="even">
 <td>P0-10</td>
@@ -2363,6 +2435,12 @@ resolution</td>
 <td>done</td>
 <td>classifies clang diagnostics into shim gaps</td>
 </tr>
+<tr class="even">
+<td>P0-28</td>
+<td><code>census_ratchet.py</code></td>
+<td>done</td>
+<td>baseline pinned at 30 errors / 5 types</td>
+</tr>
 </tbody>
 </table>
 <h3 id="p1-headless-core">P1 — Headless core</h3>
@@ -2404,25 +2482,40 @@ resolution</td>
 <td>P1-02</td>
 <td>Shim:
 <code>TObject</code>/<code>TList</code>/<code>TStrings</code></td>
-<td>todo</td>
-<td></td>
+<td>wip</td>
+<td><code>TObject</code>/<code>TPersistent</code> done;
+<code>TStrings</code> next</td>
 </tr>
 <tr class="odd">
 <td>P1-03</td>
-<td>Shim:
-<code>TDateTime</code>/<code>SysUtils</code>/<code>IOUtils</code></td>
-<td>todo</td>
-<td></td>
+<td>Shim: <code>TDateTime</code> + date/time RTL</td>
+<td>done</td>
+<td>documented anchors, negative composition,
+<code>FormatDateTime</code></td>
 </tr>
 <tr class="even">
-<td>P1-04</td>
-<td>Shim: exceptions</td>
+<td>P1-03b</td>
+<td>Shim:
+<code>SysUtils</code>/<code>IOUtils</code>/<code>StrUtils</code>
+paths</td>
 <td>todo</td>
 <td></td>
 </tr>
 <tr class="odd">
+<td>P1-04</td>
+<td>Shim: exceptions</td>
+<td>done</td>
+<td>17 Delphi classes; base and sibling matching tested</td>
+</tr>
+<tr class="even">
 <td>P1-05</td>
-<td>Shim: threading/sync</td>
+<td>Shim: <code>TCriticalSection</code>/<code>SyncObjs</code></td>
+<td>done</td>
+<td>recursive; thread exclusion tested</td>
+</tr>
+<tr class="odd">
+<td>P1-05b</td>
+<td>Shim: <code>TThread</code>/<code>StartThread</code></td>
 <td>todo</td>
 <td></td>
 </tr>
