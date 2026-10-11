@@ -65,7 +65,7 @@ IDENT = re.compile(r'[A-Za-z_]\w*')
 
 DISCOVERY_GEN = 'build/gen-unbound'
 INCLUDES = [
-    'port/shim',
+    'port/shim', 'port/casefold', '3rd-party/winscp/libs/libs3/inc',
     '3rd-party/winscp/source/resource', '3rd-party/winscp/source/windows',
     '3rd-party/winscp/source/filezilla', '3rd-party/winscp/source/putty',
     '3rd-party/winscp/source/putty/windows',

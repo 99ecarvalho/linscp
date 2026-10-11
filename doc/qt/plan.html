@@ -1895,63 +1895,30 @@ green (R1)</td>
 <p>Driven by <code>compile_census.py</code> rather than by grep counts —
 the compiler names what is actually blocking each unit, in dependency
 order.</p>
-<p><strong>All ten tracked core units compile cleanly for
-Windows</strong> – 0 errors on mingw, nothing aborting – in upstream’s
-own preprocessor configuration. Seven of the ten are clean for Linux
-too. Census: <strong>0 on mingw, 162 on Linux.</strong></p>
-<table>
-<colgroup>
-<col style="width: 33%" />
-<col style="width: 33%" />
-<col style="width: 33%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Unit</th>
-<th>mingw</th>
-<th>Linux</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>Bookmarks</code>, <code>CopyParam</code>,
-<code>FileBuffer</code>, <code>FileMasks</code>, <code>NamedObjs</code>,
-<code>Option</code>, <code>Queue</code></td>
-<td>0</td>
-<td>0</td>
-</tr>
-<tr class="even">
-<td><code>Terminal.cpp</code></td>
-<td>0</td>
-<td>25</td>
-</tr>
-<tr class="odd">
-<td><code>Configuration.cpp</code></td>
-<td>0</td>
-<td>67</td>
-</tr>
-<tr class="even">
-<td><code>Common.cpp</code></td>
-<td>0</td>
-<td>70</td>
-</tr>
-</tbody>
-</table>
-<p>What remains on Linux is of two kinds, neither of them VCL: PuTTY’s
-platform layer (55 of <code>Configuration.cpp</code>’s 67 come from
-<code>putty/windows/platform.h</code> and the Windows GSSAPI
-declarations), and Win32 calls core makes directly –
-<code>CreateFile</code>, <code>GetFileAttributes</code>,
-<code>GetModuleHandle</code> and friends. WinSCP’s PuTTY is 0.83 with
-121 of its 224 files modified (+5,276 / -1,962 lines), mostly in crypto
-and SSH, so P1-09 / P1-10 is a reconciliation, not a copy.</p>
+<p>The census now covers <strong>every core unit upstream
+builds</strong> – all 33 <code>.cpp</code> files in
+<code>ScpCore.cbproj</code>, read from the project itself – in
+upstream’s own preprocessor configuration. Census: <strong>167 errors on
+mingw (16/33 clean, none aborting), 696 on Linux (10/33 clean, 4
+aborting).</strong></p>
+<p>The ten units tracked until now were a sample, and all ten compile
+for Windows. The whole-core figure is the honest one. It rose rather
+than fell when the sample widened, because three units that used to
+abort on a missing header – counted as a floor, not a total – now parse
+to the end.</p>
+<p>Remaining on mingw, largest first: <code>S3FileSystem</code> 28,
+<code>ScpFileSystem</code> 26, <code>Security</code> 18,
+<code>SessionData</code> 18, <code>SftpFileSystem</code> 17,
+<code>RemoteFiles</code> 16, <code>Exceptions</code> 9,
+<code>HierarchicalStorage</code> 9, then eight units with 1-4 each.</p>
 <ol type="1">
-<li><strong>Widen the census to every unit in
-<code>ScpCore.cbproj</code>.</strong> Ten units were a sample; the
-honest Windows figure is the whole core library.</li>
+<li>The mingw remainder, unit by unit: 167 errors across 17 units, the
+last VCL-shim work before the core library links for Windows
+(P1-17).</li>
 <li><strong>P1-09</strong>: PuTTY’s Unix platform layer – a second
 pinned upstream plus a patch series carrying WinSCP’s platform changes
-to <code>unix/</code>.</li>
+to <code>unix/</code>. WinSCP’s PuTTY is 0.83 with 121 of 224 files
+modified (+5,276 / -1,962 lines).</li>
 <li>The Win32 file and module calls core makes directly, in
 <code>port/platform</code>.</li>
 </ol>
@@ -2188,6 +2155,25 @@ by its owner with a value no input matches</td>
 index</em> (<code>ParseShortEngMonthName</code>) and reads one past the
 end. In C++Builder that is whatever follows; here it is defined and
 means “not found”</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>The census measures every core unit in <code>ScpCore.cbproj</code>,
+read from the project, in parallel</td>
+<td>Ten units were a sample. Reading the list from upstream means a unit
+it adds fails the ratchet until baselined, rather than going unmeasured.
+66 compiles take about 5 s</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>Case-mismatched upstream includes get checked-in forwarding headers
+in <code>port/casefold</code></td>
+<td>They resolve only on case-insensitive file systems, so a Linux host
+fails even when cross-compiling for Windows. Explicit, not generated: a
+basename match would have mapped <code>putty/windows/gss.c</code>’s
+<code>security.h</code> – the Windows SDK header – onto core’s
+<code>Security.h</code>. <code>check_include_case.py</code> applies a
+same-directory rule and fails on drift either way</td>
 </tr>
 <tr class="odd">
 <td>2026-10-10</td>

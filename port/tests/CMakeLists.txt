@@ -116,6 +116,9 @@ set_tests_properties(transform_verify transform_properties_compile docs_consiste
 # The recorded closure sites must still match the source. An upstream change
 # that moves one of these lines fails here rather than silently wrapping the
 # wrong token.
+add_test(NAME include_case
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/check_include_case.py")
+set_tests_properties(include_case PROPERTIES WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 add_test(NAME closure_shapes
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_closure_shapes.py")
 add_test(NAME closure_sites

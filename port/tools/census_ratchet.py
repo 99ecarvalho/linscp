@@ -11,6 +11,10 @@ This test pins the current count per translation unit. A regression fails. An
 improvement also fails, with the command to re-baseline -- a stale baseline is
 how a ratchet quietly stops ratcheting.
 
+The units are every core .cpp upstream's ScpCore.cbproj builds, read from the
+project itself, so a unit upstream adds appears here as a failure demanding a
+baseline rather than going unmeasured. They are compiled in parallel.
+
 Both targets are measured. Linux compiles core now too, and the whole point of
 the project is one codebase for both, so letting one platform drift ahead
 unnoticed is exactly the failure this guards against.
@@ -19,10 +23,21 @@ unnoticed is exactly the failure this guards against.
   census_ratchet.py --update   record the current numbers as the new baseline
 """
 import argparse, json, os, re, subprocess, sys
+from concurrent.futures import ThreadPoolExecutor
 
 BASELINE = 'port/tests/census_baseline.json'
 TARGETS = ['x86_64-w64-mingw32', 'x86_64-pc-linux-gnu']
 GEN = 'build/gen'
+CBPROJ = '3rd-party/winscp/source/ScpCore.cbproj'
+
+
+def project_units():
+    """The core translation units upstream builds, in source/core/X.cpp form."""
+    text = open(CBPROJ, encoding='utf-8', errors='replace').read()
+    units = sorted(set(re.findall(r'Include="core\\([^"\\]+\.cpp)"', text)))
+    if not units:
+        sys.exit(f'{CBPROJ}: no core units found -- has the project layout changed?')
+    return [f'source/core/{u}' for u in units]
 
 
 def regenerate():
@@ -39,7 +54,7 @@ def regenerate():
 def measure(tu, target):
     r = subprocess.run(
         [sys.executable, 'port/tools/compile_census.py', '--tu', tu,
-         '--target', target, '--show', '0'],
+         '--target', target, '--show', '0', '--report', ''],
         capture_output=True, text=True)
     out = r.stdout
     errors = re.search(r'total errors\s*:\s*(\d+)', out)
@@ -63,10 +78,14 @@ def main():
     base = {}
     if os.path.exists(BASELINE):
         base = json.load(open(BASELINE))
-    tus = sorted(base.get('targets', {}).get(TARGETS[0], {})) or \
-          sorted(base.get('units', {})) or ['source/core/Common.cpp']
+    tus = project_units()
 
-    current = {t: {tu: measure(tu, t) for tu in tus} for t in TARGETS}
+    jobs = [(t, tu) for t in TARGETS for tu in tus]
+    with ThreadPoolExecutor(max_workers=os.cpu_count() or 4) as pool:
+        results = list(pool.map(lambda j: measure(j[1], j[0]), jobs))
+    current = {t: {} for t in TARGETS}
+    for (t, tu), m in zip(jobs, results):
+        current[t][tu] = m
 
     if a.update:
         json.dump({'targets': current}, open(BASELINE, 'w'),
@@ -95,6 +114,8 @@ def main():
         aborted = sum(1 for m in current[t].values() if m.get('aborted'))
         print(f'  {t}: {total} errors, {clean}/{len(tus)} clean, '
               f'{aborted} aborting')
+        for tu in sorted(set(was_t) - set(current[t])):
+            failures.append(f'{t} {tu}: no longer in {CBPROJ} -- re-baseline')
         for tu, now in sorted(current[t].items()):
             was = was_t.get(tu)
             if was is None:

@@ -20,28 +20,25 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 Driven by `compile_census.py` rather than by grep counts — the compiler names
 what is actually blocking each unit, in dependency order.
 
-**All ten tracked core units compile cleanly for Windows** -- 0 errors on
-mingw, nothing aborting -- in upstream's own preprocessor configuration. Seven
-of the ten are clean for Linux too. Census: **0 on mingw, 162 on Linux.**
+The census now covers **every core unit upstream builds** -- all 33 `.cpp`
+files in `ScpCore.cbproj`, read from the project itself -- in upstream's own
+preprocessor configuration. Census: **167 errors on mingw (16/33 clean, none
+aborting), 696 on Linux (10/33 clean, 4 aborting).**
 
-| Unit | mingw | Linux |
-|---|---|---|
-| `Bookmarks`, `CopyParam`, `FileBuffer`, `FileMasks`, `NamedObjs`, `Option`, `Queue` | 0 | 0 |
-| `Terminal.cpp` | 0 | 25 |
-| `Configuration.cpp` | 0 | 67 |
-| `Common.cpp` | 0 | 70 |
+The ten units tracked until now were a sample, and all ten compile for Windows.
+The whole-core figure is the honest one. It rose rather than fell when the
+sample widened, because three units that used to abort on a missing header --
+counted as a floor, not a total -- now parse to the end.
 
-What remains on Linux is of two kinds, neither of them VCL: PuTTY's platform
-layer (55 of `Configuration.cpp`'s 67 come from `putty/windows/platform.h` and
-the Windows GSSAPI declarations), and Win32 calls core makes directly --
-`CreateFile`, `GetFileAttributes`, `GetModuleHandle` and friends. WinSCP's
-PuTTY is 0.83 with 121 of its 224 files modified (+5,276 / -1,962 lines),
-mostly in crypto and SSH, so P1-09 / P1-10 is a reconciliation, not a copy.
+Remaining on mingw, largest first: `S3FileSystem` 28, `ScpFileSystem` 26,
+`Security` 18, `SessionData` 18, `SftpFileSystem` 17, `RemoteFiles` 16,
+`Exceptions` 9, `HierarchicalStorage` 9, then eight units with 1-4 each.
 
-1. **Widen the census to every unit in `ScpCore.cbproj`.** Ten units were a
-   sample; the honest Windows figure is the whole core library.
+1. The mingw remainder, unit by unit: 167 errors across 17 units, the last
+   VCL-shim work before the core library links for Windows (P1-17).
 2. **P1-09**: PuTTY's Unix platform layer -- a second pinned upstream plus a
-   patch series carrying WinSCP's platform changes to `unix/`.
+   patch series carrying WinSCP's platform changes to `unix/`. WinSCP's PuTTY
+   is 0.83 with 121 of 224 files modified (+5,276 / -1,962 lines).
 3. The Win32 file and module calls core makes directly, in `port/platform`.
 
 ## Decisions taken
@@ -76,6 +73,8 @@ mostly in crypto and SSH, so P1-09 / P1-10 is a reconciliation, not a copy.
 | 2026-10-11 | C++Builder's static class properties become static `const` pointers (`TEncoding::UTF8`) | clang accepts `static __declspec(property)` but compiles it as a plain static member, failing only at link (see verified facts). Pointers serve both of core's spellings, as a value and through `->`; `[[clang::require_constant_initialization]]` guarantees no static-init-order exposure |
 | 2026-10-11 | `Win32MajorVersion()` and friends are functions, read from `RtlGetVersion` | Core calls them as functions. `GetVersionEx` reports 6.2 to an unmanifested executable, which would turn core's `IsWin10()` false on 10 and 11. Computed on first use, which also removes a dynamic-initialiser hazard |
 | 2026-10-11 | `StaticArray<T, N>` keeps one slack element, filled by its owner with a value no input matches | Core passes `Size()` as an open array's *high index* (`ParseShortEngMonthName`) and reads one past the end. In C++Builder that is whatever follows; here it is defined and means "not found" |
+| 2026-10-11 | The census measures every core unit in `ScpCore.cbproj`, read from the project, in parallel | Ten units were a sample. Reading the list from upstream means a unit it adds fails the ratchet until baselined, rather than going unmeasured. 66 compiles take about 5 s |
+| 2026-10-11 | Case-mismatched upstream includes get checked-in forwarding headers in `port/casefold` | They resolve only on case-insensitive file systems, so a Linux host fails even when cross-compiling for Windows. Explicit, not generated: a basename match would have mapped `putty/windows/gss.c`'s `security.h` -- the Windows SDK header -- onto core's `Security.h`. `check_include_case.py` applies a same-directory rule and fails on drift either way |
 | 2026-10-10 | A PR-able branch against `winscp/winscp` will be **generated**, not hand-maintained | linscp shares no history with upstream, so its `qt` branch is not directly mergeable. Since the port is mechanical, the fork branch can be produced on demand (Q-7). Rehearsed end to end — see facts below |
 | 2026-10-10 | Transform must be byte-exact outside property lines | A full-file rewrite (CRLF loss) turned a 613-line change into 76,551. Now asserted by `verify_transform.py` |
 | 2026-10-10 | Field/accessor classification is convention-first, parens only as fallback | The parens heuristic false-positives on constructor initialiser lists; WinSCP's `F<Upper>` / `Get*`/`Set*` convention is airtight. Truly unclassifiable names now fail the run instead of producing a wrong-arity macro |

@@ -49,6 +49,8 @@ def main():
     ap.add_argument('--target', default='x86_64-w64-mingw32')
     ap.add_argument('--show', type=int, default=25)
     ap.add_argument('--max-errors', default='0')
+    # Empty to skip: the ratchet runs many of these at once.
+    ap.add_argument('--report', default='build/compile_census.txt')
     a = ap.parse_args()
 
     tu = os.path.join(a.gen, a.tu)
@@ -60,6 +62,9 @@ def main():
         'clang++', f'--target={a.target}', '-std=c++17', '-fsyntax-only',
         '-fms-extensions', '-fshort-wchar', f'-ferror-limit={a.max_errors}',
         '-I', 'port/shim',
+        # Forwarders for upstream includes that differ from the file name only
+        # in case; see port/casefold/README.md.
+        '-I', 'port/casefold',
 
         '-I', os.path.join(a.gen, 'source/core'),
         '-I', os.path.join(up, 'resource'),
@@ -74,6 +79,7 @@ def main():
         '-I', '3rd-party/winscp/libs/openssl/include',
         '-I', '3rd-party/winscp/libs/neon/src',
         '-I', '3rd-party/winscp/libs/expat/lib',
+        '-I', '3rd-party/winscp/libs/libs3/inc',
         '-Wno-everything',
     ] + _upstream_defines().flags(a.target) + [
         tu,
@@ -134,11 +140,12 @@ def main():
               'fatal error above)')
 
     os.makedirs('build', exist_ok=True)
-    with open('build/compile_census.txt', 'w') as f:
-        for kind, c in found.items():
-            for name, n in c.most_common():
-                f.write(f'{n}\t{kind}\t{name}\n')
-    print(f'\n-> build/compile_census.txt')
+    if a.report:
+        with open(a.report, 'w') as f:
+            for kind, c in found.items():
+                for name, n in c.most_common():
+                    f.write(f'{n}\t{kind}\t{name}\n')
+        print(f'\n-> {a.report}')
     return 0
 
 if __name__ == '__main__':
