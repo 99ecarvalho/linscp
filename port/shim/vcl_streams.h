@@ -96,6 +96,11 @@ public:
 
   PROP_R_F(THandle, Handle, FHandle);
 
+  // Give up the handle without closing it. Used by the handle-based file API,
+  // which wraps a borrowed handle in a temporary stream; without this, the
+  // temporary's destructor would close a handle the caller still owns.
+  void DetachHandle() { FHandle = InvalidHandleValue; }
+
 protected:
   THandle FHandle = InvalidHandleValue;
 };
@@ -135,8 +140,12 @@ public:
   void SaveToStream(TStream * Stream);
   void LoadFromStream(TStream * Stream);
 
-  const void * Memory() const { return FData.data(); }
-  PROP_R_G(const void *, MemoryPtr, Memory);
+  // Delphi exposes this as a property named Memory, and as a writable Pointer:
+  // core does `(char *)FMemory->Memory` and then writes through it, so a
+  // const pointer or a method named Memory would both break at the call site.
+  void * GetMemory() const
+    { return const_cast<void *>(static_cast<const void *>(FData.data())); }
+  PROP_R_G(void *, Memory, GetMemory);
 
 private:
   std::vector<unsigned char> FData;

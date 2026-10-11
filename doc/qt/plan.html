@@ -1377,14 +1377,22 @@ this</td>
 </tr>
 <tr class="even">
 <td>P1-06b</td>
-<td>Shim: <code>TMemIniFile</code>/<code>TCustomIniFile</code>;
-<code>TRegistry</code> → file-backed</td>
+<td>Shim:
+<code>TCustomIniFile</code>/<code>TMemIniFile</code>/<code>TRegistry</code></td>
 <td>M</td>
 <td>P1-06</td>
-<td><code>TRegistry</code> 29, <code>TCustomIniFile</code> 28. INI
-backend already exists in core</td>
+<td>Done. Real registry on Windows; on POSIX every key reports
+absent</td>
 </tr>
 <tr class="odd">
+<td>P1-06c</td>
+<td>Shim: <code>DynamicArray</code>, Delphi handle-based file API</td>
+<td>S</td>
+<td>P1-06</td>
+<td>Done. Reference-counted, as core’s by-value <code>Read</code>
+requires</td>
+</tr>
+<tr class="even">
 <td>P1-07</td>
 <td><code>port/platform</code>: Win32 types, time and error subset</td>
 <td>L</td>
@@ -1392,13 +1400,21 @@ backend already exists in core</td>
 <td>Done for the compiling surface: <code>Option.cpp</code> builds on
 Linux too</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-07b</td>
 <td><code>port/platform</code>: Win32 file and handle functions</td>
 <td>L</td>
 <td>P1-07</td>
 <td><code>CreateFile</code>/<code>ReadFile</code>/<code>WriteFile</code>/<code>CloseHandle</code>
 etc., as the census asks</td>
+</tr>
+<tr class="even">
+<td>P1-06d</td>
+<td>Frontend decision: select the INI storage backend on Linux</td>
+<td>S</td>
+<td>P1-06b</td>
+<td><code>TRegistryStorage</code> cannot work there; core already
+supports the INI path</td>
 </tr>
 <tr class="odd">
 <td>P1-08</td>
@@ -1781,8 +1797,8 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td>P1 Headless core</td>
-<td>12</td>
-<td>30</td>
+<td>14</td>
+<td>32</td>
 <td>Golden suite green, six protocols, both platforms</td>
 </tr>
 <tr class="odd">
@@ -1805,8 +1821,8 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>35</strong></td>
-<td><strong>88</strong></td>
+<td><strong>37</strong></td>
+<td><strong>90</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -1829,16 +1845,18 @@ now runs to completion instead of stopping at a missing header.</p>
 aborting.</p>
 <p>Closest unit to clean next: <code>FileBuffer.cpp</code> (16 mingw /
 24 Linux).</p>
+<p><strong>Three core units now compile cleanly on both
+targets:</strong> <code>Option.cpp</code>, <code>NamedObjs.cpp</code>
+and <code>FileBuffer.cpp</code>. Census is <strong>963 on mingw, 1,182
+on Linux</strong>.</p>
 <ol type="1">
-<li><strong>P1-06b / storage</strong> — <code>TCustomIniFile</code> and
-<code>TRegistry</code>, 12 uses each, and the last sizeable type
-group.</li>
 <li><strong>P0-06c / closure call sites</strong> — 116 bare
-member-function names, each reported by clang with an exact position, so
-the rewrite can be compiler-guided.</li>
+member-function names. Now the largest single mechanical item left, and
+compiler-guided since clang reports each with an exact position.</li>
 <li><strong>P1-07b / Win32 file and handle functions</strong> —
 <code>CreateFile</code>, <code>ReadFile</code>, <code>CloseHandle</code>
 and the rest, as the census asks for them.</li>
+<li><code>Bookmarks.cpp</code> is next closest at 47 / 49.</li>
 </ol>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
@@ -2070,6 +2088,43 @@ compound literals. <code>ARRAYOFCONST((a, b))</code> becoming
 <code>MakeFormatArgs(a, b)</code> is ordinary C++</td>
 </tr>
 <tr class="even">
+<td>2026-10-11</td>
+<td><code>TRegistry</code> on POSIX reports every key absent rather than
+empty</td>
+<td>There is no registry, and returning defaults for settings a user had
+actually set would look to them like their configuration had vanished.
+The INI backend, which core already supports, is the correct one there
+(P1-06d)</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>INI section and key names match case-insensitively</td>
+<td>Delphi’s do, and files written by WinSCP on Windows have
+inconsistent casing</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>INI sections and keys keep their file order</td>
+<td>Sorting them would churn the user’s configuration on every save and
+make diffs useless</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td><code>DynamicArray</code> shares its buffer on copy, as Delphi’s
+does</td>
+<td>Core declares <code>TSafeHandleStream::Read</code> as taking one
+<em>by value</em> and fills it for the caller. A deep-copying version
+would compile and silently return no data</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td><code>win32_on_posix.h</code> exposes <code>&lt;string.h&gt;</code>,
+<code>&lt;stdlib.h&gt;</code> and <code>&lt;stdio.h&gt;</code></td>
+<td><code>&lt;windows.h&gt;</code> does transitively, and core calls
+<code>strlen</code>, <code>strcmp</code> and <code>memmove</code>
+unqualified</td>
+</tr>
+<tr class="odd">
 <td>2026-10-10</td>
 <td><strong>Resource strings: supply Win32 <code>LoadString</code>, not
 a <code>.res</code> loader, and do not patch core</strong></td>
@@ -2081,7 +2136,7 @@ additive change — the kind upstream could take rather than a fork of its
 own code. The table is generated from upstream’s <code>.rc</code> files,
 so the strings track the submodule automatically</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>UnicodeString::c_str()</code> has a non-const overload
 returning a writable buffer</td>
@@ -2090,7 +2145,7 @@ returning a writable buffer</td>
 <code>c_str()</code> to <code>LoadString</code> as the destination to
 fill</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>TList::Notify</code> is virtual and fires before a removal,
 after an addition</td>
@@ -2098,28 +2153,28 @@ after an addition</td>
 inside it, so a wrong <code>Action</code> means a leak or a double free,
 neither of which announces itself</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>Extract</code> reports <code>lnExtracted</code>, never
 <code>lnDeleted</code></td>
 <td>That is how Delphi lets a caller take ownership back without the
 list freeing the object</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>TList::Sort</code> is stable, where Delphi’s quicksort is
 not</td>
 <td>Relying on an unstable order would be a latent caller bug either
 way, and stable is the safer guarantee to provide</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>Derived streams re-expose the base’s legacy <code>Seek</code> with a
 using-declaration</td>
 <td>Overriding one overload hides the other. Core calls both on derived
 streams, so without this the legacy origins would stop resolving</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>Stream exceptions follow Delphi’s shape exactly</td>
 <td><code>EFilerError</code>, <code>EFOpenError</code> and
@@ -2127,7 +2182,7 @@ streams, so without this the legacy origins would stop resolving</td>
 with <code>EReadError</code>/<code>EWriteError</code> beneath
 <code>EFilerError</code>. Core catches at both levels</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>port/platform</code> headers refuse to compile on Windows, and
 are POSIX-only on the include path</td>
@@ -2135,20 +2190,20 @@ are POSIX-only on the include path</td>
 which presented as a 1,220 -&gt; 783 “improvement”. The
 <code>#error</code> makes that mistake loud</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>port/compat</code> is separate from
 <code>port/platform</code></td>
 <td><code>help.h</code> is missing from upstream itself rather than
 being a platform difference, so it is needed on every target</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>The ratchet records whether a unit aborted</td>
 <td>An aborted parse reports a floor. Treating that as a distinct state
 stops a new abort from reading as sudden progress</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>Format</code> keeps malformed input visible</td>
 <td>Delphi raises on a missing argument. Core routes user- and
@@ -2236,6 +2291,19 @@ only on POSIX</td>
 <code>errno</code></td>
 <td>Core and the FileZilla layer compare them by name and store them in
 their own state</td>
+</tr>
+<tr class="odd">
+<td><code>TRegistry</code> on Linux</td>
+<td>Every key reports absent; nothing can be read or written</td>
+<td>No registry exists. The INI backend is the correct one there, and
+failing visibly beats returning defaults for settings the user had
+set</td>
+</tr>
+<tr class="even">
+<td>INI share modes</td>
+<td>Windows share modes are ignored on POSIX rather than
+approximated</td>
+<td>Advisory locking would change behaviour rather than match it</td>
 </tr>
 </tbody>
 </table>
@@ -2743,6 +2811,29 @@ unknown, 0 duplicates</td>
 <td>2026-10-10</td>
 </tr>
 <tr class="odd">
+<td><strong><code>FileBuffer.cpp</code> joins the clean set: 3/9 units
+at 0 errors on both targets</strong></td>
+<td><code>compile_census.py</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="even">
+<td>Census after storage and arrays: mingw 963, Linux 1,182, 0
+aborting</td>
+<td><code>census_ratchet.py</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="odd">
+<td><code>TRegistry</code> round-trips against the real Windows registry
+under Wine</td>
+<td><code>test_storage</code> on the mingw target</td>
+<td>2026-10-11</td>
+</tr>
+<tr class="even">
+<td>20/20 tests pass on both targets</td>
+<td><code>ctest</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="odd">
 <td>12/12 tests pass on Linux and on Windows under Wine</td>
 <td><code>ctest</code> both trees</td>
 <td>2026-10-10</td>
@@ -3103,8 +3194,20 @@ done; path routines next</td>
 <tr class="even">
 <td>P1-06b</td>
 <td>Shim: INI/registry storage</td>
+<td>done</td>
+<td>INI parses real-world files; registry real on Windows</td>
+</tr>
+<tr class="odd">
+<td>P1-06c</td>
+<td>Shim: <code>DynamicArray</code> + file API</td>
+<td>done</td>
+<td>sharing semantics tested</td>
+</tr>
+<tr class="even">
+<td>P1-06d</td>
+<td>Select INI backend on Linux</td>
 <td>todo</td>
-<td><code>TRegistry</code> 29, <code>TCustomIniFile</code> 28</td>
+<td>frontend decision</td>
 </tr>
 <tr class="odd">
 <td>P1-07</td>

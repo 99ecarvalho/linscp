@@ -3,33 +3,33 @@
     "x86_64-pc-linux-gnu": {
       "source/core/Bookmarks.cpp": {
         "aborted": false,
-        "errors": 53,
-        "missing_types": 5
+        "errors": 44,
+        "missing_types": 3
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 245,
-        "missing_types": 20
+        "errors": 241,
+        "missing_types": 17
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 225,
-        "missing_types": 30
+        "errors": 187,
+        "missing_types": 28
       },
       "source/core/CopyParam.cpp": {
         "aborted": false,
-        "errors": 99,
-        "missing_types": 6
+        "errors": 88,
+        "missing_types": 4
       },
       "source/core/FileBuffer.cpp": {
         "aborted": false,
-        "errors": 24,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/FileMasks.cpp": {
         "aborted": false,
-        "errors": 136,
-        "missing_types": 8
+        "errors": 127,
+        "missing_types": 6
       },
       "source/core/NamedObjs.cpp": {
         "aborted": false,
@@ -43,40 +43,40 @@
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 504,
-        "missing_types": 12
+        "errors": 495,
+        "missing_types": 10
       }
     },
     "x86_64-w64-mingw32": {
       "source/core/Bookmarks.cpp": {
         "aborted": false,
-        "errors": 51,
-        "missing_types": 5
+        "errors": 42,
+        "missing_types": 3
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 184,
-        "missing_types": 10
+        "errors": 179,
+        "missing_types": 7
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 158,
-        "missing_types": 8
+        "errors": 124,
+        "missing_types": 6
       },
       "source/core/CopyParam.cpp": {
         "aborted": false,
-        "errors": 99,
-        "missing_types": 6
+        "errors": 88,
+        "missing_types": 4
       },
       "source/core/FileBuffer.cpp": {
         "aborted": false,
-        "errors": 16,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/FileMasks.cpp": {
         "aborted": false,
-        "errors": 133,
-        "missing_types": 8
+        "errors": 124,
+        "missing_types": 6
       },
       "source/core/NamedObjs.cpp": {
         "aborted": false,
@@ -90,8 +90,8 @@
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 415,
-        "missing_types": 9
+        "errors": 406,
+        "missing_types": 7
       }
     }
   }

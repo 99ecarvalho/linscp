@@ -22,6 +22,14 @@ add_test(NAME strings COMMAND test_strings)
 
 # Runs on both targets on purpose: on Windows it exercises the real Win32 API,
 # which is what the POSIX implementation is being measured against.
+add_executable(test_dynarray test_dynarray.cpp)
+target_link_libraries(test_dynarray PRIVATE linscp-shim)
+add_test(NAME dynarray COMMAND test_dynarray)
+
+add_executable(test_storage test_storage.cpp)
+target_link_libraries(test_storage PRIVATE linscp-shim)
+add_test(NAME storage COMMAND test_storage)
+
 add_executable(test_resources test_resources.cpp)
 target_link_libraries(test_resources PRIVATE linscp-shim)
 # Ids come from upstream's own header, so a renumbering there fails the test.
@@ -62,7 +70,7 @@ add_test(NAME object_exceptions COMMAND test_object)
 # wine; these tell wine where the mingw runtime DLLs live and keep its output
 # off the test log.
 if(LINSCP_WINE_DLLDIR_GCC)
-  set(_wine_tests property_forms unicodestring bytestring datetime object_exceptions strings sysutils closure strutils win32_on_posix streams containers resources)
+  set(_wine_tests property_forms unicodestring bytestring datetime object_exceptions strings sysutils closure strutils win32_on_posix streams containers resources storage dynarray)
   # The backslash-escaped ';' is a literal Windows path separator inside the
   # WINEPATH value; the unescaped ';' separates the two environment entries.
   set_tests_properties(${_wine_tests} PROPERTIES ENVIRONMENT

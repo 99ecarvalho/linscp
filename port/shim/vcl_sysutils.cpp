@@ -2,6 +2,10 @@
 
 #include <cstring>
 
+#if !defined(_WIN32)
+  #include <unistd.h>
+#endif
+
 #include "vcl_bytestring.h"
 
 const UnicodeString EmptyStr;
@@ -269,3 +273,87 @@ bool DirectoryExists(const UnicodeString & Name)
 }
 
 #endif
+
+// --- Delphi's handle-based file API ----------------------------------------
+//
+// Implemented over THandleStream so the platform differences live in one place
+// rather than being repeated here.
+
+THandle FileOpen(const UnicodeString & FileName, unsigned Mode)
+{
+  try
+  {
+    // Deliberately leaks the stream object's handle to the caller, which is
+    // what a handle-returning API means: FileClose releases it.
+    auto * Stream = new TFileStream(FileName, static_cast<Word>(Mode));
+    const THandle Handle = Stream->Handle;
+    // Detach: the handle now belongs to the caller, so the stream must not
+    // close it on destruction.
+    Stream->DetachHandle();
+    delete Stream;
+    return Handle;
+  }
+  catch (const EStreamError &)
+  {
+    return InvalidHandleValue;
+  }
+}
+
+THandle FileCreate(const UnicodeString & FileName)
+{
+  return FileOpen(FileName, fmCreate);
+}
+
+void FileClose(THandle Handle)
+{
+  if (Handle != InvalidHandleValue)
+  {
+#if defined(_WIN32)
+    CloseHandle(reinterpret_cast<HANDLE>(Handle));
+#else
+    ::close(static_cast<int>(static_cast<std::intptr_t>(Handle)));
+#endif
+  }
+}
+
+__int64 FileSeek(THandle Handle, __int64 Offset, int Origin)
+{
+  THandleStream Stream(Handle);
+  const __int64 Result = Stream.Seek(Offset, static_cast<TSeekOrigin>(Origin));
+  Stream.DetachHandle();
+  return Result;
+}
+
+int FileRead(THandle Handle, void * Buffer, int Count)
+{
+  THandleStream Stream(Handle);
+  const int Result = Stream.Read(Buffer, Count);
+  Stream.DetachHandle();
+  return Result;
+}
+
+int FileWrite(THandle Handle, const void * Buffer, int Count)
+{
+  THandleStream Stream(Handle);
+  const int Result = Stream.Write(Buffer, Count);
+  Stream.DetachHandle();
+  return Result;
+}
+
+int FileRead(THandle Handle, TBytes Buffer, int Offset, int Count)
+{
+  if (Offset < 0 || Count <= 0 || Offset + Count > Buffer.Length())
+  {
+    return 0;
+  }
+  return FileRead(Handle, Buffer.data() + Offset, Count);
+}
+
+int FileWrite(THandle Handle, const TBytes Buffer, int Offset, int Count)
+{
+  if (Offset < 0 || Count <= 0 || Offset + Count > Buffer.Length())
+  {
+    return 0;
+  }
+  return FileWrite(Handle, Buffer.data() + Offset, Count);
+}

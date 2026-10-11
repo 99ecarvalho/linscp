@@ -22,6 +22,13 @@
 #include <cstddef>
 #include <cstdint>
 
+// <windows.h> transitively provides these, and core relies on it: it calls
+// strlen, strcmp and memmove unqualified. Using the C headers rather than the
+// C++ ones so the names land in the global namespace, as they do on Windows.
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 // --- integral types --------------------------------------------------------
 // Fixed-width deliberately: core serialises several of these into protocol and
 // on-disk structures, so their widths are part of the contract, not an

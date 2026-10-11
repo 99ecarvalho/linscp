@@ -9,11 +9,11 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 23 | 34 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 12 | 30 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 14 | 32 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **35** | **88** | |
+| **Total** | **37** | **90** | |
 
 ## Next three actions
 
@@ -35,13 +35,15 @@ aborting.
 
 Closest unit to clean next: `FileBuffer.cpp` (16 mingw / 24 Linux).
 
-1. **P1-06b / storage** — `TCustomIniFile` and `TRegistry`, 12 uses each, and
-   the last sizeable type group.
-2. **P0-06c / closure call sites** — 116 bare member-function names, each
-   reported by clang with an exact position, so the rewrite can be
-   compiler-guided.
-3. **P1-07b / Win32 file and handle functions** — `CreateFile`, `ReadFile`,
+**Three core units now compile cleanly on both targets:** `Option.cpp`,
+`NamedObjs.cpp` and `FileBuffer.cpp`. Census is **963 on mingw, 1,182 on Linux**.
+
+1. **P0-06c / closure call sites** — 116 bare member-function names. Now the
+   largest single mechanical item left, and compiler-guided since clang reports
+   each with an exact position.
+2. **P1-07b / Win32 file and handle functions** — `CreateFile`, `ReadFile`,
    `CloseHandle` and the rest, as the census asks for them.
+3. `Bookmarks.cpp` is next closest at 47 / 49.
 
 ## Decisions taken
 
@@ -78,6 +80,11 @@ Closest unit to clean next: `FileBuffer.cpp` (16 mingw / 24 Linux).
 | 2026-10-10 | Chained subscripts on indexed properties are unsupported | clang reads `Prop[i][j]` as a two-argument getter call. Core has 0 occurrences; `check_properties.py` fails if an upstream change adds one |
 | 2026-10-10 | Win32 A/W name macros are undone in `vcl_win32_undef.h` | `<windows.h>` renamed the *definition* of `ReplaceText` to `ReplaceTextW` while the header still declared `ReplaceText`. Both compiled; only the link failed, and only because a test called it. A link-time guard now references every colliding name |
 | 2026-10-10 | `ARRAYOFCONST` pastes its parenthesised list onto a variadic call | C++Builder builds an open array of `TVarRec`, which needs compound literals. `ARRAYOFCONST((a, b))` becoming `MakeFormatArgs(a, b)` is ordinary C++ |
+| 2026-10-11 | `TRegistry` on POSIX reports every key absent rather than empty | There is no registry, and returning defaults for settings a user had actually set would look to them like their configuration had vanished. The INI backend, which core already supports, is the correct one there (P1-06d) |
+| 2026-10-11 | INI section and key names match case-insensitively | Delphi's do, and files written by WinSCP on Windows have inconsistent casing |
+| 2026-10-11 | INI sections and keys keep their file order | Sorting them would churn the user's configuration on every save and make diffs useless |
+| 2026-10-11 | `DynamicArray` shares its buffer on copy, as Delphi's does | Core declares `TSafeHandleStream::Read` as taking one *by value* and fills it for the caller. A deep-copying version would compile and silently return no data |
+| 2026-10-11 | `win32_on_posix.h` exposes `<string.h>`, `<stdlib.h>` and `<stdio.h>` | `<windows.h>` does transitively, and core calls `strlen`, `strcmp` and `memmove` unqualified |
 | 2026-10-10 | **Resource strings: supply Win32 `LoadString`, not a `.res` loader, and do not patch core** | core's `LoadStr` is already implemented, in terms of `HInstance`, `LibModuleList` and Win32 `LoadString`. Supplying those three means no `.res` binary format to parse, no core edits, and a purely additive change — the kind upstream could take rather than a fork of its own code. The table is generated from upstream's `.rc` files, so the strings track the submodule automatically |
 | 2026-10-10 | `UnicodeString::c_str()` has a non-const overload returning a writable buffer | C++Builder's does, and core depends on it: `DoLoadStrFrom` calls `SetLength` and then passes `c_str()` to `LoadString` as the destination to fill |
 | 2026-10-10 | `TList::Notify` is virtual and fires before a removal, after an addition | Core overrides it. `TObjectList` frees owned objects from inside it, so a wrong `Action` means a leak or a double free, neither of which announces itself |
@@ -124,6 +131,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | `TFormatSettings` defaults | ISO-8601 rather than system locale | Deterministic across machines. Anything user-facing should set them explicitly |
 | Null arguments to the Win32 time functions | Rejected on POSIX; real Win32 dereferences and faults | The hardening is deliberate, so the null-argument assertions run only on POSIX |
 | Winsock error codes on POSIX | Keep their Winsock numeric values rather than mapping to `errno` | Core and the FileZilla layer compare them by name and store them in their own state |
+| `TRegistry` on Linux | Every key reports absent; nothing can be read or written | No registry exists. The INI backend is the correct one there, and failing visibly beats returning defaults for settings the user had set |
+| INI share modes | Windows share modes are ignored on POSIX rather than approximated | Advisory locking would change behaviour rather than match it |
 
 ## Open questions
 
@@ -212,6 +221,10 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | 17/17 tests pass on both targets | `ctest` | 2026-10-10 |
 | Resource strings resolved with **no core changes**: 608 strings generated from upstream's `.rc`, all ids matched, 0 unknown, 0 duplicates | `gen_resources.py` | 2026-10-10 |
 | 18/18 tests pass on both targets | `ctest` | 2026-10-10 |
+| **`FileBuffer.cpp` joins the clean set: 3/9 units at 0 errors on both targets** | `compile_census.py` | 2026-10-11 |
+| Census after storage and arrays: mingw 963, Linux 1,182, 0 aborting | `census_ratchet.py` | 2026-10-11 |
+| `TRegistry` round-trips against the real Windows registry under Wine | `test_storage` on the mingw target | 2026-10-11 |
+| 20/20 tests pass on both targets | `ctest` | 2026-10-11 |
 | 12/12 tests pass on Linux and on Windows under Wine | `ctest` both trees | 2026-10-10 |
 | Directory search validated against both backends: real `FindFirstFileW` under Wine, and `dirent` + `fnmatch` on Linux | `test_sysutils` on both targets | 2026-10-10 |
 | `__closure` scope: 44 distinct closure types, 16 typedefs; call sites pass bare member-function names | grep over generated core | 2026-10-10 |
@@ -272,7 +285,9 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-05 | Shim: `TCriticalSection`/`SyncObjs` | done | recursive; thread exclusion tested |
 | P1-05b | Shim: `TThread`/`StartThread` | todo | |
 | P1-06 | Shim: streams | done | `TStream`/`THandleStream`/`TFileStream`/`TMemoryStream` |
-| P1-06b | Shim: INI/registry storage | todo | `TRegistry` 29, `TCustomIniFile` 28 |
+| P1-06b | Shim: INI/registry storage | done | INI parses real-world files; registry real on Windows |
+| P1-06c | Shim: `DynamicArray` + file API | done | sharing semantics tested |
+| P1-06d | Select INI backend on Linux | todo | frontend decision |
 | P1-07 | `port/platform` Win32 subset | done | types, FILETIME/SYSTEMTIME, errors, winsock names |
 | P1-07b | `port/platform` Win32 file/handle functions | todo | as the census asks |
 | P1-08 | Socket-event emulation | todo | R6 |

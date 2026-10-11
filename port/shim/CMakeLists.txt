@@ -28,6 +28,8 @@ add_library(linscp-shim STATIC
   vcl_streams.cpp
   vcl_containers.cpp
   vcl_resources.cpp
+  vcl_inifiles.cpp
+  vcl_registry.cpp
   "${CMAKE_BINARY_DIR}/gen_resources.cpp"
 )
 

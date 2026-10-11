@@ -5,6 +5,8 @@
 #define LINSCP_VCL_SYSUTILS_H
 
 #include "vcl_datetime.h"
+#include "vcl_dynamicarray.h"
+#include "vcl_streams.h"
 #include "vcl_object.h"
 #include "vcl_strings.h"
 #include "vcl_types.h"
@@ -58,6 +60,20 @@ struct TSearchRec
 int FindFirst(const UnicodeString & Path, int Attr, TSearchRec & F);
 int FindNext(TSearchRec & F);
 void FindClose(TSearchRec & F);
+
+//---------------------------------------------------------------------------
+// Delphi's handle-based file API. Core uses these in FileBuffer.cpp, including
+// the array overloads that take an offset into a dynamic array.
+//---------------------------------------------------------------------------
+THandle FileOpen(const UnicodeString & FileName, unsigned Mode);
+THandle FileCreate(const UnicodeString & FileName);
+void FileClose(THandle Handle);
+__int64 FileSeek(THandle Handle, __int64 Offset, int Origin);
+
+int FileRead(THandle Handle, void * Buffer, int Count);
+int FileWrite(THandle Handle, const void * Buffer, int Count);
+int FileRead(THandle Handle, TBytes Buffer, int Offset, int Count);
+int FileWrite(THandle Handle, const TBytes Buffer, int Offset, int Count);
 
 bool FileExists(const UnicodeString & FileName);
 bool DirectoryExists(const UnicodeString & Name);
