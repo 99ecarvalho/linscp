@@ -1,0 +1,213 @@
+// UnicodeString tests, weighted toward the 1-based indexing boundaries.
+//
+// Off-by-one errors here would corrupt data silently rather than fail to
+// compile, so every 1-based entry point is tested at Index 1, at Length(), and
+// out of range on both sides.
+#include "vcl_unicodestring.h"
+
+#include <cassert>
+#include <cstdio>
+
+namespace {
+
+int Failures = 0;
+
+#define CHECK(expr)                                                           \
+  do {                                                                        \
+    if (!(expr)) {                                                            \
+      std::printf("FAIL %s:%d  %s\n", __FILE__, __LINE__, #expr);             \
+      ++Failures;                                                             \
+    }                                                                         \
+  } while (0)
+
+bool Eq(const UnicodeString & S, const wchar_t * Expected)
+{
+  return S == UnicodeString(Expected);
+}
+
+void TestConstruction()
+{
+  CHECK(UnicodeString().IsEmpty());
+  CHECK(UnicodeString().Length() == 0);
+  CHECK(UnicodeString(static_cast<const wchar_t *>(nullptr)).IsEmpty());
+
+  UnicodeString S(L"hello");
+  CHECK(S.Length() == 5);
+  CHECK(!S.IsEmpty());
+  CHECK(Eq(S, L"hello"));
+
+  CHECK(Eq(UnicodeString(L"hello", 3), L"hel"));
+  CHECK(Eq(UnicodeString(L'x', 4), L"xxxx"));
+  CHECK(UnicodeString(L'x', 0).IsEmpty());
+
+  // c_str is always null-terminated and never null
+  CHECK(UnicodeString().c_str() != nullptr);
+  CHECK(UnicodeString().c_str()[0] == L'\0');
+  CHECK(S.c_str()[5] == L'\0');
+}
+
+void TestIndexingIsOneBased()
+{
+  UnicodeString S(L"abc");
+  CHECK(S[1] == L'a');          // first character is index 1, not 0
+  CHECK(S[2] == L'b');
+  CHECK(S[3] == L'c');          // last character is index Length()
+
+  S[1] = L'A';
+  CHECK(Eq(S, L"Abc"));
+  S[3] = L'C';
+  CHECK(Eq(S, L"AbC"));
+}
+
+void TestSubString()
+{
+  UnicodeString S(L"abcdef");
+  CHECK(Eq(S.SubString(1, 3), L"abc"));     // from the very start
+  CHECK(Eq(S.SubString(4, 3), L"def"));     // to the very end
+  CHECK(Eq(S.SubString(6, 1), L"f"));       // last character only
+  CHECK(Eq(S.SubString(4), L"def"));        // open-ended overload
+  CHECK(Eq(S.SubString(1), L"abcdef"));
+
+  // clamping, matching Delphi's Copy rather than throwing
+  CHECK(Eq(S.SubString(4, 100), L"def"));   // count past the end
+  CHECK(S.SubString(7, 1).IsEmpty());       // index past the end
+  CHECK(S.SubString(1, 0).IsEmpty());       // zero count
+  CHECK(S.SubString(1, -5).IsEmpty());      // negative count
+  CHECK(Eq(S.SubString(-1, 3), L"a"));      // starts before 1: leading chars drop
+  CHECK(S.SubString(-5, 2).IsEmpty());      // entirely before the start
+  CHECK(UnicodeString().SubString(1, 5).IsEmpty());
+}
+
+void TestSearchingIsOneBasedAndZeroForMissing()
+{
+  UnicodeString S(L"a/b/c");
+  CHECK(S.Pos(UnicodeString(L"a")) == 1);   // found at the first character
+  CHECK(S.Pos(UnicodeString(L"b")) == 3);
+  CHECK(S.Pos(UnicodeString(L"c")) == 5);   // found at the last character
+  CHECK(S.Pos(UnicodeString(L"zz")) == 0);  // absent yields 0, not -1
+  CHECK(S.Pos(L'/') == 2);
+  CHECK(S.Pos(L'z') == 0);
+  CHECK(UnicodeString().Pos(UnicodeString(L"x")) == 0);
+
+  CHECK(S.LastDelimiter(UnicodeString(L"/")) == 4);
+  CHECK(S.FirstDelimiter(UnicodeString(L"/")) == 2);
+  CHECK(S.LastDelimiter(UnicodeString(L"#")) == 0);
+  CHECK(S.FirstDelimiter(UnicodeString(L"#")) == 0);
+
+  CHECK(S.IsDelimiter(UnicodeString(L"/"), 2));
+  CHECK(!S.IsDelimiter(UnicodeString(L"/"), 1));
+  CHECK(!S.IsDelimiter(UnicodeString(L"/"), 0));     // out of range, not a crash
+  CHECK(!S.IsDelimiter(UnicodeString(L"/"), 99));
+}
+
+void TestMutation()
+{
+  UnicodeString S(L"abcdef");
+  S.Delete(1, 2);
+  CHECK(Eq(S, L"cdef"));                    // delete from the start
+  S.Delete(3, 99);                          // count past the end clamps
+  CHECK(Eq(S, L"cd"));
+  S.Delete(5, 1);                           // index past the end is a no-op
+  CHECK(Eq(S, L"cd"));
+  S.Delete(1, 0);                           // zero count is a no-op
+  CHECK(Eq(S, L"cd"));
+
+  UnicodeString T(L"bcd");
+  T.Insert(UnicodeString(L"a"), 1);         // insert at the very start
+  CHECK(Eq(T, L"abcd"));
+  T.Insert(UnicodeString(L"e"), T.Length() + 1);   // append position
+  CHECK(Eq(T, L"abcde"));
+  T.Insert(UnicodeString(L"!"), 999);       // clamped to the end
+  CHECK(Eq(T, L"abcde!"));
+  T.Insert(UnicodeString(L"^"), -3);        // clamped to the start
+  CHECK(Eq(T, L"^abcde!"));
+
+  UnicodeString U(L"abcdef");
+  U.SetLength(3);
+  CHECK(Eq(U, L"abc"));
+  U.SetLength(0);
+  CHECK(U.IsEmpty());
+  U.SetLength(-1);                          // negative treated as zero
+  CHECK(U.IsEmpty());
+}
+
+void TestCaseAndTrim()
+{
+  CHECK(Eq(UnicodeString(L"AbC").LowerCase(), L"abc"));
+  CHECK(Eq(UnicodeString(L"AbC").UpperCase(), L"ABC"));
+  CHECK(Eq(UnicodeString(L"a1-B").LowerCase(), L"a1-b"));   // non-letters intact
+
+  CHECK(Eq(UnicodeString(L"  ab  ").Trim(), L"ab"));
+  CHECK(Eq(UnicodeString(L"  ab  ").TrimLeft(), L"ab  "));
+  CHECK(Eq(UnicodeString(L"  ab  ").TrimRight(), L"  ab"));
+  CHECK(Eq(UnicodeString(L"\t\r\nab").Trim(), L"ab"));      // control chars too
+  CHECK(UnicodeString(L"    ").Trim().IsEmpty());
+  CHECK(UnicodeString().Trim().IsEmpty());
+  CHECK(Eq(UnicodeString(L"ab").Trim(), L"ab"));            // nothing to trim
+}
+
+void TestComparison()
+{
+  CHECK(UnicodeString(L"abc") == UnicodeString(L"abc"));
+  CHECK(UnicodeString(L"abc") != UnicodeString(L"abd"));
+  CHECK(UnicodeString(L"abc") < UnicodeString(L"abd"));
+  CHECK(UnicodeString(L"abd") > UnicodeString(L"abc"));
+  CHECK(UnicodeString(L"ab") < UnicodeString(L"abc"));      // prefix sorts first
+
+  CHECK(UnicodeString(L"abc").Compare(UnicodeString(L"abc")) == 0);
+  CHECK(UnicodeString(L"abc").Compare(UnicodeString(L"abd")) == -1);
+  CHECK(UnicodeString(L"abd").Compare(UnicodeString(L"abc")) == 1);
+
+  CHECK(UnicodeString(L"AbC").CompareIC(UnicodeString(L"aBc")) == 0);
+  CHECK(UnicodeString(L"abc").CompareIC(UnicodeString(L"abd")) == -1);
+  CHECK(UnicodeString(L"ab").CompareIC(UnicodeString(L"abc")) == -1);
+  CHECK(UnicodeString(L"abc").CompareIC(UnicodeString(L"ab")) == 1);
+  CHECK(UnicodeString().CompareIC(UnicodeString()) == 0);
+}
+
+void TestConcatenation()
+{
+  UnicodeString S(L"ab");
+  S += UnicodeString(L"cd");
+  CHECK(Eq(S, L"abcd"));
+  S += L'e';
+  CHECK(Eq(S, L"abcde"));
+  CHECK(Eq(UnicodeString(L"ab") + UnicodeString(L"cd"), L"abcd"));
+  CHECK(Eq(UnicodeString() + UnicodeString(L"x"), L"x"));
+  CHECK((UnicodeString() + UnicodeString()).IsEmpty());
+}
+
+void TestUtf16Representation()
+{
+  // Characters outside the BMP occupy two UTF-16 code units, and Delphi's
+  // Length() counts code units, not code points. Core relies on that.
+  const wchar_t Emoji[] = { 0xD83D, 0xDE00, 0x0000 };   // U+1F600
+  UnicodeString S(Emoji);
+  CHECK(S.Length() == 2);
+  CHECK(static_cast<unsigned>(S[1]) == 0xD83Du);
+  CHECK(static_cast<unsigned>(S[2]) == 0xDE00u);
+
+  // A 2-byte wchar_t is what makes the above true.
+  CHECK(sizeof(wchar_t) == 2);
+}
+
+}  // namespace
+
+int main()
+{
+  TestConstruction();
+  TestIndexingIsOneBased();
+  TestSubString();
+  TestSearchingIsOneBasedAndZeroForMissing();
+  TestMutation();
+  TestCaseAndTrim();
+  TestComparison();
+  TestConcatenation();
+  TestUtf16Representation();
+
+  if (Failures == 0)
+  {
+    std::printf("all UnicodeString tests passed\n");
+  }
+  return Failures == 0 ? 0 : 1;
+}

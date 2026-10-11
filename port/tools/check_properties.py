@@ -98,7 +98,8 @@ print(f'declarations extracted: {len(items)}')
 print('by macro:', dict(collections.Counter(m for m, _, _ in items)))
 print(f'stub types declared: {len(types)} simple + {len(nested)} with nested members')
 
-r = subprocess.run(['clang++', '-std=c++17', '-fms-extensions', '-fsyntax-only',
+r = subprocess.run(['clang++', '-std=c++17', '-fms-extensions', '-fshort-wchar',
+                    '-fsyntax-only',
                     '-I', 'port/shim', OUT], capture_output=True, text=True)
 errs = [l for l in r.stderr.split('\n') if ': error:' in l]
 print(f'\nclang exit={r.returncode}  errors={len(errs)}')

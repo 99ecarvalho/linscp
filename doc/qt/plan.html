@@ -1157,7 +1157,15 @@ headers</td>
 <td>ADR 0001: character width for <code>UnicodeString</code></td>
 <td>S</td>
 <td>P0-24</td>
-<td>Q-8; blocks P1-01 and is effectively irreversible</td>
+<td>Accepted: <code>-fshort-wchar</code>, <code>std::u16string</code>
+storage</td>
+</tr>
+<tr class="even">
+<td>P0-26</td>
+<td><code>check_wide_abi.py</code>: enforce ADR 0001 mechanically</td>
+<td>S</td>
+<td>P0-25</td>
+<td>Wrong-ABI code links cleanly then misbehaves, so grep it</td>
 </tr>
 </tbody>
 </table>
@@ -1184,13 +1192,23 @@ platforms</h2>
 <tbody>
 <tr class="odd">
 <td>P1-01</td>
-<td>Shim: <code>UnicodeString</code> + string routines</td>
+<td>Shim: <code>UnicodeString</code> class</td>
 <td>L</td>
-<td>P0-09</td>
-<td>5,178 uses; crib from Far-NetBox
-<code>src/base/UnicodeString.hpp</code></td>
+<td>P0-25</td>
+<td>6,248 uses. Class done; 1-based API from measured usage</td>
 </tr>
 <tr class="even">
+<td>P1-01b</td>
+<td>Shim: free string routines (<code>Format</code>,
+<code>LoadStr</code>, <code>SameText</code>, <code>Pos</code>,
+<code>IntToStr</code>, …)</td>
+<td>L</td>
+<td>P1-01</td>
+<td>Measured: <code>LoadStr</code> 288, <code>SameText</code> 113,
+<code>Pos</code> 89, <code>CutToChar</code> 70, <code>IntToStr</code>
+58</td>
+</tr>
+<tr class="odd">
 <td>P1-02</td>
 <td>Shim: <code>TObject</code>, <code>TList</code>,
 <code>TStrings</code>, <code>TStringList</code>,
@@ -1199,7 +1217,7 @@ platforms</h2>
 <td>P1-01</td>
 <td>497 <code>TStrings</code> uses</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-03</td>
 <td>Shim: <code>TDateTime</code>, <code>DateUtils</code>,
 <code>SysUtils</code>, <code>IOUtils</code>, <code>StrUtils</code></td>
@@ -1207,7 +1225,7 @@ platforms</h2>
 <td>P1-01</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-04</td>
 <td>Shim: <code>Exception</code> hierarchy + Delphi exception
 semantics</td>
@@ -1216,7 +1234,7 @@ semantics</td>
 <td>Core has no <code>__try</code>/<code>__except</code> — simplifies
 this</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-05</td>
 <td>Shim: <code>TCriticalSection</code>, <code>TThread</code>,
 <code>SyncObjs</code></td>
@@ -1225,7 +1243,7 @@ this</td>
 <td><code>StartThread</code> is already abstracted in
 <code>Interface.h</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-06</td>
 <td>Shim: <code>TStream</code>, <code>TMemIniFile</code>;
 <code>TRegistry</code> → file-backed</td>
@@ -1233,35 +1251,35 @@ this</td>
 <td>P1-02</td>
 <td>INI backend already exists in core</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-07</td>
 <td><code>port/platform/win32-on-posix</code>: ~40 functions</td>
 <td>L</td>
 <td>P1-06</td>
 <td>Keeps core diff at zero</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-08</td>
 <td><code>WSAEventSelect</code> / socket-event emulation</td>
 <td>M</td>
 <td>P1-07</td>
 <td>R6</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-09</td>
 <td>PuTTY: re-import upstream <code>unix/</code> backend</td>
 <td>M</td>
 <td>P1-03</td>
 <td>Upstream maintains it; reconcile WinSCP’s patches</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-10</td>
 <td>PuTTY: reconcile WinSCP deltas against vanilla 0.85</td>
 <td>M</td>
 <td>P1-09</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-11</td>
 <td>FileZilla: replace vendored MFC subset
 (<code>CString</code>/<code>CFile</code>/<code>CTime</code>)</td>
@@ -1269,7 +1287,7 @@ this</td>
 <td>P1-01</td>
 <td>Only 4 files in <code>libs/mfc</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-12</td>
 <td><strong>FileZilla: <code>WSAAsyncSelect</code> hidden-window pump →
 epoll/poll</strong></td>
@@ -1277,28 +1295,28 @@ epoll/poll</strong></td>
 <td>P1-11</td>
 <td><strong>R2.</strong> ~1,700 lines; least mechanical task in P1</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-13</td>
 <td>Switch <code>libs/</code> to system OpenSSL, expat, neon, libs3</td>
 <td>M</td>
 <td>P0-08</td>
 <td>All vanilla upstream already</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-14</td>
 <td>Drop <code>puttyvs</code> (MSVC wrapper, obsolete)</td>
 <td>S</td>
 <td>P1-09</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-15</td>
 <td><code>winscp.com</code> shared-memory IPC → plain stdio</td>
 <td>M</td>
 <td>P1-06</td>
 <td>Both platforms</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-16</td>
 <td>Headless frontend implementing <code>Interface.h</code></td>
 <td>L</td>
@@ -1306,28 +1324,28 @@ epoll/poll</strong></td>
 <td>Derive from <code>ConsoleRunner.cpp</code> — it has zero
 <code>forms/</code> deps</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-17</td>
 <td>First link + first real SFTP session on Linux</td>
 <td>M</td>
 <td>P1-16</td>
 <td>Expect a long tail of link/ABI issues</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-18</td>
 <td>Same core + CLI cross-built for Windows, Wine-smoked</td>
 <td>M</td>
 <td>P1-17, P0-12</td>
 <td>Proves “one codebase”</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-19</td>
 <td>Golden suite green across all six protocols, both platforms</td>
 <td>L</td>
 <td>P1-18, P0-15</td>
 <td><strong>P1 exit gate</strong></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-20</td>
 <td>Verify stock <code>netstandard2.0</code> .NET assembly drives the
 Linux CLI</td>
@@ -1335,7 +1353,7 @@ Linux CLI</td>
 <td>P1-19</td>
 <td>Should work unchanged</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-21</td>
 <td><code>#ifdef</code> out <code>dragext</code>,
 <code>Setup.cpp</code>, jump lists, file associations</td>
@@ -1614,15 +1632,15 @@ evaluation down and close it</td>
 <tbody>
 <tr class="odd">
 <td>P0 Foundation</td>
-<td>14</td>
-<td>25</td>
+<td>15</td>
+<td>26</td>
 <td><code>core/Common.cpp</code> compiles on Linux clang; VCL build
 green (R1)</td>
 </tr>
 <tr class="even">
 <td>P1 Headless core</td>
-<td>0</td>
-<td>21</td>
+<td>1</td>
+<td>22</td>
 <td>Golden suite green, six protocols, both platforms</td>
 </tr>
 <tr class="odd">
@@ -1645,23 +1663,24 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>14</strong></td>
-<td><strong>71</strong></td>
+<td><strong>16</strong></td>
+<td><strong>73</strong></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <h2 id="next-three-actions">Next three actions</h2>
 <ol type="1">
-<li><strong>Q-8 / ADR 0001</strong> — confirm the <code>wchar_t</code>
-width decision before any <code>UnicodeString</code> code is written. It
-governs 6,248 references and reversing it later is a rewrite. See <a
-href="adr/0001-wchar-t-width.md">adr/0001-wchar-t-width.md</a>.</li>
-<li><strong>P1-01</strong> — implement <code>UnicodeString</code> with
-1-based Delphi indexing plus a test suite, once Q-8 is settled.</li>
+<li><strong>P1-01b</strong> — the free string routines, ranked by
+measured use: <code>LoadStr</code> (288), <code>SameText</code> (113),
+<code>Pos</code> (89), <code>CutToChar</code> (70),
+<code>IntToStr</code> (58), <code>Trim</code> (47),
+<code>IncludeTrailingBackslash</code> (39), <code>ContainsText</code>
+(37).</li>
+<li><strong>P1-02</strong> — <code>TStrings</code> /
+<code>TStringList</code> (521 uses), the next type by weight.</li>
 <li><strong>P0-13</strong> — the golden-output harness. Still the
-highest-leverage item for everything after P1, and it does not depend on
-Q-8.</li>
+highest-leverage item for everything after P1.</li>
 </ol>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
@@ -1792,11 +1811,24 @@ it caught</td>
 </tr>
 <tr class="even">
 <td>2026-10-10</td>
-<td>Proposed (Q-8): <code>wchar_t</code> with
-<code>-fshort-wchar</code>, <code>std::wstring</code> banned in
+<td><strong>Accepted (Q-8):</strong> <code>-fshort-wchar</code> with
+<code>std::u16string</code> storage; <code>std::wstring</code> banned in
 <code>port/</code></td>
-<td>Only option that leaves upstream’s thousands of <code>L"..."</code>
-literals untouched. See ADR 0001</td>
+<td>Only option leaving upstream’s thousands of <code>L"..."</code>
+literals untouched. Enforced by <code>check_wide_abi.py</code> and a
+<code>static_assert</code>. ADR 0001</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td><code>-fshort-wchar</code> set globally, not per-target</td>
+<td>One translation unit without it is an ABI landmine that links
+cleanly</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td><code>UnicodeString</code> case folding is ASCII-only for now</td>
+<td>Delphi’s is locale-aware; core uses it on protocol tokens and switch
+names. Recorded as a known limitation, not silently equivalent</td>
 </tr>
 </tbody>
 </table>
@@ -1862,11 +1894,10 @@ worth proposing upstream?</td>
 <td>—</td>
 </tr>
 <tr class="even">
-<td>Q-8</td>
-<td>Confirm ADR 0001: <code>wchar_t</code> + <code>-fshort-wchar</code>
-for <code>UnicodeString</code>?</td>
-<td><strong>P1-01</strong>; governs 6,248 references and is effectively
-irreversible</td>
+<td><del>Q-8</del></td>
+<td><del>Confirm ADR 0001</del> — <strong>resolved 2026-10-10</strong>:
+accepted</td>
+<td>—</td>
 <td>—</td>
 </tr>
 </tbody>
@@ -2056,6 +2087,33 @@ headers</td>
 <td>only VCL needs shimming for Windows</td>
 <td>2026-10-10</td>
 </tr>
+<tr class="odd">
+<td><code>-fshort-wchar</code> yields <code>sizeof(wchar_t) == 2</code>
+on both linux-gnu and mingw32</td>
+<td><code>static_assert</code> compiled for both targets</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td><code>char_traits&lt;wchar_t&gt;</code> really does call
+<code>wmemcmp</code>/<code>wcslen</code>/<code>wmemchr</code>;
+<code>char_traits&lt;char16_t&gt;</code> does not</td>
+<td><code>/usr/include/c++/14/bits/char_traits.h:512,522,534</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td><code>UnicodeString</code> API scoped from measured use:
+<code>IsEmpty</code> 594, <code>Length</code> 444, <code>c_str</code>
+247, <code>SubString</code> 184, <code>Pos</code> 86,
+<code>Delete</code> 79</td>
+<td>grep over the generated core</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>6/6 tests pass on Linux and on Windows under Wine, including
+<code>UnicodeString</code></td>
+<td><code>ctest</code> both build trees</td>
+<td>2026-10-10</td>
+</tr>
 </tbody>
 </table>
 <h2 id="task-status">Task status</h2>
@@ -2231,12 +2289,25 @@ resolution</td>
 <td>P0-25</td>
 <td>ADR 0001 character width</td>
 <td>done</td>
-<td>decision proposed, awaiting Q-8 confirmation</td>
+<td>accepted: <code>-fshort-wchar</code> +
+<code>std::u16string</code></td>
+</tr>
+<tr class="even">
+<td>P0-26</td>
+<td><code>check_wide_abi.py</code> ADR enforcement</td>
+<td>done</td>
+<td><code>shim_no_wide_abi</code> test</td>
 </tr>
 </tbody>
 </table>
 <h3 id="p1-headless-core">P1 — Headless core</h3>
 <table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th>ID</th>
@@ -2248,127 +2319,133 @@ resolution</td>
 <tbody>
 <tr class="odd">
 <td>P1-01</td>
-<td>Shim: <code>UnicodeString</code></td>
-<td>todo</td>
-<td></td>
+<td>Shim: <code>UnicodeString</code> class</td>
+<td>done</td>
+<td>1-based API, UTF-16, 9 test groups incl. surrogate pairs</td>
 </tr>
 <tr class="even">
+<td>P1-01b</td>
+<td>Shim: free string routines</td>
+<td>todo</td>
+<td>next; ranked by measured use</td>
+</tr>
+<tr class="odd">
 <td>P1-02</td>
 <td>Shim:
 <code>TObject</code>/<code>TList</code>/<code>TStrings</code></td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-03</td>
 <td>Shim:
 <code>TDateTime</code>/<code>SysUtils</code>/<code>IOUtils</code></td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-04</td>
 <td>Shim: exceptions</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-05</td>
 <td>Shim: threading/sync</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-06</td>
 <td>Shim: streams/INI/registry</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-07</td>
 <td>win32-on-posix subset</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-08</td>
 <td>Socket-event emulation</td>
 <td>todo</td>
 <td>R6</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-09</td>
 <td>PuTTY unix backend re-import</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-10</td>
 <td>PuTTY delta reconciliation</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-11</td>
 <td>FileZilla MFC subset replacement</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-12</td>
 <td>FileZilla epoll rewrite</td>
 <td>todo</td>
 <td><strong>R2</strong> — budget generously</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-13</td>
 <td>System libs</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-14</td>
 <td>Drop <code>puttyvs</code></td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-15</td>
 <td>Console IPC → stdio</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-16</td>
 <td>Headless <code>Interface.h</code> frontend</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-17</td>
 <td>First SFTP session on Linux</td>
 <td>todo</td>
 <td>long tail expected</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-18</td>
 <td>Windows cross-build + Wine</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-19</td>
 <td>Golden suite green, both platforms</td>
 <td>todo</td>
 <td><strong>P1 gate</strong></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-20</td>
 <td>.NET assembly drives Linux CLI</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-21</td>
 <td><code>#ifdef</code> out Windows-only subsystems</td>
 <td>todo</td>

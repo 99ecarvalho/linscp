@@ -14,8 +14,8 @@ import re, sys, collections
 TASKS   = 'doc/qt/TASKS.md'
 TRACKER = 'doc/qt/TRACKER.md'
 VALID   = {'todo', 'wip', 'blocked', 'done', 'dropped'}
-ROW     = re.compile(r'^\|\s*(P\d-\d+)\s*\|')
-STATUS  = re.compile(r'^\|\s*(P\d-\d+)\s*\|[^|]*\|\s*(\w+)\s*\|')
+ROW     = re.compile(r'^\|\s*(P\d-\d+[a-z]?)\s*\|')
+STATUS  = re.compile(r'^\|\s*(P\d-\d+[a-z]?)\s*\|[^|]*\|\s*(\w+)\s*\|')
 COUNT   = re.compile(r'^\|\s*(P\d)\s[^|]*\|\s*(\d+)\s*\|\s*(\d+)\s*\|')
 
 defined = {m.group(1) for l in open(TASKS) if (m := ROW.match(l))}

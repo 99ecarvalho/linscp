@@ -36,7 +36,8 @@ Goal: prove the keystone works, with no behaviour change anywhere.
 | P0-22 | Rehearse history import into a `winscp/winscp` fork | S | P0-05 | Validates Q-7 and measures the real conflict cost |
 | P0-23 | `check_docs.py`: keep TASKS and TRACKER consistent | S | — | Enforces the tracker rule mechanically rather than by discipline |
 | P0-24 | Measure the VCL surface the core requires (`census.py`) | S | P0-05 | Resolves core identifiers against real mingw/OpenSSL/stdlib headers |
-| P0-25 | ADR 0001: character width for `UnicodeString` | S | P0-24 | Q-8; blocks P1-01 and is effectively irreversible |
+| P0-25 | ADR 0001: character width for `UnicodeString` | S | P0-24 | Accepted: `-fshort-wchar`, `std::u16string` storage |
+| P0-26 | `check_wide_abi.py`: enforce ADR 0001 mechanically | S | P0-25 | Wrong-ABI code links cleanly then misbehaves, so grep it |
 
 ## P1 — Headless core on both platforms
 
@@ -44,7 +45,8 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 
 | ID | Task | Size | Depends | Notes |
 |---|---|---|---|---|
-| P1-01 | Shim: `UnicodeString` + string routines | L | P0-09 | 5,178 uses; crib from Far-NetBox `src/base/UnicodeString.hpp` |
+| P1-01 | Shim: `UnicodeString` class | L | P0-25 | 6,248 uses. Class done; 1-based API from measured usage |
+| P1-01b | Shim: free string routines (`Format`, `LoadStr`, `SameText`, `Pos`, `IntToStr`, …) | L | P1-01 | Measured: `LoadStr` 288, `SameText` 113, `Pos` 89, `CutToChar` 70, `IntToStr` 58 |
 | P1-02 | Shim: `TObject`, `TList`, `TStrings`, `TStringList`, `Contnrs` | L | P1-01 | 497 `TStrings` uses |
 | P1-03 | Shim: `TDateTime`, `DateUtils`, `SysUtils`, `IOUtils`, `StrUtils` | L | P1-01 | |
 | P1-04 | Shim: `Exception` hierarchy + Delphi exception semantics | M | P1-01 | Core has no `__try`/`__except` — simplifies this |

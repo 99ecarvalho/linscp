@@ -18,7 +18,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_compile_options(-fms-extensions)
+# -fms-extensions: __declspec(property) for the VCL property shim.
+# -fshort-wchar:   UnicodeString is UTF-16 and upstream assumes a 2-byte
+#                  wchar_t. Must be uniform across every translation unit --
+#                  a single TU without it is an ABI landmine. See ADR 0001.
+add_compile_options(-fms-extensions -fshort-wchar)
 
 set(LINSCP_UPSTREAM "${CMAKE_SOURCE_DIR}/3rd-party/winscp"
     CACHE PATH "Pristine WinSCP submodule")

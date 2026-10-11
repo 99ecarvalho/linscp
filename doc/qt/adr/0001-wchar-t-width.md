@@ -1,6 +1,6 @@
 # ADR 0001 — Character width for `UnicodeString`
 
-**Status:** open — blocks P1-01
+**Status:** accepted 2026-10-10
 **Date:** 2026-10-10
 
 ## Context
@@ -60,8 +60,23 @@ and `<cwchar>` in `port/`.
 - Qt uses UTF-16 internally (`QString`), so conversion to and from the shim is
   cheap — a point in this option's favour for Phase 2.
 
-## Open question for review
+## Verification
 
-This is the highest-leverage irreversible decision in Phase 1. It is recorded as
-**Q-8** and should be confirmed before `UnicodeString` is written, because
-reversing it later means touching all 6,248 references.
+Confirmed on this machine before `UnicodeString` was written:
+
+- `-fshort-wchar` gives `sizeof(wchar_t) == 2` on both `x86_64-pc-linux-gnu`
+  and `x86_64-w64-mingw32`.
+- The hazard is real, not theoretical: `/usr/include/c++/14/bits/char_traits.h`
+  specialises `char_traits<wchar_t>` onto `wmemcmp`, `wcslen` and `wmemchr`,
+  while `char_traits<char16_t>` is a separate specialisation that does not touch
+  libc. Storage is therefore `std::u16string`.
+
+Enforcement is mechanical, because this class of mistake links cleanly and then
+misbehaves at runtime:
+
+- `static_assert(sizeof(wchar_t) == 2)` in `port/shim/vcl_unicodestring.h`.
+- `port/tools/check_wide_abi.py`, run as the `shim_no_wide_abi` test, rejects
+  `std::wstring`, wide iostreams, `<cwchar>` and direct libc wide calls anywhere
+  under `port/` or `qt/`.
+- `-fshort-wchar` is applied globally in the top-level `CMakeLists.txt`, not
+  per-target, so no translation unit can miss it.

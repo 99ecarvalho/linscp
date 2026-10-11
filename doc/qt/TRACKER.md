@@ -8,22 +8,21 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 14 | 25 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 0 | 21 | Golden suite green, six protocols, both platforms |
+| P0 Foundation | 15 | 26 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P1 Headless core | 1 | 22 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **14** | **71** | |
+| **Total** | **16** | **73** | |
 
 ## Next three actions
 
-1. **Q-8 / ADR 0001** — confirm the `wchar_t` width decision before any
-   `UnicodeString` code is written. It governs 6,248 references and reversing it
-   later is a rewrite. See [adr/0001-wchar-t-width.md](adr/0001-wchar-t-width.md).
-2. **P1-01** — implement `UnicodeString` with 1-based Delphi indexing plus a
-   test suite, once Q-8 is settled.
+1. **P1-01b** — the free string routines, ranked by measured use: `LoadStr`
+   (288), `SameText` (113), `Pos` (89), `CutToChar` (70), `IntToStr` (58),
+   `Trim` (47), `IncludeTrailingBackslash` (39), `ContainsText` (37).
+2. **P1-02** — `TStrings` / `TStringList` (521 uses), the next type by weight.
 3. **P0-13** — the golden-output harness. Still the highest-leverage item for
-   everything after P1, and it does not depend on Q-8.
+   everything after P1.
 
 ## Decisions taken
 
@@ -46,7 +45,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | 2026-10-10 | Windows releases link statically via lld | `-fuse-ld=lld -static -L/usr/x86_64-w64-mingw32/lib`; leaves only KERNEL32 and msvcrt as deps |
 | 2026-10-10 | CMake hard-fails on non-clang compilers | A clear configure-time error beats a confusing failure in the first transformed header |
 | 2026-10-10 | The transform stamp lives outside the generated tree | `verify_transform.py` treats any extra file as a violation, which is the behaviour we want; the stamp was the first thing it caught |
-| 2026-10-10 | Proposed (Q-8): `wchar_t` with `-fshort-wchar`, `std::wstring` banned in `port/` | Only option that leaves upstream's thousands of `L"..."` literals untouched. See ADR 0001 |
+| 2026-10-10 | **Accepted (Q-8):** `-fshort-wchar` with `std::u16string` storage; `std::wstring` banned in `port/` | Only option leaving upstream's thousands of `L"..."` literals untouched. Enforced by `check_wide_abi.py` and a `static_assert`. ADR 0001 |
+| 2026-10-10 | `-fshort-wchar` set globally, not per-target | One translation unit without it is an ABI landmine that links cleanly |
+| 2026-10-10 | `UnicodeString` case folding is ASCII-only for now | Delphi's is locale-aware; core uses it on protocol tokens and switch names. Recorded as a known limitation, not silently equivalent |
 
 ## Open questions
 
@@ -59,7 +60,7 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Q-5 | Approach the maintainer early for feedback, or after P1 lands? | social strategy, not architecture | — |
 | Q-6 | Far-NetBox licence: README says GPLv3, `LICENSE.txt` is the GPLv2 text | verbatim reuse of its shim (reference use is unaffected) | — |
 | Q-7 | Build the fork-branch generator now, or when there is something worth proposing upstream? | nothing today; recommend deferring until P1 lands | — |
-| Q-8 | Confirm ADR 0001: `wchar_t` + `-fshort-wchar` for `UnicodeString`? | **P1-01**; governs 6,248 references and is effectively irreversible | — |
+| ~~Q-8~~ | ~~Confirm ADR 0001~~ — **resolved 2026-10-10**: accepted | — | — |
 
 ## Verified facts (re-check if the environment changes)
 
@@ -93,6 +94,10 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Both targets build and pass 4/4 tests; Windows runs under Wine via CTest | `ctest` on `build/linux` and `build/win` | 2026-10-10 |
 | VCL surface the core needs: ~45 real types, dominated by `UnicodeString` (6,248), `TStrings` (521), `Exception` (438), `TDateTime` (250) | `census.py`, resolved against real mingw/OpenSSL/stdlib headers | 2026-10-10 |
 | Core's Win32 headers (`shlobj`, `psapi`, `winioctl`…) are satisfied free on the mingw target | only VCL needs shimming for Windows | 2026-10-10 |
+| `-fshort-wchar` yields `sizeof(wchar_t) == 2` on both linux-gnu and mingw32 | `static_assert` compiled for both targets | 2026-10-10 |
+| `char_traits<wchar_t>` really does call `wmemcmp`/`wcslen`/`wmemchr`; `char_traits<char16_t>` does not | `/usr/include/c++/14/bits/char_traits.h:512,522,534` | 2026-10-10 |
+| `UnicodeString` API scoped from measured use: `IsEmpty` 594, `Length` 444, `c_str` 247, `SubString` 184, `Pos` 86, `Delete` 79 | grep over the generated core | 2026-10-10 |
+| 6/6 tests pass on Linux and on Windows under Wine, including `UnicodeString` | `ctest` both build trees | 2026-10-10 |
 
 ## Task status
 
@@ -123,12 +128,14 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0-22 | Rehearse history import into a winscp fork | done | zero-conflict merge; 613-line in-tree diff; mechanical conflict resolution |
 | P0-23 | `check_docs.py` TASKS/TRACKER consistency | done | found 3 drifts on first run |
 | P0-24 | VCL surface census | done | ~45 types; `build/shim_spec.txt` |
-| P0-25 | ADR 0001 character width | done | decision proposed, awaiting Q-8 confirmation |
+| P0-25 | ADR 0001 character width | done | accepted: `-fshort-wchar` + `std::u16string` |
+| P0-26 | `check_wide_abi.py` ADR enforcement | done | `shim_no_wide_abi` test |
 
 ### P1 — Headless core
 | ID | Task | Status | Note |
 |---|---|---|---|
-| P1-01 | Shim: `UnicodeString` | todo | |
+| P1-01 | Shim: `UnicodeString` class | done | 1-based API, UTF-16, 9 test groups incl. surrogate pairs |
+| P1-01b | Shim: free string routines | todo | next; ranked by measured use |
 | P1-02 | Shim: `TObject`/`TList`/`TStrings` | todo | |
 | P1-03 | Shim: `TDateTime`/`SysUtils`/`IOUtils` | todo | |
 | P1-04 | Shim: exceptions | todo | |
