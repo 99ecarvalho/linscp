@@ -8,13 +8,13 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 68,
-        "missing_types": 7
+        "errors": 67,
+        "missing_types": 6
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 68,
-        "missing_types": 17
+        "errors": 11,
+        "missing_types": 0
       },
       "source/core/CopyParam.cpp": {
         "aborted": false,
@@ -23,13 +23,13 @@
       },
       "source/core/CoreMain.cpp": {
         "aborted": false,
-        "errors": 56,
-        "missing_types": 17
+        "errors": 0,
+        "missing_types": 0
       },
       "source/core/Cryptography.cpp": {
         "aborted": true,
-        "errors": 51,
-        "missing_types": 17
+        "errors": 1,
+        "missing_types": 0
       },
       "source/core/Exceptions.cpp": {
         "aborted": false,
@@ -63,8 +63,8 @@
       },
       "source/core/FtpFileSystem.cpp": {
         "aborted": false,
-        "errors": 29,
-        "missing_types": 2
+        "errors": 2,
+        "missing_types": 0
       },
       "source/core/Global.cpp": {
         "aborted": false,
@@ -73,8 +73,8 @@
       },
       "source/core/HierarchicalStorage.cpp": {
         "aborted": false,
-        "errors": 52,
-        "missing_types": 17
+        "errors": 2,
+        "missing_types": 0
       },
       "source/core/Http.cpp": {
         "aborted": false,
@@ -98,8 +98,8 @@
       },
       "source/core/PuttyIntf.cpp": {
         "aborted": false,
-        "errors": 56,
-        "missing_types": 17
+        "errors": 5,
+        "missing_types": 0
       },
       "source/core/Queue.cpp": {
         "aborted": false,
@@ -128,8 +128,8 @@
       },
       "source/core/SecureShell.cpp": {
         "aborted": true,
-        "errors": 52,
-        "missing_types": 17
+        "errors": 2,
+        "missing_types": 0
       },
       "source/core/Security.cpp": {
         "aborted": false,
@@ -138,8 +138,8 @@
       },
       "source/core/SessionData.cpp": {
         "aborted": false,
-        "errors": 51,
-        "missing_types": 17
+        "errors": 1,
+        "missing_types": 0
       },
       "source/core/SessionInfo.cpp": {
         "aborted": true,
@@ -148,13 +148,13 @@
       },
       "source/core/SftpFileSystem.cpp": {
         "aborted": false,
-        "errors": 1,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 5,
-        "missing_types": 3
+        "errors": 3,
+        "missing_types": 1
       },
       "source/core/Usage.cpp": {
         "aborted": false,

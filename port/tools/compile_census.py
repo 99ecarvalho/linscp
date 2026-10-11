@@ -51,6 +51,8 @@ def main():
     ap.add_argument('--max-errors', default='0')
     # Empty to skip: the ratchet runs many of these at once.
     ap.add_argument('--report', default='build/compile_census.txt')
+    ap.add_argument('--raw', action='store_true',
+                    help="print clang's diagnostics instead of the summary")
     a = ap.parse_args()
 
     tu = os.path.join(a.gen, a.tu)
@@ -91,6 +93,9 @@ def main():
 
     r = subprocess.run(cmd, capture_output=True, text=True)
     err = r.stderr
+    if a.raw:
+        print(err, end='')
+        return 0 if r.returncode == 0 else 1
 
     # Count fatal errors too. A missing header produces only a *fatal* error and
     # aborts the parse, so filtering on ': error:' alone reported such a unit as

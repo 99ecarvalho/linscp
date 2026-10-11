@@ -24,6 +24,7 @@
 // definitions; the few C++-only helpers are fenced off with __cplusplus.
 #include <stddef.h>
 #include <stdint.h>
+#include <pthread.h>
 #include <sys/stat.h>
 #ifdef __cplusplus
   #include <cstddef>
@@ -95,6 +96,23 @@ typedef BYTE * LPBYTE;
 typedef DWORD * LPDWORD;
 typedef BOOL * LPBOOL;
 typedef DWORD * PDWORD;
+
+typedef const wchar_t * PCWSTR;
+typedef wchar_t * PWSTR;
+
+// Window-message parameter types. No windows exist on POSIX, but PuTTY's
+// Windows platform header and core's PuTTY glue pass these through as plain
+// integers (select_result takes a socket in a WPARAM).
+typedef UINT_PTR WPARAM;
+typedef LONG_PTR LPARAM;
+typedef LONG_PTR LRESULT;
+typedef struct RECT { LONG left; LONG top; LONG right; LONG bottom; } RECT;
+typedef struct POINT { LONG x; LONG y; } POINT;
+#define LOWORD(l) ((WORD)(((DWORD_PTR)(l)) & 0xffff))
+#define HIWORD(l) ((WORD)((((DWORD_PTR)(l)) >> 16) & 0xffff))
+#define MAKELONG(a, b) ((LONG)(((WORD)(((DWORD_PTR)(a)) & 0xffff)) | ((DWORD)((WORD)(((DWORD_PTR)(b)) & 0xffff))) << 16))
+// Import linkage is a DLL notion; declarations carrying it are ordinary.
+#define DECLSPEC_IMPORT
 
 // --- handles ---------------------------------------------------------------
 // Opaque, as on Windows. A descriptor is stored in the pointer value, so the
@@ -375,7 +393,12 @@ DWORD Win32ErrorFromErrno(int Err);
 // Only what core uses is provided. SuspendThread is deliberately absent: a
 // running pthread cannot be suspended, and a missing declaration fails loudly
 // at compile time where a stub would fail silently at run time.
+// Calling conventions: one convention on x86-64 POSIX, so all are empty.
 #define WINAPI
+#define CALLBACK
+#define APIENTRY
+#define WINAPIV
+#define PASCAL
 
 typedef DWORD (WINAPI *LPTHREAD_START_ROUTINE)(LPVOID Parameter);
 
@@ -415,6 +438,17 @@ DWORD ResumeThread(HANDLE Thread);
 // destructors on the way out do run. A catch (...) between the call and the
 // entry point would intercept it; core never calls this inside such a block.
 LINSCP_NORETURN void ExitThread(DWORD ExitCode);
+
+// Critical sections are re-entrant on Win32 -- WinSCP's putty_section is
+// entered recursively -- so this is a recursive pthread mutex.
+typedef struct CRITICAL_SECTION { pthread_mutex_t Mutex; } CRITICAL_SECTION;
+typedef CRITICAL_SECTION * LPCRITICAL_SECTION;
+void InitializeCriticalSection(LPCRITICAL_SECTION Section);
+BOOL InitializeCriticalSectionAndSpinCount(LPCRITICAL_SECTION Section, DWORD SpinCount);
+void EnterCriticalSection(LPCRITICAL_SECTION Section);
+BOOL TryEnterCriticalSection(LPCRITICAL_SECTION Section);
+void LeaveCriticalSection(LPCRITICAL_SECTION Section);
+void DeleteCriticalSection(LPCRITICAL_SECTION Section);
 BOOL GetExitCodeThread(HANDLE Thread, LPDWORD ExitCode);
 // Recorded and reported back, but has no scheduling effect. See the divergence
 // table in doc/qt/TRACKER.md.

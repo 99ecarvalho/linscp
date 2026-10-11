@@ -32,14 +32,16 @@ sessions pass -- as negotiated and pinned to AES-CTR, AES-GCM and
 ChaCha20-Poly1305. Upstream's own 64-bit work had already fixed seven of our
 eight patches' problems, so the series went from eight to one.
 
-Linux: **534 errors, 15/33 clean, 4 aborting** (588 at the pin move; the
-Win32 file functions account for the drop).
+Linux: **139 errors, 17/33 clean, 4 aborting** (588 at the pin move). The
+Win32 file functions took it to 534; PuTTY's headers compiling on Linux took
+it to 139 -- they were most of the errors in eight units.
 
 1. **P1-07b**: the rest of the Win32 calls core makes that Linux lacks --
    file functions done; registry, shell folders, time zones, version info,
    modules and processes next.
-2. **P1-09**: PuTTY's Unix platform layer from the PuTTY 0.85 release, which
-   WinSCP's copy does not carry.
+2. **P1-09**: WinSCP's PuTTY on Linux. Its headers compile now; its 110
+   Windows-layer units are next, each over the emulation or replaced by a
+   Linux unit implementing the same API (see the decisions table).
 3. **P1-15**: `winscp.com`'s scripting front end over plain stdio.
 
 ## Decisions taken
@@ -139,6 +141,8 @@ Win32 file functions account for the drop).
 | 2026-10-10 | `port/platform` headers refuse to compile on Windows, and are POSIX-only on the include path | Putting them on a Windows target shadowed the genuine mingw headers, which presented as a 1,220 -> 783 "improvement". The `#error` makes that mistake loud |
 | 2026-10-10 | `port/compat` is separate from `port/platform` | `help.h` is missing from upstream itself rather than being a platform difference, so it is needed on every target |
 | 2026-10-10 | The ratchet records whether a unit aborted | An aborted parse reports a floor. Treating that as a distinct state stops a new abort from reading as sudden progress |
+| 2026-10-11 | On Linux, WinSCP's PuTTY is compiled with its Windows platform layer, over the Win32-on-POSIX layer; Linux-specific services replace individual units (refines P1-09) | Core is written against PuTTY's Windows platform API (`select_result`, `do_select`, `get_handle_wait_list`, `HandleWaitList`), and WinSCP's changes to that layer carry real behaviour (per-session `do_select`, connect timeouts, socket buffers, source address). Taking PuTTY's `unix/` layer instead would mean reimplementing both against core's model. Where Linux genuinely differs -- the agent (`SSH_AUTH_SOCK`), GSSAPI, entropy, proxy commands -- a unit is replaced by one implementing the same API, drawing on the pinned PuTTY 0.85 release's `unix/` code |
+| 2026-10-11 | The Win32-on-POSIX headers are C as well as C++, with C linkage | PuTTY is C and includes `<windows.h>` as core does |
 | 2026-10-11 | The WinSCP pin tracks `master`, not a release tag (user's decision; supersedes P0-02's "release tag, not `master`") | Upstream is porting itself to 64-bit on `master` and fixing the same bugs this port was finding -- five of the six reported were already fixed there. Following it inherits those fixes instead of duplicating them. A bump re-runs the transform, the patch series and closure-site discovery, all of which fail loudly where upstream moved |
 | 2026-10-11 | Static initialisation follows upstream's project order: executables link core's objects directly, in `ScpCore.cbproj` order, reversed for Windows | Core's globals depend on each other across units (`EscapedBom` in HierarchicalStorage.cpp is built from `Bom` in Common.cpp). C++Builder runs constructors in link order; mingw-w64 runs them in reverse link order and Linux in link order, and archive extraction gives no order at all |
 | 2026-10-11 | Library units and defines are read from upstream's make files too (neon, libs3, expat, the MFC subset) | `upstream_units.py` reads `$(OBJ_D)\x.$(O)` objects and `DEFINES`/`DEFS` plus `Makefile.inc`'s unconditional `CFLAG_OPENSSL`. Two defines meant for C++Builder's headers, `_ASSERTE` and `NOUSER`, are undefined again for mingw-w64's |

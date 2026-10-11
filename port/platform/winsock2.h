@@ -71,6 +71,7 @@ typedef struct WSANETWORKEVENTS
   long lNetworkEvents;
   int iErrorCode[FD_MAX_EVENTS];
 } WSANETWORKEVENTS;
+typedef WSANETWORKEVENTS * LPWSANETWORKEVENTS;
 
 typedef struct WSADATA
 {

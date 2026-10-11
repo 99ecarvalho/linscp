@@ -515,3 +515,38 @@ HRESULT CoCreateInstance(REFCLSID, LPVOID, DWORD, REFIID, LPVOID * Object)
   }
   return REGDB_E_CLASSNOTREG;
 }
+
+void InitializeCriticalSection(LPCRITICAL_SECTION Section)
+{
+  pthread_mutexattr_t Attr;
+  pthread_mutexattr_init(&Attr);
+  pthread_mutexattr_settype(&Attr, PTHREAD_MUTEX_RECURSIVE);
+  pthread_mutex_init(&Section->Mutex, &Attr);
+  pthread_mutexattr_destroy(&Attr);
+}
+
+BOOL InitializeCriticalSectionAndSpinCount(LPCRITICAL_SECTION Section, DWORD)
+{
+  InitializeCriticalSection(Section);
+  return TRUE;
+}
+
+void EnterCriticalSection(LPCRITICAL_SECTION Section)
+{
+  pthread_mutex_lock(&Section->Mutex);
+}
+
+BOOL TryEnterCriticalSection(LPCRITICAL_SECTION Section)
+{
+  return (pthread_mutex_trylock(&Section->Mutex) == 0) ? TRUE : FALSE;
+}
+
+void LeaveCriticalSection(LPCRITICAL_SECTION Section)
+{
+  pthread_mutex_unlock(&Section->Mutex);
+}
+
+void DeleteCriticalSection(LPCRITICAL_SECTION Section)
+{
+  pthread_mutex_destroy(&Section->Mutex);
+}
