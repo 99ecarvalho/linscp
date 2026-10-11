@@ -8,12 +8,12 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 26 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P0 Foundation | 25 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 19 | 36 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **45** | **95** | |
+| **Total** | **44** | **95** | |
 
 ## Next three actions
 
@@ -21,21 +21,26 @@ Driven by `compile_census.py` rather than by grep counts — the compiler names
 what is actually blocking each unit, in dependency order.
 
 **Seven of ten tracked units compile cleanly on both targets**, nothing
-aborting on either. Census: **173 errors on mingw, 306 on Linux.**
+aborting on either, measured in upstream's own preprocessor configuration (see
+the correction below). Census: **159 errors on mingw, 303 on Linux.**
 
 | Unit | mingw | Linux |
 |---|---|---|
-| `Bookmarks.cpp`, `FileBuffer.cpp`, `FileMasks.cpp`, `NamedObjs.cpp`, `Option.cpp` | 0 | 0 |
-| **`Queue.cpp`** — core's thread and queue machinery | **0** | **0** |
-| `CopyParam.cpp` | 0 | 0 |
-| `Configuration.cpp` | 14 | 79 |
+| `Bookmarks`, `CopyParam`, `FileBuffer`, `FileMasks`, `NamedObjs`, `Option`, `Queue` | 0 | 0 |
+| `Configuration.cpp` | 7 | 74 |
 | `Terminal.cpp` | 46 | 70 |
-| `Common.cpp` | 113 | 157 |
+| `Common.cpp` | 106 | 159 |
 
-1. `Configuration.cpp` is closest on mingw (**14**) and has the largest
-   Linux-only excess (**65**). Measure what that excess is.
-2. `Terminal.cpp` (46 / 70).
-3. `Common.cpp` (113 / 157) holds most of the remainder.
+Most of the Linux-only excess is not shim work: **55 of `Configuration.cpp`'s
+74 Linux errors come from PuTTY headers** -- `putty/windows/platform.h` and the
+Windows GSSAPI declarations -- because WinSCP vendors only PuTTY's Windows
+platform layer. That is P1-09.
+
+1. `Configuration.cpp` on mingw (**7**): `RawByteString` to `UnicodeString`,
+   `LeftStr`, `ParamStr`, `TPath::IsDriveRooted`.
+2. **P1-09**: PuTTY's Unix platform layer, which removes the bulk of the Linux
+   excess across every unit that includes `PuttyIntf.h`.
+3. `Terminal.cpp` (46 / 70), then `Common.cpp` (106 / 159).
 
 ## Decisions taken
 
@@ -59,6 +64,9 @@ aborting on either. Census: **173 errors on mingw, 306 on Linux.**
 | 2026-10-11 | Shim XML interfaces live in `Xml::Xmlintf`; only the `_di_` aliases are global | Embarcadero's own layout. At global scope ours collided on Windows with the COM `IXMLDocument` from `<msxml.h>`. Core names them only through `_di_` aliases and `Xmlintf::` |
 | 2026-10-11 | Closure-site discovery compiles a separately transformed, *unbound* tree | Compiling the ordinary tree saw the known sites already wrapped and "rediscovered" only new ones — it cut 62 sites to 2. Now idempotent: a second run is byte-identical |
 | 2026-10-11 | VCL's implicit `SysUtils::LoadStr` and `Vcl.Menus::StripHotkey` supplied by the shim, not by patching core | Core receives both through `<vcl.h>` and never declares them. `LoadStr` is built on the existing `LoadString` table, so there is still one resource path |
+| 2026-10-11 | Core is compiled with upstream's own preprocessor configuration, read from `ScpCore.cbproj` by `port/tools/upstream_defines.py` | Copying the list would drift. Applied by the census, closure discovery and CMake alike, shim included, because `UNICODE` decides which Win32 A/W function every macro names. Windows-only names are dropped on POSIX; `_CRTIMP=` is dropped everywhere, as C++Builder's CRT linkage |
+| 2026-10-11 | Census and discovery build the Debug configuration | Its `DebugAssert` expressions are code that must compile too; Release compiles them out, which hid ten closure comparisons |
+| 2026-10-11 | `port/compat` withdrawn; supersedes the 2026-10-10 decision creating it | `help.h` was compensating for the missing `WINSCP` define, not a gap in upstream: with `WINSCP` set, PuTTY's `platform.h` never includes it |
 | 2026-10-10 | A PR-able branch against `winscp/winscp` will be **generated**, not hand-maintained | linscp shares no history with upstream, so its `qt` branch is not directly mergeable. Since the port is mechanical, the fork branch can be produced on demand (Q-7). Rehearsed end to end — see facts below |
 | 2026-10-10 | Transform must be byte-exact outside property lines | A full-file rewrite (CRLF loss) turned a 613-line change into 76,551. Now asserted by `verify_transform.py` |
 | 2026-10-10 | Field/accessor classification is convention-first, parens only as fallback | The parens heuristic false-positives on constructor initialiser lists; WinSCP's `F<Upper>` / `Get*`/`Set*` convention is airtight. Truly unclassifiable names now fail the run instead of producing a wrong-arity macro |
@@ -107,6 +115,24 @@ aborting on either. Census: **173 errors on mingw, 306 on Linux.**
 | 2026-10-10 | `port/compat` is separate from `port/platform` | `help.h` is missing from upstream itself rather than being a platform difference, so it is needed on every target |
 | 2026-10-10 | The ratchet records whether a unit aborted | An aborted parse reports a floor. Treating that as a distinct state stops a new abort from reading as sudden progress |
 | 2026-10-10 | `Format` keeps malformed input visible | Delphi raises on a missing argument. Core routes user- and server-supplied text through these into logs, so an unknown specifier is echoed and a missing argument renders as `<missing>` rather than throwing from a log path |
+
+## Correction: census figures before 2026-10-11 used the wrong configuration
+
+Until `upstream_defines.py`, every compile of core here used **none** of the
+defines upstream builds it with -- not `WINSCP`, not `UNICODE`, not `_DEBUG`.
+So the census measured a configuration upstream never builds. Two effects:
+
+- Code upstream compiles was hidden. `_DEBUG` alone exposed ten closure
+  comparisons in `Queue.cpp`, which had been reported clean; they needed
+  Borland closure *equality*, which did not exist.
+- Workarounds were built for problems that were not real: `port/compat/help.h`
+  stood in for a header that `WINSCP` compiles out.
+
+It also surfaced a shim bug that only `_DEBUG` reaches: the POSIX `TEXT()` was
+one-level, so `TEXT(__FILE__)` pasted the token into `L__FILE__`.
+
+The corrected census is **159 / 303**. Earlier figures are not comparable with
+it; the trend they showed was real, the absolute numbers were not.
 
 ## Correction: the earlier "5 errors left" figure was wrong
 
@@ -304,7 +330,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P0-29 | Legacy unqualified RTL header stubs | done | `Classes.hpp` etc.; absence was aborting most TUs |
 | P0-30 | Win32 A/W macro collisions undone | done | link-time guard test |
 | P0-31 | Ratchet both targets, track aborts | done | an abort is a distinct state, not a low number |
-| P0-32 | `port/compat` for upstream gaps | done | `help.h`; on every target, unlike `port/platform` |
+| P0-32 | `port/compat` for upstream gaps | dropped | `help.h` was compensating for the missing `WINSCP` define; withdrawn 2026-10-11 |
 | P0-28 | `census_ratchet.py` | done | both targets; aborts tracked separately |
 
 ### P1 — Headless core

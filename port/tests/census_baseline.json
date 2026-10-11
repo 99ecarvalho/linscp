@@ -8,13 +8,13 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 157,
+        "errors": 159,
         "missing_types": 9
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 79,
-        "missing_types": 18
+        "errors": 74,
+        "missing_types": 17
       },
       "source/core/CopyParam.cpp": {
         "aborted": false,
@@ -60,13 +60,13 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 113,
+        "errors": 106,
         "missing_types": 2
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 14,
-        "missing_types": 1
+        "errors": 7,
+        "missing_types": 0
       },
       "source/core/CopyParam.cpp": {
         "aborted": false,

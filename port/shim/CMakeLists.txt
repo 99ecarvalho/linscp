@@ -49,9 +49,6 @@ if(NOT WIN32)
   target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../platform")
 endif()
 target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
-# Gaps in upstream itself, as opposed to platform emulation: needed on every
-# target, so unlike ../platform this is not guarded by NOT WIN32.
-target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../compat")
 target_link_libraries(linscp-shim PUBLIC linscp-expat)
 find_package(Threads REQUIRED)
 target_link_libraries(linscp-shim PUBLIC Threads::Threads)

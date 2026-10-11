@@ -14,6 +14,18 @@ rather than a platform one.
 """
 import argparse, collections, os, re, subprocess, sys
 
+
+def _upstream_defines():
+    # Loaded by path: under python -I the script's own directory is not on
+    # sys.path, so a plain import of a sibling module would fail.
+    import importlib.util
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        'upstream_defines.py')
+    spec = importlib.util.spec_from_file_location('upstream_defines', path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
 # clang diagnostic shapes, mapped to what each implies the shim must supply.
 PATTERNS = [
     ('missing type',       re.compile(r"unknown type name '([^']+)'")),
@@ -48,7 +60,6 @@ def main():
         'clang++', f'--target={a.target}', '-std=c++17', '-fsyntax-only',
         '-fms-extensions', '-fshort-wchar', f'-ferror-limit={a.max_errors}',
         '-I', 'port/shim',
-        '-I', 'port/compat',
 
         '-I', os.path.join(a.gen, 'source/core'),
         '-I', os.path.join(up, 'resource'),
@@ -56,14 +67,15 @@ def main():
         '-I', os.path.join(up, 'filezilla'),
         '-I', os.path.join(up, 'putty'),
         # putty/windows supplies platform.h, which core reaches through
-        # PuttyIntf.h. It includes help.h, which WinSCP does not vendor; that
-        # gap is filled by port/compat below.
+        # PuttyIntf.h. That is PuTTY's *Windows* platform layer, so on Linux
+        # it accounts for much of the remaining excess; see P1-09.
         '-I', os.path.join(up, 'putty/windows'),
         '-I', os.path.join(up, 'components'),
         '-I', '3rd-party/winscp/libs/openssl/include',
         '-I', '3rd-party/winscp/libs/neon/src',
         '-I', '3rd-party/winscp/libs/expat/lib',
         '-Wno-everything',
+    ] + _upstream_defines().flags(a.target) + [
         tu,
     ]
     # port/platform holds POSIX stand-ins for Win32 headers. Offering them to a

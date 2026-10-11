@@ -31,6 +31,18 @@ the coordinates transform.py applies them in.
 """
 import argparse, json, os, re, subprocess, sys
 
+
+def _upstream_defines():
+    # Loaded by path: under python -I the script's own directory is not on
+    # sys.path, so a plain import of a sibling module would fail.
+    import importlib.util
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        'upstream_defines.py')
+    spec = importlib.util.spec_from_file_location('upstream_defines', path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
 SITES = 'port/patches/closure_sites.json'
 DIAG = re.compile(
     r'^(?P<file>[^:]+):(?P<line>\d+):(?P<col>\d+): error: '
@@ -47,7 +59,7 @@ IDENT = re.compile(r'[A-Za-z_]\w*')
 
 DISCOVERY_GEN = 'build/gen-unbound'
 INCLUDES = [
-    'port/shim', 'port/compat',
+    'port/shim',
     '3rd-party/winscp/source/resource', '3rd-party/winscp/source/windows',
     '3rd-party/winscp/source/filezilla', '3rd-party/winscp/source/putty',
     '3rd-party/winscp/source/putty/windows',
@@ -66,6 +78,7 @@ def compile_tu(path, gen, target='x86_64-w64-mingw32'):
            '-Wno-everything']
     for inc in [os.path.join(gen, 'source/core')] + INCLUDES:
         cmd += ['-I', inc]
+    cmd += _upstream_defines().flags(target)
     cmd.append(path)
     return subprocess.run(cmd, capture_output=True, text=True).stderr
 

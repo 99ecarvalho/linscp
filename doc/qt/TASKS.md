@@ -45,7 +45,7 @@ Goal: prove the keystone works, with no behaviour change anywhere.
 | P0-29 | Shim stubs for the unqualified legacy RTL header names | S | P0-27 | `Classes.hpp` etc.; their absence was aborting most TUs early |
 | P0-30 | Undo Win32 A/W name macros that collide with RTL names | S | P0-29 | `ReplaceText` broke this way: header declared it, `<windows.h>` renamed the definition, link failed. Guarded by a link-time test |
 | P0-31 | Ratchet both targets and track early aborts | S | P0-28 | Linux compiles core now; an aborting unit reports a floor, which once read as progress |
-| P0-32 | `port/compat` for headers missing from upstream itself | S | — | `help.h`, which PuTTY's `platform.h` includes but WinSCP does not vendor |
+| P0-32 | `port/compat` for headers missing from upstream itself | S | — | Withdrawn: the one case, `help.h`, is compiled out by upstream's `WINSCP` define, which the census was not setting |
 | P0-28 | `census_ratchet.py`: pin the census so progress cannot slip back | S | P0-27 | Nothing in core compiles cleanly yet, so a reintroduced type would look like a passing build |
 
 ## P1 — Headless core on both platforms

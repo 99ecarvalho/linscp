@@ -100,9 +100,12 @@ using HCURSOR = void *;
 #endif
 
 // Win32's literal macros. TEXT() is used in 40 places in core, mostly by
-// DebugAssert.
-#define TEXT(quote) L##quote
-#define _T(quote) L##quote
+// DebugAssert as TEXT(__FILE__). Two levels, as <winnt.h> has it: an argument
+// that is itself a macro only expands when it is not an operand of ##, so a
+// one-level L##quote pastes the token __FILE__ and yields L__FILE__.
+#define __TEXT(quote) L##quote
+#define TEXT(quote) __TEXT(quote)
+#define _T(quote) __TEXT(quote)
 #ifndef TRUE
   #define TRUE 1
   #define FALSE 0
