@@ -140,3 +140,18 @@ TEncoding * TEncoding::Default()
   // UTF-8 on both platforms: it is what WinSCP writes and what Linux uses.
   return UTF8();
 }
+
+UnicodeString StripHotkey(const UnicodeString & Text)
+{
+  UnicodeString Result = Text;
+  int I = 1;
+  while (I <= Result.Length())
+  {
+    if (Result[I] == L'&')
+    {
+      Result.Delete(I, 1);
+    }
+    ++I;   // whatever followed the '&' is now at I, and is kept
+  }
+  return Result;
+}

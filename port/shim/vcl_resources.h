@@ -24,6 +24,7 @@
 #include <cstddef>
 
 #include "vcl_types.h"
+#include "vcl_unicodestring.h"
 
 namespace linscp {
 
@@ -64,5 +65,11 @@ extern void * LibModuleList;
 // characters copied, not counting the terminator, which is what core's
 // DoLoadStrFrom uses to trim the result.
 int LoadString(void * Module, unsigned Ident, wchar_t * Buffer, int BufferMax);
+
+// Delphi's SysUtils.LoadStr, the one-argument form core calls ~290 times.
+// Core's own Common.h declares only LoadStr(Ident, MaxLength); this one comes
+// from the RTL. It reads the main module through a 1024-character buffer,
+// the limit core's own LoadStrFrom cites, so the longest result is 1023.
+UnicodeString LoadStr(NativeUInt Ident);
 
 #endif // LINSCP_VCL_RESOURCES_H

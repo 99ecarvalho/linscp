@@ -50,6 +50,12 @@ private:
 // Free form, as System.Masks also offers.
 bool MatchesMask(const UnicodeString & Filename, const UnicodeString & Mask);
 
+// Vcl.Menus.StripHotkey: removes the '&' marking a menu accelerator. The
+// character after each '&' is kept verbatim, so an escaped "&&" yields a
+// literal '&'. Delphi additionally strips a whole "(&X)" suffix when the
+// system locale is East Asian; that branch is not reproduced.
+UnicodeString StripHotkey(const UnicodeString & Text);
+
 //---------------------------------------------------------------------------
 // System.IOUtils.TPath, used for a handful of path queries.
 //---------------------------------------------------------------------------

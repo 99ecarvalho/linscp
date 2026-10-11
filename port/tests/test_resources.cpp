@@ -6,6 +6,7 @@
 // as core's DoLoadStrFrom expects -- including truncation, which core relies on
 // to size the result.
 #include "vcl_resources.h"
+#include "vcl_misc.h"
 
 #include <cstdio>
 #include <cstring>
@@ -110,6 +111,38 @@ void TestLoadStringContract()
   CHECK(One[0] == L'\0');
 }
 
+// SysUtils.LoadStr, checked against every row rather than a sample: a wrong
+// id mapping or a truncation would show up somewhere in 600-odd strings.
+void TestLoadStrMatchesTheWholeTable()
+{
+  int Checked = 0;
+  for (std::size_t I = 0; I < linscp::ResourceStringCount; ++I)
+  {
+    const linscp::TResourceString & Row = linscp::ResourceStrings[I];
+    const UnicodeString Expected(Row.Text);
+    const UnicodeString Got = LoadStr(Row.Ident);
+    if (Expected.Length() <= 1023)
+    {
+      CHECK(Got == Expected);
+    }
+    else
+    {
+      CHECK(Got.Length() == 1023);   // the RTL's buffer, terminator included
+    }
+    ++Checked;
+  }
+  CHECK(Checked > 500);
+  CHECK(LoadStr(999999).IsEmpty());   // missing id: empty, not an exception
+}
+
+// Exactly CopyParam.cpp's idiom, on the real upstream string.
+void TestStripHotkeyOverLoadStr()
+{
+  CHECK(LoadStr(COPY_PARAM_NEWER_ONLY) == UnicodeString(L"&New and updated files only"));
+  CHECK(StripHotkey(LoadStr(COPY_PARAM_NEWER_ONLY)) ==
+        UnicodeString(L"New and updated files only"));
+}
+
 void TestModuleListMatchesFindModule()
 {
   // core's FindModule walks LibModuleList comparing
@@ -131,6 +164,8 @@ int main()
   TestKnownStrings();
   TestLoadStringContract();
   TestModuleListMatchesFindModule();
+  TestLoadStrMatchesTheWholeTable();
+  TestStripHotkeyOverLoadStr();
 
   if (Failures == 0)
   {

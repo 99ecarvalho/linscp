@@ -181,6 +181,18 @@ void TestHostVersion()
 
 }  // namespace
 
+void TestStripHotkey()
+{
+  CHECK(StripHotkey(L"&File") == UnicodeString(L"File"));
+  CHECK(StripHotkey(L"Save &As") == UnicodeString(L"Save As"));
+  CHECK(StripHotkey(L"No hotkey") == UnicodeString(L"No hotkey"));
+  CHECK(StripHotkey(L"") == UnicodeString(L""));
+  // An escaped ampersand survives as one literal '&' -- Windows' convention.
+  CHECK(StripHotkey(L"Save && Exit") == UnicodeString(L"Save & Exit"));
+  CHECK(StripHotkey(L"&&&x") == UnicodeString(L"&x"));
+  CHECK(StripHotkey(L"trailing&") == UnicodeString(L"trailing"));
+}
+
 int main()
 {
   TestWildcardMatching();
@@ -190,6 +202,7 @@ int main()
   TestInheritsFrom();
   TestEnvironment();
   TestHostVersion();
+  TestStripHotkey();
 
   if (Failures == 0)
   {

@@ -20,24 +20,22 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 Driven by `compile_census.py` rather than by grep counts — the compiler names
 what is actually blocking each unit, in dependency order.
 
-**Six of ten tracked units compile cleanly on both targets**, nothing aborting
-on either. Census: **243 errors on mingw, 376 on Linux.**
+**Seven of ten tracked units compile cleanly on both targets**, nothing
+aborting on either. Census: **173 errors on mingw, 306 on Linux.**
 
 | Unit | mingw | Linux |
 |---|---|---|
 | `Bookmarks.cpp`, `FileBuffer.cpp`, `FileMasks.cpp`, `NamedObjs.cpp`, `Option.cpp` | 0 | 0 |
 | **`Queue.cpp`** — core's thread and queue machinery | **0** | **0** |
-| `CopyParam.cpp` | 24 | 24 |
-| `Configuration.cpp` | 25 | 90 |
-| `Terminal.cpp` | 72 | 96 |
-| `Common.cpp` | 122 | 166 |
+| `CopyParam.cpp` | 0 | 0 |
+| `Configuration.cpp` | 14 | 79 |
+| `Terminal.cpp` | 46 | 70 |
+| `Common.cpp` | 113 | 157 |
 
-1. `CopyParam.cpp` at **24 / 24** is closest, and identical on both targets, so
-   nothing platform-specific is left in it.
-2. `Configuration.cpp` has the largest Linux-only excess (**65**). Measure what
-   it is before the generic work in `Common.cpp` absorbs it.
-3. `Common.cpp` (122 / 166) and `Terminal.cpp` (72 / 96) hold most of the
-   remainder.
+1. `Configuration.cpp` is closest on mingw (**14**) and has the largest
+   Linux-only excess (**65**). Measure what that excess is.
+2. `Terminal.cpp` (46 / 70).
+3. `Common.cpp` (113 / 157) holds most of the remainder.
 
 ## Decisions taken
 
@@ -60,6 +58,7 @@ on either. Census: **243 errors on mingw, 376 on Linux.**
 | 2026-10-11 | POSIX kernel objects share one handle table, one lock and one condition variable; handle values are never reused | Makes `WaitForMultipleObjects` over mixed threads and events — including atomic `WaitAll` — correct by construction. Core has a handful of threads, so the coarse lock costs nothing measurable. Never reusing values turns use-after-close into `ERROR_INVALID_HANDLE` |
 | 2026-10-11 | Shim XML interfaces live in `Xml::Xmlintf`; only the `_di_` aliases are global | Embarcadero's own layout. At global scope ours collided on Windows with the COM `IXMLDocument` from `<msxml.h>`. Core names them only through `_di_` aliases and `Xmlintf::` |
 | 2026-10-11 | Closure-site discovery compiles a separately transformed, *unbound* tree | Compiling the ordinary tree saw the known sites already wrapped and "rediscovered" only new ones — it cut 62 sites to 2. Now idempotent: a second run is byte-identical |
+| 2026-10-11 | VCL's implicit `SysUtils::LoadStr` and `Vcl.Menus::StripHotkey` supplied by the shim, not by patching core | Core receives both through `<vcl.h>` and never declares them. `LoadStr` is built on the existing `LoadString` table, so there is still one resource path |
 | 2026-10-10 | A PR-able branch against `winscp/winscp` will be **generated**, not hand-maintained | linscp shares no history with upstream, so its `qt` branch is not directly mergeable. Since the port is mechanical, the fork branch can be produced on demand (Q-7). Rehearsed end to end — see facts below |
 | 2026-10-10 | Transform must be byte-exact outside property lines | A full-file rewrite (CRLF loss) turned a 613-line change into 76,551. Now asserted by `verify_transform.py` |
 | 2026-10-10 | Field/accessor classification is convention-first, parens only as fallback | The parens heuristic false-positives on constructor initialiser lists; WinSCP's `F<Upper>` / `Get*`/`Set*` convention is airtight. Truly unclassifiable names now fail the run instead of producing a wrong-arity macro |
@@ -148,6 +147,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | `SetThreadPriority` on POSIX | Recorded and reported back by `GetThreadPriority`, but no scheduling effect | Core only lowers background queue threads; running them at normal priority is harmless |
 | `ExitThread` / `EndThread` on POSIX | Unwinds to the entry point by exception, so destructors run; Win32 skips them | A `catch (...)` between the call and the entry point would intercept it. Core calls it only as the last statement of a thread entry point |
 | Named events on POSIX | `CreateEvent` with a name fails with `ERROR_NOT_SUPPORTED` | Would need to be cross-process. Core never names one; refusing beats quietly creating a private event |
+| `StripHotkey` in East Asian locales | The whole-`(&X)` suffix removal Delphi does under `SysLocale.FarEast` is not reproduced | Only the `&` is removed. Affects only CJK system locales |
 | `SuspendThread` on POSIX | Not declared | A running pthread cannot be suspended. A missing declaration fails at compile time; a stub would fail silently. `CREATE_SUSPENDED` + `ResumeThread` is supported |
 
 ## Open questions

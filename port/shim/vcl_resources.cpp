@@ -59,3 +59,11 @@ int LoadString(void * Module, unsigned Ident, wchar_t * Buffer, int BufferMax)
   Buffer[Length] = L'\0';
   return Length;
 }
+
+UnicodeString LoadStr(NativeUInt Ident)
+{
+  wchar_t Buffer[1024];
+  const int Length = LoadString(HInstance, static_cast<unsigned>(Ident), Buffer,
+                                static_cast<int>(sizeof(Buffer) / sizeof(Buffer[0])));
+  return UnicodeString(Buffer, Length);
+}

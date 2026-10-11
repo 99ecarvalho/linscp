@@ -8,17 +8,17 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 166,
+        "errors": 157,
         "missing_types": 9
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 90,
+        "errors": 79,
         "missing_types": 18
       },
       "source/core/CopyParam.cpp": {
         "aborted": false,
-        "errors": 24,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/FileBuffer.cpp": {
@@ -48,7 +48,7 @@
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 96,
+        "errors": 70,
         "missing_types": 4
       }
     },
@@ -60,17 +60,17 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 122,
+        "errors": 113,
         "missing_types": 2
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 25,
+        "errors": 14,
         "missing_types": 1
       },
       "source/core/CopyParam.cpp": {
         "aborted": false,
-        "errors": 24,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/FileBuffer.cpp": {
@@ -100,7 +100,7 @@
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 72,
+        "errors": 46,
         "missing_types": 1
       }
     }
