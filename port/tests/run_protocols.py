@@ -142,6 +142,36 @@ def main():
                     ran.append(proto)
             except fixtures.Missing as e:
                 skipped.append(f'{proto} ({e})')
+
+        # FTP, and FTPS explicit (ftpes://) and implicit (ftps://): the
+        # suite's own server, as none is installed here (ftp_server.py).
+        for proto, tls, implicit in (('ftp', False, False), ('ftpes', True, False), ('ftps', True, True)):
+            if not wanted(proto):
+                continue
+            try:
+                root = os.path.join(tmp, proto + '-server')
+                os.makedirs(root)
+                args = []
+                fp = None
+                if tls:
+                    cert, key, fp = fixtures.self_signed(tmp, proto)
+                    args = ['--cert', cert, '--key', key] + (['--implicit'] if implicit else [])
+                with fixtures.python_server('ftp_server.py', root, *args) as port:
+                    extra = f' -certificate={fp}' if tls else ''
+                    runner.scenario(proto, f'open {proto}://linscp:secret@127.0.0.1:{port}/{extra}', root, '/')
+                    ran.append(proto)
+            except fixtures.Missing as e:
+                skipped.append(f'{proto} ({e})')
+
+        # S3: the suite's own server (s3_server.py), plain HTTP, path-style
+        # URLs as an IP address needs; buckets are directories of its root.
+        if wanted('s3'):
+            root = os.path.join(tmp, 's3-server')
+            os.makedirs(os.path.join(root, 'bucket'))
+            with fixtures.python_server('s3_server.py', root) as port:
+                runner.scenario('s3', f'open s3plain://LINSCPKEY:secret@127.0.0.1:{port}/ -rawsettings S3UrlStyle=1',
+                                os.path.join(root, 'bucket'), '/bucket')
+                ran.append('s3')
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 

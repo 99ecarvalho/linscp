@@ -84,19 +84,22 @@ fixes came with it: storage keys are joined with backslashes on every platform
 starts from upstream's defaults -- it had never called `Default()`, so every
 setting had been zero.
 
-**SFTP, SCP, WebDAV and WebDAVS pass the same everyday script on both
-targets** -- list, download, upload, mkdir, move, delete, rmdir, each checked
-on the server's side (ctest `protocols`; rclone serves WebDAV). It found
-three bugs: class-typed properties read from a field were copies, so
+**Every protocol passes the same everyday script on both targets** -- SFTP,
+SCP, WebDAV, WebDAVS, FTP, FTPES, FTPS and S3 -- list, download, upload, mkdir, move, delete, rmdir, each checked
+on the server's side (ctest `protocols`). OpenSSH serves SSH and rclone
+WebDAV; this machine has no FTP or S3 server, so the suite has small ones of
+its own (`ftp_server.py`, with explicit and implicit TLS; `s3_server.py`). It
+found four bugs: class-typed properties read from a field were copies, so
 `Rights.Number = ...` was lost and SCP uploaded files with mode 000; neon's
 TLS-init closure travelled as two raw pointers
 (`core-neon-tls-init-closure.patch`); and a script `rmdir` over WebDAV
 dereferenced a null directory list, upstream too
-(`core-script-rmdir-full-path.patch`).
+(`core-script-rmdir-full-path.patch`); and `SubString(0, n)` returned n-1
+characters, which cut S3 bucket names short.
 
-1. FTP/FTPS (FileZilla) and S3 (libs3) in `protocols`, with small loopback
-   servers of the suite's own (this machine has no FTP or S3 server), towards
-   the golden suite (P1-19).
+1. **P0-13**: the golden-output harness (`/xmllog` runner, XML normaliser,
+   differ) over this protocol matrix -- comparable today between the two
+   targets; the reference corpus from real WinSCP (P0-15) waits on Q-2.
 2. **P1-22**: `keepuptodate` (directory watching) in the CLI.
 3. **P1-20**: the stock .NET assembly driving `linscp-cli` (it expects
    winscp.com's switches and XML log).
@@ -241,6 +244,7 @@ dereferenced a null directory list, upstream too
 | 2026-10-11 | Storage key paths use backslashes on every platform (`core-storage-key-backslashes.patch`) | `THierarchicalStorage` joined keys through the RTL's `IncludeTrailingBackslash`, which on POSIX adds the platform's path delimiter. Keys are not file paths; the INI file's sections are backslash-separated. Unchanged on Windows |
 | 2026-10-11 | A field-backed property of class type reads as the field itself (a reference) | Borland makes such a property the field: core changes members through it (`Rights.Number = TRights::rfDefault` in `TCopyParamType::Default`). Returning a copy lost every such change silently -- SCP sent mode 0000. Scalars stay by value; a class field of another type than the property's fails to compile rather than copy |
 | 2026-10-11 | Protocol tests use loopback servers: OpenSSH's sshd, rclone for WebDAV, and the suite's own where none is installed | Real servers where the machine has them, so the client is tested against implementations it did not write; a protocol whose server is missing is skipped, not failed |
+| 2026-10-11 | `SubString` takes an index below 1 as 1 and keeps the count (C++Builder's), not Delphi `Copy`'s dropping of the characters before 1 | Core's one use of it, `TS3FileSystem::ParsePath`'s `SubString(0, P - 1)`, works in WinSCP's S3 transfers only that way; the shim's earlier reading cut every bucket name by one character |
 | 2026-10-10 | `Format` keeps malformed input visible | Delphi raises on a missing argument. Core routes user- and server-supplied text through these into logs, so an unknown specifier is echoed and a missing argument renders as `<missing>` rather than throwing from a log path |
 
 ## Correction: census figures before 2026-10-11 used the wrong configuration
@@ -566,7 +570,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-16 | Headless `Interface.h` frontend | done | `port/frontend`: all 17 functions plus startup/shutdown; core initialises and finalises under Wine. Linux follows core (P1-07b) |
 | P1-17 | First SFTP session on Linux | done | Core links on Linux, and the four loopback-`sshd` session tests pass there as on Windows (negotiated, AES-CTR, AES-GCM, ChaCha20-Poly1305). Needed the `lp64_long` transform rule and the link-level wide-function check |
 | P1-18 | Windows cross-build + Wine | done | Core and the CLI, cross-built, run real SFTP sessions and scripts under Wine (`sftp_session*`, `cli_session`) |
-| P1-19 | Golden suite green, both platforms | wip | ctest `protocols`: SFTP, SCP, WebDAV, WebDAVS pass the everyday script on both targets; FTP/FTPS and S3 next. **P1 gate** |
+| P1-19 | Golden suite green, both platforms | wip | ctest `protocols`: SFTP, SCP, WebDAV(S), FTP, FTPES, FTPS and S3 pass the everyday script on both targets. The golden comparison needs P0-13 (harness) and P0-15 (corpus from real WinSCP, Q-2). **P1 gate** |
 | P1-20 | .NET assembly drives Linux CLI | todo | |
 | P1-21 | `#ifdef` out Windows-only subsystems | todo | |
 | P1-22 | CLI `keepuptodate` (directory watching) | todo | |

@@ -205,14 +205,12 @@ AnsiStringT<CodePage> AnsiStringT<CodePage>::SubString(int Index, int Count) con
   {
     return AnsiStringT();
   }
+  // C++Builder's SubString takes an index below 1 as 1 and keeps the count
+  // -- unlike Delphi's Copy. Core relies on it: TS3FileSystem::ParsePath
+  // takes a bucket name with SubString(0, P - 1).
   if (Index < 1)
   {
-    Count += Index - 1;
     Index = 1;
-    if (Count <= 0)
-    {
-      return AnsiStringT();
-    }
   }
   const std::size_t Start = static_cast<std::size_t>(Index - 1);
   AnsiStringT Result;

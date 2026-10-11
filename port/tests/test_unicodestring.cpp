@@ -76,13 +76,15 @@ void TestSubString()
   CHECK(Eq(S.SubString(4), L"def"));        // open-ended overload
   CHECK(Eq(S.SubString(1), L"abcdef"));
 
-  // clamping, matching Delphi's Copy rather than throwing
+  // clamping rather than throwing
   CHECK(Eq(S.SubString(4, 100), L"def"));   // count past the end
   CHECK(S.SubString(7, 1).IsEmpty());       // index past the end
   CHECK(S.SubString(1, 0).IsEmpty());       // zero count
   CHECK(S.SubString(1, -5).IsEmpty());      // negative count
-  CHECK(Eq(S.SubString(-1, 3), L"a"));      // starts before 1: leading chars drop
-  CHECK(S.SubString(-5, 2).IsEmpty());      // entirely before the start
+  // An index below 1 is taken as 1, the count kept: C++Builder's
+  // SubString, which TS3FileSystem::ParsePath relies on (SubString(0, P - 1)).
+  CHECK(Eq(S.SubString(0, 3), L"abc"));
+  CHECK(Eq(S.SubString(-1, 2), L"ab"));
   CHECK(UnicodeString().SubString(1, 5).IsEmpty());
 }
 
