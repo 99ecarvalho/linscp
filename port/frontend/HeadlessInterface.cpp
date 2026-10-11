@@ -54,15 +54,47 @@ UnicodeString UniqTempDir(const UnicodeString BaseDir, const UnicodeString Ident
 class THeadlessConfiguration : public TConfiguration
 {
 public:
+  // TConfiguration's constructor leaves the settings to Default(), which
+  // TWinConfiguration's constructor calls; so does this one. Without it
+  // every setting is zero.
+  THeadlessConfiguration()
+  {
+    Default();
+  }
+
   virtual UnicodeString TemporaryDir(bool Mask)
   {
     return UniqTempDir(SystemTemporaryDirectory(), L"scp", Mask);
   }
 };
 }
+#if !defined(_WIN32)
+//---------------------------------------------------------------------------
+// Where the configuration lives on POSIX, which has no registry. The file is
+// WinSCP's INI, under WinSCP's name, as on Windows linscp keeps WinSCP's
+// registry key: a WinSCP.ini exported from Windows can be dropped in. One
+// beside the executable wins, as upstream's portable mode has it (there
+// named after WinSCP.exe); otherwise the user's XDG configuration
+// directory, created if need be.
+UnicodeString PosixIniFileName()
+{
+  const UnicodeString FileName = L"WinSCP.ini";
+  const UnicodeString Portable = IncludeTrailingBackslash(ExtractFilePath(ParamStr(0))) + FileName;
+  if (FileExists(ApiPath(Portable)))
+  {
+    return Portable;
+  }
+  const UnicodeString Directory =
+    IncludeTrailingBackslash(GetShellFolderPath(CSIDL_APPDATA)) + AppNameString();
+  ForceDirectories(ApiPath(Directory));
+  return IncludeTrailingBackslash(Directory) + FileName;
+}
+#endif
 //---------------------------------------------------------------------------
 // The /ini and /rawconfig switches, as UserInterface.cpp handles them; the
-// raw configuration only without /unsafe, as its CheckSafe has it.
+// raw configuration only without /unsafe, as its CheckSafe has it. Without
+// /ini, Windows detects the storage as upstream does (an INI file if one
+// exists, else the registry); POSIX uses its INI file.
 TConfiguration * __fastcall CreateConfiguration()
 {
   TConfiguration * Result = new THeadlessConfiguration();
@@ -80,6 +112,12 @@ TConfiguration * __fastcall CreateConfiguration()
       Result->SetExplicitIniFileStorageName(IniFileName);
     }
   }
+#if !defined(_WIN32)
+  else
+  {
+    Result->SetExplicitIniFileStorageName(PosixIniFileName());
+  }
+#endif
   if (!Params->FindSwitch(L"Unsafe"))
   {
     std::unique_ptr<TStrings> RawConfig(new TStringList());

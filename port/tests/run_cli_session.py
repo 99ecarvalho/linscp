@@ -68,9 +68,10 @@ def main():
     def native(path):
         return 'Z:' + path.replace('/', '\\') if a.emulator else path
 
-    def run(*args, stdin=None):
-        cmd = ([a.emulator] if a.emulator else []) + [a.cli, '/ini=nul'] + list(args)
-        p = subprocess.run(cmd, input=stdin, capture_output=True, timeout=120)
+    def run(*args, stdin=None, ini='nul', env=None):
+        cmd = ([a.emulator] if a.emulator else []) + [a.cli] + ([f'/ini={ini}'] if ini else []) + list(args)
+        p = subprocess.run(cmd, input=stdin, capture_output=True, timeout=120,
+                           env=dict(os.environ, **(env or {})))
         return p.returncode, p.stdout, p.stderr
 
     tmp = tempfile.mkdtemp(prefix='linscp-cli-')
@@ -171,6 +172,31 @@ def main():
             text, rc = run_on_terminal(a.cli, ['help ls', 'exit'])
             check(rc == 0, f'terminal session exits 0 (rc {rc})', text)
             check(text.count('linscp> ') >= 2 and 'Lists the contents' in text, 'terminal prompt and command', text)
+
+        # A site stored in WinSCP's INI, opened by name. On POSIX the file is
+        # found where linscp keeps it ($XDG_CONFIG_HOME/linscp/WinSCP.ini),
+        # on Windows given with /ini (there the default is the registry).
+        config_home = os.path.join(tmp, 'config')
+        if a.emulator:
+            ini_path = os.path.join(tmp, 'WinSCP.ini')
+            ini_arg, ini_env = native(ini_path), None
+        else:
+            ini_path = os.path.join(config_home, 'linscp', 'WinSCP.ini')
+            ini_arg, ini_env = None, {'XDG_CONFIG_HOME': config_home}
+        os.makedirs(os.path.dirname(ini_path), exist_ok=True)
+        with open(ini_path, 'w') as f:
+            f.write('[Sessions\\linscp-test]\n'
+                    'HostName=127.0.0.1\n'
+                    f'PortNumber={port}\n'
+                    f'UserName={getpass.getuser()}\n'
+                    f'PublicKeyFile={native(ppk)}\n')
+        rc, out, err = run('/command', f'open linscp-test -hostkey={full_fingerprint.split()[-1]}',
+                           f'ls {remote}', 'exit', ini=ini_arg, env=ini_env)
+        text = out.decode(errors='replace')
+        check(rc == 0 and 'hello.txt' in text, f'a stored site opens by name (rc {rc})', text + err.decode(errors='replace'))
+        stored = open(ini_path, encoding='utf-8', errors='replace').read()
+        check('[Sessions\\linscp-test]' in stored and 'HostName=127.0.0.1' in stored,
+              'the stored site survives the configuration being saved', stored[:2000])
 
         # A script file with /parameter.
         script = os.path.join(tmp, 'script.txt')

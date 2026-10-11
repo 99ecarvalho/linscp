@@ -9,11 +9,11 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 25 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 30 | 37 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 31 | 37 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **55** | **96** | |
+| **Total** | **56** | **96** | |
 
 ## Next three actions
 
@@ -76,11 +76,20 @@ on Linux and under Wine (ctest `cli_session`). On the way: Delphi's
 zero-initialised instances, which upstream relies on, are now given by the
 shim (every allocation and every thrown object starts zeroed).
 
-1. **P1-06d**: INI storage on Linux, which a usable Linux build needs.
-2. The remaining protocols on Linux -- SCP, FTP/FTPS (FileZilla), WebDAV and
+**Configuration persists on Linux** (P1-06d done): WinSCP's INI file at
+`$XDG_CONFIG_HOME/linscp/WinSCP.ini` (or a `WinSCP.ini` beside the
+executable), stored sites included (ctest `ini_sites`, `cli_session`). Two
+fixes came with it: storage keys are joined with backslashes on every platform
+(`core-storage-key-backslashes.patch`), and the headless configuration now
+starts from upstream's defaults -- it had never called `Default()`, so every
+setting had been zero.
+
+1. The remaining protocols on Linux -- SCP, FTP/FTPS (FileZilla), WebDAV and
    S3 (neon, libs3) -- against loopback servers, as SFTP is tested, towards
    the golden suite (P1-19).
-3. **P1-22**: `keepuptodate` (directory watching) in the CLI.
+2. **P1-22**: `keepuptodate` (directory watching) in the CLI.
+3. **P1-20**: the stock .NET assembly driving `linscp-cli` (it expects
+   winscp.com's switches and XML log).
 
 ## Decisions taken
 
@@ -218,6 +227,8 @@ shim (every allocation and every thrown object starts zeroed).
 | 2026-10-11 | The scripting client (`linscp-cli`) is a runner of its own over core's `TManagementScript`, following `TConsoleRunner` and winscp.com | Upstream's runner (windows/ConsoleRunner.cpp) cannot be compiled without the VCL forms: its header is the GUI's `WinInterface.h` (117 VCL types, `WinConfiguration.h`, Delphi components). The script and its output are core's either way; the runner carries how queries (accelerators, batch answers, timeouts), prompts and input meet the console, and the console has winscp.com's semantics (UTF-8, from-beginning prints held on pipes, piped input echoed, a choice from a pipe breaks). It names itself linscp (`linscp> `), per the naming decision |
 | 2026-10-11 | Every allocation, and every thrown object, starts zeroed (global `operator new`; `--wrap=__cxa_allocate_exception`) | Delphi's InitInstance zeroes an instance before its constructor, and upstream relies on it: `TSessionData`'s constructor reaches `Modify()`, which writes through an unset `FUnsafeSettings`; `ExtException`'s reads `FMoreMessages`. A class-scoped `operator new` on `TObject` cannot be reached through core's private inheritance from `TStringList`, and thrown objects are built in the runtime's exception storage, so both paths are zeroed instead. A superset no correct code can tell apart; one `calloc` per allocation |
 | 2026-10-11 | On POSIX, `CmdLine` quotes an argument with a space, tab or quote, doubling its quotes | Core's `CutToken` reads `""` within quotes as a quote, the convention winscp.com's users write by hand. Embedded quotes were passed through, which cut `-hostkey="ssh-ed25519 255 ..."` at its first space |
+| 2026-10-11 | On POSIX the configuration is WinSCP's INI, named `WinSCP.ini`, in `$XDG_CONFIG_HOME/linscp/` -- unless `/ini` says otherwise or a `WinSCP.ini` sits beside the executable (closes P1-06d) | The counterpart of keeping WinSCP's registry key on Windows: the same format under the same name, so a `WinSCP.ini` exported from Windows can be dropped in. One file for every linscp program, as WinSCP.exe and winscp.com share one configuration; upstream's automatic name (`<executable>.ini`) would give each program its own. The executable's directory wins, as upstream's portable mode has it |
+| 2026-10-11 | Storage key paths use backslashes on every platform (`core-storage-key-backslashes.patch`) | `THierarchicalStorage` joined keys through the RTL's `IncludeTrailingBackslash`, which on POSIX adds the platform's path delimiter. Keys are not file paths; the INI file's sections are backslash-separated. Unchanged on Windows |
 | 2026-10-10 | `Format` keeps malformed input visible | Delphi raises on a missing argument. Core routes user- and server-supplied text through these into logs, so an unknown specifier is echoed and a missing argument renders as `<missing>` rather than throwing from a log path |
 
 ## Correction: census figures before 2026-10-11 used the wrong configuration
@@ -529,7 +540,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-06 | Shim: streams | done | `TStream`/`THandleStream`/`TFileStream`/`TMemoryStream` |
 | P1-06b | Shim: INI/registry storage | done | INI parses real-world files; registry real on Windows |
 | P1-06c | Shim: `DynamicArray` + file API | done | sharing semantics tested |
-| P1-06d | Select INI backend on Linux | todo | frontend decision |
+| P1-06d | Select INI backend on Linux | done | `$XDG_CONFIG_HOME/linscp/WinSCP.ini`, or `WinSCP.ini` beside the executable, or `/ini`; sites load and save (ctest `ini_sites`, `cli_session`) |
 | P1-07 | `port/platform` Win32 subset | done | types, FILETIME/SYSTEMTIME, errors, winsock names |
 | P1-07b | `port/platform` Win32 file/handle functions | done | every Win32 call core makes: files, time zones (real transition rules), modules, processes (/proc), paths, string order, environment, XDG folders, MIME and type names, reparse points, trash, registry entry points, memory regions, version resources, user name, certificate chains (OpenSSL, system trust store); tested against real Win32 under Wine where observable. Core compiles on Linux |
 | P1-08 | Socket-event emulation | done | `ws2_32` module and `WSAEventSelect`/`WSAEnumNetworkEvents`; one test passes against real Winsock (Wine) and the emulation. `WSAAsyncSelect` (FileZilla) is P1-12's |

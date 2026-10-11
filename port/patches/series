@@ -8,3 +8,4 @@ putty-aes-ni-non-win64-clang.patch
 neon-winscp-additions-windows-only.patch
 filezilla-in-addr-s-addr.patch
 filezilla-tools-unicodestring.patch
+core-storage-key-backslashes.patch

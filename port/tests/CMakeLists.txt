@@ -123,6 +123,14 @@ add_test(NAME core_init_build
 add_test(NAME core_init COMMAND test_core_init /ini=nul)
 set_tests_properties(core_init PROPERTIES DEPENDS core_init_build)
 
+# Sites in WinSCP's INI file, read through core's storage as CoreLoad does.
+add_executable(test_ini_sites EXCLUDE_FROM_ALL test_ini_sites.cpp)
+target_link_libraries(test_ini_sites PRIVATE linscp-runtime)
+add_test(NAME ini_sites_build
+  COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_ini_sites)
+add_test(NAME ini_sites COMMAND test_ini_sites /ini=nul "${CMAKE_CURRENT_BINARY_DIR}")
+set_tests_properties(ini_sites PROPERTIES DEPENDS ini_sites_build)
+
 # A real session against a throwaway loopback sshd: connect, list, download.
 add_executable(test_sftp_session EXCLUDE_FROM_ALL test_sftp_session.cpp)
 target_link_libraries(test_sftp_session PRIVATE linscp-runtime)

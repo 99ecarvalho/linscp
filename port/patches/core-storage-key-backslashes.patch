@@ -1,0 +1,33 @@
+Build storage key paths with backslashes on every platform.
+
+THierarchicalStorage joins registry and INI key paths (Sessions\My site)
+through its IncludeTrailingBackslash and ExcludeTrailingBackslash members,
+which defer to the RTL functions of those names. The RTL's add and strip the
+platform's path delimiter: a backslash on Windows, a slash on POSIX, where
+these functions also build local file paths. Keys are not file paths: their
+separator is a backslash everywhere, and the INI file's sections say so. The
+members now add and strip a backslash themselves; on Windows that is what
+the RTL did, so upstream's behaviour is unchanged. Without this, on POSIX
+the current key became "Sessions/", matched no section, and no stored site
+loaded. Line counts are unchanged.
+
+--- a/source/core/HierarchicalStorage.cpp	2026-10-11 20:24:50.370319077 -0300
++++ b/source/core/HierarchicalStorage.cpp	2026-10-11 20:24:50.391977479 -0300
+@@ -896,7 +896,7 @@
+   }
+   else
+   {
+-    return ::IncludeTrailingBackslash(S);
++    if (S[S.Length()] == L'\\') { return S; } return S + L'\\'; // linscp: keys use backslashes on any platform
+   }
+ }
+ //---------------------------------------------------------------------------
+@@ -909,7 +909,7 @@
+   }
+   else
+   {
+-    return ::ExcludeTrailingBackslash(S);
++    if (S[S.Length()] == L'\\') { return S.SubString(1, S.Length() - 1); } return S; // linscp: as above
+   }
+ }
+ //---------------------------------------------------------------------------
