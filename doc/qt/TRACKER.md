@@ -9,11 +9,11 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 25 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 21 | 36 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 22 | 36 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **46** | **95** | |
+| **Total** | **47** | **95** | |
 
 ## Next three actions
 
@@ -25,20 +25,22 @@ what is actually blocking each unit, in dependency order.
 as a real library: `linscp-core`, built by CMake with the cross toolchain.
 Linux: **558 errors, 14/33 clean, 4 aborting.**
 
-**Link check** (`--target linscp-core-link`, every core object forced into
-one executable): **17 undefined symbols on Windows, all of them the frontend
-half of `Interface.h`** (`StartThread`, `ProcessGUI`, `CreateConfiguration`,
-...), which core expects the application to supply. Every library resolves:
-the VCL shim, WinSCP's PuTTY (176 units) and its MSVC-built crypto
-(`libs/puttyvs`), FileZilla's 16 units with the 13-unit MFC subset, neon (25
-units), libs3 (14) and OpenSSL 3.3.7 -- all built with clang from pinned
-submodules.
+**Core links and runs on Windows.** Core, every library it uses and the
+headless frontend (`port/frontend`) link with nothing undefined -- the VCL
+shim, WinSCP's PuTTY (176 units) and its MSVC-built crypto (`libs/puttyvs`),
+FileZilla's 16 units with the 13-unit MFC subset, neon (25), libs3 (14) and
+OpenSSL 3.3.7, all built with clang from pinned submodules. Under Wine, every
+static initialiser runs (ctest `core_link_run`) and core's own
+`CoreInitialize`/`CoreFinalize` complete: configuration, PuTTY, FileZilla,
+neon and stored sessions come up and go down, reporting version 6.5.8
+(ctest `core_init`).
 
-1. **P1-16**: the headless frontend, after which core links and can run.
-2. **P1-13**: neon and libs3 on Linux -- each needs a POSIX configuration
+1. **P1-18**: a first real session on Windows under Wine, against a local
+   SSH server -- the earliest point a protocol runs end to end.
+2. **P1-07b**: the Win32 calls core makes that Linux lacks; the Linux census
+   (558 errors, 14/33 clean) is now the larger gap.
+3. **P1-13**: neon and libs3 on Linux -- each needs a POSIX configuration
    in place of `src/config.h` and `inc/mingw`. OpenSSL already builds there.
-3. **P1-07b**: the Win32 calls core makes that Linux lacks, now that the
-   Linux census is the larger gap (558 errors, 14/33 clean).
 
 ## Decisions taken
 
@@ -137,6 +139,9 @@ submodules.
 | 2026-10-10 | `port/platform` headers refuse to compile on Windows, and are POSIX-only on the include path | Putting them on a Windows target shadowed the genuine mingw headers, which presented as a 1,220 -> 783 "improvement". The `#error` makes that mistake loud |
 | 2026-10-10 | `port/compat` is separate from `port/platform` | `help.h` is missing from upstream itself rather than being a platform difference, so it is needed on every target |
 | 2026-10-10 | The ratchet records whether a unit aborted | An aborted parse reports a floor. Treating that as a distinct state stops a new abort from reading as sudden progress |
+| 2026-10-11 | linscp names itself to servers but keeps WinSCP's stored settings (user's decision) | `AppNameString` is "linscp" and the SSH banner `linscp-release-<version>` -- the HTTP User-Agent, S3 role session, FTP CSID and PuTTY appname follow. The registry keys stay `Software\Martin Prikryl\WinSCP 2`, so on Windows existing sites carry over |
+| 2026-10-11 | The VERSIONINFO resource is generated from `WinSCP.cbproj`'s `VerInfo_*` settings (`gen_versioninfo.py`) | Core reads its own version from the running module's resource, which C++Builder writes from those settings; generated, it follows the pin. POSIX has no resources: P1-07b's |
+| 2026-10-11 | The headless frontend compiles upstream's `windows/ProgParams.cpp` as is and copies `UniqTempDir` from `GUITools.cpp` | `TProgramParams` needs nothing beyond core; `GUITools.cpp` is otherwise GUI. Startup follows `wWinMain`'s order: the application log exists before `CoreInitialize` |
 | 2026-10-11 | OpenSSL is built from the pinned release WinSCP vendors (3.3.7, `3rd-party/openssl`) with OpenSSL's own `Configure`, not from `libs/openssl` | WinSCP's copy is trimmed for 32-bit Windows: x86 assembly without its C fallbacks (`bn_asm.c`, `des_enc.c`, ...), no Unix sources, a 32-bit `configuration.h`. It cannot build for x86-64 or Linux. Disabled features mirror WinSCP's `OPENSSL_NO_*` set |
 | 2026-10-11 | WinSCP's changes to OpenSSL are adopted or skipped by a reviewed list, `port/openssl/winscp-changes.txt` | 17 files differ. One is a security backport (CVE-2026-45447, from 3.4.6), adopted; the rest are C++Builder workarounds, skipped. `openssl_tree.py --check` (ctest `openssl_tree`) fails on a difference the list does not cover, so a WinSCP backport cannot be missed on an upgrade |
 | 2026-10-11 | neon and libs3 are compiled from the generated tree, from the unit lists in their make files | The transform's rules leave them byte-identical; the tree gives them the patch series, which libs3 already needs. `upstream_units.py` reads Borland make files as well as projects |
@@ -225,6 +230,9 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | `RawByteString` to another code page | Bytes pass through | C++Builder's `RawByteString` carries a run-time code page and would transcode out of it; this one has none |
 | `ISO8601ToDate` without a zone designator | Taken as UTC | Delphi's handling of a zoneless time is not established here; every value core parses (S3) carries `Z` |
 | `TStrings::Text` on POSIX | CRLF, not LF | See the decisions table |
+| Headless frontend: stack traces | None are recorded, so none are appended to error reports | Upstream records them through JCL's exception hooks, a Windows-only C++Builder facility |
+| Headless frontend: sleep | `SystemRequired` holds off sleep on Windows (`SetThreadExecutionState`) and does nothing on POSIX | POSIX has no equivalent without a session bus (logind inhibitors); upstream also runs it from a helper thread on Windows 11 |
+| Headless frontend: clipboard | Pasting a password finds nothing; copying raises | No clipboard without a GUI; the copy is reachable only from a GUI prompt's button |
 | `SuspendThread` on POSIX | Not declared | A running pthread cannot be suspended. A missing declaration fails at compile time; a stub would fail silently. `CREATE_SUSPENDED` + `ResumeThread` is supported |
 
 ## Open questions
@@ -425,7 +433,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-13 | System libs | wip | Windows complete: PuTTY, puttyvs, FileZilla + MFC, neon, libs3 from the WinSCP submodule, OpenSSL 3.3.7 from its own (both targets). Linux: neon and libs3 need POSIX configurations |
 | P1-14 | Drop `puttyvs` | done | the MSVC build is replaced by clang building the same files with the same defines, from `PuTTYVS.vcxproj` |
 | P1-15 | Console IPC → stdio | todo | |
-| P1-16 | Headless `Interface.h` frontend | todo | |
+| P1-16 | Headless `Interface.h` frontend | done | `port/frontend`: all 17 functions plus startup/shutdown; core initialises and finalises under Wine. Linux follows core (P1-07b) |
 | P1-17 | First SFTP session on Linux | todo | long tail expected |
 | P1-18 | Windows cross-build + Wine | todo | |
 | P1-19 | Golden suite green, both platforms | todo | **P1 gate** |

@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.25)
 project(linscp LANGUAGES C CXX
         DESCRIPTION "Qt port of WinSCP for Linux and Windows")
+if(WIN32)
+  # Version resources (port/frontend).
+  enable_language(RC)
+endif()
 
 # ---------------------------------------------------------------------------
 # clang is mandatory: the VCL property shim relies on __declspec(property),
@@ -113,6 +117,7 @@ add_subdirectory(port/filezilla)
 add_subdirectory(port/neon)
 add_subdirectory(port/libs3)
 add_subdirectory(port/core)
+add_subdirectory(port/frontend)
 
 include(CTest)
 if(BUILD_TESTING)

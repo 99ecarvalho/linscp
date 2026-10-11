@@ -153,8 +153,10 @@ def main():
     ap.add_argument('--src', default='3rd-party/winscp/source')
     ap.add_argument('--out', required=True)
     ap.add_argument('--rc', nargs='*',
+                    # TextsWin1.rc: the frontend's texts, which a headless
+                    # frontend needs too (button captions, for one).
                     default=['TextsCore1.rc', 'TextsCore2.rc',
-                             'TextsFileZilla.rc'])
+                             'TextsFileZilla.rc', 'TextsWin1.rc'])
     a = ap.parse_args()
 
     ids = parse_ids(a.src)

@@ -57,7 +57,9 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/link_check_main.cpp" "int main() { retur
 add_executable(linscp-core-link EXCLUDE_FROM_ALL "${CMAKE_CURRENT_BINARY_DIR}/link_check_main.cpp")
 target_link_libraries(linscp-core-link PRIVATE
   -Wl,--error-limit=0
-  -Wl,--whole-archive linscp-core -Wl,--no-whole-archive linscp-shim)
+  -Wl,--whole-archive linscp-core -Wl,--no-whole-archive linscp-shim
+  # Defined later, in port/frontend; names resolve when CMake generates.
+  linscp-frontend-headless)
 if(TARGET linscp-putty)
   target_link_libraries(linscp-core-link PRIVATE linscp-putty linscp-puttyvs)
 endif()

@@ -14,6 +14,11 @@ add_custom_command(
           --src "${LINSCP_UPSTREAM}/source" --out "${LINSCP_RESOURCES}"
   DEPENDS "${CMAKE_SOURCE_DIR}/port/tools/gen_resources.py"
           "${LINSCP_UPSTREAM}/source/resource/TextsCore.h"
+          "${LINSCP_UPSTREAM}/source/resource/TextsCore1.rc"
+          "${LINSCP_UPSTREAM}/source/resource/TextsCore2.rc"
+          "${LINSCP_UPSTREAM}/source/resource/TextsFileZilla.rc"
+          "${LINSCP_UPSTREAM}/source/resource/TextsWin.h"
+          "${LINSCP_UPSTREAM}/source/resource/TextsWin1.rc"
   COMMENT "Generating resource string table from upstream .rc files"
   VERBATIM)
 

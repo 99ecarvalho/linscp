@@ -86,6 +86,24 @@ add_executable(test_json test_json.cpp)
 target_link_libraries(test_json PRIVATE linscp-shim)
 add_test(NAME json COMMAND test_json)
 
+# Core, every library it uses and the headless frontend, linked into one
+# executable with every core object forced in: the link proves nothing is
+# undefined, and running it runs every static initialiser in them. Windows
+# only until core compiles for Linux.
+if(WIN32)
+  add_test(NAME core_link_build
+    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target linscp-core-link)
+  add_test(NAME core_link_run COMMAND linscp-core-link)
+  set_tests_properties(core_link_run PROPERTIES DEPENDS core_link_build)
+
+  add_executable(test_core_init EXCLUDE_FROM_ALL test_core_init.cpp)
+  target_link_libraries(test_core_init PRIVATE linscp-runtime)
+  add_test(NAME core_init_build
+    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_core_init)
+  add_test(NAME core_init COMMAND test_core_init /ini=nul)
+  set_tests_properties(core_init PROPERTIES DEPENDS core_init_build)
+endif()
+
 # Executable tests go above this line.
 # When cross-compiling, the toolchain points CMAKE_CROSSCOMPILING_EMULATOR at
 # wine; these tell wine where the mingw runtime DLLs live and keep its output
