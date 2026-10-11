@@ -384,6 +384,21 @@ estimate</a>
 <li><a href="#with-a-small-team" id="toc-with-a-small-team">With a small
 team</a></li>
 </ul></li>
+<li><a href="#compute-cost" id="toc-compute-cost">Compute cost</a>
+<ul>
+<li><a href="#tokens-consumed" id="toc-tokens-consumed">Tokens
+consumed</a></li>
+<li><a href="#api-price-sheet" id="toc-api-price-sheet">API price
+sheet</a></li>
+<li><a href="#cost-of-the-work-done-so-far"
+id="toc-cost-of-the-work-done-so-far">Cost of the work done so
+far</a></li>
+<li><a href="#extrapolated-to-completion"
+id="toc-extrapolated-to-completion">Extrapolated to completion</a></li>
+<li><a href="#subscription-seats-are-a-different-currency"
+id="toc-subscription-seats-are-a-different-currency">Subscription seats
+are a different currency</a></li>
+</ul></li>
 <li><a href="#the-binding-constraint"
 id="toc-the-binding-constraint">The binding constraint</a></li>
 <li><a href="#sensitivity" id="toc-sensitivity">Sensitivity</a></li>
@@ -1989,6 +2004,13 @@ public, GPL-3.0</td>
 <code>qt</code></td>
 </tr>
 <tr class="even">
+<td>2026-10-11</td>
+<td>Compute cost recorded as measured token usage, not an estimate</td>
+<td>The branch so far cost $297 of Opus 5 inference (99% of tokens are
+cache reads). Confirms compute is not the constraint, and shows Opus 5.5
+would halve it — see <a href="#estimates">ESTIMATES.md</a></td>
+</tr>
+<tr class="odd">
 <td>2026-10-10</td>
 <td>A PR-able branch against <code>winscp/winscp</code> will be
 <strong>generated</strong>, not hand-maintained</td>
@@ -1997,13 +2019,13 @@ branch is not directly mergeable. Since the port is mechanical, the fork
 branch can be produced on demand (Q-7). Rehearsed end to end — see facts
 below</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>Transform must be byte-exact outside property lines</td>
 <td>A full-file rewrite (CRLF loss) turned a 613-line change into
 76,551. Now asserted by <code>verify_transform.py</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>Field/accessor classification is convention-first, parens only as
 fallback</td>
@@ -2013,26 +2035,26 @@ lists; WinSCP’s <code>F&lt;Upper&gt;</code> /
 unclassifiable names now fail the run instead of producing a wrong-arity
 macro</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>Windows releases link statically via lld</td>
 <td><code>-fuse-ld=lld -static -L/usr/x86_64-w64-mingw32/lib</code>;
 leaves only KERNEL32 and msvcrt as deps</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>CMake hard-fails on non-clang compilers</td>
 <td>A clear configure-time error beats a confusing failure in the first
 transformed header</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>The transform stamp lives outside the generated tree</td>
 <td><code>verify_transform.py</code> treats any extra file as a
 violation, which is the behaviour we want; the stamp was the first thing
 it caught</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><strong>Accepted (Q-8):</strong> <code>-fshort-wchar</code> with
 <code>std::u16string</code> storage; <code>std::wstring</code> banned in
@@ -2041,19 +2063,19 @@ it caught</td>
 literals untouched. Enforced by <code>check_wide_abi.py</code> and a
 <code>static_assert</code>. ADR 0001</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>-fshort-wchar</code> set globally, not per-target</td>
 <td>One translation unit without it is an ABI landmine that links
 cleanly</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>UnicodeString</code> case folding is ASCII-only for now</td>
 <td>Delphi’s is locale-aware; core uses it on protocol tokens and switch
 names. Recorded as a known limitation, not silently equivalent</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>vcl.h</code> transitively exposes the Win32 API</td>
 <td>Matches C++Builder, which upstream’s <code>CorePCH.h</code> depends
@@ -2061,20 +2083,20 @@ on: it includes <code>&lt;vcl.h&gt;</code> and core’s headers before
 <code>&lt;Winapi.Windows.hpp&gt;</code>. Fixing this alone removed 9 of
 24 missing types</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>UTF-8 decoding substitutes one U+FFFD per maximal subpart</td>
 <td>Unicode’s recommended practice. The first implementation emitted one
 per byte; a test on truncated input caught it</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>Byte strings keep C++Builder’s code-page template shape</td>
 <td>Core relies on <code>RawByteString</code> and
 <code>UTF8String</code> being distinct types; collapsing them would let
 byte reinterpretation happen silently</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>Date and time are combined only through
 <code>ComposeDateTime</code></td>
@@ -2082,20 +2104,20 @@ byte reinterpretation happen silently</td>
 <code>Date + Time</code> lands a day late at the mirrored time. Correct
 for file timestamps, wrong in general and wrong silently</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>TCriticalSection</code> wraps
 <code>std::recursive_mutex</code></td>
 <td>Delphi’s is re-entrant; a plain <code>std::mutex</code> would
 deadlock on core’s re-entrant paths rather than fail a test</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>Compile-census numbers are ratcheted in CI</td>
 <td>No core TU compiles cleanly yet, so a reintroduced missing type
 would otherwise present as a passing build</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>TStrings</code> is 0-based while <code>UnicodeString</code> is
 1-based</td>
@@ -2103,20 +2125,20 @@ would otherwise present as a passing build</td>
 hazard, so each is pinned by a boundary test rather than left to
 memory</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>TStrings</code> references objects, never owns them</td>
 <td>Delphi does not free them and core owns them elsewhere; freeing here
 would be a double-free. Asserted by a test that outlives the list</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>Chained subscripts on indexed properties are unsupported</td>
 <td>clang reads <code>Prop[i][j]</code> as a two-argument getter call.
 Core has 0 occurrences; <code>check_properties.py</code> fails if an
 upstream change adds one</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>Win32 A/W name macros are undone in
 <code>vcl_win32_undef.h</code></td>
@@ -2126,7 +2148,7 @@ still declared <code>ReplaceText</code>. Both compiled; only the link
 failed, and only because a test called it. A link-time guard now
 references every colliding name</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>ARRAYOFCONST</code> pastes its parenthesised list onto a
 variadic call</td>
@@ -2134,7 +2156,7 @@ variadic call</td>
 compound literals. <code>ARRAYOFCONST((a, b))</code> becoming
 <code>MakeFormatArgs(a, b)</code> is ordinary C++</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td>XML is parsed for real, using the expat upstream vendors, rather
 than stubbed</td>
@@ -2142,7 +2164,7 @@ than stubbed</td>
 sysroot has no expat, so the vendored source is compiled for both
 targets, which also keeps them on one version</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>Wide-character functions are renamed and the CRT names redirected by
 macro</td>
@@ -2151,7 +2173,7 @@ macro</td>
 only in return type – and a macro also guarantees core’s calls reach
 ours rather than glibc’s</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td><code>towlower</code>/<code>towupper</code> fold ASCII only, on both
 platforms</td>
@@ -2159,7 +2181,7 @@ platforms</td>
 running the test against it. Folding Latin-1 on POSIX alone would make
 the platforms disagree, which is worse than being narrow</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td><code>try</code>/<code>__finally</code> uses the same lambda
 expansion on <em>both</em> targets</td>
@@ -2167,7 +2189,7 @@ expansion on <em>both</em> targets</td>
 worth more than relying on it, and it removes a way for the two to
 diverge in behaviour</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td>The <code>try</code>/<code>__finally</code> transform measures brace
 depth on the <em>pristine</em> lines and applies every edit
@@ -2176,7 +2198,7 @@ afterwards</td>
 containing no brace, so editing in place miscounted the depth of any
 enclosing block – and core nests these</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>One bare <code>return</code> inside a guarded body is permitted, by
 checked condition</td>
@@ -2185,7 +2207,7 @@ then falls off the end of the function, which is what Borland does – but
 only when the block ends the function and the return carries no value.
 Both are verified rather than assumed</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td>Every property form routes through a generated public wrapper</td>
 <td>Borland’s <code>__property</code> grants access to a private
@@ -2195,7 +2217,7 @@ ordinary member call at the use site. The wrappers restore both
 behaviours, and the getter casts its result to the declared type because
 C++Builder is lax where the two differ in constness</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td><code>UnicodeString</code> accepts numbers implicitly, yielding
 their decimal text</td>
@@ -2203,7 +2225,7 @@ their decimal text</td>
 <code>UnicodeString s = 0;</code> gives <code>"0"</code> – but diverging
 would mean editing core</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td>Globals that need dynamic initialisation are declared
 <em>before</em> the object that initialises them</td>
@@ -2212,13 +2234,13 @@ declaration order. Putting the initialiser first had its constructor
 assign to a <code>UnicodeString</code> that was not yet constructed,
 which segfaulted rather than failing to compile</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td><code>TMask</code> matching is case-insensitive</td>
 <td>Delphi’s is, and core uses it for file masks users type without
 regard to case</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td>Closure call sites are <strong>compiler-discovered, committed, then
 replayed</strong></td>
@@ -2229,7 +2251,7 @@ so discovery records them to
 <code>transform.py</code> replays that list, failing loudly if a
 recorded site no longer holds the expected identifier</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>A diagnostic inside a macro expansion is resolved to the macro
 <em>definition</em></td>
@@ -2238,7 +2260,7 @@ recorded site no longer holds the expected identifier</td>
 61 duplicate reports. Binding the definition once fixes every call site,
 and cut the work from 118 sites to 62</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td><code>TRegistry</code> on POSIX reports every key absent rather than
 empty</td>
@@ -2247,19 +2269,19 @@ actually set would look to them like their configuration had vanished.
 The INI backend, which core already supports, is the correct one there
 (P1-06d)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>INI section and key names match case-insensitively</td>
 <td>Delphi’s do, and files written by WinSCP on Windows have
 inconsistent casing</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td>INI sections and keys keep their file order</td>
 <td>Sorting them would churn the user’s configuration on every save and
 make diffs useless</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td><code>DynamicArray</code> shares its buffer on copy, as Delphi’s
 does</td>
@@ -2267,7 +2289,7 @@ does</td>
 <em>by value</em> and fills it for the caller. A deep-copying version
 would compile and silently return no data</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td><code>win32_on_posix.h</code> exposes <code>&lt;string.h&gt;</code>,
 <code>&lt;stdlib.h&gt;</code> and <code>&lt;stdio.h&gt;</code></td>
@@ -2275,7 +2297,7 @@ would compile and silently return no data</td>
 <code>strlen</code>, <code>strcmp</code> and <code>memmove</code>
 unqualified</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><strong>Resource strings: supply Win32 <code>LoadString</code>, not
 a <code>.res</code> loader, and do not patch core</strong></td>
@@ -2287,7 +2309,7 @@ additive change — the kind upstream could take rather than a fork of its
 own code. The table is generated from upstream’s <code>.rc</code> files,
 so the strings track the submodule automatically</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>UnicodeString::c_str()</code> has a non-const overload
 returning a writable buffer</td>
@@ -2296,7 +2318,7 @@ returning a writable buffer</td>
 <code>c_str()</code> to <code>LoadString</code> as the destination to
 fill</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>TList::Notify</code> is virtual and fires before a removal,
 after an addition</td>
@@ -2304,28 +2326,28 @@ after an addition</td>
 inside it, so a wrong <code>Action</code> means a leak or a double free,
 neither of which announces itself</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>Extract</code> reports <code>lnExtracted</code>, never
 <code>lnDeleted</code></td>
 <td>That is how Delphi lets a caller take ownership back without the
 list freeing the object</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>TList::Sort</code> is stable, where Delphi’s quicksort is
 not</td>
 <td>Relying on an unstable order would be a latent caller bug either
 way, and stable is the safer guarantee to provide</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>Derived streams re-expose the base’s legacy <code>Seek</code> with a
 using-declaration</td>
 <td>Overriding one overload hides the other. Core calls both on derived
 streams, so without this the legacy origins would stop resolving</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>Stream exceptions follow Delphi’s shape exactly</td>
 <td><code>EFilerError</code>, <code>EFOpenError</code> and
@@ -2333,7 +2355,7 @@ streams, so without this the legacy origins would stop resolving</td>
 with <code>EReadError</code>/<code>EWriteError</code> beneath
 <code>EFilerError</code>. Core catches at both levels</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>port/platform</code> headers refuse to compile on Windows, and
 are POSIX-only on the include path</td>
@@ -2341,20 +2363,20 @@ are POSIX-only on the include path</td>
 which presented as a 1,220 -&gt; 783 “improvement”. The
 <code>#error</code> makes that mistake loud</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>port/compat</code> is separate from
 <code>port/platform</code></td>
 <td><code>help.h</code> is missing from upstream itself rather than
 being a platform difference, so it is needed on every target</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>The ratchet records whether a unit aborted</td>
 <td>An aborted parse reports a floor. Treating that as a distinct state
 stops a new abort from reading as sudden progress</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>Format</code> keeps malformed input visible</td>
 <td>Delphi raises on a missing argument. Core routes user- and
@@ -4033,14 +4055,255 @@ single build bring-up.</p>
 </tr>
 </tbody>
 </table>
+<h2 id="compute-cost">Compute cost</h2>
+<p>Unlike the rest of this document, this section is <strong>measured,
+not estimated</strong>. Every commit on the <code>qt</code> branch so
+far was produced by <code>claude-opus-5</code>, and the session
+transcripts carry per-turn token usage. Figures below are for the branch
+state at <code>c801756</code> (2026-10-11): 22 commits, 16,960 lines
+added, 24 shim tests green on both targets, 5 of 9 tracked core units
+compiling clean on both.</p>
+<h3 id="tokens-consumed">Tokens consumed</h3>
+<table>
+<thead>
+<tr class="header">
+<th>Category</th>
+<th>Tokens</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Base input</td>
+<td>2,160</td>
+</tr>
+<tr class="even">
+<td>Cache writes (1h TTL)</td>
+<td>1,922,665</td>
+</tr>
+<tr class="odd">
+<td><strong>Cache reads</strong></td>
+<td><strong>473,255,696</strong></td>
+</tr>
+<tr class="even">
+<td>Output (incl. reasoning)</td>
+<td>1,654,640</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td><strong>476,835,161</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Cache reads are 99.2% of all tokens. That is the signature of this
+kind of work: a long-lived session re-reading a large working context (a
+400k-line C++ tree, the shim, the plan docs) on every turn. It dominates
+the bill, so the cache-read rate — not the output rate — is what the
+cost turns on.</p>
+<h3 id="api-price-sheet">API price sheet</h3>
+<p>List prices per million tokens, from <a
+href="https://platform.claude.com/docs/en/about-claude/pricing">platform.claude.com/docs/en/about-claude/pricing</a>
+as of 2026-10-11.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Opus 5</th>
+<th>Opus 5.5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Base input</td>
+<td>$5.00</td>
+<td>$4.00</td>
+</tr>
+<tr class="even">
+<td>Cache write, 5 min</td>
+<td>$6.25</td>
+<td>$5.00</td>
+</tr>
+<tr class="odd">
+<td>Cache write, 1 hour</td>
+<td>$10.00</td>
+<td>$8.00</td>
+</tr>
+<tr class="even">
+<td>Cache read (hit/refresh)</td>
+<td>$0.50 (0.1× input)</td>
+<td><strong>$0.20 (0.05× input)</strong></td>
+</tr>
+<tr class="odd">
+<td>Output</td>
+<td>$25.00</td>
+<td>$20.00</td>
+</tr>
+<tr class="even">
+<td>Batch input / output</td>
+<td>$2.50 / $12.50</td>
+<td>$2.00 / $10.00</td>
+</tr>
+<tr class="odd">
+<td>Fast mode input / output</td>
+<td>$10.00 / $50.00</td>
+<td>$8.00 / $40.00</td>
+</tr>
+</tbody>
+</table>
+<p>Batch halves the base rates but is unusable here — the work is
+interactive and each step depends on the previous build result.</p>
+<h3 id="cost-of-the-work-done-so-far">Cost of the work done so far</h3>
+<p>The same measured token mix, priced under both sheets:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Line item</th>
+<th>Opus 5</th>
+<th>Opus 5.5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Base input</td>
+<td>$0.01</td>
+<td>$0.01</td>
+</tr>
+<tr class="even">
+<td>Cache writes</td>
+<td>$19.23</td>
+<td>$15.38</td>
+</tr>
+<tr class="odd">
+<td>Cache reads</td>
+<td>$236.63</td>
+<td>$94.65</td>
+</tr>
+<tr class="even">
+<td>Output</td>
+<td>$41.37</td>
+<td>$33.09</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td><strong>$297.23</strong></td>
+<td><strong>$143.13</strong></td>
+</tr>
+<tr class="even">
+<td>Share of bill that is cache reads</td>
+<td>80%</td>
+<td>66%</td>
+</tr>
+<tr class="odd">
+<td>Per commit (22)</td>
+<td>$13.51</td>
+<td>$6.51</td>
+</tr>
+<tr class="even">
+<td>Per 1,000 lines landed</td>
+<td>$17.53</td>
+<td>$8.44</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Opus 5.5 is 52% cheaper on this workload, not the 20% the
+headline list price suggests.</strong> The reason is the cache-read
+multiplier: 0.05× base input instead of 0.1×, which on a session that is
+99% cache reads is the only number that matters. Any workload shaped
+like this one — long sessions over a large fixed codebase — should
+expect the same disproportionate saving.</p>
+<p>Caveat on reasoning effort: <strong>price per token does not vary
+with effort.</strong> Effort changes how many reasoning tokens are
+produced, not the rate they are billed at. So the Opus 5 column is a
+bill, but the Opus 5.5 column is <em>this session’s token mix
+re-priced</em> — not Opus 5.5 actually doing the work. If 5.5 reaches
+the same result in fewer tokens the real figure is lower; if it
+deliberates more, higher.</p>
+<h3 id="extrapolated-to-completion">Extrapolated to completion</h3>
+<p>Progress is ~14% of the plan by month-weighted task completion (P0
+26/35 and P1 18/36 against the per-phase Opus 5 budgets above). Scaling
+the measured spend:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Scenario</th>
+<th>Plan progress</th>
+<th>Opus 5</th>
+<th>Opus 5.5</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Full parity, optimistic (11 mo)</td>
+<td>19.8%</td>
+<td>$1,498</td>
+<td>$722</td>
+</tr>
+<tr class="even">
+<td>Full parity, midpoint (15.9 mo)</td>
+<td>13.7%</td>
+<td>$2,162</td>
+<td>$1,041</td>
+</tr>
+<tr class="odd">
+<td>Full parity, pessimistic (21 mo)</td>
+<td>10.4%</td>
+<td>$2,860</td>
+<td>$1,377</td>
+</tr>
+<tr class="even">
+<td><strong>Narrow Qt client (Q-1), 8–14 mo</strong></td>
+<td>15–27%</td>
+<td><strong>$1,090 – $1,907</strong></td>
+<td><strong>$525 – $918</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Order of magnitude only. The extrapolation assumes cost per unit of
+plan progress stays flat, and it will not: P3 generates Qt UI from
+<code>.dfm</code> declarative specs, writing more and searching a huge
+C++ tree less, so the cache-read share that dominates today should fall
+as the project moves into the UI phases.</p>
+<h3 id="subscription-seats-are-a-different-currency">Subscription seats
+are a different currency</h3>
+<p>The figures above are API list prices. On a Claude subscription seat
+(Pro, Max, or a Team / seat-based Enterprise seat) none of it is billed
+per token: usage is included up to the plan’s rolling 5-hour and weekly
+limits. Spend beyond those limits is only possible if <strong>usage
+credits</strong> (formerly “extra usage”) are enabled — on Team and
+seat-based Enterprise that is an Owner / Primary Owner decision, with
+optional monthly spend caps per organisation, per seat tier and per
+member. With credits disabled, hitting the limit pauses work until it
+resets; it cannot generate a surprise invoice. See <a
+href="https://support.claude.com/en/articles/11049741-what-is-the-max-plan">Max
+plan limits</a> and <a
+href="https://support.claude.com/en/articles/12005970-extra-usage-for-team-and-seat-based-enterprise-plans">extra
+usage for Team and seat-based Enterprise plans</a>.</p>
+<p>The practical consequence for planning this port: <strong>on a
+subscription seat the limit is wall-clock throughput, not
+money.</strong> That reinforces the conclusion below rather than
+changing it.</p>
 <h2 id="the-binding-constraint">The binding constraint</h2>
 <p><strong>Code generation is not the bottleneck; human review and
 real-world verification throughput are.</strong></p>
 <p>This matters for planning:</p>
 <ul>
-<li>Compute cost is not the limiter. Reviewer attention is. A reviewer
-who merges a 4,000-line shim without reading it has converted a 3×
-multiplier into a latent defect fund.</li>
+<li>Compute cost is not the limiter. Reviewer attention is. The
+measurement above settles the first half of that claim: the whole port
+costs somewhere between a few hundred and a few thousand dollars of
+inference, against 2.8–5.2 developer-years unassisted. A reviewer who
+merges a 4,000-line shim without reading it has converted a 3×
+multiplier into a latent defect fund, and that is the cost that actually
+scales.</li>
 <li>The highest-leverage investment is therefore <strong>P0-13/14 (the
 golden-output harness and server containers)</strong>. It raises the
 trustworthy review rate for every phase that follows. Underfunding it

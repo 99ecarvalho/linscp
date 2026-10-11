@@ -70,6 +70,110 @@ bring-up.
 | 1 dev + Opus 5 | 11 – 21 months |
 | 3 devs + Opus 5 | 6 – 11 months |
 
+## Compute cost
+
+Unlike the rest of this document, this section is **measured, not estimated**.
+Every commit on the `qt` branch so far was produced by `claude-opus-5`, and the
+session transcripts carry per-turn token usage. Figures below are for the branch
+state at `c801756` (2026-10-11): 22 commits, 16,960 lines added, 24 shim tests
+green on both targets, 5 of 9 tracked core units compiling clean on both.
+
+### Tokens consumed
+
+| Category | Tokens |
+|---|---|
+| Base input | 2,160 |
+| Cache writes (1h TTL) | 1,922,665 |
+| **Cache reads** | **473,255,696** |
+| Output (incl. reasoning) | 1,654,640 |
+| **Total** | **476,835,161** |
+
+Cache reads are 99.2% of all tokens. That is the signature of this kind of work:
+a long-lived session re-reading a large working context (a 400k-line C++ tree,
+the shim, the plan docs) on every turn. It dominates the bill, so the cache-read
+rate — not the output rate — is what the cost turns on.
+
+### API price sheet
+
+List prices per million tokens, from
+[platform.claude.com/docs/en/about-claude/pricing](https://platform.claude.com/docs/en/about-claude/pricing)
+as of 2026-10-11.
+
+| | Opus 5 | Opus 5.5 |
+|---|---|---|
+| Base input | $5.00 | $4.00 |
+| Cache write, 5 min | $6.25 | $5.00 |
+| Cache write, 1 hour | $10.00 | $8.00 |
+| Cache read (hit/refresh) | $0.50 (0.1× input) | **$0.20 (0.05× input)** |
+| Output | $25.00 | $20.00 |
+| Batch input / output | $2.50 / $12.50 | $2.00 / $10.00 |
+| Fast mode input / output | $10.00 / $50.00 | $8.00 / $40.00 |
+
+Batch halves the base rates but is unusable here — the work is interactive and
+each step depends on the previous build result.
+
+### Cost of the work done so far
+
+The same measured token mix, priced under both sheets:
+
+| Line item | Opus 5 | Opus 5.5 |
+|---|---|---|
+| Base input | $0.01 | $0.01 |
+| Cache writes | $19.23 | $15.38 |
+| Cache reads | $236.63 | $94.65 |
+| Output | $41.37 | $33.09 |
+| **Total** | **$297.23** | **$143.13** |
+| Share of bill that is cache reads | 80% | 66% |
+| Per commit (22) | $13.51 | $6.51 |
+| Per 1,000 lines landed | $17.53 | $8.44 |
+
+**Opus 5.5 is 52% cheaper on this workload, not the 20% the headline list price
+suggests.** The reason is the cache-read multiplier: 0.05× base input instead of
+0.1×, which on a session that is 99% cache reads is the only number that matters.
+Any workload shaped like this one — long sessions over a large fixed codebase —
+should expect the same disproportionate saving.
+
+Caveat on reasoning effort: **price per token does not vary with effort.** Effort
+changes how many reasoning tokens are produced, not the rate they are billed at.
+So the Opus 5 column is a bill, but the Opus 5.5 column is *this session's token
+mix re-priced* — not Opus 5.5 actually doing the work. If 5.5 reaches the same
+result in fewer tokens the real figure is lower; if it deliberates more, higher.
+
+### Extrapolated to completion
+
+Progress is ~14% of the plan by month-weighted task completion (P0 26/35 and
+P1 18/36 against the per-phase Opus 5 budgets above). Scaling the measured spend:
+
+| Scenario | Plan progress | Opus 5 | Opus 5.5 |
+|---|---|---|---|
+| Full parity, optimistic (11 mo) | 19.8% | $1,498 | $722 |
+| Full parity, midpoint (15.9 mo) | 13.7% | $2,162 | $1,041 |
+| Full parity, pessimistic (21 mo) | 10.4% | $2,860 | $1,377 |
+| **Narrow Qt client (Q-1), 8–14 mo** | 15–27% | **$1,090 – $1,907** | **$525 – $918** |
+
+Order of magnitude only. The extrapolation assumes cost per unit of plan progress
+stays flat, and it will not: P3 generates Qt UI from `.dfm` declarative specs,
+writing more and searching a huge C++ tree less, so the cache-read share that
+dominates today should fall as the project moves into the UI phases.
+
+### Subscription seats are a different currency
+
+The figures above are API list prices. On a Claude subscription seat (Pro, Max,
+or a Team / seat-based Enterprise seat) none of it is billed per token: usage is
+included up to the plan's rolling 5-hour and weekly limits. Spend beyond those
+limits is only possible if **usage credits** (formerly "extra usage") are enabled
+— on Team and seat-based Enterprise that is an Owner / Primary Owner decision,
+with optional monthly spend caps per organisation, per seat tier and per member.
+With credits disabled, hitting the limit pauses work until it resets; it cannot
+generate a surprise invoice. See
+[Max plan limits](https://support.claude.com/en/articles/11049741-what-is-the-max-plan)
+and
+[extra usage for Team and seat-based Enterprise plans](https://support.claude.com/en/articles/12005970-extra-usage-for-team-and-seat-based-enterprise-plans).
+
+The practical consequence for planning this port: **on a subscription seat the
+limit is wall-clock throughput, not money.** That reinforces the conclusion
+below rather than changing it.
+
 ## The binding constraint
 
 **Code generation is not the bottleneck; human review and real-world
@@ -77,9 +181,12 @@ verification throughput are.**
 
 This matters for planning:
 
-- Compute cost is not the limiter. Reviewer attention is. A reviewer who merges
-  a 4,000-line shim without reading it has converted a 3× multiplier into a
-  latent defect fund.
+- Compute cost is not the limiter. Reviewer attention is. The measurement above
+  settles the first half of that claim: the whole port costs somewhere between a
+  few hundred and a few thousand dollars of inference, against 2.8–5.2
+  developer-years unassisted. A reviewer who merges a 4,000-line shim without
+  reading it has converted a 3× multiplier into a latent defect fund, and that
+  is the cost that actually scales.
 - The highest-leverage investment is therefore **P0-13/14 (the golden-output
   harness and server containers)**. It raises the trustworthy review rate for
   every phase that follows. Underfunding it caps the achievable multiplier for
