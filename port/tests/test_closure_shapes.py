@@ -45,6 +45,20 @@ check('F(Arr[0].Name);', 'Name', None)
 # Logical and is not address-of.
 check('if (x && Name)', 'Name', 'if (x && CLOSURE(Name))')
 
+# Brace counting for try/__finally sees code only.
+code = transform.code_only_lines([
+    '  f(); // in queue) }',
+    '  s = "}{"; c = \'}\';',
+    '  /* { spans',
+    '     lines } */ g(); }',
+    '  esc = "\\" }";',
+])
+braces = [(l.count('{'), l.count('}')) for l in code]
+expected = [(0, 0), (0, 0), (0, 0), (0, 1), (0, 0)]
+if braces != expected:
+    print(f'FAIL code_only_lines: got {braces}, expected {expected}')
+    failures += 1
+
 if failures:
     sys.exit(1)
 print('all closure shape tests passed')

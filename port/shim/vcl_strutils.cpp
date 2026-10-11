@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <string>
 #include <type_traits>
 
@@ -1166,4 +1167,9 @@ UnicodeString & UnicodeString::cat_sprintf(const wchar_t * Format, ...)
   *this += WideVFormat(Format, Args);
   va_end(Args);
   return *this;
+}
+
+UnicodeString UTF8ToString(const char * S)
+{
+  return (S == nullptr) ? UnicodeString() : linscp::Utf8ToUtf16(S, std::strlen(S));
 }

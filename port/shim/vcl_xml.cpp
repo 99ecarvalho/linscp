@@ -23,6 +23,8 @@ struct TNode
 {
   TNodeType Type = Xml::Xmlintf::ntElement;
   UnicodeString Name;
+  UnicodeString LocalName;
+  UnicodeString NamespaceURI;
   UnicodeString Value;          // text, comment and declaration content
   std::map<UnicodeString, UnicodeString> Attributes;
   std::vector<std::shared_ptr<TNode>> Children;
@@ -63,6 +65,20 @@ public:
     return I < 0 ? _di_IXMLNode() : Get(I);
   }
 
+  _di_IXMLNode FindNode(const UnicodeString & LocalName,
+                        const UnicodeString & NamespaceURI) override
+  {
+    for (std::size_t I = 0; I < FItems.size(); ++I)
+    {
+      if ((FItems[I]->Type == Xml::Xmlintf::ntElement) &&
+          (FItems[I]->LocalName == LocalName) && (FItems[I]->NamespaceURI == NamespaceURI))
+      {
+        return Get(static_cast<int>(I));
+      }
+    }
+    return _di_IXMLNode();
+  }
+
   int IndexOf(const UnicodeString & Name) override
   {
     for (std::size_t I = 0; I < FItems.size(); ++I)
@@ -87,6 +103,9 @@ public:
   explicit TXmlNode(std::shared_ptr<TNode> Data) : FData(std::move(Data)) {}
 
   UnicodeString GetNodeName() override { return FData->Name; }
+  UnicodeString GetLocalName() override
+    { return (FData->Type == Xml::Xmlintf::ntElement) ? FData->LocalName : FData->Name; }
+  UnicodeString GetNamespaceURI() override { return FData->NamespaceURI; }
   TNodeType GetNodeType() override { return FData->Type; }
 
   Variant GetNodeValue() override
@@ -161,6 +180,22 @@ struct TParseState
   std::vector<std::shared_ptr<TNode>> Top;     // declaration, root
   std::vector<TNode *> Stack;
   std::string PendingText;                     // UTF-8, across chunks
+  // Namespace bindings in scope, one frame per open element; "" is the
+  // default namespace.
+  std::vector<std::map<UnicodeString, UnicodeString>> Scopes;
+
+  UnicodeString Resolve(const UnicodeString & Prefix) const
+  {
+    for (auto It = Scopes.rbegin(); It != Scopes.rend(); ++It)
+    {
+      const auto Found = It->find(Prefix);
+      if (Found != It->end())
+      {
+        return Found->second;
+      }
+    }
+    return UnicodeString();
+  }
 
   void Add(std::shared_ptr<TNode> Node)
   {
@@ -203,10 +238,26 @@ void OnStart(void * UserData, const XML_Char * Name, const XML_Char ** Attrs)
   State->FlushText();
   auto Node = std::make_shared<TNode>();
   Node->Name = FromUtf8(Name);
+  std::map<UnicodeString, UnicodeString> Bindings;
   for (int I = 0; (Attrs != nullptr) && (Attrs[I] != nullptr) && (Attrs[I + 1] != nullptr); I += 2)
   {
-    Node->Attributes[FromUtf8(Attrs[I])] = FromUtf8(Attrs[I + 1]);
+    const UnicodeString AttrName = FromUtf8(Attrs[I]);
+    const UnicodeString AttrValue = FromUtf8(Attrs[I + 1]);
+    Node->Attributes[AttrName] = AttrValue;
+    if (AttrName == L"xmlns")
+    {
+      Bindings[UnicodeString()] = AttrValue;
+    }
+    else if (AttrName.SubString(1, 6) == L"xmlns:")
+    {
+      Bindings[AttrName.SubString(7)] = AttrValue;
+    }
   }
+  State->Scopes.push_back(std::move(Bindings));
+  const int Colon = Node->Name.Pos(UnicodeString(L":"));
+  const UnicodeString Prefix = (Colon > 0) ? Node->Name.SubString(1, Colon - 1) : UnicodeString();
+  Node->LocalName = (Colon > 0) ? Node->Name.SubString(Colon + 1) : Node->Name;
+  Node->NamespaceURI = State->Resolve(Prefix);
   TNode * Raw = Node.get();
   State->Add(std::move(Node));
   State->Stack.push_back(Raw);
@@ -219,6 +270,10 @@ void OnEnd(void * UserData, const XML_Char *)
   if (!State->Stack.empty())
   {
     State->Stack.pop_back();
+  }
+  if (!State->Scopes.empty())
+  {
+    State->Scopes.pop_back();
   }
 }
 

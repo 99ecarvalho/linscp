@@ -63,7 +63,7 @@
       },
       "source/core/FtpFileSystem.cpp": {
         "aborted": false,
-        "errors": 35,
+        "errors": 34,
         "missing_types": 2
       },
       "source/core/Global.cpp": {
@@ -73,7 +73,7 @@
       },
       "source/core/HierarchicalStorage.cpp": {
         "aborted": false,
-        "errors": 58,
+        "errors": 57,
         "missing_types": 17
       },
       "source/core/Http.cpp": {
@@ -98,7 +98,7 @@
       },
       "source/core/PuttyIntf.cpp": {
         "aborted": false,
-        "errors": 59,
+        "errors": 56,
         "missing_types": 17
       },
       "source/core/Queue.cpp": {
@@ -113,17 +113,17 @@
       },
       "source/core/S3FileSystem.cpp": {
         "aborted": false,
-        "errors": 5,
+        "errors": 2,
         "missing_types": 0
       },
       "source/core/ScpFileSystem.cpp": {
         "aborted": false,
-        "errors": 5,
+        "errors": 3,
         "missing_types": 0
       },
       "source/core/Script.cpp": {
         "aborted": false,
-        "errors": 2,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/SecureShell.cpp": {
@@ -138,7 +138,7 @@
       },
       "source/core/SessionData.cpp": {
         "aborted": false,
-        "errors": 52,
+        "errors": 51,
         "missing_types": 17
       },
       "source/core/SessionInfo.cpp": {
@@ -230,7 +230,7 @@
       },
       "source/core/FtpFileSystem.cpp": {
         "aborted": false,
-        "errors": 1,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/Global.cpp": {
@@ -240,7 +240,7 @@
       },
       "source/core/HierarchicalStorage.cpp": {
         "aborted": false,
-        "errors": 1,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/Http.cpp": {
@@ -265,7 +265,7 @@
       },
       "source/core/PuttyIntf.cpp": {
         "aborted": false,
-        "errors": 3,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/Queue.cpp": {
@@ -280,17 +280,17 @@
       },
       "source/core/S3FileSystem.cpp": {
         "aborted": false,
-        "errors": 3,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/ScpFileSystem.cpp": {
         "aborted": false,
-        "errors": 2,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/Script.cpp": {
         "aborted": false,
-        "errors": 2,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/SecureShell.cpp": {
@@ -305,12 +305,12 @@
       },
       "source/core/SessionData.cpp": {
         "aborted": false,
-        "errors": 1,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/SessionInfo.cpp": {
         "aborted": false,
-        "errors": 1,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/SftpFileSystem.cpp": {
@@ -330,7 +330,7 @@
       },
       "source/core/WebDAVFileSystem.cpp": {
         "aborted": false,
-        "errors": 3,
+        "errors": 0,
         "missing_types": 0
       }
     }

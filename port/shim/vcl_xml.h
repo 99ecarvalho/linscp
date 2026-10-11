@@ -95,6 +95,10 @@ public:
   virtual ~IXMLNode() = default;
 
   virtual UnicodeString GetNodeName() = 0;     // "#text", "#comment" for those
+  // The name without its prefix, and the namespace it resolves to through the
+  // xmlns declarations in scope ("" for none).
+  virtual UnicodeString GetLocalName() = 0;
+  virtual UnicodeString GetNamespaceURI() = 0;
   virtual TNodeType GetNodeType() = 0;
   // A text or comment node's content. An element's is its text, as Text below.
   virtual Variant GetNodeValue() = 0;
@@ -111,6 +115,8 @@ public:
   virtual Variant GetAttribute(const UnicodeString & Name) = 0;
 
   PROP_R_G(UnicodeString, NodeName, GetNodeName);
+  PROP_R_G(UnicodeString, LocalName, GetLocalName);
+  PROP_R_G(UnicodeString, NamespaceURI, GetNamespaceURI);
   PROP_R_G(TNodeType, NodeType, GetNodeType);
   PROP_R_G(Variant, NodeValue, GetNodeValue);
   PROP_R_G(UnicodeString, Text, GetText);
@@ -125,6 +131,10 @@ public:
   virtual int GetCount() = 0;
   virtual _di_IXMLNode Get(int Index) = 0;
   virtual _di_IXMLNode FindNode(const UnicodeString & Name) = 0;
+  // Delphi's overload: by local name and namespace URI, which is how S3
+  // finds elements under its xmlns="https://..." default namespace.
+  virtual _di_IXMLNode FindNode(const UnicodeString & LocalName,
+                                const UnicodeString & NamespaceURI) = 0;
   virtual int IndexOf(const UnicodeString & Name) = 0;
 
   PROP_R_G(int, Count, GetCount);

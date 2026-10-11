@@ -59,6 +59,48 @@ def parse_body(body):
 #   TClosure<void(TLogLineType Type, const UnicodeString & Line)> f
 # Only two of these exist in core, both in SessionInfo, but they have to be
 # handled: the declaration and the definition must agree or nothing links.
+def code_only_lines(lines):
+    """Each line with comments and string/character literals blanked out.
+
+    For counting braces. A brace inside a comment once shifted a block's depth
+    by one -- ScpFileSystem.cpp has `// ... in queue) }` inside a __finally --
+    and put LINSCP_END_FINALLY on the wrong line. Block comments carry across
+    lines, so this works on the whole list rather than line by line.
+    """
+    out = []
+    in_block = False
+    for line in lines:
+        res = []
+        i, n = 0, len(line)
+        while i < n:
+            c = line[i]
+            if in_block:
+                if line.startswith('*/', i):
+                    in_block = False
+                    i += 2
+                else:
+                    i += 1
+                continue
+            if line.startswith('//', i):
+                break
+            if line.startswith('/*', i):
+                in_block = True
+                i += 2
+                continue
+            if c in '"\'':
+                quote = c
+                i += 1
+                while i < n and line[i] != quote:
+                    i += 2 if line[i] == '\\' else 1
+                i += 1
+                res.append(' ')
+                continue
+            res.append(c)
+            i += 1
+        out.append(''.join(res))
+    return out
+
+
 def strip_comments(text):
     """Remove // and /* */ comments. Deliberately simple: it is used only to
     decide whether a keyword really appears as code, so over-removing inside a
@@ -225,6 +267,7 @@ class Transformer:
         depth for any enclosing block, and core nests these.
         """
         original = list(lines)
+        code = code_only_lines(original)
         blocks = []
 
         for i, line in enumerate(original):
@@ -237,7 +280,7 @@ class Transformer:
             try_at = None
             depth = 0
             for j in range(i - 1, max(-1, i - 2000), -1):
-                depth += original[j].count('}') - original[j].count('{')
+                depth += code[j].count('}') - code[j].count('{')
                 if depth == 0 and original[j].strip() == 'try':
                     try_at = j
                     break
@@ -254,7 +297,7 @@ class Transformer:
             end_at = None
             depth = 0
             for j in range(i + 1, min(len(original), i + 2000)):
-                depth += original[j].count('{') - original[j].count('}')
+                depth += code[j].count('{') - code[j].count('}')
                 if depth == 0 and original[j].strip() == '}':
                     end_at = j
                     break

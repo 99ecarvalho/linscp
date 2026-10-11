@@ -1,5 +1,7 @@
 #include "vcl_variant.h"
 
+#include <cmath>
+
 #include "vcl_strutils.h"
 
 Variant VarArrayCreate(const int * Bounds, int Bounds_High, TVarType VarType)
@@ -56,7 +58,31 @@ __int64 Variant::Scalar() const
     }
     return V;
   }
+  if (FType == varDouble)
+  {
+    // Delphi rounds a floating variant to an integer, half to even.
+    return static_cast<__int64>(std::nearbyint(FFloat));
+  }
   return FValue;
+}
+
+Variant::operator double() const
+{
+  if (FType == varDouble)
+  {
+    return FFloat;
+  }
+  if (FType == varUString)
+  {
+    double D;
+    if (!TryStrToFloat(FString, D))
+    {
+      throw EVariantTypeCastError(
+        UnicodeString(L"Could not convert variant of type (UnicodeString) into type (Double)"));
+    }
+    return D;
+  }
+  return static_cast<double>(Scalar());
 }
 
 Variant::operator UnicodeString() const
@@ -72,6 +98,10 @@ Variant::operator UnicodeString() const
       if (IsArray())
       {
         throw EVariantTypeCastError(UnicodeString(L"Invalid variant type conversion"));
+      }
+      if (FType == varDouble)
+      {
+        return FloatToStr(FFloat);
       }
       return (FType == varLongWord) ? UIntToStr(static_cast<unsigned __int64>(FValue))
                                     : IntToStr(FValue);

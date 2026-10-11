@@ -9,29 +9,35 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 25 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 19 | 36 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 20 | 36 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **44** | **95** | |
+| **Total** | **45** | **95** | |
 
 ## Next three actions
 
 Driven by `compile_census.py` rather than by grep counts — the compiler names
 what is actually blocking each unit, in dependency order.
 
-The census covers **every core unit upstream builds** -- all 33 `.cpp` files
-in `ScpCore.cbproj`, read from the project itself -- in upstream's own
-preprocessor configuration. Census: **17 errors on mingw (24/33 clean, none
-aborting), 571 on Linux (13/33 clean, 4 aborting).**
+**The whole core library compiles for Windows.** All 33 `.cpp` files in
+upstream's `ScpCore.cbproj`, in upstream's own preprocessor configuration:
+**0 errors on mingw, 33/33 clean.** Linux: **558 errors, 14/33 clean, 4
+aborting.**
 
-1. The last 17 mingw errors, across nine units. After them the core library
-   compiles for Windows and P1-17 (first link) can start.
+The census is `-fsyntax-only`. It proves every unit parses and type-checks,
+not that the library links: a function the shim declares but never defines
+only shows up at link time. That is the next measurement.
+
+1. **Build core as a real library for Windows** (P1-17 groundwork): compile
+   all 33 units in CMake with the cross toolchain and resolve what the
+   linker reports -- undefined shim functions, and the PuTTY, FileZilla,
+   OpenSSL and neon libraries core links against (P1-13).
 2. **P1-09**: PuTTY's Unix platform layer -- a second pinned upstream plus a
    patch series carrying WinSCP's platform changes to `unix/`. WinSCP's PuTTY
    is 0.83 with 121 of 224 files modified (+5,276 / -1,962 lines).
-3. The Win32 file, module and shell calls core makes directly, in
-   `port/platform`.
+3. **P1-07b**: the Win32 file, module and shell calls core makes directly,
+   in `port/platform`, which is most of the rest of the Linux remainder.
 
 ## Decisions taken
 
@@ -71,6 +77,7 @@ aborting), 571 on Linux (13/33 clean, 4 aborting).**
 | 2026-10-11 | The XML DOM follows Delphi's model: text and comment nodes as children, Null attribute variants, raising loaders | FileZilla keeps a site's name as a text node among element children, found by `NodeType`; core tests absent attributes with `IsNull()`; and `ImportFromFilezilla` has no handler around `LoadFromFile`, so a malformed file must raise rather than import nothing. The earlier `bool` loaders were a divergence justified by a wrong reading of core |
 | 2026-10-11 | `TCustomIniFile`'s virtuals take parameters by value, and its abstract set is Delphi's eight | C++Builder declares Delphi virtuals that way and core's `TOptionsIniFile` overrides with exactly those signatures; by-reference parameters made its methods new functions and left the class abstract |
 | 2026-10-11 | `TStrings::Text` uses CRLF on both platforms | Delphi's POSIX RTL uses LF. Core builds configuration and server-facing text through `Text`, and identical output everywhere matters more |
+| 2026-10-11 | try/__finally brace depth is measured over code only | A `}` inside a comment in a `__finally` body put `LINSCP_END_FINALLY` one brace early in ScpFileSystem.cpp. Comments and string/character literals are now blanked before counting; still 179 blocks |
 | 2026-10-10 | A PR-able branch against `winscp/winscp` will be **generated**, not hand-maintained | linscp shares no history with upstream, so its `qt` branch is not directly mergeable. Since the port is mechanical, the fork branch can be produced on demand (Q-7). Rehearsed end to end — see facts below |
 | 2026-10-10 | Transform must be byte-exact outside property lines | A full-file rewrite (CRLF loss) turned a 613-line change into 76,551. Now asserted by `verify_transform.py` |
 | 2026-10-10 | Field/accessor classification is convention-first, parens only as fallback | The parens heuristic false-positives on constructor initialiser lists; WinSCP's `F<Upper>` / `Get*`/`Set*` convention is airtight. Truly unclassifiable names now fail the run instead of producing a wrong-arity macro |
@@ -367,7 +374,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-02 | Shim: `TObject`/`TStrings`/`TStringList` | done | 0-based indexing, case-insensitive default, CommaText round trip |
 | P1-02b | Shim: `TList`/`TObjectList`/sets | done | ownership and `Notify` semantics tested |
 | P1-03 | Shim: `TDateTime` + date/time RTL | done | documented anchors, negative composition, `FormatDateTime` |
-| P1-03b | Shim: `SysUtils`/`IOUtils`/`StrUtils` paths | wip | `TSearchRec`, `FindFirst`/`FindNext`, `FileExists` done; path routines next |
+| P1-03b | Shim: `SysUtils`/`IOUtils`/`StrUtils` paths | done | everything core calls from those units compiles for Windows; POSIX file calls are P1-07b |
 | P1-04 | Shim: exceptions | done | 17 Delphi classes; base and sibling matching tested |
 | P1-05 | Shim: `TCriticalSection`/`SyncObjs` | done | recursive; thread exclusion tested |
 | P1-05b | Shim: `TThread`/`StartThread` | done | Win32 threads, events and waits on POSIX; `BeginThread`/`EndThread` on both. Tested against the real kernel under Wine. `TThread` itself dropped — dead upstream |

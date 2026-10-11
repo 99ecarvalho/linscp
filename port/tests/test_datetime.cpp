@@ -423,6 +423,20 @@ void TestMonthNames()
   CHECK(FS.LongDayNames[0] == UnicodeString(L"Sunday"));
 }
 
+void TestFormatDateTimeWithSettings()
+{
+  // WebDAVFileSystem.cpp's HTTP date, with English settings.
+  const TFormatSettings FS = TFormatSettings::Create((TLocaleID)1033);
+  const TDateTime DT = EncodeDateTime(2024, 3, 5, 13, 14, 15, 0);
+  CHECK(FormatDateTime(L"ddd, d mmm yyyy hh:nn:ss 'GMT'", DT, FS) ==
+        UnicodeString(L"Tue, 5 Mar 2024 13:14:15 GMT"));
+  // Composite specifiers use the settings passed, not the defaults.
+  TFormatSettings Other = FS;
+  Other.ShortDateFormat = L"dd.mm.yyyy";
+  Other.DateSeparator = L".";
+  CHECK(FormatDateTime(L"ddddd", DT, Other) == UnicodeString(L"05.03.2024"));
+}
+
 }  // namespace
 
 int main()
@@ -447,6 +461,8 @@ int main()
   TestBetweenFamily();
   TestTryStrToDateTimeWithSettings();
   TestMonthNames();
+
+  TestFormatDateTimeWithSettings();
 
   if (Failures == 0)
   {

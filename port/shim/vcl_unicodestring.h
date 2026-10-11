@@ -63,6 +63,11 @@ public:
   // places, e.g. SameText(Value, "on"). Decoded as UTF-8, which is a superset
   // of the ASCII those literals actually are.
   UnicodeString(const char * S);
+  // C++Builder's: Len bytes, decoded as the one-argument form decodes.
+  UnicodeString(const char * S, int Len);
+  // UTF-32, as C++Builder's clang-based UnicodeString accepts; explicit so a
+  // null pointer constant does not become ambiguous between pointer types.
+  explicit UnicodeString(const char32_t * S);
 
   // A single character, implicitly, as in C++Builder: core passes a bare
   // wchar_t constant to functions taking a string. Constrained to exactly
@@ -176,5 +181,8 @@ public:
 private:
   std::u16string FData;
 };
+
+// WebDAVFileSystem.cpp: U"\\U0001F512" + Owner.
+UnicodeString operator+(const char32_t * A, const UnicodeString & B);
 
 #endif // LINSCP_VCL_UNICODESTRING_H

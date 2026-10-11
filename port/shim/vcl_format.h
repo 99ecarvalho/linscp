@@ -51,6 +51,8 @@ public:
   TVarRec(const UnicodeString & V) : FType(vtUnicodeString), FString(V) {}
   TVarRec(const AnsiString & V) : FType(vtUnicodeString), FString(ToUnicodeString(V)) {}
   TVarRec(const UTF8String & V) : FType(vtUnicodeString), FString(ToUnicodeString(V)) {}
+  TVarRec(const RawByteString & V) : FType(vtUnicodeString), FString(ToUnicodeString(V)) {}
+  TVarRec(long double V)    : FType(vtExtended), FFloat(static_cast<double>(V)) {}
   TVarRec(void * V)         : FType(vtPointer), FPointer(V) {}
 
   TVarRecType Type() const { return FType; }

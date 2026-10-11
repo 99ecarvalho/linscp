@@ -352,3 +352,34 @@ UnicodeString operator+(wchar_t C, const UnicodeString & B)
   Result += B;
   return Result;
 }
+
+UnicodeString::UnicodeString(const char * S, int Len)
+{
+  if ((S != nullptr) && (Len > 0))
+  {
+    *this = linscp::Utf8ToUtf16(S, static_cast<std::size_t>(Len));
+  }
+}
+
+UnicodeString::UnicodeString(const char32_t * S)
+{
+  for (; (S != nullptr) && (*S != 0); ++S)
+  {
+    char32_t C = *S;
+    if (C >= 0x10000)
+    {
+      C -= 0x10000;
+      *this += static_cast<wchar_t>(0xD800 + (C >> 10));
+      *this += static_cast<wchar_t>(0xDC00 + (C & 0x3FF));
+    }
+    else
+    {
+      *this += static_cast<wchar_t>(C);
+    }
+  }
+}
+
+UnicodeString operator+(const char32_t * A, const UnicodeString & B)
+{
+  return UnicodeString(A) + B;
+}

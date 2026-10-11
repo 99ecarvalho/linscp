@@ -12,6 +12,7 @@
 #ifndef LINSCP_VCL_VARIANT_H
 #define LINSCP_VCL_VARIANT_H
 
+#include <type_traits>
 #include <vector>
 
 #include "vcl_object.h"
@@ -23,6 +24,7 @@ constexpr TVarType varEmpty    = 0x0000;
 constexpr TVarType varNull     = 0x0001;
 constexpr TVarType varUString  = 0x0102;
 constexpr TVarType varInteger  = 0x0003;
+constexpr TVarType varDouble   = 0x0005;
 constexpr TVarType varLongWord = 0x0013;
 constexpr TVarType varInt64    = 0x0014;
 constexpr TVarType varArray    = 0x2000;
@@ -34,6 +36,7 @@ public:
   Variant(int Value) : FType(varInteger), FValue(Value) {}
   Variant(unsigned int Value) : FType(varLongWord), FValue(Value) {}
   Variant(__int64 Value) : FType(varInt64), FValue(Value) {}
+  Variant(double Value) : FType(varDouble), FFloat(Value) {}
   Variant(const UnicodeString & Value) : FType(varUString), FString(Value) {}
   Variant(const wchar_t * Value) : FType(varUString), FString(Value) {}
 
@@ -48,6 +51,7 @@ public:
   operator int() const;
   operator unsigned int() const;
   operator __int64() const;
+  operator double() const;
   // Null raises EVariantTypeCastError, as with Delphi's default
   // NullStrictConvert; Empty gives an empty string; integers their digits.
   operator UnicodeString() const;
@@ -59,6 +63,18 @@ public:
   friend bool operator==(const UnicodeString & S, const Variant & V) { return V == S; }
   friend bool operator!=(const Variant & V, const UnicodeString & S) { return !(V == S); }
   friend bool operator!=(const UnicodeString & S, const Variant & V) { return !(V == S); }
+
+  // Arithmetic as Delphi's variants do it, in double. Templates so a plain
+  // number on either side is an exact match: FtpFileSystem.cpp writes
+  // SecsPerDay * static_cast<Variant>(Difference).
+  template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+  friend Variant operator*(T A, const Variant & B)
+    { return Variant(static_cast<double>(A) * static_cast<double>(B)); }
+  template <typename T, typename = std::enable_if_t<std::is_arithmetic_v<T>>>
+  friend Variant operator*(const Variant & A, T B)
+    { return Variant(static_cast<double>(A) * static_cast<double>(B)); }
+  friend Variant operator*(const Variant & A, const Variant & B)
+    { return Variant(static_cast<double>(A) * static_cast<double>(B)); }
 
   // Variant arrays. Copies are deep, as Delphi's VarCopy of an array is.
   Variant GetElement(int Index) const;
@@ -77,6 +93,7 @@ private:
 
   TVarType FType = varEmpty;
   __int64 FValue = 0;
+  double FFloat = 0.0;
   UnicodeString FString;
   int FLow = 0;
   std::vector<__int64> FElements;

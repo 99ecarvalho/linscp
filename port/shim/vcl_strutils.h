@@ -139,6 +139,8 @@ UnicodeString DupeString(const UnicodeString & S, int Count);
 // --- encoding --------------------------------------------------------------
 UnicodeString UTF8ToString(const UTF8String & S);
 UnicodeString UTF8ToString(const RawByteString & S);
+// Exact for the char * PuTTY hands back; otherwise ambiguous between the two.
+UnicodeString UTF8ToString(const char * S);
 UTF8String StringToUTF8(const UnicodeString & S);
 
 // --- paths -----------------------------------------------------------------

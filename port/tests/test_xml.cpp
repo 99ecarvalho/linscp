@@ -269,6 +269,28 @@ void TestAttributeVariant()
   CHECK(Raised);                                  // Delphi's NullStrictConvert
 }
 
+void TestNamespaces()
+{
+  // S3's NeedNode: FindNode(Name, Namespace) under a default namespace.
+  const _di_IXMLDocument Doc = NewXMLDocument();
+  Doc->LoadFromXML(U(L"<AssumeRoleResponse xmlns=\"https://sts.amazonaws.com/doc/2011-06-15/\">"
+                     L"<AssumeRoleResult><s:Inner xmlns:s=\"urn:s\"/></AssumeRoleResult>"
+                     L"</AssumeRoleResponse>"));
+  const UnicodeString Ns(L"https://sts.amazonaws.com/doc/2011-06-15/");
+  const _di_IXMLNode Response = Doc->ChildNodes->FindNode(L"AssumeRoleResponse", Ns);
+  CHECK(Response != NULL);
+  CHECK(Doc->ChildNodes->FindNode(L"AssumeRoleResponse", L"urn:other") == NULL);
+  // The default namespace is inherited by children.
+  const _di_IXMLNode Result = Response->ChildNodes->FindNode(L"AssumeRoleResult", Ns);
+  CHECK(Result != NULL);
+  // A prefixed element: local name plus its own namespace.
+  const _di_IXMLNode Inner = Result->ChildNodes->FindNode(L"Inner", L"urn:s");
+  CHECK(Inner != NULL);
+  CHECK(Inner->NodeName == U(L"s:Inner"));
+  CHECK(Inner->LocalName == U(L"Inner"));
+  CHECK(Inner->NamespaceURI == U(L"urn:s"));
+}
+
 }  // namespace
 
 // Core names the unit scope alone, as SessionData.cpp does with
@@ -294,6 +316,8 @@ int main()
   TestMixedContentTextNodes();
   TestPreserveWhiteSpace();
   TestAttributeVariant();
+
+  TestNamespaces();
 
   if (Failures == 0)
   {

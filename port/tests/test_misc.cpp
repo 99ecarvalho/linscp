@@ -402,6 +402,18 @@ void TestTimeSpanTotals()
   CHECK(std::fabs(TTimeSpan::FromSeconds(43200).TotalDays - 0.5) < 1e-9);
 }
 
+void TestVariantArithmetic()
+{
+  // FtpFileSystem.cpp: seconds from a day-fraction difference.
+  const double Difference = 0.25;   // six hours, as a TDateTime difference
+  const __int64 Seconds = static_cast<__int64>(SecsPerDay * static_cast<Variant>(Difference));
+  CHECK(Seconds == 21600);
+  // A floating variant rounds to an integer half to even, as Delphi's does.
+  CHECK(static_cast<__int64>(Variant(2.5)) == 2);
+  CHECK(static_cast<__int64>(Variant(3.5)) == 4);
+  CHECK(static_cast<double>(Variant(UnicodeString(L"1.5"))) == 1.5);
+}
+
 }  // namespace
 
 void TestStripHotkey()
@@ -440,6 +452,8 @@ int main()
   TestFormatFloat();
 
   TestTimeSpanTotals();
+
+  TestVariantArithmetic();
 
   if (Failures == 0)
   {

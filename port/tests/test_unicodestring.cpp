@@ -3,6 +3,8 @@
 // Off-by-one errors here would corrupt data silently rather than fail to
 // compile, so every 1-based entry point is tested at Index 1, at Length(), and
 // out of range on both sides.
+#include "vcl_strutils.h"
+#include "vcl_bytestring.h"
 #include "vcl_unicodestring.h"
 
 #include <cassert>
@@ -201,6 +203,36 @@ void TestUtf16Representation()
   CHECK(sizeof(wchar_t) == 2);
 }
 
+void TestCrossTypeStrings()
+{
+  // HierarchicalStorage.cpp: UnicodeString(Dest.c_str(), Dest.Length()).
+  const RawByteString Dest("key%20x", 7);
+  CHECK(UnicodeString(Dest.c_str(), Dest.Length()) == UnicodeString(L"key%20x"));
+  CHECK(UnicodeString("abcdef", 3) == UnicodeString(L"abc"));
+  // WebDAVFileSystem.cpp: U"\U0001F512" + Owner, a lock and a name.
+  const UnicodeString Lock = U"\U0001F512" + UnicodeString(L"bob");
+  CHECK(Lock.Length() == 5);
+  CHECK((Lock[1] == static_cast<wchar_t>(0xD83D)) && (Lock[2] == static_cast<wchar_t>(0xDD12)));
+  CHECK(Lock.SubString(3) == UnicodeString(L"bob"));
+  // PuttyIntf.cpp: UTF8ToString on a char *.
+  const char * Name = "caf\xC3\xA9";
+  CHECK(UTF8ToString(Name) == UnicodeString(L"caf\u00E9"));
+  // Byte strings compare with UnicodeString as text (S3, SessionData).
+  const AnsiString Host("s3.amazonaws.com");
+  CHECK(Host == UnicodeString(L"s3.amazonaws.com"));
+  CHECK(UnicodeString(L"other") != Host);
+  const RawByteString Pass("p", 1);
+  CHECK(UnicodeString(L"p") == Pass);
+  // SessionInfo.cpp: UtfLine.Insert('\r', Index).
+  UTF8String Line("ab\n", 3);
+  Line.Insert('\r', 3);
+  CHECK(Line == UTF8String("ab\r\n"));
+  // c_str() is char * even on a const string, for C APIs (neon).
+  const UTF8String Path("/dir", 4);
+  char * Raw = Path.c_str();
+  CHECK(Raw[0] == '/');
+}
+
 }  // namespace
 
 int main()
@@ -214,6 +246,8 @@ int main()
   TestComparison();
   TestConcatenation();
   TestUtf16Representation();
+
+  TestCrossTypeStrings();
 
   if (Failures == 0)
   {

@@ -464,10 +464,15 @@ bool IsSameDay(const TDateTime & Value, const TDateTime & Basis)
 
 UnicodeString FormatDateTime(const UnicodeString & Format, const TDateTime & DT)
 {
+  return FormatDateTime(Format, DT, TFormatSettings::Default());
+}
+
+UnicodeString FormatDateTime(const UnicodeString & Format, const TDateTime & DT,
+                             const TFormatSettings & FS)
+{
   Word Y = 0, Mo = 0, D = 0, H = 0, Mi = 0, S = 0, Z = 0;
   ::DecodeDate(DT, Y, Mo, D);
   ::DecodeTime(DT, H, Mi, S, Z);
-  const TFormatSettings & FS = TFormatSettings::Default();
 
   UnicodeString Out;
   const int N = Format.Length();
@@ -510,8 +515,8 @@ UnicodeString FormatDateTime(const UnicodeString & Format, const TDateTime & DT)
         else               { Out += Pad(Mo, Run); }
         break;
       case L'd':
-        if (Run >= 6)      { Out += FormatDateTime(FS.LongDateFormat, DT); }
-        else if (Run == 5) { Out += FormatDateTime(FS.ShortDateFormat, DT); }
+        if (Run >= 6)      { Out += FormatDateTime(FS.LongDateFormat, DT, FS); }
+        else if (Run == 5) { Out += FormatDateTime(FS.ShortDateFormat, DT, FS); }
         else if (Run == 4) { Out += UnicodeString(LongDayNames[DayOfWeek(DT) - 1]); }
         else if (Run == 3) { Out += UnicodeString(ShortDayNames[DayOfWeek(DT) - 1]); }
         else               { Out += Pad(D, Run); }
@@ -529,7 +534,7 @@ UnicodeString FormatDateTime(const UnicodeString & Format, const TDateTime & DT)
         Out += (Run >= 3) ? Pad(Z, 3) : Pad(Z, Run);
         break;
       case L't':
-        Out += FormatDateTime(Run >= 2 ? FS.LongTimeFormat : FS.ShortTimeFormat, DT);
+        Out += FormatDateTime(Run >= 2 ? FS.LongTimeFormat : FS.ShortTimeFormat, DT, FS);
         break;
       default:
         for (int K = 0; K < Run; ++K)

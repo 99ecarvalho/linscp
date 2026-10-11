@@ -91,10 +91,10 @@ public:
   void SetLength(int NewLength)
     { FData.resize(NewLength > 0 ? static_cast<std::size_t>(NewLength) : 0); }
 
-  const char * c_str() const { return FData.c_str(); }
-  // Writable, as C++Builder's c_str() is: core shreds secrets in place with
-  // memset(Str.c_str(), 0, ...).
-  char * c_str() { return FData.data(); }
+  // char * even on a const string, as C++Builder's c_str() is: core shreds
+  // secrets in place with memset(Str.c_str(), ...) and hands c_str() to C APIs
+  // taking char * (neon's ne_uri.path).
+  char * c_str() const { return const_cast<char *>(FData.c_str()); }
   const char * data() const { return FData.c_str(); }
   char * MutableData() { return const_cast<char *>(FData.data()); }
 
@@ -108,6 +108,7 @@ public:
   int Pos(char C) const;
   void Delete(int Index, int Count);
   void Insert(const AnsiStringT & S, int Index);
+  void Insert(char C, int Index) { Insert(AnsiStringT(&C, 1), Index); }
   void Unique() {}
 
   AnsiStringT & operator+=(const AnsiStringT & S) { FData += S.FData; return *this; }
@@ -202,6 +203,17 @@ AnsiStringT<CodePage> AnsiStringT<CodePage>::Format(const AnsiStringT & Fmt,
 {
   return AnsiStringT(FormatOpenArray(ToUnicodeString(Fmt), Args, Args_High));
 }
+
+// Comparing a byte string with a UnicodeString compares as text, as Delphi
+// does. Exact templates, so neither side's implicit conversion is in play.
+template <unsigned short CP>
+bool operator==(const AnsiStringT<CP> & A, const UnicodeString & B) { return ToUnicodeString(A) == B; }
+template <unsigned short CP>
+bool operator==(const UnicodeString & A, const AnsiStringT<CP> & B) { return A == ToUnicodeString(B); }
+template <unsigned short CP>
+bool operator!=(const AnsiStringT<CP> & A, const UnicodeString & B) { return !(A == B); }
+template <unsigned short CP>
+bool operator!=(const UnicodeString & A, const AnsiStringT<CP> & B) { return !(A == B); }
 
 // WideStrUtils' classification of a byte string.
 enum TEncodeType { etUSASCII, etUTF8, etANSI };

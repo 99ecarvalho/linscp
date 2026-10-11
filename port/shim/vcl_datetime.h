@@ -165,6 +165,8 @@ bool IsSameDay(const TDateTime & Value, const TDateTime & Basis);
 
 // --- formatting ------------------------------------------------------------
 UnicodeString FormatDateTime(const UnicodeString & Format, const TDateTime & DT);
+UnicodeString FormatDateTime(const UnicodeString & Format, const TDateTime & DT,
+                             const TFormatSettings & Settings);
 UnicodeString DateTimeToStr(const TDateTime & DT);
 bool TryStrToDateTime(const UnicodeString & S, TDateTime & DT);
 // Delphi's scan: field order from ShortDateFormat (in which '/' stands for
