@@ -19,10 +19,17 @@
   #error "win32_on_posix.h is for non-Windows targets; include <windows.h> instead"
 #endif
 
-#include <cstddef>
-#include <cstdint>
-#include <string>
+// C and C++ alike: WinSCP's PuTTY, which is C, includes this through
+// <windows.h> as core does. The API has C linkage so both reach the same
+// definitions; the few C++-only helpers are fenced off with __cplusplus.
+#include <stddef.h>
+#include <stdint.h>
 #include <sys/stat.h>
+#ifdef __cplusplus
+  #include <cstddef>
+  #include <cstdint>
+  #include <string>
+#endif
 
 // <windows.h> transitively provides these, and core relies on it: it calls
 // strlen, strcmp and memmove unqualified. Using the C headers rather than the
@@ -31,72 +38,82 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifdef __cplusplus
+  #define LINSCP_NORETURN [[noreturn]]
+#else
+  #define LINSCP_NORETURN _Noreturn
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // --- integral types --------------------------------------------------------
 // Fixed-width deliberately: core serialises several of these into protocol and
 // on-disk structures, so their widths are part of the contract, not an
 // implementation detail.
-using BYTE = std::uint8_t;
-using WORD = std::uint16_t;
-using DWORD = std::uint32_t;
-using DWORD32 = std::uint32_t;
-using DWORD64 = std::uint64_t;
-using LONG = std::int32_t;
-using ULONG = std::uint32_t;
-using LONGLONG = std::int64_t;
-using ULONGLONG = std::uint64_t;
-using SHORT = std::int16_t;
-using USHORT = std::uint16_t;
-using UINT = std::uint32_t;
-using INT = std::int32_t;
-using BOOL = int;                 // Win32 BOOL is int, not bool
-using CHAR = char;
-using WCHAR = wchar_t;
-using UCHAR = unsigned char;
-using LCID = DWORD;
-using LANGID = WORD;
-using HRESULT = std::int32_t;
-using NTSTATUS = std::int32_t;
-using REGSAM = DWORD;
-using SIZE_T = std::size_t;
-using SSIZE_T = std::ptrdiff_t;
-using INT_PTR = std::intptr_t;
-using UINT_PTR = std::uintptr_t;
-using LONG_PTR = std::intptr_t;
-using ULONG_PTR = std::uintptr_t;
-using DWORD_PTR = std::uintptr_t;
+typedef uint8_t BYTE;
+typedef uint16_t WORD;
+typedef uint32_t DWORD;
+typedef uint32_t DWORD32;
+typedef uint64_t DWORD64;
+typedef int32_t LONG;
+typedef uint32_t ULONG;
+typedef int64_t LONGLONG;
+typedef uint64_t ULONGLONG;
+typedef int16_t SHORT;
+typedef uint16_t USHORT;
+typedef uint32_t UINT;
+typedef int32_t INT;
+typedef int BOOL;                 // Win32 BOOL is int, not bool
+typedef char CHAR;
+typedef wchar_t WCHAR;
+typedef unsigned char UCHAR;
+typedef DWORD LCID;
+typedef WORD LANGID;
+typedef int32_t HRESULT;
+typedef int32_t NTSTATUS;
+typedef DWORD REGSAM;
+typedef size_t SIZE_T;
+typedef ptrdiff_t SSIZE_T;
+typedef intptr_t INT_PTR;
+typedef uintptr_t UINT_PTR;
+typedef intptr_t LONG_PTR;
+typedef uintptr_t ULONG_PTR;
+typedef uintptr_t DWORD_PTR;
 
-using PVOID = void *;
-using LPVOID = void *;
-using LPCVOID = const void *;
-using LPSTR = char *;
-using LPCSTR = const char *;
-using LPWSTR = wchar_t *;
-using LPCWSTR = const wchar_t *;
-using LPTSTR = wchar_t *;
-using LPCTSTR = const wchar_t *;
-using LPBYTE = BYTE *;
-using LPDWORD = DWORD *;
-using LPBOOL = BOOL *;
-using PDWORD = DWORD *;
+typedef void * PVOID;
+typedef void * LPVOID;
+typedef const void * LPCVOID;
+typedef char * LPSTR;
+typedef const char * LPCSTR;
+typedef wchar_t * LPWSTR;
+typedef const wchar_t * LPCWSTR;
+typedef wchar_t * LPTSTR;
+typedef const wchar_t * LPCTSTR;
+typedef BYTE * LPBYTE;
+typedef DWORD * LPDWORD;
+typedef BOOL * LPBOOL;
+typedef DWORD * PDWORD;
 
 // --- handles ---------------------------------------------------------------
 // Opaque, as on Windows. A descriptor is stored in the pointer value, so the
 // POSIX backing is an implementation detail callers never see.
-using HANDLE = void *;
-using HMODULE = void *;
-using HINSTANCE = void *;
-using HWND = void *;
-using HKEY = void *;
-using HLOCAL = void *;
-using HGLOBAL = void *;
-using HRSRC = void *;
-using HICON = void *;
-using HCURSOR = void *;
+typedef void * HANDLE;
+typedef void * HMODULE;
+typedef void * HINSTANCE;
+typedef void * HWND;
+typedef void * HKEY;
+typedef void * HLOCAL;
+typedef void * HGLOBAL;
+typedef void * HRSRC;
+typedef void * HICON;
+typedef void * HCURSOR;
 
-#define INVALID_HANDLE_VALUE (reinterpret_cast<HANDLE>(-1))
-#define INVALID_FILE_ATTRIBUTES (static_cast<DWORD>(-1))
-#define INVALID_SET_FILE_POINTER (static_cast<DWORD>(-1))
-#define INVALID_FILE_SIZE (static_cast<DWORD>(0xFFFFFFFF))
+#define INVALID_HANDLE_VALUE (((HANDLE)(-1)))
+#define INVALID_FILE_ATTRIBUTES (((DWORD)(-1)))
+#define INVALID_SET_FILE_POINTER (((DWORD)(-1)))
+#define INVALID_FILE_SIZE (((DWORD)(0xFFFFFFFF)))
 
 #ifndef MAX_PATH
   #define MAX_PATH 260
@@ -124,91 +141,94 @@ using HCURSOR = void *;
 // They are given distinct names and the CRT names redirected with macros,
 // rather than redeclared. A redeclaration is not possible -- <string> pulls in
 // <cwchar>, whose wcschr differs from ours only in return type -- and a macro
-// also guarantees core's calls reach these rather than glibc's.
+// also guarantees core's and PuTTY's calls reach these rather than glibc's.
 //
 // Case folding is ASCII only, matching what the Windows CRT does in the default
 // locale -- verified by running the same test against the real CRT under Wine.
 // Being wider on one platform would make the two disagree, which is worse than
 // being narrow. Real Unicode folding is a separate job; see the divergence
 // table in doc/qt/TRACKER.md.
-#include <cwchar>
-#include <cwctype>
+#ifdef __cplusplus
+}  // extern "C"
+  #include <cwchar>
+  #include <cwctype>
+extern "C" {
+#else
+  #include <wchar.h>
+  #include <wctype.h>
+#endif
 
-namespace linscp {
+wchar_t linscp_ToLower(wchar_t C);
+wchar_t linscp_ToUpper(wchar_t C);
+size_t linscp_WideLength(const wchar_t * S);
+int linscp_WideCompare(const wchar_t * A, const wchar_t * B);
+int linscp_WideCompareN(const wchar_t * A, const wchar_t * B, size_t N);
+wchar_t * linscp_WideFindChar(const wchar_t * S, wchar_t C);
+wchar_t * linscp_WideFindCharLast(const wchar_t * S, wchar_t C);
+wchar_t * linscp_WideFindString(const wchar_t * Haystack, const wchar_t * Needle);
 
-wchar_t ToLower(wchar_t C);
-wchar_t ToUpper(wchar_t C);
-std::size_t WideLength(const wchar_t * S);
-int WideCompare(const wchar_t * A, const wchar_t * B);
-int WideCompareN(const wchar_t * A, const wchar_t * B, std::size_t N);
-wchar_t * WideFindChar(const wchar_t * S, wchar_t C);
-wchar_t * WideFindCharLast(const wchar_t * S, wchar_t C);
-wchar_t * WideFindString(const wchar_t * Haystack, const wchar_t * Needle);
-
-}  // namespace linscp
-
-#define towlower  ::linscp::ToLower
-#define towupper  ::linscp::ToUpper
-#define wcslen    ::linscp::WideLength
-#define wcscmp    ::linscp::WideCompare
-#define wcsncmp   ::linscp::WideCompareN
-#define wcschr    ::linscp::WideFindChar
-#define wcsrchr   ::linscp::WideFindCharLast
-#define wcsstr    ::linscp::WideFindString
+#define towlower  linscp_ToLower
+#define towupper  linscp_ToUpper
+#define wcslen    linscp_WideLength
+#define wcscmp    linscp_WideCompare
+#define wcsncmp   linscp_WideCompareN
+#define wcschr    linscp_WideFindChar
+#define wcsrchr   linscp_WideFindCharLast
+#define wcsstr    linscp_WideFindString
 
 // --- time ------------------------------------------------------------------
 // FILETIME counts 100-nanosecond intervals since 1601-01-01 UTC. Core stores
 // file timestamps in these and compares them against remote times, so the
 // epoch and the scale both matter.
-struct FILETIME
+typedef struct FILETIME
 {
-  DWORD dwLowDateTime = 0;
-  DWORD dwHighDateTime = 0;
-};
+  DWORD dwLowDateTime;
+  DWORD dwHighDateTime;
+} FILETIME;
 
 // Win32's directory-entry record, with its real field set. Core reads it
 // through Delphi's TSearchRec.FindData.
-struct WIN32_FIND_DATAW
+typedef struct WIN32_FIND_DATAW
 {
-  DWORD dwFileAttributes = 0;
+  DWORD dwFileAttributes;
   FILETIME ftCreationTime;
   FILETIME ftLastAccessTime;
   FILETIME ftLastWriteTime;
-  DWORD nFileSizeHigh = 0;
-  DWORD nFileSizeLow = 0;
-  DWORD dwReserved0 = 0;
-  DWORD dwReserved1 = 0;
-  wchar_t cFileName[MAX_PATH] = {};
-  wchar_t cAlternateFileName[14] = {};
-};
-using WIN32_FIND_DATA = WIN32_FIND_DATAW;
+  DWORD nFileSizeHigh;
+  DWORD nFileSizeLow;
+  DWORD dwReserved0;
+  DWORD dwReserved1;
+  wchar_t cFileName[MAX_PATH];
+  wchar_t cAlternateFileName[14];
+} WIN32_FIND_DATAW;
+typedef WIN32_FIND_DATAW WIN32_FIND_DATA;
 
-struct SYSTEMTIME
+typedef struct SYSTEMTIME
 {
-  WORD wYear = 0;
-  WORD wMonth = 0;
-  WORD wDayOfWeek = 0;
-  WORD wDay = 0;
-  WORD wHour = 0;
-  WORD wMinute = 0;
-  WORD wSecond = 0;
-  WORD wMilliseconds = 0;
-};
+  WORD wYear;
+  WORD wMonth;
+  WORD wDayOfWeek;
+  WORD wDay;
+  WORD wHour;
+  WORD wMinute;
+  WORD wSecond;
+  WORD wMilliseconds;
+} SYSTEMTIME;
 
-struct TIME_ZONE_INFORMATION
+typedef struct TIME_ZONE_INFORMATION
 {
-  LONG Bias = 0;
-  WCHAR StandardName[32] = { 0 };
+  LONG Bias;
+  WCHAR StandardName[32];
   SYSTEMTIME StandardDate;
-  LONG StandardBias = 0;
-  WCHAR DaylightName[32] = { 0 };
+  LONG StandardBias;
+  WCHAR DaylightName[32];
   SYSTEMTIME DaylightDate;
-  LONG DaylightBias = 0;
-};
+  LONG DaylightBias;
+} TIME_ZONE_INFORMATION;
 
 // Intervals between 1601-01-01 and 1970-01-01: 11644473600 seconds.
-constexpr std::uint64_t FileTimeUnixEpochDelta = 116444736000000000ULL;
-constexpr std::uint64_t FileTimeTicksPerSecond = 10000000ULL;
+#define FileTimeUnixEpochDelta ((uint64_t)116444736000000000ULL)
+#define FileTimeTicksPerSecond ((uint64_t)10000000ULL)
 
 BOOL FileTimeToSystemTime(const FILETIME * FileTime, SYSTEMTIME * SystemTime);
 BOOL SystemTimeToFileTime(const SYSTEMTIME * SystemTime, FILETIME * FileTime);
@@ -220,9 +240,14 @@ void GetSystemTimeAsFileTime(FILETIME * FileTime);
 LONG CompareFileTime(const FILETIME * A, const FILETIME * B);
 DWORD GetTimeZoneInformation(TIME_ZONE_INFORMATION * Info);
 
+#ifdef __cplusplus
+}  // extern "C"
 // Helpers used by the shim itself; not part of the Win32 API.
-std::uint64_t FileTimeToTicks(const FILETIME & FileTime);
-FILETIME TicksToFileTime(std::uint64_t Ticks);
+uint64_t FileTimeToTicks(const FILETIME & FileTime);
+FILETIME TicksToFileTime(uint64_t Ticks);
+extern "C" {
+#endif
+
 
 // --- file attributes -------------------------------------------------------
 #define FILE_ATTRIBUTE_READONLY            0x00000001
@@ -239,12 +264,12 @@ FILETIME TicksToFileTime(std::uint64_t Ticks);
 #define FILE_ATTRIBUTE_OFFLINE             0x00001000
 #define FILE_ATTRIBUTE_ENCRYPTED           0x00004000
 
-struct SECURITY_ATTRIBUTES;
-using LPSECURITY_ATTRIBUTES = SECURITY_ATTRIBUTES *;
+typedef struct SECURITY_ATTRIBUTES SECURITY_ATTRIBUTES;
+typedef SECURITY_ATTRIBUTES * LPSECURITY_ATTRIBUTES;
 
 // Kernel-object handles start here; every value below is a descriptor.
 // Descriptors are bounded by RLIMIT_NOFILE, orders of magnitude lower.
-constexpr std::uintptr_t LinscpKernelHandleBase = 0x10000000;
+#define LinscpKernelHandleBase ((uintptr_t)0x10000000)
 
 // --- files -----------------------------------------------------------------
 // A file HANDLE is the descriptor itself, as the shim's THandleStream takes it,
@@ -298,6 +323,8 @@ BOOL SetFileAttributes(LPCWSTR FileName, DWORD FileAttributes);
 // terminator, or when the buffer is too small the size needed including it.
 DWORD GetTempPath(DWORD BufferLength, LPWSTR Buffer);
 
+#ifdef __cplusplus
+}  // extern "C"
 namespace linscp {
 
 // UTF-16 to the UTF-8 the file system takes. An unpaired surrogate becomes
@@ -307,6 +334,9 @@ std::string WideToUtf8(const wchar_t * S);
 DWORD AttributesFromStat(const struct stat & St, const char * Name);
 
 }  // namespace linscp
+extern "C" {
+#endif
+
 
 // --- error codes -----------------------------------------------------------
 // Only the codes core actually tests for.
@@ -347,7 +377,7 @@ DWORD Win32ErrorFromErrno(int Err);
 // at compile time where a stub would fail silently at run time.
 #define WINAPI
 
-using LPTHREAD_START_ROUTINE = DWORD (WINAPI *)(LPVOID Parameter);
+typedef DWORD (WINAPI *LPTHREAD_START_ROUTINE)(LPVOID Parameter);
 
 #define INFINITE              0xFFFFFFFF
 #define WAIT_OBJECT_0         0x00000000
@@ -384,7 +414,7 @@ DWORD ResumeThread(HANDLE Thread);
 // Unwinds to the thread's entry point by exception, so unlike Win32 the
 // destructors on the way out do run. A catch (...) between the call and the
 // entry point would intercept it; core never calls this inside such a block.
-[[noreturn]] void ExitThread(DWORD ExitCode);
+LINSCP_NORETURN void ExitThread(DWORD ExitCode);
 BOOL GetExitCodeThread(HANDLE Thread, LPDWORD ExitCode);
 // Recorded and reported back, but has no scheduling effect. See the divergence
 // table in doc/qt/TRACKER.md.
@@ -411,8 +441,8 @@ ULONGLONG GetTickCount64();
 // Core initialises COM per thread for MSXML, which on POSIX is expat with no
 // COM underneath. Counted per thread so the return values match: S_OK on a
 // thread's first call, S_FALSE after.
-#define S_OK     (static_cast<HRESULT>(0))
-#define S_FALSE  (static_cast<HRESULT>(1))
+#define S_OK     (((HRESULT)(0)))
+#define S_FALSE  (((HRESULT)(1)))
 HRESULT CoInitialize(LPVOID Reserved);
 void CoUninitialize();
 
@@ -420,31 +450,41 @@ void CoUninitialize();
 // COM to instantiate anything from: CoCreateInstance reports every class as
 // unregistered, which is what Windows says for a class that is not installed
 // -- TComPtr::TryCreate then fails and Create raises, as they would there.
-struct GUID
+typedef struct GUID
 {
-  DWORD Data1 = 0;
-  WORD Data2 = 0;
-  WORD Data3 = 0;
-  BYTE Data4[8] = {};
-};
-using IID = GUID;
-using CLSID = GUID;
-using REFIID = const IID &;
-using REFCLSID = const CLSID &;
+  DWORD Data1;
+  WORD Data2;
+  WORD Data3;
+  BYTE Data4[8];
+} GUID;
+typedef GUID IID;
+typedef GUID CLSID;
+// References in C++, pointers in C: the same ABI.
+#ifdef __cplusplus
+typedef const IID & REFIID;
+typedef const CLSID & REFCLSID;
+#else
+typedef const IID * REFIID;
+typedef const CLSID * REFCLSID;
+#endif
 #define CLSCTX_INPROC_SERVER   0x1
 #define CLSCTX_LOCAL_SERVER    0x4
 #define CLSCTX_ALL             0x17
-#define REGDB_E_CLASSNOTREG    (static_cast<HRESULT>(0x80040154))
-#define SUCCEEDED(hr)          (static_cast<HRESULT>(hr) >= 0)
-#define FAILED(hr)             (static_cast<HRESULT>(hr) < 0)
+#define REGDB_E_CLASSNOTREG    (((HRESULT)(0x80040154)))
+#define SUCCEEDED(hr)          (((HRESULT)(hr)) >= 0)
+#define FAILED(hr)             (((HRESULT)(hr)) < 0)
 HRESULT CoCreateInstance(REFCLSID ClsId, LPVOID Outer, DWORD ClsContext,
   REFIID Iid, LPVOID * Object);
+#ifdef __cplusplus
+}  // extern "C"
 namespace linscp {
 // IID_PPV_ARGS's identifier half. No interface has an identifier here; the
 // value only ever reaches CoCreateInstance, which refuses every request.
-template <typename T> const IID & IidOf(T **) { static const IID None; return None; }
+template <typename T> const IID & IidOf(T **) { static const IID None{}; return None; }
 }
-#define IID_PPV_ARGS(pp) ::linscp::IidOf(pp), reinterpret_cast<void **>(pp)
+#define IID_PPV_ARGS(pp) ::linscp::IidOf(pp), ((void **)(pp))
+extern "C" {
+#endif
 
 // --- registry access modes -------------------------------------------------
 // Present so declarations compile; the storage backend core actually uses on
@@ -457,27 +497,31 @@ template <typename T> const IID & IidOf(T **) { static const IID None; return No
 #define KEY_WRITE             0x20006
 #define KEY_ALL_ACCESS        0xF003F
 
-#define HKEY_CLASSES_ROOT     (reinterpret_cast<HKEY>(0x80000000ULL))
-#define HKEY_CURRENT_USER     (reinterpret_cast<HKEY>(0x80000001ULL))
-#define HKEY_LOCAL_MACHINE    (reinterpret_cast<HKEY>(0x80000002ULL))
-#define HKEY_USERS            (reinterpret_cast<HKEY>(0x80000003ULL))
+#define HKEY_CLASSES_ROOT     (((HKEY)(0x80000000ULL)))
+#define HKEY_CURRENT_USER     (((HKEY)(0x80000001ULL)))
+#define HKEY_LOCAL_MACHINE    (((HKEY)(0x80000002ULL)))
+#define HKEY_USERS            (((HKEY)(0x80000003ULL)))
 
 // --- version info ----------------------------------------------------------
-struct VS_FIXEDFILEINFO
+typedef struct VS_FIXEDFILEINFO
 {
-  DWORD dwSignature = 0;
-  DWORD dwStrucVersion = 0;
-  DWORD dwFileVersionMS = 0;
-  DWORD dwFileVersionLS = 0;
-  DWORD dwProductVersionMS = 0;
-  DWORD dwProductVersionLS = 0;
-  DWORD dwFileFlagsMask = 0;
-  DWORD dwFileFlags = 0;
-  DWORD dwFileOS = 0;
-  DWORD dwFileType = 0;
-  DWORD dwFileSubtype = 0;
-  DWORD dwFileDateMS = 0;
-  DWORD dwFileDateLS = 0;
-};
+  DWORD dwSignature;
+  DWORD dwStrucVersion;
+  DWORD dwFileVersionMS;
+  DWORD dwFileVersionLS;
+  DWORD dwProductVersionMS;
+  DWORD dwProductVersionLS;
+  DWORD dwFileFlagsMask;
+  DWORD dwFileFlags;
+  DWORD dwFileOS;
+  DWORD dwFileType;
+  DWORD dwFileSubtype;
+  DWORD dwFileDateMS;
+  DWORD dwFileDateLS;
+} VS_FIXEDFILEINFO;
+
+#ifdef __cplusplus
+}  // extern "C"
+#endif
 
 #endif // LINSCP_WIN32_ON_POSIX_H

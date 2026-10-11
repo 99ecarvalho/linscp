@@ -65,9 +65,7 @@ long LocalOffsetSeconds(std::time_t Utc)
 // The macros in the header point the CRT names here. Written out rather than
 // delegating to glibc, whose versions take a 4-byte wint_t (ADR 0001).
 
-namespace linscp {
-
-wchar_t ToLower(wchar_t C)
+wchar_t linscp_ToLower(wchar_t C)
 {
   // ASCII only, deliberately. The Windows CRT's towlower is locale-dependent
   // and folds only ASCII in the default locale, which a run of this test under
@@ -81,7 +79,7 @@ wchar_t ToLower(wchar_t C)
   return C;
 }
 
-wchar_t ToUpper(wchar_t C)
+wchar_t linscp_ToUpper(wchar_t C)
 {
   // ASCII only; see ToLower.
   if (C >= L'a' && C <= L'z')
@@ -91,7 +89,7 @@ wchar_t ToUpper(wchar_t C)
   return C;
 }
 
-std::size_t WideLength(const wchar_t * S)
+size_t linscp_WideLength(const wchar_t * S)
 {
   if (S == nullptr)
   {
@@ -105,7 +103,7 @@ std::size_t WideLength(const wchar_t * S)
   return N;
 }
 
-int WideCompare(const wchar_t * A, const wchar_t * B)
+int linscp_WideCompare(const wchar_t * A, const wchar_t * B)
 {
   while (*A != L'\0' && *A == *B)
   {
@@ -118,7 +116,7 @@ int WideCompare(const wchar_t * A, const wchar_t * B)
   return X < Y ? -1 : (X > Y ? 1 : 0);
 }
 
-int WideCompareN(const wchar_t * A, const wchar_t * B, std::size_t N)
+int linscp_WideCompareN(const wchar_t * A, const wchar_t * B, std::size_t N)
 {
   for (std::size_t I = 0; I < N; ++I)
   {
@@ -136,7 +134,7 @@ int WideCompareN(const wchar_t * A, const wchar_t * B, std::size_t N)
   return 0;
 }
 
-wchar_t * WideFindChar(const wchar_t * S, wchar_t C)
+wchar_t * linscp_WideFindChar(const wchar_t * S, wchar_t C)
 {
   if (S == nullptr)
   {
@@ -153,7 +151,7 @@ wchar_t * WideFindChar(const wchar_t * S, wchar_t C)
   return C == L'\0' ? const_cast<wchar_t *>(S) : nullptr;
 }
 
-wchar_t * WideFindCharLast(const wchar_t * S, wchar_t C)
+wchar_t * linscp_WideFindCharLast(const wchar_t * S, wchar_t C)
 {
   if (S == nullptr)
   {
@@ -174,7 +172,7 @@ wchar_t * WideFindCharLast(const wchar_t * S, wchar_t C)
   return const_cast<wchar_t *>(Last);
 }
 
-wchar_t * WideFindString(const wchar_t * Haystack, const wchar_t * Needle)
+wchar_t * linscp_WideFindString(const wchar_t * Haystack, const wchar_t * Needle)
 {
   if (Haystack == nullptr || Needle == nullptr)
   {
@@ -200,8 +198,6 @@ wchar_t * WideFindString(const wchar_t * Haystack, const wchar_t * Needle)
   }
   return nullptr;
 }
-
-}  // namespace linscp
 
 std::uint64_t FileTimeToTicks(const FILETIME & FileTime)
 {

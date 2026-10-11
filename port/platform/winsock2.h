@@ -30,17 +30,21 @@ Do not put port/platform on the include path for a Windows target."
 #include <sys/types.h>
 #include <unistd.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // On Windows a SOCKET is an opaque handle; on POSIX it is a descriptor. Keeping
 // it unsigned matches Win32, and INVALID_SOCKET is the all-ones value there.
-using SOCKET = std::uintptr_t;
-#define INVALID_SOCKET (static_cast<SOCKET>(~0))
+typedef uintptr_t SOCKET;
+#define INVALID_SOCKET (((SOCKET)(~0)))
 #define SOCKET_ERROR (-1)
 
-using WSAEVENT = HANDLE;
-using LPWSAEVENT = HANDLE *;
-#define WSA_INVALID_EVENT (static_cast<WSAEVENT>(nullptr))
+typedef HANDLE WSAEVENT;
+typedef HANDLE * LPWSAEVENT;
+#define WSA_INVALID_EVENT (((WSAEVENT)0))
 #define WSA_MAXIMUM_WAIT_EVENTS 64
-#define WSA_WAIT_FAILED (static_cast<DWORD>(-1))
+#define WSA_WAIT_FAILED (((DWORD)(-1)))
 #define WSA_WAIT_TIMEOUT 258
 #define WSA_WAIT_EVENT_0 0
 
@@ -62,22 +66,22 @@ using LPWSAEVENT = HANDLE *;
 #define FD_CONNECT   (1 << FD_CONNECT_BIT)
 #define FD_CLOSE     (1 << FD_CLOSE_BIT)
 
-struct WSANETWORKEVENTS
+typedef struct WSANETWORKEVENTS
 {
-  long lNetworkEvents = 0;
-  int iErrorCode[FD_MAX_EVENTS] = { 0 };
-};
+  long lNetworkEvents;
+  int iErrorCode[FD_MAX_EVENTS];
+} WSANETWORKEVENTS;
 
-struct WSADATA
+typedef struct WSADATA
 {
-  WORD wVersion = 0;
-  WORD wHighVersion = 0;
-  char szDescription[257] = { 0 };
-  char szSystemStatus[129] = { 0 };
-  unsigned short iMaxSockets = 0;
-  unsigned short iMaxUdpDg = 0;
-  char * lpVendorInfo = nullptr;
-};
+  WORD wVersion;
+  WORD wHighVersion;
+  char szDescription[257];
+  char szSystemStatus[129];
+  unsigned short iMaxSockets;
+  unsigned short iMaxUdpDg;
+  char * lpVendorInfo;
+} WSADATA;
 
 // Winsock error codes. Kept at their Winsock values on purpose: core and the
 // FileZilla layer compare against these by name and carry them around.
@@ -137,5 +141,9 @@ DWORD WSAWaitForMultipleEvents(DWORD Count, const WSAEVENT * Events,
                                BOOL WaitAll, DWORD Timeout, BOOL Alertable);
 
 #define FIONBIO_WINSOCK 0x8004667E
+
+#ifdef __cplusplus
+}  // extern "C"
+#endif
 
 #endif // LINSCP_WINSOCK2_H

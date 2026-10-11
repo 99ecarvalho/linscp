@@ -5,3 +5,6 @@
 	path = 3rd-party/openssl
 	url = https://github.com/openssl/openssl.git
 	shallow = true
+[submodule "3rd-party/putty"]
+	path = 3rd-party/putty
+	url = https://git.tartarus.org/simon/putty.git
