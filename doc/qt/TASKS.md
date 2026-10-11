@@ -59,7 +59,7 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P1-01e | Resource strings: `LoadStr`/`FmtLoadStr` implementation | M | P1-01d | Declared only; `LoadStr` is core's own and reads the resource module |
 | P1-01c | Shim: `AnsiString` / `UTF8String` / `RawByteString` + UTF-8 codec | M | P1-01 | Distinct code-page types; wire-format correctness lives here |
 | P1-02 | Shim: `TObject`, `TStrings`, `TStringList` | L | P1-01 | Done. 17 of the 30 `Common.cpp` errors |
-| P1-02b | Shim: `TList`, `TObjectList`, `Contnrs` | M | P1-02 | `TObjectList` 14 uses; not yet needed by `Common.cpp` |
+| P1-02b | Shim: `TList`, `TObjectList`, Delphi sets | M | P1-02 | Done. `Notify` is virtual and core overrides it |
 | P1-03 | Shim: `TDateTime` + date/time RTL | L | P1-01 | Done. 30 of 70 `Common.cpp` errors |
 | P1-03b | Shim: `SysUtils` / `IOUtils` / `StrUtils` file and path routines | L | P1-03 | `IncludeTrailingBackslash` 39, `ExtractFileName` 29 |
 | P1-04 | Shim: `Exception` hierarchy + Delphi exception semantics | M | P1-01 | Core has no `__try`/`__except` — simplifies this |

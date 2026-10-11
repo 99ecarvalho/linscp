@@ -1322,12 +1322,10 @@ resource module</td>
 </tr>
 <tr class="odd">
 <td>P1-02b</td>
-<td>Shim: <code>TList</code>, <code>TObjectList</code>,
-<code>Contnrs</code></td>
+<td>Shim: <code>TList</code>, <code>TObjectList</code>, Delphi sets</td>
 <td>M</td>
 <td>P1-02</td>
-<td><code>TObjectList</code> 14 uses; not yet needed by
-<code>Common.cpp</code></td>
+<td>Done. <code>Notify</code> is virtual and core overrides it</td>
 </tr>
 <tr class="even">
 <td>P1-03</td>
@@ -1782,7 +1780,7 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td>P1 Headless core</td>
-<td>10</td>
+<td>11</td>
 <td>30</td>
 <td>Golden suite green, six protocols, both platforms</td>
 </tr>
@@ -1806,7 +1804,7 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>33</strong></td>
+<td><strong>34</strong></td>
 <td><strong>88</strong></td>
 <td></td>
 </tr>
@@ -1824,21 +1822,22 @@ ahead of the larger type groups.</p>
 either target: <strong>1,334 errors on mingw, 1,575 on Linux</strong>.
 Both are higher than the previously reported figures because the parse
 now runs to completion instead of stopping at a missing header.</p>
-<p>Closest units to clean: <code>FileBuffer.cpp</code> (16 mingw / 24
-Linux) and <code>NamedObjs.cpp</code> (17 / 17).</p>
+<p><strong>Two core units now compile cleanly on both targets:</strong>
+<code>Option.cpp</code> and <code>NamedObjs.cpp</code>. Census is
+<strong>1,070 errors on mingw, 1,299 on Linux</strong>, nothing
+aborting.</p>
+<p>Closest unit to clean next: <code>FileBuffer.cpp</code> (16 mingw /
+24 Linux).</p>
 <ol type="1">
-<li><strong>P1-02b / <code>TList</code></strong> plus
-<code>TListNotification</code> and <code>TObjectList</code>, and the
-cheap scalar-ish types blocking the same units:
-<code>TNotifyEvent</code>, <code>TShortCut</code>,
-<code>TShiftState</code>,
-<code>TThreadID</code>/<code>TThreadFunc</code>,
-<code>PResStringRec</code>, <code>TVSFixedFileInfo</code>.</li>
 <li><strong>P1-06b / storage</strong> — <code>TCustomIniFile</code> and
-<code>TRegistry</code>, 12 uses each.</li>
+<code>TRegistry</code>, 12 uses each, and the last sizeable type
+group.</li>
 <li><strong>P0-06c / closure call sites</strong> — 116 bare
 member-function names, each reported by clang with an exact position, so
 the rewrite can be compiler-guided.</li>
+<li><strong>P1-01e / resource strings</strong> — <code>LoadStr</code> is
+declared by core but unimplemented; <code>FMTLOAD</code> appears 252
+times, so nothing will link without it.</li>
 </ol>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
@@ -2071,12 +2070,34 @@ compound literals. <code>ARRAYOFCONST((a, b))</code> becoming
 </tr>
 <tr class="even">
 <td>2026-10-10</td>
+<td><code>TList::Notify</code> is virtual and fires before a removal,
+after an addition</td>
+<td>Core overrides it. <code>TObjectList</code> frees owned objects from
+inside it, so a wrong <code>Action</code> means a leak or a double free,
+neither of which announces itself</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td><code>Extract</code> reports <code>lnExtracted</code>, never
+<code>lnDeleted</code></td>
+<td>That is how Delphi lets a caller take ownership back without the
+list freeing the object</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td><code>TList::Sort</code> is stable, where Delphi’s quicksort is
+not</td>
+<td>Relying on an unstable order would be a latent caller bug either
+way, and stable is the safer guarantee to provide</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
 <td>Derived streams re-expose the base’s legacy <code>Seek</code> with a
 using-declaration</td>
 <td>Overriding one overload hides the other. Core calls both on derived
 streams, so without this the legacy origins would stop resolving</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>Stream exceptions follow Delphi’s shape exactly</td>
 <td><code>EFilerError</code>, <code>EFOpenError</code> and
@@ -2084,7 +2105,7 @@ streams, so without this the legacy origins would stop resolving</td>
 with <code>EReadError</code>/<code>EWriteError</code> beneath
 <code>EFilerError</code>. Core catches at both levels</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>port/platform</code> headers refuse to compile on Windows, and
 are POSIX-only on the include path</td>
@@ -2092,20 +2113,20 @@ are POSIX-only on the include path</td>
 which presented as a 1,220 -&gt; 783 “improvement”. The
 <code>#error</code> makes that mistake loud</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>port/compat</code> is separate from
 <code>port/platform</code></td>
 <td><code>help.h</code> is missing from upstream itself rather than
 being a platform difference, so it is needed on every target</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>The ratchet records whether a unit aborted</td>
 <td>An aborted parse reports a floor. Treating that as a distinct state
 stops a new abort from reading as sudden progress</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>Format</code> keeps malformed input visible</td>
 <td>Delphi raises on a missing argument. Core routes user- and
@@ -2671,18 +2692,35 @@ argument; the POSIX version rejects it</td>
 <td>2026-10-10</td>
 </tr>
 <tr class="even">
+<td><strong><code>Option.cpp</code> and <code>NamedObjs.cpp</code> both
+compile clean on both targets</strong></td>
+<td><code>compile_census.py</code>, 0 errors each</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>Census after containers: mingw 1,070, Linux 1,299, 2/9 units
+clean</td>
+<td><code>census_ratchet.py</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>17/17 tests pass on both targets</td>
+<td><code>ctest</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
 <td>12/12 tests pass on Linux and on Windows under Wine</td>
 <td><code>ctest</code> both trees</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Directory search validated against both backends: real
 <code>FindFirstFileW</code> under Wine, and <code>dirent</code> +
 <code>fnmatch</code> on Linux</td>
 <td><code>test_sysutils</code> on both targets</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>__closure</code> scope: 44 distinct closure types, 16
 typedefs; call sites pass bare member-function names</td>
 <td>grep over generated core</td>
@@ -2982,10 +3020,9 @@ trip</td>
 </tr>
 <tr class="odd">
 <td>P1-02b</td>
-<td>Shim:
-<code>TList</code>/<code>TObjectList</code>/<code>Contnrs</code></td>
-<td>todo</td>
-<td>not yet needed by <code>Common.cpp</code></td>
+<td>Shim: <code>TList</code>/<code>TObjectList</code>/sets</td>
+<td>done</td>
+<td>ownership and <code>Notify</code> semantics tested</td>
 </tr>
 <tr class="even">
 <td>P1-03</td>

@@ -25,6 +25,20 @@ using Extended = long double;
 using NativeInt  = std::intptr_t;
 using NativeUInt = std::uintptr_t;
 using Pointer  = void *;
+
+// Delphi aliases core uses in declarations.
+using TShortCut = Word;              // a virtual key plus shift-state bits
+using TThreadID = std::uint32_t;
+using TThreadFunc = unsigned (*)(void *);
+
+// Pointer to a resource-string record. Core only ever passes these through to
+// the resource layer, so the record itself stays opaque.
+struct TResStringRec
+{
+  void * Module = nullptr;
+  unsigned Identifier = 0;
+};
+using PResStringRec = TResStringRec *;
 using UInt64   = std::uint64_t;
 
 #ifndef __BORLANDC__
