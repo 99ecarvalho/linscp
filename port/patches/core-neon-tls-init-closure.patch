@@ -1,0 +1,54 @@
+Hand neon a copy of the TLS-init closure, not its two pointers.
+
+SetNeonTlsInit stores the closure in the neon session by reinterpreting it
+as a TMethod and saving its code and data pointers, and ne_init_ssl_session
+rebuilds it with MakeMethod. That relies on a closure being exactly those
+two pointers, which only Borland's __closure is; with any other closure
+type the saved words are its internals, read from a by-value parameter that
+is gone by the time neon calls back, and the rebuilt closure is garbage
+(the port's first WebDAV-over-TLS connection crashed there). The session
+now holds a heap copy of the closure, freed by neon's destroy-session hook
+-- which also covers the sessions libs3 creates and destroys itself -- and
+ne_init_ssl_session calls that copy. On C++Builder the behaviour is the
+same, at the cost of one small allocation per session. Line counts are
+unchanged.
+
+--- a/source/core/NeonIntf.cpp	2026-10-11 20:33:03.205121338 -0300
++++ b/source/core/NeonIntf.cpp	2026-10-11 20:33:03.222762066 -0300
+@@ -255,9 +255,9 @@
+ void ne_init_ssl_session(SSL * Ssl, void * UserData)
+ {
+   ne_session * Session = static_cast<ne_session *>(UserData);
+-  void * Code = ne_get_session_private(Session, SESSION_TLS_INIT_KEY);
+-  void * Data = ne_get_session_private(Session, SESSION_TLS_INIT_DATA_KEY);
+-  TNeonTlsInit OnNeonTlsInit = MakeMethod<TNeonTlsInit>(Data, Code);
++  TNeonTlsInit OnNeonTlsInit = NULL;
++  TNeonTlsInit * StoredTlsInit = static_cast<TNeonTlsInit *>(ne_get_session_private(Session, SESSION_TLS_INIT_KEY));
++  if (StoredTlsInit != NULL) { OnNeonTlsInit = *StoredTlsInit; } // linscp: the closure itself, see SetNeonTlsInit
+   if (DebugAlwaysTrue(OnNeonTlsInit != NULL))
+   {
+     OnNeonTlsInit(Ssl, Session);
+@@ -265,7 +265,7 @@
+ }
+ 
+ } // extern "C"
+-//---------------------------------------------------------------------------
++static void DeleteNeonTlsInit(void * Data) { delete static_cast<TNeonTlsInit *>(Data); } // linscp: with the session
+ void SetNeonTlsInit(ne_session * Session, TNeonTlsInit OnNeonTlsInit, TTerminal * Terminal)
+ {
+   UnicodeString CertificateStorage = Configuration->CertificateStorageExpanded;
+@@ -278,10 +278,10 @@
+     }
+   }
+ 
+-  // As the OnNeonTlsInit always only calls SetupSsl, we can simplify this with one shared implementation
+-  TMethod & Method = *reinterpret_cast<TMethod*>(&OnNeonTlsInit);
+-  ne_set_session_private(Session, SESSION_TLS_INIT_KEY, Method.Code);
+-  ne_set_session_private(Session, SESSION_TLS_INIT_DATA_KEY, Method.Data);
++  // linscp: a copy of the closure, freed with the session, rather than its code and data pointers
++  TNeonTlsInit * StoredTlsInit = new TNeonTlsInit(OnNeonTlsInit);
++  ne_set_session_private(Session, SESSION_TLS_INIT_KEY, StoredTlsInit);
++  ne_hook_destroy_session(Session, DeleteNeonTlsInit, StoredTlsInit);
+ }
+ //---------------------------------------------------------------------------
+ void InitNeonTls(

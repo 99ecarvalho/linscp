@@ -9,3 +9,5 @@ neon-winscp-additions-windows-only.patch
 filezilla-in-addr-s-addr.patch
 filezilla-tools-unicodestring.patch
 core-storage-key-backslashes.patch
+core-neon-tls-init-closure.patch
+core-script-rmdir-full-path.patch

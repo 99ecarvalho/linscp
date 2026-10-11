@@ -169,6 +169,13 @@ add_test(NAME cli_session
           --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:linscp-cli>")
 set_tests_properties(cli_session PROPERTIES
   DEPENDS cli_session_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+# One everyday script over every protocol whose server is installed here,
+# each checked on the server's side (run_protocols.py, fixtures.py).
+add_test(NAME protocols
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_protocols.py"
+          --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:linscp-cli>")
+set_tests_properties(protocols PROPERTIES
+  DEPENDS cli_session_build SKIP_RETURN_CODE 77 TIMEOUT 600)
 
 # PuTTY's crypto primitives against published vectors, on both targets: the
 # PuTTY libraries alone, with a stub for the one frontend function they need.

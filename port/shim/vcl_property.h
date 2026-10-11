@@ -46,8 +46,15 @@
   // the class, which restores Borland's behaviour.
 
   // read = <field>
+  //
+  // Borland makes a field-backed property the field itself: core writes
+  // `Rights.Number = TRights::rfDefault` (TCopyParamType::Default) and
+  // expects the field to change. A class-typed field of the property's own
+  // type is therefore returned by reference (TFieldRead); a scalar by value,
+  // converted to the property's type, as before.
   #define PROP_R_F(T, Name, Field)                                            \
-    T __gp_##Name() const { return LINSCP_AS(T, Field); }                     \
+    linscp::TFieldRead<T> __gp_##Name() { return static_cast<linscp::TFieldRead<T>>(Field); }      \
+    linscp::TFieldReadConst<T> __gp_##Name() const { return static_cast<linscp::TFieldReadConst<T>>(Field); } \
     __declspec(property(get = __gp_##Name)) T Name
 
   // Method-backed reads go through LINSCP_SELF, which drops constness before
@@ -70,25 +77,40 @@
   // declaration does not compile. A cast rather than a const_cast because the
   // same wrapper serves value-typed properties, where it is a no-op.
   #define LINSCP_AS(T, EXPR) ((T)(EXPR))
+
+namespace linscp {
+// A field-backed property's read: the field itself when the property's type
+// is a class, so members can be changed through the property, as under
+// Borland; otherwise the field converted to the property's type. A class
+// field of another type than the property's does not bind, and fails to
+// compile rather than copy.
+template <typename T>
+using TFieldRead = std::conditional_t<std::is_class_v<T>, T &, T>;
+template <typename T>
+using TFieldReadConst = std::conditional_t<std::is_class_v<T>, const T &, T>;
+}  // namespace linscp
   #define PROP_R_G(T, Name, Getter)                                           \
     T __gp_##Name() const { return LINSCP_AS(T, LINSCP_SELF->Getter()); }     \
     __declspec(property(get = __gp_##Name)) T Name
 
   // read = <field>, write = <same field>
   #define PROP_RW_FF(T, Name, Field)                                          \
-    T __gp_##Name() const { return LINSCP_AS(T, Field); }                     \
+    linscp::TFieldRead<T> __gp_##Name() { return static_cast<linscp::TFieldRead<T>>(Field); }      \
+    linscp::TFieldReadConst<T> __gp_##Name() const { return static_cast<linscp::TFieldReadConst<T>>(Field); }\
     void __sp_##Name(T __v) { Field = __v; }                                   \
     __declspec(property(get = __gp_##Name, put = __sp_##Name)) T Name
 
   // read = <field>, write = <a different field>
   #define PROP_RW_F2(T, Name, RField, WField)                                 \
-    T __gp_##Name() const { return LINSCP_AS(T, RField); }                    \
+    linscp::TFieldRead<T> __gp_##Name() { return static_cast<linscp::TFieldRead<T>>(RField); }     \
+    linscp::TFieldReadConst<T> __gp_##Name() const { return static_cast<linscp::TFieldReadConst<T>>(RField); }\
     void __sp_##Name(T __v) { WField = __v; }                                 \
     __declspec(property(get = __gp_##Name, put = __sp_##Name)) T Name
 
   // read = <field>, write = <method>
   #define PROP_RW_FS(T, Name, Field, Setter)                                  \
-    T __gp_##Name() const { return LINSCP_AS(T, Field); }                     \
+    linscp::TFieldRead<T> __gp_##Name() { return static_cast<linscp::TFieldRead<T>>(Field); }      \
+    linscp::TFieldReadConst<T> __gp_##Name() const { return static_cast<linscp::TFieldReadConst<T>>(Field); }\
     void __sp_##Name(T __v) { Setter(__v); }                                  \
     __declspec(property(get = __gp_##Name, put = __sp_##Name)) T Name
 
