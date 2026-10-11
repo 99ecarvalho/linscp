@@ -1119,6 +1119,12 @@ UnicodeString & UnicodeString::sprintf(const wchar_t * Format, ...)
   return *this;
 }
 
+int UnicodeString::vprintf(const wchar_t * Format, va_list Args)
+{
+  *this = WideVFormat(Format, Args);
+  return Length();
+}
+
 UnicodeString & UnicodeString::cat_sprintf(const wchar_t * Format, ...)
 {
   va_list Args;

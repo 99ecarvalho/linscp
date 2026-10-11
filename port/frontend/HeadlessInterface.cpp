@@ -104,14 +104,31 @@ void __fastcall ShowExtendedException(Exception * E)
   }
 }
 //---------------------------------------------------------------------------
-// Upstream records stack traces through JCL's exception hooks; nothing
-// records them here, so there is never one to append or report.
-bool __fastcall AppendExceptionStackTraceAndForget(TStrings *& /*MoreMessages*/)
+// As upstream's WinInterface.cpp: only core and resource strings involved.
+void AppendStackTrace(TStrings * MoreMessages, TStrings * StackTrace)
+{
+  if (!MoreMessages->Text.IsEmpty())
+  {
+    MoreMessages->Text = MoreMessages->Text + "\n";
+  }
+  MoreMessages->Text = MoreMessages->Text + LoadStr(STACK_TRACE) + "\n";
+  MoreMessages->AddStrings(StackTrace);
+}
+//---------------------------------------------------------------------------
+// Upstream walks the stack with JCL, a C++Builder-only library; nothing
+// records traces here, so an exception never carries one to append or report.
+bool AppendExceptionStackTrace(Exception * /*E*/, TStrings *& /*MoreMessages*/)
 {
   return false;
 }
 //---------------------------------------------------------------------------
-UnicodeString __fastcall GetExceptionDebugInfo()
+// The caller owns the list; it is empty, for the same reason.
+TStrings * GetCurrentStackTrace()
+{
+  return new TStringList();
+}
+//---------------------------------------------------------------------------
+UnicodeString GetExceptionDebugInfo(Exception * /*E*/)
 {
   return UnicodeString();
 }
@@ -200,10 +217,8 @@ int __fastcall ThreadProc(void * AParam)
 }
 }
 //---------------------------------------------------------------------------
-// As upstream. The handle is returned as int, which holds it on both
-// targets: Win32 kernel handles are 32-bit significant by design, and the
-// POSIX layer issues small integers the same way.
-int __fastcall StartThread(void * SecurityAttributes, unsigned StackSize,
+// As upstream.
+THandle StartThread(void * SecurityAttributes, unsigned StackSize,
   TThreadFunc ThreadFunc, void * Parameter, unsigned CreationFlags,
   TThreadID & ThreadId)
 {

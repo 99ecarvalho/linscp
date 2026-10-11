@@ -25,25 +25,21 @@ what is actually blocking each unit, in dependency order.
 as a real library: `linscp-core`, built by CMake with the cross toolchain.
 Linux: **558 errors, 14/33 clean, 4 aborting.**
 
-**A first real session works on Windows** (under Wine): core connects to
-an OpenSSH server over SFTP, authenticates with a key it converted to PPK
-itself, lists a directory and downloads a file byte for byte -- once as
-negotiated and once pinned to each cipher family (AES-CTR, AES-GCM,
-ChaCha20-Poly1305). The server is a throwaway unprivileged `sshd` on
-loopback (`port/tests/run_sftp_session.py`). Getting there found a real
-upstream portability bug: PuTTY's AES-NI counter mode is wrong under any
-compiler but MSVC (`putty-aes-ni-vector-constants.patch`), now also guarded
-by known-answer tests (`putty_crypto`).
+**Upstream is now WinSCP's `master`** (6.6.4-RC + 3, `aaae9dcb5`), with
+OpenSSL 3.5.9 and PuTTY 0.85, and everything works on it as it did on 6.5.8:
+all 33 core units compile for Windows, core links, and under Wine real SFTP
+sessions pass -- as negotiated and pinned to AES-CTR, AES-GCM and
+ChaCha20-Poly1305. Upstream's own 64-bit work had already fixed seven of our
+eight patches' problems, so the series went from eight to one.
 
-Core, every library it uses and the headless frontend link with nothing
-undefined, all built with clang from pinned submodules.
+Linux: **588 errors, 14/33 clean, 4 aborting** (558 before; the +30 is
+upstream's new Windows Shell integration in `RemoteFiles.cpp`).
 
-1. **P1-07b**: the Win32 calls core makes that Linux lacks; the Linux census
-   (558 errors, 14/33 clean) is now the gap between this and P1-17.
-2. **P1-15**: `winscp.com`'s scripting front end over plain stdio, so the
-   session above can be driven by script rather than by a test program.
-3. **P1-13**: neon and libs3 on Linux -- each needs a POSIX configuration
-   in place of `src/config.h` and `inc/mingw`. OpenSSL already builds there.
+1. **P1-07b**: the Win32 calls core makes that Linux lacks (file functions in
+   progress, shelved on a stash during the pin move).
+2. **P1-09**: PuTTY's Unix platform layer from the PuTTY 0.85 release, which
+   WinSCP's copy does not carry.
+3. **P1-15**: `winscp.com`'s scripting front end over plain stdio.
 
 ## Decisions taken
 
@@ -142,6 +138,9 @@ undefined, all built with clang from pinned submodules.
 | 2026-10-10 | `port/platform` headers refuse to compile on Windows, and are POSIX-only on the include path | Putting them on a Windows target shadowed the genuine mingw headers, which presented as a 1,220 -> 783 "improvement". The `#error` makes that mistake loud |
 | 2026-10-10 | `port/compat` is separate from `port/platform` | `help.h` is missing from upstream itself rather than being a platform difference, so it is needed on every target |
 | 2026-10-10 | The ratchet records whether a unit aborted | An aborted parse reports a floor. Treating that as a distinct state stops a new abort from reading as sudden progress |
+| 2026-10-11 | The WinSCP pin tracks `master`, not a release tag (user's decision; supersedes P0-02's "release tag, not `master`") | Upstream is porting itself to 64-bit on `master` and fixing the same bugs this port was finding -- five of the six reported were already fixed there. Following it inherits those fixes instead of duplicating them. A bump re-runs the transform, the patch series and closure-site discovery, all of which fail loudly where upstream moved |
+| 2026-10-11 | Static initialisation follows upstream's project order: executables link core's objects directly, in `ScpCore.cbproj` order, reversed for Windows | Core's globals depend on each other across units (`EscapedBom` in HierarchicalStorage.cpp is built from `Bom` in Common.cpp). C++Builder runs constructors in link order; mingw-w64 runs them in reverse link order and Linux in link order, and archive extraction gives no order at all |
+| 2026-10-11 | Library units and defines are read from upstream's make files too (neon, libs3, expat, the MFC subset) | `upstream_units.py` reads `$(OBJ_D)\x.$(O)` objects and `DEFINES`/`DEFS` plus `Makefile.inc`'s unconditional `CFLAG_OPENSSL`. Two defines meant for C++Builder's headers, `_ASSERTE` and `NOUSER`, are undefined again for mingw-w64's |
 | 2026-10-11 | Third-party libraries stay on the version WinSCP vendors while that is straightforward (user's policy) | Today that holds for all of them (OpenSSL is the same 3.3.7 release plus WinSCP's reviewed changes). If keeping one in step gets complicated, the port moves to a newer upstream release instead, carries the patches it needs on a locally maintained branch, and offers that version to WinSCP when the two merge |
 | 2026-10-11 | Bugs found in upstream code are reported to the project that owns them, against its current `master` | Six were found. Five are already fixed on WinSCP's `master`, which is being ported to 64-bit itself (`WinSCP.cbproj` gained a `Win64` platform after 6.5.8): libs3's `ssize_t`, FileZilla's `GWLP_USERDATA`, the AES-NI constants, PuTTY's option defaults (back to PuTTY's own `conf.h`) and neon's `ne_init_ssl_session` declaration. The sixth, `get_remote_username` reading `CONF_username` with `conf_get_str`, is winscp/winscp#68. None is in PuTTY, OpenSSL, neon or libs3 proper |
 | 2026-10-11 | Every non-Debug build defines `NDEBUG`, including one with no build type | Upstream has only Debug (`_DEBUG`) and Release (`NDEBUG`). With neither, PuTTY's standard `assert` stays live, which upstream never builds -- and core depends on that: `get_remote_username` reads `CONF_username` with `conf_get_str`, which asserts on its type |
@@ -149,7 +148,7 @@ undefined, all built with clang from pinned submodules.
 | 2026-10-11 | linscp names itself to servers but keeps WinSCP's stored settings (user's decision) | `AppNameString` is "linscp" and the SSH banner `linscp-release-<version>` -- the HTTP User-Agent, S3 role session, FTP CSID and PuTTY appname follow. The registry keys stay `Software\Martin Prikryl\WinSCP 2`, so on Windows existing sites carry over |
 | 2026-10-11 | The VERSIONINFO resource is generated from `WinSCP.cbproj`'s `VerInfo_*` settings (`gen_versioninfo.py`) | Core reads its own version from the running module's resource, which C++Builder writes from those settings; generated, it follows the pin. POSIX has no resources: P1-07b's |
 | 2026-10-11 | The headless frontend compiles upstream's `windows/ProgParams.cpp` as is and copies `UniqTempDir` from `GUITools.cpp` | `TProgramParams` needs nothing beyond core; `GUITools.cpp` is otherwise GUI. Startup follows `wWinMain`'s order: the application log exists before `CoreInitialize` |
-| 2026-10-11 | OpenSSL is built from the pinned release WinSCP vendors (3.3.7, `3rd-party/openssl`) with OpenSSL's own `Configure`, not from `libs/openssl` | WinSCP's copy is trimmed for 32-bit Windows: x86 assembly without its C fallbacks (`bn_asm.c`, `des_enc.c`, ...), no Unix sources, a 32-bit `configuration.h`. It cannot build for x86-64 or Linux. Disabled features mirror WinSCP's `OPENSSL_NO_*` set |
+| 2026-10-11 | OpenSSL is built from the pinned release WinSCP vendors (3.3.7 then, 3.5.9 since the move to `master`; `3rd-party/openssl`) with OpenSSL's own `Configure`, not from `libs/openssl` | WinSCP's copy is trimmed for 32-bit Windows: x86 assembly without its C fallbacks (`bn_asm.c`, `des_enc.c`, ...), no Unix sources, a 32-bit `configuration.h`. It cannot build for x86-64 or Linux. Disabled features mirror WinSCP's `OPENSSL_NO_*` set |
 | 2026-10-11 | WinSCP's changes to OpenSSL are adopted or skipped by a reviewed list, `port/openssl/winscp-changes.txt` | 17 files differ. One is a security backport (CVE-2026-45447, from 3.4.6), adopted; the rest are C++Builder workarounds, skipped. `openssl_tree.py --check` (ctest `openssl_tree`) fails on a difference the list does not cover, so a WinSCP backport cannot be missed on an upgrade |
 | 2026-10-11 | neon and libs3 are compiled from the generated tree, from the unit lists in their make files | The transform's rules leave them byte-identical; the tree gives them the patch series, which libs3 already needs. `upstream_units.py` reads Borland make files as well as projects |
 | 2026-10-11 | libs3 is compiled as C++ | Its Makefile passes bcc32 `-P`. WinSCP's additions depend on it (struct names without `struct`) and core declares libs3's functions with C++ linkage |
@@ -255,7 +254,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | Q-7 | Build the fork-branch generator now, or when there is something worth proposing upstream? | nothing today; recommend deferring until P1 lands | — |
 | ~~Q-8~~ | ~~Confirm ADR 0001~~ — **resolved 2026-10-10**: accepted | — | — |
 | ~~Q-9~~ | ~~Stay on WinSCP's OpenSSL 3.3, or move to a supported LTS?~~ — **resolved 2026-10-11** by the third-party library policy (decisions table): stay while it is straightforward | — | — |
-| Q-10 | Bump the WinSCP pin to the first release with upstream's own 64-bit port? Five of our patches then fail to apply -- by design -- and are dropped | recommend yes, when it ships; until then 6.5.8 | — |
+| ~~Q-10~~ | ~~Bump the WinSCP pin to upstream's first 64-bit release?~~ — **resolved 2026-10-11**: pinned to `master` instead (decisions table) | — | — |
 
 ## Verified facts (re-check if the environment changes)
 
@@ -266,6 +265,9 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | WinSCP's OpenSSL differs from the 3.3.7 release in 17 files, one of them functionally (a CVE-2026-45447 backport in `pk7_smime.c`) | `openssl_tree.py --check`, CRLF ignored; WinSCP commit bb46bb15d | 2026-10-11 |
 | WinSCP's OpenSSL lacks the C fallbacks for its x86 assembly and every Unix source | `bn_asm.c`, `des_enc.c`, `bf_enc.c`, `c_enc.c`, `threads_pthread.c`, `rand_unix.c` absent from `libs/openssl` | 2026-10-11 |
 | Upstream libs3 returns `int` where neon's body provider returns `ssize_t` | `neon_read_func` in `libs3/src/request.c`; fixed by `libs3-64bit-body-provider.patch` | 2026-10-11 |
+| WinSCP `master` is being ported to 64-bit | `WinSCP.cbproj` has a `Win64` platform; libs are built with bcc64 (`libs/Makefile.inc`); `StartThread` returns `THandle`; AES-NI uses `_mm_setr_epi8` under `_WIN64` | 2026-10-11 |
+| mingw-w64 runs global constructors in reverse link order, Linux in link order | Three one-line units linked a, b, c print "c b a" under Wine and "a b c" natively | 2026-10-11 |
+| WinSCP `master`'s OpenSSL 3.5.9 differs from the release only by C++Builder workarounds (5 files) | `openssl_tree.py --check` | 2026-10-11 |
 | Upstream FileZilla truncates a pointer on x86-64 | `CAsyncSocketEx` stores `this` with `SetWindowLongPtr(hWnd, GWL_USERDATA, (LONG)this)`; fixed by `filezilla-64bit-window-userdata.patch` | 2026-10-11 |
 | lld reports undefined references in every object it pulls in, even from functions `--gc-sections` would drop | Local test: an unreferenced function calling an undefined symbol fails the link with and without `-ffunction-sections` | 2026-10-11 |
 | Upstream WinSCP is built for 32-bit Windows only | `PuTTYVS.vcxproj` has only `Win32` configurations, and PuTTY's option defaults cast string addresses to `int`, which only fits in 32 bits | 2026-10-11 |
@@ -375,7 +377,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | ID | Task | Status | Note |
 |---|---|---|---|
 | P0-01 | Repo layout | done | `port/{shim,platform,tools,patches}`, `qt/`, `cmake/` |
-| P0-02 | Pin submodule to a release tag | done | 6.5.8, latest stable; 6.6.x is all RC/beta |
+| P0-02 | Pin submodule to a release tag | done | was 6.5.8; since 2026-10-11 tracks `master` by decision (decisions table) |
 | P0-03 | Dual-target property macro header | done | `port/shim/vcl_property.h`; 9 forms, self-tested |
 | P0-04 | Verify C++Builder accepts the macro | blocked | Q-2: needs licence + Windows |
 | P0-05 | `transform.py` property rewriter | done | 613/613, 0 unhandled |
@@ -440,7 +442,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-10 | PuTTY delta reconciliation | todo | |
 | P1-11 | FileZilla MFC subset replacement | wip | FileZilla and the MFC subset build and link for Windows from the submodule (three patches); Linux replacement next |
 | P1-12 | FileZilla epoll rewrite | todo | **R2** — budget generously |
-| P1-13 | System libs | wip | Windows complete: PuTTY, puttyvs, FileZilla + MFC, neon, libs3 from the WinSCP submodule, OpenSSL 3.3.7 from its own (both targets). Linux: neon and libs3 need POSIX configurations |
+| P1-13 | System libs | wip | Windows complete: PuTTY, puttyvs, FileZilla + MFC, neon, libs3 from the WinSCP submodule, OpenSSL 3.5.9 from its own (both targets); expat from its make file. Linux: neon and libs3 need POSIX configurations |
 | P1-14 | Drop `puttyvs` | done | the MSVC build is replaced by clang building the same files with the same defines, from `PuTTYVS.vcxproj` |
 | P1-15 | Console IPC → stdio | todo | |
 | P1-16 | Headless `Interface.h` frontend | done | `port/frontend`: all 17 functions plus startup/shutdown; core initialises and finalises under Wine. Linux follows core (P1-07b) |

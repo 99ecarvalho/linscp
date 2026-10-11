@@ -495,3 +495,12 @@ void Sleep(DWORD Milliseconds)
   }
   std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
 }
+
+HRESULT CoCreateInstance(REFCLSID, LPVOID, DWORD, REFIID, LPVOID * Object)
+{
+  if (Object != nullptr)
+  {
+    *Object = nullptr;
+  }
+  return REGDB_E_CLASSNOTREG;
+}

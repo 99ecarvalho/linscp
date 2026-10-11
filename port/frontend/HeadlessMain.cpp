@@ -34,3 +34,41 @@ void HeadlessFinalize()
   AppLog(L"Finalizing done");
   SAFE_DESTROY_EX(TApplicationLog, ApplicationLog);
 }
+//---------------------------------------------------------------------------
+// windows/ProgParams.cpp's TProgramParams, verbatim but for its first line:
+// upstream's file now opens with the GUI's precompiled header (WinPCH.h,
+// which is FormsPCH.h), so it cannot be compiled without the VCL forms.
+static std::unique_ptr<TProgramParams> ProgramParamsOwner;
+//---------------------------------------------------------------------------
+TProgramParams * __fastcall TProgramParams::Instance()
+{
+  if (ProgramParamsOwner.get() == NULL)
+  {
+    ProgramParamsOwner.reset(new TProgramParams());
+  }
+  return ProgramParamsOwner.get();
+}
+//---------------------------------------------------------------------------
+__fastcall TProgramParams::TProgramParams()
+{
+  Init(CmdLine);
+}
+//---------------------------------------------------------------------------
+__fastcall TProgramParams::TProgramParams(const UnicodeString & CmdLine)
+{
+  Init(CmdLine);
+}
+//---------------------------------------------------------------------------
+void __fastcall TProgramParams::Init(const UnicodeString & CmdLine)
+{
+  UnicodeString CommandLine = CmdLine;
+
+  UnicodeString Param;
+  CutToken(CommandLine, Param);
+  Parse(CommandLine);
+}
+//---------------------------------------------------------------------------
+UnicodeString __fastcall TProgramParams::FormatSwitch(const UnicodeString & Switch)
+{
+  return FORMAT(L"/%s", (Switch));
+}

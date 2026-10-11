@@ -118,6 +118,20 @@ public:
     AnsiStringT R; R.FData = FData.substr(0, E); return R;
   }
   AnsiStringT Trim() const { return TrimLeft().TrimRight(); }
+  // ASCII folding, as the shim's UnicodeString::UpperCase (see the divergence
+  // table); core applies these to protocol tokens.
+  AnsiStringT UpperCase() const
+  {
+    AnsiStringT R(*this);
+    for (char & C : R.FData) { if ((C >= 'a') && (C <= 'z')) { C = static_cast<char>(C - 'a' + 'A'); } }
+    return R;
+  }
+  AnsiStringT LowerCase() const
+  {
+    AnsiStringT R(*this);
+    for (char & C : R.FData) { if ((C >= 'A') && (C <= 'Z')) { C = static_cast<char>(C - 'A' + 'a'); } }
+    return R;
+  }
   int Pos(const AnsiStringT & Substr) const;
   int Pos(char C) const;
   void Delete(int Index, int Count);
@@ -142,6 +156,10 @@ public:
     { return A.FData < B.FData; }
   friend AnsiStringT operator+(const AnsiStringT & A, const AnsiStringT & B)
     { AnsiStringT R(A); R += B; return R; }
+  friend AnsiStringT operator+(const AnsiStringT & A, char C)
+    { AnsiStringT R(A); R += C; return R; }
+  friend AnsiStringT operator+(char C, const AnsiStringT & A)
+    { AnsiStringT R(&C, 1); R += A; return R; }
 
   // Exposed for the conversion helpers and for callers that need the raw bytes.
   const std::string & Bytes() const { return FData; }

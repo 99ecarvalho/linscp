@@ -1,10 +1,3 @@
 # The reviewed patch series, applied in order to the pristine submodule before
 # transform.py's rules. See port/tools/patchset.py.
-putty-64bit-conf-defaults.patch
-mfc-x86-64.patch
-filezilla-ws2tcpip-case.patch
-mfc-standard-cxx.patch
-filezilla-64bit-window-userdata.patch
-mfc-winscp-dead-references.patch
-libs3-64bit-body-provider.patch
-putty-aes-ni-vector-constants.patch
+core-closure-functional-cast.patch

@@ -1,10 +1,9 @@
 # The headless frontend: core's Interface.h functions for a process with no
-# GUI, plus upstream's TProgramParams (windows/ProgParams.cpp), which needs
-# nothing beyond core and is compiled as it is.
+# GUI, plus upstream's TProgramParams (windows/ProgParams.h; its .cpp is
+# carried in HeadlessMain.cpp, since upstream's now needs the VCL forms).
 add_library(linscp-frontend-headless STATIC EXCLUDE_FROM_ALL
   HeadlessInterface.cpp
-  HeadlessMain.cpp
-  "${LINSCP_UPSTREAM}/source/windows/ProgParams.cpp")
+  HeadlessMain.cpp)
 target_link_libraries(linscp-frontend-headless PUBLIC linscp-core)
 target_include_directories(linscp-frontend-headless PUBLIC
   "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -14,6 +13,10 @@ target_include_directories(linscp-frontend-headless PUBLIC
 # order, so the PuTTY <-> core cycle needs no repetition.
 add_library(linscp-runtime INTERFACE)
 target_link_libraries(linscp-runtime INTERFACE linscp-frontend-headless linscp-core)
+# Core's objects themselves, in linscp-core's source order, so their static
+# initialisers run in upstream's project order (see port/core). Linked first
+# and whole, the archive above is left with nothing to contribute.
+target_sources(linscp-runtime INTERFACE $<TARGET_OBJECTS:linscp-core>)
 foreach(_lib linscp-putty linscp-puttyvs linscp-filezilla linscp-libs3 linscp-neon)
   if(TARGET ${_lib})
     target_link_libraries(linscp-runtime INTERFACE ${_lib})

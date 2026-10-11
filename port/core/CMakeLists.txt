@@ -19,6 +19,14 @@ set(LINSCP_CORE_SOURCES "")
 foreach(_unit IN LISTS LINSCP_CORE_UNITS)
   list(APPEND LINSCP_CORE_SOURCES "${LINSCP_GEN}/${_unit}")
 endforeach()
+# Core's globals depend on each other across units, and C++Builder runs their
+# constructors in project order. mingw-w64 runs them in reverse link order and
+# Linux in link order, so the units are listed reversed for Windows: the
+# executables link these objects directly, in this order (port/frontend's
+# linscp-runtime), rather than leaving it to archive member extraction.
+if(WIN32)
+  list(REVERSE LINSCP_CORE_SOURCES)
+endif()
 set_source_files_properties(${LINSCP_CORE_SOURCES} PROPERTIES GENERATED TRUE)
 
 add_library(linscp-core STATIC EXCLUDE_FROM_ALL ${LINSCP_CORE_SOURCES})
@@ -55,17 +63,7 @@ target_compile_options(linscp-core PRIVATE -w)
 # reports. It is a measurement, not a program: main() does nothing.
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/link_check_main.cpp" "int main() { return 0; }\n")
 add_executable(linscp-core-link EXCLUDE_FROM_ALL "${CMAKE_CURRENT_BINARY_DIR}/link_check_main.cpp")
-target_link_libraries(linscp-core-link PRIVATE
-  -Wl,--error-limit=0
-  -Wl,--whole-archive linscp-core -Wl,--no-whole-archive linscp-shim
-  # Defined later, in port/frontend; names resolve when CMake generates.
-  linscp-frontend-headless)
-if(TARGET linscp-putty)
-  target_link_libraries(linscp-core-link PRIVATE linscp-putty linscp-puttyvs)
-endif()
-if(TARGET linscp-filezilla)
-  target_link_libraries(linscp-core-link PRIVATE linscp-filezilla)
-endif()
-if(TARGET linscp-libs3)
-  target_link_libraries(linscp-core-link PRIVATE linscp-libs3 linscp-neon)
-endif()
+# linscp-runtime links every core object (in initialisation order) and every
+# library core uses; defined later, in port/frontend, and resolved when CMake
+# generates.
+target_link_libraries(linscp-core-link PRIVATE -Wl,--error-limit=0 linscp-runtime)

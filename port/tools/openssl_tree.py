@@ -97,6 +97,13 @@ def assemble(out, changes, release=RELEASE, winscp=WINSCP):
             if write_if_changed(dst, data):
                 shutil.copymode(src, dst)
                 written += 1
+    # Files a newer release removed. Left behind, a pin bump builds a mix of
+    # two releases: 3.3.7's leftovers crashed 3.5.9 in RAND_poll.
+    for dirpath, _, names in os.walk(out):
+        for n in names:
+            rel = os.path.relpath(os.path.join(dirpath, n), out).replace(os.sep, '/')
+            if rel not in expected:
+                os.remove(os.path.join(dirpath, n))
     return written, len(expected)
 
 

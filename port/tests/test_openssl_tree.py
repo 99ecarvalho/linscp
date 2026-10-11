@@ -53,6 +53,10 @@ check(not os.path.exists(os.path.join(out, 'include/gen.h')),
       'WinSCP\'s generated headers are not copied')
 check(ot.assemble(out, {'crypto/a.c': 'adopt'}, release, winscp)[0] == 0,
       'a second run writes nothing, so mtimes are kept')
+open(os.path.join(out, 'crypto/gone.c'), 'w').write('int gone;\n')
+ot.assemble(out, {'crypto/a.c': 'adopt'}, release, winscp)
+check(not os.path.exists(os.path.join(out, 'crypto/gone.c')),
+      'a file the release no longer has is removed')
 out2 = tempfile.mkdtemp()
 ot.assemble(out2, {'crypto/a.c': 'skip'}, release, winscp)
 check(open(os.path.join(out2, 'crypto/a.c'), 'rb').read() == b'int a;\n',

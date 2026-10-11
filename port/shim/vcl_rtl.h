@@ -56,6 +56,7 @@
 #include "vcl_sysutils.h"
 #include "vcl_strutils.h"
 #include "vcl_format.h"
+#include "vcl_comobj.h"
 #include "vcl_streams.h"
 #include "vcl_dynamicarray.h"
 #include "vcl_set.h"

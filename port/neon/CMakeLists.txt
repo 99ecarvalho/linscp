@@ -26,22 +26,16 @@ set_source_files_properties(${LINSCP_NEON_UNITS} PROPERTIES GENERATED TRUE)
 
 add_library(linscp-neon STATIC EXCLUDE_FROM_ALL ${LINSCP_NEON_UNITS})
 add_dependencies(linscp-neon transform)
-# Makefile.bcb's CFLAG, less what only bcc32 needs (_RTLDLL, the
-# _stricmp=stricmp renames) and NOUSER: mingw-w64's iphlpapi.h, which
-# ne_socket.c includes, reaches ole2.h, and that needs user32's MSG.
-target_compile_definitions(linscp-neon PRIVATE
-  WIN32 WIN32_LEAN_AND_MEAN NE_HAVE_SSL HAVE_OPENSSL HAVE_EXPAT HAVE_EXPAT_H
-  NE_HAVE_DAV NE_LFS USE_GETADDRINFO NOGDI COMPILED_FROM_DSP
-  XML_STATIC HAVE_STRTOLL WINSCP)
+# Makefile.bcb's DEFINES, and the OpenSSL flags it takes from Makefile.inc.
+linscp_upstream_defines(linscp-neon PRIVATE ../libs/neon/Makefile.bcb)
 target_include_directories(linscp-neon PRIVATE "${_neon_gen}/src" "${_neon_gen}")
 target_link_libraries(linscp-neon PRIVATE linscp-openssl linscp-expat)
 target_link_libraries(linscp-neon INTERFACE linscp-openssl-ssl linscp-expat
   ws2_32 secur32 iphlpapi)
 set_target_properties(linscp-neon PROPERTIES C_STANDARD 11 C_EXTENSIONS ON)
 # Upstream's code is compiled as it is; its warnings are not ours to fix.
-# ne_socket.c calls WinSCP's ne_init_ssl_session without including the header
-# that declares it, which bcc32 compiles as C89 does; clang makes an implicit
-# declaration an error unless told otherwise. The call matches the implicit
-# signature's ABI: pointer arguments, result unused.
-target_compile_options(linscp-neon PRIVATE -w
-  -Wno-error=implicit-function-declaration)
+# Two of the make file's defines are for C++Builder's own headers and break
+# mingw-w64's: _ASSERTE, defined to 1, is a macro its malloc.h calls, and
+# NOUSER removes the MSG its iphlpapi.h (through ole2.h) needs. Undefined
+# after the -D flags, which CMake emits first.
+target_compile_options(linscp-neon PRIVATE -w -U_ASSERTE -UNOUSER)

@@ -23,7 +23,7 @@ set(_ossl_bld "${_ossl}/build")
 set(LINSCP_OPENSSL_OPTIONS
   no-shared no-module no-tests no-apps no-docs
   no-camellia no-rc5 no-mdc2 no-whirlpool no-seed no-engine no-zlib
-  no-quic no-brotli no-comp no-tfo no-unstable-qlog)
+  no-quic no-brotli no-comp no-tfo no-unstable-qlog no-dgram no-ts)
 if(WIN32)
   set(_ossl_target mingw64)
   set(_ossl_cc "${CMAKE_C_COMPILER} --target=${LINSCP_TARGET_TRIPLE}")
@@ -47,6 +47,10 @@ add_custom_command(
 
 add_custom_command(
   OUTPUT  "${_ossl_bld}/configdata.pm"
+  # From an empty directory: OpenSSL's make files do not rebuild everything a
+  # changed configuration affects (dropping no-ts left TS objects behind), and
+  # this step only runs when the options or the tree changed.
+  COMMAND "${CMAKE_COMMAND}" -E rm -rf "${_ossl_bld}"
   COMMAND "${CMAKE_COMMAND}" -E make_directory "${_ossl_bld}"
   COMMAND "${CMAKE_COMMAND}" -E chdir "${_ossl_bld}"
           "${LINSCP_PERL}" "${_ossl_src}/Configure" ${_ossl_target}

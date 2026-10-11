@@ -15,7 +15,15 @@
 #include "putty.h"
 #include "ssh.h"
 
-bool aes_ni_available(void);
+/* PuTTY's own availability test: the hardware implementation's constructor
+ * returns NULL where the CPU lacks the instructions. */
+static bool aes_ni_available(void)
+{
+    ssh_cipher *c = ssh_cipher_new(&ssh_aes128_sdctr_ni);
+    if (c)
+        ssh_cipher_free(c);
+    return c != NULL;
+}
 
 static int failures = 0;
 

@@ -15,27 +15,20 @@ set(_prelude "${CMAKE_SOURCE_DIR}/port/shim/vcl_win32_prelude.h")
 set(_shim_includes "$<TARGET_PROPERTY:linscp-shim,INTERFACE_INCLUDE_DIRECTORIES>")
 
 # --- WinSCP's MFC subset -----------------------------------------------------
-# No project file upstream, only libs/mfc/source/borland.mak, so its sources
-# and defines are mirrored here: the OBJECT, FILES, MISC and WINMISC lists, and
-# TARGDEFS for the UNICODE build. _AFX_NO_DAO_SUPPORT is added because DAO is
-# 32-bit only; Microsoft's own MFC turns it off for every non-x86 target, in
-# the afxv_cpu.h WinSCP does not vendor.
-set(_mfc_units objcore except validadd filecore filex filest strcore strex
-               timecore fixalloc plex winstr apphelp)
-set(LINSCP_MFC_SOURCES "")
-foreach(_u IN LISTS _mfc_units)
-  list(APPEND LINSCP_MFC_SOURCES "${_g}/libs/mfc/source/${_u}.cpp")
-endforeach()
+# No project file upstream, only libs/mfc/source/borland.mak: its objects and
+# DEFS are read from it.
+execute_process(
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/upstream_units.py"
+          --project "${LINSCP_UPSTREAM}/libs/mfc/source/borland.mak" --separator ";"
+  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+  OUTPUT_VARIABLE LINSCP_MFC_SOURCES
+  COMMAND_ERROR_IS_FATAL ANY
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
+list(TRANSFORM LINSCP_MFC_SOURCES PREPEND "${_g}/")
 set_source_files_properties(${LINSCP_MFC_SOURCES} PROPERTIES GENERATED TRUE)
 add_library(linscp-mfc STATIC EXCLUDE_FROM_ALL ${LINSCP_MFC_SOURCES})
 add_dependencies(linscp-mfc transform)
-target_compile_definitions(linscp-mfc PRIVATE
-  UNICODE _UNICODE WINSCP _WINDOWS
-  _AFX_NO_OLEDB_SUPPORT _AFX_NO_OCC_SUPPORT _AFX_NO_OCX_SUPPORT _AFX_NO_DB_SUPPORT
-  _AFX_NO_AFXCMN_SUPPORT _AFX_NO_RICHEDIT_SUPPORT _AFX_NO_INET_SUPPORT
-  _AFX_NO_DHTML_SUPPORT _AFX_NO_OLE_SUPPORT _AFX_NO_SOCKET_SUPPORT _AFX_NO_SYNC_SUPPORT
-  _AFX_NO_DAO_SUPPORT
-  "$<IF:$<CONFIG:Debug>,_DEBUG,NDEBUG>")
+linscp_upstream_defines(linscp-mfc PRIVATE ../libs/mfc/source/borland.mak)
 target_include_directories(linscp-mfc PRIVATE
   "${_g}/libs/mfc/include" "${_g}/libs/mfc/source" ${_shim_includes})
 target_compile_options(linscp-mfc PRIVATE -include "${_prelude}" -w)

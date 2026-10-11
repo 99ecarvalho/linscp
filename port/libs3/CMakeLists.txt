@@ -28,12 +28,26 @@ list(TRANSFORM LINSCP_LIBS3_UNITS PREPEND "${LINSCP_GEN}/")
 set_source_files_properties(${LINSCP_LIBS3_UNITS} PROPERTIES LANGUAGE CXX GENERATED TRUE)
 add_library(linscp-libs3 STATIC EXCLUDE_FROM_ALL ${LINSCP_LIBS3_UNITS})
 add_dependencies(linscp-libs3 transform)
-# The Makefile's CFLAG and INCL, in its order; OpenSSL and expat come from
-# their own targets.
-target_compile_definitions(linscp-libs3 PRIVATE
-  WIN32 WIN32_LEAN_AND_MEAN WINSCP NE_LFS)
+# The Makefile's DEFINES (and Makefile.inc's OpenSSL flags) and INCL, in its
+# order; OpenSSL and expat come from their own targets.
+linscp_upstream_defines(linscp-libs3 PRIVATE ../libs/libs3/Makefile)
 target_include_directories(linscp-libs3 PRIVATE
-  "${_s3_gen}/inc" "${_s3_gen}/inc/mingw" "${LINSCP_GEN}/libs/neon/src")
+  "${_s3_gen}/inc" "${LINSCP_GEN}/libs/neon/src")
+# inc/mingw stands in for POSIX headers mingw lacks: sys/utsname.h, and a
+# pthread.h over Win32 that mingw_functions.c implements. That unit gets it
+# first, as upstream's include path has it. Every other unit searches it only
+# after the system's: request.c now includes <memory>, whose libstdc++
+# threading support needs the real winpthreads pthread.h (C++Builder's library
+# never asks for one). request.c's own mutex calls then reach winpthreads,
+# linked anyway; libs3's versions, compiled as C++, have other names.
+set(_mingw_functions "${_s3_gen}/src/mingw_functions.c")
+foreach(_unit IN LISTS LINSCP_LIBS3_UNITS)
+  if(_unit STREQUAL _mingw_functions)
+    set_property(SOURCE "${_unit}" APPEND PROPERTY INCLUDE_DIRECTORIES "${_s3_gen}/inc/mingw")
+  else()
+    set_property(SOURCE "${_unit}" APPEND PROPERTY COMPILE_OPTIONS -idirafter "${_s3_gen}/inc/mingw")
+  endif()
+endforeach()
 target_link_libraries(linscp-libs3 PRIVATE linscp-openssl linscp-expat)
 target_link_libraries(linscp-libs3 INTERFACE linscp-neon)
 # Upstream's code is compiled as it is; its warnings are not ours to fix.

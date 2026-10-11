@@ -147,6 +147,8 @@ public:
   int ToInt() const;
   int ToIntDef(int Default) const;
   UnicodeString & sprintf(const wchar_t * Format, ...);
+  // The va_list form; returns the resulting length, as C++Builder's does.
+  int vprintf(const wchar_t * Format, va_list Args);
   UnicodeString & cat_sprintf(const wchar_t * Format, ...);
 
   int Compare(const UnicodeString & S) const;
@@ -184,5 +186,8 @@ private:
 
 // WebDAVFileSystem.cpp: U"\\U0001F512" + Owner.
 UnicodeString operator+(const char32_t * A, const UnicodeString & B);
+
+// Delphi's String, which C++Builder's System.hpp declares for C++ too.
+using String = UnicodeString;
 
 #endif // LINSCP_VCL_UNICODESTRING_H

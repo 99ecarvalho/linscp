@@ -345,6 +345,36 @@ ULONGLONG GetTickCount64();
 HRESULT CoInitialize(LPVOID Reserved);
 void CoUninitialize();
 
+// Class and interface identifiers, so core's TComPtr compiles. There is no
+// COM to instantiate anything from: CoCreateInstance reports every class as
+// unregistered, which is what Windows says for a class that is not installed
+// -- TComPtr::TryCreate then fails and Create raises, as they would there.
+struct GUID
+{
+  DWORD Data1 = 0;
+  WORD Data2 = 0;
+  WORD Data3 = 0;
+  BYTE Data4[8] = {};
+};
+using IID = GUID;
+using CLSID = GUID;
+using REFIID = const IID &;
+using REFCLSID = const CLSID &;
+#define CLSCTX_INPROC_SERVER   0x1
+#define CLSCTX_LOCAL_SERVER    0x4
+#define CLSCTX_ALL             0x17
+#define REGDB_E_CLASSNOTREG    (static_cast<HRESULT>(0x80040154))
+#define SUCCEEDED(hr)          (static_cast<HRESULT>(hr) >= 0)
+#define FAILED(hr)             (static_cast<HRESULT>(hr) < 0)
+HRESULT CoCreateInstance(REFCLSID ClsId, LPVOID Outer, DWORD ClsContext,
+  REFIID Iid, LPVOID * Object);
+namespace linscp {
+// IID_PPV_ARGS's identifier half. No interface has an identifier here; the
+// value only ever reaches CoCreateInstance, which refuses every request.
+template <typename T> const IID & IidOf(T **) { static const IID None; return None; }
+}
+#define IID_PPV_ARGS(pp) ::linscp::IidOf(pp), reinterpret_cast<void **>(pp)
+
 // --- registry access modes -------------------------------------------------
 // Present so declarations compile; the storage backend core actually uses on
 // Linux is the INI path, which already exists upstream.

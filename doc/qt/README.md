@@ -17,22 +17,20 @@ built so that upstream WinSCP remains trackable with near-zero merge cost.
 One codebase. Qt UI. Builds and runs on Linux and Windows. No Embarcadero
 C++Builder in the toolchain.
 
-## Current state (2026-10-10)
+## Current state (2026-10-11)
 
-Phase 0 is 23 of 34 done; Phase 1 is 9 of 30. Upstream is pinned to the latest
-**stable** release, `6.5.8`.
+Phase 0 is 25 of 35 done; Phase 1 is 22 of 36. Upstream is pinned to WinSCP's
+**`master`** (6.6.4-RC plus three commits), which is being ported to 64-bit
+itself, with OpenSSL 3.5.9 and PuTTY 0.85; see the tracker for why `master`
+rather than a release.
 
-**`source/core/Option.cpp` compiles cleanly against the shim on Linux *and*
-Windows** — the first real WinSCP core translation unit to build, on both
-platforms. Across the nine tracked units, with nothing aborting on either
-target, the counts are 1,334 errors on Windows and 1,575 on Linux, ratcheted in
-CI per target so neither platform can drift ahead unnoticed.
-
-The shim covers `UnicodeString`, the byte-string family with a UTF-8 codec,
-`TDateTime`, the Delphi exception hierarchy, `TCriticalSection`,
-`TStrings`/`TStringList`, directory search, `TClosure` for `__closure`, the free
-string/number/path routines, `TVarRec`/`Format`, and a Win32 subset for POSIX.
-15 test binaries pass on Linux and on Windows under Wine.
+**Core runs real SFTP sessions on Windows.** Cross-built with clang, core and
+every library it uses -- PuTTY, FileZilla and its MFC subset, neon, libs3,
+expat, OpenSSL -- link with nothing undefined, and under Wine a test program
+connects to an OpenSSH server, authenticates with a key, lists a directory and
+downloads a file, once per cipher family. All 33 core units compile for
+Windows; on Linux 14 of 33 do, 588 errors remaining, mostly Win32 calls the
+POSIX layer does not yet provide and PuTTY's missing Unix platform layer.
 
 ## The three findings the plan rests on
 

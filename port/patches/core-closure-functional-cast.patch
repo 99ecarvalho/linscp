@@ -1,0 +1,21 @@
+Cast between closure types with a functional cast, not reinterpret_cast.
+
+A Borland __closure is a built-in (code, data) pair, so reinterpret_cast
+between two closure types is allowed. Under standard C++ a closure is a
+class, and reinterpret_cast cannot convert one class object into another.
+The functional cast is the old C-style cast this line had before upstream's
+"Refactoring old-style casts" (e5efed895), so C++Builder compiles it as it
+did then; the shim gives it the same meaning, keeping the original closure
+so the cast back is lossless. Line counts are unchanged.
+
+--- a/source/core/Terminal.cpp	2026-10-11 16:55:31.730293582 -0300
++++ b/source/core/Terminal.cpp	2026-10-11 16:55:31.734293597 -0300
+@@ -4178,7 +4178,7 @@
+               else
+               {
+                 // not used anymore
+-                TProcessFileEventEx ProcessFileEx = reinterpret_cast<TProcessFileEventEx>(ProcessFile);
++                TProcessFileEventEx ProcessFileEx = TProcessFileEventEx(ProcessFile);
+                 ProcessFileEx(FileName, File, Param, Index);
+               }
+               Success = true;

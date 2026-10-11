@@ -625,6 +625,7 @@ def main():
     series = patchset.load_series()
     used = set()
     nfiles = 0
+    produced = set()
     for sub in a.subdirs:
         root = os.path.join(a.src, sub)
         if not os.path.isdir(root):
@@ -646,6 +647,7 @@ def main():
                 if not nlines_ok:
                     sys.exit(f'LINE COUNT CHANGED in {rel} — transform is not 1:1')
                 nfiles += 1
+                produced.add(os.path.normpath(dst))
                 if not a.check:
                     # Unchanged output keeps its mtime, so the build recompiles
                     # only what a rule or patch actually changed.
@@ -655,6 +657,21 @@ def main():
                         continue
                     os.makedirs(os.path.dirname(dst), exist_ok=True)
                     open(dst, 'w', encoding='utf-8', errors='surrogateescape', newline='').write(new)
+
+    # Outputs whose source upstream deleted or renamed. Left in place they
+    # still compile and link -- a stale KeyGen.cpp survived a pin bump this
+    # way and was "rediscovered" by bind_closures.py.
+    pruned = 0
+    if not a.check:
+        for sub in a.subdirs:
+            for dirpath, _, names in os.walk(os.path.join(a.out, sub)):
+                for n in names:
+                    p = os.path.normpath(os.path.join(dirpath, n))
+                    if os.path.splitext(n)[1].lower() in EXTS and p not in produced:
+                        os.remove(p)
+                        pruned += 1
+    if pruned:
+        t.stats['pruned'] = pruned
 
     # A hunk for a file in scope that never applied means the file is gone or
     # renamed upstream; the patch needs attention either way.

@@ -54,9 +54,16 @@ function(linscp_upstream_defines TARGET SCOPE PROJECT)
   # rejects the dependency as registered twice.
   get_filename_component(_cbproj "${LINSCP_UPSTREAM}/source/${PROJECT}" ABSOLUTE)
   set_property(DIRECTORY "${CMAKE_SOURCE_DIR}" APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${_cbproj}")
+  # A project file (.cbproj, .vcxproj), or a Borland make file for the
+  # libraries WinSCP builds that way (neon, libs3, the MFC subset).
+  if(_cbproj MATCHES "\\.(bcb|mak)$" OR _cbproj MATCHES "/Makefile$")
+    set(_cmd "${CMAKE_SOURCE_DIR}/port/tools/upstream_units.py" --defines --project "${_cbproj}")
+  else()
+    set(_cmd "${CMAKE_SOURCE_DIR}/port/tools/upstream_defines.py"
+             --target "${CMAKE_SYSTEM_NAME}" --config Base --project "${_cbproj}")
+  endif()
   execute_process(
-    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/upstream_defines.py"
-            --target "${CMAKE_SYSTEM_NAME}" --config Base --project "${_cbproj}"
+    COMMAND "${Python3_EXECUTABLE}" ${_cmd}
     WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     OUTPUT_VARIABLE _flags
     RESULT_VARIABLE _rc

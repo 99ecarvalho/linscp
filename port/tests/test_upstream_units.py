@@ -22,8 +22,9 @@ def check(cond, what):
 
 # neon: explicit rules; ne_ntlm.c exists but Makefile.bcb does not build it.
 neon = uu.project_units(os.path.join(WINSCP, 'libs/neon/Makefile.bcb'))
-check(len(neon) == 25, f'neon: 25 units ({len(neon)})')
+check(len(neon) == 26, f'neon: 26 units ({len(neon)})')
 check('libs/neon/src/ne_openssl.c' in neon, 'neon: ne_openssl.c')
+check('libs/neon/src/ne_ssl.c' in neon, 'neon: ne_ssl.c')
 check('libs/neon/src/ne_ntlm.c' not in neon, 'neon: ne_ntlm.c is not built upstream')
 
 # libs3: an object list and .PATH.c.
@@ -31,6 +32,19 @@ s3 = uu.project_units(os.path.join(WINSCP, 'libs/libs3/Makefile'))
 check(len(s3) == 14, f'libs3: 14 units ({len(s3)})')
 check('libs/libs3/src/mingw_functions.c' in s3, 'libs3: mingw_functions.c')
 check('libs/libs3/src/s3.c' not in s3, 'libs3: s3.c, the command-line tool, is not built')
+
+# The MFC subset: bare `x.$(O)` objects, sources next to the make file.
+mfc = uu.project_units(os.path.join(WINSCP, 'libs/mfc/source/borland.mak'))
+check(mfc == ['libs/mfc/source/filecore.cpp', 'libs/mfc/source/strcore.cpp',
+              'libs/mfc/source/strex.cpp', 'libs/mfc/source/timecore.cpp'], f'mfc: {mfc}')
+
+# Defines: DEFINES plus Makefile.inc's unconditional CFLAG_OPENSSL, never
+# the WIN64 branch's _WIN64.
+nd = uu.make_defines(os.path.join(WINSCP, 'libs/neon/Makefile.bcb'))
+check('WINSCP' in nd and 'OPENSSL_NO_DEPRECATED' in nd, f'neon defines: {nd}')
+check('_WIN64' not in nd, 'neon defines: no _WIN64')
+check(uu.make_defines(os.path.join(WINSCP, 'libs/mfc/source/borland.mak')) ==
+      ['_UNICODE', 'UNICODE', 'WINSCP', '_WINDOWS'], 'mfc defines')
 
 # A make file naming an object it has no source for fails, rather than
 # silently dropping the unit.
