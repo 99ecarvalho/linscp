@@ -18,14 +18,77 @@
 // all, the transform wraps it as
 //     OnCaptureOutput = CLOSURE(CaptureOutput);
 // and the macro recovers the enclosing class from decltype(*this).
+//
+// Equality is Borland's: two closures are equal when both are null, or both
+// name the same method on the same object. Core relies on it -- TTerminalThread
+// asserts its handlers were restored by comparing them. A bare std::function
+// has no equality at all, so a closure made by CLOSURE() carries its (instance,
+// member pointer) identity alongside the callable. One made from any other
+// callable gets a token its copies share: equal to its copies, and to nothing
+// else.
 //---------------------------------------------------------------------------
 #ifndef LINSCP_VCL_CLOSURE_H
 #define LINSCP_VCL_CLOSURE_H
 
 #include <cstddef>
+#include <cstring>
 #include <functional>
+#include <memory>
 #include <type_traits>
 #include <utility>
+
+namespace linscp {
+
+// What Borland's TMethod holds: the code and the instance.
+struct TMethodIdentity
+{
+  const void * Instance = nullptr;
+  // A member function pointer, as raw bytes. Itanium's ABI -- clang's on both
+  // targets, mingw included -- makes every one two words; checked below.
+  alignas(void *) unsigned char Method[2 * sizeof(void *)] = {};
+
+  friend bool operator==(const TMethodIdentity & A, const TMethodIdentity & B)
+  {
+    return (A.Instance == B.Instance) &&
+           (std::memcmp(A.Method, B.Method, sizeof(A.Method)) == 0);
+  }
+};
+
+// A method bound to an instance: callable, and knows its identity.
+template <typename C, typename PMF>
+class TBoundMethod
+{
+public:
+  static_assert(sizeof(PMF) <= sizeof(TMethodIdentity::Method),
+                "member function pointer larger than two words");
+
+  TBoundMethod(C * Instance, PMF Method) : FInstance(Instance), FMethod(Method) {}
+
+  template <typename... A>
+  decltype(auto) operator()(A &&... Args) const
+  {
+    return (FInstance->*FMethod)(std::forward<A>(Args)...);
+  }
+
+  TMethodIdentity Identity() const
+  {
+    TMethodIdentity Result;
+    Result.Instance = FInstance;
+    std::memcpy(Result.Method, &FMethod, sizeof(FMethod));
+    return Result;
+  }
+
+private:
+  C * FInstance;
+  PMF FMethod;
+};
+
+template <typename T>
+struct IsBoundMethod : std::false_type {};
+template <typename C, typename PMF>
+struct IsBoundMethod<TBoundMethod<C, PMF>> : std::true_type {};
+
+}  // namespace linscp
 
 template <typename Signature>
 class TClosure;
@@ -49,11 +112,34 @@ public:
             typename = std::enable_if_t<
               !std::is_same_v<std::decay_t<F>, TClosure> &&
               std::is_invocable_r_v<R, std::decay_t<F> &, A...>>>
-  TClosure(F && Callable) : FFn(std::forward<F>(Callable)) {}
+  TClosure(F && Callable)
+  {
+    if constexpr (linscp::IsBoundMethod<std::decay_t<F>>::value)
+    {
+      FBound = true;
+      FIdentity = Callable.Identity();
+    }
+    else
+    {
+      // A null function pointer makes an empty closure, as it would in Borland.
+      if constexpr (std::is_pointer_v<std::decay_t<F>>)
+      {
+        if (Callable == nullptr)
+        {
+          return;
+        }
+      }
+      FToken = std::make_shared<char>();
+    }
+    FFn = std::forward<F>(Callable);
+  }
 
   TClosure & operator=(std::nullptr_t)
   {
     FFn = nullptr;
+    FBound = false;
+    FIdentity = linscp::TMethodIdentity();
+    FToken.reset();
     return *this;
   }
 
@@ -77,27 +163,43 @@ public:
   friend bool operator!=(std::nullptr_t, const TClosure & C)
     { return static_cast<bool>(C.FFn); }
 
+  // Borland identity: same object and same method, or both null.
+  friend bool operator==(const TClosure & X, const TClosure & Y)
+  {
+    const bool XNull = !static_cast<bool>(X.FFn);
+    const bool YNull = !static_cast<bool>(Y.FFn);
+    if (XNull || YNull)
+    {
+      return XNull && YNull;
+    }
+    if (X.FBound || Y.FBound)
+    {
+      return X.FBound && Y.FBound && (X.FIdentity == Y.FIdentity);
+    }
+    return X.FToken == Y.FToken;
+  }
+  friend bool operator!=(const TClosure & X, const TClosure & Y)
+    { return !(X == Y); }
+
 private:
   std::function<R(A...)> FFn;
+  bool FBound = false;
+  linscp::TMethodIdentity FIdentity;
+  std::shared_ptr<char> FToken;  // identity of a non-method callable
 };
 
-// Bind an instance to one of its member functions.
+// Bind an instance to one of its member functions. Returns a TBoundMethod, so
+// the closure it initialises knows which method on which object it holds.
 template <typename C, typename R, typename... A>
 auto MakeClosure(C * Instance, R (C::*Method)(A...))
 {
-  return [Instance, Method](A... Args) -> R
-  {
-    return (Instance->*Method)(std::forward<A>(Args)...);
-  };
+  return linscp::TBoundMethod<C, R (C::*)(A...)>(Instance, Method);
 }
 
 template <typename C, typename R, typename... A>
 auto MakeClosure(const C * Instance, R (C::*Method)(A...) const)
 {
-  return [Instance, Method](A... Args) -> R
-  {
-    return (Instance->*Method)(std::forward<A>(Args)...);
-  };
+  return linscp::TBoundMethod<const C, R (C::*)(A...) const>(Instance, Method);
 }
 
 // The classic VCL event signature, used across core and declared by the VCL

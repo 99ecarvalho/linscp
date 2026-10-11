@@ -150,6 +150,92 @@ void TestLambdaAndOtherObject()
   CHECK(Other.Got == 10);                // Other() doubles its argument
 }
 
+// --- Borland closure equality ----------------------------------------------
+
+// The shape of TTerminalThread: it swaps a terminal's handlers for its own,
+// and its destructor asserts they are still its own before restoring them.
+struct TTerminalLike
+{
+  TNotifyEvent OnInformation;
+};
+
+struct TThreadLike
+{
+  TTerminalLike * Terminal;
+  TNotifyEvent Saved;
+  void TerminalInformation(int) {}
+  void Other(int) {}
+
+  explicit TThreadLike(TTerminalLike * T) : Terminal(T)
+  {
+    Saved = Terminal->OnInformation;
+    Terminal->OnInformation = CLOSURE(TerminalInformation);
+  }
+  bool StillOurs() { return Terminal->OnInformation == CLOSURE(TerminalInformation); }
+  bool OtherIsOurs() { return Terminal->OnInformation == CLOSURE(Other); }
+};
+
+void TestEqualityIsIdentity()
+{
+  TOwner A, B;
+  TNotifyEvent X, Y;
+  A.WireUp(X);
+  A.WireUp(Y);
+  CHECK(X == Y);            // two separate CLOSURE()s, same method, same object
+  CHECK(!(X != Y));
+
+  TNotifyEvent Z;
+  B.WireUp(Z);
+  CHECK(X != Z);            // same method, different object
+
+  TNotifyEvent W = MakeClosure(&A, &TOwner::Other);
+  CHECK(X != W);            // same object, different method
+
+  TNotifyEvent Copy = X;
+  CHECK(Copy == X);         // copies keep the identity
+
+  // Null compares equal only to null.
+  TNotifyEvent N1, N2;
+  CHECK(N1 == N2);
+  CHECK(X != N1);
+  CHECK(N1 != X);
+  X = NULL;
+  CHECK(X == N1);
+}
+
+void TestNonMethodClosures()
+{
+  // No method identity, so: equal to its own copies, and to nothing else.
+  TNotifyEvent L1 = [](int) {};
+  TNotifyEvent L1Copy = L1;
+  TNotifyEvent L2 = [](int) {};
+  CHECK(L1 == L1Copy);
+  CHECK(L1 != L2);
+
+  TNotifyEvent F = FreeHandler;
+  TNotifyEvent FCopy = F;
+  CHECK(F == FCopy);
+  CHECK(F != L1);
+
+  TOwner O;
+  TNotifyEvent M;
+  O.WireUp(M);
+  CHECK(M != L1);           // a method never equals a non-method
+}
+
+void TestTerminalThreadIdiom()
+{
+  TTerminalLike Terminal;
+  TThreadLike Thread(&Terminal);
+  CHECK(Thread.StillOurs());
+  CHECK(!Thread.OtherIsOurs());
+
+  // Another thread object on the same terminal takes over the handler.
+  TThreadLike Second(&Terminal);
+  CHECK(!Thread.StillOurs());
+  CHECK(Second.StillOurs());
+}
+
 }  // namespace
 
 int main()
@@ -160,6 +246,9 @@ int main()
   TestNonVoidReturnAndReferenceArgs();
   TestCopyAndReassign();
   TestLambdaAndOtherObject();
+  TestEqualityIsIdentity();
+  TestNonMethodClosures();
+  TestTerminalThreadIdiom();
 
   if (Failures == 0)
   {
