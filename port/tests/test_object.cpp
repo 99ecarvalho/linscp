@@ -224,6 +224,18 @@ void TestClassName()
   CHECK(I.QualifiedClassName() == UnicodeString(L"Outer.TInner"));
 }
 
+void TestHeapAndExternalHierarchy()
+{
+  // Exceptions.cpp classifies by dynamic_cast to these bases.
+  EOutOfMemory Oom(UnicodeString(L"oom"));
+  CHECK(dynamic_cast<EHeapException *>(static_cast<Exception *>(&Oom)) != nullptr);
+  EInvalidPointer Ptr(UnicodeString(L"ptr"));
+  CHECK(dynamic_cast<EHeapException *>(static_cast<Exception *>(&Ptr)) != nullptr);
+  EAccessViolation Av(UnicodeString(L"av"));
+  CHECK(dynamic_cast<EExternal *>(static_cast<Exception *>(&Av)) != nullptr);
+  CHECK(dynamic_cast<EHeapException *>(static_cast<Exception *>(&Av)) == nullptr);
+}
+
 }  // namespace
 
 int main()
@@ -239,6 +251,8 @@ int main()
 
   TestMetaclasses();
   TestClassName();
+
+  TestHeapAndExternalHierarchy();
 
   if (Failures == 0)
   {

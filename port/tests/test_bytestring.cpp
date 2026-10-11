@@ -197,6 +197,32 @@ void TestWritableCStrAndCharAssignment()
   CHECK(Raw == RawByteString("abc"));
 }
 
+RawByteString TakesRaw(const RawByteString & R) { return R; }
+
+void TestCrossCodePageConversions()
+{
+  // SftpFileSystem's AddString(UTF8String) reaching AddString(RawByteString):
+  // the bytes pass through.
+  const UTF8String Utf8("caf\xC3\xA9", 5);
+  CHECK(TakesRaw(Utf8).Bytes() == std::string("caf\xC3\xA9"));
+  // Its L"..." extension names arrive as RawByteString directly.
+  CHECK(TakesRaw(L"check-file-name").Bytes() == std::string("check-file-name"));
+  // Between two real code pages the text is transcoded, not the bytes copied.
+  const AnsiString Ansi = Utf8;
+  CHECK(Ansi.Bytes() == std::string("caf\xE9"));
+  const UTF8String Back = Ansi;
+  CHECK(Back.Bytes() == std::string("caf\xC3\xA9"));
+  // Out of RawByteString: passed through (no run-time code page to honour).
+  const RawByteString Raw("\xC3\xA9", 2);
+  const UTF8String FromRaw = Raw;
+  CHECK(FromRaw.Bytes() == std::string("\xC3\xA9"));
+
+  // Common.cpp's Shred ends with `Str = L""` for every byte-string type.
+  RawByteString R2("x", 1);
+  R2 = L"";
+  CHECK(R2.IsEmpty());
+}
+
 }  // namespace
 
 int main()
@@ -211,6 +237,8 @@ int main()
   TestImplicitToUnicode();
 
   TestWritableCStrAndCharAssignment();
+
+  TestCrossCodePageConversions();
 
   if (Failures == 0)
   {

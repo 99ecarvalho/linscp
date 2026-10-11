@@ -169,7 +169,9 @@ protected:
   }
 
 LINSCP_DERIVED_EXCEPTION(EAbort, Exception);
-LINSCP_DERIVED_EXCEPTION(EOutOfMemory, Exception);
+// Delphi: EOutOfMemory is an EHeapException, which core tests for by type.
+LINSCP_DERIVED_EXCEPTION(EHeapException, Exception);
+LINSCP_DERIVED_EXCEPTION(EOutOfMemory, EHeapException);
 LINSCP_DERIVED_EXCEPTION(EInOutError, Exception);
 
 LINSCP_DERIVED_EXCEPTION(EExternal, Exception);
@@ -194,7 +196,12 @@ LINSCP_DERIVED_EXCEPTION(EEncodingError, Exception);
 LINSCP_DERIVED_EXCEPTION(EDirectoryNotFoundException, Exception);
 LINSCP_DERIVED_EXCEPTION(EOSError, Exception);
 LINSCP_DERIVED_EXCEPTION(EInvalidOperation, Exception);
+// Delphi's hardware and heap exceptions. Core only tests for them by type when
+// describing an exception; nothing here raises them.
+LINSCP_DERIVED_EXCEPTION(EAccessViolation, EExternal);
+LINSCP_DERIVED_EXCEPTION(EInvalidPointer, EHeapException);
 LINSCP_DERIVED_EXCEPTION(EVariantBoundsError, EVariantError);
+LINSCP_DERIVED_EXCEPTION(EVariantTypeCastError, EVariantError);
 LINSCP_DERIVED_EXCEPTION(EFileNotFoundException, Exception);
 
 #endif // LINSCP_VCL_OBJECT_H

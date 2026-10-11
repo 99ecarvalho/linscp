@@ -45,6 +45,8 @@
   #undef CreateFile
   #undef GetVersionEx
   #undef OutputDebugString
+  // GDI's, reached through the shell headers; collides with TStrings::GetObject.
+  #undef GetObject
 
   // mingw's _mingw.h defines __int64 as `long long`; clang's keyword is the
   // same type, and unlike the macro allows __int64(x). _mingw.h is guarded,

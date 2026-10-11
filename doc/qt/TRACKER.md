@@ -20,26 +20,18 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 Driven by `compile_census.py` rather than by grep counts — the compiler names
 what is actually blocking each unit, in dependency order.
 
-The census now covers **every core unit upstream builds** -- all 33 `.cpp`
-files in `ScpCore.cbproj`, read from the project itself -- in upstream's own
-preprocessor configuration. Census: **142 errors on mingw (16/33 clean, none
-aborting), 669 on Linux (10/33 clean, 4 aborting).**
+The census covers **every core unit upstream builds** -- all 33 `.cpp` files
+in `ScpCore.cbproj`, read from the project itself -- in upstream's own
+preprocessor configuration. Census: **17 errors on mingw (24/33 clean, none
+aborting), 571 on Linux (13/33 clean, 4 aborting).**
 
-The ten units tracked until now were a sample, and all ten compile for Windows.
-The whole-core figure is the honest one. It rose rather than fell when the
-sample widened, because three units that used to abort on a missing header --
-counted as a floor, not a total -- now parse to the end.
-
-Remaining on mingw, largest first: `S3FileSystem` 28, `ScpFileSystem` 26,
-`Security` 18, `SessionData` 18, `SftpFileSystem` 17, `RemoteFiles` 16,
-`Exceptions` 9, `HierarchicalStorage` 9, then eight units with 1-4 each.
-
-1. The mingw remainder, unit by unit: 167 errors across 17 units, the last
-   VCL-shim work before the core library links for Windows (P1-17).
+1. The last 17 mingw errors, across nine units. After them the core library
+   compiles for Windows and P1-17 (first link) can start.
 2. **P1-09**: PuTTY's Unix platform layer -- a second pinned upstream plus a
    patch series carrying WinSCP's platform changes to `unix/`. WinSCP's PuTTY
    is 0.83 with 121 of 224 files modified (+5,276 / -1,962 lines).
-3. The Win32 file and module calls core makes directly, in `port/platform`.
+3. The Win32 file, module and shell calls core makes directly, in
+   `port/platform`.
 
 ## Decisions taken
 
@@ -76,6 +68,9 @@ Remaining on mingw, largest first: `S3FileSystem` 28, `ScpFileSystem` 26,
 | 2026-10-11 | The census measures every core unit in `ScpCore.cbproj`, read from the project, in parallel | Ten units were a sample. Reading the list from upstream means a unit it adds fails the ratchet until baselined, rather than going unmeasured. 66 compiles take about 5 s |
 | 2026-10-11 | Case-mismatched upstream includes get checked-in forwarding headers in `port/casefold` | They resolve only on case-insensitive file systems, so a Linux host fails even when cross-compiling for Windows. Explicit, not generated: a basename match would have mapped `putty/windows/gss.c`'s `security.h` -- the Windows SDK header -- onto core's `Security.h`. `check_include_case.py` applies a same-directory rule and fails on drift either way |
 | 2026-10-11 | `ARRAYOFCONST` expands to C++Builder's two arguments, a `TVarRec` pointer and the high index | Core's own functions take open arrays that way (`ExecCommand`, `ExtException`), so a single container argument cannot reach them. The count comes from `sizeof` over an unevaluated call, so each value is evaluated once -- C++Builder's macro evaluates them twice |
+| 2026-10-11 | The XML DOM follows Delphi's model: text and comment nodes as children, Null attribute variants, raising loaders | FileZilla keeps a site's name as a text node among element children, found by `NodeType`; core tests absent attributes with `IsNull()`; and `ImportFromFilezilla` has no handler around `LoadFromFile`, so a malformed file must raise rather than import nothing. The earlier `bool` loaders were a divergence justified by a wrong reading of core |
+| 2026-10-11 | `TCustomIniFile`'s virtuals take parameters by value, and its abstract set is Delphi's eight | C++Builder declares Delphi virtuals that way and core's `TOptionsIniFile` overrides with exactly those signatures; by-reference parameters made its methods new functions and left the class abstract |
+| 2026-10-11 | `TStrings::Text` uses CRLF on both platforms | Delphi's POSIX RTL uses LF. Core builds configuration and server-facing text through `Text`, and identical output everywhere matters more |
 | 2026-10-10 | A PR-able branch against `winscp/winscp` will be **generated**, not hand-maintained | linscp shares no history with upstream, so its `qt` branch is not directly mergeable. Since the port is mechanical, the fork branch can be produced on demand (Q-7). Rehearsed end to end — see facts below |
 | 2026-10-10 | Transform must be byte-exact outside property lines | A full-file rewrite (CRLF loss) turned a 613-line change into 76,551. Now asserted by `verify_transform.py` |
 | 2026-10-10 | Field/accessor classification is convention-first, parens only as fallback | The parens heuristic false-positives on constructor initialiser lists; WinSCP's `F<Upper>` / `Get*`/`Set*` convention is airtight. Truly unclassifiable names now fail the run instead of producing a wrong-arity macro |
@@ -197,6 +192,10 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | `ExtractShortPathName` on POSIX | The name unchanged | No 8.3 names exist |
 | `ExceptAddr` / `ExceptionErrorMessage` | No addresses are recorded: `ExceptAddr` is null and the module is the executable | The class name and message, the useful part, are exact |
 | `FormatFloat` | Digits, grouping, decimals, literals and sections only; scientific notation raises `EConvertError` | Core's one use is `"#,##0"` |
+| Element `Text` with mixed content | Concatenates the element's text children | Delphi raises when an element holds more than a single text node. Leaf elements, which is what core reads, agree |
+| `RawByteString` to another code page | Bytes pass through | C++Builder's `RawByteString` carries a run-time code page and would transcode out of it; this one has none |
+| `ISO8601ToDate` without a zone designator | Taken as UTC | Delphi's handling of a zoneless time is not established here; every value core parses (S3) carries `Z` |
+| `TStrings::Text` on POSIX | CRLF, not LF | See the decisions table |
 | `SuspendThread` on POSIX | Not declared | A running pthread cannot be suspended. A missing declaration fails at compile time; a stub would fail silently. `CREATE_SUSPENDED` + `ResumeThread` is supported |
 
 ## Open questions

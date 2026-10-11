@@ -19,6 +19,11 @@
 
 // Delphi constants core references directly.
 extern const UnicodeString sLineBreak;
+// Delphi resourcestrings, as C++Builder spells them. Core formats with the
+// first and shows the second on a button.
+#define System_Sysconst_SOSError (UnicodeString(L"System Error.  Code: %d.") + sLineBreak + UnicodeString(L"%s%s"))
+#define Vcl_Consts_SMsgDlgCancel (UnicodeString(L"Cancel"))
+
 // Winapi.Windows' module-name constant.
 inline constexpr wchar_t kernel32[] = L"kernel32.dll";
 constexpr bool True = true;
@@ -53,6 +58,7 @@ __int64 StrToInt64(const UnicodeString & S);
 __int64 StrToInt64Def(const UnicodeString & S, __int64 Default);
 bool TryStrToInt64(const UnicodeString & S, __int64 & Value);
 UnicodeString FloatToStr(double Value);
+bool TryStrToFloat(const UnicodeString & S, double & Value);
 double StrToFloatDef(const UnicodeString & S, double Default);
 
 // --- comparison ------------------------------------------------------------
@@ -90,6 +96,35 @@ UnicodeString AnsiReplaceStr(const UnicodeString & AText, const UnicodeString & 
                              const UnicodeString & AToText);
 // Delphi's: S[Index] is one of Delimiters; false for an index outside S.
 bool IsDelimiter(const UnicodeString & Delimiters, const UnicodeString & S, int Index);
+// The index of the first character of S, from StartIdx, that is one of
+// Delimiters; 0 when there is none.
+int FindDelimiter(const UnicodeString & Delimiters, const UnicodeString & S, int StartIdx = 1);
+// Case-insensitive, as Delphi's -- ASCII folding, as everywhere in the shim.
+int AnsiCompareText(const UnicodeString & S1, const UnicodeString & S2);
+int StrLIComp(const wchar_t * Str1, const wchar_t * Str2, unsigned MaxLen);
+// Raises EConvertError, as Delphi's does.
+double StrToFloat(const UnicodeString & S);
+
+// --- System.Math --------------------------------------------------------------
+// Delphi's overload set, one per numeric type.
+inline int Min(int A, int B) { return (A < B) ? A : B; }
+inline unsigned Min(unsigned A, unsigned B) { return (A < B) ? A : B; }
+inline __int64 Min(__int64 A, __int64 B) { return (A < B) ? A : B; }
+inline unsigned __int64 Min(unsigned __int64 A, unsigned __int64 B) { return (A < B) ? A : B; }
+inline double Min(double A, double B) { return (A < B) ? A : B; }
+inline int Max(int A, int B) { return (A > B) ? A : B; }
+inline unsigned Max(unsigned A, unsigned B) { return (A > B) ? A : B; }
+inline __int64 Max(__int64 A, __int64 B) { return (A > B) ? A : B; }
+inline unsigned __int64 Max(unsigned __int64 A, unsigned __int64 B) { return (A > B) ? A : B; }
+inline double Max(double A, double B) { return (A > B) ? A : B; }
+// -1, 0 or 1.
+inline int CompareValue(int A, int B) { return (A < B) ? -1 : (A > B) ? 1 : 0; }
+inline int CompareValue(__int64 A, __int64 B) { return (A < B) ? -1 : (A > B) ? 1 : 0; }
+inline int CompareValue(double A, double B) { return (A < B) ? -1 : (A > B) ? 1 : 0; }
+
+// Borland <stdlib.h>'s random(num): 0 .. num-1, over rand(). Not Delphi's
+// Random; core's Security.cpp calls this one.
+int random(int num);
 // StrUtils' open-array lookups: the index of AText among AValues[0..High],
 // or -1. IndexStr is case-sensitive, IndexText not.
 int IndexStr(const UnicodeString & AText, const UnicodeString * AValues, int AValues_High);

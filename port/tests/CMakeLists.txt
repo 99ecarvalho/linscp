@@ -82,6 +82,10 @@ add_executable(test_thread test_thread.cpp)
 target_link_libraries(test_thread PRIVATE linscp-shim)
 add_test(NAME thread COMMAND test_thread)
 
+add_executable(test_json test_json.cpp)
+target_link_libraries(test_json PRIVATE linscp-shim)
+add_test(NAME json COMMAND test_json)
+
 # Executable tests go above this line.
 # When cross-compiling, the toolchain points CMAKE_CROSSCOMPILING_EMULATOR at
 # wine; these tell wine where the mingw runtime DLLs live and keep its output

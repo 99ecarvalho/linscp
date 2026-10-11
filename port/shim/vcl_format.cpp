@@ -371,3 +371,8 @@ UnicodeString FmtLoadStr(int Ident, const TVarRec * Args, int Args_High)
 {
   return Format(LoadStr(static_cast<NativeUInt>(Ident)), Args, Args_High);
 }
+
+UnicodeString FormatOpenArray(const UnicodeString & Fmt, const TVarRec * Args, int Args_High)
+{
+  return Format(Fmt, Args, Args_High);
+}

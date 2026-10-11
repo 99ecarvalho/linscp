@@ -299,3 +299,46 @@ UnicodeString ToUnicodeString(const RawByteString & S)
 {
   return linscp::RawToUtf16(S.c_str(), static_cast<std::size_t>(S.Length()));
 }
+
+TEncodeType DetectUTF8Encoding(const RawByteString & S)
+{
+  const std::string & B = S.Bytes();
+  bool Ascii = true;
+  std::size_t I = 0;
+  while (I < B.size())
+  {
+    const unsigned char C = static_cast<unsigned char>(B[I]);
+    if (C < 0x80)
+    {
+      ++I;
+      continue;
+    }
+    Ascii = false;
+    // A well-formed multi-byte sequence: lead byte, then continuations.
+    const int Need = (C >= 0xF0 && C <= 0xF4) ? 3 : (C >= 0xE0) ? 2 : (C >= 0xC2 && C <= 0xDF) ? 1 : -1;
+    // The continuation bytes must all be present: indices I+1 .. I+Need.
+    if ((Need < 0) || (I + static_cast<std::size_t>(Need) >= B.size()))
+    {
+      return etANSI;
+    }
+    for (int K = 1; K <= Need; ++K)
+    {
+      if ((static_cast<unsigned char>(B[I + K]) & 0xC0) != 0x80)
+      {
+        return etANSI;
+      }
+    }
+    I += static_cast<std::size_t>(Need) + 1;
+  }
+  return Ascii ? etUSASCII : etUTF8;
+}
+
+UnicodeString UTF8ArrayToString(const char * A, int A_High)
+{
+  int Len = 0;
+  while ((Len <= A_High) && (A[Len] != '\0'))
+  {
+    ++Len;
+  }
+  return linscp::Utf8ToUtf16(A, static_cast<std::size_t>(Len));
+}

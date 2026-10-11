@@ -9,7 +9,7 @@
 
 namespace {
 
-bool SameName(const UnicodeString & A, const UnicodeString & B)
+bool SameName(const UnicodeString A, const UnicodeString B)
 {
   return A.CompareIC(B) == 0;
 }
@@ -18,52 +18,66 @@ bool SameName(const UnicodeString & A, const UnicodeString & B)
 
 // --- TCustomIniFile typed accessors ----------------------------------------
 
-int TCustomIniFile::ReadInteger(const UnicodeString & Section,
-                                const UnicodeString & Ident, int Default)
+bool TCustomIniFile::SectionExists(const UnicodeString Section)
+{
+  TStringList Keys;
+  ReadSection(Section, &Keys);
+  return Keys.Count > 0;
+}
+
+bool TCustomIniFile::ValueExists(const UnicodeString Section, const UnicodeString Ident)
+{
+  TStringList Keys;
+  ReadSection(Section, &Keys);
+  return Keys.IndexOf(Ident) >= 0;
+}
+
+int TCustomIniFile::ReadInteger(const UnicodeString Section,
+                                const UnicodeString Ident, int Default)
 {
   return StrToIntDef(ReadString(Section, Ident, UnicodeString()), Default);
 }
 
-void TCustomIniFile::WriteInteger(const UnicodeString & Section,
-                                  const UnicodeString & Ident, int Value)
+void TCustomIniFile::WriteInteger(const UnicodeString Section,
+                                  const UnicodeString Ident, int Value)
 {
   WriteString(Section, Ident, IntToStr(Value));
 }
 
-__int64 TCustomIniFile::ReadInt64(const UnicodeString & Section,
-                                  const UnicodeString & Ident, __int64 Default)
+__int64 TCustomIniFile::ReadInt64(const UnicodeString Section,
+                                  const UnicodeString Ident, __int64 Default)
 {
   return StrToInt64Def(ReadString(Section, Ident, UnicodeString()), Default);
 }
 
-void TCustomIniFile::WriteInt64(const UnicodeString & Section,
-                                const UnicodeString & Ident, __int64 Value)
+void TCustomIniFile::WriteInt64(const UnicodeString Section,
+                                const UnicodeString Ident, __int64 Value)
 {
   WriteString(Section, Ident, IntToStr(Value));
 }
 
-bool TCustomIniFile::ReadBool(const UnicodeString & Section,
-                              const UnicodeString & Ident, bool Default)
+bool TCustomIniFile::ReadBool(const UnicodeString Section,
+                              const UnicodeString Ident, bool Default)
 {
   // Delphi stores booleans as "0" and "1" and reads anything non-zero as true.
   return ReadInteger(Section, Ident, Default ? 1 : 0) != 0;
 }
 
-void TCustomIniFile::WriteBool(const UnicodeString & Section,
-                               const UnicodeString & Ident, bool Value)
+void TCustomIniFile::WriteBool(const UnicodeString Section,
+                               const UnicodeString Ident, bool Value)
 {
   WriteInteger(Section, Ident, Value ? 1 : 0);
 }
 
 // --- TMemIniFile -----------------------------------------------------------
 
-TMemIniFile::TMemIniFile(const UnicodeString & AFileName)
+TMemIniFile::TMemIniFile(const UnicodeString AFileName)
   : TCustomIniFile(AFileName)
 {
   LoadFromFile();
 }
 
-TMemIniFile::TSection * TMemIniFile::FindSection(const UnicodeString & Name)
+TMemIniFile::TSection * TMemIniFile::FindSection(const UnicodeString Name)
 {
   for (TSection & S : FSections)
   {
@@ -75,7 +89,7 @@ TMemIniFile::TSection * TMemIniFile::FindSection(const UnicodeString & Name)
   return nullptr;
 }
 
-TMemIniFile::TSection & TMemIniFile::EnsureSection(const UnicodeString & Name)
+TMemIniFile::TSection & TMemIniFile::EnsureSection(const UnicodeString Name)
 {
   if (TSection * S = FindSection(Name))
   {
@@ -86,7 +100,7 @@ TMemIniFile::TSection & TMemIniFile::EnsureSection(const UnicodeString & Name)
 }
 
 TMemIniFile::TPair * TMemIniFile::FindValue(TSection & Section,
-                                            const UnicodeString & Ident)
+                                            const UnicodeString Ident)
 {
   for (TPair & P : Section.Values)
   {
@@ -171,9 +185,9 @@ void TMemIniFile::LoadFromFile()
   }
 }
 
-UnicodeString TMemIniFile::ReadString(const UnicodeString & Section,
-                                      const UnicodeString & Ident,
-                                      const UnicodeString & Default)
+UnicodeString TMemIniFile::ReadString(const UnicodeString Section,
+                                      const UnicodeString Ident,
+                                      const UnicodeString Default)
 {
   TSection * S = FindSection(Section);
   if (S == nullptr)
@@ -184,9 +198,9 @@ UnicodeString TMemIniFile::ReadString(const UnicodeString & Section,
   return P == nullptr ? Default : P->second;
 }
 
-void TMemIniFile::WriteString(const UnicodeString & Section,
-                              const UnicodeString & Ident,
-                              const UnicodeString & Value)
+void TMemIniFile::WriteString(const UnicodeString Section,
+                              const UnicodeString Ident,
+                              const UnicodeString Value)
 {
   TSection & S = EnsureSection(Section);
   if (TPair * P = FindValue(S, Ident))
@@ -199,7 +213,7 @@ void TMemIniFile::WriteString(const UnicodeString & Section,
   }
 }
 
-void TMemIniFile::ReadSection(const UnicodeString & Section, TStrings * Strings)
+void TMemIniFile::ReadSection(const UnicodeString Section, TStrings * Strings)
 {
   if (Strings == nullptr)
   {
@@ -228,7 +242,7 @@ void TMemIniFile::ReadSections(TStrings * Strings)
   }
 }
 
-void TMemIniFile::ReadSectionValues(const UnicodeString & Section,
+void TMemIniFile::ReadSectionValues(const UnicodeString Section,
                                     TStrings * Strings)
 {
   if (Strings == nullptr)
@@ -247,7 +261,7 @@ void TMemIniFile::ReadSectionValues(const UnicodeString & Section,
   }
 }
 
-void TMemIniFile::EraseSection(const UnicodeString & Section)
+void TMemIniFile::EraseSection(const UnicodeString Section)
 {
   FSections.erase(
     std::remove_if(FSections.begin(), FSections.end(),
@@ -256,8 +270,8 @@ void TMemIniFile::EraseSection(const UnicodeString & Section)
     FSections.end());
 }
 
-void TMemIniFile::DeleteKey(const UnicodeString & Section,
-                            const UnicodeString & Ident)
+void TMemIniFile::DeleteKey(const UnicodeString Section,
+                            const UnicodeString Ident)
 {
   if (TSection * S = FindSection(Section))
   {
@@ -269,13 +283,13 @@ void TMemIniFile::DeleteKey(const UnicodeString & Section,
   }
 }
 
-bool TMemIniFile::SectionExists(const UnicodeString & Section)
+bool TMemIniFile::SectionExists(const UnicodeString Section)
 {
   return FindSection(Section) != nullptr;
 }
 
-bool TMemIniFile::ValueExists(const UnicodeString & Section,
-                              const UnicodeString & Ident)
+bool TMemIniFile::ValueExists(const UnicodeString Section,
+                              const UnicodeString Ident)
 {
   TSection * S = FindSection(Section);
   return S != nullptr && FindValue(*S, Ident) != nullptr;
@@ -359,7 +373,7 @@ void TMemIniFile::UpdateFile()
   }
 }
 
-void TMemIniFile::Rename(const UnicodeString & AFileName, bool Reload)
+void TMemIniFile::Rename(const UnicodeString AFileName, bool Reload)
 {
   FFileName = AFileName;
   if (Reload)

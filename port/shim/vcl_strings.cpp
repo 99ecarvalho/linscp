@@ -1,4 +1,6 @@
 #include "vcl_strings.h"
+#include "vcl_streams.h"
+#include "vcl_misc.h"
 
 #include <algorithm>
 #include <fstream>
@@ -7,6 +9,9 @@
 
 namespace {
 
+// CRLF on both platforms, unlike Delphi's POSIX RTL, whose sLineBreak is LF.
+// Core builds configuration and server-facing text through TStrings::Text, and
+// identical output everywhere matters more than matching Delphi-for-Linux.
 const wchar_t * const LineBreak = L"\r\n";
 
 bool NeedsQuoting(const UnicodeString & S, wchar_t Delimiter, wchar_t QuoteChar)
@@ -233,58 +238,72 @@ UnicodeString TStrings::GetDelimitedText() const
 
 void TStrings::SetDelimitedText(UnicodeString Value)
 {
+  // Delphi's loop, transcribed: in the default mode any character up to ' '
+  // also ends an item and is skipped between items; StrictDelimiter limits
+  // both to Delimiter alone.
   Clear();
   const int N = Value.Length();
-  int I = 1;
-  while (I <= N)
+  auto At = [&](int I) -> wchar_t { return (I <= N) ? Value[I] : L'\0'; };
+  auto IsSpace = [&](wchar_t C) { return (C != L'\0') && (C <= L' '); };
+  int P = 1;
+  if (!FStrictDelimiter)
   {
-    // Delphi skips whitespace before an item.
-    while (I <= N && Value[I] == L' ')
-    {
-      ++I;
-    }
+    while (IsSpace(At(P))) { ++P; }
+  }
+  while (At(P) != L'\0')
+  {
     UnicodeString Item;
-    if (I <= N && Value[I] == FQuoteChar)
+    if (At(P) == FQuoteChar)
     {
-      ++I;
-      while (I <= N)
+      ++P;
+      while (At(P) != L'\0')
       {
-        if (Value[I] == FQuoteChar)
+        if (At(P) == FQuoteChar)
         {
-          if (I < N && Value[I + 1] == FQuoteChar)
+          if (At(P + 1) == FQuoteChar)
           {
             Item += FQuoteChar;     // a doubled quote is one literal quote
-            I += 2;
+            P += 2;
             continue;
           }
-          ++I;
+          ++P;
           break;
         }
-        Item += Value[I];
-        ++I;
+        Item += At(P);
+        ++P;
       }
     }
     else
     {
-      while (I <= N && Value[I] != FDelimiter)
+      while ((At(P) != L'\0') && (At(P) != FDelimiter) &&
+             (FStrictDelimiter || !IsSpace(At(P))))
       {
-        Item += Value[I];
-        ++I;
+        Item += At(P);
+        ++P;
       }
     }
     Add(Item);
-    while (I <= N && Value[I] != FDelimiter)
+    if (!FStrictDelimiter)
     {
-      ++I;
+      while (IsSpace(At(P))) { ++P; }
     }
-    if (I <= N && Value[I] == FDelimiter)
+    if (At(P) == FDelimiter)
     {
-      ++I;
-      if (I > N)
+      if (At(P + 1) == L'\0')
       {
         Add(UnicodeString());       // a trailing delimiter means a final empty item
       }
+      do { ++P; } while (!FStrictDelimiter && IsSpace(At(P)));
     }
+  }
+}
+
+void TStrings::SaveToStream(TStream * Stream) const
+{
+  const TBytes Bytes = TEncoding::Default->GetBytes(GetText());
+  if (Bytes.Length > 0)
+  {
+    Stream->WriteBuffer(&Bytes[0], Bytes.Length);
   }
 }
 

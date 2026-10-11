@@ -1,11 +1,13 @@
 //---------------------------------------------------------------------------
 // System.Variant, as far as core uses it.
 //
-// One use, in SftpFileSystem: packet numbers kept in a one-dimensional variant
-// array of varLongWord, through VarArrayCreate, GetElement, PutElement,
-// ArrayHighBound and ArrayRedim. That is what is provided. Anything wider --
-// a second dimension, a non-integer element type -- raises rather than
-// half-working, so a new use in upstream shows up as an error.
+// Two uses. SftpFileSystem keeps packet numbers in a one-dimensional variant
+// array of varLongWord (VarArrayCreate, GetElement, PutElement, ArrayHighBound,
+// ArrayRedim). SessionData reads XML attributes as OleVariant, which is Null
+// when the attribute is absent and a string otherwise. That is what is
+// provided: integers, strings, Null, and integer arrays. Anything wider -- a
+// second dimension, another element type -- raises rather than half-working,
+// so a new use in upstream shows up as an error.
 //---------------------------------------------------------------------------
 #ifndef LINSCP_VCL_VARIANT_H
 #define LINSCP_VCL_VARIANT_H
@@ -14,9 +16,12 @@
 
 #include "vcl_object.h"
 #include "vcl_types.h"
+#include "vcl_unicodestring.h"
 
 using TVarType = Word;
 constexpr TVarType varEmpty    = 0x0000;
+constexpr TVarType varNull     = 0x0001;
+constexpr TVarType varUString  = 0x0102;
 constexpr TVarType varInteger  = 0x0003;
 constexpr TVarType varLongWord = 0x0013;
 constexpr TVarType varInt64    = 0x0014;
@@ -29,13 +34,31 @@ public:
   Variant(int Value) : FType(varInteger), FValue(Value) {}
   Variant(unsigned int Value) : FType(varLongWord), FValue(Value) {}
   Variant(__int64 Value) : FType(varInt64), FValue(Value) {}
+  Variant(const UnicodeString & Value) : FType(varUString), FString(Value) {}
+  Variant(const wchar_t * Value) : FType(varUString), FString(Value) {}
+
+  // Delphi's Null(): distinct from Empty, and what an absent XML attribute is.
+  static Variant MakeNull() { Variant V; V.FType = varNull; return V; }
 
   TVarType VarType() const { return FType; }
   bool IsArray() const { return (FType & varArray) != 0; }
+  bool IsNull() const { return FType == varNull; }
+  bool IsEmpty() const { return FType == varEmpty; }
 
   operator int() const;
   operator unsigned int() const;
   operator __int64() const;
+  // Null raises EVariantTypeCastError, as with Delphi's default
+  // NullStrictConvert; Empty gives an empty string; integers their digits.
+  operator UnicodeString() const;
+
+  // String comparison, as Delphi compares a string variant with a string.
+  // Null equals nothing, Delphi's default ncrLoose rule.
+  friend bool operator==(const Variant & V, const UnicodeString & S)
+    { return !V.IsNull() && (static_cast<UnicodeString>(V) == S); }
+  friend bool operator==(const UnicodeString & S, const Variant & V) { return V == S; }
+  friend bool operator!=(const Variant & V, const UnicodeString & S) { return !(V == S); }
+  friend bool operator!=(const UnicodeString & S, const Variant & V) { return !(V == S); }
 
   // Variant arrays. Copies are deep, as Delphi's VarCopy of an array is.
   Variant GetElement(int Index) const;
@@ -54,9 +77,13 @@ private:
 
   TVarType FType = varEmpty;
   __int64 FValue = 0;
+  UnicodeString FString;
   int FLow = 0;
   std::vector<__int64> FElements;
 };
+
+using OleVariant = Variant;
+inline Variant Null() { return Variant::MakeNull(); }
 
 // Bounds holds low/high pairs, one per dimension; Bounds_High is the index of
 // the last entry, as OPENARRAY produces it.

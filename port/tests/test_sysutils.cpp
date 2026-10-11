@@ -3,6 +3,7 @@
 // This is the first shim code with two genuinely different implementations
 // (Win32 FindFirstFileW, and dirent + fnmatch on POSIX), so the tests assert
 // behaviour rather than implementation and run on both targets.
+#include <cmath>
 #include "vcl_bytestring.h"
 #include "vcl_streams.h"
 #include "vcl_misc.h"
@@ -359,6 +360,49 @@ void TestSymLinkAndShortPath()
 #endif
 }
 
+bool SameDateTimeMs(const TDateTime & A, const TDateTime & B)
+{
+  return MilliSecondsBetween(A, B) == 0;
+}
+
+void TestIso8601()
+{
+  // S3's Expiration, in UTC.
+  const TDateTime A = ISO8601ToDate(L"2024-03-05T18:00:00Z");
+  CHECK(SameDateTimeMs(A, EncodeDateTime(2024, 3, 5, 18, 0, 0, 0)));
+  CHECK(SameDateTimeMs(ISO8601ToDate(L"2024-03-05T19:30:00+01:30"),
+                       EncodeDateTime(2024, 3, 5, 18, 0, 0, 0)));
+  CHECK(SameDateTimeMs(ISO8601ToDate(L"2024-03-05T13:00:00.125-05:00"),
+                       EncodeDateTime(2024, 3, 5, 18, 0, 0, 125)));
+  CHECK(SameDateTimeMs(ISO8601ToDate(L"2024-03-05"), EncodeDate(2024, 3, 5)));
+  // Local is the same instant, shifted by this machine's offset.
+  const TDateTime Local = ISO8601ToDate(L"2024-03-05T18:00:00Z", false);
+  CHECK(std::fabs(Local.Val() - A.Val()) <= 14.0 / 24.0 + 1e-9);
+  bool Raised = false;
+  try { ISO8601ToDate(L"2024-13-05T00:00:00Z"); }
+  catch (const EConvertError &) { Raised = true; }
+  CHECK(Raised);
+  Raised = false;
+  try { ISO8601ToDate(L"yesterday"); }
+  catch (const EConvertError &) { Raised = true; }
+  CHECK(Raised);
+}
+
+void TestFileAgeAndCmdLine()
+{
+  const UnicodeString File = IncludeTrailingBackslash(TPath::GetTempPath()) + L"linscp_age.txt";
+  {
+    TFileStream S(File, fmCreate);
+  }
+  TDateTime Age;
+  CHECK(FileAge(File, Age));
+  CHECK(std::fabs(Age.Val() - Now().Val()) < 5.0 / (24 * 60));     // local, and fresh
+  DeleteFile(File);
+  CHECK(!FileAge(File, Age));
+  CHECK(CmdLine != nullptr);
+  CHECK(UnicodeString(CmdLine).Pos(UnicodeString(L"test_sysutils")) > 0);
+}
+
 }  // namespace
 
 int main()
@@ -382,6 +426,9 @@ int main()
 
   TestSystemTimeToDateTime();
   TestSymLinkAndShortPath();
+
+  TestIso8601();
+  TestFileAgeAndCmdLine();
 
   if (Failures == 0)
   {

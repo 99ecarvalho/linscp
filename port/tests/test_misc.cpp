@@ -4,6 +4,7 @@
 // that break such matchers are adjacent stars, a trailing star over an empty
 // remainder, and a pattern longer than the name. Core uses this for the file
 // masks users type, so a wrong answer silently transfers the wrong files.
+#include <cmath>
 #include "vcl_format.h"
 #include <initializer_list>
 #include <string>
@@ -392,6 +393,15 @@ void TestFormatFloat()
   CHECK(Raised);
 }
 
+void TestTimeSpanTotals()
+{
+  // FtpFileSystem.cpp's time-difference check.
+  const double Hours = TTimeSpan::FromSeconds(-48 * 3600 - 1800).TotalHours;
+  CHECK(std::fabs(Hours + 48.5) < 1e-9);
+  CHECK(std::fabs(TTimeSpan::FromSeconds(90).TotalMinutes - 1.5) < 1e-9);
+  CHECK(std::fabs(TTimeSpan::FromSeconds(43200).TotalDays - 0.5) < 1e-9);
+}
+
 }  // namespace
 
 void TestStripHotkey()
@@ -428,6 +438,8 @@ int main()
   TestBase64();
   TestExceptObject();
   TestFormatFloat();
+
+  TestTimeSpanTotals();
 
   if (Failures == 0)
   {

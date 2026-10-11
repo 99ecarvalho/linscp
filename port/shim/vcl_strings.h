@@ -21,6 +21,8 @@
 
 enum TDuplicates { dupIgnore, dupAccept, dupError };
 
+class TStream;
+
 class TStrings : public TPersistent
 {
 public:
@@ -65,6 +67,14 @@ public:
 
   PROP_RW_FF(wchar_t, Delimiter, FDelimiter);
   PROP_RW_FF(wchar_t, QuoteChar, FQuoteChar);
+  // Delphi's: when false (the default), whitespace separates items as well as
+  // Delimiter does; when true, only Delimiter does.
+  PROP_RW_FF(bool, StrictDelimiter, FStrictDelimiter);
+
+  // Text in TEncoding::Default, without a byte-order mark -- as Delphi writes
+  // with its Windows default encoding, whose preamble is empty.
+  void SaveToStream(TStream * Stream) const;
+  void Append(const UnicodeString & S) { Add(S); }
   PROP_RW_FF(wchar_t, NameValueSeparator, FNameValueSeparator);
   PROP_RW_FF(bool, CaseSensitive, FCaseSensitive);
 
@@ -93,6 +103,7 @@ protected:
 
   wchar_t FDelimiter = L',';
   wchar_t FQuoteChar = L'"';
+  bool FStrictDelimiter = false;
   wchar_t FNameValueSeparator = L'=';
   bool FCaseSensitive = false;           // Delphi's default
   int FUpdateCount = 0;

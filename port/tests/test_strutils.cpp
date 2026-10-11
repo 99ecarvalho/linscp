@@ -354,6 +354,88 @@ void TestSmallStringHelpers()
   CHECK(UnicodeString::StringOfChar(L'-', 3) == UnicodeString(L"---"));
 }
 
+void TestWideSprintf()
+{
+  UnicodeString Buf;
+  // ScpFileSystem.cpp's SCP time header, exactly.
+  Buf.sprintf(L"T%lu 0 %lu 0", static_cast<unsigned long>(1700000000),
+              static_cast<unsigned long>(1700000001));
+  CHECK(Buf == UnicodeString(L"T1700000000 0 1700000001 0"));
+  // C++Builder's wide conventions: %s wide, %S narrow.
+  Buf.sprintf(L"[%s|%S|%5s|%-4s|%.2s]", L"w\u00E9", "n", L"ab", L"c", L"xyz");
+  CHECK(Buf == UnicodeString(L"[w\u00E9|n|   ab|c   |xy]"));
+  Buf.sprintf(L"%d %5.2f %x %X %lld %c %%", -7, 3.14159, 255, 255, 1234567890123LL, L'Z');
+  CHECK(Buf == UnicodeString(L"-7  3.14 ff FF 1234567890123 Z %"));
+  Buf.cat_sprintf(L"+%03d", 5);
+  CHECK(Buf == UnicodeString(L"-7  3.14 ff FF 1234567890123 Z %+005"));
+  CHECK(UnicodeString(L"42").ToInt() == 42);
+  CHECK(UnicodeString(L"x").ToIntDef(9) == 9);
+  bool Raised = false;
+  try { UnicodeString(L"4x2").ToInt(); }
+  catch (const EConvertError &) { Raised = true; }
+  CHECK(Raised);
+}
+
+void TestNarrowFormatting()
+{
+  UTF8String U;
+  CHECK(U.sprintf("%s-%d", "neon", 3) == 6);
+  CHECK(U == UTF8String("neon-3"));
+  // S3FileSystem.cpp's multipart body, exactly.
+  const RawByteString Part = RawByteString::Format(
+    "  <Part><PartNumber>%d</PartNumber><ETag>%s</ETag></Part>\n",
+    ARRAYOFCONST((7, UnicodeString(L"\"abc\""))));
+  CHECK(Part == RawByteString("  <Part><PartNumber>7</PartNumber><ETag>\"abc\"</ETag></Part>\n"));
+}
+
+void TestUtf8Helpers()
+{
+  CHECK(DetectUTF8Encoding(RawByteString("plain")) == etUSASCII);
+  CHECK(DetectUTF8Encoding(RawByteString("caf\xC3\xA9")) == etUTF8);
+  CHECK(DetectUTF8Encoding(RawByteString("caf\xE9")) == etANSI);          // Latin-1
+  CHECK(DetectUTF8Encoding(RawByteString("x\xC3")) == etANSI);           // truncated
+  const char Bytes[] = "ab\xC3\xA9\0zz";
+  // SecureShell.cpp passes the open array's high index.
+  CHECK(UTF8ArrayToString(Bytes, 3) == UnicodeString(L"ab\u00E9"));
+  CHECK(UTF8ArrayToString(Bytes, 6) == UnicodeString(L"ab\u00E9"));     // stops at NUL
+}
+
+void TestMathAndParsing()
+{
+  CHECK(Min(3, 99) == 3);
+  CHECK(Max(static_cast<__int64>(-1), static_cast<__int64>(5)) == 5);
+  CHECK(Min(1.5, -2.0) == -2.0);
+  CHECK(CompareValue(1, 2) == -1);
+  CHECK(CompareValue(2.0, 2.0) == 0);
+  for (int I = 0; I < 200; ++I)
+  {
+    const int R = random(5);
+    CHECK((R >= 0) && (R < 5));
+  }
+  CHECK(StrToFloat(L"2.5") == 2.5);
+  double D = 0;
+  CHECK(!TryStrToFloat(L"2.5x", D));
+  bool Raised = false;
+  try { StrToFloat(L"abc"); }
+  catch (const EConvertError &) { Raised = true; }
+  CHECK(Raised);
+  CHECK(FindDelimiter(L",;", L"ab;c,d") == 3);
+  CHECK(FindDelimiter(L",;", L"ab;c,d", 4) == 5);
+  CHECK(FindDelimiter(L",;", L"abc") == 0);
+  CHECK(AnsiCompareText(L"ABC", L"abc") == 0);
+  CHECK(StrLIComp(L"SessionName/x", L"sessionname", 11) == 0);
+  CHECK(StrLIComp(L"abc", L"abd", 3) < 0);
+}
+
+void TestResourceStringMacros()
+{
+  // Exceptions.cpp formats with the first.
+  const UnicodeString M = Format(System_Sysconst_SOSError,
+                                 MakeFormatArgs(5, UnicodeString(L"Access is denied"), UnicodeString()));
+  CHECK(M == UnicodeString(L"System Error.  Code: 5.") + sLineBreak + UnicodeString(L"Access is denied"));
+  CHECK(Vcl_Consts_SMsgDlgCancel == UnicodeString(L"Cancel"));
+}
+
 }  // namespace
 
 int main()
@@ -374,6 +456,12 @@ int main()
 
   TestIntToHexWidths();
   TestSmallStringHelpers();
+
+  TestWideSprintf();
+  TestNarrowFormatting();
+  TestUtf8Helpers();
+  TestMathAndParsing();
+  TestResourceStringMacros();
 
   if (Failures == 0)
   {

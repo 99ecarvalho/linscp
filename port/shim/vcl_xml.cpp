@@ -7,7 +7,12 @@
 
 #include "vcl_bytestring.h"
 #include "vcl_streams.h"
+#include "vcl_strutils.h"
 #include "vcl_sysutils.h"
+
+using Xml::Xmlintf::IXMLNode;
+using Xml::Xmlintf::IXMLNodeList;
+using Xml::Xmlintf::TNodeType;
 
 namespace {
 
@@ -16,26 +21,26 @@ namespace {
 // cyclic.
 struct TNode
 {
+  TNodeType Type = Xml::Xmlintf::ntElement;
   UnicodeString Name;
-  UnicodeString Text;
+  UnicodeString Value;          // text, comment and declaration content
   std::map<UnicodeString, UnicodeString> Attributes;
   std::vector<std::shared_ptr<TNode>> Children;
 };
 
-UnicodeString FromUtf8(const char * S, int Len)
+UnicodeString FromUtf8(const char * S, std::size_t Len)
 {
-  if (S == nullptr || Len <= 0)
-  {
-    return UnicodeString();
-  }
-  return linscp::Utf8ToUtf16(S, static_cast<std::size_t>(Len));
+  return (S == nullptr || Len == 0) ? UnicodeString() : linscp::Utf8ToUtf16(S, Len);
 }
 
-// Returns the interface rather than the concrete type: the concrete class is
-// defined below, and a conversion to the interface needs the complete type.
+UnicodeString FromUtf8(const char * S)
+{
+  return FromUtf8(S, (S == nullptr) ? 0 : std::char_traits<char>::length(S));
+}
+
 _di_IXMLNode MakeNode(const std::shared_ptr<TNode> & Data);
 
-class TXmlNodeList : public Xml::Xmlintf::IXMLNodeList
+class TXmlNodeList : public IXMLNodeList
 {
 public:
   explicit TXmlNodeList(std::vector<std::shared_ptr<TNode>> Items)
@@ -62,7 +67,8 @@ public:
   {
     for (std::size_t I = 0; I < FItems.size(); ++I)
     {
-      // XML element names are case-sensitive, unlike most of the Delphi RTL.
+      // Names are case-sensitive in XML; text nodes are "#text" and so
+      // never match an element name.
       if (FItems[I]->Name == Name)
       {
         return static_cast<int>(I);
@@ -75,13 +81,39 @@ private:
   std::vector<std::shared_ptr<TNode>> FItems;
 };
 
-class TXmlNode : public Xml::Xmlintf::IXMLNode
+class TXmlNode : public IXMLNode
 {
 public:
   explicit TXmlNode(std::shared_ptr<TNode> Data) : FData(std::move(Data)) {}
 
   UnicodeString GetNodeName() override { return FData->Name; }
-  UnicodeString GetText() override { return FData->Text; }
+  TNodeType GetNodeType() override { return FData->Type; }
+
+  Variant GetNodeValue() override
+  {
+    if (FData->Type == Xml::Xmlintf::ntElement)
+    {
+      return Variant(GetText());
+    }
+    return Variant(FData->Value);
+  }
+
+  UnicodeString GetText() override
+  {
+    if (FData->Type != Xml::Xmlintf::ntElement)
+    {
+      return FData->Value;
+    }
+    UnicodeString Result;
+    for (const auto & Child : FData->Children)
+    {
+      if ((Child->Type == Xml::Xmlintf::ntText) || (Child->Type == Xml::Xmlintf::ntCData))
+      {
+        Result += Child->Value;
+      }
+    }
+    return Result;
+  }
 
   _di_IXMLNodeList GetChildNodes() override
   {
@@ -92,7 +124,7 @@ public:
   {
     for (const auto & Child : FData->Children)
     {
-      if (Child->Name == Name)
+      if ((Child->Type == Xml::Xmlintf::ntElement) && (Child->Name == Name))
       {
         return MakeNode(Child);
       }
@@ -105,10 +137,10 @@ public:
     return FData->Attributes.find(Name) != FData->Attributes.end();
   }
 
-  UnicodeString GetAttribute(const UnicodeString & Name) override
+  Variant GetAttribute(const UnicodeString & Name) override
   {
     const auto It = FData->Attributes.find(Name);
-    return It == FData->Attributes.end() ? UnicodeString() : It->second;
+    return (It == FData->Attributes.end()) ? Null() : Variant(It->second);
   }
 
 private:
@@ -125,41 +157,65 @@ _di_IXMLNode MakeNode(const std::shared_ptr<TNode> & Data)
 //---------------------------------------------------------------------------
 struct TParseState
 {
-  std::shared_ptr<TNode> Root;
+  bool PreserveWhiteSpace = false;
+  std::vector<std::shared_ptr<TNode>> Top;     // declaration, root
   std::vector<TNode *> Stack;
+  std::string PendingText;                     // UTF-8, across chunks
+
+  void Add(std::shared_ptr<TNode> Node)
+  {
+    if (Stack.empty())
+    {
+      Top.push_back(std::move(Node));
+    }
+    else
+    {
+      Stack.back()->Children.push_back(std::move(Node));
+    }
+  }
+
+  // Character data arrives in arbitrary chunks and must accumulate into one
+  // node. Whitespace-only text is dropped unless asked to keep it, as
+  // Delphi's default ParseOptions do.
+  void FlushText()
+  {
+    if (PendingText.empty() || Stack.empty())
+    {
+      PendingText.clear();
+      return;
+    }
+    const bool Blank = PendingText.find_first_not_of(" \t\r\n") == std::string::npos;
+    if (PreserveWhiteSpace || !Blank)
+    {
+      auto Node = std::make_shared<TNode>();
+      Node->Type = Xml::Xmlintf::ntText;
+      Node->Name = L"#text";
+      Node->Value = FromUtf8(PendingText.data(), PendingText.size());
+      Add(std::move(Node));
+    }
+    PendingText.clear();
+  }
 };
 
 void OnStart(void * UserData, const XML_Char * Name, const XML_Char ** Attrs)
 {
   auto * State = static_cast<TParseState *>(UserData);
+  State->FlushText();
   auto Node = std::make_shared<TNode>();
-  Node->Name = FromUtf8(Name, static_cast<int>(std::char_traits<char>::length(Name)));
-  for (int I = 0; Attrs != nullptr && Attrs[I] != nullptr; I += 2)
+  Node->Name = FromUtf8(Name);
+  for (int I = 0; (Attrs != nullptr) && (Attrs[I] != nullptr) && (Attrs[I + 1] != nullptr); I += 2)
   {
-    if (Attrs[I + 1] == nullptr)
-    {
-      break;
-    }
-    Node->Attributes[FromUtf8(Attrs[I],
-        static_cast<int>(std::char_traits<char>::length(Attrs[I])))] =
-      FromUtf8(Attrs[I + 1],
-        static_cast<int>(std::char_traits<char>::length(Attrs[I + 1])));
+    Node->Attributes[FromUtf8(Attrs[I])] = FromUtf8(Attrs[I + 1]);
   }
   TNode * Raw = Node.get();
-  if (State->Stack.empty())
-  {
-    State->Root = Node;
-  }
-  else
-  {
-    State->Stack.back()->Children.push_back(Node);
-  }
+  State->Add(std::move(Node));
   State->Stack.push_back(Raw);
 }
 
 void OnEnd(void * UserData, const XML_Char *)
 {
   auto * State = static_cast<TParseState *>(UserData);
+  State->FlushText();
   if (!State->Stack.empty())
   {
     State->Stack.pop_back();
@@ -168,81 +224,119 @@ void OnEnd(void * UserData, const XML_Char *)
 
 void OnText(void * UserData, const XML_Char * S, int Len)
 {
-  auto * State = static_cast<TParseState *>(UserData);
-  if (!State->Stack.empty())
-  {
-    // Appended rather than assigned: expat delivers character data in
-    // arbitrary chunks, so a value split across callbacks must accumulate.
-    State->Stack.back()->Text += FromUtf8(S, Len);
-  }
+  static_cast<TParseState *>(UserData)->PendingText.append(S, static_cast<std::size_t>(Len));
 }
 
-class TXmlDocument : public Xml::Xmlintf::IXMLDocument
+void OnComment(void * UserData, const XML_Char * Data)
 {
-public:
-  bool LoadFromFile(const UnicodeString & FileName) override
-  {
-    std::string Bytes;
-    try
-    {
-      TFileStream F(FileName, fmOpenRead);
-      const __int64 Length = F.Size;
-      if (Length > 0)
-      {
-        Bytes.resize(static_cast<std::size_t>(Length));
-        F.ReadBuffer(&Bytes[0], static_cast<int>(Length));
-      }
-    }
-    catch (const EStreamError &)
-    {
-      return false;
-    }
-    return ParseUtf8(Bytes);
-  }
+  auto * State = static_cast<TParseState *>(UserData);
+  State->FlushText();
+  auto Node = std::make_shared<TNode>();
+  Node->Type = Xml::Xmlintf::ntComment;
+  Node->Name = L"#comment";
+  Node->Value = FromUtf8(Data);
+  State->Add(std::move(Node));
+}
 
-  bool LoadFromXml(const UnicodeString & Xml) override
+void OnXmlDecl(void * UserData, const XML_Char * Version, const XML_Char * Encoding, int)
+{
+  auto * State = static_cast<TParseState *>(UserData);
+  auto Node = std::make_shared<TNode>();
+  Node->Type = Xml::Xmlintf::ntProcessingInstr;
+  Node->Name = L"xml";
+  Node->Value = UnicodeString(L"version=\"") + FromUtf8(Version) + L"\"";
+  if (Encoding != nullptr)
   {
-    const UTF8String Utf8(Xml);
-    return ParseUtf8(std::string(Utf8.c_str(),
-                                 static_cast<std::size_t>(Utf8.Length())));
+    Node->Value += UnicodeString(L" encoding=\"") + FromUtf8(Encoding) + L"\"";
   }
-
-  _di_IXMLNode GetDocumentElement() override
-  {
-    return FRoot ? MakeNode(FRoot) : _di_IXMLNode();
-  }
-
-private:
-  bool ParseUtf8(const std::string & Bytes)
-  {
-    FRoot.reset();
-    XML_Parser Parser = XML_ParserCreate("UTF-8");
-    if (Parser == nullptr)
-    {
-      return false;
-    }
-    TParseState State;
-    XML_SetUserData(Parser, &State);
-    XML_SetElementHandler(Parser, OnStart, OnEnd);
-    XML_SetCharacterDataHandler(Parser, OnText);
-    const XML_Status Status = XML_Parse(
-      Parser, Bytes.empty() ? "" : Bytes.data(),
-      static_cast<int>(Bytes.size()), XML_TRUE);
-    XML_ParserFree(Parser);
-    if (Status != XML_STATUS_OK)
-    {
-      return false;      // malformed input is a failed load, not an exception
-    }
-    FRoot = State.Root;
-    return FRoot != nullptr;
-  }
-
-  std::shared_ptr<TNode> FRoot;
-};
+  State->Add(std::move(Node));
+}
 
 }  // namespace
 
+struct Xml::Xmldoc::TXMLDocument::TState
+{
+  std::vector<std::shared_ptr<TNode>> Top;
+};
+
+Xml::Xmldoc::TXMLDocument::TXMLDocument(TObject *) : FState(new TState()) {}
+Xml::Xmldoc::TXMLDocument::~TXMLDocument() = default;
+
+void Xml::Xmldoc::TXMLDocument::LoadFromFile(const UnicodeString & FileName)
+{
+  std::string Bytes;
+  try
+  {
+    TFileStream F(FileName, fmOpenRead);
+    const __int64 Length = F.Size;
+    if (Length > 0)
+    {
+      Bytes.resize(static_cast<std::size_t>(Length));
+      F.ReadBuffer(&Bytes[0], static_cast<int>(Length));
+    }
+  }
+  catch (const EStreamError & E)
+  {
+    throw EDOMParseError(E.Message);
+  }
+  Parse(Bytes);
+}
+
+void Xml::Xmldoc::TXMLDocument::LoadFromXML(const UnicodeString & XML)
+{
+  const UTF8String Utf8(XML);
+  Parse(std::string(Utf8.c_str(), static_cast<std::size_t>(Utf8.Length())));
+}
+
+void Xml::Xmldoc::TXMLDocument::Parse(const std::string & Utf8)
+{
+  FState->Top.clear();
+  XML_Parser Parser = XML_ParserCreate(nullptr);   // honour the declared encoding
+  if (Parser == nullptr)
+  {
+    throw EDOMParseError(UnicodeString(L"Cannot create XML parser"));
+  }
+  TParseState State;
+  State.PreserveWhiteSpace = FParseOptions.Contains(Xml::Xmlintf::poPreserveWhiteSpace);
+  XML_SetUserData(Parser, &State);
+  XML_SetElementHandler(Parser, OnStart, OnEnd);
+  XML_SetCharacterDataHandler(Parser, OnText);
+  XML_SetCommentHandler(Parser, OnComment);
+  XML_SetXmlDeclHandler(Parser, OnXmlDecl);
+  const XML_Status Status = XML_Parse(
+    Parser, Utf8.empty() ? "" : Utf8.data(), static_cast<int>(Utf8.size()), XML_TRUE);
+  UnicodeString Error;
+  if (Status != XML_STATUS_OK)
+  {
+    Error = FromUtf8(XML_ErrorString(XML_GetErrorCode(Parser))) + L" at line " +
+            IntToStr(static_cast<__int64>(XML_GetCurrentLineNumber(Parser)));
+  }
+  XML_ParserFree(Parser);
+  if (!Error.IsEmpty())
+  {
+    throw EDOMParseError(Error);
+  }
+  FState->Top = std::move(State.Top);
+}
+
+_di_IXMLNode Xml::Xmldoc::TXMLDocument::GetDocumentElement()
+{
+  for (const auto & Node : FState->Top)
+  {
+    if (Node->Type == Xml::Xmlintf::ntElement)
+    {
+      return MakeNode(Node);
+    }
+  }
+  return _di_IXMLNode();
+}
+
+_di_IXMLNodeList Xml::Xmldoc::TXMLDocument::GetChildNodes()
+{
+  return _di_IXMLNodeList(std::make_shared<TXmlNodeList>(FState->Top));
+}
+
 _di_IXMLDocument Xml::Xmlintf::NewXMLDocument()
 {
-  return _di_IXMLDocument(std::make_shared<TXmlDocument>());
+  return interface_cast<IXMLDocument>(new Xml::Xmldoc::TXMLDocument(nullptr));
 }

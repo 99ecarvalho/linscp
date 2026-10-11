@@ -120,6 +120,20 @@ bool FileGetSymLinkTarget(const UnicodeString & FileName, UnicodeString & Target
 // names, so the name comes back unchanged.
 UnicodeString ExtractShortPathName(const UnicodeString & FileName);
 
+// Delphi's: the file's last-write time, local. False when it does not exist.
+bool FileAge(const UnicodeString & FileName, TDateTime & FileDateTime, bool FollowLink = true);
+
+// DateUtils' ISO8601ToDate: YYYY-MM-DD[THH:MM[:SS[.fff]]][Z|+HH:MM|-HH:MM].
+// The result is UTC, or local when AReturnUTC is false. A time without a zone
+// designator is taken as UTC; see the divergence table. Raises EConvertError.
+TDateTime ISO8601ToDate(const UnicodeString & AISODate, bool AReturnUTC = true);
+
+// System's CmdLine: the whole command line. Windows' own string there; on
+// POSIX the arguments joined by spaces, quoted where they contain one. A
+// variable, as in Delphi -- core also has a parameter of that name, which a
+// macro would break.
+extern wchar_t * CmdLine;
+
 // Delphi's ForceDirectories: creates every missing component. Raises
 // EInOutError on an empty name, as Delphi does.
 bool ForceDirectories(UnicodeString Dir);

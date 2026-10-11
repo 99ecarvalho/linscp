@@ -1,5 +1,7 @@
 #include "vcl_variant.h"
 
+#include "vcl_strutils.h"
+
 Variant VarArrayCreate(const int * Bounds, int Bounds_High, TVarType VarType)
 {
   if ((Bounds == nullptr) || (Bounds_High != 1))
@@ -40,11 +42,40 @@ void Variant::CheckIndex(int Index) const
 
 __int64 Variant::Scalar() const
 {
-  if (IsArray())
+  if (IsArray() || IsNull())
   {
-    throw EVariantError(UnicodeString(L"Invalid variant type conversion"));
+    throw EVariantTypeCastError(UnicodeString(L"Invalid variant type conversion"));
+  }
+  if (FType == varUString)
+  {
+    __int64 V = 0;
+    if (!TryStrToInt64(FString, V))
+    {
+      throw EVariantTypeCastError(
+        UnicodeString(L"Could not convert variant of type (UnicodeString) into type (Int64)"));
+    }
+    return V;
   }
   return FValue;
+}
+
+Variant::operator UnicodeString() const
+{
+  switch (FType)
+  {
+    case varEmpty:   return UnicodeString();
+    case varUString: return FString;
+    case varNull:
+      throw EVariantTypeCastError(
+        UnicodeString(L"Could not convert variant of type (Null) into type (UnicodeString)"));
+    default:
+      if (IsArray())
+      {
+        throw EVariantTypeCastError(UnicodeString(L"Invalid variant type conversion"));
+      }
+      return (FType == varLongWord) ? UIntToStr(static_cast<unsigned __int64>(FValue))
+                                    : IntToStr(FValue);
+  }
 }
 
 Variant::operator int() const { return static_cast<int>(Scalar()); }

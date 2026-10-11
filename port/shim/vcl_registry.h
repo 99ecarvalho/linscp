@@ -17,6 +17,7 @@
 #ifndef LINSCP_VCL_REGISTRY_H
 #define LINSCP_VCL_REGISTRY_H
 
+#include "vcl_datetime.h"
 #include "vcl_object.h"
 #include "vcl_property.h"
 #include "vcl_strings.h"
@@ -70,6 +71,11 @@ public:
   bool ReadBool(const UnicodeString & Name);
   void WriteBool(const UnicodeString & Name, bool Value);
   int ReadBinaryData(const UnicodeString & Name, void * Buffer, int BufSize);
+  // Delphi stores both as an eight-byte REG_BINARY double.
+  double ReadFloat(const UnicodeString & Name);
+  void WriteFloat(const UnicodeString & Name, double Value);
+  TDateTime ReadDateTime(const UnicodeString & Name);
+  void WriteDateTime(const UnicodeString & Name, TDateTime Value);
   void WriteBinaryData(const UnicodeString & Name, const void * Buffer,
                        int BufSize);
 

@@ -2,6 +2,7 @@
 #ifndef LINSCP_VCL_RTL_H
 #define LINSCP_VCL_RTL_H
 
+#include <cmath>     // <vcl.h> brings in the C maths functions; core relies on it
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -19,8 +20,19 @@
   // COM, which core initialises per thread (Queue.cpp). WIN32_LEAN_AND_MEAN
   // drops it from <windows.h>, where Embarcadero's <vcl.h> has it.
   #include <objbase.h>
-  // The shell API (SHFileOperation), which WIN32_LEAN_AND_MEAN also drops.
+  // The shell API (SHFileOperation), which WIN32_LEAN_AND_MEAN also drops,
+  // as it does CryptoAPI (certificate chains) and the shell folders.
   #include <shellapi.h>
+  #include <shlobj.h>
+  #include <wincrypt.h>
+  #include <tchar.h>
+  using TSHFileInfoW = SHFILEINFOW;   // Delphi's alias
+
+  // A Windows SDK definition mingw-w64's headers lack: ws2def.h's
+  // _IOR('t', 123, ULONG).
+  #ifndef SIO_IDEAL_SEND_BACKLOG_QUERY
+    #define SIO_IDEAL_SEND_BACKLOG_QUERY 0x4004747B
+  #endif
 
   #include "vcl_win32_undef.h"
 #else
@@ -54,6 +66,7 @@
 #include "vcl_misc.h"
 #include "vcl_xml.h"
 #include "vcl_variant.h"
+#include "vcl_json.h"
 
 // Embarcadero calling-convention and closure keywords. __fastcall is a pure
 // calling convention and means nothing to us on x86-64; __closure becomes a

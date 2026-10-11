@@ -1,5 +1,6 @@
 #include "vcl_sysutils.h"
 
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -664,3 +665,161 @@ UnicodeString ExtractShortPathName(const UnicodeString & FileName)
   return FileName;
 #endif
 }
+
+namespace {
+
+// 1601-01-01, the FILETIME epoch, as a TDateTime serial.
+constexpr double FileTimeEpochSerial = -109205.0;
+
+FILETIME DateTimeToFileTimeUtc(const TDateTime & DT)
+{
+  const long long Ms = std::llround((DT.Val() - FileTimeEpochSerial) * 86400000.0);
+  const unsigned long long Ticks = static_cast<unsigned long long>(Ms) * 10000ULL;
+  FILETIME F;
+  F.dwLowDateTime = static_cast<DWORD>(Ticks & 0xFFFFFFFFULL);
+  F.dwHighDateTime = static_cast<DWORD>(Ticks >> 32);
+  return F;
+}
+
+TDateTime FileTimeToDateTimeValue(const FILETIME & F)
+{
+  SYSTEMTIME S;
+  if (FileTimeToSystemTime(&F, &S) == 0)
+  {
+    return TDateTime();
+  }
+  return SystemTimeToDateTime(S);
+}
+
+TDateTime UtcToLocal(const TDateTime & Utc)
+{
+  const FILETIME U = DateTimeToFileTimeUtc(Utc);
+  FILETIME L;
+  return (FileTimeToLocalFileTime(&U, &L) != 0) ? FileTimeToDateTimeValue(L) : Utc;
+}
+
+int Digits(const UnicodeString & S, int & I, int Count)
+{
+  int V = 0;
+  for (int K = 0; K < Count; ++K, ++I)
+  {
+    if ((I > S.Length()) || (S[I] < L'0') || (S[I] > L'9'))
+    {
+      throw EConvertError(UnicodeString(L"'") + S + L"' is not a valid ISO 8601 date");
+    }
+    V = V * 10 + (S[I] - L'0');
+  }
+  return V;
+}
+
+}  // namespace
+
+bool FileAge(const UnicodeString & FileName, TDateTime & FileDateTime, bool FollowLink)
+{
+  FILETIME Write;
+#if defined(_WIN32)
+  (void)FollowLink;
+  WIN32_FILE_ATTRIBUTE_DATA Data;
+  if (!GetFileAttributesExW(FileName.c_str(), GetFileExInfoStandard, &Data))
+  {
+    return false;
+  }
+  Write = Data.ftLastWriteTime;
+#else
+  struct stat St{};
+  const std::string Path = ToBytes(FileName);
+  if ((FollowLink ? stat(Path.c_str(), &St) : lstat(Path.c_str(), &St)) != 0)
+  {
+    return false;
+  }
+  Write = FileTimeFromTimespec(St.st_mtim);
+#endif
+  FILETIME Local;
+  if (FileTimeToLocalFileTime(&Write, &Local) == 0)
+  {
+    return false;
+  }
+  FileDateTime = FileTimeToDateTimeValue(Local);
+  return true;
+}
+
+TDateTime ISO8601ToDate(const UnicodeString & AISODate, bool AReturnUTC)
+{
+  const UnicodeString S = AISODate.Trim();
+  int I = 1;
+  const int Y = Digits(S, I, 4);
+  if ((I > S.Length()) || (S[I++] != L'-')) { Digits(S, I = S.Length() + 1, 1); }
+  const int Mo = Digits(S, I, 2);
+  if ((I > S.Length()) || (S[I++] != L'-')) { Digits(S, I = S.Length() + 1, 1); }
+  const int D = Digits(S, I, 2);
+  int H = 0, Mi = 0, Sec = 0, Ms = 0, OffsetMinutes = 0;
+  if ((I <= S.Length()) && ((S[I] == L'T') || (S[I] == L't') || (S[I] == L' ')))
+  {
+    ++I;
+    H = Digits(S, I, 2);
+    if ((I <= S.Length()) && (S[I] == L':')) { ++I; }
+    Mi = Digits(S, I, 2);
+    if ((I <= S.Length()) && (S[I] == L':'))
+    {
+      ++I;
+      Sec = Digits(S, I, 2);
+      if ((I <= S.Length()) && ((S[I] == L'.') || (S[I] == L',')))
+      {
+        ++I;
+        int Scale = 100;
+        while ((I <= S.Length()) && (S[I] >= L'0') && (S[I] <= L'9'))
+        {
+          Ms += (S[I++] - L'0') * Scale;   // digits past milliseconds are dropped
+          Scale /= 10;
+        }
+      }
+    }
+    if ((I <= S.Length()) && ((S[I] == L'Z') || (S[I] == L'z')))
+    {
+      ++I;
+    }
+    else if ((I <= S.Length()) && ((S[I] == L'+') || (S[I] == L'-')))
+    {
+      const int Sign = (S[I++] == L'-') ? -1 : 1;
+      const int OH = Digits(S, I, 2);
+      if ((I <= S.Length()) && (S[I] == L':')) { ++I; }
+      const int OM = (I <= S.Length()) ? Digits(S, I, 2) : 0;
+      OffsetMinutes = Sign * (OH * 60 + OM);
+    }
+  }
+  TDateTime Date, Time;
+  if ((I <= S.Length()) ||
+      !TryEncodeDate(static_cast<Word>(Y), static_cast<Word>(Mo), static_cast<Word>(D), Date) ||
+      !TryEncodeTime(static_cast<Word>(H), static_cast<Word>(Mi), static_cast<Word>(Sec),
+                     static_cast<Word>(Ms), Time))
+  {
+    throw EConvertError(UnicodeString(L"'") + AISODate + L"' is not a valid ISO 8601 date");
+  }
+  // Local wall time minus its offset is UTC.
+  const TDateTime Utc = IncMinute(ComposeDateTime(Date, Time), -OffsetMinutes);
+  return AReturnUTC ? Utc : UtcToLocal(Utc);
+}
+
+namespace {
+
+wchar_t * InitCmdLine()
+{
+#if defined(_WIN32)
+  return GetCommandLineW();
+#else
+  static UnicodeString Line;
+  for (const UnicodeString & Arg : CommandLineParams())
+  {
+    if (!Line.IsEmpty())
+    {
+      Line += L" ";
+    }
+    Line += (Arg.Pos(UnicodeString(L" ")) > 0) ? UnicodeString(L"\"") + Arg + L"\"" : Arg;
+  }
+  return Line.c_str();
+#endif
+}
+
+}  // namespace
+
+wchar_t * CmdLine = InitCmdLine();

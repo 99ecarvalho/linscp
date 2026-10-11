@@ -149,6 +149,12 @@ public:
     { return static_cast<double>(FTicks) / TicksPerMillisecond; }
   double GetTotalSeconds() const
     { return static_cast<double>(FTicks) / TicksPerSecond; }
+  double GetTotalMinutes() const
+    { return static_cast<double>(FTicks) / TicksPerMinute; }
+  double GetTotalHours() const
+    { return static_cast<double>(FTicks) / TicksPerHour; }
+  double GetTotalDays() const
+    { return static_cast<double>(FTicks) / TicksPerDay; }
 
   // Components, truncating toward zero as Delphi's do, so a negative span has
   // negative components -- core's FormatTimeZone relies on that.
@@ -161,6 +167,9 @@ public:
   PROP_R_G(__int64, Ticks, GetTicks);
   PROP_R_G(double, TotalMilliseconds, GetTotalMilliseconds);
   PROP_R_G(double, TotalSeconds, GetTotalSeconds);
+  PROP_R_G(double, TotalMinutes, GetTotalMinutes);
+  PROP_R_G(double, TotalHours, GetTotalHours);
+  PROP_R_G(double, TotalDays, GetTotalDays);
   PROP_R_G(int, Days, GetDays);
   PROP_R_G(int, Hours, GetHours);
   PROP_R_G(int, Minutes, GetMinutes);

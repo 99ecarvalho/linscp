@@ -321,3 +321,24 @@ void TRegistry::WriteBool(const UnicodeString & Name, bool Value)
 {
   WriteInteger(Name, Value ? 1 : 0);
 }
+
+double TRegistry::ReadFloat(const UnicodeString & Name)
+{
+  double Value = 0.0;
+  return (ReadBinaryData(Name, &Value, sizeof(Value)) == static_cast<int>(sizeof(Value))) ? Value : 0.0;
+}
+
+void TRegistry::WriteFloat(const UnicodeString & Name, double Value)
+{
+  WriteBinaryData(Name, &Value, sizeof(Value));
+}
+
+TDateTime TRegistry::ReadDateTime(const UnicodeString & Name)
+{
+  return TDateTime(ReadFloat(Name));
+}
+
+void TRegistry::WriteDateTime(const UnicodeString & Name, TDateTime Value)
+{
+  WriteFloat(Name, Value.Val());
+}

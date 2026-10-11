@@ -15,7 +15,10 @@
 #ifndef LINSCP_VCL_BYTESTRING_H
 #define LINSCP_VCL_BYTESTRING_H
 
+#include <cstdarg>
+#include <cstdio>
 #include <string>
+#include <type_traits>
 
 #include "vcl_unicodestring.h"
 
@@ -25,6 +28,8 @@ enum : unsigned short
   CP_UTF8_SHIM = 65001,
   CP_RAW_SHIM = 65535,    // no conversion: bytes pass through unchanged
 };
+
+class TVarRec;
 
 template <unsigned short CodePage>
 class AnsiStringT
@@ -47,6 +52,31 @@ public:
   // Transcoding constructor and conversion. Deliberately explicit in neither
   // direction only where C++Builder is also implicit, so upstream compiles.
   AnsiStringT(const UnicodeString & S) { Assign(S); }
+  // A wide literal directly: through UnicodeString would be two user-defined
+  // conversions. Core passes its L"..." SFTP extension names this way.
+  AnsiStringT(const wchar_t * S) { Assign(UnicodeString(S)); }
+  // And assigned, or `Str = L""` would be ambiguous between this constructor
+  // and the UnicodeString one.
+  AnsiStringT & operator=(const wchar_t * S) { Assign(UnicodeString(S)); return *this; }
+
+  // Between code pages, implicitly, as C++Builder allows. Into or out of
+  // RawByteString the bytes pass through untouched; between two real code
+  // pages they are transcoded via UTF-16. (C++Builder's RawByteString carries
+  // a run-time code page and would transcode out of it; this one has none --
+  // see the divergence table.)
+  template <unsigned short Other,
+            typename = std::enable_if_t<Other != CodePage>>
+  AnsiStringT(const AnsiStringT<Other> & S)
+  {
+    if constexpr ((CodePage == CP_RAW_SHIM) || (Other == CP_RAW_SHIM))
+    {
+      FData = S.Bytes();
+    }
+    else
+    {
+      Assign(ToUnicodeString(S));
+    }
+  }
   AnsiStringT & operator=(const UnicodeString & S) { Assign(S); return *this; }
   // Bytes as they are. Without this, `Str = Str.c_str()` is ambiguous between
   // the byte constructor and the UnicodeString conversion.
@@ -81,6 +111,12 @@ public:
   void Unique() {}
 
   AnsiStringT & operator+=(const AnsiStringT & S) { FData += S.FData; return *this; }
+
+  // C++Builder's narrow printf family; replaces the content, returns its length.
+  int vprintf(const char * Format, va_list Args);
+  int sprintf(const char * Format, ...);
+  // C++Builder's static Format over an open array, via Delphi's Format.
+  static AnsiStringT Format(const AnsiStringT & Fmt, const TVarRec * Args, int Args_High);
   AnsiStringT & operator+=(char C) { FData += C; return *this; }
 
   friend bool operator==(const AnsiStringT & A, const AnsiStringT & B)
@@ -128,5 +164,50 @@ inline AnsiStringT<CodePage>::operator UnicodeString() const
 {
   return ToUnicodeString(*this);
 }
+
+template <unsigned short CodePage>
+int AnsiStringT<CodePage>::vprintf(const char * Format, va_list Args)
+{
+  va_list Copy;
+  va_copy(Copy, Args);
+  const int N = std::vsnprintf(nullptr, 0, Format, Copy);
+  va_end(Copy);
+  if (N < 0)
+  {
+    FData.clear();
+    return 0;
+  }
+  FData.assign(static_cast<std::size_t>(N) + 1, '\0');
+  std::vsnprintf(&FData[0], FData.size(), Format, Args);
+  FData.resize(static_cast<std::size_t>(N));
+  return N;
+}
+
+template <unsigned short CodePage>
+int AnsiStringT<CodePage>::sprintf(const char * Format, ...)
+{
+  va_list Args;
+  va_start(Args, Format);
+  const int N = vprintf(Format, Args);
+  va_end(Args);
+  return N;
+}
+
+// Defined in vcl_format.cpp, which knows TVarRec.
+UnicodeString FormatOpenArray(const UnicodeString & Fmt, const TVarRec * Args, int Args_High);
+
+template <unsigned short CodePage>
+AnsiStringT<CodePage> AnsiStringT<CodePage>::Format(const AnsiStringT & Fmt,
+                                                    const TVarRec * Args, int Args_High)
+{
+  return AnsiStringT(FormatOpenArray(ToUnicodeString(Fmt), Args, Args_High));
+}
+
+// WideStrUtils' classification of a byte string.
+enum TEncodeType { etUSASCII, etUTF8, etANSI };
+TEncodeType DetectUTF8Encoding(const RawByteString & S);
+// System's UTF8ArrayToString over an open array: A[0..A_High], stopping at the
+// first NUL as Delphi does.
+UnicodeString UTF8ArrayToString(const char * A, int A_High);
 
 #endif // LINSCP_VCL_BYTESTRING_H

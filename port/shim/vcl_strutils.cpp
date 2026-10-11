@@ -1,6 +1,7 @@
 #include "vcl_strutils.h"
 
 #include <cerrno>
+#include <cstdarg>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -189,21 +190,28 @@ UnicodeString FloatToStr(double Value)
   return FromAscii(Buf);
 }
 
-double StrToFloatDef(const UnicodeString & S, double Default)
+bool TryStrToFloat(const UnicodeString & S, double & Value)
 {
   const std::string A = Narrow(Trim(S));
   if (A.empty())
   {
-    return Default;
+    return false;
   }
   errno = 0;
   char * End = nullptr;
   const double V = std::strtod(A.c_str(), &End);
   if (errno == ERANGE || End == nullptr || *End != '\0')
   {
-    return Default;
+    return false;
   }
-  return V;
+  Value = V;
+  return true;
+}
+
+double StrToFloatDef(const UnicodeString & S, double Default)
+{
+  double V;
+  return TryStrToFloat(S, V) ? V : Default;
 }
 
 // --- comparison ------------------------------------------------------------
@@ -943,4 +951,219 @@ int IndexText(const UnicodeString & AText, const UnicodeString * AValues, int AV
     }
   }
   return -1;
+}
+
+int FindDelimiter(const UnicodeString & Delimiters, const UnicodeString & S, int StartIdx)
+{
+  for (int I = (StartIdx < 1) ? 1 : StartIdx; I <= S.Length(); ++I)
+  {
+    if (Delimiters.Pos(UnicodeString(S[I])) > 0)
+    {
+      return I;
+    }
+  }
+  return 0;
+}
+
+int AnsiCompareText(const UnicodeString & S1, const UnicodeString & S2)
+{
+  return CompareText(S1, S2);
+}
+
+int StrLIComp(const wchar_t * Str1, const wchar_t * Str2, unsigned MaxLen)
+{
+  for (unsigned I = 0; I < MaxLen; ++I)
+  {
+    wchar_t A = Str1[I], B = Str2[I];
+    if ((A >= L'A') && (A <= L'Z')) { A = static_cast<wchar_t>(A + 32); }
+    if ((B >= L'A') && (B <= L'Z')) { B = static_cast<wchar_t>(B + 32); }
+    if (A != B)
+    {
+      return (A < B) ? -1 : 1;
+    }
+    if (A == L'\0')
+    {
+      return 0;
+    }
+  }
+  return 0;
+}
+
+double StrToFloat(const UnicodeString & S)
+{
+  double V;
+  if (!TryStrToFloat(S, V))
+  {
+    throw EConvertError(UnicodeString(L"'") + S + L"' is not a valid floating point value");
+  }
+  return V;
+}
+
+int random(int num)
+{
+  return static_cast<int>((static_cast<long long>(std::rand()) * num) /
+                          (static_cast<long long>(RAND_MAX) + 1));
+}
+
+// --- UnicodeString members that need the RTL ---------------------------------
+
+int UnicodeString::ToInt() const
+{
+  return StrToInt(*this);
+}
+
+int UnicodeString::ToIntDef(int Default) const
+{
+  return StrToIntDef(*this, Default);
+}
+
+namespace {
+
+// C++Builder's wide printf conventions, without libc's wide functions (whose
+// wchar_t is four bytes here): numbers through narrow snprintf, strings
+// padded and truncated on UTF-16 directly.
+UnicodeString WideVFormat(const wchar_t * Format, va_list Args)
+{
+  UnicodeString Out;
+  const wchar_t * P = Format;
+  while ((P != nullptr) && (*P != L'\0'))
+  {
+    if (*P != L'%')
+    {
+      Out += *P++;
+      continue;
+    }
+    ++P;
+    if (*P == L'%')
+    {
+      Out += L'%';
+      ++P;
+      continue;
+    }
+    std::string Spec = "%";
+    bool Left = false;
+    while ((*P == L'-') || (*P == L'+') || (*P == L' ') || (*P == L'#') || (*P == L'0'))
+    {
+      Left = Left || (*P == L'-');
+      Spec += static_cast<char>(*P++);
+    }
+    int Width = -1;
+    if (*P == L'*') { Width = va_arg(Args, int); ++P; if (Width < 0) { Left = true; Width = -Width; } }
+    else { while ((*P >= L'0') && (*P <= L'9')) { Width = ((Width < 0) ? 0 : Width) * 10 + (*P++ - L'0'); } }
+    int Precision = -1;
+    if (*P == L'.')
+    {
+      ++P;
+      Precision = 0;
+      if (*P == L'*') { Precision = va_arg(Args, int); ++P; }
+      else { while ((*P >= L'0') && (*P <= L'9')) { Precision = Precision * 10 + (*P++ - L'0'); } }
+    }
+    // Length modifiers.
+    enum { lNone, lH, lHH, lL, lLL, lBigL, lZ } Len = lNone;
+    if (*P == L'h') { ++P; Len = lH; if (*P == L'h') { ++P; Len = lHH; } }
+    else if (*P == L'l') { ++P; Len = lL; if (*P == L'l') { ++P; Len = lLL; } }
+    else if (*P == L'L') { ++P; Len = lBigL; }
+    else if ((*P == L'z') || (*P == L'j') || (*P == L't')) { ++P; Len = lZ; }
+    else if ((P[0] == L'I') && (P[1] == L'6') && (P[2] == L'4')) { P += 3; Len = lLL; }
+    const wchar_t Conv = *P;
+    if (Conv == L'\0')
+    {
+      break;
+    }
+    ++P;
+
+    auto Pad = [&](UnicodeString S) {
+      if ((Precision >= 0) && (S.Length() > Precision)) { S.SetLength(Precision); }
+      while (S.Length() < Width) { S = Left ? S + L" " : UnicodeString(L" ") + S; }
+      return S;
+    };
+    auto Narrow = [&](auto Value, const char * LengthText, char C) {
+      std::string F = Spec;
+      if (Width >= 0) { F += std::to_string(Width); }
+      if (Precision >= 0) { F += "." + std::to_string(Precision); }
+      F += LengthText;
+      F += C;
+      char Buf[512];
+      std::snprintf(Buf, sizeof(Buf), F.c_str(), Value);
+      Out += UnicodeString(Buf);
+    };
+
+    switch (Conv)
+    {
+      case L'd': case L'i':
+        if ((Len == lLL) || (Len == lZ)) { Narrow(va_arg(Args, long long), "ll", 'd'); }
+        else if (Len == lL) { Narrow(va_arg(Args, long), "l", 'd'); }
+        else { Narrow(va_arg(Args, int), "", 'd'); }
+        break;
+      case L'u': case L'x': case L'X': case L'o':
+      {
+        const char C = static_cast<char>(Conv);
+        if ((Len == lLL) || (Len == lZ)) { Narrow(va_arg(Args, unsigned long long), "ll", C); }
+        else if (Len == lL) { Narrow(va_arg(Args, unsigned long), "l", C); }
+        else { Narrow(va_arg(Args, unsigned int), "", C); }
+        break;
+      }
+      case L'f': case L'F': case L'e': case L'E': case L'g': case L'G':
+        if (Len == lBigL) { Narrow(va_arg(Args, long double), "L", static_cast<char>(Conv)); }
+        else { Narrow(va_arg(Args, double), "", static_cast<char>(Conv)); }
+        break;
+      case L'p':
+        Narrow(va_arg(Args, void *), "", 'p');
+        break;
+      case L'c':
+        if (Len == lH) { Out += Pad(UnicodeString(static_cast<wchar_t>(static_cast<unsigned char>(va_arg(Args, int))))); }
+        else { Out += Pad(UnicodeString(static_cast<wchar_t>(va_arg(Args, int)))); }
+        break;
+      case L'C':
+        Out += Pad(UnicodeString(static_cast<wchar_t>(static_cast<unsigned char>(va_arg(Args, int)))));
+        break;
+      case L's':
+        if (Len == lH)
+        {
+          const char * S = va_arg(Args, const char *);
+          Out += Pad(UnicodeString((S != nullptr) ? S : "(null)"));
+        }
+        else
+        {
+          const wchar_t * S = va_arg(Args, const wchar_t *);
+          Out += Pad(UnicodeString((S != nullptr) ? S : L"(null)"));
+        }
+        break;
+      case L'S':
+        if (Len == lL)
+        {
+          const wchar_t * S = va_arg(Args, const wchar_t *);
+          Out += Pad(UnicodeString((S != nullptr) ? S : L"(null)"));
+        }
+        else
+        {
+          const char * S = va_arg(Args, const char *);
+          Out += Pad(UnicodeString((S != nullptr) ? S : "(null)"));
+        }
+        break;
+      default:
+        throw EConvertError(UnicodeString(L"UnicodeString::sprintf: unsupported conversion"));
+    }
+  }
+  return Out;
+}
+
+}  // namespace
+
+UnicodeString & UnicodeString::sprintf(const wchar_t * Format, ...)
+{
+  va_list Args;
+  va_start(Args, Format);
+  *this = WideVFormat(Format, Args);
+  va_end(Args);
+  return *this;
+}
+
+UnicodeString & UnicodeString::cat_sprintf(const wchar_t * Format, ...)
+{
+  va_list Args;
+  va_start(Args, Format);
+  *this += WideVFormat(Format, Args);
+  va_end(Args);
+  return *this;
 }

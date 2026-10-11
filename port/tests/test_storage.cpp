@@ -280,6 +280,38 @@ void TestRegistry()
 #endif
 }
 
+// TOptionsIniFile's exact override set and signatures (HierarchicalStorage.cpp).
+// `override` makes any signature drift a compile error; instantiating it
+// proves the class is not abstract.
+class TOptionsShapedIniFile : public TCustomIniFile
+{
+public:
+  TOptionsShapedIniFile() : TCustomIniFile(UnicodeString()) {}
+  UnicodeString ReadString(const UnicodeString Section, const UnicodeString Ident,
+                           const UnicodeString Default) override
+    { return ((Section == L"S") && (Ident == L"k")) ? UnicodeString(L"v") : Default; }
+  void WriteString(const UnicodeString, const UnicodeString, const UnicodeString) override {}
+  void ReadSection(const UnicodeString Section, TStrings * Strings) override
+    { if (Section == L"S") { Strings->Add(L"k"); } }
+  void ReadSections(TStrings * Strings) override { Strings->Add(L"S"); }
+  void ReadSectionValues(const UnicodeString, TStrings *) override {}
+  void EraseSection(const UnicodeString) override {}
+  void DeleteKey(const UnicodeString, const UnicodeString) override {}
+  void UpdateFile() override {}
+};
+
+void TestCoreShapedDescendant()
+{
+  TOptionsShapedIniFile F;
+  CHECK(F.ReadString(L"S", L"k", L"d") == UnicodeString(L"v"));
+  // Delphi answers these through ReadSection, so a descendant need not.
+  CHECK(F.SectionExists(L"S"));
+  CHECK(!F.SectionExists(L"T"));
+  CHECK(F.ValueExists(L"S", L"k"));
+  CHECK(!F.ValueExists(L"S", L"x"));
+  CHECK(F.ReadInteger(L"S", L"missing", 7) == 7);
+}
+
 }  // namespace
 
 int main()
@@ -297,6 +329,8 @@ int main()
 
   std::error_code Ec;
   fs::remove_all(Dir(), Ec);
+
+  TestCoreShapedDescendant();
 
   if (Failures == 0)
   {

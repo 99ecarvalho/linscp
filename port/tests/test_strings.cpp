@@ -3,6 +3,10 @@
 // The first test exists because this shim contains two different index bases:
 // TStrings is 0-based, UnicodeString is 1-based. Confusing them corrupts data
 // silently, so the boundary is pinned explicitly.
+#include <string>
+#include "vcl_bytestring.h"
+#include "vcl_strutils.h"
+#include "vcl_streams.h"
 #include "vcl_strings.h"
 
 #include <cstdio>
@@ -370,6 +374,46 @@ void TestOwnsObjects()
   CHECK(Freed == 4);
 }
 
+// Delphi's DelimitedText, both modes. Usage.cpp sets StrictDelimiter.
+void TestDelimitedTextModes()
+{
+  TStringList L;
+  L.Delimiter = L',';
+  L.DelimitedText = L"a b,c";
+  CHECK(L.Count == 3);                     // whitespace also separates
+  CHECK((L.Strings[0] == UnicodeString(L"a")) && (L.Strings[1] == UnicodeString(L"b")) && (L.Strings[2] == UnicodeString(L"c")));
+  L.StrictDelimiter = true;
+  L.DelimitedText = L"a b,c";
+  CHECK(L.Count == 2);                     // only the delimiter does
+  CHECK(L.Strings[0] == UnicodeString(L"a b"));
+  L.StrictDelimiter = false;
+  L.DelimitedText = L"  \"x, y\" , z,";
+  CHECK(L.Count == 3);
+  CHECK(L.Strings[0] == UnicodeString(L"x, y"));   // quoted keeps both
+  CHECK(L.Strings[1] == UnicodeString(L"z"));
+  CHECK(L.Strings[2].IsEmpty());                    // trailing delimiter, final empty item
+  L.DelimitedText = L"\"say \"\"hi\"\"\"";
+  CHECK((L.Count == 1) && (L.Strings[0] == UnicodeString(L"say \"hi\"")));
+}
+
+void TestSaveToStreamAndAppend()
+{
+  TStringList L;
+  L.Add(L"one");
+  L.Append(L"caf\u00E9");
+  TMemoryStream M;
+  L.SaveToStream(&M);
+  CHECK(L.Count == 2);
+  // UTF-8 (the shim's Default), no byte-order mark, and Text's CRLF -- on both
+  // platforms, so what core writes is identical everywhere.
+  const std::string Expected = std::string("one\r\ncaf\xC3\xA9\r\n");
+  CHECK(M.Size == static_cast<__int64>(Expected.size()));
+  std::string Got(static_cast<std::size_t>(M.Size), '\0');
+  M.Position = 0;
+  M.ReadBuffer(&Got[0], static_cast<int>(Got.size()));
+  CHECK(Got == Expected);
+}
+
 }  // namespace
 
 int main()
@@ -387,6 +431,9 @@ int main()
 
   TestFind();
   TestOwnsObjects();
+
+  TestDelimitedTextModes();
+  TestSaveToStreamAndAppend();
 
   if (Failures == 0)
   {

@@ -136,6 +136,14 @@ public:
   UnicodeString TrimRight() const;
 
   // --- comparison ----------------------------------------------------------
+  // C++Builder's conversions and printf-style formatting. ToInt raises
+  // EConvertError as StrToInt does. sprintf replaces the content and follows
+  // C++Builder's wide conventions: %s takes a wchar_t *, %S a char *.
+  int ToInt() const;
+  int ToIntDef(int Default) const;
+  UnicodeString & sprintf(const wchar_t * Format, ...);
+  UnicodeString & cat_sprintf(const wchar_t * Format, ...);
+
   int Compare(const UnicodeString & S) const;
   int CompareIC(const UnicodeString & S) const;   // case-insensitive, ASCII
 
