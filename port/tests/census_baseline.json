@@ -8,12 +8,12 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 67,
-        "missing_types": 6
+        "errors": 0,
+        "missing_types": 0
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 11,
+        "errors": 4,
         "missing_types": 0
       },
       "source/core/CopyParam.cpp": {
@@ -63,7 +63,7 @@
       },
       "source/core/FtpFileSystem.cpp": {
         "aborted": false,
-        "errors": 2,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/Global.cpp": {
@@ -108,12 +108,12 @@
       },
       "source/core/RemoteFiles.cpp": {
         "aborted": false,
-        "errors": 20,
+        "errors": 19,
         "missing_types": 2
       },
       "source/core/S3FileSystem.cpp": {
         "aborted": false,
-        "errors": 1,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/ScpFileSystem.cpp": {
@@ -138,7 +138,7 @@
       },
       "source/core/SessionData.cpp": {
         "aborted": false,
-        "errors": 1,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/SessionInfo.cpp": {

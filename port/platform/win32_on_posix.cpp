@@ -366,20 +366,159 @@ LONG CompareFileTime(const FILETIME * A, const FILETIME * B)
   return TA < TB ? -1 : (TA > TB ? 1 : 0);
 }
 
+namespace {
+
+// The offset and DST flag in effect at a UTC instant.
+long OffsetAt(std::time_t T, bool & IsDst)
+{
+  std::tm Local{};
+  localtime_r(&T, &Local);
+  IsDst = Local.tm_isdst > 0;
+  return Local.tm_gmtoff;
+}
+
+// A transition as a Win32 recurring rule, from the local time in effect just
+// before it: month, weekday, week of the month (5 for the last), time.
+SYSTEMTIME RuleFor(std::time_t LocalBefore)
+{
+  std::tm L{};
+  gmtime_r(&LocalBefore, &L);
+  SYSTEMTIME R{};
+  R.wYear = 0;
+  R.wMonth = static_cast<WORD>(L.tm_mon + 1);
+  R.wDayOfWeek = static_cast<WORD>(L.tm_wday);
+  static const int DaysIn[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+  const int Year = L.tm_year + 1900;
+  const bool Leap = ((Year % 4 == 0) && (Year % 100 != 0)) || (Year % 400 == 0);
+  const int Days = DaysIn[L.tm_mon] + (((L.tm_mon == 1) && Leap) ? 1 : 0);
+  R.wDay = static_cast<WORD>((L.tm_mday + 7 > Days) ? 5 : (L.tm_mday - 1) / 7 + 1);
+  R.wHour = static_cast<WORD>(L.tm_hour);
+  R.wMinute = static_cast<WORD>(L.tm_min);
+  return R;
+}
+
+void CopyName(WCHAR * Dest, const char * Name)
+{
+  int I = 0;
+  for (; (Name != nullptr) && (Name[I] != '\0') && (I < 31); ++I)
+  {
+    Dest[I] = static_cast<WCHAR>(static_cast<unsigned char>(Name[I]));
+  }
+  Dest[I] = 0;
+}
+
+// Win32's description of the system zone for a year, read from the zone
+// database: each day of the year is sampled, and every change of offset is
+// located to the second by bisection.
+bool ZoneForYear(int Year, TIME_ZONE_INFORMATION * Info)
+{
+  tzset();
+  *Info = TIME_ZONE_INFORMATION();
+  std::tm Jan{};
+  Jan.tm_year = Year - 1900;
+  Jan.tm_mon = 0;
+  Jan.tm_mday = 1;
+  const std::time_t Start = timegm(&Jan);
+  bool PrevDst = false;
+  long Prev = OffsetAt(Start, PrevDst);
+  long Standard = PrevDst ? 0 : Prev;
+  long Daylight = PrevDst ? Prev : 0;
+  bool HaveStandard = !PrevDst, HaveDaylight = PrevDst;
+  bool HaveDaylightDate = false, HaveStandardDate = false;
+  for (int Day = 1; Day <= 366; ++Day)
+  {
+    const std::time_t T = Start + static_cast<std::time_t>(Day) * 86400;
+    bool Dst = false;
+    const long Off = OffsetAt(T, Dst);
+    if (Dst && !HaveDaylight) { Daylight = Off; HaveDaylight = true; }
+    if (!Dst && !HaveStandard) { Standard = Off; HaveStandard = true; }
+    if ((Off != Prev) || (Dst != PrevDst))
+    {
+      std::time_t Lo = T - 86400, Hi = T;     // Lo before, Hi after
+      while (Hi - Lo > 1)
+      {
+        const std::time_t Mid = Lo + (Hi - Lo) / 2;
+        bool MidDst = false;
+        const long MidOff = OffsetAt(Mid, MidDst);
+        if ((MidOff == Prev) && (MidDst == PrevDst)) { Lo = Mid; } else { Hi = Mid; }
+      }
+      const SYSTEMTIME Rule = RuleFor(Hi + Prev);
+      if (Dst && !PrevDst && !HaveDaylightDate)
+      {
+        Info->DaylightDate = Rule;
+        HaveDaylightDate = true;
+      }
+      else if (!Dst && PrevDst && !HaveStandardDate)
+      {
+        Info->StandardDate = Rule;
+        HaveStandardDate = true;
+      }
+    }
+    Prev = Off;
+    PrevDst = Dst;
+  }
+  if (!HaveStandard)
+  {
+    Standard = Daylight;
+  }
+  Info->Bias = -static_cast<LONG>(Standard / 60);
+  Info->StandardBias = 0;
+  CopyName(Info->StandardName, tzname[0]);
+  const bool HasDst = HaveDaylight && HaveDaylightDate && HaveStandardDate;
+  if (HasDst)
+  {
+    Info->DaylightBias = -static_cast<LONG>((Daylight - Standard) / 60);
+    CopyName(Info->DaylightName, tzname[1]);
+  }
+  else
+  {
+    Info->StandardDate = SYSTEMTIME();
+    Info->DaylightDate = SYSTEMTIME();
+  }
+  return HasDst;
+}
+
+}  // namespace
+
 DWORD GetTimeZoneInformation(TIME_ZONE_INFORMATION * Info)
 {
   if (Info == nullptr)
   {
-    return 0xFFFFFFFFu;    // TIME_ZONE_ID_INVALID
+    return TIME_ZONE_ID_INVALID;
   }
-  *Info = TIME_ZONE_INFORMATION();
   const std::time_t Now = std::time(nullptr);
-  // Win32's Bias is minutes to ADD to local to reach UTC, i.e. the negative of
-  // the usual offset. Getting the sign wrong would shift every timestamp.
-  Info->Bias = -static_cast<LONG>(LocalOffsetSeconds(Now) / 60);
   std::tm Local{};
   localtime_r(&Now, &Local);
-  return Local.tm_isdst > 0 ? 2u : 1u;   // DAYLIGHT : STANDARD
+  if (!ZoneForYear(Local.tm_year + 1900, Info))
+  {
+    return TIME_ZONE_ID_UNKNOWN;
+  }
+  return (Local.tm_isdst > 0) ? TIME_ZONE_ID_DAYLIGHT : TIME_ZONE_ID_STANDARD;
+}
+
+BOOL GetTimeZoneInformationForYear(USHORT Year, PDYNAMIC_TIME_ZONE_INFORMATION DynamicInfo,
+  LPTIME_ZONE_INFORMATION Info)
+{
+  if ((DynamicInfo != nullptr) || (Info == nullptr))
+  {
+    SetLastError(ERROR_INVALID_PARAMETER);
+    return FALSE;
+  }
+  ZoneForYear(Year, Info);
+  return TRUE;
+}
+
+BOOL SystemTimeToTzSpecificLocalTime(const TIME_ZONE_INFORMATION * Zone,
+  const SYSTEMTIME * Universal, SYSTEMTIME * Local)
+{
+  if (Zone != nullptr)
+  {
+    SetLastError(ERROR_NOT_SUPPORTED);
+    return FALSE;
+  }
+  FILETIME U, L;
+  return SystemTimeToFileTime(Universal, &U) && FileTimeToLocalFileTime(&U, &L) &&
+    FileTimeToSystemTime(&L, Local);
 }
 
 DWORD GetLastError()

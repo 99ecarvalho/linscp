@@ -6,6 +6,10 @@
 // points of the format, not values read back from this implementation.
 #if defined(_WIN32)
   #include <windows.h>
+  #include <shlwapi.h>
+  #include <tlhelp32.h>
+  #include <psapi.h>
+  #include <urlmon.h>
   #include "vcl_win32_undef.h"
 #else
   #include "win32_on_posix.h"
@@ -433,6 +437,243 @@ void TestFiles()
 #endif
 }
 
+// shlwapi's path parsing on backslash paths, the form core hands it.
+void TestPathParsing()
+{
+  // Only drive and UNC roots are skipped; a bare backslash is not one.
+  const wchar_t * Drive = L"C:\\dir\\file";
+  CHECK(PathSkipRoot(Drive) == Drive + 3);
+  const wchar_t * Unc = L"\\\\server\\share\\dir";
+  CHECK(PathSkipRoot(Unc) == Unc + 15);
+  const wchar_t * Rooted = L"\\home\\user";
+  CHECK(PathSkipRoot(Rooted) == NULL);
+  CHECK(PathSkipRoot(L"relative\\path") == NULL);
+  CHECK(PathIsRelative(L"relative\\path") != 0);
+  CHECK(PathIsRelative(L"\\home\\user") == 0);
+  CHECK(PathIsRelative(L"C:\\dir") == 0);
+  CHECK(PathIsRelative(L"\\\\server\\share") == 0);
+}
+
+// Explorer's order, and the case-insensitive and tie-breaking comparisons
+// core sorts file lists with.
+void TestStringOrder()
+{
+  CHECK(StrCmpLogicalW(L"file2", L"file10") < 0);
+  CHECK(StrCmpLogicalW(L"file10", L"file2") > 0);
+  CHECK(StrCmpLogicalW(L"File2", L"file2") == 0);
+  CHECK(StrCmpLogicalW(L"a", L"B") < 0);
+  CHECK(StrCmpLogicalW(L"x007", L"x7") == 0);
+  CHECK(lstrcmpi(L"abc", L"ABD") < 0);
+  CHECK(lstrcmpi(L"ABC", L"abc") == 0);
+  CHECK(lstrcmp(L"a", L"A") < 0);
+  CHECK(lstrcmp(L"abc", L"abd") < 0);
+  CHECK(lstrcmp(L"abc", L"abc") == 0);
+}
+
+void TestEnvironmentExpansion()
+{
+#if defined(_WIN32)
+  SetEnvironmentVariableW(L"LINSCP_TEST_VAR", L"value");
+#else
+  setenv("LINSCP_TEST_VAR", "value", 1);
+#endif
+  wchar_t Out[64];
+  const DWORD N = ExpandEnvironmentStrings(L"<%LINSCP_TEST_VAR%|%LINSCP_UNSET_VAR%>", Out, 64);
+  const Path16 Want = u"<value|%LINSCP_UNSET_VAR%>";
+  CHECK(P16(Out) == Want);
+  CHECK(N == Want.size() + 1);
+  // Too small: nothing written, the size needed returned.
+  wchar_t Tiny[4];
+  CHECK(ExpandEnvironmentStrings(L"%LINSCP_TEST_VAR%", Tiny, 4) == 6);
+}
+
+void TestModulesAndProcesses()
+{
+  HMODULE Kernel32 = GetModuleHandle(L"kernel32.dll");
+  CHECK(Kernel32 != NULL);
+  CHECK(GetModuleHandle(L"ntdll.dll") != NULL);
+  CHECK(GetProcAddress(Kernel32, "GetTimeZoneInformationForYear") != NULL);
+  CHECK(GetProcAddress(Kernel32, "LinscpNoSuchFunction") == NULL);
+
+  HANDLE Snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+  CHECK(Snapshot != INVALID_HANDLE_VALUE);
+  PROCESSENTRY32 Entry;
+  memset(&Entry, 0, sizeof(Entry));
+  Entry.dwSize = sizeof(Entry);
+  bool Found = false;
+  if (Process32First(Snapshot, &Entry))
+  {
+    do
+    {
+      Found = Found || (Entry.th32ProcessID == GetCurrentProcessId());
+    } while (Process32Next(Snapshot, &Entry));
+  }
+  CHECK(Found);
+  CHECK(CloseHandle(Snapshot) != 0);
+
+  HANDLE Self = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, GetCurrentProcessId());
+  CHECK(Self != NULL);
+  wchar_t Name[MAX_PATH];
+  const DWORD Len = GetModuleFileNameEx(Self, NULL, Name, MAX_PATH);
+  CHECK(Len > 0);
+  CHECK(Narrow(P16(Name)).find("test_win32_posix") != std::string::npos);
+  CloseHandle(Self);
+}
+
+void TestMimeTypes()
+{
+  wchar_t * Mime = NULL;
+  CHECK(FindMimeFromData(NULL, L"page.html", NULL, 0, NULL, FMFD_URLASFILENAME, &Mime, 0) == S_OK);
+  if (Mime != NULL)
+  {
+    CHECK(Narrow(P16(Mime)) == "text/html");
+    CoTaskMemFree(Mime);
+  }
+}
+
+#if !defined(_WIN32)
+// Rules against what Windows' own registry says for the same zones.
+void CheckZone(const char * Zone, LONG Bias, LONG DaylightBias,
+  WORD DMonth, WORD DWeek, WORD DHour, WORD SMonth, WORD SWeek, WORD SHour)
+{
+  setenv("TZ", Zone, 1);
+  tzset();
+  TIME_ZONE_INFORMATION Z;
+  const DWORD Id = GetTimeZoneInformation(&Z);
+  CHECK(Id != TIME_ZONE_ID_INVALID);
+  const bool Ok =
+    (Z.Bias == Bias) && (Z.StandardBias == 0) && (Z.DaylightBias == DaylightBias) &&
+    (Z.DaylightDate.wMonth == DMonth) && (Z.DaylightDate.wDay == DWeek) &&
+    (Z.DaylightDate.wHour == DHour) &&
+    (Z.StandardDate.wMonth == SMonth) && (Z.StandardDate.wDay == SWeek) &&
+    (Z.StandardDate.wHour == SHour) &&
+    ((DMonth == 0) || ((Z.DaylightDate.wDayOfWeek == 0) && (Z.StandardDate.wDayOfWeek == 0)));
+  if (!Ok)
+  {
+    std::printf("  %s: bias %d/%d, daylight %d/%d %d:00 dow %d, standard %d/%d %d:00 dow %d\n", Zone,
+      (int)Z.Bias, (int)Z.DaylightBias, Z.DaylightDate.wMonth, Z.DaylightDate.wDay,
+      Z.DaylightDate.wHour, Z.DaylightDate.wDayOfWeek, Z.StandardDate.wMonth,
+      Z.StandardDate.wDay, Z.StandardDate.wHour, Z.StandardDate.wDayOfWeek);
+  }
+  CHECK(Ok);
+  CHECK((DMonth != 0) || (Id == TIME_ZONE_ID_UNKNOWN));
+}
+
+void TestTimeZones()
+{
+  const char * Saved = getenv("TZ");
+  const std::string Restore = (Saved != NULL) ? Saved : "";
+  // Central Europe: last Sunday of March 02:00, last Sunday of October 03:00.
+  CheckZone("Europe/Prague", -60, -60, 3, 5, 2, 10, 5, 3);
+  // US Eastern: second Sunday of March, first Sunday of November, 02:00.
+  CheckZone("America/New_York", 300, -60, 3, 2, 2, 11, 1, 2);
+  // AUS Eastern: first Sunday of October 02:00, first Sunday of April 03:00.
+  CheckZone("Australia/Sydney", -600, -60, 10, 1, 2, 4, 1, 3);
+  // No DST at all.
+  CheckZone("UTC", 0, 0, 0, 0, 0, 0, 0, 0);
+  CheckZone("Asia/Tokyo", -540, 0, 0, 0, 0, 0, 0, 0);
+  // A UTC instant in Prague's summer is two hours ahead locally.
+  setenv("TZ", "Europe/Prague", 1);
+  tzset();
+  SYSTEMTIME U{}, L{};
+  U.wYear = 2024; U.wMonth = 7; U.wDay = 1; U.wHour = 12;
+  CHECK(SystemTimeToTzSpecificLocalTime(NULL, &U, &L) != 0);
+  CHECK(L.wHour == 14);
+  if (Saved != NULL) { setenv("TZ", Restore.c_str(), 1); } else { unsetenv("TZ"); }
+  tzset();
+}
+
+void TestXdgFolders()
+{
+  setenv("XDG_CONFIG_HOME", "/linscp-test/config", 1);
+  setenv("XDG_DATA_HOME", "/linscp-test/data", 1);
+  wchar_t Path[MAX_PATH];
+  CHECK(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, SHGFP_TYPE_CURRENT, Path) == S_OK);
+  CHECK(Narrow(P16(Path)) == "/linscp-test/config");
+  CHECK(SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA, NULL, SHGFP_TYPE_CURRENT, Path) == S_OK);
+  CHECK(Narrow(P16(Path)) == "/linscp-test/data");
+  CHECK(SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, SHGFP_TYPE_CURRENT, Path) == S_OK);
+  CHECK(Narrow(P16(Path)) == getenv("HOME"));
+  unsetenv("XDG_CONFIG_HOME");
+  unsetenv("XDG_DATA_HOME");
+}
+
+// A symbolic link reads back through FSCTL_GET_REPARSE_POINT in the NT
+// layout core parses (Common.cpp's REPARSE_DATA_BUFFER).
+void TestSymlinkReparse()
+{
+  wchar_t Temp[MAX_PATH];
+  GetTempPath(MAX_PATH, Temp);
+  const Path16 Link = P16(Temp) + u"linscp_test_link";
+  unlink(Narrow(Link).c_str());
+  CHECK(symlink("target/dir", Narrow(Link).c_str()) == 0);
+  HANDLE H = CreateFile(W(Link), 0, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+                        FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+  CHECK(H != INVALID_HANDLE_VALUE);
+  char Buffer[MAXIMUM_REPARSE_DATA_BUFFER_SIZE];
+  DWORD Returned = 0;
+  CHECK(DeviceIoControl(H, FSCTL_GET_REPARSE_POINT, NULL, 0, Buffer, sizeof(Buffer), &Returned, NULL) != 0);
+  struct Head { ULONG Tag; USHORT Len, Res, SubOff, SubLen, PrintOff, PrintLen; ULONG Flags; };
+  const Head * R = reinterpret_cast<const Head *>(Buffer);
+  CHECK(R->Tag == IO_REPARSE_TAG_SYMLINK);
+  CHECK((R->Flags & SYMLINK_FLAG_RELATIVE) != 0);
+  const char16_t * Name = reinterpret_cast<const char16_t *>(Buffer + sizeof(Head) + R->PrintOff);
+  CHECK(Path16(Name, R->PrintLen / 2) == u"target/dir");
+  CloseHandle(H);
+  // A plain file is not a reparse point.
+  const Path16 Plain = P16(Temp) + u"linscp_test_plain";
+  if (FILE * F = fopen(Narrow(Plain).c_str(), "w")) { fclose(F); }
+  H = CreateFile(W(Plain), 0, 0, NULL, OPEN_EXISTING, FILE_FLAG_OPEN_REPARSE_POINT, NULL);
+  CHECK(H != INVALID_HANDLE_VALUE);
+  CHECK(DeviceIoControl(H, FSCTL_GET_REPARSE_POINT, NULL, 0, Buffer, sizeof(Buffer), &Returned, NULL) == 0);
+  CHECK(GetLastError() == ERROR_NOT_A_REPARSE_POINT);
+  CloseHandle(H);
+  unlink(Narrow(Plain).c_str());
+  unlink(Narrow(Link).c_str());
+}
+
+// FOF_ALLOWUNDO moves to the freedesktop.org trash, with its .trashinfo.
+void TestTrash()
+{
+  wchar_t Temp[MAX_PATH];
+  GetTempPath(MAX_PATH, Temp);
+  const std::string Base = Narrow(P16(Temp)) + "linscp_trash_test";
+  const std::string Data = Base + "/data";
+  const std::string File = Base + "/doomed file.txt";
+  mkdir(Base.c_str(), 0700);
+  if (FILE * F = fopen(File.c_str(), "w")) { fputs("x", F); fclose(F); }
+  setenv("XDG_DATA_HOME", Data.c_str(), 1);
+  Path16 List = P16(Temp) + u"linscp_trash_test/doomed file.txt";
+  List.push_back(0);
+  SHFILEOPSTRUCT Op;
+  memset(&Op, 0, sizeof(Op));
+  Op.wFunc = FO_DELETE;
+  Op.pFrom = W(List);
+  Op.fFlags = FOF_NOCONFIRMATION | FOF_SILENT | FOF_NOERRORUI | FOF_ALLOWUNDO;
+  CHECK(SHFileOperation(&Op) == 0);
+  struct stat St;
+  CHECK(stat(File.c_str(), &St) != 0);
+  CHECK(stat((Data + "/Trash/files/doomed file.txt").c_str(), &St) == 0);
+  std::string Info;
+  if (FILE * F = fopen((Data + "/Trash/info/doomed file.txt.trashinfo").c_str(), "r"))
+  {
+    char Line[512];
+    while (fgets(Line, sizeof(Line), F)) { Info += Line; }
+    fclose(F);
+  }
+  CHECK(Info.find("Path=" + Base + "/doomed%20file.txt\n") != std::string::npos);
+  CHECK(Info.find("DeletionDate=") != std::string::npos);
+  unsetenv("XDG_DATA_HOME");
+  // Without FOF_ALLOWUNDO a directory goes, contents and all.
+  Op.fFlags &= ~FOF_ALLOWUNDO;
+  List = P16(Temp) + u"linscp_trash_test";
+  List.push_back(0);
+  Op.pFrom = W(List);
+  CHECK(SHFileOperation(&Op) == 0);
+  CHECK(stat(Base.c_str(), &St) != 0);
+}
+#endif
+
 }  // namespace
 
 int main()
@@ -449,6 +690,17 @@ int main()
 
   TestBareWin32NamesCoreCalls();
   TestFiles();
+  TestPathParsing();
+  TestStringOrder();
+  TestEnvironmentExpansion();
+  TestModulesAndProcesses();
+  TestMimeTypes();
+#if !defined(_WIN32)
+  TestTimeZones();
+  TestXdgFolders();
+  TestSymlinkReparse();
+  TestTrash();
+#endif
 
   if (Failures == 0)
   {

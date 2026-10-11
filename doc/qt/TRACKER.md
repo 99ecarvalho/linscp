@@ -32,9 +32,10 @@ sessions pass -- as negotiated and pinned to AES-CTR, AES-GCM and
 ChaCha20-Poly1305. Upstream's own 64-bit work had already fixed seven of our
 eight patches' problems, so the series went from eight to one.
 
-Linux: **139 errors, 17/33 clean, 4 aborting** (588 at the pin move). The
-Win32 file functions took it to 534; PuTTY's headers compiling on Linux took
-it to 139 -- they were most of the errors in eight units.
+Linux: **60 errors, 21/33 clean, 4 aborting** (588 at the pin move). The
+Win32 file functions took it to 534, PuTTY's headers compiling on Linux to
+139, and the time zone, module, process, path, string-order, shell-folder,
+MIME, reparse-point and shell-delete groups to 60.
 
 1. **P1-07b**: the rest of the Win32 calls core makes that Linux lacks --
    file functions done; registry, shell folders, time zones, version info,
@@ -244,6 +245,12 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | Headless frontend: stack traces | None are recorded, so none are appended to error reports | Upstream records them through JCL's exception hooks, a Windows-only C++Builder facility |
 | Headless frontend: sleep | `SystemRequired` holds off sleep on Windows (`SetThreadExecutionState`) and does nothing on POSIX | POSIX has no equivalent without a session bus (logind inhibitors); upstream also runs it from a helper thread on Windows 11 |
 | Headless frontend: clipboard | Pasting a password finds nothing; copying raises | No clipboard without a GUI; the copy is reachable only from a GUI prompt's button |
+| String order on POSIX (`lstrcmp`, `lstrcmpi`, `StrCmpLogicalW`) | Ordinal comparison of ASCII-folded UTF-16, digits by value for the logical form, lower case first on ties | Windows uses linguistic collation for the user's locale. Sort order of file lists can differ for non-ASCII names and punctuation |
+| Time zone names on POSIX | `StandardName`/`DaylightName` are the zone database's abbreviations (`CET`, `CEST`) | Windows gives long names ("Central Europe Standard Time"). Core only logs them |
+| ANSI code page and locale on POSIX | Reported as 28591 (Latin-1) and en-US (0x0409) | The shim takes ACP to be Latin-1; there is no Windows locale to report |
+| `FindMimeFromData` on POSIX | By file name only, from shared-mime-info's globs; never by content | Core's one call passes `FMFD_URLASFILENAME` |
+| `SHFileOperation` on POSIX | `FO_DELETE` only; `FOF_ALLOWUNDO` uses the home trash of the freedesktop.org specification, so a file on another file system fails rather than being copied | Core only deletes, to the recycle bin or not |
+| `EnumProcessModules` on POSIX | Fails | Only used to log the module list |
 | File share modes on POSIX | Accepted and ignored; a second opener is never refused with `ERROR_SHARING_VIOLATION` | POSIX has no mandatory locking. Core retries on that error (HierarchicalStorage.cpp), so never seeing it only removes a wait |
 | `FILE_FLAG_DELETE_ON_CLOSE` on POSIX | The name is unlinked at open, not at the last close | Either way nothing is left behind; core uses it only to probe that a directory is writable |
 | File creation time on POSIX | The birth time where the file system records one (`statx`), else the modification time; it cannot be set | POSIX has no settable creation time |
@@ -274,6 +281,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | WinSCP's OpenSSL lacks the C fallbacks for its x86 assembly and every Unix source | `bn_asm.c`, `des_enc.c`, `bf_enc.c`, `c_enc.c`, `threads_pthread.c`, `rand_unix.c` absent from `libs/openssl` | 2026-10-11 |
 | Upstream libs3 returns `int` where neon's body provider returns `ssize_t` | `neon_read_func` in `libs3/src/request.c`; fixed by `libs3-64bit-body-provider.patch` | 2026-10-11 |
 | WinSCP `master` is being ported to 64-bit | `WinSCP.cbproj` has a `Win64` platform; libs are built with bcc64 (`libs/Makefile.inc`); `StartThread` returns `THandle`; AES-NI uses `_mm_setr_epi8` under `_WIN64` | 2026-10-11 |
+| The POSIX path parsing, string order, environment expansion, module, process and MIME functions match Win32 on everything the tests check | The same tests pass against the real API under Wine; that is how `PathSkipRoot` was found not to skip a bare leading backslash | 2026-10-11 |
+| The POSIX time zone rules match Windows' for Central Europe, US Eastern, AUS Eastern, UTC and Japan | `TestTimeZones`, against the rules Windows' registry holds for those zones | 2026-10-11 |
 | The POSIX file functions match Win32 on everything `TestFiles` checks | The same test passes against the real API under Wine and against the POSIX layer | 2026-10-11 |
 | `std::wstring` is unusable on POSIX under `-fshort-wchar` | Its traits call glibc's 4-byte `wcslen`: `wstring(L"/tmp/") + L"x"` came out as "/tmp/" | 2026-10-11 |
 | mingw-w64 runs global constructors in reverse link order, Linux in link order | Three one-line units linked a, b, c print "c b a" under Wine and "a b c" natively | 2026-10-11 |
@@ -446,7 +455,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-06c | Shim: `DynamicArray` + file API | done | sharing semantics tested |
 | P1-06d | Select INI backend on Linux | todo | frontend decision |
 | P1-07 | `port/platform` Win32 subset | done | types, FILETIME/SYSTEMTIME, errors, winsock names |
-| P1-07b | `port/platform` Win32 file/handle functions | wip | `CreateFile`, `Get/SetFileTime`, `GetFileSize`, `Get/SetFileAttributes`, `GetTempPath`, descriptor-aware `CloseHandle`; tested against real Win32 under Wine |
+| P1-07b | `port/platform` Win32 file/handle functions | wip | files, time zones (real transition rules), modules, processes (/proc), paths, string order, environment, XDG shell folders, MIME, reparse points, trash; tested against real Win32 under Wine where observable |
 | P1-08 | Socket-event emulation | todo | R6 |
 | P1-09 | PuTTY unix backend re-import | todo | |
 | P1-10 | PuTTY delta reconciliation | todo | |

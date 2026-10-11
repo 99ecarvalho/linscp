@@ -6,6 +6,7 @@
 // construction -- including WaitAll, which must acquire every object at once --
 // and core has a handful of threads, not hundreds.
 #include "win32_on_posix.h"
+#include "win32_kernel_internal.h"
 
 #include <pthread.h>
 #include <unistd.h>
@@ -25,14 +26,7 @@
 
 namespace {
 
-struct TKernelObject
-{
-  virtual ~TKernelObject() = default;
-  // Both are called with GKernelMutex held.
-  virtual bool IsSignaled() const = 0;
-  // A satisfied wait consumes the object where Win32 says it does.
-  virtual void Acquire() {}
-};
+using linscp::TKernelObject;
 
 struct TEvent final : TKernelObject
 {
@@ -102,6 +96,21 @@ std::shared_ptr<T> Find(HANDLE Handle)
   }
   return std::dynamic_pointer_cast<T>(It->second);
 }
+
+}  // namespace
+
+HANDLE linscp::RegisterKernelObject(std::shared_ptr<TKernelObject> Object)
+{
+  return Register(std::move(Object));
+}
+
+std::shared_ptr<linscp::TKernelObject> linscp::FindKernelObject(HANDLE Handle)
+{
+  std::lock_guard<std::mutex> Lock(GKernelMutex);
+  return Find<TKernelObject>(Handle);
+}
+
+namespace {
 
 void * ThreadEntry(void * Arg) noexcept
 {
@@ -442,7 +451,12 @@ BOOL CloseHandle(HANDLE Object)
     const auto It = GHandles.find(Value);
     if (It == GHandles.end())
     {
-      if ((Object != INVALID_HANDLE_VALUE) && (Value < LinscpKernelHandleBase))
+      if (Object == INVALID_HANDLE_VALUE)
+      {
+        // GetCurrentProcess's pseudo-handle, which closes successfully.
+        return TRUE;
+      }
+      if (Value < LinscpKernelHandleBase)
       {
         // A descriptor, from CreateFile.
         if (::close(static_cast<int>(Value)) == 0)

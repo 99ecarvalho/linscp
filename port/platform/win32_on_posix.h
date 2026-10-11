@@ -96,6 +96,9 @@ typedef BYTE * LPBYTE;
 typedef DWORD * LPDWORD;
 typedef BOOL * LPBOOL;
 typedef DWORD * PDWORD;
+typedef uint32_t UINT32;
+typedef int64_t INT64;
+typedef uint64_t UINT64;
 
 typedef const wchar_t * PCWSTR;
 typedef wchar_t * PWSTR;
@@ -256,7 +259,40 @@ void GetSystemTime(SYSTEMTIME * SystemTime);
 void GetLocalTime(SYSTEMTIME * SystemTime);
 void GetSystemTimeAsFileTime(FILETIME * FileTime);
 LONG CompareFileTime(const FILETIME * A, const FILETIME * B);
+// The system time zone as Win32 describes one: Bias is the standard offset
+// (minutes to add to local standard time to reach UTC), DaylightBias the
+// further shift in DST, and StandardDate/DaylightDate this year's two
+// transitions as recurring rules (wYear 0; wDay the week of the month, 5 for
+// the last), in the local time in effect just before each -- found in the
+// zone database rather than assumed. Without DST both dates have wMonth 0
+// and TIME_ZONE_ID_UNKNOWN is returned, as on Windows.
+#define TIME_ZONE_ID_INVALID   ((DWORD)0xFFFFFFFF)
+#define TIME_ZONE_ID_UNKNOWN   0
+#define TIME_ZONE_ID_STANDARD  1
+#define TIME_ZONE_ID_DAYLIGHT  2
+typedef TIME_ZONE_INFORMATION * LPTIME_ZONE_INFORMATION;
+typedef struct DYNAMIC_TIME_ZONE_INFORMATION
+{
+  LONG Bias;
+  WCHAR StandardName[32];
+  SYSTEMTIME StandardDate;
+  LONG StandardBias;
+  WCHAR DaylightName[32];
+  SYSTEMTIME DaylightDate;
+  LONG DaylightBias;
+  WCHAR TimeZoneKeyName[128];
+  BOOL DynamicDaylightTimeDisabled;
+} DYNAMIC_TIME_ZONE_INFORMATION;
+typedef DYNAMIC_TIME_ZONE_INFORMATION * PDYNAMIC_TIME_ZONE_INFORMATION;
 DWORD GetTimeZoneInformation(TIME_ZONE_INFORMATION * Info);
+// The same for any year's rules, which core finds through
+// GetProcAddress(kernel32, ...); DynamicInfo must be null (the system zone).
+BOOL GetTimeZoneInformationForYear(USHORT Year, PDYNAMIC_TIME_ZONE_INFORMATION DynamicInfo,
+  LPTIME_ZONE_INFORMATION Info);
+// Only for the system zone (Zone null), which the zone database converts
+// exactly; core never passes another.
+BOOL SystemTimeToTzSpecificLocalTime(const TIME_ZONE_INFORMATION * Zone,
+  const SYSTEMTIME * Universal, SYSTEMTIME * Local);
 
 #ifdef __cplusplus
 }  // extern "C"
@@ -372,6 +408,10 @@ extern "C" {
 #define ERROR_FILE_EXISTS            80
 #define ERROR_INVALID_PARAMETER      87
 #define ERROR_INSUFFICIENT_BUFFER   122
+#define ERROR_MOD_NOT_FOUND         126
+#define ERROR_PROC_NOT_FOUND        127
+#define ERROR_ENVVAR_NOT_FOUND      203
+#define ERROR_NOT_A_REPARSE_POINT  4390
 #define ERROR_DISK_FULL             112
 #define ERROR_ALREADY_EXISTS        183
 #define ERROR_MORE_DATA             234
@@ -535,6 +575,180 @@ extern "C" {
 #define HKEY_CURRENT_USER     (((HKEY)(0x80000001ULL)))
 #define HKEY_LOCAL_MACHINE    (((HKEY)(0x80000002ULL)))
 #define HKEY_USERS            (((HKEY)(0x80000003ULL)))
+#define HKEY_PERFORMANCE_DATA ((HKEY)(0x80000004ULL))
+#define HKEY_CURRENT_CONFIG   ((HKEY)(0x80000005ULL))
+#define HKEY_DYN_DATA         ((HKEY)(0x80000006ULL))
+#define KEY_WOW64_64KEY       0x0100
+#define KEY_WOW64_32KEY       0x0200
+
+// --- modules ---------------------------------------------------------------
+// Core probes optional system functions with GetModuleHandle(L"kernel32.dll")
+// and GetProcAddress. kernel32.dll and ntdll.dll are "loaded" -- IsWine()
+// asserts ntdll is -- and resolve the functions this layer really implements
+// (GetTimeZoneInformationForYear); any other name is absent, so core takes
+// its fallback, as it would on a Windows without the function. Nothing else
+// can be loaded.
+typedef void (*FARPROC)(void);
+HMODULE GetModuleHandle(LPCWSTR ModuleName);
+HMODULE LoadLibrary(LPCWSTR FileName);
+FARPROC GetProcAddress(HMODULE Module, LPCSTR ProcName);
+BOOL FreeLibrary(HMODULE Module);
+
+// --- processes -------------------------------------------------------------
+// The process list comes from /proc, as Toolhelp's does from the kernel;
+// core reads it to name its ancestor processes in logs. OpenProcess gives a
+// handle GetModuleFileNameEx turns into the executable's path.
+#define TH32CS_SNAPPROCESS          0x00000002
+#define PROCESS_QUERY_INFORMATION   0x0400
+#define PROCESS_VM_READ             0x0010
+typedef struct PROCESSENTRY32W
+{
+  DWORD dwSize;
+  DWORD cntUsage;
+  DWORD th32ProcessID;
+  ULONG_PTR th32DefaultHeapID;
+  DWORD th32ModuleID;
+  DWORD cntThreads;
+  DWORD th32ParentProcessID;
+  LONG pcPriClassBase;
+  DWORD dwFlags;
+  WCHAR szExeFile[MAX_PATH];
+} PROCESSENTRY32W;
+typedef PROCESSENTRY32W PROCESSENTRY32;
+HANDLE CreateToolhelp32Snapshot(DWORD Flags, DWORD ProcessId);
+BOOL Process32First(HANDLE Snapshot, PROCESSENTRY32W * Entry);
+BOOL Process32Next(HANDLE Snapshot, PROCESSENTRY32W * Entry);
+HANDLE OpenProcess(DWORD DesiredAccess, BOOL InheritHandle, DWORD ProcessId);
+// The pseudo-handle, as on Windows: (HANDLE)-1, which CloseHandle ignores.
+HANDLE GetCurrentProcess(void);
+// Module null is the executable; that is the only module named.
+DWORD GetModuleFileNameEx(HANDLE Process, HMODULE Module, LPWSTR FileName, DWORD Size);
+// Fails: the module list is only logged, and an ELF process's has no
+// HMODULE equivalent to report.
+BOOL EnumProcessModules(HANDLE Process, HMODULE * Modules, DWORD Size, LPDWORD Needed);
+// Never WOW64: nothing on POSIX runs a 32-bit Windows binary on a 64-bit one.
+BOOL IsWow64Process(HANDLE Process, BOOL * Wow64Process);
+BOOL GetProductInfo(DWORD OSMajor, DWORD OSMinor, DWORD SpMajor, DWORD SpMinor,
+  PDWORD ReturnedProductType);
+
+// --- environment, paths, strings -------------------------------------------
+// %NAME% expanded from the environment; an unset name is left as written, as
+// on Windows. Returns the length including the terminator, or when the
+// buffer is too small the size needed.
+DWORD ExpandEnvironmentStrings(LPCWSTR Src, LPWSTR Dst, DWORD Size);
+// shlwapi's, with its rules on backslash paths: core turns every slash into
+// a backslash before calling them, so a POSIX path arrives as "\home\x".
+// PathIsRelative calls that absolute; PathSkipRoot skips only drive and UNC
+// roots, so returns null for it, as shlwapi does.
+LPCWSTR PathSkipRoot(LPCWSTR Path);
+BOOL PathIsRelative(LPCWSTR Path);
+// Case-insensitive with runs of digits compared as numbers, as Explorer
+// sorts. No linguistic collation: see the divergence table.
+int StrCmpLogicalW(LPCWSTR A, LPCWSTR B);
+// Ordinal comparison of the case-folded strings; lstrcmp breaks ties with
+// lower case first, as Windows' word sort does.
+int lstrcmpi(LPCWSTR A, LPCWSTR B);
+int lstrcmp(LPCWSTR A, LPCWSTR B);
+FILE * _wfopen(LPCWSTR FileName, LPCWSTR Mode);
+wchar_t * _wcsdup(const wchar_t * S);
+
+// --- shell folders ---------------------------------------------------------
+// The CSIDL folders core asks for, mapped onto the XDG directories: the
+// Documents and Desktop user directories (user-dirs.dirs), the configuration
+// and data homes for the two application-data folders, $HOME for the profile.
+#define CSIDL_PERSONAL          0x0005
+#define CSIDL_DESKTOPDIRECTORY  0x0010
+#define CSIDL_APPDATA           0x001a
+#define CSIDL_LOCAL_APPDATA     0x001c
+#define CSIDL_COMMON_APPDATA    0x0023
+#define CSIDL_PROFILE           0x0028
+#define SHGFP_TYPE_CURRENT      0
+#define SHGFP_TYPE_DEFAULT      1
+#define E_FAIL                  ((HRESULT)0x80004005)
+#define E_INVALIDARG            ((HRESULT)0x80070057)
+HRESULT SHGetFolderPath(HWND Owner, int Folder, HANDLE Token, DWORD Flags, LPWSTR Path);
+
+// --- memory ----------------------------------------------------------------
+// Both release malloc'd memory: everything this layer hands out that a
+// caller frees with them was allocated so.
+HGLOBAL GlobalFree(HGLOBAL Memory);
+void CoTaskMemFree(LPVOID Memory);
+
+// --- MIME types (urlmon) ----------------------------------------------------
+// By file name only (FMFD_URLASFILENAME, core's one use), from the
+// shared-mime-info glob database; the content is never sniffed. E_FAIL when
+// nothing matches, as for an unknown extension on Windows.
+#define FMFD_DEFAULT            0x00000000
+#define FMFD_URLASFILENAME      0x00000001
+HRESULT FindMimeFromData(LPVOID BindCtx, LPCWSTR Url, LPVOID Buffer, DWORD Size,
+  LPCWSTR ProposedMime, DWORD MimeFlags, LPWSTR * MimeOut, DWORD Reserved);
+
+// --- code pages and locale ---------------------------------------------------
+// The shim takes the ANSI code page to be Latin-1, so that is what is
+// reported for it; the user locale is en-US. See the divergence table.
+#define CP_ACP      0
+#define CP_OEMCP    1
+#define CP_UTF8     65001
+#define MAX_DEFAULTCHAR      2
+#define MAX_LEADBYTES        12
+typedef struct CPINFOEXW
+{
+  UINT MaxCharSize;
+  BYTE DefaultChar[MAX_DEFAULTCHAR];
+  BYTE LeadByte[MAX_LEADBYTES];
+  WCHAR UnicodeDefaultChar;
+  UINT CodePage;
+  WCHAR CodePageName[MAX_PATH];
+} CPINFOEXW;
+typedef CPINFOEXW CPINFOEX;
+BOOL GetCPInfoEx(UINT CodePage, DWORD Flags, CPINFOEXW * Info);
+LCID GetUserDefaultLCID(void);
+
+// --- reparse points ------------------------------------------------------------
+// A symbolic link reads back as a Win32 symlink reparse point: opened with
+// FILE_FLAG_OPEN_REPARSE_POINT the link itself is opened (O_PATH, not
+// followed), and FSCTL_GET_REPARSE_POINT fills the NT REPARSE_DATA_BUFFER
+// layout with its target. Anything else is not a reparse point.
+#define FILE_FLAG_OPEN_REPARSE_POINT       0x00200000
+#define FSCTL_GET_REPARSE_POINT            0x000900A8
+#define MAXIMUM_REPARSE_DATA_BUFFER_SIZE   (16 * 1024)
+#define IO_REPARSE_TAG_MOUNT_POINT         0xA0000003u
+#define IO_REPARSE_TAG_SYMLINK             0xA000000Cu
+#define SYMLINK_FLAG_RELATIVE              0x00000001
+typedef struct OVERLAPPED OVERLAPPED;
+typedef OVERLAPPED * LPOVERLAPPED;
+BOOL DeviceIoControl(HANDLE Device, DWORD IoControlCode, LPVOID InBuffer, DWORD InSize,
+  LPVOID OutBuffer, DWORD OutSize, LPDWORD BytesReturned, LPOVERLAPPED Overlapped);
+
+// --- shell file operations ------------------------------------------------------
+// FO_DELETE only, which is what core uses: with FOF_ALLOWUNDO the files go to
+// the freedesktop.org trash (the user's home trash), as Explorer's go to the
+// recycle bin; without it they are deleted, directories recursively.
+#define FO_MOVE                  0x0001
+#define FO_COPY                  0x0002
+#define FO_DELETE                0x0003
+#define FO_RENAME                0x0004
+#define FOF_SILENT               0x0004
+#define FOF_RENAMEONCOLLISION    0x0008
+#define FOF_NOCONFIRMATION       0x0010
+#define FOF_ALLOWUNDO            0x0040
+#define FOF_NOCONFIRMMKDIR       0x0200
+#define FOF_NOERRORUI            0x0400
+typedef WORD FILEOP_FLAGS;
+typedef struct SHFILEOPSTRUCTW
+{
+  HWND hwnd;
+  UINT wFunc;
+  LPCWSTR pFrom;
+  LPCWSTR pTo;
+  FILEOP_FLAGS fFlags;
+  BOOL fAnyOperationsAborted;
+  LPVOID hNameMappings;
+  LPCWSTR lpszProgressTitle;
+} SHFILEOPSTRUCTW;
+typedef SHFILEOPSTRUCTW SHFILEOPSTRUCT;
+typedef SHFILEOPSTRUCTW * LPSHFILEOPSTRUCTW;
+int SHFileOperation(LPSHFILEOPSTRUCTW FileOp);
 
 // --- version info ----------------------------------------------------------
 typedef struct VS_FIXEDFILEINFO

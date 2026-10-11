@@ -143,6 +143,29 @@ HANDLE CreateFile(LPCWSTR FileName, DWORD DesiredAccess, DWORD /*ShareMode*/,
   DWORD FlagsAndAttributes, HANDLE /*TemplateFile*/)
 {
   const std::string Path = linscp::WideToUtf8(FileName);
+  if ((DesiredAccess & (GENERIC_READ | GENERIC_WRITE)) == 0)
+  {
+    // No data access: opened only to be asked about (timestamps, a link's
+    // target), as Win32 allows. With FILE_FLAG_OPEN_REPARSE_POINT a link is
+    // opened itself, not followed.
+    if (CreationDisposition != OPEN_EXISTING)
+    {
+      SetLastError(ERROR_INVALID_PARAMETER);
+      return INVALID_HANDLE_VALUE;
+    }
+    int PathFlags = O_PATH | O_CLOEXEC;
+    if ((FlagsAndAttributes & FILE_FLAG_OPEN_REPARSE_POINT) != 0)
+    {
+      PathFlags |= O_NOFOLLOW;
+    }
+    const int Fd = open(Path.c_str(), PathFlags);
+    if (Fd < 0)
+    {
+      Fail();
+      return INVALID_HANDLE_VALUE;
+    }
+    return reinterpret_cast<HANDLE>(static_cast<std::intptr_t>(Fd));
+  }
   int Flags = O_CLOEXEC;
   if ((FlagsAndAttributes & FILE_FLAG_BACKUP_SEMANTICS) != 0)
   {

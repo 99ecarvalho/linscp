@@ -58,6 +58,9 @@ add_test(NAME streams COMMAND test_streams)
 
 add_executable(test_win32_posix test_win32_posix.cpp)
 target_link_libraries(test_win32_posix PRIVATE linscp-shim)
+if(WIN32)
+  target_link_libraries(test_win32_posix PRIVATE shlwapi psapi urlmon)
+endif()
 add_test(NAME win32_on_posix COMMAND test_win32_posix)
 
 add_executable(test_strutils test_strutils.cpp)
