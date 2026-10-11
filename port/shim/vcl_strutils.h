@@ -176,7 +176,6 @@ UnicodeString GetEnvironmentVariable(const UnicodeString & Name);
 bool SetEnvironmentVariable(const UnicodeString & Name,
                             const UnicodeString & Value);
 UnicodeString ExpandFileName(const UnicodeString & FileName);
-UnicodeString ExpandEnvironmentVariables(const UnicodeString & S);
 
 // AnsiSameText is Delphi's byte-wise case-insensitive compare. It is not a
 // synonym for SameText: Delphi's folds only the ANSI range, which is what the

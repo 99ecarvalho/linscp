@@ -94,6 +94,7 @@ add_custom_target(transform ALL DEPENDS "${LINSCP_GEN_STAMP}")
 include(cmake/expat.cmake)
 
 add_subdirectory(port/shim)
+add_subdirectory(port/core)
 
 include(CTest)
 if(BUILD_TESTING)

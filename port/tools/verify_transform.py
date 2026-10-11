@@ -14,6 +14,8 @@ A changed line must be one of:
               port/patches/closure_sites.json, as CLOSURE(Name) or
               CLOSURE_OF(obj, Name). Recomputed here with a regex, not with
               transform.py's own scanner, so the two must agree
+  inline    - in a header, a namespace-scope function definition given
+              `inline` and nothing else
   closeoff  - the line where a multi-line closure typedef ended, changed only
               by turning its ";" into ">;"
   tryfinally- a `try`, `__finally` or closing brace rewritten to the
@@ -32,9 +34,12 @@ import re as _re
 
 def _recorded_sites():
     """{(file, line): [(column, identifier), ...]} from the committed list."""
-    path = 'port/patches/closure_sites.json'
+    # Relative to this script, as transform.py loads it; and required, so the
+    # verifier cannot agree with a transform that bound nothing.
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        '..', 'patches', 'closure_sites.json')
     if not os.path.exists(path):
-        return {}
+        sys.exit(f'missing {path}')
     by_pos = {}
     for site in _json.load(open(path))['sites']:
         by_pos.setdefault((site['file'], site['line']), []).append(
@@ -101,7 +106,7 @@ def closeoff(old_line):
 
 
 def main(gen='build/gen', src='3rd-party/winscp'):
-    changed = macros = files = closures = closeoffs = bindings = 0
+    changed = macros = files = closures = closeoffs = bindings = inlines = 0
     tryfinallys = 0
     bad = []
     for dp, _, ns in os.walk(gen):
@@ -135,6 +140,10 @@ def main(gen='build/gen', src='3rd-party/winscp'):
                     bindings += 1
                 elif y == closeoff(x):
                     closeoffs += 1
+                elif (u.lower().endswith('.h') and
+                      y.lstrip() == 'inline ' + x.lstrip() and
+                      y[:len(y) - len(y.lstrip())] == x[:len(x) - len(x.lstrip())]):
+                    inlines += 1
                 else:
                     bad.append(f'{u}:{i}: changed line matches no transform rule\n'
                                f'      - {x.strip()[:80]}\n      + {y.strip()[:80]}')
@@ -145,6 +154,7 @@ def main(gen='build/gen', src='3rd-party/winscp'):
     print(f'  closure:      {closures}')
     print(f'  template end: {closeoffs}')
     print(f'  closure bind: {bindings}')
+    print(f'  inline:       {inlines}')
     print(f'  try/finally:  {tryfinallys}')
     if bad:
         print(f'\nVIOLATIONS ({len(bad)}):')

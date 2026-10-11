@@ -178,6 +178,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--gen', default='build/gen')
     ap.add_argument('--discover', action='store_true')
+    # For the generated tree the build actually compiles: every recorded site
+    # must be bound there. Without this an unbound tree passed as "not yet
+    # bound" -- which is how CMake's tree went without any bindings unnoticed.
+    ap.add_argument('--require-bound', action='store_true')
     a = ap.parse_args()
 
     if a.discover:
@@ -228,7 +232,7 @@ def main():
     applied = 0
     for s in sites:
         ident = identifier_at(a.gen, s['file'], s['line'], s['column'])
-        if ident == s['identifier']:
+        if ident == s['identifier'] and not a.require_bound:
             continue          # not yet bound
         if ident == 'CLOSURE':
             # Already bound. Confirm it is this identifier that was wrapped,
@@ -244,15 +248,20 @@ def main():
                      rf"{s['identifier']}\)", text_at(a.gen, s)):
             applied += 1
             continue
-        bad.append(f"{s['file']}:{s['line']}:{s['column']}: expected "
-                   f"{s['identifier']!r}, found {ident!r}")
+        if ident == s['identifier']:
+            bad.append(f"{s['file']}:{s['line']}:{s['column']}: "
+                       f"{s['identifier']!r} is not bound")
+        else:
+            bad.append(f"{s['file']}:{s['line']}:{s['column']}: expected "
+                       f"{s['identifier']!r}, found {ident!r}")
     print(f'recorded sites: {len(sites)}  ({applied} already bound)')
     if bad:
         print(f'\nSTALE ({len(bad)}) -- upstream moved; re-run with --discover:')
         for b in bad[:15]:
             print('  ', b)
         return 1
-    print('OK: every recorded site matches, bound or not')
+    print('OK: every recorded site is bound' if a.require_bound else
+          'OK: every recorded site matches, bound or not')
     return 0
 
 

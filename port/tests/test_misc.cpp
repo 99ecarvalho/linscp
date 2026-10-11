@@ -195,26 +195,6 @@ void TestInheritsFrom()
   CHECK(!P->InheritsFrom<TDerived>());          // a base is not its derived
 }
 
-void TestEnvironment()
-{
-  // Round-trip a variable of our own rather than depending on the host's.
-  CHECK(SetEnvironmentVariable(U(L"LINSCP_TEST_VAR"), U(L"hello")));
-  CHECK(GetEnvironmentVariable(U(L"LINSCP_TEST_VAR")) == U(L"hello"));
-  CHECK(GetEnvironmentVariable(U(L"LINSCP_NOT_SET_XYZ")).IsEmpty());
-
-#if !defined(_WIN32)
-  // POSIX-style expansion, which is the equivalent of %VAR% on Windows.
-  CHECK(ExpandEnvironmentVariables(U(L"[$LINSCP_TEST_VAR]")) ==
-        U(L"[hello]"));
-  CHECK(ExpandEnvironmentVariables(U(L"[${LINSCP_TEST_VAR}]")) ==
-        U(L"[hello]"));
-  CHECK(ExpandEnvironmentVariables(U(L"plain")) == U(L"plain"));
-  CHECK(ExpandEnvironmentVariables(U(L"$LINSCP_NOT_SET_XYZ")).IsEmpty());
-#endif
-
-  CHECK(AnsiSameText(U(L"AbC"), U(L"aBc")));
-  CHECK(!AnsiSameStr(U(L"AbC"), U(L"aBc")));
-}
 
 void TestHostVersion()
 {
@@ -414,6 +394,17 @@ void TestVariantArithmetic()
   CHECK(static_cast<double>(Variant(UnicodeString(L"1.5"))) == 1.5);
 }
 
+void TestEnvironment()
+{
+  // Round-trip a variable of our own rather than depending on the host's.
+  CHECK(SetEnvironmentVariable(U(L"LINSCP_TEST_VAR"), U(L"hello")));
+  CHECK(GetEnvironmentVariable(U(L"LINSCP_TEST_VAR")) == U(L"hello"));
+  CHECK(GetEnvironmentVariable(U(L"LINSCP_NOT_SET_XYZ")).IsEmpty());
+
+  CHECK(AnsiSameText(U(L"AbC"), U(L"aBc")));
+  CHECK(!AnsiSameStr(U(L"AbC"), U(L"aBc")));
+}
+
 }  // namespace
 
 void TestStripHotkey()
@@ -436,7 +427,6 @@ int main()
   TestEncoding();
   TestGetBufferEncoding();
   TestInheritsFrom();
-  TestEnvironment();
   TestHostVersion();
   TestStripHotkey();
 
@@ -454,6 +444,8 @@ int main()
   TestTimeSpanTotals();
 
   TestVariantArithmetic();
+
+  TestEnvironment();
 
   if (Failures == 0)
   {

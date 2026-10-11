@@ -195,6 +195,8 @@ class Transformer:
         self.transform_closures(path, lines)
         self.transform_try_finally(path, lines)
         self.bind_closure_sites(path, lines)
+        if path.lower().endswith('.h'):
+            self.inline_header_definitions(path, lines)
         out = []
         for lineno, line in enumerate(lines, 1):
             if '__property' not in line or '#define' in line:
@@ -208,6 +210,30 @@ class Transformer:
                 new = None
             out.append(new if new is not None else line)
         return '\n'.join(out)
+
+    # A function defined on one line, at namespace scope, in a header.
+    HEADER_DEFINITION = re.compile(
+        r'^(?!\s*(inline|static|template|typedef|class|struct|enum|namespace|'
+        r'extern|return|if|else|for|while|do|switch)\b)'
+        r'[A-Za-z_][\w\s\*&:<>,]*?\b\w+\s*\([^;{}]*\)\s*(const\s*)?\{.*\}\s*$')
+
+    def inline_header_definitions(self, path, lines):
+        """Give a header's namespace-scope function definitions `inline`.
+
+        Common.h defines IsWideChar without it, so every unit including the
+        header emits its own copy -- one definition per unit, which C++Builder's
+        linker tolerates and the C++ standard does not. `inline` is what makes
+        it legal; nothing else changes, and members (already implicitly
+        inline) are out of scope because only depth zero is considered.
+        """
+        code = code_only_lines(lines)
+        depth = 0
+        for i, line in enumerate(lines):
+            if depth == 0 and self.HEADER_DEFINITION.match(code[i].rstrip('\r')):
+                indent = len(line) - len(line.lstrip())
+                lines[i] = line[:indent] + 'inline ' + line[indent:]
+                self.stats['header_inline'] += 1
+            depth += code[i].count('{') - code[i].count('}')
 
     def bind_closure_sites(self, path, lines):
         """Rewrite Borland's implicit closures as explicit bindings.
@@ -485,13 +511,19 @@ EXTS = {'.h', '.hpp', '.cpp', '.c', '.inc'}
 # expected. Discovered by the compiler (port/tools/bind_closures.py), recorded,
 # and applied here so the result is reproducible rather than depending on a
 # compile. See that script for why this cannot be inferred by regex.
-CLOSURE_SITES = 'port/patches/closure_sites.json'
+# Relative to this script, not the working directory: CMake runs the transform
+# from the build tree, where a relative path found nothing and every binding
+# was silently skipped.
+CLOSURE_SITES = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                             '..', 'patches', 'closure_sites.json')
 
 
 def load_closure_sites():
     """{relative path: [(line, column, identifier), ...]}"""
     if not os.path.exists(CLOSURE_SITES):
-        return {}
+        # Part of the reviewed patch series, not optional: without it core does
+        # not compile, and a quietly empty list is how that went unnoticed.
+        sys.exit(f'missing {CLOSURE_SITES}')
     import json
     by_file = {}
     for site in json.load(open(CLOSURE_SITES))['sites']:

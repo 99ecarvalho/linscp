@@ -740,47 +740,6 @@ UnicodeString ExpandFileName(const UnicodeString & FileName)
   return ExpandUNCFileName(FileName);
 }
 
-UnicodeString ExpandEnvironmentVariables(const UnicodeString & S)
-{
-#if defined(_WIN32)
-  wchar_t Buf[32767];
-  const DWORD N = ExpandEnvironmentStringsW(
-    S.c_str(), Buf, static_cast<DWORD>(sizeof(Buf) / sizeof(Buf[0])));
-  return N == 0 ? S : UnicodeString(Buf);
-#else
-  // $VAR and ${VAR}, the POSIX equivalent of Windows' %VAR%.
-  UnicodeString Out;
-  int I = 1;
-  while (I <= S.Length())
-  {
-    if (S[I] != L'$')
-    {
-      Out += S[I];
-      ++I;
-      continue;
-    }
-    ++I;
-    const bool Braced = (I <= S.Length() && S[I] == L'{');
-    if (Braced)
-    {
-      ++I;
-    }
-    UnicodeString Name;
-    while (I <= S.Length() &&
-           (Braced ? S[I] != L'}' : (IsAsciiAlnum(S[I]) || S[I] == L'_')))
-    {
-      Name += S[I];
-      ++I;
-    }
-    if (Braced && I <= S.Length())
-    {
-      ++I;
-    }
-    Out += GetEnvironmentVariable(Name);
-  }
-  return Out;
-#endif
-}
 
 bool AnsiSameText(const UnicodeString & A, const UnicodeString & B)
 {

@@ -32,12 +32,13 @@ CBPROJ = '3rd-party/winscp/source/ScpCore.cbproj'
 
 
 def project_units():
-    """The core translation units upstream builds, in source/core/X.cpp form."""
-    text = open(CBPROJ, encoding='utf-8', errors='replace').read()
-    units = sorted(set(re.findall(r'Include="core\\([^"\\]+\.cpp)"', text)))
-    if not units:
-        sys.exit(f'{CBPROJ}: no core units found -- has the project layout changed?')
-    return [f'source/core/{u}' for u in units]
+    """The core translation units upstream builds; see upstream_units.py."""
+    import importlib.util
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'upstream_units.py')
+    spec = importlib.util.spec_from_file_location('upstream_units', path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.project_units(CBPROJ)
 
 
 def regenerate():

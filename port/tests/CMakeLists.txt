@@ -127,7 +127,7 @@ add_test(NAME closure_shapes
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_closure_shapes.py")
 add_test(NAME closure_sites
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/bind_closures.py"
-          --gen "${LINSCP_GEN}")
+          --gen "${LINSCP_GEN}" --require-bound)
 set_tests_properties(closure_sites
   PROPERTIES WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 

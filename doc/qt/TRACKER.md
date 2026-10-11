@@ -20,24 +20,28 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 Driven by `compile_census.py` rather than by grep counts — the compiler names
 what is actually blocking each unit, in dependency order.
 
-**The whole core library compiles for Windows.** All 33 `.cpp` files in
-upstream's `ScpCore.cbproj`, in upstream's own preprocessor configuration:
-**0 errors on mingw, 33/33 clean.** Linux: **558 errors, 14/33 clean, 4
-aborting.**
+**The whole core library compiles for Windows** -- all 33 units in upstream's
+`ScpCore.cbproj`, 0 errors -- and now not only in the syntax-only census but
+as a real library: `linscp-core`, built by CMake with the cross toolchain.
+Linux: **558 errors, 14/33 clean, 4 aborting.**
 
-The census is `-fsyntax-only`. It proves every unit parses and type-checks,
-not that the library links: a function the shim declares but never defines
-only shows up at link time. That is the next measurement.
+**Link check** (`--target linscp-core-link`, every core object forced into
+one executable): **352 undefined symbols on Windows, none of them the VCL
+shim's.** Every Delphi RTL function core calls now resolves. What remains is
+the work that was always separate:
 
-1. **Build core as a real library for Windows** (P1-17 groundwork): compile
-   all 33 units in CMake with the cross toolchain and resolve what the
-   linker reports -- undefined shim functions, and the PuTTY, FileZilla,
-   OpenSSL and neon libraries core links against (P1-13).
-2. **P1-09**: PuTTY's Unix platform layer -- a second pinned upstream plus a
-   patch series carrying WinSCP's platform changes to `unix/`. WinSCP's PuTTY
-   is 0.83 with 121 of 224 files modified (+5,276 / -1,962 lines).
-3. **P1-07b**: the Win32 file, module and shell calls core makes directly,
-   in `port/platform`, which is most of the rest of the Linux remainder.
+| Missing | Symbols | Task |
+|---|---|---|
+| PuTTY (WinSCP's vendored copy) | ~145 | P1-13 |
+| neon, OpenSSL, libs3 from `libs/` | ~150 | P1-13 |
+| FileZilla | 28 | P1-11 |
+| The frontend half of `Interface.h` (`StartThread`, `ProcessGUI`, ...) | 17 | P1-16 |
+
+1. **P1-13 for Windows**: build WinSCP's PuTTY, then neon, libs3 and OpenSSL
+   from the submodule as CMake libraries, and link them in.
+2. **P1-16**: the headless frontend -- the 17 `Interface.h` functions -- after
+   which core links and can run.
+3. **P1-09**: PuTTY's Unix platform layer, for Linux.
 
 ## Decisions taken
 
@@ -78,6 +82,9 @@ only shows up at link time. That is the next measurement.
 | 2026-10-11 | `TCustomIniFile`'s virtuals take parameters by value, and its abstract set is Delphi's eight | C++Builder declares Delphi virtuals that way and core's `TOptionsIniFile` overrides with exactly those signatures; by-reference parameters made its methods new functions and left the class abstract |
 | 2026-10-11 | `TStrings::Text` uses CRLF on both platforms | Delphi's POSIX RTL uses LF. Core builds configuration and server-facing text through `Text`, and identical output everywhere matters more |
 | 2026-10-11 | try/__finally brace depth is measured over code only | A `}` inside a comment in a `__finally` body put `LINSCP_END_FINALLY` one brace early in ScpFileSystem.cpp. Comments and string/character literals are now blanked before counting; still 179 blocks |
+| 2026-10-11 | The transform finds its patch series relative to itself, and a missing one is an error | CMake runs it from the build tree, where the relative path found nothing: every CMake-built tree had **no closure bindings at all**, and the verifier, loading the same way, agreed. The census ran from the repo root and never saw it. `bind_closures.py --require-bound` now checks the tree the build compiles |
+| 2026-10-11 | Header function definitions at namespace scope get `inline` (transform rule, verified) | `Common.h` defines `IsWideChar` without it: one definition per including unit, 31 in all, which C++Builder's linker tolerates and the standard forbids. A rule rather than a patch, so a new one upstream is handled too; a global `--allow-multiple-definition` would have hidden real duplicates |
+| 2026-10-11 | The shim's `ExpandEnvironmentVariables` removed | Core defines it itself, with Windows `%VAR%` semantics through `ExpandEnvironmentStrings`. The shim's was an invented POSIX `$VAR` variant, a duplicate the syntax-only census could not see. Linux gets `ExpandEnvironmentStrings` with Windows semantics instead (P1-07b) |
 | 2026-10-10 | A PR-able branch against `winscp/winscp` will be **generated**, not hand-maintained | linscp shares no history with upstream, so its `qt` branch is not directly mergeable. Since the port is mechanical, the fork branch can be produced on demand (Q-7). Rehearsed end to end — see facts below |
 | 2026-10-10 | Transform must be byte-exact outside property lines | A full-file rewrite (CRLF loss) turned a 613-line change into 76,551. Now asserted by `verify_transform.py` |
 | 2026-10-10 | Field/accessor classification is convention-first, parens only as fallback | The parens heuristic false-positives on constructor initialiser lists; WinSCP's `F<Upper>` / `Get*`/`Set*` convention is airtight. Truly unclassifiable names now fail the run instead of producing a wrong-arity macro |
