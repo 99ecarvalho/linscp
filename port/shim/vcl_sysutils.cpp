@@ -140,17 +140,14 @@ std::string ToBytes(const UnicodeString & S)
   return linscp::Utf16ToUtf8(S);
 }
 
+// The platform layer's mapping, so FileGetAttr and GetFileAttributes agree;
+// Delphi's fa* constants are Win32's attribute bits.
 int AttrFromStat(const struct stat & St, const std::string & Name)
 {
-  int Attr = 0;
-  if (S_ISDIR(St.st_mode))  { Attr |= faDirectory; }
-  if (S_ISLNK(St.st_mode))  { Attr |= faSymLink; }
-  if ((St.st_mode & S_IWUSR) == 0) { Attr |= faReadOnly; }
-  // POSIX has no hidden bit; a leading dot is the established convention and
-  // is what users expect "show hidden files" to act on.
-  if (!Name.empty() && Name[0] == '.') { Attr |= faHidden; }
-  if (Attr == 0) { Attr = faNormal; }
-  return Attr;
+  static_assert((faReadOnly == FILE_ATTRIBUTE_READONLY) && (faHidden == FILE_ATTRIBUTE_HIDDEN) &&
+                (faDirectory == FILE_ATTRIBUTE_DIRECTORY) && (faSymLink == FILE_ATTRIBUTE_REPARSE_POINT) &&
+                (faNormal == FILE_ATTRIBUTE_NORMAL), "fa* must equal FILE_ATTRIBUTE_*");
+  return static_cast<int>(linscp::AttributesFromStat(St, Name.c_str()));
 }
 
 FILETIME FileTimeFromTimespec(const struct timespec & T)
