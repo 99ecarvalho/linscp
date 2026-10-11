@@ -603,9 +603,21 @@ def main():
     ap.add_argument('--check', action='store_true',
                     help='report only; do not write the output tree')
     ap.add_argument('--report')
+    ap.add_argument('--list-outputs', action='store_true',
+                    help='print the generated files, relative to --out, and exit')
     ap.add_argument('--no-closure-sites', action='store_true',
                     help='skip binding recorded closure sites (for discovery)')
     a = ap.parse_args()
+
+    if a.list_outputs:
+        # For the build: CMake declares these as the transform's byproducts.
+        for sub_ in a.subdirs:
+            for dirpath, _, names in os.walk(os.path.join(a.src, sub_)):
+                for n in sorted(names):
+                    if os.path.splitext(n)[1].lower() in EXTS:
+                        print(os.path.relpath(os.path.join(dirpath, n), a.src)
+                              .replace(os.sep, '/'))
+        return 0
 
     t = Transformer(bind_sites=not a.no_closure_sites, src_root=a.src)
     patchset = _load_patchset()
@@ -634,6 +646,12 @@ def main():
                     sys.exit(f'LINE COUNT CHANGED in {rel} — transform is not 1:1')
                 nfiles += 1
                 if not a.check:
+                    # Unchanged output keeps its mtime, so the build recompiles
+                    # only what a rule or patch actually changed.
+                    if os.path.exists(dst) and open(
+                            dst, encoding='utf-8', errors='surrogateescape',
+                            newline='').read() == new:
+                        continue
                     os.makedirs(os.path.dirname(dst), exist_ok=True)
                     open(dst, 'w', encoding='utf-8', errors='surrogateescape', newline='').write(new)
 

@@ -80,8 +80,19 @@ set(LINSCP_GEN_STAMP "${CMAKE_BINARY_DIR}/transform.stamp")
 # scripts. Without this, a change to closure_sites.json left the generated tree
 # silently stale.
 file(GLOB LINSCP_PATCHES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/port/patches/*")
+# Every generated file is a byproduct. Otherwise Ninja stats them before the
+# transform runs, sees nothing newer than the objects, and compiles nothing:
+# a new patch reached build/gen but not the libraries built from it.
+execute_process(
+  COMMAND "${Python3_EXECUTABLE}" "${LINSCP_TRANSFORM}"
+          --src "${LINSCP_UPSTREAM}" --list-outputs
+  OUTPUT_VARIABLE _gen_files OUTPUT_STRIP_TRAILING_WHITESPACE
+  COMMAND_ERROR_IS_FATAL ANY)
+string(REPLACE "\n" ";" _gen_files "${_gen_files}")
+list(TRANSFORM _gen_files PREPEND "${LINSCP_GEN}/")
 add_custom_command(
   OUTPUT  "${LINSCP_GEN_STAMP}"
+  BYPRODUCTS ${_gen_files}
   COMMAND "${Python3_EXECUTABLE}" "${LINSCP_TRANSFORM}"
           --src "${LINSCP_UPSTREAM}" --out "${LINSCP_GEN}"
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/verify_transform.py"
