@@ -323,6 +323,7 @@ int GetThreadPriority(HANDLE Thread);
 // started by CreateThread equal to the id CreateThread reported -- core asserts
 // exactly that in TTerminalThread.
 DWORD GetCurrentThreadId();
+DWORD GetCurrentProcessId();
 
 DWORD WaitForSingleObject(HANDLE Handle, DWORD Milliseconds);
 DWORD WaitForMultipleObjects(DWORD Count, const HANDLE * Handles, BOOL WaitAll,

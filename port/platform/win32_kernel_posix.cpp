@@ -8,6 +8,7 @@
 #include "win32_on_posix.h"
 
 #include <pthread.h>
+#include <unistd.h>
 
 #include <algorithm>
 #include <atomic>
@@ -338,6 +339,11 @@ DWORD GetCurrentThreadId()
     GThreadId = GNextThreadId++;
   }
   return GThreadId;
+}
+
+DWORD GetCurrentProcessId()
+{
+  return static_cast<DWORD>(getpid());
 }
 
 DWORD WaitForMultipleObjects(DWORD Count, const HANDLE * Handles, BOOL WaitAll,

@@ -22,8 +22,8 @@ what is actually blocking each unit, in dependency order.
 
 The census now covers **every core unit upstream builds** -- all 33 `.cpp`
 files in `ScpCore.cbproj`, read from the project itself -- in upstream's own
-preprocessor configuration. Census: **167 errors on mingw (16/33 clean, none
-aborting), 696 on Linux (10/33 clean, 4 aborting).**
+preprocessor configuration. Census: **142 errors on mingw (16/33 clean, none
+aborting), 669 on Linux (10/33 clean, 4 aborting).**
 
 The ten units tracked until now were a sample, and all ten compile for Windows.
 The whole-core figure is the honest one. It rose rather than fell when the
@@ -75,6 +75,7 @@ Remaining on mingw, largest first: `S3FileSystem` 28, `ScpFileSystem` 26,
 | 2026-10-11 | `StaticArray<T, N>` keeps one slack element, filled by its owner with a value no input matches | Core passes `Size()` as an open array's *high index* (`ParseShortEngMonthName`) and reads one past the end. In C++Builder that is whatever follows; here it is defined and means "not found" |
 | 2026-10-11 | The census measures every core unit in `ScpCore.cbproj`, read from the project, in parallel | Ten units were a sample. Reading the list from upstream means a unit it adds fails the ratchet until baselined, rather than going unmeasured. 66 compiles take about 5 s |
 | 2026-10-11 | Case-mismatched upstream includes get checked-in forwarding headers in `port/casefold` | They resolve only on case-insensitive file systems, so a Linux host fails even when cross-compiling for Windows. Explicit, not generated: a basename match would have mapped `putty/windows/gss.c`'s `security.h` -- the Windows SDK header -- onto core's `Security.h`. `check_include_case.py` applies a same-directory rule and fails on drift either way |
+| 2026-10-11 | `ARRAYOFCONST` expands to C++Builder's two arguments, a `TVarRec` pointer and the high index | Core's own functions take open arrays that way (`ExecCommand`, `ExtException`), so a single container argument cannot reach them. The count comes from `sizeof` over an unevaluated call, so each value is evaluated once -- C++Builder's macro evaluates them twice |
 | 2026-10-10 | A PR-able branch against `winscp/winscp` will be **generated**, not hand-maintained | linscp shares no history with upstream, so its `qt` branch is not directly mergeable. Since the port is mechanical, the fork branch can be produced on demand (Q-7). Rehearsed end to end — see facts below |
 | 2026-10-10 | Transform must be byte-exact outside property lines | A full-file rewrite (CRLF loss) turned a 613-line change into 76,551. Now asserted by `verify_transform.py` |
 | 2026-10-10 | Field/accessor classification is convention-first, parens only as fallback | The parens heuristic false-positives on constructor initialiser lists; WinSCP's `F<Upper>` / `Get*`/`Set*` convention is airtight. Truly unclassifiable names now fail the run instead of producing a wrong-arity macro |

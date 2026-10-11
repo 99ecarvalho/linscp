@@ -6,11 +6,13 @@
 //     #define FMTLOAD(I, F)   FmtLoadStr(I, ARRAYOFCONST(F))
 // written as FORMAT(L"%s=%s", (Name, Value)) -- note the extra parentheses.
 //
-// That shape is what makes this tractable. C++Builder builds an open array of
-// TVarRec, which needs compound literals; here ARRAYOFCONST simply pastes the
-// already-parenthesised list onto a variadic call, so
-//     ARRAYOFCONST((Name, Value))  ->  MakeFormatArgs(Name, Value)
-// which is ordinary C++ with no macro trickery beyond the paste.
+// ARRAYOFCONST expands, as in C++Builder, to the two arguments of a Delphi open
+// array: a TVarRec pointer and the array's *high index* (count - 1). Core's
+// own functions take them that way -- ExecCommand(Cmd, const TVarRec * Args,
+// int Size), ExtException(Msg, Args, Args_Size) -- so a single container
+// argument cannot work. The pointer is a temporary array's, alive to the end
+// of the full expression. The count comes from sizeof over an unevaluated
+// call, so unlike C++Builder's macro each value is evaluated exactly once.
 //---------------------------------------------------------------------------
 #ifndef LINSCP_VCL_FORMAT_H
 #define LINSCP_VCL_FORMAT_H
@@ -76,16 +78,25 @@ TFormatArgs MakeFormatArgs(A &&... Args)
   return TFormatArgs{ TVarRec(std::forward<A>(Args))... };
 }
 
-// Pastes the already-parenthesised argument list onto the variadic call.
-#define ARRAYOFCONST(VALUES) MakeFormatArgs VALUES
+namespace linscp {
 
+// Never called: only its return type's size is used, to count arguments.
+template <typename... A>
+char (&FormatArgCount(A &&...))[sizeof...(A) + 1];
+
+}  // namespace linscp
+
+#define ARRAYOFCONST(VALUES) \
+  MakeFormatArgs VALUES .data(), \
+  (static_cast<int>(sizeof(::linscp::FormatArgCount VALUES)) - 2)
+
+// Delphi's Format. Args_High is the open array's high index, -1 for none.
+UnicodeString Format(const UnicodeString & Fmt, const TVarRec * Args, int Args_High);
+// The same, over a container; convenient for the shim's own callers.
 UnicodeString Format(const UnicodeString & Fmt, const TFormatArgs & Args);
 
-// Format a resource string: FmtLoadStr(Ident, Args) is Format(LoadStr(Ident),
-// Args). Declared but not defined here on purpose -- LoadStr is core's own
-// (Common.h) and reads from the resource module, so the definition belongs with
-// the resource layer rather than the RTL shim.
-UnicodeString FmtLoadStr(int Ident, const TFormatArgs & Args);
+// SysUtils' FmtLoadStr: Format(LoadStr(Ident), Args).
+UnicodeString FmtLoadStr(int Ident, const TVarRec * Args, int Args_High);
 
 // Delphi's FormatFloat, for the placeholder subset: '0' and '#' digits, ','
 // grouping, '.' decimals, quoted or plain literal text, and up to three ';'

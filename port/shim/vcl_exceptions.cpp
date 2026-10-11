@@ -35,12 +35,7 @@ UnicodeString Formatted(const UnicodeString & Fmt, const TVarRec * Args,
   // C++Builder passes the *index of the last element*, not the count, which is
   // what ARRAYOFCONST computes. Off by one here would silently drop the final
   // argument from every formatted exception message.
-  TFormatArgs Collected;
-  for (int I = 0; I <= ArgsSize; ++I)
-  {
-    Collected.push_back(Args[I]);
-  }
-  return Format(Fmt, Collected);
+  return Format(Fmt, Args, ArgsSize);
 }
 
 }  // namespace

@@ -1,6 +1,12 @@
 {
   "sites": [
     {
+      "file": "source/core/FtpFileSystem.cpp",
+      "line": 1092,
+      "column": 61,
+      "identifier": "ChangeFileProperties"
+    },
+    {
       "file": "source/core/Http.cpp",
       "line": 80,
       "column": 34,
@@ -185,6 +191,18 @@
       "line": 2615,
       "column": 13,
       "identifier": "TerminalReopenEvent"
+    },
+    {
+      "file": "source/core/S3FileSystem.cpp",
+      "line": 668,
+      "column": 39,
+      "identifier": "InitSslSession"
+    },
+    {
+      "file": "source/core/S3FileSystem.cpp",
+      "line": 2245,
+      "column": 56,
+      "identifier": "LoadFileProperties"
     },
     {
       "file": "source/core/ScpFileSystem.cpp",

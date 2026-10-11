@@ -83,6 +83,8 @@ void TestSuspendedStartProtocol()
 
 void TestThreadIdStable()
 {
+  CHECK(GetCurrentProcessId() != 0);
+  CHECK(GetCurrentProcessId() == GetCurrentProcessId());
   const DWORD Main = GetCurrentThreadId();
   CHECK(Main != 0);
   CHECK(GetCurrentThreadId() == Main);

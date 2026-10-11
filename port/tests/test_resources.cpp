@@ -6,6 +6,7 @@
 // as core's DoLoadStrFrom expects -- including truncation, which core relies on
 // to size the result.
 #include "vcl_resources.h"
+#include "vcl_format.h"
 #include "vcl_misc.h"
 
 #include <cstdio>
@@ -156,6 +157,42 @@ void TestModuleListMatchesFindModule()
   CHECK(Module->Next == nullptr);
 }
 
+// Global.h's macros, verbatim.
+#define FORMAT(S, F) Format(S, ARRAYOFCONST(F))
+#define FMTLOAD(I, F) FmtLoadStr(I, ARRAYOFCONST(F))
+
+int GHigh = -99;
+const TVarRec * GArgs = nullptr;
+// Shaped like core's TSCPFileSystem::ExecCommand(Cmd, const TVarRec *, int).
+void CoreShapedCallee(const TVarRec * Args, int Size)
+{
+  GArgs = Args;
+  GHigh = Size;
+}
+
+int GEvaluations = 0;
+int Counted() { ++GEvaluations; return 7; }
+
+void TestOpenArrayMacro()
+{
+  CoreShapedCallee(ARRAYOFCONST((1, L"two", 3.0)));
+  CHECK(GHigh == 2);                         // the high index, as in C++Builder
+  CHECK(GArgs != nullptr);
+  CoreShapedCallee(ARRAYOFCONST(()));
+  CHECK(GHigh == -1);                        // empty
+
+  GEvaluations = 0;
+  const UnicodeString S = FORMAT(L"%d-%d", (Counted(), Counted()));
+  CHECK(S == UnicodeString(L"7-7"));
+  CHECK(GEvaluations == 2);                  // once each, not twice
+
+  CHECK(FORMAT(L"%s=%d", (L"k", 5)) == UnicodeString(L"k=5"));
+  // FMTLOAD over a real upstream string with two specifiers.
+  const UnicodeString Msg = FMTLOAD(COMMAND_FAILED2, (L"ls", 2));
+  CHECK(Msg.Pos(UnicodeString(L"Command 'ls'")) == 1);
+  CHECK(Msg.Pos(UnicodeString(L"return code 2")) > 0);
+}
+
 }  // namespace
 
 int main()
@@ -166,6 +203,8 @@ int main()
   TestModuleListMatchesFindModule();
   TestLoadStrMatchesTheWholeTable();
   TestStripHotkeyOverLoadStr();
+
+  TestOpenArrayMacro();
 
   if (Failures == 0)
   {

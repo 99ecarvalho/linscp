@@ -1,4 +1,5 @@
 #include "vcl_format.h"
+#include "vcl_resources.h"
 #include "vcl_datetime.h"
 #include <vector>
 #include <cmath>
@@ -354,4 +355,19 @@ UnicodeString FormatFloat(const UnicodeString & Format, double Value,
     }
   }
   return Result;
+}
+
+UnicodeString Format(const UnicodeString & Fmt, const TVarRec * Args, int Args_High)
+{
+  TFormatArgs Collected;
+  for (int I = 0; (Args != nullptr) && (I <= Args_High); ++I)
+  {
+    Collected.push_back(Args[I]);
+  }
+  return Format(Fmt, Collected);
+}
+
+UnicodeString FmtLoadStr(int Ident, const TVarRec * Args, int Args_High)
+{
+  return Format(LoadStr(static_cast<NativeUInt>(Ident)), Args, Args_High);
 }
