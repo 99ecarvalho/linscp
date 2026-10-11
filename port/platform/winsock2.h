@@ -25,6 +25,7 @@ Do not put port/platform on the include path for a Windows target."
 #include <netdb.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
+#include <sys/ioctl.h>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -81,7 +82,14 @@ typedef struct hostent * LPHOSTENT;
 #define WSAGETSELECTERROR(lParam) HIWORD(lParam)
 typedef struct sockaddr SOCKADDR;
 typedef struct sockaddr_in SOCKADDR_IN;
+typedef struct sockaddr_in * PSOCKADDR_IN;
+typedef struct sockaddr_in * LPSOCKADDR_IN;
 typedef struct sockaddr_in6 SOCKADDR_IN6;
+typedef struct in_addr IN_ADDR;
+typedef struct in_addr * LPIN_ADDR;
+// Winsock's name for the bytes of an IPv6 address (in6addr.h); glibc's is
+// s6_addr, over the same 16 bytes.
+#define s6_bytes s6_addr
 typedef struct sockaddr_storage SOCKADDR_STORAGE;
 
 typedef struct WSAData
@@ -132,6 +140,7 @@ typedef struct WSAData
 #define WSAEPFNOSUPPORT         (WSABASEERR + 46)
 #define WSAEAFNOSUPPORT         (WSABASEERR + 47)
 #define WSAEPROCLIM             (WSABASEERR + 67)
+#define WSANOTINITIALISED       (WSABASEERR + 93)
 #define WSAEDISCON              (WSABASEERR + 101)
 #define WSAHOST_NOT_FOUND       (WSABASEERR + 1001)
 #define WSATRY_AGAIN            (WSABASEERR + 1002)
@@ -164,9 +173,25 @@ typedef WSAPROTOCOL_INFOA * LPWSAPROTOCOL_INFO;
 // The address as text, "a.b.c.d:port" or "[v6]:port" when the port is set.
 int WSAAddressToStringA(LPSOCKADDR Address, DWORD AddressLength, LPWSAPROTOCOL_INFO ProtocolInfo,
   LPSTR String, LPDWORD StringLength);
-// Window-message notification needs a window, of which there are none:
-// fails with WSAEOPNOTSUPP. PuTTY on Windows uses WSAEventSelect as core does.
+// Notification by window message, as FileZilla's sockets use: each event
+// is posted to Window as Message, wParam the socket and lParam
+// WSAMAKESELECTREPLY(event, error), under the same re-enabling rules as
+// WSAEventSelect, which it replaces (and is replaced by). Events 0 cancels.
 int WSAAsyncSelect(SOCKET S, HWND Window, UINT Message, LONG Events);
+
+// An IPv4 host lookup on another thread. The reply is posted to Window as
+// Message, wParam the returned handle and lParam
+// WSAMAKEASYNCREPLY(length needed, error), with a hostent laid out in
+// Buffer (h_addr the first address). After WSACancelAsyncRequest nothing is
+// posted and Buffer is not written; cancelling a finished request fails with
+// WSAEALREADY.
+#define MAXGETHOSTSTRUCT 1024
+#define WSAMAKEASYNCREPLY(buflen, error) ((LPARAM)MAKELONG(buflen, error))
+#define WSAGETASYNCBUFLEN(lParam) LOWORD(lParam)
+#define WSAGETASYNCERROR(lParam) HIWORD(lParam)
+#define WSAEALREADY (WSABASEERR + 37)
+HANDLE WSAAsyncGetHostByName(HWND Window, UINT Message, const char * Name, char * Buffer, int BufferLength);
+int WSACancelAsyncRequest(HANDLE AsyncTaskHandle);
 
 // The local interfaces' addresses (SIO_GET_INTERFACE_LIST), from getifaddrs.
 #define SIO_GET_INTERFACE_LIST 0x4004747F
@@ -186,8 +211,7 @@ typedef struct _INTERFACE_INFO
   sockaddr_gen iiNetmask;
 } INTERFACE_INFO;
 
-// The event model. Declared so core compiles; the implementation lands with
-// P1-08, which replaces FileZilla's hidden-window message pump.
+// The event model (win32_winsock_posix.cpp).
 WSAEVENT WSACreateEvent();
 BOOL WSACloseEvent(WSAEVENT Event);
 BOOL WSAResetEvent(WSAEVENT Event);
@@ -216,6 +240,33 @@ int WSAIoctl(SOCKET S, DWORD IoControlCode, LPVOID InBuffer, DWORD InSize, LPVOI
 
 #ifdef __cplusplus
 }  // extern "C"
+
+// The socket functions with Winsock's signatures, for C++ that calls them
+// directly (FileZilla) rather than through ws2_32's GetProcAddress (PuTTY):
+// the same functions the module exports, so errors are Winsock codes in
+// WSAGetLastError, a pending connect is WSAEWOULDBLOCK, sends never raise
+// SIGPIPE and the selections' re-enabling rules apply. They overload libc's
+// on the SOCKET argument, so a call on a SOCKET reaches them and one on a
+// descriptor libc's. Where an argument would match libc's better -- a buffer
+// as void * -- the call is deleted rather than quietly taking BSD semantics.
+// socket, gethostbyname, getaddrinfo and the rest share libc's signatures,
+// so libc's serve; FileZilla tests only their results. C++ linkage even
+// where the header is included inside extern "C" (core includes PuTTY's).
+extern "C++" {
+int connect(SOCKET S, const struct sockaddr * Name, int NameLen);
+int bind(SOCKET S, const struct sockaddr * Name, int NameLen);
+int listen(SOCKET S, int Backlog);
+SOCKET accept(SOCKET S, struct sockaddr * Address, int * AddressLen);
+int send(SOCKET S, const char * Buffer, int Length, int Flags);
+int send(SOCKET S, const void * Buffer, int Length, int Flags) = delete;
+int recv(SOCKET S, char * Buffer, int Length, int Flags);
+int recv(SOCKET S, void * Buffer, int Length, int Flags) = delete;
+int shutdown(SOCKET S, int How);
+int getsockopt(SOCKET S, int Level, int Name, char * Value, int * Length);
+int setsockopt(SOCKET S, int Level, int Name, const char * Value, int Length);
+int getpeername(SOCKET S, struct sockaddr * Name, int * NameLen);
+int getsockname(SOCKET S, struct sockaddr * Name, int * NameLen);
+}
 #endif
 
 #endif // LINSCP_WINSOCK2_H

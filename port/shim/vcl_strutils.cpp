@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <algorithm>
 #include <cstring>
 #include <string>
 #include <type_traits>
@@ -1102,6 +1103,28 @@ int UnicodeString::vprintf(const wchar_t * Format, va_list Args)
   *this = WideVFormat(Format, Args);
   return Length();
 }
+
+#if !defined(_WIN32)
+// The platform layer's legacy swprintf (win32_on_posix.h) formats with this.
+int linscp_FormatWide(wchar_t * Buffer, const wchar_t * Format, va_list Args)
+{
+  const UnicodeString Result = WideVFormat(Format, Args);
+  std::memcpy(Buffer, Result.c_str(), (static_cast<std::size_t>(Result.Length()) + 1) * sizeof(wchar_t));
+  return Result.Length();
+}
+
+int linscp_FormatWideN(wchar_t * Buffer, size_t Count, const wchar_t * Format, va_list Args)
+{
+  const UnicodeString Result = WideVFormat(Format, Args);
+  if (Count > 0)
+  {
+    const std::size_t N = std::min(static_cast<std::size_t>(Result.Length()), Count - 1);
+    std::memcpy(Buffer, Result.c_str(), N * sizeof(wchar_t));
+    Buffer[N] = L'\0';
+  }
+  return Result.Length();
+}
+#endif
 
 UnicodeString & UnicodeString::cat_sprintf(const wchar_t * Format, ...)
 {

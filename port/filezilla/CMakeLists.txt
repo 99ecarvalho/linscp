@@ -1,15 +1,11 @@
 # WinSCP's MFC subset and FileZilla, compiled from the generated tree.
 #
-# Windows only for now: FileZilla's sockets are Win32 asynchronous sockets
-# driven through window messages. Linux needs them replaced (P1-12).
+# FileZilla's sockets are Win32 asynchronous sockets driven through window
+# messages; on POSIX the platform layer emulates those (P1-12).
 #
 # Both are compiled with vcl_win32_prelude.h forced first, so MFC's classes
 # are declared without <windows.h>'s A/W name macros, as core and the shim
 # see Win32. See that header for why.
-if(NOT WIN32)
-  return()
-endif()
-
 set(_g "${LINSCP_GEN}")
 set(_prelude "${CMAKE_SOURCE_DIR}/port/shim/vcl_win32_prelude.h")
 set(_shim_includes "$<TARGET_PROPERTY:linscp-shim,INTERFACE_INCLUDE_DIRECTORIES>")

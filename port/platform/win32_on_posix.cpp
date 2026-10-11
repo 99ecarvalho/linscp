@@ -4,6 +4,8 @@
 #include <chrono>
 #include <ctime>
 #include <cstdlib>
+#include <locale.h>
+#include <wctype.h>
 #include <string>
 
 namespace {
@@ -263,6 +265,56 @@ long linscp_WideToLong(const wchar_t * S, wchar_t ** End, int Base)
 int linscp_WideToInt(const wchar_t * S)
 {
   return static_cast<int>(linscp_WideToLong(S, nullptr, 10));
+}
+
+long long linscp_WideToInt64(const wchar_t * S)
+{
+  // As linscp_WideToLong: ASCII digits only, as the CRT accepts.
+  std::string Narrow;
+  for (const wchar_t * P = S; (*P != L'\0') && (static_cast<unsigned>(*P) < 0x80); ++P)
+  {
+    Narrow += static_cast<char>(*P);
+  }
+  return std::strtoll(Narrow.c_str(), nullptr, 10);
+}
+
+int linscp_WideIsAlpha(wchar_t C)
+{
+  // The CRT classifies wide characters by Unicode whatever the locale, so
+  // this asks a fixed UTF-8 locale rather than the process's. Surrogates are
+  // not letters on their own, there as here.
+  static const locale_t Utf8 = newlocale(LC_CTYPE_MASK, "C.UTF-8", static_cast<locale_t>(0));
+  const unsigned U = static_cast<unsigned>(C);
+  if (Utf8 == static_cast<locale_t>(0))
+  {
+    return ((U | 0x20) >= 'a') && ((U | 0x20) <= 'z');
+  }
+  return iswalpha_l(static_cast<wint_t>(U), Utf8) ? 1 : 0;
+}
+
+char * linscp_LowerAscii(char * S)
+{
+  for (char * P = S; *P != '\0'; ++P)
+  {
+    if ((*P >= 'A') && (*P <= 'Z'))
+    {
+      *P = static_cast<char>(*P - 'A' + 'a');
+    }
+  }
+  return S;
+}
+
+// The CRT's: compares as towlower folds, returning the difference.
+int linscp_WideCompareIC(const wchar_t * A, const wchar_t * B)
+{
+  for (;; ++A, ++B)
+  {
+    const wchar_t X = linscp_ToLower(*A), Y = linscp_ToLower(*B);
+    if ((X != Y) || (X == L'\0'))
+    {
+      return static_cast<int>(X) - static_cast<int>(Y);
+    }
+  }
 }
 
 std::uint64_t FileTimeToTicks(const FILETIME & FileTime)
@@ -658,18 +710,17 @@ int WinsockErrorFromErrno(int Err)
   }
 }
 
-namespace {
-thread_local int GWsaLastError = 0;
-}
-
+// One per-thread error, as on Windows, where WSAGetLastError is
+// GetLastError: FileZilla sets errors with WSASetLastError and reads them
+// with GetLastError.
 int WSAGetLastError()
 {
-  return GWsaLastError != 0 ? GWsaLastError : WinsockErrorFromErrno(errno);
+  return static_cast<int>(GetLastError());
 }
 
 void WSASetLastError(int Error)
 {
-  GWsaLastError = Error;
+  SetLastError(static_cast<DWORD>(Error));
 }
 
 int WSAStartup(WORD VersionRequested, WSADATA * Data)

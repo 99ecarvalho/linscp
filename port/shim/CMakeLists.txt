@@ -56,6 +56,7 @@ if(NOT WIN32)
     "${CMAKE_CURRENT_SOURCE_DIR}/../platform/win32_crypt_posix.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/../platform/win32_system_posix.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/../platform/win32_winsock_posix.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../platform/win32_window_posix.cpp"
   )
 endif()
 if(NOT WIN32)

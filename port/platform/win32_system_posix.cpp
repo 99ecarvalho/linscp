@@ -137,6 +137,15 @@ int _vsnprintf(char * Buffer, size_t Count, const char * Format, va_list Args)
   return ((N < 0) || (static_cast<size_t>(N) >= Count)) ? -1 : N;
 }
 
+int _snprintf(char * Buffer, size_t Count, const char * Format, ...)
+{
+  va_list Args;
+  va_start(Args, Format);
+  const int N = _vsnprintf(Buffer, Count, Format, Args);
+  va_end(Args);
+  return N;
+}
+
 BOOL QueryPerformanceCounter(LARGE_INTEGER * Count)
 {
   timespec T{};
@@ -1118,4 +1127,27 @@ BOOL GetUserNameA(LPSTR Buffer, LPDWORD Size)
   std::memcpy(Buffer, Name.c_str(), Name.size() + 1);
   *Size = static_cast<DWORD>(Name.size() + 1);
   return TRUE;
+}
+
+BOOL IsBadWritePtr(LPVOID Block, UINT_PTR Size)
+{
+  return ((Block == nullptr) && (Size > 0)) ? TRUE : FALSE;
+}
+
+int MessageBoxW(HWND, LPCWSTR Text, LPCWSTR Caption, UINT)
+{
+  auto Utf8 = [](LPCWSTR W) -> std::string
+  {
+    if (W == nullptr)
+    {
+      return std::string();
+    }
+    const int N = WideCharToMultiByte(CP_UTF8, 0, W, -1, nullptr, 0, nullptr, nullptr);
+    std::string R(static_cast<std::size_t>((N > 0) ? N : 1), '\0');
+    WideCharToMultiByte(CP_UTF8, 0, W, -1, &R[0], N, nullptr, nullptr);
+    R.resize(std::strlen(R.c_str()));
+    return R;
+  };
+  std::fprintf(stderr, "%s: %s\n", Utf8(Caption).c_str(), Utf8(Text).c_str());
+  return IDOK;
 }

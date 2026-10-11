@@ -304,6 +304,20 @@ DWORD GetFileSize(HANDLE File, LPDWORD FileSizeHigh)
   return static_cast<DWORD>(Size & 0xFFFFFFFFu);
 }
 
+BOOL CreateDirectory(LPCWSTR PathName, LPSECURITY_ATTRIBUTES)
+{
+  if (mkdir(linscp::WideToUtf8(PathName).c_str(), 0777) == 0)
+  {
+    return TRUE;
+  }
+  switch (errno)
+  {
+    case EEXIST: SetLastError(ERROR_ALREADY_EXISTS); return FALSE;
+    case ENOENT: SetLastError(ERROR_PATH_NOT_FOUND); return FALSE;
+    default: return Fail();
+  }
+}
+
 DWORD GetFileAttributes(LPCWSTR FileName)
 {
   const std::string Path = linscp::WideToUtf8(FileName);

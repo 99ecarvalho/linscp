@@ -197,6 +197,10 @@ wchar_t * linscp_WideCopyN(wchar_t * Dest, const wchar_t * Src, size_t N);
 wchar_t * linscp_WideFindAny(const wchar_t * S, const wchar_t * Chars);
 long linscp_WideToLong(const wchar_t * S, wchar_t ** End, int Base);
 int linscp_WideToInt(const wchar_t * S);
+int linscp_WideCompareIC(const wchar_t * A, const wchar_t * B);
+long long linscp_WideToInt64(const wchar_t * S);
+int linscp_WideIsAlpha(wchar_t C);
+char * linscp_LowerAscii(char * S);
 
 #define towlower  linscp_ToLower
 #define towupper  linscp_ToUpper
@@ -211,6 +215,15 @@ int linscp_WideToInt(const wchar_t * S);
 #define wcspbrk   linscp_WideFindAny
 #define wcstol    linscp_WideToLong
 #define _wtoi     linscp_WideToInt
+#define _wcsicmp  linscp_WideCompareIC
+#define _wtoi64   linscp_WideToInt64
+// tchar.h's, as UNICODE maps it: iswalpha.
+#define _istalpha linscp_WideIsAlpha
+// The CRT's old name; in the C locale it folds ASCII only.
+#define strlwr    linscp_LowerAscii
+#define _strlwr   linscp_LowerAscii
+// tchar.h's: the next character; UTF-16 is not stepped by code point.
+#define _wcsinc(P) ((P) + 1)
 
 // --- time ------------------------------------------------------------------
 // FILETIME counts 100-nanosecond intervals since 1601-01-01 UTC. Core stores
@@ -396,6 +409,10 @@ DWORD GetFileAttributes(LPCWSTR FileName);
 // READONLY clears every write bit, its absence restores the owner's; the
 // rest are ignored.
 BOOL SetFileAttributes(LPCWSTR FileName, DWORD FileAttributes);
+// Security attributes are ignored; the directory gets the umask's mode.
+// Fails with ERROR_ALREADY_EXISTS or, for a missing parent,
+// ERROR_PATH_NOT_FOUND, as Win32.
+BOOL CreateDirectory(LPCWSTR PathName, LPSECURITY_ATTRIBUTES SecurityAttributes);
 // $TMPDIR, else /tmp, with a trailing slash. As Win32: the length without the
 // terminator, or when the buffer is too small the size needed including it.
 DWORD GetTempPath(DWORD BufferLength, LPWSTR Buffer);
@@ -903,6 +920,7 @@ BOOL VerQueryValue(LPCVOID Block, LPCWSTR SubBlock, LPVOID * Buffer, UINT * Leng
 // MSVC's: -1 when the output does not fit, where C99's returns the length
 // needed. Code written for Windows tests for the former.
 int _vsnprintf(char * Buffer, size_t Count, const char * Format, va_list Args);
+int _snprintf(char * Buffer, size_t Count, const char * Format, ...);
 
 typedef union _LARGE_INTEGER
 {
@@ -1114,6 +1132,118 @@ BOOL CryptAcquireContextA(HCRYPTPROV * Provider, LPCSTR Container, LPCSTR Provid
 BOOL CryptGenRandom(HCRYPTPROV Provider, DWORD Length, BYTE * Buffer);
 BOOL CryptReleaseContext(HCRYPTPROV Provider, DWORD Flags);
 
+// Whether a block can be written. Windows probes the pages; POSIX has no
+// probe that is not itself a hazard, so only a null block is reported bad.
+BOOL IsBadWritePtr(LPVOID Block, UINT_PTR Size);
+
+// A message box, in a process with no desktop: the caption and text go to
+// standard error, and the default button (IDOK) is the answer.
+#define MB_OK              0x00000000L
+#define MB_ICONHAND        0x00000010L
+#define MB_ICONERROR       MB_ICONHAND
+#define MB_ICONEXCLAMATION 0x00000030L
+#define MB_ICONWARNING     MB_ICONEXCLAMATION
+#define IDOK 1
+int MessageBoxW(HWND Window, LPCWSTR Text, LPCWSTR Caption, UINT Type);
+
+// --- windows and message queues --------------------------------------------
+// No desktop: windows are message targets only, as FileZilla's helper window
+// is -- a window procedure, an owning thread and a user-data slot. Every
+// thread gets a message queue on its first call to a message function, as
+// Win32 creates one; it goes when the thread exits. Retrieval is Win32's:
+// posted messages first, in order, then WM_TIMER, synthesized for a due
+// timer; filters by window (NULL: any; (HWND)-1: thread messages only) and by
+// message range; WM_QUIT makes GetMessage return 0.
+typedef WORD ATOM;
+typedef void * HBRUSH;
+typedef void * HMENU;
+typedef LRESULT (CALLBACK * WNDPROC)(HWND, UINT, WPARAM, LPARAM);
+typedef void (CALLBACK * TIMERPROC)(HWND, UINT, UINT_PTR, DWORD);
+
+typedef struct tagMSG
+{
+  HWND hwnd;
+  UINT message;
+  WPARAM wParam;
+  LPARAM lParam;
+  DWORD time;
+  POINT pt;
+} MSG, * PMSG, * LPMSG;
+
+typedef struct tagWNDCLASSEXW
+{
+  UINT cbSize;
+  UINT style;
+  WNDPROC lpfnWndProc;
+  int cbClsExtra;
+  int cbWndExtra;
+  HINSTANCE hInstance;
+  HICON hIcon;
+  HCURSOR hCursor;
+  HBRUSH hbrBackground;
+  LPCWSTR lpszMenuName;
+  LPCWSTR lpszClassName;
+  HICON hIconSm;
+} WNDCLASSEXW, WNDCLASSEX;
+
+typedef struct tagCREATESTRUCTW
+{
+  LPVOID lpCreateParams;
+  HINSTANCE hInstance;
+  HMENU hMenu;
+  HWND hwndParent;
+  int cy;
+  int cx;
+  int y;
+  int x;
+  LONG style;
+  LPCWSTR lpszName;
+  LPCWSTR lpszClass;
+  DWORD dwExStyle;
+} CREATESTRUCTW, CREATESTRUCT;
+
+#define WM_NULL       0x0000
+#define WM_CREATE     0x0001
+#define WM_DESTROY    0x0002
+#define WM_QUIT       0x0012
+#define WM_NCCREATE   0x0081
+#define WM_NCDESTROY  0x0082
+#define WM_TIMER      0x0113
+#define WM_USER       0x0400
+#define WM_APP        0x8000
+#define PM_NOREMOVE   0x0000
+#define PM_REMOVE     0x0001
+#define PM_NOYIELD    0x0002
+#define GWLP_WNDPROC  (-4)
+#define GWLP_USERDATA (-21)
+#define HWND_MESSAGE  ((HWND)(LONG_PTR)-3)
+#define USER_TIMER_MINIMUM 0x0000000A
+#define USER_TIMER_MAXIMUM 0x7FFFFFFF
+#define ERROR_INVALID_WINDOW_HANDLE  1400
+#define ERROR_CANNOT_FIND_WND_CLASS  1407
+#define ERROR_CLASS_ALREADY_EXISTS   1410
+#define ERROR_INVALID_INDEX          1413
+#define ERROR_INVALID_THREAD_ID      1444
+#define ERROR_NOT_ENOUGH_QUOTA       1816
+
+ATOM RegisterClassEx(const WNDCLASSEXW * Class);
+HWND CreateWindowEx(DWORD ExStyle, LPCWSTR ClassName, LPCWSTR WindowName, DWORD Style,
+  int X, int Y, int Width, int Height, HWND Parent, HMENU Menu, HINSTANCE Instance, LPVOID Param);
+BOOL DestroyWindow(HWND Window);
+BOOL IsWindow(HWND Window);
+LRESULT DefWindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LParam);
+LONG_PTR GetWindowLongPtr(HWND Window, int Index);
+LONG_PTR SetWindowLongPtr(HWND Window, int Index, LONG_PTR Value);
+UINT RegisterWindowMessage(LPCWSTR Name);
+BOOL PostMessage(HWND Window, UINT Message, WPARAM WParam, LPARAM LParam);
+BOOL PostThreadMessage(DWORD ThreadId, UINT Message, WPARAM WParam, LPARAM LParam);
+BOOL GetMessage(LPMSG Msg, HWND Window, UINT FilterMin, UINT FilterMax);
+BOOL PeekMessage(LPMSG Msg, HWND Window, UINT FilterMin, UINT FilterMax, UINT RemoveMsg);
+BOOL TranslateMessage(const MSG * Msg);
+LRESULT DispatchMessage(const MSG * Msg);
+UINT_PTR SetTimer(HWND Window, UINT_PTR IdEvent, UINT Elapse, TIMERPROC TimerFunc);
+BOOL KillTimer(HWND Window, UINT_PTR IdEvent);
+
 // In C built without UNICODE -- PuTTY -- the bare names are the narrow
 // forms, as <windows.h> maps them. C++ (core, built with UNICODE) keeps the
 // wide functions under the bare names.
@@ -1149,6 +1279,54 @@ BOOL CryptReleaseContext(HCRYPTPROV Provider, DWORD Flags);
 
 #ifdef __cplusplus
 }  // extern "C"
+
+// C++ linkage even where this header is first included inside extern "C".
+extern "C++" {
+
+// C++ is built with UNICODE: the bare names are the wide functions.
+inline HANDLE FindFirstFile(LPCWSTR FileName, WIN32_FIND_DATAW * Data)
+{
+  return FindFirstFileW(FileName, Data);
+}
+inline BOOL FindNextFile(HANDLE Find, WIN32_FIND_DATAW * Data)
+{
+  return FindNextFileW(Find, Data);
+}
+inline int MessageBox(HWND Window, LPCWSTR Text, LPCWSTR Caption, UINT Type)
+{
+  return MessageBoxW(Window, Text, Caption, Type);
+}
+inline HWND CreateWindow(LPCWSTR ClassName, LPCWSTR WindowName, DWORD Style, int X, int Y,
+  int Width, int Height, HWND Parent, HMENU Menu, HINSTANCE Instance, LPVOID Param)
+{
+  return CreateWindowEx(0, ClassName, WindowName, Style, X, Y, Width, Height, Parent, Menu, Instance, Param);
+}
+
+// The Windows CRT's original swprintf, with no buffer size, which mingw-w64
+// and C++Builder still declare (AsyncSslSocketLayer.cpp uses it): formatted
+// as UnicodeString::sprintf formats, with Windows' conventions (%s is wide),
+// by the shim, which links with this layer. ISO's swprintf(Buffer, Count,
+// Format, ...) is a different overload, and libc's (4-byte wchar_t).
+int linscp_FormatWide(wchar_t * Buffer, const wchar_t * Format, va_list Args);
+inline int swprintf(wchar_t * Buffer, const wchar_t * Format, ...)
+{
+  va_list Args;
+  va_start(Args, Format);
+  const int Result = linscp_FormatWide(Buffer, Format, Args);
+  va_end(Args);
+  return Result;
+}
+// snwprintf as mingw-w64 and C++Builder define it: C99's semantics (always
+// terminated if Count > 0, returning the length the whole output needs).
+int linscp_FormatWideN(wchar_t * Buffer, size_t Count, const wchar_t * Format, va_list Args);
+inline int snwprintf(wchar_t * Buffer, size_t Count, const wchar_t * Format, ...)
+{
+  va_list Args;
+  va_start(Args, Format);
+  const int Result = linscp_FormatWideN(Buffer, Count, Format, Args);
+  va_end(Args);
+  return Result;
+}
 
 // Win32 code written for LLP64 passes an unsigned long where a DWORD is
 // declared: the same 32 bits on Windows, 64 on LP64 POSIX. Overloads take
@@ -1187,6 +1365,8 @@ inline DWORD GetFileSize(HANDLE File, unsigned long * FileSizeHigh)
   }
   return Low;
 }
+
+}  // extern "C++"
 #endif
 
 #endif // LINSCP_WIN32_ON_POSIX_H

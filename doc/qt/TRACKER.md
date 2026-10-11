@@ -9,11 +9,11 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 25 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 25 | 36 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 27 | 36 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **50** | **95** | |
+| **Total** | **52** | **95** | |
 
 ## Next three actions
 
@@ -50,16 +50,21 @@ test against real Winsock under Wine and against the emulation (ctest
 **neon and libs3 build on Linux** (P1-13 done). neon takes a POSIX
 configuration from its own `configure` (`port/neon/config-posix.h`); WinSCP's
 Windows-only additions to it are guarded by one patch, and libs3's use the
-POSIX layer. Linking every core object on Linux (`linscp-core-link`) now
-leaves **28 undefined symbols, all FileZilla's** (`TFileZillaIntf`,
-`TFTPServerCapabilities`).
+POSIX layer.
 
-1. **P1-12**: FileZilla on Linux -- its sockets are `WSAAsyncSelect`'s, driven
-   by window messages to a hidden window, which the emulation now needs. The
-   last thing between core and a Linux link.
-2. **P1-17**: the first SFTP session on Linux, against the same loopback
-   `sshd` the Windows session tests use.
-3. **P1-15**: the stdio command-line frontend, on both targets.
+**Core links on Linux** -- every core object, PuTTY, neon, libs3, FileZilla
+and WinSCP's MFC subset, nothing undefined (ctest `core_link_build`) -- and
+initialises and finalises there (`core_init`). FileZilla is compiled as is
+over an emulation of the user32 it uses: windows as message targets, thread
+message queues, timers, `WSAAsyncSelect` and `WSAAsyncGetHostByName` (P1-11,
+P1-12 done). ctest `messages` checks it against user32 and ws2_32 under Wine
+and against the emulation, with the same assertions.
+
+1. **P1-17**: the first SFTP session on Linux. It builds and starts, then
+   fails with heap corruption (`malloc(): corrupted top size`) before
+   connecting; the Linux session tests are registered once it passes.
+2. **P1-15**: the stdio command-line frontend, on both targets.
+3. **P1-06d**: INI storage on Linux, which a usable Linux build needs.
 
 ## Decisions taken
 
@@ -186,6 +191,11 @@ leaves **28 undefined symbols, all FileZilla's** (`TFileZillaIntf`,
 | 2026-10-11 | neon on POSIX: platform facts from neon's own `configure`, feature choices from WinSCP's Win32 `config.h` (`port/neon/config-posix.h`, force-included) | WinSCP's `src/config.h` is empty off Win32. Taking configure's feature answers too would make Linux differ from Windows in what it offers servers and shows users: SHA-512 digest auth (`HAVE_OPENSSL11`), IANA cipher names (`HAVE_SSL_CIPHER_STANDARD_NAME`). The sizes it records are checked by `_Static_assert` |
 | 2026-10-11 | WinSCP's Windows-only additions to neon are compiled on Windows only (`neon-winscp-additions-windows-only.patch`) | An unused `<windows.h>`, `ioctlsocket(FIONBIO)` where upstream's `fcntl` code sits beside it, and `ne_sock_sspi_init` calling SSPI unguarded. On POSIX neon uses BSD sockets directly, not the Winsock emulation |
 | 2026-10-11 | libs3 on POSIX is compiled over the POSIX layer (`-include windows.h`) | WinSCP's additions call `GetSystemTime` and `strnicmp`, which on Windows arrive through OpenSSL's headers including `<windows.h>`. Emulating them keeps libs3 unpatched |
+| 2026-10-11 | FileZilla keeps its Win32 window-message model on POSIX, over an emulated user32 subset (`win32_window_posix.cpp`), instead of a rewrite onto epoll (changes P1-12's approach) | FileZilla's socket layer is built around one hidden helper window per thread: `WSAAsyncSelect`, layer notifications and a timer all post to it, and its worker runs a `GetMessage` loop. About twenty functions with Win32's rules -- verified against user32 under Wine by one test -- leave FileZilla unmodified, where a rewrite would be the least mechanical change in P1 and would diverge from upstream with every merge |
+| 2026-10-11 | WinSCP's MFC subset is built as is on Linux (closes P1-11 without a replacement) | It is `CString`/`CFile`/`CTime` over the shim's `UnicodeString` already; given the POSIX layer it compiles unchanged |
+| 2026-10-11 | Direct Winsock calls from C++ reach the `ws2_32` module's functions through overloads on `SOCKET` | FileZilla calls `connect`, `send`, `recv`, `accept`, ... directly with `SOCKET`s and `int` lengths. Overloads on the `SOCKET` argument win over libc's, so those calls get Winsock's semantics; a `void *` buffer, which would match libc's better, is a deleted overload, so no call quietly takes BSD semantics. Functions with libc's exact signature (`socket`, `getaddrinfo`, ...) stay libc's: FileZilla tests only their results |
+| 2026-10-11 | `WSAGetLastError` is `GetLastError` on POSIX | As on Windows. FileZilla sets errors with `WSASetLastError` and reads them with `GetLastError`. The previous separate Winsock error, falling back to `errno`, predated the `ws2_32` module |
+| 2026-10-11 | The `*_build` tests share a ctest resource lock | Each builds this tree; two at once contend for Ninja's lock and fail spuriously under `ctest -j` (seen as flakes of `putty_overrides_build`, `core_init_build`, `sftp_session_build`) |
 | 2026-10-10 | `Format` keeps malformed input visible | Delphi raises on a missing argument. Core routes user- and server-supplied text through these into logs, so an unknown specifier is echoed and a missing argument renders as `<missing>` rather than throwing from a log path |
 
 ## Correction: census figures before 2026-10-11 used the wrong configuration
@@ -286,6 +296,9 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | Proxy commands on POSIX | Run with `/bin/sh -c` | Windows hands the command line to `CreateProcess` |
 | WebDAV authentication on Linux | No SSPI, so no Windows-integrated NTLM/Negotiate; `ne_sock_sspi_init` reports it unavailable, which core already handles. neon's GSSAPI is not enabled | SSPI is Windows'. GSSAPI for WebDAV would be a feature beyond upstream's |
 | Agent choice (`AuthAgent`) on Linux | Stored and restored, but Pageant and OpenSSH both mean `$SSH_AUTH_SOCK` | PuTTY's Unix Pageant and OpenSSH's agent listen on the same socket |
+| Windows on POSIX | Message targets only: a procedure, an owning thread, user data. No desktop, painting or `SendMessage`; creation and destruction send `WM_NCCREATE`/`WM_CREATE` and `WM_DESTROY`/`WM_NCDESTROY` only | Nothing headless needs more. `SendMessage` is undeclared, so a use fails to compile |
+| `IsBadWritePtr` on POSIX | Reports only a null block as bad | Windows probes the pages; POSIX has no probe that is not itself a hazard. FileZilla uses it as a sanity check on its own requests |
+| `MessageBox` on POSIX | Caption and text go to standard error; the answer is `IDOK` | No desktop. FileZilla raises one only for "cannot happen" TLS session errors |
 | `SuspendThread` on POSIX | Not declared | A running pthread cannot be suspended. A missing declaration fails at compile time; a stub would fail silently. `CREATE_SUSPENDED` + `ResumeThread` is supported |
 
 ## Open questions
@@ -307,6 +320,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 
 | Fact | Evidence | Date |
 |---|---|---|
+| A thread timer's `WM_TIMER` is not retrieved with the `(HWND)-1` filter | Under Wine, `PeekMessage`/`GetMessage` with `(HWND)-1` never return it once due, while a `NULL` filter does (ctest `messages`). Microsoft documents the filter as selecting posted thread messages; the emulation matches Wine | 2026-10-11 |
+| Linux polls a TCP socket that was never connected as writable and hung up | `POLLOUT|POLLHUP` before `connect`: the Winsock emulation reported `FD_WRITE` and a spurious `FD_CLOSE` for a socket selected before connecting -- the order FileZilla uses -- until it tracked that state (ctest `messages`, repeated runs) | 2026-10-11 |
 | PuTTY's AES-NI SDCTR is wrong when built by clang or GCC | WinSCP's `_MM_SETR_EPI8` brace-initialises `__m128i`, which is a byte union under MSVC but a two-lane vector elsewhere: the byte-reversal mask loses all but two values. NIST SP 800-38A F.5.1 fails, software AES passes; sessions fail with "Incoming packet was garbled on decryption" | 2026-10-11 |
 | `CopyToLocal` needs each name's `TRemoteFile` in `Objects[]` | A bare name list crashes in `TRemoteFile::GetLinkedFile`; WinSCP's callers always pass the listed files | 2026-10-11 |
 | WinSCP's OpenSSL differs from the 3.3.7 release in 17 files, one of them functionally (a CVE-2026-45447 backport in `pk7_smime.c`) | `openssl_tree.py --check`, CRLF ignored; WinSCP commit bb46bb15d | 2026-10-11 |
@@ -494,13 +509,13 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-08 | Socket-event emulation | done | `ws2_32` module and `WSAEventSelect`/`WSAEnumNetworkEvents`; one test passes against real Winsock (Wine) and the emulation. `WSAAsyncSelect` (FileZilla) is P1-12's |
 | P1-09 | PuTTY unix backend re-import | wip | WinSCP's PuTTY builds on Linux with its Windows layer over the emulation; agent and GSSAPI replaced (`port/putty/linux`). Runtime networking is P1-08's |
 | P1-10 | PuTTY delta reconciliation | todo | |
-| P1-11 | FileZilla MFC subset replacement | wip | FileZilla and the MFC subset build and link for Windows from the submodule (three patches); Linux replacement next |
-| P1-12 | FileZilla epoll rewrite | todo | **R2** — budget generously |
+| P1-11 | FileZilla MFC subset replacement | done | Not replaced: WinSCP's subset (`CString`/`CFile`/`CTime` over the shim) builds as is on both targets |
+| P1-12 | FileZilla epoll rewrite | done | Not rewritten: FileZilla builds unmodified on Linux over an emulated user32 subset (windows, message queues, timers, `WSAAsyncSelect`, `WSAAsyncGetHostByName`); ctest `messages` passes against user32/ws2_32 (Wine) and the emulation. One patch (`in_addr`'s `s_addr`) |
 | P1-13 | System libs | done | PuTTY, puttyvs, neon, libs3 from the WinSCP submodule, OpenSSL 3.5.9 from its own, expat from its make file, on both targets; FileZilla + MFC on Windows (Linux is P1-12). neon on POSIX: `config-posix.h` from its `configure` |
 | P1-14 | Drop `puttyvs` | done | the MSVC build is replaced by clang building the same files with the same defines, from `PuTTYVS.vcxproj` |
 | P1-15 | Console IPC → stdio | todo | |
 | P1-16 | Headless `Interface.h` frontend | done | `port/frontend`: all 17 functions plus startup/shutdown; core initialises and finalises under Wine. Linux follows core (P1-07b) |
-| P1-17 | First SFTP session on Linux | todo | long tail expected |
+| P1-17 | First SFTP session on Linux | wip | Core links and initialises on Linux. The session test builds; it fails with heap corruption before connecting |
 | P1-18 | Windows cross-build + Wine | wip | Core, cross-built, runs real SFTP sessions under Wine (four cipher configurations); the CLI is P1-15's |
 | P1-19 | Golden suite green, both platforms | todo | **P1 gate** |
 | P1-20 | .NET assembly drives Linux CLI | todo | |

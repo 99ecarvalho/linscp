@@ -64,6 +64,17 @@ endif()
 add_test(NAME winsock COMMAND test_winsock)
 set_tests_properties(winsock PROPERTIES TIMEOUT 60)
 
+# Windows, message queues and window-message sockets (FileZilla's model):
+# user32 and ws2_32 on Windows, the emulation on POSIX, same assertions.
+add_executable(test_messages test_messages.cpp)
+target_link_libraries(test_messages PRIVATE linscp-shim)
+if(WIN32)
+  target_compile_definitions(test_messages PRIVATE UNICODE _UNICODE)
+  target_link_libraries(test_messages PRIVATE ws2_32)
+endif()
+add_test(NAME messages COMMAND test_messages)
+set_tests_properties(messages PROPERTIES TIMEOUT 60)
+
 add_executable(test_win32_posix test_win32_posix.cpp)
 target_link_libraries(test_win32_posix PRIVATE linscp-shim)
 if(WIN32)
@@ -99,49 +110,49 @@ add_test(NAME json COMMAND test_json)
 
 # Core, every library it uses and the headless frontend, linked into one
 # executable with every core object forced in: the link proves nothing is
-# undefined, and running it runs every static initialiser in them. Windows
-# only until core compiles for Linux.
+# undefined, and running it runs every static initialiser in them.
+add_test(NAME core_link_build
+  COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target linscp-core-link)
+add_test(NAME core_link_run COMMAND linscp-core-link)
+set_tests_properties(core_link_run PROPERTIES DEPENDS core_link_build)
+
+add_executable(test_core_init EXCLUDE_FROM_ALL test_core_init.cpp)
+target_link_libraries(test_core_init PRIVATE linscp-runtime)
+add_test(NAME core_init_build
+  COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_core_init)
+add_test(NAME core_init COMMAND test_core_init /ini=nul)
+set_tests_properties(core_init PROPERTIES DEPENDS core_init_build)
+
+# A real session against a throwaway loopback sshd: connect, list, download.
+add_executable(test_sftp_session EXCLUDE_FROM_ALL test_sftp_session.cpp)
+target_link_libraries(test_sftp_session PRIVATE linscp-runtime)
+add_test(NAME sftp_session_build
+  COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_sftp_session)
+# Once as negotiated, then pinned to each cipher family: each runs through
+# different PuTTY code (AES-NI or software AES, GCM, ChaCha20-Poly1305).
+# Linux builds the session but does not run it yet: it fails there (P1-17).
 if(WIN32)
-  add_test(NAME core_link_build
-    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target linscp-core-link)
-  add_test(NAME core_link_run COMMAND linscp-core-link)
-  set_tests_properties(core_link_run PROPERTIES DEPENDS core_link_build)
-
-  add_executable(test_core_init EXCLUDE_FROM_ALL test_core_init.cpp)
-  target_link_libraries(test_core_init PRIVATE linscp-runtime)
-  add_test(NAME core_init_build
-    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_core_init)
-  add_test(NAME core_init COMMAND test_core_init /ini=nul)
-  set_tests_properties(core_init PROPERTIES DEPENDS core_init_build)
-
-  # A real session against a throwaway loopback sshd: connect, list, download.
-  add_executable(test_sftp_session EXCLUDE_FROM_ALL test_sftp_session.cpp)
-  target_link_libraries(test_sftp_session PRIVATE linscp-runtime)
-  add_test(NAME sftp_session_build
-    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_sftp_session)
-  # Once as negotiated, then pinned to each cipher family: each runs through
-  # different PuTTY code (AES-NI or software AES, GCM, ChaCha20-Poly1305).
-  foreach(_case "default;" "aes_ctr;Ciphers aes128-ctr" "aes_gcm;Ciphers aes256-gcm@openssh.com"
-                "chacha;Ciphers chacha20-poly1305@openssh.com")
-    list(GET _case 0 _name)
-    list(GET _case 1 _line)
-    set(_extra)
-    if(_line)
-      set(_extra --sshd "${_line}")
-    endif()
-    set(_test sftp_session)
-    if(NOT _name STREQUAL "default")
-      set(_test sftp_session_${_name})
-    endif()
-    add_test(NAME ${_test}
-      COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_sftp_session.py"
-              --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" ${_extra}
-              "$<TARGET_FILE:test_sftp_session>")
-    set_tests_properties(${_test} PROPERTIES
-      DEPENDS sftp_session_build SKIP_RETURN_CODE 77 TIMEOUT 180)
-  endforeach()
-
+foreach(_case "default;" "aes_ctr;Ciphers aes128-ctr" "aes_gcm;Ciphers aes256-gcm@openssh.com"
+              "chacha;Ciphers chacha20-poly1305@openssh.com")
+  list(GET _case 0 _name)
+  list(GET _case 1 _line)
+  set(_extra)
+  if(_line)
+    set(_extra --sshd "${_line}")
+  endif()
+  set(_test sftp_session)
+  if(NOT _name STREQUAL "default")
+    set(_test sftp_session_${_name})
+  endif()
+  add_test(NAME ${_test}
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_sftp_session.py"
+            --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" ${_extra}
+            "$<TARGET_FILE:test_sftp_session>")
+  set_tests_properties(${_test} PROPERTIES
+    DEPENDS sftp_session_build SKIP_RETURN_CODE 77 TIMEOUT 180)
+endforeach()
 endif()
+
 
 # PuTTY's crypto primitives against published vectors, on both targets: the
 # PuTTY libraries alone, with a stub for the one frontend function they need.
@@ -156,13 +167,6 @@ if(TARGET linscp-putty)
     COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_putty_crypto)
   add_test(NAME putty_crypto COMMAND test_putty_crypto)
   set_tests_properties(putty_crypto PROPERTIES DEPENDS putty_crypto_build)
-endif()
-
-# On Linux core compiles and archives; linking it needs PuTTY, FileZilla, neon
-# and libs3 there too, which are still Windows-only (P1-09, P1-12, P1-13).
-if(NOT WIN32)
-  add_test(NAME core_build
-    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target linscp-core)
 endif()
 
 # Executable tests go above this line.
@@ -246,3 +250,14 @@ add_test(NAME shim_no_wide_abi
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/check_wide_abi.py")
 set_tests_properties(shim_no_wide_abi
   PROPERTIES WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+
+# The *_build tests each run a build of this tree; two at once contend for
+# Ninja's lock and fail spuriously under ctest -j, so they take turns.
+get_property(_all_tests DIRECTORY PROPERTY TESTS)
+set(_build_tests)
+foreach(_t IN LISTS _all_tests)
+  if(_t MATCHES "_build$")
+    list(APPEND _build_tests ${_t})
+  endif()
+endforeach()
+set_tests_properties(${_build_tests} PROPERTIES RESOURCE_LOCK linscp_build_tree)

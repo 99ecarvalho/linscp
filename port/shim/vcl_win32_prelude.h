@@ -34,5 +34,13 @@
   #ifdef __cplusplus
     #include <algorithm>
   #endif
+#else
+  // POSIX: the port's Win32 layer, which has no name macros to remove. The
+  // <algorithm> reasoning above holds here as well.
+  #include "windows.h"
+  #include "winsock2.h"
+  #ifdef __cplusplus
+    #include <algorithm>
+  #endif
 #endif
 #endif

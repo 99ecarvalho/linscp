@@ -46,11 +46,17 @@ namespace {
 struct TSocketState
 {
   HANDLE Event = nullptr;
+  // WSAAsyncSelect's target, instead of Event.
+  HWND Window = nullptr;
+  UINT Message = 0;
   long Mask = 0;
   long Pending = 0;
   int Errors[FD_MAX_EVENTS] = {};
   bool Connecting = false;
   bool Listening = false;
+  // Neither connected, connecting nor listening: Winsock reports nothing.
+  // (Linux polls such a socket as writable and hung up.)
+  bool Idle = false;
   bool ReadArmed = true;
   bool WriteArmed = true;
   bool AcceptArmed = true;
@@ -83,11 +89,17 @@ int SocketError(int Fd)
 }
 
 // Requires GMutex. Records Event with its error and signals the socket's
-// event object.
-void Record(TSocketState & S, long Event, int Bit, int Error)
+// event object -- or, selected with WSAAsyncSelect, posts the event to its
+// window.
+void Record(int Fd, TSocketState & S, long Event, int Bit, int Error)
 {
   if ((S.Mask & Event) == 0)
   {
+    return;
+  }
+  if (S.Window != nullptr)
+  {
+    PostMessage(S.Window, S.Message, static_cast<WPARAM>(Fd), WSAMAKESELECTREPLY(Event, Error));
     return;
   }
   S.Pending |= Event;
@@ -119,6 +131,10 @@ void MonitorLoop()
         if (S.Connecting)
         {
           Ev |= POLLOUT;
+        }
+        else if (S.Idle)
+        {
+          continue;
         }
         else
         {
@@ -170,12 +186,14 @@ void MonitorLoop()
         {
           const int Err = SocketError(Fd);
           S.Connecting = false;
-          Record(S, FD_CONNECT, FD_CONNECT_BIT, WinsockErrorFromErrno(Err));
+          // A failed connect leaves the socket as it was: unconnected.
+          S.Idle = (Err != 0);
+          Record(Fd, S, FD_CONNECT, FD_CONNECT_BIT, WinsockErrorFromErrno(Err));
           if (Err == 0)
           {
             // Windows posts FD_WRITE once a connect has succeeded.
             S.WriteArmed = false;
-            Record(S, FD_WRITE, FD_WRITE_BIT, 0);
+            Record(Fd, S, FD_WRITE, FD_WRITE_BIT, 0);
           }
         }
         continue;
@@ -185,23 +203,23 @@ void MonitorLoop()
         if (R & POLLIN)
         {
           S.AcceptArmed = false;
-          Record(S, FD_ACCEPT, FD_ACCEPT_BIT, 0);
+          Record(Fd, S, FD_ACCEPT, FD_ACCEPT_BIT, 0);
         }
         continue;
       }
       if ((R & POLLIN) && S.ReadArmed)
       {
         char Peek;
-        const ssize_t Got = recv(Fd, &Peek, 1, MSG_PEEK | MSG_DONTWAIT);
+        const ssize_t Got = ::recv(Fd, static_cast<void *>(&Peek), std::size_t{1}, MSG_PEEK | MSG_DONTWAIT);
         if (Got > 0)
         {
           S.ReadArmed = false;
-          Record(S, FD_READ, FD_READ_BIT, 0);
+          Record(Fd, S, FD_READ, FD_READ_BIT, 0);
         }
         else if ((Got == 0) && !S.CloseReported)
         {
           S.CloseReported = true;
-          Record(S, FD_CLOSE, FD_CLOSE_BIT, 0);
+          Record(Fd, S, FD_CLOSE, FD_CLOSE_BIT, 0);
         }
       }
       if ((R & (POLLRDHUP | POLLHUP | POLLERR)) && !S.CloseReported)
@@ -209,17 +227,17 @@ void MonitorLoop()
         // A reset is reported as the close's error, as Winsock does.
         const int Err = SocketError(Fd);
         S.CloseReported = true;
-        Record(S, FD_CLOSE, FD_CLOSE_BIT, (Err != 0) ? WinsockErrorFromErrno(Err) : 0);
+        Record(Fd, S, FD_CLOSE, FD_CLOSE_BIT, (Err != 0) ? WinsockErrorFromErrno(Err) : 0);
       }
       if ((R & POLLOUT) && S.WriteArmed)
       {
         S.WriteArmed = false;
-        Record(S, FD_WRITE, FD_WRITE_BIT, 0);
+        Record(Fd, S, FD_WRITE, FD_WRITE_BIT, 0);
       }
       if ((R & POLLPRI) && S.OobArmed)
       {
         S.OobArmed = false;
-        Record(S, FD_OOB, FD_OOB_BIT, 0);
+        Record(Fd, S, FD_OOB, FD_OOB_BIT, 0);
       }
     }
   }
@@ -295,14 +313,12 @@ DWORD WSAWaitForMultipleEvents(DWORD Count, const WSAEVENT * Events, BOOL WaitAl
   return WaitForMultipleObjects(Count, Events, WaitAll, Timeout);
 }
 
-int WSAEventSelect(SOCKET Socket, WSAEVENT Event, long NetworkEvents)
+namespace {
+
+// Either selection: events to an event object or to a window.
+int Select(SOCKET Socket, WSAEVENT Event, HWND Window, UINT Message, long NetworkEvents)
 {
   const int Fd = FdOf(Socket);
-  if ((NetworkEvents != 0) && (Event == nullptr))
-  {
-    WSASetLastError(WSAEINVAL);
-    return SOCKET_ERROR;
-  }
   // As Winsock: selecting events makes the socket non-blocking, and stays so.
   const int Flags = fcntl(Fd, F_GETFL);
   if ((Flags < 0) || (fcntl(Fd, F_SETFL, Flags | O_NONBLOCK) < 0))
@@ -313,6 +329,8 @@ int WSAEventSelect(SOCKET Socket, WSAEVENT Event, long NetworkEvents)
   StartMonitor();
   TSocketState & S = State(Fd);
   S.Event = Event;
+  S.Window = Window;
+  S.Message = Message;
   S.Mask = NetworkEvents;
   // A new selection clears what was recorded and re-evaluates the socket:
   // Winsock posts FD_READ, FD_WRITE, FD_ACCEPT or FD_CLOSE at once if they
@@ -324,8 +342,23 @@ int WSAEventSelect(SOCKET Socket, WSAEVENT Event, long NetworkEvents)
   int Listening = 0;
   socklen_t Len = sizeof(Listening);
   S.Listening = (getsockopt(Fd, SOL_SOCKET, SO_ACCEPTCONN, &Listening, &Len) == 0) && (Listening != 0);
+  sockaddr_storage Peer;
+  socklen_t PeerLen = sizeof(Peer);
+  S.Idle = !S.Listening && !S.Connecting && (getpeername(Fd, reinterpret_cast<sockaddr *>(&Peer), &PeerLen) != 0);
   Wake();
   return 0;
+}
+
+}  // namespace
+
+int WSAEventSelect(SOCKET Socket, WSAEVENT Event, long NetworkEvents)
+{
+  if ((NetworkEvents != 0) && (Event == nullptr))
+  {
+    WSASetLastError(WSAEINVAL);
+    return SOCKET_ERROR;
+  }
+  return Select(Socket, Event, nullptr, 0, NetworkEvents);
 }
 
 int WSAEnumNetworkEvents(SOCKET Socket, WSAEVENT Event, WSANETWORKEVENTS * Events)
@@ -352,10 +385,134 @@ int WSAEnumNetworkEvents(SOCKET Socket, WSAEVENT Event, WSANETWORKEVENTS * Event
   return 0;
 }
 
-int WSAAsyncSelect(SOCKET, HWND, UINT, LONG)
+int WSAAsyncSelect(SOCKET Socket, HWND Window, UINT Message, LONG Events)
 {
-  WSASetLastError(WSAEOPNOTSUPP);
-  return SOCKET_ERROR;
+  if ((Events != 0) && !IsWindow(Window))
+  {
+    WSASetLastError(WSAEINVAL);
+    return SOCKET_ERROR;
+  }
+  return Select(Socket, nullptr, Window, Message, Events);
+}
+
+// --- asynchronous host lookup --------------------------------------------------
+
+namespace {
+
+std::mutex GLookupMutex;
+// Requests in flight, by handle; true once cancelled.
+std::map<HANDLE, bool> GLookups;
+std::uintptr_t GNextLookup = 1;
+
+// Lays a hostent for Info's IPv4 addresses out in Out, as Winsock does: the
+// structure, then the pointer arrays, the addresses and the name, all within
+// the buffer. Returns the length that needs; writes only if it fits Size.
+std::size_t LayOutHostent(const char * Name, const addrinfo * Info, char * Out, std::size_t Size)
+{
+  std::vector<in_addr> Addresses;
+  const char * Canonical = Name;
+  for (const addrinfo * I = Info; I != nullptr; I = I->ai_next)
+  {
+    if ((I->ai_canonname != nullptr) && (Canonical == Name))
+    {
+      Canonical = I->ai_canonname;
+    }
+    if (I->ai_family == AF_INET)
+    {
+      Addresses.push_back(reinterpret_cast<const sockaddr_in *>(I->ai_addr)->sin_addr);
+    }
+  }
+  const std::size_t NameLength = std::strlen(Canonical) + 1;
+  const std::size_t Pointers = (1 + Addresses.size() + 1) * sizeof(char *);
+  const std::size_t Needed = sizeof(hostent) + Pointers + Addresses.size() * sizeof(in_addr) + NameLength;
+  if (Needed > Size)
+  {
+    return Needed;
+  }
+  hostent * H = reinterpret_cast<hostent *>(Out);
+  char ** Aliases = reinterpret_cast<char **>(Out + sizeof(hostent));
+  char ** List = Aliases + 1;
+  char * Data = Out + sizeof(hostent) + Pointers;
+  char * NameOut = Data + Addresses.size() * sizeof(in_addr);
+  Aliases[0] = nullptr;
+  for (std::size_t I = 0; I < Addresses.size(); ++I)
+  {
+    std::memcpy(Data + I * sizeof(in_addr), &Addresses[I], sizeof(in_addr));
+    List[I] = Data + I * sizeof(in_addr);
+  }
+  List[Addresses.size()] = nullptr;
+  std::memcpy(NameOut, Canonical, NameLength);
+  H->h_name = NameOut;
+  H->h_aliases = Aliases;
+  H->h_addrtype = AF_INET;
+  H->h_length = sizeof(in_addr);
+  H->h_addr_list = List;
+  return Needed;
+}
+
+}  // namespace
+
+HANDLE WSAAsyncGetHostByName(HWND Window, UINT Message, const char * Name, char * Buffer, int BufferLength)
+{
+  if ((Name == nullptr) || (Buffer == nullptr) || (BufferLength < 0) || !IsWindow(Window))
+  {
+    WSASetLastError(WSAEINVAL);
+    return nullptr;
+  }
+  HANDLE Handle;
+  {
+    std::lock_guard<std::mutex> Lock(GLookupMutex);
+    Handle = reinterpret_cast<HANDLE>(GNextLookup++);
+    GLookups[Handle] = false;
+  }
+  std::thread([Handle, Window, Message, Host = std::string(Name), Buffer, BufferLength]()
+  {
+    addrinfo Hints{};
+    Hints.ai_family = AF_INET;
+    Hints.ai_socktype = SOCK_STREAM;
+    Hints.ai_flags = AI_CANONNAME;
+    addrinfo * Info = nullptr;
+    int Error = AddrInfoError(getaddrinfo(Host.c_str(), nullptr, &Hints, &Info));
+    {
+      // The buffer is written, and the reply posted, only for a request
+      // still wanted: after WSACancelAsyncRequest the caller may free it.
+      std::lock_guard<std::mutex> Lock(GLookupMutex);
+      const auto It = GLookups.find(Handle);
+      if ((It != GLookups.end()) && !It->second)
+      {
+        std::size_t Needed = 0;
+        if (Error == 0)
+        {
+          Needed = LayOutHostent(Host.c_str(), Info, Buffer, static_cast<std::size_t>(BufferLength));
+          if (Needed > static_cast<std::size_t>(BufferLength))
+          {
+            Error = WSAENOBUFS;
+          }
+        }
+        PostMessage(Window, Message, reinterpret_cast<WPARAM>(Handle),
+          WSAMAKEASYNCREPLY((Needed > 0xFFFF) ? 0xFFFF : Needed, Error));
+      }
+      GLookups.erase(Handle);
+    }
+    if (Info != nullptr)
+    {
+      freeaddrinfo(Info);
+    }
+  }).detach();
+  return Handle;
+}
+
+int WSACancelAsyncRequest(HANDLE AsyncTaskHandle)
+{
+  std::lock_guard<std::mutex> Lock(GLookupMutex);
+  const auto It = GLookups.find(AsyncTaskHandle);
+  if ((It == GLookups.end()) || It->second)
+  {
+    WSASetLastError((It == GLookups.end()) ? WSAEALREADY : WSAEINVAL);
+    return SOCKET_ERROR;
+  }
+  It->second = true;
+  return 0;
 }
 
 // --- Winsock-signature socket functions (the ws2_32 module) ---------------------
@@ -376,15 +533,22 @@ SOCKET WINAPI Ws2Socket(int Family, int Type, int Protocol)
 int WINAPI Ws2Connect(SOCKET S, const struct sockaddr * Name, int NameLen)
 {
   const int Fd = FdOf(S);
-  if (connect(Fd, Name, static_cast<socklen_t>(NameLen)) == 0)
+  const int Result = connect(Fd, Name, static_cast<socklen_t>(NameLen));
+  if ((Result == 0) || (errno == EINPROGRESS))
   {
-    return 0;
-  }
-  if (errno == EINPROGRESS)
-  {
+    // Pending -- or, on a selected socket, done at once: the monitor reports
+    // FD_CONNECT and then FD_WRITE once the socket is writable. A blocking
+    // connect made before any selection is simply connected; selecting it
+    // later reports FD_WRITE alone, as Winsock does.
     std::lock_guard<std::mutex> Lock(GMutex);
-    State(Fd).Connecting = true;
+    TSocketState & St = State(Fd);
+    St.Connecting = (Result != 0) || (St.Mask != 0);
+    St.Idle = false;
     Wake();
+    if (Result == 0)
+    {
+      return 0;
+    }
     WSASetLastError(WSAEWOULDBLOCK);
     return SOCKET_ERROR;
   }
@@ -404,7 +568,9 @@ int WINAPI Ws2Listen(SOCKET S, int Backlog)
     return Fail();
   }
   std::lock_guard<std::mutex> Lock(GMutex);
-  State(Fd).Listening = true;
+  TSocketState & St = State(Fd);
+  St.Listening = true;
+  St.Idle = false;
   Wake();
   return 0;
 }
@@ -434,6 +600,8 @@ SOCKET WINAPI Ws2Accept(SOCKET S, struct sockaddr * Address, int * AddressLen)
     fcntl(New, F_SETFL, Flags | O_NONBLOCK);
     TSocketState & A = State(New);
     A.Event = L.Event;
+    A.Window = L.Window;
+    A.Message = L.Message;
     A.Mask = L.Mask;
   }
   return static_cast<SOCKET>(New);
@@ -442,7 +610,7 @@ SOCKET WINAPI Ws2Accept(SOCKET S, struct sockaddr * Address, int * AddressLen)
 int WINAPI Ws2Send(SOCKET S, const char * Buffer, int Length, int Flags)
 {
   const int Fd = FdOf(S);
-  const ssize_t N = send(Fd, Buffer, static_cast<std::size_t>(Length), Flags | MSG_NOSIGNAL);
+  const ssize_t N = ::send(Fd, static_cast<const void *>(Buffer), static_cast<std::size_t>(Length), Flags | MSG_NOSIGNAL);
   if (N >= 0)
   {
     return static_cast<int>(N);
@@ -468,7 +636,7 @@ int WINAPI Ws2Send(SOCKET S, const char * Buffer, int Length, int Flags)
 int WINAPI Ws2Recv(SOCKET S, char * Buffer, int Length, int Flags)
 {
   const int Fd = FdOf(S);
-  const ssize_t N = recv(Fd, Buffer, static_cast<std::size_t>(Length), Flags);
+  const ssize_t N = ::recv(Fd, static_cast<void *>(Buffer), static_cast<std::size_t>(Length), Flags);
   const int Saved = errno;
   {
     // Any recv re-enables FD_READ (and an out-of-band one FD_OOB).
@@ -521,7 +689,8 @@ int WINAPI Ws2Setsockopt(SOCKET S, int Level, int Name, const char * Value, int 
     // SO_REUSEPORT.
     return 0;
   }
-  return (setsockopt(FdOf(S), Level, Name, Value, static_cast<socklen_t>(Length)) == 0) ? 0 : Fail();
+  return (::setsockopt(FdOf(S), Level, Name, static_cast<const void *>(Value), static_cast<socklen_t>(Length)) == 0) ?
+    0 : Fail();
 }
 
 int WINAPI Ws2Getpeername(SOCKET S, struct sockaddr * Name, int * NameLen)
@@ -791,6 +960,25 @@ int WSAAddressToStringA(LPSOCKADDR Address, DWORD AddressLength, LPWSAPROTOCOL_I
   return 0;
 }
 
+// The same functions under Winsock's names, for C++ calling them directly.
+int connect(SOCKET S, const struct sockaddr * Name, int NameLen) { return Ws2Connect(S, Name, NameLen); }
+int bind(SOCKET S, const struct sockaddr * Name, int NameLen) { return Ws2Bind(S, Name, NameLen); }
+int listen(SOCKET S, int Backlog) { return Ws2Listen(S, Backlog); }
+SOCKET accept(SOCKET S, struct sockaddr * Address, int * AddressLen) { return Ws2Accept(S, Address, AddressLen); }
+int send(SOCKET S, const char * Buffer, int Length, int Flags) { return Ws2Send(S, Buffer, Length, Flags); }
+int recv(SOCKET S, char * Buffer, int Length, int Flags) { return Ws2Recv(S, Buffer, Length, Flags); }
+int shutdown(SOCKET S, int How) { return Ws2Shutdown(S, How); }
+int getsockopt(SOCKET S, int Level, int Name, char * Value, int * Length)
+{
+  return Ws2Getsockopt(S, Level, Name, Value, Length);
+}
+int setsockopt(SOCKET S, int Level, int Name, const char * Value, int Length)
+{
+  return Ws2Setsockopt(S, Level, Name, Value, Length);
+}
+int getpeername(SOCKET S, struct sockaddr * Name, int * NameLen) { return Ws2Getpeername(S, Name, NameLen); }
+int getsockname(SOCKET S, struct sockaddr * Name, int * NameLen) { return Ws2Getsockname(S, Name, NameLen); }
+
 // The ws2_32 module's exports, for GetProcAddress.
 FARPROC linscp_Ws2Proc(LPCSTR Name)
 {
@@ -814,6 +1002,7 @@ FARPROC linscp_Ws2Proc(LPCSTR Name)
     EXPORT("WSAAsyncSelect", WSAAsyncSelect), EXPORT("WSAIoctl", WSAIoctl),
     EXPORT("WSAAddressToStringA", WSAAddressToStringA), EXPORT("WSACreateEvent", WSACreateEvent),
     EXPORT("WSACloseEvent", WSACloseEvent), EXPORT("WSAWaitForMultipleEvents", WSAWaitForMultipleEvents),
+    EXPORT("WSAAsyncGetHostByName", WSAAsyncGetHostByName), EXPORT("WSACancelAsyncRequest", WSACancelAsyncRequest),
   };
 #undef EXPORT
   for (const TExport & E : Exports)
