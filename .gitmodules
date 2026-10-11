@@ -8,3 +8,4 @@
 [submodule "3rd-party/putty"]
 	path = 3rd-party/putty
 	url = https://git.tartarus.org/simon/putty.git
+	shallow = true

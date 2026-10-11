@@ -31,6 +31,8 @@ existing Windows build is never broken by the port.
 ```
 3rd-party/winscp   pinned upstream submodule, never modified
 3rd-party/openssl  pinned OpenSSL release (the version WinSCP vendors)
+3rd-party/putty    pinned PuTTY release (the version WinSCP vendors), for
+                   the Unix platform code WinSCP's copy does not carry
 port/patches       reviewed patch series applied to the generated tree
 port/shim          VCL runtime replacement
 port/platform      POSIX and Win32 compatibility
