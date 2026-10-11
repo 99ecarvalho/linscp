@@ -46,6 +46,19 @@ def parse_body(body):
         out[k.strip()] = v.strip()
     return out
 
+# typedef RET __fastcall (__closure * NAME)(ARGS);   ->  using NAME = TClosure<RET(ARGS)>;
+#
+# Both spellings appear, with and without __fastcall, and the argument list is
+# often on following lines. Line counts are preserved by splitting the result
+# the same way the original was split: "TClosure<RET" closes the first line and
+# the final ";" becomes ">;", because TClosure<RET(ARGS)> is exactly
+# "TClosure<RET" + "(ARGS)" + ">".
+CLOSURE_RE = re.compile(
+    r'^(?P<indent>\s*)typedef\s+(?P<ret>.+?)\s*'
+    r'\(\s*__closure\s*\*\s*(?P<name>\w+)\s*\)'
+    r'(?P<rest>.*)$')
+
+
 class Ambiguous(Exception):
     def __init__(self, name, parens, nfield, nmethod):
         super().__init__(
@@ -63,8 +76,10 @@ class Transformer:
 
     def transform_file(self, path, text):
         methods = set(re.findall(r'\b(\w+)\s*\(', text))
+        lines = text.split('\n')
+        self.transform_closures(path, lines)
         out = []
-        for lineno, line in enumerate(text.split('\n'), 1):
+        for lineno, line in enumerate(lines, 1):
             if '__property' not in line or '#define' in line:
                 out.append(line); continue
             # CR is carried in <tail> on CRLF files, so line endings survive
@@ -76,6 +91,39 @@ class Transformer:
                 new = None
             out.append(new if new is not None else line)
         return '\n'.join(out)
+
+    def transform_closures(self, path, lines):
+        """Rewrite __closure typedefs in place, preserving the line count."""
+        for i, line in enumerate(lines):
+            if '__closure' not in line or 'typedef' not in line:
+                continue
+            m = CLOSURE_RE.match(line)
+            if not m:
+                self.stats['closure_unmatched'] += 1
+                self.unhandled.append((path, i + 1, line.strip()[:90]))
+                continue
+            ret = m.group('ret').replace('__fastcall', '').strip()
+            head = f"{m.group('indent')}using {m.group('name')} = TClosure<{ret}"
+            rest = m.group('rest')
+            if ';' in rest:
+                # Entirely on this line: close the template here.
+                lines[i] = head + rest.rstrip()[:-1] + '>;'
+                self.stats['closure_typedef'] += 1
+                continue
+            # Argument list continues on following lines; close at the ';'.
+            end = None
+            for j in range(i + 1, min(i + 8, len(lines))):
+                if ';' in lines[j]:
+                    end = j
+                    break
+            if end is None:
+                self.stats['closure_unterminated'] += 1
+                self.unhandled.append((path, i + 1, line.strip()[:90]))
+                continue
+            lines[i] = head + rest
+            k = lines[end].rfind(';')
+            lines[end] = lines[end][:k] + '>;' + lines[end][k + 1:]
+            self.stats['closure_typedef'] += 1
 
     def transform_line(self, path, lineno, line, methods):
         m = PROP_RE.match(line)

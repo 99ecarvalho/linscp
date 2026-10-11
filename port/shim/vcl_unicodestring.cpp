@@ -276,3 +276,18 @@ UnicodeString operator+(const UnicodeString & A, const UnicodeString & B)
   Result += B;
   return Result;
 }
+
+UnicodeString operator+(const UnicodeString & A, wchar_t C)
+{
+  UnicodeString Result(A);
+  Result += C;
+  return Result;
+}
+
+UnicodeString operator+(wchar_t C, const UnicodeString & B)
+{
+  UnicodeString Result;
+  Result += C;
+  Result += B;
+  return Result;
+}

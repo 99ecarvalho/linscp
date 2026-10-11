@@ -8,30 +8,30 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 19 | 30 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P0 Foundation | 20 | 31 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 6 | 27 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **25** | **82** | |
+| **Total** | **26** | **83** | |
 
 ## Next three actions
 
 Driven by `compile_census.py` rather than by grep counts — the compiler names
 what is actually blocking `Common.cpp`, in dependency order.
 
-Ranked by the aggregate census across nine core TUs (2,409 errors total).
+Ranked by the aggregate census across nine core TUs (**1,924 errors**, down from
+2,409 after closure typedefs landed).
 
-1. **P0-06b / `__closure`** — still the largest single group once the event
-   typedefs are counted together: `TProcessLocalFileEvent` 33,
-   `TTransferOutEvent`/`TTransferInEvent` 30 each, `TLogOptionEvent` 28,
-   `TQueryParamsTimerEvent` 21, `TButtonSubmitEvent` 21, `TAddLogEntryEvent` 20.
-2. **P1-06 / streams** — `TStream`, `THandleStream`, `TMemoryStream`, ~31 each.
-3. **P1-02b / `TList`** (28) and **P1-06b / `TRegistry`** (29) plus
-   `TCustomIniFile` (28).
-
-Also outstanding and cheap: `TVarRec` + `ARRAYOFCONST` (the varargs formatting
-path), `TShiftState`, `TThreadID`/`TThreadFunc`, `PResStringRec`.
+1. **P1-01b / free string routines** — now the broadest gap: `LoadStr` 288,
+   `SameText` 113, `Pos` 89, `CutToChar` 70, `IntToStr` 58, plus `TryStrToInt`,
+   `EndsStr`, `SameStr`. `Option.cpp` is down to 10 errors and every one is in
+   this group, so it is the closest TU to compiling.
+2. **P0-06c / closure call sites** — 116 bare member-function names to wrap.
+   Compiler-guided, since clang reports each with an exact position.
+3. **P1-06 / streams** (`TStream`, `THandleStream`, `TMemoryStream`) and
+   **P1-01d / `TVarRec` + `ARRAYOFCONST`**, the varargs formatting path behind
+   `FORMAT` and `FMTLOAD`.
 
 ## Decisions taken
 
@@ -163,6 +163,12 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | All 624 transformed declarations compile on 6.5.8 | `check_properties.py`, exit 0 | 2026-10-10 |
 | Honest aggregate census: **2,409 errors across 9 core TUs**, ratcheted | `census_ratchet.py` | 2026-10-10 |
 | 12/12 tests pass on both targets after the version change | `ctest` both trees | 2026-10-10 |
+| All 44 `__closure` typedefs rewrite to `TClosure<Sig>`; 16 single-line, 28 spanning lines, 0 unhandled | `transform.py` | 2026-10-10 |
+| Changed lines now fully accounted for: 624 property + 44 closure + 28 template-end = 696 | `verify_transform.py` | 2026-10-10 |
+| `CLOSURE()` binds the enclosing instance correctly on both targets, including non-void returns and reference arguments | `test_closure` on Linux and under Wine | 2026-10-10 |
+| Aggregate census **2,409 -> 1,924** across 9 TUs; `Terminal.cpp` missing types 51 -> 20 | `census_ratchet.py` | 2026-10-10 |
+| 116 call sites pass a bare member-function name where a closure is expected | clang diagnostic count across all core TUs | 2026-10-10 |
+| 13/13 tests pass on both targets | `ctest` | 2026-10-10 |
 | 12/12 tests pass on Linux and on Windows under Wine | `ctest` both trees | 2026-10-10 |
 | Directory search validated against both backends: real `FindFirstFileW` under Wine, and `dirent` + `fnmatch` on Linux | `test_sysutils` on both targets | 2026-10-10 |
 | `__closure` scope: 44 distinct closure types, 16 typedefs; call sites pass bare member-function names | grep over generated core | 2026-10-10 |
@@ -178,7 +184,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P0-04 | Verify C++Builder accepts the macro | blocked | Q-2: needs licence + Windows |
 | P0-05 | `transform.py` property rewriter | done | 613/613, 0 unhandled |
 | P0-06 | `transform.py` fastcall/ARRAYOFCONST | todo | `__closure` split out as P0-06b |
-| P0-06b | `__closure` support | todo | the only remaining `Common.cpp` blocker |
+| P0-06b | `__closure` type + typedef transform | done | 44 typedefs; `CLOSURE()` macro verified on both targets |
+| P0-06c | `__closure` call-site binding | todo | 116 sites, compiler-guided |
 | P0-07 | Transform idempotence tests | done | idempotent + line-count parity asserted |
 | P0-08 | CMake skeleton | done | transform+verify wired as a build step; CTest on both targets |
 | P0-09 | Minimal shim for `core/Common.cpp` | wip | 417 errors / 29 types, measured honestly (see correction below) |

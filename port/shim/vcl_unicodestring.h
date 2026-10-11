@@ -114,6 +114,13 @@ public:
 
   friend UnicodeString operator+(const UnicodeString & A, const UnicodeString & B);
 
+  // Concatenating a single character. A wchar_t does not convert to
+  // UnicodeString implicitly -- the single-character constructor is explicit so
+  // that an accidental integer cannot become a string -- so these are needed on
+  // their own. Core writes `Path + L'/'` in a number of places.
+  friend UnicodeString operator+(const UnicodeString & A, wchar_t C);
+  friend UnicodeString operator+(wchar_t C, const UnicodeString & B);
+
 private:
   std::u16string FData;
 };

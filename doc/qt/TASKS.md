@@ -18,7 +18,8 @@ Goal: prove the keystone works, with no behaviour change anywhere.
 | P0-04 | **Verify C++Builder accepts macro-expanded `__property`** | S | P0-03 | **R1. Do this first.** Needs a licence + Windows. Blocks the zero-diff story |
 | P0-05 | `transform.py`: `__property` rewriter, line-preserving | M | P0-03 | 591 decls, 4 forms + 4 manual |
 | P0-06 | `transform.py`: `__fastcall`, `ARRAYOFCONST` | S | P0-05 | `__fastcall` is an empty define |
-| P0-06b | `__closure`: closure type + typedef transform + call-site binding | L | P0-06 | **The only thing still blocking `Common.cpp`.** 44 distinct closure types, 16 typedefs. Call sites pass a bare member-function name, which Borland binds to `this` implicitly and which is not valid C++ at all |
+| P0-06b | `__closure`: `TClosure` type + typedef transform | M | P0-06 | Done. 44 typedefs rewritten to `TClosure<Sig>`; contract measured from core (`!= NULL` 62, `== NULL` 31, `= NULL` 51) |
+| P0-06c | `__closure`: bind the 116 bare-member-name call sites | M | P0-06b | Compiler-guided: clang reports each with an exact file/line/column, so the rewrite wraps that identifier in `CLOSURE(...)` rather than inferring the enclosing class by regex |
 | P0-07 | Transform idempotence + line-count assertion tests | S | P0-05 | Guards against silent drift |
 | P0-08 | CMake skeleton: generate → compile one TU | M | P0-01, P0-05 | |
 | P0-09 | Minimal shim to compile `core/Common.cpp` on Linux clang | M | P0-08 | The real measurement of shim cost |

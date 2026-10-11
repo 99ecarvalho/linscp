@@ -4,9 +4,14 @@ Audit the generated tree against pristine upstream.
 
 Asserts the invariants the whole upstream-tracking model depends on:
   1. line counts are identical file-for-file
-  2. every changed line contained __property upstream
-  3. every changed line emits exactly one transform macro
-  4. nothing else differs, including line endings
+  2. every changed line is accounted for by exactly one transform rule
+  3. nothing else differs, including line endings
+
+A changed line must be one of:
+  property  - contained __property, now emits exactly one PROP_* macro
+  closure   - contained __closure, now declares a TClosure alias
+  closeoff  - the line where a multi-line closure typedef ended, changed only
+              by turning its ";" into ">;"
 
 Exit non-zero on any violation.
 """
@@ -15,8 +20,16 @@ import os, re, sys
 MINE = re.compile(r'\bPROP_(R_F|R_G|R_GI|RW_FF|RW_FS|RW_GF|RW_GS|W_F|W_S|'
                   r'IDX_R_G|IDX_RW_GS)\(')
 
+def closeoff(old_line):
+    """The expected rewrite of a line that merely closed a closure template."""
+    k = old_line.rfind(';')
+    if k < 0:
+        return None
+    return old_line[:k] + '>;' + old_line[k + 1:]
+
+
 def main(gen='build/gen', src='3rd-party/winscp'):
-    changed = macros = files = 0
+    changed = macros = files = closures = closeoffs = 0
     bad = []
     for dp, _, ns in os.walk(gen):
         for n in ns:
@@ -33,21 +46,32 @@ def main(gen='build/gen', src='3rd-party/winscp'):
                 if x == y:
                     continue
                 changed += 1
-                m = len(MINE.findall(y))
-                macros += m
-                if m != 1:
-                    bad.append(f'{u}:{i}: emits {m} macros: {y.strip()[:80]}')
-                if '__property' not in x:
-                    bad.append(f'{u}:{i}: changed but upstream had no __property: {x.strip()[:80]}')
+                if '__property' in x:
+                    n = len(MINE.findall(y))
+                    macros += n
+                    if n != 1:
+                        bad.append(f'{u}:{i}: emits {n} macros: {y.strip()[:80]}')
+                elif '__closure' in x:
+                    closures += 1
+                    if 'TClosure<' not in y:
+                        bad.append(f'{u}:{i}: __closure not rewritten: {y.strip()[:80]}')
+                elif y == closeoff(x):
+                    closeoffs += 1
+                else:
+                    bad.append(f'{u}:{i}: changed line matches no transform rule\n'
+                               f'      - {x.strip()[:80]}\n      + {y.strip()[:80]}')
+
     print(f'files compared: {files}')
     print(f'lines changed:  {changed}')
-    print(f'macros emitted: {macros}')
+    print(f'  property:     {macros}')
+    print(f'  closure:      {closures}')
+    print(f'  template end: {closeoffs}')
     if bad:
         print(f'\nVIOLATIONS ({len(bad)}):')
         for v in bad[:25]:
             print('  ', v)
         return 1
-    print('\nOK: every changed line is exactly one property transform')
+    print('\nOK: every changed line is accounted for by one transform rule')
     return 0
 
 if __name__ == '__main__':

@@ -173,6 +173,10 @@ void TestConcatenation()
   S += L'e';
   CHECK(Eq(S, L"abcde"));
   CHECK(Eq(UnicodeString(L"ab") + UnicodeString(L"cd"), L"abcd"));
+  CHECK(Eq(UnicodeString(L"ab") + L'c', L"abc"));          // char on the right
+  CHECK(Eq(L'a' + UnicodeString(L"bc"), L"abc"));          // char on the left
+  CHECK(Eq(UnicodeString(L"a") + L"bc", L"abc"));          // literal via ctor
+  CHECK(Eq(UnicodeString() + L'x', L"x"));
   CHECK(Eq(UnicodeString() + UnicodeString(L"x"), L"x"));
   CHECK((UnicodeString() + UnicodeString()).IsEmpty());
 }

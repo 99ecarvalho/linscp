@@ -20,6 +20,10 @@ add_executable(test_strings test_strings.cpp)
 target_link_libraries(test_strings PRIVATE linscp-shim)
 add_test(NAME strings COMMAND test_strings)
 
+add_executable(test_closure test_closure.cpp)
+target_link_libraries(test_closure PRIVATE linscp-shim)
+add_test(NAME closure COMMAND test_closure)
+
 add_executable(test_sysutils test_sysutils.cpp)
 target_link_libraries(test_sysutils PRIVATE linscp-shim)
 add_test(NAME sysutils COMMAND test_sysutils)
@@ -34,7 +38,7 @@ add_test(NAME object_exceptions COMMAND test_object)
 # wine; these tell wine where the mingw runtime DLLs live and keep its output
 # off the test log.
 if(LINSCP_WINE_DLLDIR_GCC)
-  set(_wine_tests property_forms unicodestring bytestring datetime object_exceptions strings sysutils)
+  set(_wine_tests property_forms unicodestring bytestring datetime object_exceptions strings sysutils closure)
   # The backslash-escaped ';' is a literal Windows path separator inside the
   # WINEPATH value; the unescaped ';' separates the two environment entries.
   set_tests_properties(${_wine_tests} PROPERTIES ENVIRONMENT

@@ -1025,31 +1025,39 @@ line-preserving</td>
 </tr>
 <tr class="odd">
 <td>P0-06b</td>
-<td><code>__closure</code>: closure type + typedef transform + call-site
-binding</td>
-<td>L</td>
+<td><code>__closure</code>: <code>TClosure</code> type + typedef
+transform</td>
+<td>M</td>
 <td>P0-06</td>
-<td><strong>The only thing still blocking
-<code>Common.cpp</code>.</strong> 44 distinct closure types, 16
-typedefs. Call sites pass a bare member-function name, which Borland
-binds to <code>this</code> implicitly and which is not valid C++ at
-all</td>
+<td>Done. 44 typedefs rewritten to <code>TClosure&lt;Sig&gt;</code>;
+contract measured from core (<code>!= NULL</code> 62,
+<code>== NULL</code> 31, <code>= NULL</code> 51)</td>
 </tr>
 <tr class="even">
+<td>P0-06c</td>
+<td><code>__closure</code>: bind the 116 bare-member-name call
+sites</td>
+<td>M</td>
+<td>P0-06b</td>
+<td>Compiler-guided: clang reports each with an exact file/line/column,
+so the rewrite wraps that identifier in <code>CLOSURE(...)</code> rather
+than inferring the enclosing class by regex</td>
+</tr>
+<tr class="odd">
 <td>P0-07</td>
 <td>Transform idempotence + line-count assertion tests</td>
 <td>S</td>
 <td>P0-05</td>
 <td>Guards against silent drift</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-08</td>
 <td>CMake skeleton: generate → compile one TU</td>
 <td>M</td>
 <td>P0-01, P0-05</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-09</td>
 <td>Minimal shim to compile <code>core/Common.cpp</code> on Linux
 clang</td>
@@ -1057,7 +1065,7 @@ clang</td>
 <td>P0-08</td>
 <td>The real measurement of shim cost</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-10</td>
 <td>Install + script mingw-w64 sysroot; clang <code>--target</code>
 toolchain file</td>
@@ -1065,28 +1073,28 @@ toolchain file</td>
 <td>P0-08</td>
 <td>GCC is unusable — clang only</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-11</td>
 <td>CI matrix: Linux native + Windows cross, both clang</td>
 <td>M</td>
 <td>P0-10</td>
 <td>From the first commit</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-12</td>
 <td>Wine in CI for Windows smoke tests</td>
 <td>S</td>
 <td>P0-11</td>
 <td>Not release certification</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-13</td>
 <td>Golden-output harness: runner, XML normaliser, differ</td>
 <td>M</td>
 <td>—</td>
 <td>PLAN §5; highest leverage in P0</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-14</td>
 <td>Protocol server containers (OpenSSH, vsftpd, ProFTPD, WebDAV,
 MinIO)</td>
@@ -1094,21 +1102,21 @@ MinIO)</td>
 <td>P0-13</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-15</td>
 <td>Capture golden XML corpus from real WinSCP on Windows</td>
 <td>M</td>
 <td>P0-13, P0-14</td>
 <td>Needs a Windows host</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-16</td>
 <td>ADR log (<code>doc/qt/adr/</code>)</td>
 <td>S</td>
 <td>—</td>
 <td>Record toolchain/ABI choices as made</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-17</td>
 <td><code>check_properties.py</code>: compile-test every transformed
 declaration</td>
@@ -1117,14 +1125,14 @@ declaration</td>
 <td>Validates macro arity across the real corpus without the full
 shim</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-18</td>
 <td>HTML render of the plan docs (<code>build-html.sh</code>)</td>
 <td>S</td>
 <td>—</td>
 <td>pandoc, self-contained, light/dark</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-19</td>
 <td>Publish repository with licence and root README</td>
 <td>S</td>
@@ -1132,7 +1140,7 @@ shim</td>
 <td>Public, GPL-3.0; <code>main</code> released, <code>qt</code>
 active</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-20</td>
 <td>Generator for a PR-able branch against a <code>winscp/winscp</code>
 fork</td>
@@ -1140,7 +1148,7 @@ fork</td>
 <td>P1-19</td>
 <td>Defer until there is something worth proposing (Q-7)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-21</td>
 <td><code>verify_transform.py</code>: audit the generated tree against
 upstream</td>
@@ -1148,14 +1156,14 @@ upstream</td>
 <td>P0-05</td>
 <td>Byte-exactness is the invariant the whole model rests on</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-22</td>
 <td>Rehearse history import into a <code>winscp/winscp</code> fork</td>
 <td>S</td>
 <td>P0-05</td>
 <td>Validates Q-7 and measures the real conflict cost</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-23</td>
 <td><code>check_docs.py</code>: keep TASKS and TRACKER consistent</td>
 <td>S</td>
@@ -1163,7 +1171,7 @@ upstream</td>
 <td>Enforces the tracker rule mechanically rather than by
 discipline</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-24</td>
 <td>Measure the VCL surface the core requires
 (<code>census.py</code>)</td>
@@ -1172,7 +1180,7 @@ discipline</td>
 <td>Resolves core identifiers against real mingw/OpenSSL/stdlib
 headers</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-25</td>
 <td>ADR 0001: character width for <code>UnicodeString</code></td>
 <td>S</td>
@@ -1180,14 +1188,14 @@ headers</td>
 <td>Accepted: <code>-fshort-wchar</code>, <code>std::u16string</code>
 storage</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-26</td>
 <td><code>check_wide_abi.py</code>: enforce ADR 0001 mechanically</td>
 <td>S</td>
 <td>P0-25</td>
 <td>Wrong-ABI code links cleanly then misbehaves, so grep it</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-27</td>
 <td><code>compile_census.py</code>: classify what a real core TU still
 needs</td>
@@ -1195,7 +1203,7 @@ needs</td>
 <td>P0-09</td>
 <td>Lets the compiler enumerate the shim gap instead of grep</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-29</td>
 <td>Shim stubs for the unqualified legacy RTL header names</td>
 <td>S</td>
@@ -1203,7 +1211,7 @@ needs</td>
 <td><code>Classes.hpp</code> etc.; their absence was aborting most TUs
 early</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-28</td>
 <td><code>census_ratchet.py</code>: pin the census so progress cannot
 slip back</td>
@@ -1715,8 +1723,8 @@ evaluation down and close it</td>
 <tbody>
 <tr class="odd">
 <td>P0 Foundation</td>
-<td>19</td>
-<td>30</td>
+<td>20</td>
+<td>31</td>
 <td><code>core/Common.cpp</code> compiles on Linux clang; VCL build
 green (R1)</td>
 </tr>
@@ -1746,8 +1754,8 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>25</strong></td>
-<td><strong>82</strong></td>
+<td><strong>26</strong></td>
+<td><strong>83</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -1756,27 +1764,24 @@ green (R1)</td>
 <p>Driven by <code>compile_census.py</code> rather than by grep counts —
 the compiler names what is actually blocking <code>Common.cpp</code>, in
 dependency order.</p>
-<p>Ranked by the aggregate census across nine core TUs (2,409 errors
-total).</p>
+<p>Ranked by the aggregate census across nine core TUs (<strong>1,924
+errors</strong>, down from 2,409 after closure typedefs landed).</p>
 <ol type="1">
-<li><strong>P0-06b / <code>__closure</code></strong> — still the largest
-single group once the event typedefs are counted together:
-<code>TProcessLocalFileEvent</code> 33,
-<code>TTransferOutEvent</code>/<code>TTransferInEvent</code> 30 each,
-<code>TLogOptionEvent</code> 28, <code>TQueryParamsTimerEvent</code> 21,
-<code>TButtonSubmitEvent</code> 21, <code>TAddLogEntryEvent</code>
-20.</li>
-<li><strong>P1-06 / streams</strong> — <code>TStream</code>,
-<code>THandleStream</code>, <code>TMemoryStream</code>, ~31 each.</li>
-<li><strong>P1-02b / <code>TList</code></strong> (28) and <strong>P1-06b
-/ <code>TRegistry</code></strong> (29) plus <code>TCustomIniFile</code>
-(28).</li>
+<li><strong>P1-01b / free string routines</strong> — now the broadest
+gap: <code>LoadStr</code> 288, <code>SameText</code> 113,
+<code>Pos</code> 89, <code>CutToChar</code> 70, <code>IntToStr</code>
+58, plus <code>TryStrToInt</code>, <code>EndsStr</code>,
+<code>SameStr</code>. <code>Option.cpp</code> is down to 10 errors and
+every one is in this group, so it is the closest TU to compiling.</li>
+<li><strong>P0-06c / closure call sites</strong> — 116 bare
+member-function names to wrap. Compiler-guided, since clang reports each
+with an exact position.</li>
+<li><strong>P1-06 / streams</strong> (<code>TStream</code>,
+<code>THandleStream</code>, <code>TMemoryStream</code>) and
+<strong>P1-01d / <code>TVarRec</code> +
+<code>ARRAYOFCONST</code></strong>, the varargs formatting path behind
+<code>FORMAT</code> and <code>FMTLOAD</code>.</li>
 </ol>
-<p>Also outstanding and cheap: <code>TVarRec</code> +
-<code>ARRAYOFCONST</code> (the varargs formatting path),
-<code>TShiftState</code>,
-<code>TThreadID</code>/<code>TThreadFunc</code>,
-<code>PResStringRec</code>.</p>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
 <colgroup>
@@ -2424,6 +2429,42 @@ TUs</strong>, ratcheted</td>
 <td>2026-10-10</td>
 </tr>
 <tr class="odd">
+<td>All 44 <code>__closure</code> typedefs rewrite to
+<code>TClosure&lt;Sig&gt;</code>; 16 single-line, 28 spanning lines, 0
+unhandled</td>
+<td><code>transform.py</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>Changed lines now fully accounted for: 624 property + 44 closure +
+28 template-end = 696</td>
+<td><code>verify_transform.py</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td><code>CLOSURE()</code> binds the enclosing instance correctly on
+both targets, including non-void returns and reference arguments</td>
+<td><code>test_closure</code> on Linux and under Wine</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>Aggregate census <strong>2,409 -&gt; 1,924</strong> across 9 TUs;
+<code>Terminal.cpp</code> missing types 51 -&gt; 20</td>
+<td><code>census_ratchet.py</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>116 call sites pass a bare member-function name where a closure is
+expected</td>
+<td>clang diagnostic count across all core TUs</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>13/13 tests pass on both targets</td>
+<td><code>ctest</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
 <td>12/12 tests pass on Linux and on Windows under Wine</td>
 <td><code>ctest</code> both trees</td>
 <td>2026-10-10</td>
@@ -2500,150 +2541,157 @@ typedefs; call sites pass bare member-function names</td>
 </tr>
 <tr class="odd">
 <td>P0-06b</td>
-<td><code>__closure</code> support</td>
-<td>todo</td>
-<td>the only remaining <code>Common.cpp</code> blocker</td>
+<td><code>__closure</code> type + typedef transform</td>
+<td>done</td>
+<td>44 typedefs; <code>CLOSURE()</code> macro verified on both
+targets</td>
 </tr>
 <tr class="even">
+<td>P0-06c</td>
+<td><code>__closure</code> call-site binding</td>
+<td>todo</td>
+<td>116 sites, compiler-guided</td>
+</tr>
+<tr class="odd">
 <td>P0-07</td>
 <td>Transform idempotence tests</td>
 <td>done</td>
 <td>idempotent + line-count parity asserted</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-08</td>
 <td>CMake skeleton</td>
 <td>done</td>
 <td>transform+verify wired as a build step; CTest on both targets</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-09</td>
 <td>Minimal shim for <code>core/Common.cpp</code></td>
 <td>wip</td>
 <td>417 errors / 29 types, measured honestly (see correction below)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-10</td>
 <td>mingw-w64 sysroot + clang toolchain file</td>
 <td>done</td>
 <td><code>cmake/toolchain-mingw-w64.cmake</code>; clang + lld + Wine
 emulator</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-11</td>
 <td>CI matrix Linux + Windows cross</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-12</td>
 <td>Wine smoke tests in CI</td>
 <td>wip</td>
 <td>wired into CTest via <code>CMAKE_CROSSCOMPILING_EMULATOR</code>;
 GitHub Actions pending</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-13</td>
 <td>Golden-output harness</td>
 <td>todo</td>
 <td>highest leverage in P0</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-14</td>
 <td>Protocol server containers</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-15</td>
 <td>Capture golden corpus from real WinSCP</td>
 <td>blocked</td>
 <td>Q-2: needs Windows host</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-16</td>
 <td>ADR log</td>
 <td>wip</td>
 <td><code>doc/qt/adr/</code> started with ADR 0001</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-17</td>
 <td>Property compile-check harness</td>
 <td>done</td>
 <td><code>check_properties.py</code>, 613 declarations, clang exit
 0</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-18</td>
 <td>HTML render of plan docs</td>
 <td>done</td>
 <td><code>doc/qt/plan.html</code> via <code>build-html.sh</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-19</td>
 <td>Publish repository, licence, root README</td>
 <td>done</td>
 <td>public at <code>99ecarvalho/linscp</code>; work on
 <code>qt</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-20</td>
 <td>Fork-branch generator</td>
 <td>todo</td>
 <td>deferred to P1-19 (Q-7); rehearsed manually in P0-22</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-21</td>
 <td><code>verify_transform.py</code> upstream-diff audit</td>
 <td>done</td>
 <td>asserts line parity, byte-exactness and 1 macro per changed
 line</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-22</td>
 <td>Rehearse history import into a winscp fork</td>
 <td>done</td>
 <td>zero-conflict merge; 613-line in-tree diff; mechanical conflict
 resolution</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-23</td>
 <td><code>check_docs.py</code> TASKS/TRACKER consistency</td>
 <td>done</td>
 <td>found 3 drifts on first run</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-24</td>
 <td>VCL surface census</td>
 <td>done</td>
 <td>~45 types; <code>build/shim_spec.txt</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-25</td>
 <td>ADR 0001 character width</td>
 <td>done</td>
 <td>accepted: <code>-fshort-wchar</code> +
 <code>std::u16string</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-26</td>
 <td><code>check_wide_abi.py</code> ADR enforcement</td>
 <td>done</td>
 <td><code>shim_no_wide_abi</code> test</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-27</td>
 <td><code>compile_census.py</code></td>
 <td>done</td>
 <td>classifies clang diagnostics into shim gaps</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-29</td>
 <td>Legacy unqualified RTL header stubs</td>
 <td>done</td>
 <td><code>Classes.hpp</code> etc.; absence was aborting most TUs</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-28</td>
 <td><code>census_ratchet.py</code></td>
 <td>done</td>
