@@ -109,8 +109,8 @@ typedef wchar_t * PWSTR;
 typedef UINT_PTR WPARAM;
 typedef LONG_PTR LPARAM;
 typedef LONG_PTR LRESULT;
-typedef struct RECT { LONG left; LONG top; LONG right; LONG bottom; } RECT;
-typedef struct POINT { LONG x; LONG y; } POINT;
+typedef struct tagRECT { LONG left; LONG top; LONG right; LONG bottom; } RECT;
+typedef struct tagPOINT { LONG x; LONG y; } POINT;
 #define LOWORD(l) ((WORD)(((DWORD_PTR)(l)) & 0xffff))
 #define HIWORD(l) ((WORD)((((DWORD_PTR)(l)) >> 16) & 0xffff))
 #define MAKELONG(a, b) ((LONG)(((WORD)(((DWORD_PTR)(a)) & 0xffff)) | ((DWORD)((WORD)(((DWORD_PTR)(b)) & 0xffff))) << 16))
@@ -187,6 +187,11 @@ int linscp_WideCompareN(const wchar_t * A, const wchar_t * B, size_t N);
 wchar_t * linscp_WideFindChar(const wchar_t * S, wchar_t C);
 wchar_t * linscp_WideFindCharLast(const wchar_t * S, wchar_t C);
 wchar_t * linscp_WideFindString(const wchar_t * Haystack, const wchar_t * Needle);
+wchar_t * linscp_WideCopy(wchar_t * Dest, const wchar_t * Src);
+wchar_t * linscp_WideCopyN(wchar_t * Dest, const wchar_t * Src, size_t N);
+wchar_t * linscp_WideFindAny(const wchar_t * S, const wchar_t * Chars);
+long linscp_WideToLong(const wchar_t * S, wchar_t ** End, int Base);
+int linscp_WideToInt(const wchar_t * S);
 
 #define towlower  linscp_ToLower
 #define towupper  linscp_ToUpper
@@ -196,12 +201,17 @@ wchar_t * linscp_WideFindString(const wchar_t * Haystack, const wchar_t * Needle
 #define wcschr    linscp_WideFindChar
 #define wcsrchr   linscp_WideFindCharLast
 #define wcsstr    linscp_WideFindString
+#define wcscpy    linscp_WideCopy
+#define wcsncpy   linscp_WideCopyN
+#define wcspbrk   linscp_WideFindAny
+#define wcstol    linscp_WideToLong
+#define _wtoi     linscp_WideToInt
 
 // --- time ------------------------------------------------------------------
 // FILETIME counts 100-nanosecond intervals since 1601-01-01 UTC. Core stores
 // file timestamps in these and compares them against remote times, so the
 // epoch and the scale both matter.
-typedef struct FILETIME
+typedef struct _FILETIME
 {
   DWORD dwLowDateTime;
   DWORD dwHighDateTime;
@@ -209,7 +219,7 @@ typedef struct FILETIME
 
 // Win32's directory-entry record, with its real field set. Core reads it
 // through Delphi's TSearchRec.FindData.
-typedef struct WIN32_FIND_DATAW
+typedef struct _WIN32_FIND_DATAW
 {
   DWORD dwFileAttributes;
   FILETIME ftCreationTime;
@@ -224,7 +234,7 @@ typedef struct WIN32_FIND_DATAW
 } WIN32_FIND_DATAW;
 typedef WIN32_FIND_DATAW WIN32_FIND_DATA;
 
-typedef struct SYSTEMTIME
+typedef struct _SYSTEMTIME
 {
   WORD wYear;
   WORD wMonth;
@@ -236,7 +246,7 @@ typedef struct SYSTEMTIME
   WORD wMilliseconds;
 } SYSTEMTIME;
 
-typedef struct TIME_ZONE_INFORMATION
+typedef struct _TIME_ZONE_INFORMATION
 {
   LONG Bias;
   WCHAR StandardName[32];
@@ -271,7 +281,7 @@ LONG CompareFileTime(const FILETIME * A, const FILETIME * B);
 #define TIME_ZONE_ID_STANDARD  1
 #define TIME_ZONE_ID_DAYLIGHT  2
 typedef TIME_ZONE_INFORMATION * LPTIME_ZONE_INFORMATION;
-typedef struct DYNAMIC_TIME_ZONE_INFORMATION
+typedef struct _TIME_DYNAMIC_ZONE_INFORMATION
 {
   LONG Bias;
   WCHAR StandardName[32];
@@ -318,7 +328,7 @@ extern "C" {
 #define FILE_ATTRIBUTE_OFFLINE             0x00001000
 #define FILE_ATTRIBUTE_ENCRYPTED           0x00004000
 
-typedef struct SECURITY_ATTRIBUTES SECURITY_ATTRIBUTES;
+typedef struct _SECURITY_ATTRIBUTES SECURITY_ATTRIBUTES;
 typedef SECURITY_ATTRIBUTES * LPSECURITY_ATTRIBUTES;
 
 // Kernel-object handles start here; every value below is a descriptor.
@@ -365,6 +375,12 @@ BOOL GetFileTime(HANDLE File, FILETIME * CreationTime, FILETIME * LastAccessTime
 BOOL SetFileTime(HANDLE File, const FILETIME * CreationTime,
   const FILETIME * LastAccessTime, const FILETIME * LastWriteTime);
 DWORD GetFileSize(HANDLE File, LPDWORD FileSizeHigh);
+#define FILE_BEGIN    0
+#define FILE_CURRENT  1
+#define FILE_END      2
+// lseek, with Win32's split offset: the high half in and out through
+// DistanceToMoveHigh when it is given.
+DWORD SetFilePointer(HANDLE File, LONG DistanceToMove, LONG * DistanceToMoveHigh, DWORD MoveMethod);
 // The mapping the shim's FileGetAttr uses: DIRECTORY, REPARSE_POINT for a
 // symbolic link, READONLY without the owner's write bit, HIDDEN for a leading
 // dot, NORMAL when none applies. GetFileAttributes follows links, as Win32
@@ -412,6 +428,9 @@ extern "C" {
 #define ERROR_PROC_NOT_FOUND        127
 #define ERROR_ENVVAR_NOT_FOUND      203
 #define ERROR_NOT_A_REPARSE_POINT  4390
+#define ERROR_NONE_MAPPED          1332
+#define ERROR_RESOURCE_DATA_NOT_FOUND 1812
+#define ERROR_RESOURCE_TYPE_NOT_FOUND 1813
 #define ERROR_DISK_FULL             112
 #define ERROR_ALREADY_EXISTS        183
 #define ERROR_MORE_DATA             234
@@ -481,7 +500,7 @@ LINSCP_NORETURN void ExitThread(DWORD ExitCode);
 
 // Critical sections are re-entrant on Win32 -- WinSCP's putty_section is
 // entered recursively -- so this is a recursive pthread mutex.
-typedef struct CRITICAL_SECTION { pthread_mutex_t Mutex; } CRITICAL_SECTION;
+typedef struct _RTL_CRITICAL_SECTION { pthread_mutex_t Mutex; } CRITICAL_SECTION;
 typedef CRITICAL_SECTION * LPCRITICAL_SECTION;
 void InitializeCriticalSection(LPCRITICAL_SECTION Section);
 BOOL InitializeCriticalSectionAndSpinCount(LPCRITICAL_SECTION Section, DWORD SpinCount);
@@ -505,6 +524,8 @@ DWORD WaitForMultipleObjects(DWORD Count, const HANDLE * Handles, BOOL WaitAll,
   DWORD Milliseconds);
 BOOL CloseHandle(HANDLE Object);
 void Sleep(DWORD Milliseconds);
+// No asynchronous procedure calls exist to wake an alertable sleep.
+DWORD SleepEx(DWORD Milliseconds, BOOL Alertable);
 
 // Milliseconds on a monotonic clock. Wraps at 2^32 (about 49.7 days), as the
 // Win32 one does; core only ever subtracts two readings, which survives that.
@@ -524,7 +545,7 @@ void CoUninitialize();
 // COM to instantiate anything from: CoCreateInstance reports every class as
 // unregistered, which is what Windows says for a class that is not installed
 // -- TComPtr::TryCreate then fails and Create raises, as they would there.
-typedef struct GUID
+typedef struct _GUID
 {
   DWORD Data1;
   WORD Data2;
@@ -578,6 +599,20 @@ extern "C" {
 #define HKEY_PERFORMANCE_DATA ((HKEY)(0x80000004ULL))
 #define HKEY_CURRENT_CONFIG   ((HKEY)(0x80000005ULL))
 #define HKEY_DYN_DATA         ((HKEY)(0x80000006ULL))
+// Registry value types.
+#define REG_NONE              0
+#define REG_SZ                1
+#define REG_EXPAND_SZ         2
+#define REG_BINARY            3
+#define REG_DWORD             4
+#define REG_MULTI_SZ          7
+#define REG_QWORD             11
+// There is no registry on POSIX: the shim's TRegistry opens no key, so the
+// handle these receive is never a key, and they say so.
+LONG RegQueryValueEx(HKEY Key, LPCWSTR ValueName, LPDWORD Reserved, LPDWORD Type,
+  LPBYTE Data, LPDWORD DataSize);
+LONG RegSetValueEx(HKEY Key, LPCWSTR ValueName, DWORD Reserved, DWORD Type,
+  const BYTE * Data, DWORD DataSize);
 #define KEY_WOW64_64KEY       0x0100
 #define KEY_WOW64_32KEY       0x0200
 
@@ -601,7 +636,7 @@ BOOL FreeLibrary(HMODULE Module);
 #define TH32CS_SNAPPROCESS          0x00000002
 #define PROCESS_QUERY_INFORMATION   0x0400
 #define PROCESS_VM_READ             0x0010
-typedef struct PROCESSENTRY32W
+typedef struct tagPROCESSENTRY32W
 {
   DWORD dwSize;
   DWORD cntUsage;
@@ -668,6 +703,25 @@ wchar_t * _wcsdup(const wchar_t * S);
 #define E_INVALIDARG            ((HRESULT)0x80070057)
 HRESULT SHGetFolderPath(HWND Owner, int Folder, HANDLE Token, DWORD Flags, LPWSTR Path);
 
+// File type names, by name only (SHGFI_USEFILEATTRIBUTES, core's one use):
+// "File folder" for a directory, shared-mime-info's description for a known
+// type ("HTML document"), else "XYZ File" for extension .xyz, as Windows names
+// an unregistered type, or "File". There is no system image list; iIcon is 0.
+#define SHGFI_ICON              0x000000100
+#define SHGFI_DISPLAYNAME       0x000000200
+#define SHGFI_TYPENAME          0x000000400
+#define SHGFI_SYSICONINDEX      0x000004000
+#define SHGFI_USEFILEATTRIBUTES 0x000000010
+typedef struct _SHFILEINFOW
+{
+  HICON hIcon;
+  int iIcon;
+  DWORD dwAttributes;
+  WCHAR szDisplayName[MAX_PATH];
+  WCHAR szTypeName[80];
+} SHFILEINFOW;
+DWORD_PTR SHGetFileInfo(LPCWSTR Path, DWORD FileAttributes, SHFILEINFOW * Info, UINT Size, UINT Flags);
+
 // --- memory ----------------------------------------------------------------
 // Both release malloc'd memory: everything this layer hands out that a
 // caller frees with them was allocated so.
@@ -691,7 +745,7 @@ HRESULT FindMimeFromData(LPVOID BindCtx, LPCWSTR Url, LPVOID Buffer, DWORD Size,
 #define CP_UTF8     65001
 #define MAX_DEFAULTCHAR      2
 #define MAX_LEADBYTES        12
-typedef struct CPINFOEXW
+typedef struct _cpinfoexW
 {
   UINT MaxCharSize;
   BYTE DefaultChar[MAX_DEFAULTCHAR];
@@ -715,7 +769,7 @@ LCID GetUserDefaultLCID(void);
 #define IO_REPARSE_TAG_MOUNT_POINT         0xA0000003u
 #define IO_REPARSE_TAG_SYMLINK             0xA000000Cu
 #define SYMLINK_FLAG_RELATIVE              0x00000001
-typedef struct OVERLAPPED OVERLAPPED;
+typedef struct _OVERLAPPED OVERLAPPED;
 typedef OVERLAPPED * LPOVERLAPPED;
 BOOL DeviceIoControl(HANDLE Device, DWORD IoControlCode, LPVOID InBuffer, DWORD InSize,
   LPVOID OutBuffer, DWORD OutSize, LPDWORD BytesReturned, LPOVERLAPPED Overlapped);
@@ -735,7 +789,7 @@ BOOL DeviceIoControl(HANDLE Device, DWORD IoControlCode, LPVOID InBuffer, DWORD 
 #define FOF_NOCONFIRMMKDIR       0x0200
 #define FOF_NOERRORUI            0x0400
 typedef WORD FILEOP_FLAGS;
-typedef struct SHFILEOPSTRUCTW
+typedef struct _SHFILEOPSTRUCTW
 {
   HWND hwnd;
   UINT wFunc;
@@ -750,8 +804,34 @@ typedef SHFILEOPSTRUCTW SHFILEOPSTRUCT;
 typedef SHFILEOPSTRUCTW * LPSHFILEOPSTRUCTW;
 int SHFileOperation(LPSHFILEOPSTRUCTW FileOp);
 
+// --- memory regions --------------------------------------------------------
+// The process's address space as Win32 describes it, from /proc/self/maps:
+// a mapping is committed (MEM_COMMIT), anonymous ones private (MEM_PRIVATE)
+// and file-backed ones mapped (MEM_MAPPED); the gaps are free. Core sums
+// these to log memory use. Linux overcommits, so "committed" here is
+// address space, not memory in use: see the divergence table.
+#define MEM_COMMIT    0x00001000
+#define MEM_RESERVE   0x00002000
+#define MEM_FREE      0x00010000
+#define MEM_PRIVATE   0x00020000
+#define MEM_MAPPED    0x00040000
+#define MEM_IMAGE     0x01000000
+typedef struct _MEMORY_BASIC_INFORMATION
+{
+  PVOID BaseAddress;
+  PVOID AllocationBase;
+  DWORD AllocationProtect;
+  WORD PartitionId;
+  SIZE_T RegionSize;
+  DWORD State;
+  DWORD Protect;
+  DWORD Type;
+} MEMORY_BASIC_INFORMATION;
+// Returns the bytes written to Info, or 0 past the last mapping.
+SIZE_T VirtualQuery(LPCVOID Address, MEMORY_BASIC_INFORMATION * Info, SIZE_T Length);
+
 // --- version info ----------------------------------------------------------
-typedef struct VS_FIXEDFILEINFO
+typedef struct tagVS_FIXEDFILEINFO
 {
   DWORD dwSignature;
   DWORD dwStrucVersion;
@@ -767,9 +847,73 @@ typedef struct VS_FIXEDFILEINFO
   DWORD dwFileDateMS;
   DWORD dwFileDateLS;
 } VS_FIXEDFILEINFO;
+#define VS_FFI_SIGNATURE 0xFEEF04BD
+
+// The running executable's version resource. On Windows windres embeds it;
+// here gen_versioninfo.py generates the same data from WinSCP.cbproj into
+// each executable (port/frontend), which defines linscp_OwnVersionInfo. The
+// platform layer's own definition is weak and returns null, for executables
+// without one.
+typedef struct linscp_VersionString { const WCHAR * Key; const WCHAR * Value; } linscp_VersionString;
+typedef struct linscp_VersionInfoData
+{
+  VS_FIXEDFILEINFO Fixed;
+  WORD Language;
+  WORD CodePage;
+  int StringCount;
+  const linscp_VersionString * Strings;
+} linscp_VersionInfoData;
+const linscp_VersionInfoData * linscp_OwnVersionInfo(void);
+
+// The executable's own resource only (the file core asks about); for any
+// other file there is none, ERROR_RESOURCE_DATA_NOT_FOUND. VerQueryValue
+// answers "\\", "\\VarFileInfo\\Translation" and
+// "\\StringFileInfo\\<lang><codepage>\\<key>", returning pointers into the
+// block, string lengths in characters with the terminator, as Win32 does.
+DWORD GetFileVersionInfoSize(LPCWSTR FileName, LPDWORD Handle);
+BOOL GetFileVersionInfo(LPCWSTR FileName, DWORD Handle, DWORD Size, LPVOID Data);
+BOOL VerQueryValue(LPCVOID Block, LPCWSTR SubBlock, LPVOID * Buffer, UINT * Length);
 
 #ifdef __cplusplus
 }  // extern "C"
+
+// Win32 code written for LLP64 passes an unsigned long where a DWORD is
+// declared: the same 32 bits on Windows, 64 on LP64 POSIX. Overloads take
+// the wider type and fill it, so such code needs no change (Terminal.cpp's
+// GetFileSize(Handle, &HSize)).
+inline LONG RegQueryValueEx(HKEY Key, LPCWSTR ValueName, LPDWORD Reserved, unsigned long * Type,
+  LPBYTE Data, unsigned long * DataSize)
+{
+  DWORD T = (Type != nullptr) ? static_cast<DWORD>(*Type) : 0;
+  DWORD S = (DataSize != nullptr) ? static_cast<DWORD>(*DataSize) : 0;
+  const LONG R = RegQueryValueEx(Key, ValueName, Reserved, (Type != nullptr) ? &T : nullptr, Data,
+    (DataSize != nullptr) ? &S : nullptr);
+  if (Type != nullptr) { *Type = T; }
+  if (DataSize != nullptr) { *DataSize = S; }
+  return R;
+}
+
+inline DWORD GetFileVersionInfoSize(LPCWSTR FileName, unsigned long * Handle)
+{
+  DWORD H = 0;
+  const DWORD R = GetFileVersionInfoSize(FileName, &H);
+  if (Handle != nullptr)
+  {
+    *Handle = H;
+  }
+  return R;
+}
+
+inline DWORD GetFileSize(HANDLE File, unsigned long * FileSizeHigh)
+{
+  DWORD High = 0;
+  const DWORD Low = GetFileSize(File, &High);
+  if (FileSizeHigh != nullptr)
+  {
+    *FileSizeHigh = High;
+  }
+  return Low;
+}
 #endif
 
 #endif // LINSCP_WIN32_ON_POSIX_H

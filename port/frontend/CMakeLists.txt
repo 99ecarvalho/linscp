@@ -26,7 +26,8 @@ endforeach()
 # Core reads its own version from the executable's VERSIONINFO resource, which
 # C++Builder writes from WinSCP.cbproj's VerInfo_* settings. Generated from
 # the same settings, so it follows the pin, and linked into every executable
-# built on core. POSIX has no resources; the platform layer's part (P1-07b).
+# built on core. POSIX has no resources: there the same data is generated as
+# C++, which the platform layer serves GetFileVersionInfo from.
 if(WIN32)
   set(_verrc "${CMAKE_CURRENT_BINARY_DIR}/versioninfo.rc")
   add_custom_command(
@@ -40,6 +41,22 @@ if(WIN32)
   add_library(linscp-versioninfo OBJECT EXCLUDE_FROM_ALL "${_verrc}")
   # An object library's objects reach only targets linking it directly, so
   # they are handed on as sources instead.
+  target_sources(linscp-runtime INTERFACE $<TARGET_OBJECTS:linscp-versioninfo>)
+  add_dependencies(linscp-runtime linscp-versioninfo)
+endif()
+if(NOT WIN32)
+  set(_vercpp "${CMAKE_CURRENT_BINARY_DIR}/versioninfo.cpp")
+  add_custom_command(
+    OUTPUT  "${_vercpp}"
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/gen_versioninfo.py"
+            --project "${LINSCP_UPSTREAM}/source/WinSCP.cbproj" --out "${_vercpp}" --cxx
+            --platform "${CMAKE_SYSTEM_NAME}"
+    DEPENDS "${CMAKE_SOURCE_DIR}/port/tools/gen_versioninfo.py"
+            "${LINSCP_UPSTREAM}/source/WinSCP.cbproj"
+    COMMENT "Generating version information from WinSCP.cbproj"
+    VERBATIM)
+  add_library(linscp-versioninfo OBJECT EXCLUDE_FROM_ALL "${_vercpp}")
+  target_link_libraries(linscp-versioninfo PRIVATE linscp-shim)
   target_sources(linscp-runtime INTERFACE $<TARGET_OBJECTS:linscp-versioninfo>)
   add_dependencies(linscp-runtime linscp-versioninfo)
 endif()

@@ -38,8 +38,11 @@
 #else
   // Same reasoning on POSIX: core's headers reference DWORD, FILETIME, HKEY and
   // friends before anything includes a platform header explicitly, so the
-  // Win32 subset must be visible from <vcl.h> onwards.
+  // Win32 subset must be visible from <vcl.h> onwards -- with the same extra
+  // headers as the Windows branch, which core relies on as it does there.
   #include "win32_on_posix.h"
+  #include "wincrypt.h"
+  using TSHFileInfoW = SHFILEINFOW;   // Delphi's alias, as on Windows
 #endif
 
 #include "vcl_property.h"

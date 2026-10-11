@@ -53,10 +53,14 @@ if(NOT WIN32)
     "${CMAKE_CURRENT_SOURCE_DIR}/../platform/win32_kernel_posix.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/../platform/win32_file_posix.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/../platform/win32_misc_posix.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../platform/win32_crypt_posix.cpp"
   )
 endif()
 if(NOT WIN32)
   target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../platform")
+  # wincrypt.h's certificate chains are verified with OpenSSL.
+  target_link_libraries(linscp-shim PUBLIC linscp-openssl-crypto)
+  add_dependencies(linscp-shim linscp-openssl-build)
 endif()
 target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(linscp-shim PUBLIC linscp-expat)

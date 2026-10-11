@@ -4,6 +4,9 @@
 // promises; the comments here are about how.
 #include "win32_on_posix.h"
 #include "win32_kernel_internal.h"
+#include "secext.h"
+
+#include <pwd.h>
 
 #include <cerrno>
 #include <cstdlib>
@@ -16,6 +19,7 @@
 #include <string>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <algorithm>
 #include <vector>
 
 extern char ** environ;
@@ -981,4 +985,331 @@ int SHFileOperation(LPSHFILEOPSTRUCTW FileOp)
     }
   }
   return 0;
+}
+
+// --- registry ------------------------------------------------------------------------------
+
+LONG RegQueryValueEx(HKEY, LPCWSTR, LPDWORD, LPDWORD, LPBYTE, LPDWORD)
+{
+  return ERROR_INVALID_HANDLE;
+}
+
+LONG RegSetValueEx(HKEY, LPCWSTR, DWORD, DWORD, const BYTE *, DWORD)
+{
+  return ERROR_INVALID_HANDLE;
+}
+
+// --- user name ------------------------------------------------------------------------------
+
+BOOLEAN GetUserNameEx(EXTENDED_NAME_FORMAT Format, LPWSTR Name, ULONG * Size)
+{
+  if ((Format != NameSamCompatible) || (Size == nullptr))
+  {
+    SetLastError(ERROR_NONE_MAPPED);
+    return 0;
+  }
+  char Host[256] = {};
+  gethostname(Host, sizeof(Host) - 1);
+  std::string User;
+  if (const passwd * Pw = getpwuid(geteuid()))
+  {
+    User = Pw->pw_name;
+  }
+  else
+  {
+    User = std::to_string(geteuid());
+  }
+  // The short host name, as Windows' NetBIOS computer name is.
+  std::string HostName = Host;
+  const std::size_t Dot = HostName.find('.');
+  if (Dot != std::string::npos)
+  {
+    HostName.resize(Dot);
+  }
+  const std::u16string Full = FromUtf8(HostName + "\\" + User);
+  if ((Name == nullptr) || (*Size < Full.size() + 1))
+  {
+    *Size = static_cast<ULONG>(Full.size() + 1);
+    SetLastError(ERROR_MORE_DATA);
+    return 0;
+  }
+  CopyOut(Full, Name, *Size);
+  *Size = static_cast<ULONG>(Full.size());
+  return 1;
+}
+
+// --- memory regions ---------------------------------------------------------------------------
+
+SIZE_T VirtualQuery(LPCVOID Address, MEMORY_BASIC_INFORMATION * Info, SIZE_T Length)
+{
+  if ((Info == nullptr) || (Length < sizeof(MEMORY_BASIC_INFORMATION)))
+  {
+    SetLastError(ERROR_INSUFFICIENT_BUFFER);
+    return 0;
+  }
+  const auto At = reinterpret_cast<std::uintptr_t>(Address);
+  std::ifstream Maps("/proc/self/maps");
+  std::string Line;
+  std::uintptr_t PrevEnd = 0;
+  while (std::getline(Maps, Line))
+  {
+    // "start-end perms offset dev inode [path]"
+    char * End = nullptr;
+    const std::uintptr_t Start = std::strtoull(Line.c_str(), &End, 16);
+    const std::uintptr_t Stop = std::strtoull(End + 1, &End, 16);
+    if (At < Start)
+    {
+      // In the gap before this mapping: free.
+      std::memset(Info, 0, sizeof(*Info));
+      Info->BaseAddress = reinterpret_cast<PVOID>(std::max(PrevEnd, At));
+      Info->RegionSize = Start - std::max(PrevEnd, At);
+      Info->State = MEM_FREE;
+      return sizeof(*Info);
+    }
+    if (At < Stop)
+    {
+      std::istringstream Fields(Line);
+      std::string Range, Perms, Offset, Device, Inode, Path;
+      Fields >> Range >> Perms >> Offset >> Device >> Inode;
+      std::getline(Fields, Path);
+      const bool Anonymous = (Inode == "0");
+      std::memset(Info, 0, sizeof(*Info));
+      Info->BaseAddress = reinterpret_cast<PVOID>(Start);
+      Info->AllocationBase = Info->BaseAddress;
+      Info->RegionSize = Stop - Start;
+      Info->State = MEM_COMMIT;
+      Info->Type = Anonymous ? MEM_PRIVATE : MEM_MAPPED;
+      return sizeof(*Info);
+    }
+    PrevEnd = Stop;
+  }
+  return 0;
+}
+
+// --- version resources ---------------------------------------------------------------------
+
+extern "C" __attribute__((weak)) const linscp_VersionInfoData * linscp_OwnVersionInfo(void)
+{
+  return nullptr;
+}
+
+namespace {
+
+// The block GetFileVersionInfo hands out: a header, the fixed information,
+// the translation, then each string as key and value, null-terminated UTF-16.
+// Only VerQueryValue reads it, and finds everything by walking it.
+struct TVersionBlockHead
+{
+  DWORD Magic;
+  DWORD Size;
+  VS_FIXEDFILEINFO Fixed;
+  WORD Translation[2];
+  DWORD StringCount;
+};
+const DWORD VersionBlockMagic = 0x4C565349;   // "ISVL"
+
+std::vector<char> BuildVersionBlock(const linscp_VersionInfoData & D)
+{
+  std::vector<char> B(sizeof(TVersionBlockHead));
+  auto Append = [&B](const WCHAR * S)
+  {
+    const std::size_t N = (linscp_WideLength(S) + 1) * sizeof(WCHAR);
+    const char * P = reinterpret_cast<const char *>(S);
+    B.insert(B.end(), P, P + N);
+  };
+  for (int I = 0; I < D.StringCount; ++I)
+  {
+    Append(D.Strings[I].Key);
+    Append(D.Strings[I].Value);
+  }
+  TVersionBlockHead Head{};
+  Head.Magic = VersionBlockMagic;
+  Head.Size = static_cast<DWORD>(B.size());
+  Head.Fixed = D.Fixed;
+  Head.Translation[0] = D.Language;
+  Head.Translation[1] = D.CodePage;
+  Head.StringCount = static_cast<DWORD>(D.StringCount);
+  std::memcpy(B.data(), &Head, sizeof(Head));
+  return B;
+}
+
+bool IsOwnExecutable(LPCWSTR FileName)
+{
+  char Self[4096], Given[4096];
+  return (realpath("/proc/self/exe", Self) != nullptr) &&
+         (realpath(linscp::WideToUtf8(FileName).c_str(), Given) != nullptr) &&
+         (std::strcmp(Self, Given) == 0);
+}
+
+}  // namespace
+
+DWORD GetFileVersionInfoSize(LPCWSTR FileName, LPDWORD Handle)
+{
+  if (Handle != nullptr)
+  {
+    *Handle = 0;
+  }
+  const linscp_VersionInfoData * D = linscp_OwnVersionInfo();
+  if ((D == nullptr) || !IsOwnExecutable(FileName))
+  {
+    SetLastError(ERROR_RESOURCE_DATA_NOT_FOUND);
+    return 0;
+  }
+  return static_cast<DWORD>(BuildVersionBlock(*D).size());
+}
+
+BOOL GetFileVersionInfo(LPCWSTR FileName, DWORD, DWORD Size, LPVOID Data)
+{
+  const linscp_VersionInfoData * D = linscp_OwnVersionInfo();
+  if ((D == nullptr) || (Data == nullptr) || !IsOwnExecutable(FileName))
+  {
+    SetLastError(ERROR_RESOURCE_DATA_NOT_FOUND);
+    return FALSE;
+  }
+  const std::vector<char> B = BuildVersionBlock(*D);
+  if (Size < B.size())
+  {
+    SetLastError(ERROR_INSUFFICIENT_BUFFER);
+    return FALSE;
+  }
+  std::memcpy(Data, B.data(), B.size());
+  return TRUE;
+}
+
+BOOL VerQueryValue(LPCVOID Block, LPCWSTR SubBlock, LPVOID * Buffer, UINT * Length)
+{
+  const auto * Head = static_cast<const TVersionBlockHead *>(Block);
+  if ((Head == nullptr) || (Head->Magic != VersionBlockMagic) || (SubBlock == nullptr) ||
+      (Buffer == nullptr) || (Length == nullptr))
+  {
+    SetLastError(ERROR_INVALID_PARAMETER);
+    return FALSE;
+  }
+  const std::u16string Path = Wide(SubBlock);
+  if (Path == u"\\")
+  {
+    *Buffer = const_cast<VS_FIXEDFILEINFO *>(&Head->Fixed);
+    *Length = sizeof(VS_FIXEDFILEINFO);
+    return TRUE;
+  }
+  if (SameIgnoringCase(Path, "\\VarFileInfo\\Translation"))
+  {
+    *Buffer = const_cast<WORD *>(Head->Translation);
+    *Length = sizeof(Head->Translation);
+    return TRUE;
+  }
+  // \StringFileInfo\LLLLCCCC\Key, the block name in hex as core formats it.
+  const std::u16string Prefix = u"\\StringFileInfo\\";
+  if ((Path.size() > Prefix.size() + 9) &&
+      SameIgnoringCase(Path.substr(0, Prefix.size()), "\\StringFileInfo\\") &&
+      (Path[Prefix.size() + 8] == u'\\'))
+  {
+    char Expected[9];
+    std::snprintf(Expected, sizeof(Expected), "%04X%04X", Head->Translation[0], Head->Translation[1]);
+    if (SameIgnoringCase(Path.substr(Prefix.size(), 8), Expected))
+    {
+      const std::u16string Key = Path.substr(Prefix.size() + 9);
+      const auto * P = reinterpret_cast<const WCHAR *>(Head + 1);
+      for (DWORD I = 0; I < Head->StringCount; ++I)
+      {
+        const WCHAR * K = P;
+        P += linscp_WideLength(P) + 1;
+        const WCHAR * V = P;
+        P += linscp_WideLength(P) + 1;
+        if (Wide(K) == Key)
+        {
+          *Buffer = const_cast<WCHAR *>(V);
+          *Length = static_cast<UINT>(linscp_WideLength(V) + 1);
+          return TRUE;
+        }
+      }
+    }
+  }
+  SetLastError(ERROR_RESOURCE_TYPE_NOT_FOUND);
+  *Buffer = nullptr;
+  *Length = 0;
+  return FALSE;
+}
+
+// --- file type names ---------------------------------------------------------------------------
+
+namespace {
+
+// The untranslated <comment> of a type's shared-mime-info entry.
+std::string MimeComment(const std::string & Type)
+{
+  for (const char * Root : { "/usr/share/mime/", "/usr/local/share/mime/" })
+  {
+    std::ifstream Xml(std::string(Root) + Type + ".xml");
+    std::stringstream All;
+    All << Xml.rdbuf();
+    const std::string Text = All.str();
+    const std::size_t Open = Text.find("<comment>");
+    if (Open != std::string::npos)
+    {
+      const std::size_t Start = Open + 9;
+      const std::size_t Close = Text.find("</comment>", Start);
+      if (Close != std::string::npos)
+      {
+        return Text.substr(Start, Close - Start);
+      }
+    }
+  }
+  return std::string();
+}
+
+}  // namespace
+
+DWORD_PTR SHGetFileInfo(LPCWSTR Path, DWORD FileAttributes, SHFILEINFOW * Info, UINT Size, UINT Flags)
+{
+  if ((Info == nullptr) || (Size < sizeof(SHFILEINFOW)) || ((Flags & SHGFI_USEFILEATTRIBUTES) == 0))
+  {
+    return 0;
+  }
+  std::memset(Info, 0, sizeof(*Info));
+  std::string Name = linscp::WideToUtf8(Path);
+  const std::size_t Slash = Name.find_last_of("/\\");
+  if (Slash != std::string::npos)
+  {
+    Name = Name.substr(Slash + 1);
+  }
+  if ((Flags & SHGFI_TYPENAME) != 0)
+  {
+    std::string Type;
+    if ((FileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
+    {
+      Type = "File folder";
+    }
+    else
+    {
+      const std::string Mime = MimeForName(Name);
+      Type = Mime.empty() ? std::string() : MimeComment(Mime);
+      if (Type.empty())
+      {
+        const std::size_t Dot = Name.rfind('.');
+        if ((Dot != std::string::npos) && (Dot + 1 < Name.size()))
+        {
+          std::string Ext = Name.substr(Dot + 1);
+          for (char & C : Ext)
+          {
+            if ((C >= 'a') && (C <= 'z')) { C = static_cast<char>(C - 'a' + 'A'); }
+          }
+          Type = Ext + " File";
+        }
+        else
+        {
+          Type = "File";
+        }
+      }
+    }
+    CopyOut(FromUtf8(Type).substr(0, 79), Info->szTypeName, 80);
+  }
+  if ((Flags & SHGFI_DISPLAYNAME) != 0)
+  {
+    CopyOut(FromUtf8(Name).substr(0, MAX_PATH - 1), Info->szDisplayName, MAX_PATH);
+  }
+  Info->dwAttributes = FileAttributes;
+  // Nonzero: success. Windows returns the system image list's handle when
+  // SHGFI_SYSICONINDEX is asked for.
+  return 1;
 }

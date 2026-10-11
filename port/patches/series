@@ -1,3 +1,5 @@
 # The reviewed patch series, applied in order to the pristine submodule before
 # transform.py's rules. See port/tools/patchset.py.
 core-closure-functional-cast.patch
+core-lp64-knock-address.patch
+core-shell-file-operation-windows-only.patch

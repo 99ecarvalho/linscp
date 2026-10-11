@@ -1,0 +1,53 @@
+Compile the synchronize checklist's Explorer file operation on Windows only.
+
+TSynchronizeChecklistFileOperation carries out a synchronization checklist
+through Explorer's IFileOperation (a Shell COM object), so that local
+deletions go to the recycle bin with Explorer's progress and undo. Only
+WinSCP's Windows GUI uses it (CustomScpExplorer.cpp). Elsewhere neither the
+object nor the interfaces exist, and declaring them only to compile would
+pretend to a facility that is not there; a frontend on another platform
+implements the operation its own way. The class and its implementation are
+guarded with _WIN32, which C++Builder defines, so upstream's build is
+unchanged. Each guard replaces a separator comment line, so line counts are
+unchanged.
+
+--- a/source/core/RemoteFiles.h	2026-10-11 18:02:13.581022032 -0300
++++ b/source/core/RemoteFiles.h	2026-10-11 18:02:13.602850675 -0300
+@@ -557,7 +557,7 @@
+ struct IFileOperation;
+ struct IShellItem;
+ class TFileOperationProgressSink;
+-//---------------------------------------------------------------------------
++#if defined(_WIN32) // linscp: Explorer's IFileOperation; Windows only
+ class TSynchronizeChecklistFileOperation
+ {
+ friend class TSynchronizeChecklist;
+@@ -582,7 +582,7 @@
+   void * FToken;
+   bool FAny;
+ };
+-//---------------------------------------------------------------------------
++#endif
+ class TFileOperationProgressType;
+ //---------------------------------------------------------------------------
+ class TSynchronizeProgress
+--- a/source/core/RemoteFiles.cpp	2026-10-11 18:02:13.582665535 -0300
++++ b/source/core/RemoteFiles.cpp	2026-10-11 18:02:13.603752518 -0300
+@@ -3237,7 +3237,7 @@
+       return false;
+   }
+ }
+-//---------------------------------------------------------------------------
++#if defined(_WIN32) // linscp: Explorer's IFileOperation; Windows only
+ //---------------------------------------------------------------------------
+ class TFileOperationProgressSink : public TCppInterfacedObject<IFileOperationProgressSink>
+ {
+@@ -3401,7 +3401,7 @@
+     }
+   }
+ }
+-//---------------------------------------------------------------------------
++#endif
+ //---------------------------------------------------------------------------
+ TSynchronizeProgress::TSynchronizeProgress(const TSynchronizeChecklist * Checklist)
+ {

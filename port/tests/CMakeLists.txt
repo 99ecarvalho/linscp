@@ -59,7 +59,7 @@ add_test(NAME streams COMMAND test_streams)
 add_executable(test_win32_posix test_win32_posix.cpp)
 target_link_libraries(test_win32_posix PRIVATE linscp-shim)
 if(WIN32)
-  target_link_libraries(test_win32_posix PRIVATE shlwapi psapi urlmon)
+  target_link_libraries(test_win32_posix PRIVATE shlwapi psapi urlmon secur32)
 endif()
 add_test(NAME win32_on_posix COMMAND test_win32_posix)
 
@@ -146,6 +146,13 @@ if(WIN32)
   set_tests_properties(putty_crypto PROPERTIES DEPENDS putty_crypto_build)
 endif()
 
+# On Linux core compiles and archives; linking it needs PuTTY, FileZilla, neon
+# and libs3 there too, which are still Windows-only (P1-09, P1-12, P1-13).
+if(NOT WIN32)
+  add_test(NAME core_build
+    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target linscp-core)
+endif()
+
 # Executable tests go above this line.
 # When cross-compiling, the toolchain points CMAKE_CROSSCOMPILING_EMULATOR at
 # wine; these tell wine where the mingw runtime DLLs live and keep its output
@@ -204,6 +211,8 @@ if(TARGET linscp-putty)
             "${LINSCP_TARGET_OBJDUMP}" "$<TARGET_FILE:linscp-puttyvs>" aes-ni.c.obj aes_ni_available)
   set_tests_properties(aes_ni_guard PROPERTIES DEPENDS aes_ni_guard_build)
 endif()
+add_test(NAME tryfinally_inline
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_tryfinally_inline.py")
 add_test(NAME closure_shapes
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_closure_shapes.py")
 add_test(NAME closure_sites

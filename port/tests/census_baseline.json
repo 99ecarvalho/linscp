@@ -13,7 +13,7 @@
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 4,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/CopyParam.cpp": {
@@ -27,8 +27,8 @@
         "missing_types": 0
       },
       "source/core/Cryptography.cpp": {
-        "aborted": true,
-        "errors": 1,
+        "aborted": false,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/Exceptions.cpp": {
@@ -43,7 +43,7 @@
       },
       "source/core/FileInfo.cpp": {
         "aborted": false,
-        "errors": 6,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/FileMasks.cpp": {
@@ -53,7 +53,7 @@
       },
       "source/core/FileOperationProgress.cpp": {
         "aborted": false,
-        "errors": 1,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/FileSystems.cpp": {
@@ -73,7 +73,7 @@
       },
       "source/core/HierarchicalStorage.cpp": {
         "aborted": false,
-        "errors": 2,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/Http.cpp": {
@@ -98,7 +98,7 @@
       },
       "source/core/PuttyIntf.cpp": {
         "aborted": false,
-        "errors": 5,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/Queue.cpp": {
@@ -108,8 +108,8 @@
       },
       "source/core/RemoteFiles.cpp": {
         "aborted": false,
-        "errors": 19,
-        "missing_types": 2
+        "errors": 0,
+        "missing_types": 0
       },
       "source/core/S3FileSystem.cpp": {
         "aborted": false,
@@ -127,14 +127,14 @@
         "missing_types": 0
       },
       "source/core/SecureShell.cpp": {
-        "aborted": true,
-        "errors": 2,
+        "aborted": false,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/Security.cpp": {
         "aborted": false,
-        "errors": 15,
-        "missing_types": 7
+        "errors": 0,
+        "missing_types": 0
       },
       "source/core/SessionData.cpp": {
         "aborted": false,
@@ -142,8 +142,8 @@
         "missing_types": 0
       },
       "source/core/SessionInfo.cpp": {
-        "aborted": true,
-        "errors": 1,
+        "aborted": false,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/SftpFileSystem.cpp": {
@@ -153,8 +153,8 @@
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 3,
-        "missing_types": 1
+        "errors": 0,
+        "missing_types": 0
       },
       "source/core/Usage.cpp": {
         "aborted": false,
@@ -162,8 +162,8 @@
         "missing_types": 0
       },
       "source/core/WebDAVFileSystem.cpp": {
-        "aborted": true,
-        "errors": 1,
+        "aborted": false,
+        "errors": 0,
         "missing_types": 0
       }
     },

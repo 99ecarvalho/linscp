@@ -10,15 +10,26 @@
   #include <tlhelp32.h>
   #include <psapi.h>
   #include <urlmon.h>
+  #include <lmcons.h>
+  #define SECURITY_WIN32
+  #include <security.h>
   #include "vcl_win32_undef.h"
 #else
   #include "win32_on_posix.h"
+  #include "wincrypt.h"
+  #include "lmcons.h"
+  #include "secext.h"
+  #include <openssl/evp.h>
+  #include <openssl/pem.h>
+  #include <openssl/x509.h>
+  #include <openssl/x509v3.h>
   #include <sys/stat.h>
   #include <unistd.h>
 #endif
 
 #include <cstdint>
 #include <string>
+#include <vector>
 #include <cstdio>
 #include <ctime>
 
@@ -531,7 +542,94 @@ void TestMimeTypes()
   }
 }
 
+// The wide C library functions upstream calls, which on POSIX are the
+// layer's 2-byte versions.
+void TestWideStrings()
+{
+  wchar_t Buf[8];
+  CHECK(wcscpy(Buf, L"abc") == Buf);
+  CHECK(P16(Buf) == u"abc");
+  wchar_t Padded[6] = { L'x', L'x', L'x', L'x', L'x', L'x' };
+  wcsncpy(Padded, L"ab", 5);
+  CHECK((Padded[0] == L'a') && (Padded[1] == L'b') && (Padded[2] == 0) && (Padded[4] == 0) && (Padded[5] == L'x'));
+  const wchar_t * Path = L"dir\\file/name";
+  CHECK(wcspbrk(Path, L"\\/") == Path + 3);
+  CHECK(wcspbrk(L"plain", L"\\/") == NULL);
+  wchar_t * End = NULL;
+  const wchar_t * Number = L"  -42rest";
+  CHECK(wcstol(Number, &End, 10) == -42);
+  CHECK(End == Number + 5);
+  CHECK(_wtoi(L"221 reply") == 221);
+}
+
+void TestFilePointer()
+{
+  wchar_t Temp[MAX_PATH];
+  GetTempPath(MAX_PATH, Temp);
+  const Path16 File = P16(Temp) + u"linscp_seek_test";
+  HANDLE H = CreateFile(W(File), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, 0);
+  CHECK(H != INVALID_HANDLE_VALUE);
+  LONG High = 0;
+  CHECK(SetFilePointer(H, 10, &High, FILE_BEGIN) == 10);
+  CHECK(High == 0);
+  CHECK(SetFilePointer(H, -4, NULL, FILE_CURRENT) == 6);
+  CHECK(SetFilePointer(H, 0, NULL, FILE_END) == 0);
+  CloseHandle(H);
+#if defined(_WIN32)
+  DeleteFileW(W(File));
+#else
+  unlink(Narrow(File).c_str());
+#endif
+}
+
+void TestMemoryRegions()
+{
+  int OnStack = 0;
+  MEMORY_BASIC_INFORMATION Info;
+  CHECK(VirtualQuery(&OnStack, &Info, sizeof(Info)) == sizeof(Info));
+  CHECK(Info.State == MEM_COMMIT);
+  const char * Base = static_cast<const char *>(Info.BaseAddress);
+  CHECK((Base <= reinterpret_cast<const char *>(&OnStack)) &&
+        (reinterpret_cast<const char *>(&OnStack) < Base + Info.RegionSize));
+  // Walking from the bottom, as core does, finds committed memory and ends.
+  const char * Address = NULL;
+  size_t Committed = 0;
+  int Regions = 0;
+  while ((VirtualQuery(Address, &Info, sizeof(Info)) == sizeof(Info)) && (Regions < 100000))
+  {
+    if (Info.State == MEM_COMMIT) { Committed += Info.RegionSize; }
+    Address = static_cast<const char *>(Info.BaseAddress) + Info.RegionSize;
+    ++Regions;
+  }
+  CHECK(Committed > 0);
+  CHECK(Regions < 100000);
+}
+
+void TestUserName()
+{
+  wchar_t Name[UNLEN + 1];
+  unsigned long Size = UNLEN + 1;
+  CHECK(GetUserNameEx(NameSamCompatible, Name, &Size) != 0);
+  const std::string N = Narrow(P16(Name));
+  CHECK(Size == N.size());
+  const std::size_t Slash = N.find('\\');
+  CHECK((Slash != std::string::npos) && (Slash > 0) && (Slash + 1 < N.size()));
+}
+
 #if !defined(_WIN32)
+// The names Windows Explorer gives -- not Wine, whose shell32 says "Folder"
+// and ".zzqq file", so this is checked on POSIX only.
+void TestTypeNames()
+{
+  SHFILEINFOW Info;
+  CHECK(SHGetFileInfo(L"some folder", FILE_ATTRIBUTE_DIRECTORY, &Info, sizeof(Info),
+                      SHGFI_TYPENAME | SHGFI_USEFILEATTRIBUTES) != 0);
+  CHECK(Narrow(P16(Info.szTypeName)) == "File folder");
+  CHECK(SHGetFileInfo(L"archive.zzqq", FILE_ATTRIBUTE_NORMAL, &Info, sizeof(Info),
+                      SHGFI_TYPENAME | SHGFI_USEFILEATTRIBUTES) != 0);
+  CHECK(Narrow(P16(Info.szTypeName)) == "ZZQQ File");
+}
+
 // Rules against what Windows' own registry says for the same zones.
 void CheckZone(const char * Zone, LONG Bias, LONG DaylightBias,
   WORD DMonth, WORD DWeek, WORD DHour, WORD SMonth, WORD SWeek, WORD SHour)
@@ -672,9 +770,167 @@ void TestTrash()
   CHECK(SHFileOperation(&Op) == 0);
   CHECK(stat(Base.c_str(), &St) != 0);
 }
+// Certificates against the system trust store, as WindowsValidateCertificate
+// asks: a fresh self-signed one is refused as untrusted, a root the system
+// trusts is accepted.
+std::vector<unsigned char> Der(X509 * Certificate)
+{
+  unsigned char * Out = NULL;
+  const int N = i2d_X509(Certificate, &Out);
+  std::vector<unsigned char> R(Out, Out + (N > 0 ? N : 0));
+  OPENSSL_free(Out);
+  return R;
+}
+
+HRESULT PolicyError(const std::vector<unsigned char> & Certificate)
+{
+  PCCERT_CONTEXT Context = CertCreateCertificateContext(
+    X509_ASN_ENCODING | PKCS_7_ASN_ENCODING, Certificate.data(), (DWORD)Certificate.size());
+  CHECK(Context != NULL);
+  CERT_CHAIN_ENGINE_CONFIG Config;
+  memset(&Config, 0, sizeof(Config));
+  Config.cbSize = sizeof(Config);
+  HCERTCHAINENGINE Engine = NULL;
+  CHECK(CertCreateCertificateChainEngine(&Config, &Engine) != 0);
+  CERT_CHAIN_PARA Para;
+  memset(&Para, 0, sizeof(Para));
+  Para.cbSize = sizeof(Para);
+  PCCERT_CHAIN_CONTEXT Chain = NULL;
+  CHECK(CertGetCertificateChain(Engine, Context, NULL, NULL, &Para, CERT_CHAIN_CACHE_END_CERT, NULL, &Chain) != 0);
+  CERT_CHAIN_POLICY_PARA PolicyPara;
+  memset(&PolicyPara, 0, sizeof(PolicyPara));
+  PolicyPara.cbSize = sizeof(PolicyPara);
+  CERT_CHAIN_POLICY_STATUS Status;
+  memset(&Status, 0, sizeof(Status));
+  Status.cbSize = sizeof(Status);
+  CHECK(CertVerifyCertificateChainPolicy(CERT_CHAIN_POLICY_SSL, Chain, &PolicyPara, &Status) != 0);
+  CertFreeCertificateChain(Chain);
+  CertFreeCertificateChainEngine(Engine);
+  CertFreeCertificateContext(Context);
+  return (HRESULT)Status.dwError;
+}
+
+X509 * MakeCertificate(EVP_PKEY * Key, const char * Subject, X509 * Issuer, EVP_PKEY * IssuerKey,
+  bool Ca, long ValidFrom, long ValidTo)
+{
+  X509 * C = X509_new();
+  X509_set_version(C, 2);
+  static long Serial = 1;
+  ASN1_INTEGER_set(X509_get_serialNumber(C), Serial++);
+  X509_gmtime_adj(X509_getm_notBefore(C), ValidFrom);
+  X509_gmtime_adj(X509_getm_notAfter(C), ValidTo);
+  X509_set_pubkey(C, Key);
+  X509_NAME * Name = X509_get_subject_name(C);
+  X509_NAME_add_entry_by_txt(Name, "CN", MBSTRING_ASC, (const unsigned char *)Subject, -1, -1, 0);
+  X509_set_issuer_name(C, (Issuer != NULL) ? X509_get_subject_name(Issuer) : Name);
+  X509V3_CTX Ctx;
+  X509V3_set_ctx_nodb(&Ctx);
+  X509V3_set_ctx(&Ctx, (Issuer != NULL) ? Issuer : C, C, NULL, NULL, 0);
+  const char * Extensions[][2] = {
+    { "basicConstraints", Ca ? "critical,CA:TRUE" : "CA:FALSE" },
+    { "keyUsage", Ca ? "critical,keyCertSign,cRLSign" : "critical,digitalSignature" },
+    { "extendedKeyUsage", Ca ? NULL : "serverAuth" },
+    { "subjectKeyIdentifier", "hash" },
+  };
+  for (const auto & E : Extensions)
+  {
+    if (E[1] != NULL)
+    {
+      X509_EXTENSION * X = X509V3_EXT_conf(NULL, &Ctx, E[0], E[1]);
+      X509_add_ext(C, X, -1);
+      X509_EXTENSION_free(X);
+    }
+  }
+  X509_sign(C, (IssuerKey != NULL) ? IssuerKey : Key, EVP_sha256());
+  return C;
+}
+
+void TestCertificateChains()
+{
+  // A private CA, trusted through SSL_CERT_FILE, which OpenSSL's default
+  // locations honour; then a leaf for each verdict core distinguishes.
+  wchar_t Temp[MAX_PATH];
+  GetTempPath(MAX_PATH, Temp);
+  const std::string CaFile = Narrow(P16(Temp)) + "linscp_test_ca.pem";
+  EVP_PKEY * CaKey = EVP_EC_gen("P-256");
+  X509 * Ca = MakeCertificate(CaKey, "linscp test CA", NULL, NULL, true, -60, 3600);
+  if (FILE * F = fopen(CaFile.c_str(), "w"))
+  {
+    PEM_write_X509(F, Ca);
+    fclose(F);
+  }
+  const char * Saved = getenv("SSL_CERT_FILE");
+  const std::string Restore = (Saved != NULL) ? Saved : "";
+  setenv("SSL_CERT_FILE", CaFile.c_str(), 1);
+
+  EVP_PKEY * Key = EVP_EC_gen("P-256");
+  X509 * Good = MakeCertificate(Key, "server.test", Ca, CaKey, false, -60, 3600);
+  CHECK(PolicyError(Der(Good)) == S_OK);
+  X509 * Expired = MakeCertificate(Key, "server.test", Ca, CaKey, false, -7200, -3600);
+  CHECK(PolicyError(Der(Expired)) == CERT_E_EXPIRED);
+  EVP_PKEY * OtherKey = EVP_EC_gen("P-256");
+  X509 * OtherCa = MakeCertificate(OtherKey, "unknown CA", NULL, NULL, true, -60, 3600);
+  X509 * Orphan = MakeCertificate(Key, "server.test", OtherCa, OtherKey, false, -60, 3600);
+  CHECK(PolicyError(Der(Orphan)) == CERT_E_CHAINING);
+  X509 * Self = MakeCertificate(Key, "self.test", NULL, NULL, false, -60, 3600);
+  CHECK(PolicyError(Der(Self)) == CERT_E_UNTRUSTEDROOT);
+  // Not a certificate at all.
+  const unsigned char Junk[] = { 1, 2, 3 };
+  CHECK(CertCreateCertificateContext(X509_ASN_ENCODING, Junk, sizeof(Junk)) == NULL);
+
+  for (X509 * C : { Good, Expired, OtherCa, Orphan, Self, Ca }) { X509_free(C); }
+  for (EVP_PKEY * K : { Key, OtherKey, CaKey }) { EVP_PKEY_free(K); }
+  if (Saved != NULL) { setenv("SSL_CERT_FILE", Restore.c_str(), 1); } else { unsetenv("SSL_CERT_FILE"); }
+  unlink(CaFile.c_str());
+}
+
+// The executable's own version resource, through the weak hook: this test
+// supplies its own data, as gen_versioninfo.py's output does for a program.
+const linscp_VersionString TestStrings[] = {
+  { L"ProductName", L"WinSCP" }, { L"ProductVersion", L"6.6.5.0" } };
+const linscp_VersionInfoData TestVersion = {
+  { VS_FFI_SIGNATURE, 0x00010000, 0x00060006, 0x00050000, 0x00060006, 0x00050000, 0x3F, 0, 0x40004, 1, 0, 0, 0 },
+  0x0409, 1200, 2, TestStrings };
+
+void TestVersionResource()
+{
+  char Self[4096];
+  const ssize_t N = readlink("/proc/self/exe", Self, sizeof(Self) - 1);
+  CHECK(N > 0);
+  Self[N > 0 ? N : 0] = 0;
+  Path16 SelfPath;
+  for (ssize_t I = 0; I < N; ++I) { SelfPath += (char16_t)(unsigned char)Self[I]; }
+  DWORD Handle = 1;
+  const DWORD Size = GetFileVersionInfoSize(W(SelfPath), &Handle);
+  CHECK((Size > 0) && (Handle == 0));
+  std::vector<char> Block(Size);
+  CHECK(GetFileVersionInfo(W(SelfPath), 0, Size, Block.data()) != 0);
+  VS_FIXEDFILEINFO * Fixed = NULL;
+  UINT Len = 0;
+  CHECK(VerQueryValue(Block.data(), L"\\", (void **)&Fixed, &Len) != 0);
+  CHECK((Len == sizeof(VS_FIXEDFILEINFO)) && (Fixed->dwSignature == VS_FFI_SIGNATURE) &&
+        (Fixed->dwFileVersionMS == 0x00060006));
+  WORD * Translation = NULL;
+  CHECK(VerQueryValue(Block.data(), L"\\VarFileInfo\\Translation", (void **)&Translation, &Len) != 0);
+  CHECK((Len == 4) && (Translation[0] == 0x0409) && (Translation[1] == 1200));
+  wchar_t * Value = NULL;
+  CHECK(VerQueryValue(Block.data(), L"\\StringFileInfo\\040904B0\\ProductVersion", (void **)&Value, &Len) != 0);
+  CHECK((Len == 8) && (P16(Value) == u"6.6.5.0"));
+  CHECK(VerQueryValue(Block.data(), L"\\StringFileInfo\\040904B0\\NoSuchKey", (void **)&Value, &Len) == 0);
+  // Any other file has no resource.
+  CHECK(GetFileVersionInfoSize(L"/bin/sh", &Handle) == 0);
+}
 #endif
 
 }  // namespace
+
+#if !defined(_WIN32)
+// The strong definition the platform layer's weak one yields to.
+extern "C" const linscp_VersionInfoData * linscp_OwnVersionInfo(void)
+{
+  return &TestVersion;
+}
+#endif
 
 int main()
 {
@@ -695,7 +951,14 @@ int main()
   TestEnvironmentExpansion();
   TestModulesAndProcesses();
   TestMimeTypes();
+  TestWideStrings();
+  TestFilePointer();
+  TestMemoryRegions();
+  TestUserName();
 #if !defined(_WIN32)
+  TestTypeNames();
+  TestCertificateChains();
+  TestVersionResource();
   TestTimeZones();
   TestXdgFolders();
   TestSymlinkReparse();

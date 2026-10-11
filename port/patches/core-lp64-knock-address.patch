@@ -1,0 +1,21 @@
+Read the knocked FTP port's IPv4 address as 32 bits.
+
+The address is read through an unsigned long pointer. That is 32 bits on
+Windows (LLP64), so it reads exactly the four address bytes there; on LP64
+targets unsigned long is 64 bits, and the read runs four bytes past the
+address into whatever follows it in gethostbyname's buffer. The assignment to
+the 32-bit s_addr then keeps the right bytes on little-endian machines, which
+is why it goes unnoticed, but the over-read is undefined. ULONG is 32 bits on
+every Windows compiler and in the POSIX layer. Line counts are unchanged.
+
+--- a/source/core/SecureShell.cpp	2026-10-11 17:56:17.183648113 -0300
++++ b/source/core/SecureShell.cpp	2026-10-11 17:56:17.200201383 -0300
+@@ -544,7 +544,7 @@
+           Address.sin_family = AF_INET;
+           int Port = FtpPortNumber;
+           Address.sin_port = htons(static_cast<short>(Port));
+-          Address.sin_addr.s_addr = *(reinterpret_cast<unsigned long *>(*HostEntry->h_addr_list));
++          Address.sin_addr.s_addr = *(reinterpret_cast<ULONG *>(*HostEntry->h_addr_list));
+ 
+           HANDLE Event = CreateEvent(NULL, false, false, NULL);
+           Result = (WSAEventSelect(Socket, static_cast<WSAEVENT>(Event), FD_CONNECT | FD_CLOSE) != SOCKET_ERROR);

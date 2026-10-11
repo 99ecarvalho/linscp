@@ -9,11 +9,11 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 25 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 22 | 36 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 23 | 36 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **47** | **95** | |
+| **Total** | **48** | **95** | |
 
 ## Next three actions
 
@@ -25,25 +25,23 @@ what is actually blocking each unit, in dependency order.
 as a real library: `linscp-core`, built by CMake with the cross toolchain.
 Linux: **558 errors, 14/33 clean, 4 aborting.**
 
-**Upstream is now WinSCP's `master`** (6.6.4-RC + 3, `aaae9dcb5`), with
-OpenSSL 3.5.9 and PuTTY 0.85, and everything works on it as it did on 6.5.8:
-all 33 core units compile for Windows, core links, and under Wine real SFTP
-sessions pass -- as negotiated and pinned to AES-CTR, AES-GCM and
-ChaCha20-Poly1305. Upstream's own 64-bit work had already fixed seven of our
-eight patches' problems, so the series went from eight to one.
+**Core compiles on Linux.** All 33 units of `ScpCore.cbproj` build with
+clang into `liblinscp-core.a` (ctest `core_build`), from WinSCP's `master`
+(6.6.4-RC + 3) with no core changes beyond four small patches. Linux had 588
+census errors at the pin move. The Win32 functions core calls are now
+provided by the POSIX layer, tested against the real API under Wine wherever
+the behaviour is observable there.
 
-Linux: **60 errors, 21/33 clean, 4 aborting** (588 at the pin move). The
-Win32 file functions took it to 534, PuTTY's headers compiling on Linux to
-139, and the time zone, module, process, path, string-order, shell-folder,
-MIME, reparse-point and shell-delete groups to 60.
+On Windows, core links and runs real SFTP sessions under Wine, as negotiated
+and pinned to AES-CTR, AES-GCM and ChaCha20-Poly1305.
 
-1. **P1-07b**: the rest of the Win32 calls core makes that Linux lacks --
-   file functions done; registry, shell folders, time zones, version info,
-   modules and processes next.
-2. **P1-09**: WinSCP's PuTTY on Linux. Its headers compile now; its 110
-   Windows-layer units are next, each over the emulation or replaced by a
-   Linux unit implementing the same API (see the decisions table).
-3. **P1-15**: `winscp.com`'s scripting front end over plain stdio.
+1. **P1-09**: WinSCP's PuTTY on Linux -- its headers compile; its Windows
+   platform units are next, over the emulation, with Linux implementations
+   for the agent (`SSH_AUTH_SOCK`), GSSAPI, entropy and proxy commands.
+2. **P1-08**: `WSAEventSelect`/`WSAEnumNetworkEvents` on POSIX, which core's
+   SSH event loop and PuTTY's network layer are written against.
+3. **P1-13**: neon and libs3 on Linux; then core links and P1-17's first
+   Linux session follows.
 
 ## Decisions taken
 
@@ -251,6 +249,10 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | `FindMimeFromData` on POSIX | By file name only, from shared-mime-info's globs; never by content | Core's one call passes `FMFD_URLASFILENAME` |
 | `SHFileOperation` on POSIX | `FO_DELETE` only; `FOF_ALLOWUNDO` uses the home trash of the freedesktop.org specification, so a file on another file system fails rather than being copied | Core only deletes, to the recycle bin or not |
 | `EnumProcessModules` on POSIX | Fails | Only used to log the module list |
+| `WindowsValidateCertificate` on POSIX | The chain is verified with OpenSSL against the system trust store (OpenSSL's default locations, `SSL_CERT_FILE`/`SSL_CERT_DIR`, the distributions' bundles); missing intermediates are not fetched and revocation is not checked | Windows' chain engine does both online. A server that omits its intermediate is refused here where Windows might accept it |
+| `VirtualQuery` on POSIX | Every mapping counts as committed | Linux overcommits; core only logs the totals, which overstate memory in use |
+| `SHGetFileInfo` on POSIX | Type names only; no icons (`iIcon` 0) | There is no system image list without a GUI |
+| `TSynchronizeChecklistFileOperation` | Windows only (`core-shell-file-operation-windows-only.patch`) | It drives Explorer's `IFileOperation`, and only the Windows GUI uses it |
 | File share modes on POSIX | Accepted and ignored; a second opener is never refused with `ERROR_SHARING_VIOLATION` | POSIX has no mandatory locking. Core retries on that error (HierarchicalStorage.cpp), so never seeing it only removes a wait |
 | `FILE_FLAG_DELETE_ON_CLOSE` on POSIX | The name is unlinked at open, not at the last close | Either way nothing is left behind; core uses it only to probe that a directory is writable |
 | File creation time on POSIX | The birth time where the file system records one (`statx`), else the modification time; it cannot be set | POSIX has no settable creation time |
@@ -282,6 +284,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | Upstream libs3 returns `int` where neon's body provider returns `ssize_t` | `neon_read_func` in `libs3/src/request.c`; fixed by `libs3-64bit-body-provider.patch` | 2026-10-11 |
 | WinSCP `master` is being ported to 64-bit | `WinSCP.cbproj` has a `Win64` platform; libs are built with bcc64 (`libs/Makefile.inc`); `StartThread` returns `THandle`; AES-NI uses `_mm_setr_epi8` under `_WIN64` | 2026-10-11 |
 | The POSIX path parsing, string order, environment expansion, module, process and MIME functions match Win32 on everything the tests check | The same tests pass against the real API under Wine; that is how `PathSkipRoot` was found not to skip a bare leading backslash | 2026-10-11 |
+| Core passes `unsigned long *` where Win32 declares `DWORD *`/`PULONG` (Terminal.cpp, FileInfo.cpp, HierarchicalStorage.cpp, SessionInfo.cpp) | 32 bits on Windows (LLP64), 64 on Linux (LP64); the POSIX layer adds C++ overloads for those calls, and one read through `unsigned long *` that over-read became `core-lp64-knock-address.patch` | 2026-10-11 |
+| A one-line `try { } __finally { }` in a macro (Configuration.cpp's `BLOCK`) escaped the transform, and compiled on Windows as clang's native SEH | The Linux census reported "SEH '__try' is not supported"; the transform now rewrites the one-line form too | 2026-10-11 |
 | The POSIX time zone rules match Windows' for Central Europe, US Eastern, AUS Eastern, UTC and Japan | `TestTimeZones`, against the rules Windows' registry holds for those zones | 2026-10-11 |
 | The POSIX file functions match Win32 on everything `TestFiles` checks | The same test passes against the real API under Wine and against the POSIX layer | 2026-10-11 |
 | `std::wstring` is unusable on POSIX under `-fshort-wchar` | Its traits call glibc's 4-byte `wcslen`: `wstring(L"/tmp/") + L"x"` came out as "/tmp/" | 2026-10-11 |
@@ -455,7 +459,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-06c | Shim: `DynamicArray` + file API | done | sharing semantics tested |
 | P1-06d | Select INI backend on Linux | todo | frontend decision |
 | P1-07 | `port/platform` Win32 subset | done | types, FILETIME/SYSTEMTIME, errors, winsock names |
-| P1-07b | `port/platform` Win32 file/handle functions | wip | files, time zones (real transition rules), modules, processes (/proc), paths, string order, environment, XDG shell folders, MIME, reparse points, trash; tested against real Win32 under Wine where observable |
+| P1-07b | `port/platform` Win32 file/handle functions | done | every Win32 call core makes: files, time zones (real transition rules), modules, processes (/proc), paths, string order, environment, XDG folders, MIME and type names, reparse points, trash, registry entry points, memory regions, version resources, user name, certificate chains (OpenSSL, system trust store); tested against real Win32 under Wine where observable. Core compiles on Linux |
 | P1-08 | Socket-event emulation | todo | R6 |
 | P1-09 | PuTTY unix backend re-import | todo | |
 | P1-10 | PuTTY delta reconciliation | todo | |

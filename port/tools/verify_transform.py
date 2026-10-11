@@ -114,6 +114,34 @@ def tryfinally_of(old_line):
     return None
 
 
+def inline_tryfinally_of(old_line):
+    """The expected rewrite of a try/__finally written on one line: the
+    keywords become LINSCP_TRY and LINSCP_FINALLY and the brace closing the
+    cleanup LINSCP_END_FINALLY. Worked out here independently of transform.py
+    (by token scan rather than its brace walk); braces inside string literals
+    would defeat it, and core's one such line has none."""
+    tokens = re.split(r'(\btry\b|\b__finally\b|[{}])', old_line)
+    if 'try' not in tokens or '__finally' not in tokens:
+        return None
+    out = []
+    state = 'before'     # before -> body -> between -> cleanup -> after
+    depth = 0
+    for t in tokens:
+        if state == 'before' and t == 'try':
+            out.append('LINSCP_TRY'); state = 'body'; continue
+        if state == 'between' and t == '__finally':
+            out.append('LINSCP_FINALLY'); state = 'cleanup'; continue
+        if state in ('body', 'cleanup') and t in '{}' and t:
+            depth += 1 if t == '{' else -1
+            if depth == 0:
+                if state == 'body':
+                    state = 'between'
+                else:
+                    out.append('LINSCP_END_FINALLY'); state = 'after'; continue
+        out.append(t)
+    return ''.join(out) if state == 'after' else None
+
+
 def closeoff(old_line):
     """The expected rewrite of a line that merely closed a closure template."""
     k = old_line.rfind(';')
@@ -170,7 +198,7 @@ def main(gen='build/gen', src='3rd-party/winscp'):
                     closures += 1
                     if 'TClosure<' not in y:
                         bad.append(f'{u}:{i}: __closure not rewritten: {y.strip()[:80]}')
-                elif tryfinally_of(x) == y:
+                elif tryfinally_of(x) == y or inline_tryfinally_of(x) == y:
                     tryfinallys += 1
                 elif binding_of(rel_for_sites, i, x) == y:
                     bindings += 1

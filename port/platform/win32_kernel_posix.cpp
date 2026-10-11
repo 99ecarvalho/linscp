@@ -564,3 +564,9 @@ void DeleteCriticalSection(LPCRITICAL_SECTION Section)
 {
   pthread_mutex_destroy(&Section->Mutex);
 }
+
+DWORD SleepEx(DWORD Milliseconds, BOOL)
+{
+  Sleep(Milliseconds);
+  return 0;
+}

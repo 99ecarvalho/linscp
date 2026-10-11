@@ -180,6 +180,39 @@ def closure_expression(text, start, ident):
     return begin, end, replacement
 
 
+def inline_try_finally(code_line):
+    """(try, body start, body end, __finally, closing brace) columns of a
+    `try { ... } __finally { ... }` contained in one line, else None. The
+    line is the code-only form, so braces in comments and literals do not
+    count, and has the same columns as the original."""
+    m = re.search(r'\btry\s*\{', code_line)
+    if m is None:
+        return None
+    def close(start):
+        depth = 0
+        for k in range(start, len(code_line)):
+            if code_line[k] == '{':
+                depth += 1
+            elif code_line[k] == '}':
+                depth -= 1
+                if depth == 0:
+                    return k
+        return None
+    body_open = m.end() - 1
+    body_close = close(body_open)
+    if body_close is None:
+        return None
+    f = re.match(r'\s*__finally\s*\{', code_line[body_close + 1:])
+    if f is None:
+        return None
+    finally_at = body_close + 1 + code_line[body_close + 1:].index('__finally')
+    cleanup_open = body_close + f.end()
+    cleanup_close = close(cleanup_open)
+    if cleanup_close is None:
+        return None
+    return m.start(), body_open + 1, body_close, finally_at, cleanup_close
+
+
 class Transformer:
     def __init__(self, bind_sites=True, src_root=None):
         # The pristine tree, so rules can consult the real file names.
@@ -425,6 +458,25 @@ class Transformer:
                 '__finally', 'LINSCP_FINALLY', 1)
             lines[end_at] = lines[end_at].replace('}', 'LINSCP_END_FINALLY', 1)
             self.stats['tryfinally'] += 1
+
+        # The same construct written on one line, as in Configuration.cpp's
+        # BLOCK macro. Missed, it compiled as clang's SEH __try/__finally on
+        # Windows -- not the dual-target form -- and not at all on Linux.
+        code = code_only_lines(lines)
+        for i, line in enumerate(lines):
+            span = inline_try_finally(code[i])
+            if span is None:
+                continue
+            try_at, body_start, body_end, finally_at, end_at = span
+            if re.search(r'\breturn\b', code[i][body_start:body_end]):
+                self.stats['tryfinally_has_return'] += 1
+                self.unhandled.append(
+                    (path, i + 1, 'guarded body contains `return`; cannot wrap in a lambda'))
+                continue
+            lines[i] = (line[:try_at] + 'LINSCP_TRY' + line[try_at + 3:finally_at] +
+                        'LINSCP_FINALLY' + line[finally_at + 9:end_at] +
+                        'LINSCP_END_FINALLY' + line[end_at + 1:])
+            self.stats['tryfinally_inline'] += 1
 
     def transform_closures(self, path, lines):
         """Rewrite __closure typedefs in place, preserving the line count."""

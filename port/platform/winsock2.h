@@ -66,14 +66,25 @@ typedef HANDLE * LPWSAEVENT;
 #define FD_CONNECT   (1 << FD_CONNECT_BIT)
 #define FD_CLOSE     (1 << FD_CLOSE_BIT)
 
-typedef struct WSANETWORKEVENTS
+typedef struct _WSANETWORKEVENTS
 {
   long lNetworkEvents;
   int iErrorCode[FD_MAX_EVENTS];
 } WSANETWORKEVENTS;
 typedef WSANETWORKEVENTS * LPWSANETWORKEVENTS;
+typedef struct hostent HOSTENT;
+typedef struct hostent * LPHOSTENT;
+// The LPARAM a select reply carries: the event in the low word, the error
+// in the high one, as WSAAsyncSelect packs them.
+#define WSAMAKESELECTREPLY(event, error) ((LPARAM)MAKELONG(event, error))
+#define WSAGETSELECTEVENT(lParam) LOWORD(lParam)
+#define WSAGETSELECTERROR(lParam) HIWORD(lParam)
+typedef struct sockaddr SOCKADDR;
+typedef struct sockaddr_in SOCKADDR_IN;
+typedef struct sockaddr_in6 SOCKADDR_IN6;
+typedef struct sockaddr_storage SOCKADDR_STORAGE;
 
-typedef struct WSADATA
+typedef struct WSAData
 {
   WORD wVersion;
   WORD wHighVersion;
@@ -142,6 +153,16 @@ DWORD WSAWaitForMultipleEvents(DWORD Count, const WSAEVENT * Events,
                                BOOL WaitAll, DWORD Timeout, BOOL Alertable);
 
 #define FIONBIO_WINSOCK 0x8004667E
+
+// Socket ioctls. Linux has no ideal-send-backlog query: WSAIoctl fails with
+// WSAEOPNOTSUPP, and core keeps its send buffer as configured.
+#define SIO_IDEAL_SEND_BACKLOG_QUERY 0x4004747B
+#define WSAEOPNOTSUPP (WSABASEERR + 45)
+typedef void * LPWSAOVERLAPPED;
+typedef void * LPWSAOVERLAPPED_COMPLETION_ROUTINE;
+int WSAIoctl(SOCKET S, DWORD IoControlCode, LPVOID InBuffer, DWORD InSize, LPVOID OutBuffer,
+  DWORD OutSize, LPDWORD BytesReturned, LPWSAOVERLAPPED Overlapped,
+  LPWSAOVERLAPPED_COMPLETION_ROUTINE Completion);
 
 #ifdef __cplusplus
 }  // extern "C"

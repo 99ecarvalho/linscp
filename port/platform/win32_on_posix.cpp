@@ -3,6 +3,8 @@
 #include <cerrno>
 #include <chrono>
 #include <ctime>
+#include <cstdlib>
+#include <string>
 
 namespace {
 
@@ -197,6 +199,70 @@ wchar_t * linscp_WideFindString(const wchar_t * Haystack, const wchar_t * Needle
     }
   }
   return nullptr;
+}
+
+wchar_t * linscp_WideCopy(wchar_t * Dest, const wchar_t * Src)
+{
+  wchar_t * D = Dest;
+  while ((*D++ = *Src++) != L'\0')
+  {
+  }
+  return Dest;
+}
+
+wchar_t * linscp_WideCopyN(wchar_t * Dest, const wchar_t * Src, size_t N)
+{
+  // As the CRT: stops copying at the terminator but pads to N with nulls,
+  // and leaves Dest unterminated when Src is N or longer.
+  size_t I = 0;
+  for (; (I < N) && (Src[I] != L'\0'); ++I)
+  {
+    Dest[I] = Src[I];
+  }
+  for (; I < N; ++I)
+  {
+    Dest[I] = L'\0';
+  }
+  return Dest;
+}
+
+wchar_t * linscp_WideFindAny(const wchar_t * S, const wchar_t * Chars)
+{
+  for (; *S != L'\0'; ++S)
+  {
+    for (const wchar_t * C = Chars; *C != L'\0'; ++C)
+    {
+      if (*S == *C)
+      {
+        return const_cast<wchar_t *>(S);
+      }
+    }
+  }
+  return nullptr;
+}
+
+long linscp_WideToLong(const wchar_t * S, wchar_t ** End, int Base)
+{
+  // ASCII digits only, which is what the CRT accepts too: narrowed and
+  // handed to strtol, then the end mapped back by position.
+  std::string Narrow;
+  const wchar_t * P = S;
+  for (; (*P != L'\0') && (static_cast<unsigned>(*P) < 0x80); ++P)
+  {
+    Narrow += static_cast<char>(*P);
+  }
+  char * NarrowEnd = nullptr;
+  const long Result = std::strtol(Narrow.c_str(), &NarrowEnd, Base);
+  if (End != nullptr)
+  {
+    *End = const_cast<wchar_t *>(S + (NarrowEnd - Narrow.c_str()));
+  }
+  return Result;
+}
+
+int linscp_WideToInt(const wchar_t * S)
+{
+  return static_cast<int>(linscp_WideToLong(S, nullptr, 10));
 }
 
 std::uint64_t FileTimeToTicks(const FILETIME & FileTime)
@@ -627,4 +693,15 @@ int WSACleanup()
 int closesocket(SOCKET S)
 {
   return ::close(static_cast<int>(S));
+}
+
+int WSAIoctl(SOCKET, DWORD, LPVOID, DWORD, LPVOID, DWORD, LPDWORD BytesReturned,
+  LPWSAOVERLAPPED, LPWSAOVERLAPPED_COMPLETION_ROUTINE)
+{
+  if (BytesReturned != nullptr)
+  {
+    *BytesReturned = 0;
+  }
+  WSASetLastError(WSAEOPNOTSUPP);
+  return SOCKET_ERROR;
 }

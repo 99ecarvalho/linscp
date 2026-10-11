@@ -1,6 +1,7 @@
 // Win32 file functions over POSIX descriptors. See the files section of
 // win32_on_posix.h for the handle model.
 #include "win32_on_posix.h"
+#include "io.h"
 
 #include <cerrno>
 #include <fcntl.h>
@@ -387,4 +388,43 @@ DWORD GetTempPath(DWORD BufferLength, LPWSTR Buffer)
   }
   Buffer[Needed] = L'\0';
   return Needed;
+}
+
+int _open_osfhandle(intptr_t Handle, int)
+{
+  return static_cast<int>(Handle);
+}
+
+int _close(int Fd)
+{
+  return close(Fd);
+}
+
+DWORD SetFilePointer(HANDLE File, LONG DistanceToMove, LONG * DistanceToMoveHigh, DWORD MoveMethod)
+{
+  const int Fd = FdOf(File);
+  if (Fd < 0)
+  {
+    SetLastError(ERROR_INVALID_HANDLE);
+    return INVALID_SET_FILE_POINTER;
+  }
+  // Without a high half the distance is a signed 32-bit value; with one the
+  // two make a signed 64-bit value.
+  off_t Distance = (DistanceToMoveHigh != nullptr)
+    ? static_cast<off_t>((static_cast<std::uint64_t>(static_cast<std::uint32_t>(*DistanceToMoveHigh)) << 32) |
+                         static_cast<std::uint32_t>(DistanceToMove))
+    : static_cast<off_t>(DistanceToMove);
+  const int Whence = (MoveMethod == FILE_CURRENT) ? SEEK_CUR : ((MoveMethod == FILE_END) ? SEEK_END : SEEK_SET);
+  const off_t Result = lseek(Fd, Distance, Whence);
+  if (Result < 0)
+  {
+    Fail();
+    return INVALID_SET_FILE_POINTER;
+  }
+  if (DistanceToMoveHigh != nullptr)
+  {
+    *DistanceToMoveHigh = static_cast<LONG>(static_cast<std::uint64_t>(Result) >> 32);
+  }
+  SetLastError(NO_ERROR);
+  return static_cast<DWORD>(static_cast<std::uint64_t>(Result) & 0xFFFFFFFFu);
 }
