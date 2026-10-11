@@ -14,6 +14,8 @@ A changed line must be one of:
               port/patches/closure_sites.json
   closeoff  - the line where a multi-line closure typedef ended, changed only
               by turning its ";" into ">;"
+  tryfinally- a `try`, `__finally` or closing brace rewritten to the
+              LINSCP_TRY / LINSCP_FINALLY / LINSCP_END_FINALLY macros
 
 Exit non-zero on any violation.
 """
@@ -60,6 +62,18 @@ def binding_of(rel_path, lineno, old_line):
     return out
 
 
+def tryfinally_of(old_line):
+    """The expected rewrite of one of the three try/__finally lines."""
+    stripped = old_line.strip()
+    if stripped == 'try':
+        return old_line.replace('try', 'LINSCP_TRY', 1)
+    if stripped == '__finally':
+        return old_line.replace('__finally', 'LINSCP_FINALLY', 1)
+    if stripped == '}':
+        return old_line.replace('}', 'LINSCP_END_FINALLY', 1)
+    return None
+
+
 def closeoff(old_line):
     """The expected rewrite of a line that merely closed a closure template."""
     k = old_line.rfind(';')
@@ -70,6 +84,7 @@ def closeoff(old_line):
 
 def main(gen='build/gen', src='3rd-party/winscp'):
     changed = macros = files = closures = closeoffs = bindings = 0
+    tryfinallys = 0
     bad = []
     for dp, _, ns in os.walk(gen):
         for n in ns:
@@ -96,6 +111,8 @@ def main(gen='build/gen', src='3rd-party/winscp'):
                     closures += 1
                     if 'TClosure<' not in y:
                         bad.append(f'{u}:{i}: __closure not rewritten: {y.strip()[:80]}')
+                elif tryfinally_of(x) == y:
+                    tryfinallys += 1
                 elif binding_of(rel_for_sites, i, x) == y:
                     bindings += 1
                 elif y == closeoff(x):
@@ -110,6 +127,7 @@ def main(gen='build/gen', src='3rd-party/winscp'):
     print(f'  closure:      {closures}')
     print(f'  template end: {closeoffs}')
     print(f'  closure bind: {bindings}')
+    print(f'  try/finally:  {tryfinallys}')
     if bad:
         print(f'\nVIOLATIONS ({len(bad)}):')
         for v in bad[:25]:

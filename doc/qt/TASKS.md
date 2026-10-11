@@ -67,7 +67,7 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P1-05 | Shim: `TCriticalSection` + `SyncObjs` | M | P1-02 | Done; recursive, as Delphi's is |
 | P1-05b | Shim: `TThread` / `StartThread` | M | P1-05 | `Interface.h` already abstracts thread creation |
 | P1-08b | Shim: `Masks`, `TPath`, `TTimeSpan`, `TEncoding`, `TNotifyEvent`, env/version globals | M | P1-01b | Done. The long tail the census named after the big groups cleared |
-| P1-09b | `try`/`__finally` for POSIX | L | P1-08b | **182 blocks**, 0 `__try`, 0 `__except`. clang maps Borland's `__finally` to SEH, which the mingw target supports and Linux does not. Only 2 of 182 contain a `return` in the guarded body, so a line-preserving lambda transform covers 180 and those 2 go in the patch series |
+| P1-09b | `try`/`__finally` for POSIX | L | P1-08b | Done. **All 179 blocks** transformed, 0 unhandled, patch series still empty. Same expansion on both targets, so neither can rely on SEH |
 | P1-06 | Shim: `TStream`/`THandleStream`/`TMemoryStream` | M | P1-02 | ~31 uses each; now the largest non-closure group |
 | P1-06b | Shim: `TCustomIniFile`/`TMemIniFile`/`TRegistry` | M | P1-06 | Done. Real registry on Windows; on POSIX every key reports absent |
 | P1-06c | Shim: `DynamicArray`, Delphi handle-based file API | S | P1-06 | Done. Reference-counted, as core's by-value `Read` requires |

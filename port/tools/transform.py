@@ -59,6 +59,15 @@ def parse_body(body):
 #   TClosure<void(TLogLineType Type, const UnicodeString & Line)> f
 # Only two of these exist in core, both in SessionInfo, but they have to be
 # handled: the declaration and the definition must agree or nothing links.
+def strip_comments(text):
+    """Remove // and /* */ comments. Deliberately simple: it is used only to
+    decide whether a keyword really appears as code, so over-removing inside a
+    string literal would at worst cost a false negative on a construct that
+    does not occur here."""
+    text = re.sub(r'/\*.*?\*/', ' ', text, flags=re.S)
+    return re.sub(r'//[^\n]*', ' ', text)
+
+
 CLOSURE_PARAM_RE = re.compile(
     r'(?P<ret>[A-Za-z_][\w:*&<>\s]*?)\s*(?:__fastcall\s*)?'
     r'\(\s*__closure\s*\*\s*(?P<name>\w+)\s*\)\s*'
@@ -90,6 +99,7 @@ class Transformer:
         methods = set(re.findall(r'\b(\w+)\s*\(', text))
         lines = text.split('\n')
         self.transform_closures(path, lines)
+        self.transform_try_finally(path, lines)
         self.bind_closure_sites(path, lines)
         out = []
         for lineno, line in enumerate(lines, 1):
@@ -130,6 +140,101 @@ class Transformer:
             lines[lineno - 1] = (text[:start] + 'CLOSURE(' + ident + ')' +
                                  text[start + len(ident):])
             self.stats['closure_bound'] += 1
+
+    def transform_try_finally(self, path, lines):
+        """Rewrite Borland try/__finally into the dual-target macro form.
+
+        Three lines change per block -- the `try`, the `__finally`, and the
+        closing brace -- so the line count is preserved and the diff against
+        upstream stays reviewable. See port/shim/vcl_tryfinally.h for what the
+        macros expand to.
+
+        Done in two passes. Brace depth is measured against the original lines
+        and every edit applied afterwards, because LINSCP_END_FINALLY replaces a
+        `}` with text containing no brace: editing as we went miscounted the
+        depth for any enclosing block, and core nests these.
+        """
+        original = list(lines)
+        blocks = []
+
+        for i, line in enumerate(original):
+            if line.strip() != '__finally':
+                continue
+
+            # Walk back to the matching `try`. The line immediately before is
+            # the `}` closing the guarded body, so depth returns to zero
+            # exactly at the `try`.
+            try_at = None
+            depth = 0
+            for j in range(i - 1, max(-1, i - 2000), -1):
+                depth += original[j].count('}') - original[j].count('{')
+                if depth == 0 and original[j].strip() == 'try':
+                    try_at = j
+                    break
+            if try_at is None:
+                self.stats['tryfinally_no_try'] += 1
+                self.unhandled.append(
+                    (path, i + 1, 'no matching `try` for this __finally'))
+                continue
+
+            # A `return` in the guarded body would return from the lambda
+            # rather than the enclosing function. Refuse rather than silently
+            # change control flow; these few belong in the patch series.
+            # Walk forward to the brace closing the cleanup block.
+            end_at = None
+            depth = 0
+            for j in range(i + 1, min(len(original), i + 2000)):
+                depth += original[j].count('{') - original[j].count('}')
+                if depth == 0 and original[j].strip() == '}':
+                    end_at = j
+                    break
+            if end_at is None:
+                self.stats['tryfinally_no_end'] += 1
+                self.unhandled.append(
+                    (path, i + 1, 'no closing brace for this __finally block'))
+                continue
+
+            # A `return` in the guarded body returns from the lambda, not the
+            # enclosing function. Comments are stripped first, because two of
+            # the three initial hits were the word in a comment.
+            #
+            # One case is still safe: a bare `return;` where the block is the
+            # last statement of the function. Returning from the lambda then
+            # runs the cleanup via the guard and falls off the end of the
+            # function, which is what Borland would do. That is exactly the one
+            # real occurrence in core, so the condition is checked rather than
+            # assumed -- a value-returning `return`, or any code after the
+            # block, still refuses.
+            body = strip_comments('\n'.join(original[try_at:i]))
+            if re.search(r'\breturn\b', body):
+                bare_only = not re.search(r'\breturn\s+[^;\s]', body)
+                after = end_at + 1
+                while after < len(original) and not original[after].strip():
+                    after += 1
+                # rstrip the CR too: the core is CRLF and the transform
+                # preserves line endings, so a raw comparison never matches.
+                closes_function = (after < len(original) and
+                                   original[after].rstrip('\r') == '}')
+                if not (bare_only and closes_function):
+                    self.stats['tryfinally_has_return'] += 1
+                    self.unhandled.append(
+                        (path, try_at + 1,
+                         'guarded body contains `return`; cannot wrap in a '
+                         'lambda'))
+                    continue
+                self.notes.append(
+                    (path, try_at + 1,
+                     'bare `return` in the guarded body, but the block ends '
+                     'the function, so the lambda form is equivalent'))
+
+            blocks.append((try_at, i, end_at))
+
+        for try_at, finally_at, end_at in blocks:
+            lines[try_at] = lines[try_at].replace('try', 'LINSCP_TRY', 1)
+            lines[finally_at] = lines[finally_at].replace(
+                '__finally', 'LINSCP_FINALLY', 1)
+            lines[end_at] = lines[end_at].replace('}', 'LINSCP_END_FINALLY', 1)
+            self.stats['tryfinally'] += 1
 
     def transform_closures(self, path, lines):
         """Rewrite __closure typedefs in place, preserving the line count."""
@@ -318,7 +423,7 @@ def main():
     for k, v in sorted(t.stats.items()):
         print(f'  {k:16} {v}')
     if t.notes:
-        print(f'\nnotes ({len(t.notes)}) - accessors declared elsewhere:')
+        print(f'\nnotes ({len(t.notes)}):')
         for p_, l, m in t.notes[:10]:
             print(f'  {p_}:{l}: {m}')
     if t.unhandled:

@@ -1390,11 +1390,9 @@ cleared</td>
 <td><code>try</code>/<code>__finally</code> for POSIX</td>
 <td>L</td>
 <td>P1-08b</td>
-<td><strong>182 blocks</strong>, 0 <code>__try</code>, 0
-<code>__except</code>. clang maps Borland’s <code>__finally</code> to
-SEH, which the mingw target supports and Linux does not. Only 2 of 182
-contain a <code>return</code> in the guarded body, so a line-preserving
-lambda transform covers 180 and those 2 go in the patch series</td>
+<td>Done. <strong>All 179 blocks</strong> transformed, 0 unhandled,
+patch series still empty. Same expansion on both targets, so neither can
+rely on SEH</td>
 </tr>
 <tr class="odd">
 <td>P1-06</td>
@@ -1826,7 +1824,7 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td>P1 Headless core</td>
-<td>15</td>
+<td>16</td>
 <td>34</td>
 <td>Golden suite green, six protocols, both platforms</td>
 </tr>
@@ -1850,7 +1848,7 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>41</strong></td>
+<td><strong>42</strong></td>
 <td><strong>93</strong></td>
 <td></td>
 </tr>
@@ -1878,17 +1876,17 @@ aborting.</p>
 targets:</strong> <code>Option.cpp</code>, <code>NamedObjs.cpp</code>
 and <code>FileBuffer.cpp</code>. Census is <strong>963 on mingw, 1,182
 on Linux</strong>.</p>
-<p>Census is <strong>342 on mingw, 586 on Linux</strong>. Four of nine
-units are clean on mingw; <code>Bookmarks.cpp</code> is clean there and
-2 errors from clean on Linux, both <code>__finally</code>.</p>
+<p>Census is <strong>314 on mingw, 496 on Linux</strong>, and
+<strong>four of nine units are clean on both targets</strong> for the
+first time. The two platforms are now within 180 errors of each other,
+down from a gap of 244.</p>
 <ol type="1">
-<li><strong>P1-09b / <code>try</code>/<code>__finally</code></strong> —
-the main thing holding Linux behind now. 182 blocks, and the Linux-only
-gap in several units is exactly this.</li>
 <li><code>FileMasks.cpp</code> at <strong>10 / 13</strong> is next
 closest to clean.</li>
 <li><strong>P1-05b / <code>TThread</code></strong> and
 <code>StartThread</code>.</li>
+<li><code>Common.cpp</code> and <code>Terminal.cpp</code> carry most of
+what is left; neither has a single dominant cause any more.</li>
 </ol>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
@@ -2121,6 +2119,32 @@ compound literals. <code>ARRAYOFCONST((a, b))</code> becoming
 </tr>
 <tr class="even">
 <td>2026-10-11</td>
+<td><code>try</code>/<code>__finally</code> uses the same lambda
+expansion on <em>both</em> targets</td>
+<td>SEH would work on mingw, but one code path on both platforms is
+worth more than relying on it, and it removes a way for the two to
+diverge in behaviour</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>The <code>try</code>/<code>__finally</code> transform measures brace
+depth on the <em>pristine</em> lines and applies every edit
+afterwards</td>
+<td><code>LINSCP_END_FINALLY</code> replaces a <code>}</code> with text
+containing no brace, so editing in place miscounted the depth of any
+enclosing block – and core nests these</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>One bare <code>return</code> inside a guarded body is permitted, by
+checked condition</td>
+<td>Returning from the lambda runs the cleanup through the guard and
+then falls off the end of the function, which is what Borland does – but
+only when the block ends the function and the return carries no value.
+Both are verified rather than assumed</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
 <td>Every property form routes through a generated public wrapper</td>
 <td>Borland’s <code>__property</code> grants access to a private
 accessor from outside the class and ignores constness;
@@ -2129,7 +2153,7 @@ ordinary member call at the use site. The wrappers restore both
 behaviours, and the getter casts its result to the declared type because
 C++Builder is lax where the two differ in constness</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td><code>UnicodeString</code> accepts numbers implicitly, yielding
 their decimal text</td>
@@ -2137,7 +2161,7 @@ their decimal text</td>
 <code>UnicodeString s = 0;</code> gives <code>"0"</code> – but diverging
 would mean editing core</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td>Globals that need dynamic initialisation are declared
 <em>before</em> the object that initialises them</td>
@@ -2146,13 +2170,13 @@ declaration order. Putting the initialiser first had its constructor
 assign to a <code>UnicodeString</code> that was not yet constructed,
 which segfaulted rather than failing to compile</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td><code>TMask</code> matching is case-insensitive</td>
 <td>Delphi’s is, and core uses it for file masks users type without
 regard to case</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td>Closure call sites are <strong>compiler-discovered, committed, then
 replayed</strong></td>
@@ -2163,7 +2187,7 @@ so discovery records them to
 <code>transform.py</code> replays that list, failing loudly if a
 recorded site no longer holds the expected identifier</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>A diagnostic inside a macro expansion is resolved to the macro
 <em>definition</em></td>
@@ -2172,7 +2196,7 @@ recorded site no longer holds the expected identifier</td>
 61 duplicate reports. Binding the definition once fixes every call site,
 and cut the work from 118 sites to 62</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td><code>TRegistry</code> on POSIX reports every key absent rather than
 empty</td>
@@ -2181,19 +2205,19 @@ actually set would look to them like their configuration had vanished.
 The INI backend, which core already supports, is the correct one there
 (P1-06d)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>INI section and key names match case-insensitively</td>
 <td>Delphi’s do, and files written by WinSCP on Windows have
 inconsistent casing</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td>INI sections and keys keep their file order</td>
 <td>Sorting them would churn the user’s configuration on every save and
 make diffs useless</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td><code>DynamicArray</code> shares its buffer on copy, as Delphi’s
 does</td>
@@ -2201,7 +2225,7 @@ does</td>
 <em>by value</em> and fills it for the caller. A deep-copying version
 would compile and silently return no data</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td><code>win32_on_posix.h</code> exposes <code>&lt;string.h&gt;</code>,
 <code>&lt;stdlib.h&gt;</code> and <code>&lt;stdio.h&gt;</code></td>
@@ -2209,7 +2233,7 @@ would compile and silently return no data</td>
 <code>strlen</code>, <code>strcmp</code> and <code>memmove</code>
 unqualified</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><strong>Resource strings: supply Win32 <code>LoadString</code>, not
 a <code>.res</code> loader, and do not patch core</strong></td>
@@ -2221,7 +2245,7 @@ additive change — the kind upstream could take rather than a fork of its
 own code. The table is generated from upstream’s <code>.rc</code> files,
 so the strings track the submodule automatically</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>UnicodeString::c_str()</code> has a non-const overload
 returning a writable buffer</td>
@@ -2230,7 +2254,7 @@ returning a writable buffer</td>
 <code>c_str()</code> to <code>LoadString</code> as the destination to
 fill</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>TList::Notify</code> is virtual and fires before a removal,
 after an addition</td>
@@ -2238,28 +2262,28 @@ after an addition</td>
 inside it, so a wrong <code>Action</code> means a leak or a double free,
 neither of which announces itself</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>Extract</code> reports <code>lnExtracted</code>, never
 <code>lnDeleted</code></td>
 <td>That is how Delphi lets a caller take ownership back without the
 list freeing the object</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>TList::Sort</code> is stable, where Delphi’s quicksort is
 not</td>
 <td>Relying on an unstable order would be a latent caller bug either
 way, and stable is the safer guarantee to provide</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>Derived streams re-expose the base’s legacy <code>Seek</code> with a
 using-declaration</td>
 <td>Overriding one overload hides the other. Core calls both on derived
 streams, so without this the legacy origins would stop resolving</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>Stream exceptions follow Delphi’s shape exactly</td>
 <td><code>EFilerError</code>, <code>EFOpenError</code> and
@@ -2267,7 +2291,7 @@ streams, so without this the legacy origins would stop resolving</td>
 with <code>EReadError</code>/<code>EWriteError</code> beneath
 <code>EFilerError</code>. Core catches at both levels</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>port/platform</code> headers refuse to compile on Windows, and
 are POSIX-only on the include path</td>
@@ -2275,20 +2299,20 @@ are POSIX-only on the include path</td>
 which presented as a 1,220 -&gt; 783 “improvement”. The
 <code>#error</code> makes that mistake loud</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>port/compat</code> is separate from
 <code>port/platform</code></td>
 <td><code>help.h</code> is missing from upstream itself rather than
 being a platform difference, so it is needed on every target</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>The ratchet records whether a unit aborted</td>
 <td>An aborted parse reports a floor. Treating that as a distinct state
 stops a new abort from reading as sudden progress</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>Format</code> keeps malformed input visible</td>
 <td>Delphi raises on a missing argument. Core routes user- and
@@ -2993,6 +3017,29 @@ only viable overload takes a string</td>
 <td>2026-10-11</td>
 </tr>
 <tr class="odd">
+<td>All <strong>179</strong> <code>try</code>/<code>__finally</code>
+blocks transformed, 0 unhandled; the patch series is still empty</td>
+<td><code>transform.py</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="even">
+<td>Changed lines: 1,297, every one accounted for — 624 property, 46
+closure, 28 template end, 62 binding, 537 try/finally (179 x 3)</td>
+<td><code>verify_transform.py</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="odd">
+<td>Census after try/finally: mingw <strong>314</strong>, Linux
+<strong>496</strong>; 4/9 clean on <em>both</em> targets</td>
+<td><code>census_ratchet.py</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="even">
+<td>23/23 tests pass on both targets</td>
+<td><code>ctest</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="odd">
 <td>12/12 tests pass on Linux and on Windows under Wine</td>
 <td><code>ctest</code> both trees</td>
 <td>2026-10-10</td>
@@ -3359,8 +3406,8 @@ done; path routines next</td>
 <tr class="even">
 <td>P1-09b</td>
 <td><code>try</code>/<code>__finally</code> for POSIX</td>
-<td>todo</td>
-<td>182 blocks; the main Linux blocker now</td>
+<td>done</td>
+<td>179 blocks, 0 unhandled; same expansion on both targets</td>
 </tr>
 <tr class="odd">
 <td>P1-06</td>

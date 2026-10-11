@@ -3,17 +3,17 @@
     "x86_64-pc-linux-gnu": {
       "source/core/Bookmarks.cpp": {
         "aborted": false,
-        "errors": 2,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 210,
+        "errors": 208,
         "missing_types": 13
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 126,
+        "errors": 115,
         "missing_types": 24
       },
       "source/core/CopyParam.cpp": {
@@ -43,7 +43,7 @@
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 201,
+        "errors": 126,
         "missing_types": 5
       }
     },
@@ -55,12 +55,12 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 147,
+        "errors": 146,
         "missing_types": 3
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 40,
+        "errors": 39,
         "missing_types": 2
       },
       "source/core/CopyParam.cpp": {
@@ -90,7 +90,7 @@
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 111,
+        "errors": 85,
         "missing_types": 2
       }
     }

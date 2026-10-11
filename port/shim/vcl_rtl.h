@@ -26,6 +26,7 @@
 #endif
 
 #include "vcl_property.h"
+#include "vcl_tryfinally.h"
 #include "vcl_closure.h"
 #include "vcl_object.h"
 #include "vcl_syncobjs.h"

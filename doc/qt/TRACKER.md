@@ -9,11 +9,11 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 26 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 15 | 34 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 16 | 34 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **41** | **93** | |
+| **Total** | **42** | **93** | |
 
 ## Next three actions
 
@@ -38,14 +38,14 @@ Closest unit to clean next: `FileBuffer.cpp` (16 mingw / 24 Linux).
 **Three core units now compile cleanly on both targets:** `Option.cpp`,
 `NamedObjs.cpp` and `FileBuffer.cpp`. Census is **963 on mingw, 1,182 on Linux**.
 
-Census is **342 on mingw, 586 on Linux**. Four of nine units are clean on
-mingw; `Bookmarks.cpp` is clean there and 2 errors from clean on Linux, both
-`__finally`.
+Census is **314 on mingw, 496 on Linux**, and **four of nine units are clean on
+both targets** for the first time. The two platforms are now within 180 errors
+of each other, down from a gap of 244.
 
-1. **P1-09b / `try`/`__finally`** — the main thing holding Linux behind now.
-   182 blocks, and the Linux-only gap in several units is exactly this.
-2. `FileMasks.cpp` at **10 / 13** is next closest to clean.
-3. **P1-05b / `TThread`** and `StartThread`.
+1. `FileMasks.cpp` at **10 / 13** is next closest to clean.
+2. **P1-05b / `TThread`** and `StartThread`.
+3. `Common.cpp` and `Terminal.cpp` carry most of what is left; neither has a
+   single dominant cause any more.
 
 ## Decisions taken
 
@@ -82,6 +82,9 @@ mingw; `Bookmarks.cpp` is clean there and 2 errors from clean on Linux, both
 | 2026-10-10 | Chained subscripts on indexed properties are unsupported | clang reads `Prop[i][j]` as a two-argument getter call. Core has 0 occurrences; `check_properties.py` fails if an upstream change adds one |
 | 2026-10-10 | Win32 A/W name macros are undone in `vcl_win32_undef.h` | `<windows.h>` renamed the *definition* of `ReplaceText` to `ReplaceTextW` while the header still declared `ReplaceText`. Both compiled; only the link failed, and only because a test called it. A link-time guard now references every colliding name |
 | 2026-10-10 | `ARRAYOFCONST` pastes its parenthesised list onto a variadic call | C++Builder builds an open array of `TVarRec`, which needs compound literals. `ARRAYOFCONST((a, b))` becoming `MakeFormatArgs(a, b)` is ordinary C++ |
+| 2026-10-11 | `try`/`__finally` uses the same lambda expansion on *both* targets | SEH would work on mingw, but one code path on both platforms is worth more than relying on it, and it removes a way for the two to diverge in behaviour |
+| 2026-10-11 | The `try`/`__finally` transform measures brace depth on the *pristine* lines and applies every edit afterwards | `LINSCP_END_FINALLY` replaces a `}` with text containing no brace, so editing in place miscounted the depth of any enclosing block -- and core nests these |
+| 2026-10-11 | One bare `return` inside a guarded body is permitted, by checked condition | Returning from the lambda runs the cleanup through the guard and then falls off the end of the function, which is what Borland does -- but only when the block ends the function and the return carries no value. Both are verified rather than assumed |
 | 2026-10-11 | Every property form routes through a generated public wrapper | Borland's `__property` grants access to a private accessor from outside the class and ignores constness; `__declspec(property)` does neither, because it expands to an ordinary member call at the use site. The wrappers restore both behaviours, and the getter casts its result to the declared type because C++Builder is lax where the two differ in constness |
 | 2026-10-11 | `UnicodeString` accepts numbers implicitly, yielding their decimal text | C++Builder does, and core depends on it. The hazard is real -- `UnicodeString s = 0;` gives `"0"` -- but diverging would mean editing core |
 | 2026-10-11 | Globals that need dynamic initialisation are declared *before* the object that initialises them | Within a translation unit, dynamic initialisation runs in declaration order. Putting the initialiser first had its constructor assign to a `UnicodeString` that was not yet constructed, which segfaulted rather than failing to compile |
@@ -245,6 +248,10 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | Borland's `__property` reaches *private* accessors; `__declspec(property)` does not | `TBookmark` declares public properties over private setters | 2026-10-11 |
 | `__finally` in core: **182 blocks**, 0 `__try`, 0 `__except`; only 2 bodies contain a `return` | grep plus brace analysis | 2026-10-11 |
 | `UnicodeString` has implicit numeric constructors in C++Builder | `EXT_EXCEPTION_METHODS` calls `ExtException(E, Ident)` with an `int`, and the only viable overload takes a string | 2026-10-11 |
+| All **179** `try`/`__finally` blocks transformed, 0 unhandled; the patch series is still empty | `transform.py` | 2026-10-11 |
+| Changed lines: 1,297, every one accounted for — 624 property, 46 closure, 28 template end, 62 binding, 537 try/finally (179 x 3) | `verify_transform.py` | 2026-10-11 |
+| Census after try/finally: mingw **314**, Linux **496**; 4/9 clean on *both* targets | `census_ratchet.py` | 2026-10-11 |
+| 23/23 tests pass on both targets | `ctest` | 2026-10-11 |
 | 12/12 tests pass on Linux and on Windows under Wine | `ctest` both trees | 2026-10-10 |
 | Directory search validated against both backends: real `FindFirstFileW` under Wine, and `dirent` + `fnmatch` on Linux | `test_sysutils` on both targets | 2026-10-10 |
 | `__closure` scope: 44 distinct closure types, 16 typedefs; call sites pass bare member-function names | grep over generated core | 2026-10-10 |
@@ -306,7 +313,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-05 | Shim: `TCriticalSection`/`SyncObjs` | done | recursive; thread exclusion tested |
 | P1-05b | Shim: `TThread`/`StartThread` | todo | |
 | P1-08b | Shim: masks, paths, timespan, encoding, env | done | the census long tail |
-| P1-09b | `try`/`__finally` for POSIX | todo | 182 blocks; the main Linux blocker now |
+| P1-09b | `try`/`__finally` for POSIX | done | 179 blocks, 0 unhandled; same expansion on both targets |
 | P1-06 | Shim: streams | done | `TStream`/`THandleStream`/`TFileStream`/`TMemoryStream` |
 | P1-06b | Shim: INI/registry storage | done | INI parses real-world files; registry real on Windows |
 | P1-06c | Shim: `DynamicArray` + file API | done | sharing semantics tested |

@@ -22,6 +22,10 @@ add_test(NAME strings COMMAND test_strings)
 
 # Runs on both targets on purpose: on Windows it exercises the real Win32 API,
 # which is what the POSIX implementation is being measured against.
+add_executable(test_tryfinally test_tryfinally.cpp)
+target_link_libraries(test_tryfinally PRIVATE linscp-shim)
+add_test(NAME tryfinally COMMAND test_tryfinally)
+
 add_executable(test_misc test_misc.cpp)
 target_link_libraries(test_misc PRIVATE linscp-shim)
 add_test(NAME misc COMMAND test_misc)
@@ -74,7 +78,7 @@ add_test(NAME object_exceptions COMMAND test_object)
 # wine; these tell wine where the mingw runtime DLLs live and keep its output
 # off the test log.
 if(LINSCP_WINE_DLLDIR_GCC)
-  set(_wine_tests property_forms unicodestring bytestring datetime object_exceptions strings sysutils closure strutils win32_on_posix streams containers resources storage dynarray misc)
+  set(_wine_tests property_forms unicodestring bytestring datetime object_exceptions strings sysutils closure strutils win32_on_posix streams containers resources storage dynarray misc tryfinally)
   # The backslash-escaped ';' is a literal Windows path separator inside the
   # WINEPATH value; the unescaped ';' separates the two environment entries.
   set_tests_properties(${_wine_tests} PROPERTIES ENVIRONMENT
