@@ -67,13 +67,21 @@ protected:
 LINSCP_DERIVED_EXCEPTION(EAbort, Exception);
 LINSCP_DERIVED_EXCEPTION(EOutOfMemory, Exception);
 LINSCP_DERIVED_EXCEPTION(EInOutError, Exception);
+
 LINSCP_DERIVED_EXCEPTION(EExternal, Exception);
 LINSCP_DERIVED_EXCEPTION(EIntError, Exception);
 LINSCP_DERIVED_EXCEPTION(EMathError, Exception);
 LINSCP_DERIVED_EXCEPTION(EConvertError, Exception);
 LINSCP_DERIVED_EXCEPTION(EListError, Exception);
 LINSCP_DERIVED_EXCEPTION(EStringListError, EListError);
-LINSCP_DERIVED_EXCEPTION(EFilerError, Exception);
+// Delphi's stream exception hierarchy, which core catches at EStreamError in
+// places: EFilerError, EFOpenError and EFCreateError are all siblings under it,
+// and EReadError/EWriteError sit under EFilerError. Flattening any of this would
+// stop existing handlers matching, with no compile error to say so.
+LINSCP_DERIVED_EXCEPTION(EStreamError, Exception);
+LINSCP_DERIVED_EXCEPTION(EFCreateError, EStreamError);
+LINSCP_DERIVED_EXCEPTION(EFOpenError, EStreamError);
+LINSCP_DERIVED_EXCEPTION(EFilerError, EStreamError);
 LINSCP_DERIVED_EXCEPTION(EReadError, EFilerError);
 LINSCP_DERIVED_EXCEPTION(EWriteError, EFilerError);
 LINSCP_DERIVED_EXCEPTION(EClassNotFound, EFilerError);

@@ -11,6 +11,7 @@ add_library(linscp-shim STATIC
   vcl_sysutils.cpp
   vcl_strutils.cpp
   vcl_format.cpp
+  vcl_streams.cpp
 )
 
 # The Win32 subset core calls directly. Only built for non-Windows targets; on

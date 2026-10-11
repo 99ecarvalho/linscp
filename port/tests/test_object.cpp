@@ -52,6 +52,24 @@ void TestExceptionHierarchy()
   catch (const Exception & E) { CHECK(E.GetMessage() == UnicodeString(L"os")); }
   catch (...) { CHECK(false); }
 
+  // The stream family: EReadError and EWriteError are reachable as
+  // EFilerError and, one level up, as EStreamError. Core catches at both
+  // levels, so both must match.
+  try { throw EReadError(UnicodeString(L"r")); }
+  catch (const EStreamError &) { }
+  catch (...) { CHECK(false); }
+
+  try { throw EFOpenError(UnicodeString(L"o")); }
+  catch (const EStreamError &) { }
+  catch (...) { CHECK(false); }
+
+  // ... but EFOpenError is a sibling of EFilerError, not a child.
+  bool AsFiler = false;
+  try { throw EFOpenError(UnicodeString(L"o")); }
+  catch (const EFilerError &) { AsFiler = true; }
+  catch (const EStreamError &) { }
+  CHECK(!AsFiler);
+
   // Siblings must NOT catch each other.
   bool WrongHandler = false;
   try { throw EListError(UnicodeString(L"l")); }

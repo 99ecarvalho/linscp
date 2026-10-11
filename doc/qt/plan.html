@@ -1782,7 +1782,7 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td>P1 Headless core</td>
-<td>9</td>
+<td>10</td>
 <td>30</td>
 <td>Golden suite green, six protocols, both platforms</td>
 </tr>
@@ -1806,7 +1806,7 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>32</strong></td>
+<td><strong>33</strong></td>
 <td><strong>88</strong></td>
 <td></td>
 </tr>
@@ -1824,13 +1824,18 @@ ahead of the larger type groups.</p>
 either target: <strong>1,334 errors on mingw, 1,575 on Linux</strong>.
 Both are higher than the previously reported figures because the parse
 now runs to completion instead of stopping at a missing header.</p>
+<p>Closest units to clean: <code>FileBuffer.cpp</code> (16 mingw / 24
+Linux) and <code>NamedObjs.cpp</code> (17 / 17).</p>
 <ol type="1">
-<li><strong>P1-06 / streams</strong> — <code>TStream</code>,
-<code>THandleStream</code>, <code>TMemoryStream</code>, ~31 uses each,
-and the largest remaining type group on both targets.</li>
-<li><strong>P1-02b / <code>TList</code></strong> and
-<code>TObjectList</code>, then
-<code>TCustomIniFile</code>/<code>TRegistry</code>.</li>
+<li><strong>P1-02b / <code>TList</code></strong> plus
+<code>TListNotification</code> and <code>TObjectList</code>, and the
+cheap scalar-ish types blocking the same units:
+<code>TNotifyEvent</code>, <code>TShortCut</code>,
+<code>TShiftState</code>,
+<code>TThreadID</code>/<code>TThreadFunc</code>,
+<code>PResStringRec</code>, <code>TVSFixedFileInfo</code>.</li>
+<li><strong>P1-06b / storage</strong> — <code>TCustomIniFile</code> and
+<code>TRegistry</code>, 12 uses each.</li>
 <li><strong>P0-06c / closure call sites</strong> — 116 bare
 member-function names, each reported by clang with an exact position, so
 the rewrite can be compiler-guided.</li>
@@ -2063,6 +2068,21 @@ variadic call</td>
 <td>C++Builder builds an open array of <code>TVarRec</code>, which needs
 compound literals. <code>ARRAYOFCONST((a, b))</code> becoming
 <code>MakeFormatArgs(a, b)</code> is ordinary C++</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>Derived streams re-expose the base’s legacy <code>Seek</code> with a
+using-declaration</td>
+<td>Overriding one overload hides the other. Core calls both on derived
+streams, so without this the legacy origins would stop resolving</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>Stream exceptions follow Delphi’s shape exactly</td>
+<td><code>EFilerError</code>, <code>EFOpenError</code> and
+<code>EFCreateError</code> are siblings under <code>EStreamError</code>,
+with <code>EReadError</code>/<code>EWriteError</code> beneath
+<code>EFilerError</code>. Core catches at both levels</td>
 </tr>
 <tr class="even">
 <td>2026-10-10</td>
@@ -2641,6 +2661,16 @@ argument; the POSIX version rejects it</td>
 <td>2026-10-10</td>
 </tr>
 <tr class="even">
+<td>Census after streams: mingw 1,242, Linux 1,483, 0 aborting</td>
+<td><code>census_ratchet.py</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>16/16 tests pass on both targets</td>
+<td><code>ctest</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
 <td>12/12 tests pass on Linux and on Windows under Wine</td>
 <td><code>ctest</code> both trees</td>
 <td>2026-10-10</td>
@@ -2995,9 +3025,8 @@ done; path routines next</td>
 <tr class="odd">
 <td>P1-06</td>
 <td>Shim: streams</td>
-<td>todo</td>
-<td><code>TStream</code>/<code>THandleStream</code>/<code>TMemoryStream</code>,
-~31 uses each</td>
+<td>done</td>
+<td><code>TStream</code>/<code>THandleStream</code>/<code>TFileStream</code>/<code>TMemoryStream</code></td>
 </tr>
 <tr class="even">
 <td>P1-06b</td>

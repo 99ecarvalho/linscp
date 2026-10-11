@@ -9,11 +9,11 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 23 | 34 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 9 | 30 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 10 | 30 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **32** | **88** | |
+| **Total** | **33** | **88** | |
 
 ## Next three actions
 
@@ -29,9 +29,14 @@ target: **1,334 errors on mingw, 1,575 on Linux**. Both are higher than the
 previously reported figures because the parse now runs to completion instead of
 stopping at a missing header.
 
-1. **P1-06 / streams** — `TStream`, `THandleStream`, `TMemoryStream`, ~31 uses
-   each, and the largest remaining type group on both targets.
-2. **P1-02b / `TList`** and `TObjectList`, then `TCustomIniFile`/`TRegistry`.
+Closest units to clean: `FileBuffer.cpp` (16 mingw / 24 Linux) and
+`NamedObjs.cpp` (17 / 17).
+
+1. **P1-02b / `TList`** plus `TListNotification` and `TObjectList`, and the
+   cheap scalar-ish types blocking the same units: `TNotifyEvent`, `TShortCut`,
+   `TShiftState`, `TThreadID`/`TThreadFunc`, `PResStringRec`,
+   `TVSFixedFileInfo`.
+2. **P1-06b / storage** — `TCustomIniFile` and `TRegistry`, 12 uses each.
 3. **P0-06c / closure call sites** — 116 bare member-function names, each
    reported by clang with an exact position, so the rewrite can be
    compiler-guided.
@@ -71,6 +76,8 @@ stopping at a missing header.
 | 2026-10-10 | Chained subscripts on indexed properties are unsupported | clang reads `Prop[i][j]` as a two-argument getter call. Core has 0 occurrences; `check_properties.py` fails if an upstream change adds one |
 | 2026-10-10 | Win32 A/W name macros are undone in `vcl_win32_undef.h` | `<windows.h>` renamed the *definition* of `ReplaceText` to `ReplaceTextW` while the header still declared `ReplaceText`. Both compiled; only the link failed, and only because a test called it. A link-time guard now references every colliding name |
 | 2026-10-10 | `ARRAYOFCONST` pastes its parenthesised list onto a variadic call | C++Builder builds an open array of `TVarRec`, which needs compound literals. `ARRAYOFCONST((a, b))` becoming `MakeFormatArgs(a, b)` is ordinary C++ |
+| 2026-10-10 | Derived streams re-expose the base's legacy `Seek` with a using-declaration | Overriding one overload hides the other. Core calls both on derived streams, so without this the legacy origins would stop resolving |
+| 2026-10-10 | Stream exceptions follow Delphi's shape exactly | `EFilerError`, `EFOpenError` and `EFCreateError` are siblings under `EStreamError`, with `EReadError`/`EWriteError` beneath `EFilerError`. Core catches at both levels |
 | 2026-10-10 | `port/platform` headers refuse to compile on Windows, and are POSIX-only on the include path | Putting them on a Windows target shadowed the genuine mingw headers, which presented as a 1,220 -> 783 "improvement". The `#error` makes that mistake loud |
 | 2026-10-10 | `port/compat` is separate from `port/platform` | `help.h` is missing from upstream itself rather than being a platform difference, so it is needed on every target |
 | 2026-10-10 | The ratchet records whether a unit aborted | An aborted parse reports a floor. Treating that as a distinct state stops a new abort from reading as sudden progress |
@@ -191,6 +198,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | Real Win32 `FileTimeToSystemTime` faults on a null argument; the POSIX version rejects it | Wine crash dump, `cmpq $0, (%rcx)` | 2026-10-10 |
 | Honest totals with 0 units aborting: mingw 1,334, Linux 1,575 | `census_ratchet.py`, both targets | 2026-10-10 |
 | 15/15 tests pass on both targets | `ctest` | 2026-10-10 |
+| Census after streams: mingw 1,242, Linux 1,483, 0 aborting | `census_ratchet.py` | 2026-10-10 |
+| 16/16 tests pass on both targets | `ctest` | 2026-10-10 |
 | 12/12 tests pass on Linux and on Windows under Wine | `ctest` both trees | 2026-10-10 |
 | Directory search validated against both backends: real `FindFirstFileW` under Wine, and `dirent` + `fnmatch` on Linux | `test_sysutils` on both targets | 2026-10-10 |
 | `__closure` scope: 44 distinct closure types, 16 typedefs; call sites pass bare member-function names | grep over generated core | 2026-10-10 |
@@ -250,7 +259,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-04 | Shim: exceptions | done | 17 Delphi classes; base and sibling matching tested |
 | P1-05 | Shim: `TCriticalSection`/`SyncObjs` | done | recursive; thread exclusion tested |
 | P1-05b | Shim: `TThread`/`StartThread` | todo | |
-| P1-06 | Shim: streams | todo | `TStream`/`THandleStream`/`TMemoryStream`, ~31 uses each |
+| P1-06 | Shim: streams | done | `TStream`/`THandleStream`/`TFileStream`/`TMemoryStream` |
 | P1-06b | Shim: INI/registry storage | todo | `TRegistry` 29, `TCustomIniFile` 28 |
 | P1-07 | `port/platform` Win32 subset | done | types, FILETIME/SYSTEMTIME, errors, winsock names |
 | P1-07b | `port/platform` Win32 file/handle functions | todo | as the census asks |
