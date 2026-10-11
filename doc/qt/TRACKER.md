@@ -8,30 +8,31 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 20 | 31 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 6 | 27 | Golden suite green, six protocols, both platforms |
+| P0 Foundation | 21 | 32 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P1 Headless core | 8 | 29 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **26** | **83** | |
+| **Total** | **29** | **85** | |
 
 ## Next three actions
 
 Driven by `compile_census.py` rather than by grep counts — the compiler names
 what is actually blocking `Common.cpp`, in dependency order.
 
-Ranked by the aggregate census across nine core TUs (**1,924 errors**, down from
-2,409 after closure typedefs landed).
+**`source/core/Option.cpp` compiles cleanly on the Windows target — 0 errors,
+0 fatal, exit 0.** The first real WinSCP core translation unit to build against
+the shim. Aggregate across the nine tracked TUs is **1,220 errors**, down from
+2,409.
 
-1. **P1-01b / free string routines** — now the broadest gap: `LoadStr` 288,
-   `SameText` 113, `Pos` 89, `CutToChar` 70, `IntToStr` 58, plus `TryStrToInt`,
-   `EndsStr`, `SameStr`. `Option.cpp` is down to 10 errors and every one is in
-   this group, so it is the closest TU to compiling.
-2. **P0-06c / closure call sites** — 116 bare member-function names to wrap.
-   Compiler-guided, since clang reports each with an exact position.
-3. **P1-06 / streams** (`TStream`, `THandleStream`, `TMemoryStream`) and
-   **P1-01d / `TVarRec` + `ARRAYOFCONST`**, the varargs formatting path behind
-   `FORMAT` and `FMTLOAD`.
+1. **P1-06 / streams** — `TStream`, `THandleStream`, `TMemoryStream`, ~31 uses
+   each, and the largest remaining type group.
+2. **P1-07 / `win32-on-posix`** — `Option.cpp` still fails on Linux with 10
+   errors, all Win32 types (`HKEY`, `HINSTANCE`, `LCID`). Until this lands, the
+   Windows target runs ahead of Linux, which is the opposite of the end goal.
+3. **P0-06c / closure call sites** — 116 bare member-function names, each
+   reported by clang with an exact position, so the rewrite can be
+   compiler-guided.
 
 ## Decisions taken
 
@@ -66,6 +67,9 @@ Ranked by the aggregate census across nine core TUs (**1,924 errors**, down from
 | 2026-10-10 | `TStrings` is 0-based while `UnicodeString` is 1-based | Both match their Delphi originals. Two bases in one codebase is a hazard, so each is pinned by a boundary test rather than left to memory |
 | 2026-10-10 | `TStrings` references objects, never owns them | Delphi does not free them and core owns them elsewhere; freeing here would be a double-free. Asserted by a test that outlives the list |
 | 2026-10-10 | Chained subscripts on indexed properties are unsupported | clang reads `Prop[i][j]` as a two-argument getter call. Core has 0 occurrences; `check_properties.py` fails if an upstream change adds one |
+| 2026-10-10 | Win32 A/W name macros are undone in `vcl_win32_undef.h` | `<windows.h>` renamed the *definition* of `ReplaceText` to `ReplaceTextW` while the header still declared `ReplaceText`. Both compiled; only the link failed, and only because a test called it. A link-time guard now references every colliding name |
+| 2026-10-10 | `ARRAYOFCONST` pastes its parenthesised list onto a variadic call | C++Builder builds an open array of `TVarRec`, which needs compound literals. `ARRAYOFCONST((a, b))` becoming `MakeFormatArgs(a, b)` is ordinary C++ |
+| 2026-10-10 | `Format` keeps malformed input visible | Delphi raises on a missing argument. Core routes user- and server-supplied text through these into logs, so an unknown specifier is echoed and a missing argument renders as `<missing>` rather than throwing from a log path |
 
 ## Correction: the earlier "5 errors left" figure was wrong
 
@@ -169,6 +173,12 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | Aggregate census **2,409 -> 1,924** across 9 TUs; `Terminal.cpp` missing types 51 -> 20 | `census_ratchet.py` | 2026-10-10 |
 | 116 call sites pass a bare member-function name where a closure is expected | clang diagnostic count across all core TUs | 2026-10-10 |
 | 13/13 tests pass on both targets | `ctest` | 2026-10-10 |
+| **`core/Option.cpp` compiles clean on mingw: exit 0, 0 errors, 0 fatal** | direct clang run, verified rather than inferred from the census | 2026-10-10 |
+| The same TU still fails on Linux with 10 Win32-type errors | the deferred P1-07 gap | 2026-10-10 |
+| Aggregate census **1,924 -> 1,220** across 9 TUs | `census_ratchet.py` | 2026-10-10 |
+| `Format` handles width, alignment, precision and explicit argument indices; unknown specifiers and missing arguments stay visible instead of dropping text | `test_strutils` | 2026-10-10 |
+| 161 narrow string literals in core require `UnicodeString(const char *)` | grep over generated core | 2026-10-10 |
+| 14/14 tests pass on both targets | `ctest` | 2026-10-10 |
 | 12/12 tests pass on Linux and on Windows under Wine | `ctest` both trees | 2026-10-10 |
 | Directory search validated against both backends: real `FindFirstFileW` under Wine, and `dirent` + `fnmatch` on Linux | `test_sysutils` on both targets | 2026-10-10 |
 | `__closure` scope: 44 distinct closure types, 16 typedefs; call sites pass bare member-function names | grep over generated core | 2026-10-10 |
@@ -188,7 +198,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P0-06c | `__closure` call-site binding | todo | 116 sites, compiler-guided |
 | P0-07 | Transform idempotence tests | done | idempotent + line-count parity asserted |
 | P0-08 | CMake skeleton | done | transform+verify wired as a build step; CTest on both targets |
-| P0-09 | Minimal shim for `core/Common.cpp` | wip | 417 errors / 29 types, measured honestly (see correction below) |
+| P0-09 | Minimal shim for `core/Common.cpp` | wip | 224 errors; `Option.cpp` is the first TU at 0 |
 | P0-10 | mingw-w64 sysroot + clang toolchain file | done | `cmake/toolchain-mingw-w64.cmake`; clang + lld + Wine emulator |
 | P0-11 | CI matrix Linux + Windows cross | todo | |
 | P0-12 | Wine smoke tests in CI | wip | wired into CTest via `CMAKE_CROSSCOMPILING_EMULATOR`; GitHub Actions pending |
@@ -208,13 +218,16 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P0-26 | `check_wide_abi.py` ADR enforcement | done | `shim_no_wide_abi` test |
 | P0-27 | `compile_census.py` | done | classifies clang diagnostics into shim gaps |
 | P0-29 | Legacy unqualified RTL header stubs | done | `Classes.hpp` etc.; absence was aborting most TUs |
+| P0-30 | Win32 A/W macro collisions undone | done | link-time guard test |
 | P0-28 | `census_ratchet.py` | done | baseline pinned at 30 errors / 5 types |
 
 ### P1 — Headless core
 | ID | Task | Status | Note |
 |---|---|---|---|
 | P1-01 | Shim: `UnicodeString` class | done | 1-based API, UTF-16, 9 test groups incl. surrogate pairs |
-| P1-01b | Shim: free string routines | todo | ranked by measured use |
+| P1-01b | Shim: free string routines | done | `Option.cpp` reaches 0 errors |
+| P1-01d | Shim: `TVarRec`/`Format`/`ARRAYOFCONST` | done | `FORMAT` 438 + `FMTLOAD` 252 call sites |
+| P1-01e | Resource strings `LoadStr`/`FmtLoadStr` | todo | declared only; belongs with the resource layer |
 | P1-01c | Shim: byte-string family + UTF-8 codec | done | malformed-input behaviour tested explicitly |
 | P1-02 | Shim: `TObject`/`TStrings`/`TStringList` | done | 0-based indexing, case-insensitive default, CommaText round trip |
 | P1-02b | Shim: `TList`/`TObjectList`/`Contnrs` | todo | not yet needed by `Common.cpp` |

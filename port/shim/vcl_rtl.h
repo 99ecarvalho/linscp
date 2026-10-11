@@ -16,6 +16,8 @@
     #define WIN32_LEAN_AND_MEAN
   #endif
   #include <windows.h>
+
+  #include "vcl_win32_undef.h"
 #endif
 
 #include "vcl_property.h"
@@ -28,6 +30,8 @@
 #include "vcl_datetime.h"
 #include "vcl_strings.h"
 #include "vcl_sysutils.h"
+#include "vcl_strutils.h"
+#include "vcl_format.h"
 
 // Embarcadero calling-convention and closure keywords. __fastcall is a pure
 // calling convention and means nothing to us on x86-64; __closure becomes a

@@ -1,4 +1,5 @@
 #include "vcl_unicodestring.h"
+#include "vcl_bytestring.h"
 
 #include <algorithm>
 #include <cassert>
@@ -57,6 +58,14 @@ UnicodeString::UnicodeString(const wchar_t * S, int Len)
   if (S != nullptr && Len > 0)
   {
     FData.assign(AsU16(S), static_cast<std::size_t>(Len));
+  }
+}
+
+UnicodeString::UnicodeString(const char * S)
+{
+  if (S != nullptr)
+  {
+    *this = linscp::Utf8ToUtf16(S, std::char_traits<char>::length(S));
   }
 }
 

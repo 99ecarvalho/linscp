@@ -42,6 +42,7 @@ Goal: prove the keystone works, with no behaviour change anywhere.
 | P0-26 | `check_wide_abi.py`: enforce ADR 0001 mechanically | S | P0-25 | Wrong-ABI code links cleanly then misbehaves, so grep it |
 | P0-27 | `compile_census.py`: classify what a real core TU still needs | S | P0-09 | Lets the compiler enumerate the shim gap instead of grep |
 | P0-29 | Shim stubs for the unqualified legacy RTL header names | S | P0-27 | `Classes.hpp` etc.; their absence was aborting most TUs early |
+| P0-30 | Undo Win32 A/W name macros that collide with RTL names | S | P0-29 | `ReplaceText` broke this way: header declared it, `<windows.h>` renamed the definition, link failed. Guarded by a link-time test |
 | P0-28 | `census_ratchet.py`: pin the census so progress cannot slip back | S | P0-27 | Nothing in core compiles cleanly yet, so a reintroduced type would look like a passing build |
 
 ## P1 — Headless core on both platforms
@@ -51,7 +52,9 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | ID | Task | Size | Depends | Notes |
 |---|---|---|---|---|
 | P1-01 | Shim: `UnicodeString` class | L | P0-25 | 6,248 uses. Class done; 1-based API from measured usage |
-| P1-01b | Shim: free string routines (`Format`, `LoadStr`, `SameText`, `Pos`, `IntToStr`, …) | L | P1-01 | Measured: `LoadStr` 288, `SameText` 113, `Pos` 89, `CutToChar` 70, `IntToStr` 58 |
+| P1-01b | Shim: free string, number and path routines | L | P1-01 | Done. `Option.cpp` reaches 0 errors |
+| P1-01d | Shim: `TVarRec` + `Format` + `ARRAYOFCONST` | M | P1-01b | Done. Behind `FORMAT` (438 uses) and `FMTLOAD` (252) |
+| P1-01e | Resource strings: `LoadStr`/`FmtLoadStr` implementation | M | P1-01d | Declared only; `LoadStr` is core's own and reads the resource module |
 | P1-01c | Shim: `AnsiString` / `UTF8String` / `RawByteString` + UTF-8 codec | M | P1-01 | Distinct code-page types; wire-format correctness lives here |
 | P1-02 | Shim: `TObject`, `TStrings`, `TStringList` | L | P1-01 | Done. 17 of the 30 `Common.cpp` errors |
 | P1-02b | Shim: `TList`, `TObjectList`, `Contnrs` | M | P1-02 | `TObjectList` 14 uses; not yet needed by `Common.cpp` |

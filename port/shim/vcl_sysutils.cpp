@@ -9,6 +9,7 @@ const UnicodeString EmptyStr;
 #if defined(_WIN32)
 
 #include <windows.h>
+#include "vcl_win32_undef.h"
 
 namespace {
 

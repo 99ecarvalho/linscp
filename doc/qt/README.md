@@ -19,17 +19,22 @@ C++Builder in the toolchain.
 
 ## Current state (2026-10-10)
 
-Phase 0 is 19 of 30 done; Phase 1 is 6 of 27. Upstream is pinned to the latest
-**stable** release, `6.5.8`, as a submodule at `3rd-party/winscp`.
+Phase 0 is 21 of 32 done; Phase 1 is 8 of 29. Upstream is pinned to the latest
+**stable** release, `6.5.8`.
 
-Landed: the dual-target `__property` shim and transform, plus `UnicodeString`,
-the byte-string family with a UTF-8 codec, `TDateTime`, the Delphi exception
-hierarchy, `TCriticalSection`, `TStrings`/`TStringList`, and directory search on
-both Win32 and POSIX. 12 test binaries pass on Linux and on Windows under Wine.
+**`source/core/Option.cpp` compiles cleanly against the shim on the Windows
+target** — the first real WinSCP core translation unit to build. Across the nine
+tracked units the count is **1,220 errors**, down from 2,409, ratcheted in CI so
+it can only fall.
 
-Real core code compiles against the shim: **2,409 errors across 9 translation
-units**, ratcheted so the number can only go down. The largest remaining group
-is `__closure` support.
+The shim now covers `UnicodeString`, the byte-string family with a UTF-8 codec,
+`TDateTime`, the Delphi exception hierarchy, `TCriticalSection`,
+`TStrings`/`TStringList`, directory search on both Win32 and POSIX, `TClosure`
+for `__closure`, the free string/number/path routines, and `TVarRec`/`Format`.
+14 test binaries pass on Linux and on Windows under Wine.
+
+The Windows target currently runs ahead of Linux: the same unit still fails there
+on Win32 types, which is what `port/platform/win32-on-posix` (P1-07) is for.
 
 ## The three findings the plan rests on
 

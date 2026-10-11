@@ -9,6 +9,8 @@ add_library(linscp-shim STATIC
   vcl_datetime.cpp
   vcl_strings.cpp
   vcl_sysutils.cpp
+  vcl_strutils.cpp
+  vcl_format.cpp
 )
 target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_features(linscp-shim PUBLIC cxx_std_17)

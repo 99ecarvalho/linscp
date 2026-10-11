@@ -27,6 +27,7 @@
 
 #include <cstddef>
 #include <string>
+#include <type_traits>
 
 static_assert(sizeof(wchar_t) == 2,
               "linscp requires -fshort-wchar: UnicodeString is UTF-16 and "
@@ -46,7 +47,21 @@ public:
 
   UnicodeString(const wchar_t * S);
   UnicodeString(const wchar_t * S, int Len);
-  explicit UnicodeString(wchar_t C, int Count = 1);
+
+  // Narrow literals. C++Builder accepts them and core relies on it in 161
+  // places, e.g. SameText(Value, "on"). Decoded as UTF-8, which is a superset
+  // of the ASCII those literals actually are.
+  UnicodeString(const char * S);
+
+  // A single character, implicitly, as in C++Builder: core passes a bare
+  // wchar_t constant to functions taking a string. Constrained to exactly
+  // wchar_t so an integer cannot quietly become a one-character string.
+  template <typename C,
+            typename = std::enable_if_t<std::is_same_v<C, wchar_t>>>
+  UnicodeString(C Ch) : FData(1, static_cast<char16_t>(Ch)) {}
+
+  // Repeated character; explicit, since the count makes intent clear anyway.
+  explicit UnicodeString(wchar_t C, int Count);
 
   // --- length ---------------------------------------------------------------
   int Length() const { return static_cast<int>(FData.size()); }

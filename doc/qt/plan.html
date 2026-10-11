@@ -431,19 +431,24 @@ merge cost.</p>
 <p>One codebase. Qt UI. Builds and runs on Linux and Windows. No
 Embarcadero C++Builder in the toolchain.</p>
 <h2 id="current-state-2026-10-10">Current state (2026-10-10)</h2>
-<p>Phase 0 is 19 of 30 done; Phase 1 is 6 of 27. Upstream is pinned to
-the latest <strong>stable</strong> release, <code>6.5.8</code>, as a
-submodule at <code>3rd-party/winscp</code>.</p>
-<p>Landed: the dual-target <code>__property</code> shim and transform,
-plus <code>UnicodeString</code>, the byte-string family with a UTF-8
-codec, <code>TDateTime</code>, the Delphi exception hierarchy,
-<code>TCriticalSection</code>,
-<code>TStrings</code>/<code>TStringList</code>, and directory search on
-both Win32 and POSIX. 12 test binaries pass on Linux and on Windows
-under Wine.</p>
-<p>Real core code compiles against the shim: <strong>2,409 errors across
-9 translation units</strong>, ratcheted so the number can only go down.
-The largest remaining group is <code>__closure</code> support.</p>
+<p>Phase 0 is 21 of 32 done; Phase 1 is 8 of 29. Upstream is pinned to
+the latest <strong>stable</strong> release, <code>6.5.8</code>.</p>
+<p><strong><code>source/core/Option.cpp</code> compiles cleanly against
+the shim on the Windows target</strong> — the first real WinSCP core
+translation unit to build. Across the nine tracked units the count is
+<strong>1,220 errors</strong>, down from 2,409, ratcheted in CI so it
+can only fall.</p>
+<p>The shim now covers <code>UnicodeString</code>, the byte-string
+family with a UTF-8 codec, <code>TDateTime</code>, the Delphi exception
+hierarchy, <code>TCriticalSection</code>,
+<code>TStrings</code>/<code>TStringList</code>, directory search on both
+Win32 and POSIX, <code>TClosure</code> for <code>__closure</code>, the
+free string/number/path routines, and
+<code>TVarRec</code>/<code>Format</code>. 14 test binaries pass on Linux
+and on Windows under Wine.</p>
+<p>The Windows target currently runs ahead of Linux: the same unit still
+fails there on Win32 types, which is what
+<code>port/platform/win32-on-posix</code> (P1-07) is for.</p>
 <h2 id="the-three-findings-the-plan-rests-on">The three findings the
 plan rests on</h2>
 <ol type="1">
@@ -1212,6 +1217,15 @@ needs</td>
 early</td>
 </tr>
 <tr class="odd">
+<td>P0-30</td>
+<td>Undo Win32 A/W name macros that collide with RTL names</td>
+<td>S</td>
+<td>P0-29</td>
+<td><code>ReplaceText</code> broke this way: header declared it,
+<code>&lt;windows.h&gt;</code> renamed the definition, link failed.
+Guarded by a link-time test</td>
+</tr>
+<tr class="even">
 <td>P0-28</td>
 <td><code>census_ratchet.py</code>: pin the census so progress cannot
 slip back</td>
@@ -1252,14 +1266,28 @@ platforms</h2>
 </tr>
 <tr class="even">
 <td>P1-01b</td>
-<td>Shim: free string routines (<code>Format</code>,
-<code>LoadStr</code>, <code>SameText</code>, <code>Pos</code>,
-<code>IntToStr</code>, …)</td>
+<td>Shim: free string, number and path routines</td>
 <td>L</td>
 <td>P1-01</td>
-<td>Measured: <code>LoadStr</code> 288, <code>SameText</code> 113,
-<code>Pos</code> 89, <code>CutToChar</code> 70, <code>IntToStr</code>
-58</td>
+<td>Done. <code>Option.cpp</code> reaches 0 errors</td>
+</tr>
+<tr class="odd">
+<td>P1-01d</td>
+<td>Shim: <code>TVarRec</code> + <code>Format</code> +
+<code>ARRAYOFCONST</code></td>
+<td>M</td>
+<td>P1-01b</td>
+<td>Done. Behind <code>FORMAT</code> (438 uses) and <code>FMTLOAD</code>
+(252)</td>
+</tr>
+<tr class="even">
+<td>P1-01e</td>
+<td>Resource strings: <code>LoadStr</code>/<code>FmtLoadStr</code>
+implementation</td>
+<td>M</td>
+<td>P1-01d</td>
+<td>Declared only; <code>LoadStr</code> is core’s own and reads the
+resource module</td>
 </tr>
 <tr class="odd">
 <td>P1-01c</td>
@@ -1723,15 +1751,15 @@ evaluation down and close it</td>
 <tbody>
 <tr class="odd">
 <td>P0 Foundation</td>
-<td>20</td>
-<td>31</td>
+<td>21</td>
+<td>32</td>
 <td><code>core/Common.cpp</code> compiles on Linux clang; VCL build
 green (R1)</td>
 </tr>
 <tr class="even">
 <td>P1 Headless core</td>
-<td>6</td>
-<td>27</td>
+<td>8</td>
+<td>29</td>
 <td>Golden suite green, six protocols, both platforms</td>
 </tr>
 <tr class="odd">
@@ -1754,8 +1782,8 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>26</strong></td>
-<td><strong>83</strong></td>
+<td><strong>29</strong></td>
+<td><strong>85</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -1764,23 +1792,23 @@ green (R1)</td>
 <p>Driven by <code>compile_census.py</code> rather than by grep counts —
 the compiler names what is actually blocking <code>Common.cpp</code>, in
 dependency order.</p>
-<p>Ranked by the aggregate census across nine core TUs (<strong>1,924
-errors</strong>, down from 2,409 after closure typedefs landed).</p>
+<p><strong><code>source/core/Option.cpp</code> compiles cleanly on the
+Windows target — 0 errors, 0 fatal, exit 0.</strong> The first real
+WinSCP core translation unit to build against the shim. Aggregate across
+the nine tracked TUs is <strong>1,220 errors</strong>, down from
+2,409.</p>
 <ol type="1">
-<li><strong>P1-01b / free string routines</strong> — now the broadest
-gap: <code>LoadStr</code> 288, <code>SameText</code> 113,
-<code>Pos</code> 89, <code>CutToChar</code> 70, <code>IntToStr</code>
-58, plus <code>TryStrToInt</code>, <code>EndsStr</code>,
-<code>SameStr</code>. <code>Option.cpp</code> is down to 10 errors and
-every one is in this group, so it is the closest TU to compiling.</li>
+<li><strong>P1-06 / streams</strong> — <code>TStream</code>,
+<code>THandleStream</code>, <code>TMemoryStream</code>, ~31 uses each,
+and the largest remaining type group.</li>
+<li><strong>P1-07 / <code>win32-on-posix</code></strong> —
+<code>Option.cpp</code> still fails on Linux with 10 errors, all Win32
+types (<code>HKEY</code>, <code>HINSTANCE</code>, <code>LCID</code>).
+Until this lands, the Windows target runs ahead of Linux, which is the
+opposite of the end goal.</li>
 <li><strong>P0-06c / closure call sites</strong> — 116 bare
-member-function names to wrap. Compiler-guided, since clang reports each
-with an exact position.</li>
-<li><strong>P1-06 / streams</strong> (<code>TStream</code>,
-<code>THandleStream</code>, <code>TMemoryStream</code>) and
-<strong>P1-01d / <code>TVarRec</code> +
-<code>ARRAYOFCONST</code></strong>, the varargs formatting path behind
-<code>FORMAT</code> and <code>FMTLOAD</code>.</li>
+member-function names, each reported by clang with an exact position, so
+the rewrite can be compiler-guided.</li>
 </ol>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
@@ -1992,6 +2020,32 @@ would be a double-free. Asserted by a test that outlives the list</td>
 <td>clang reads <code>Prop[i][j]</code> as a two-argument getter call.
 Core has 0 occurrences; <code>check_properties.py</code> fails if an
 upstream change adds one</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>Win32 A/W name macros are undone in
+<code>vcl_win32_undef.h</code></td>
+<td><code>&lt;windows.h&gt;</code> renamed the <em>definition</em> of
+<code>ReplaceText</code> to <code>ReplaceTextW</code> while the header
+still declared <code>ReplaceText</code>. Both compiled; only the link
+failed, and only because a test called it. A link-time guard now
+references every colliding name</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td><code>ARRAYOFCONST</code> pastes its parenthesised list onto a
+variadic call</td>
+<td>C++Builder builds an open array of <code>TVarRec</code>, which needs
+compound literals. <code>ARRAYOFCONST((a, b))</code> becoming
+<code>MakeFormatArgs(a, b)</code> is ordinary C++</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td><code>Format</code> keeps malformed input visible</td>
+<td>Delphi raises on a missing argument. Core routes user- and
+server-supplied text through these into logs, so an unknown specifier is
+echoed and a missing argument renders as <code>&lt;missing&gt;</code>
+rather than throwing from a log path</td>
 </tr>
 </tbody>
 </table>
@@ -2465,6 +2519,41 @@ expected</td>
 <td>2026-10-10</td>
 </tr>
 <tr class="odd">
+<td><strong><code>core/Option.cpp</code> compiles clean on mingw: exit
+0, 0 errors, 0 fatal</strong></td>
+<td>direct clang run, verified rather than inferred from the census</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>The same TU still fails on Linux with 10 Win32-type errors</td>
+<td>the deferred P1-07 gap</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>Aggregate census <strong>1,924 -&gt; 1,220</strong> across 9
+TUs</td>
+<td><code>census_ratchet.py</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td><code>Format</code> handles width, alignment, precision and explicit
+argument indices; unknown specifiers and missing arguments stay visible
+instead of dropping text</td>
+<td><code>test_strutils</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>161 narrow string literals in core require
+<code>UnicodeString(const char *)</code></td>
+<td>grep over generated core</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>14/14 tests pass on both targets</td>
+<td><code>ctest</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
 <td>12/12 tests pass on Linux and on Windows under Wine</td>
 <td><code>ctest</code> both trees</td>
 <td>2026-10-10</td>
@@ -2568,7 +2657,7 @@ targets</td>
 <td>P0-09</td>
 <td>Minimal shim for <code>core/Common.cpp</code></td>
 <td>wip</td>
-<td>417 errors / 29 types, measured honestly (see correction below)</td>
+<td>224 errors; <code>Option.cpp</code> is the first TU at 0</td>
 </tr>
 <tr class="even">
 <td>P0-10</td>
@@ -2692,6 +2781,12 @@ resolution</td>
 <td><code>Classes.hpp</code> etc.; absence was aborting most TUs</td>
 </tr>
 <tr class="odd">
+<td>P0-30</td>
+<td>Win32 A/W macro collisions undone</td>
+<td>done</td>
+<td>link-time guard test</td>
+</tr>
+<tr class="even">
 <td>P0-28</td>
 <td><code>census_ratchet.py</code></td>
 <td>done</td>
@@ -2725,8 +2820,21 @@ resolution</td>
 <tr class="even">
 <td>P1-01b</td>
 <td>Shim: free string routines</td>
+<td>done</td>
+<td><code>Option.cpp</code> reaches 0 errors</td>
+</tr>
+<tr class="odd">
+<td>P1-01d</td>
+<td>Shim:
+<code>TVarRec</code>/<code>Format</code>/<code>ARRAYOFCONST</code></td>
+<td>done</td>
+<td><code>FORMAT</code> 438 + <code>FMTLOAD</code> 252 call sites</td>
+</tr>
+<tr class="even">
+<td>P1-01e</td>
+<td>Resource strings <code>LoadStr</code>/<code>FmtLoadStr</code></td>
 <td>todo</td>
-<td>ranked by measured use</td>
+<td>declared only; belongs with the resource layer</td>
 </tr>
 <tr class="odd">
 <td>P1-01c</td>

@@ -2,40 +2,40 @@
   "target": "x86_64-w64-mingw32",
   "units": {
     "source/core/Bookmarks.cpp": {
-      "errors": 139,
-      "missing_types": 13
+      "errors": 94,
+      "missing_types": 12
     },
     "source/core/Common.cpp": {
-      "errors": 386,
-      "missing_types": 22
+      "errors": 224,
+      "missing_types": 21
     },
     "source/core/Configuration.cpp": {
-      "errors": 110,
-      "missing_types": 14
+      "errors": 66,
+      "missing_types": 13
     },
     "source/core/CopyParam.cpp": {
-      "errors": 232,
-      "missing_types": 17
+      "errors": 131,
+      "missing_types": 16
     },
     "source/core/FileBuffer.cpp": {
-      "errors": 46,
+      "errors": 41,
       "missing_types": 4
     },
     "source/core/FileMasks.cpp": {
-      "errors": 235,
-      "missing_types": 19
+      "errors": 164,
+      "missing_types": 18
     },
     "source/core/NamedObjs.cpp": {
-      "errors": 23,
+      "errors": 17,
       "missing_types": 1
     },
     "source/core/Option.cpp": {
-      "errors": 10,
+      "errors": 0,
       "missing_types": 0
     },
     "source/core/Terminal.cpp": {
-      "errors": 743,
-      "missing_types": 20
+      "errors": 483,
+      "missing_types": 19
     }
   }
 }
