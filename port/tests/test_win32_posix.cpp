@@ -9,6 +9,8 @@
   #include "vcl_win32_undef.h"
 #else
   #include "win32_on_posix.h"
+  #include <sys/stat.h>
+  #include <unistd.h>
 #endif
 
 #include <cstdint>
@@ -308,6 +310,129 @@ void TestBareWin32NamesCoreCalls()
 #endif
 }
 
+// The file functions as core calls them (Terminal.cpp, SftpFileSystem.cpp,
+// Common.cpp, HierarchicalStorage.cpp). On Windows this runs against the real
+// API, so each check is a statement about Win32 the POSIX layer must match.
+// Paths for TestFiles. std::wstring cannot be used on POSIX: under
+// -fshort-wchar its traits call glibc's 4-byte wcslen (ADR 0001), and a
+// concatenation silently comes out short. char16_t strings hold the same
+// UTF-16 on both targets.
+using Path16 = std::u16string;
+Path16 P16(const wchar_t * S)
+{
+  Path16 R;
+  for (; *S != 0; ++S) { R += static_cast<char16_t>(*S); }
+  return R;
+}
+const wchar_t * W(const Path16 & S) { return reinterpret_cast<const wchar_t *>(S.c_str()); }
+std::string Narrow(const Path16 & S)
+{
+  std::string R;
+  for (char16_t C : S) { R += static_cast<char>(C); }
+  return R;
+}
+
+void TestFiles()
+{
+  wchar_t Temp[MAX_PATH];
+  const DWORD N = GetTempPath(MAX_PATH, Temp);
+  CHECK((N > 0) && (N < MAX_PATH) && ((Temp[N - 1] == L'\\') || (Temp[N - 1] == L'/')));
+  // Too small a buffer reports the size needed, terminator included.
+  wchar_t Tiny[1];
+  CHECK(GetTempPath(1, Tiny) == N + 1);
+
+  Temp[N] = 0;
+  const Path16 Dir = P16(Temp) + u"linscp_files_test";
+  const std::string NarrowDir = Narrow(Dir);
+#if defined(_WIN32)
+  CreateDirectoryW(W(Dir), NULL);
+  const char16_t Sep = u'\\';
+#else
+  mkdir(NarrowDir.c_str(), 0700);
+  const char16_t Sep = u'/';
+#endif
+  const Path16 File = Dir + Sep + u"file.bin";
+  const std::string NarrowFile = Narrow(File);
+  remove(NarrowFile.c_str());
+
+  // CREATE_NEW is exclusive: IsDirectoryWriteable relies on it.
+  HANDLE H = CreateFile(W(File), GENERIC_READ | GENERIC_WRITE, 0, NULL,
+                        CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);
+  CHECK(H != INVALID_HANDLE_VALUE);
+  CHECK(CloseHandle(H) != 0);
+  H = CreateFile(W(File), GENERIC_READ | GENERIC_WRITE, 0, NULL,
+                 CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);
+  CHECK(H == INVALID_HANDLE_VALUE);
+  CHECK(GetLastError() == ERROR_FILE_EXISTS);
+
+  // Size, through the split high/low form core reads.
+  if (FILE * F = fopen(NarrowFile.c_str(), "wb"))
+  {
+    fwrite("12345", 1, 5, F);
+    fclose(F);
+  }
+  H = CreateFile(W(File), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
+                 OPEN_EXISTING, 0, 0);
+  CHECK(H != INVALID_HANDLE_VALUE);
+  DWORD High = 0xDEAD;
+  CHECK(GetFileSize(H, &High) == 5);
+  CHECK(High == 0);
+  CloseHandle(H);
+
+  // A modification time set is the one read back; a null time is untouched.
+  const FILETIME Stamp = FromTicks(132223694450000000ULL);   // 2020-01-02 03:04:05 UTC
+  H = CreateFile(W(File), GENERIC_WRITE, FILE_SHARE_READ, NULL,
+                 OPEN_EXISTING, 0, 0);
+  CHECK(H != INVALID_HANDLE_VALUE);
+  FILETIME Before{}, After{}, Access{};
+  CHECK(GetFileTime(H, NULL, &Access, &Before) != 0);
+  CHECK(SetFileTime(H, NULL, NULL, &Stamp) != 0);
+  CHECK(GetFileTime(H, NULL, NULL, &After) != 0);
+  CHECK(Ticks(After) == Ticks(Stamp));
+  CloseHandle(H);
+
+  // A directory opens with FILE_FLAG_BACKUP_SEMANTICS, and takes a timestamp.
+  H = CreateFile(W(Dir), GENERIC_WRITE, FILE_SHARE_WRITE, NULL,
+                 OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0);
+  CHECK(H != INVALID_HANDLE_VALUE);
+  if (H != INVALID_HANDLE_VALUE)
+  {
+    CHECK(SetFileTime(H, NULL, NULL, &Stamp) != 0);
+    CHECK(GetFileTime(H, NULL, NULL, &After) != 0);
+    CHECK(Ticks(After) == Ticks(Stamp));
+    CloseHandle(H);
+  }
+
+  // Attributes.
+  CHECK((GetFileAttributes(W(Dir)) & FILE_ATTRIBUTE_DIRECTORY) != 0);
+  CHECK((GetFileAttributes(W(File)) & FILE_ATTRIBUTE_DIRECTORY) == 0);
+  CHECK(SetFileAttributes(W(File), FILE_ATTRIBUTE_READONLY) != 0);
+  CHECK((GetFileAttributes(W(File)) & FILE_ATTRIBUTE_READONLY) != 0);
+  CHECK(SetFileAttributes(W(File), FILE_ATTRIBUTE_NORMAL) != 0);
+  CHECK((GetFileAttributes(W(File)) & FILE_ATTRIBUTE_READONLY) == 0);
+  const Path16 Missing = Dir + Sep + u"missing";
+  CHECK(GetFileAttributes(W(Missing)) == INVALID_FILE_ATTRIBUTES);
+  CHECK(GetLastError() == ERROR_FILE_NOT_FOUND);
+  CHECK(CreateFile(W(Missing), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, 0) ==
+        INVALID_HANDLE_VALUE);
+  CHECK(GetLastError() == ERROR_FILE_NOT_FOUND);
+
+  // FILE_FLAG_DELETE_ON_CLOSE leaves nothing behind once closed.
+  const Path16 Scratch = Dir + Sep + u"scratch.tmp";
+  H = CreateFile(W(Scratch), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_NEW,
+                 FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, 0);
+  CHECK(H != INVALID_HANDLE_VALUE);
+  CloseHandle(H);
+  CHECK(GetFileAttributes(W(Scratch)) == INVALID_FILE_ATTRIBUTES);
+
+  remove(NarrowFile.c_str());
+#if defined(_WIN32)
+  RemoveDirectoryW(W(Dir));
+#else
+  rmdir(NarrowDir.c_str());
+#endif
+}
+
 }  // namespace
 
 int main()
@@ -323,6 +448,7 @@ int main()
   TestConstantsMatchWin32();
 
   TestBareWin32NamesCoreCalls();
+  TestFiles();
 
   if (Failures == 0)
   {

@@ -51,6 +51,7 @@ if(NOT WIN32)
   target_sources(linscp-shim PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/../platform/win32_on_posix.cpp"
     "${CMAKE_CURRENT_SOURCE_DIR}/../platform/win32_kernel_posix.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../platform/win32_file_posix.cpp"
   )
 endif()
 if(NOT WIN32)

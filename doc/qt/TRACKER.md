@@ -32,11 +32,12 @@ sessions pass -- as negotiated and pinned to AES-CTR, AES-GCM and
 ChaCha20-Poly1305. Upstream's own 64-bit work had already fixed seven of our
 eight patches' problems, so the series went from eight to one.
 
-Linux: **588 errors, 14/33 clean, 4 aborting** (558 before; the +30 is
-upstream's new Windows Shell integration in `RemoteFiles.cpp`).
+Linux: **534 errors, 15/33 clean, 4 aborting** (588 at the pin move; the
+Win32 file functions account for the drop).
 
-1. **P1-07b**: the Win32 calls core makes that Linux lacks (file functions in
-   progress, shelved on a stash during the pin move).
+1. **P1-07b**: the rest of the Win32 calls core makes that Linux lacks --
+   file functions done; registry, shell folders, time zones, version info,
+   modules and processes next.
 2. **P1-09**: PuTTY's Unix platform layer from the PuTTY 0.85 release, which
    WinSCP's copy does not carry.
 3. **P1-15**: `winscp.com`'s scripting front end over plain stdio.
@@ -239,6 +240,9 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | Headless frontend: stack traces | None are recorded, so none are appended to error reports | Upstream records them through JCL's exception hooks, a Windows-only C++Builder facility |
 | Headless frontend: sleep | `SystemRequired` holds off sleep on Windows (`SetThreadExecutionState`) and does nothing on POSIX | POSIX has no equivalent without a session bus (logind inhibitors); upstream also runs it from a helper thread on Windows 11 |
 | Headless frontend: clipboard | Pasting a password finds nothing; copying raises | No clipboard without a GUI; the copy is reachable only from a GUI prompt's button |
+| File share modes on POSIX | Accepted and ignored; a second opener is never refused with `ERROR_SHARING_VIOLATION` | POSIX has no mandatory locking. Core retries on that error (HierarchicalStorage.cpp), so never seeing it only removes a wait |
+| `FILE_FLAG_DELETE_ON_CLOSE` on POSIX | The name is unlinked at open, not at the last close | Either way nothing is left behind; core uses it only to probe that a directory is writable |
+| File creation time on POSIX | The birth time where the file system records one (`statx`), else the modification time; it cannot be set | POSIX has no settable creation time |
 | `SuspendThread` on POSIX | Not declared | A running pthread cannot be suspended. A missing declaration fails at compile time; a stub would fail silently. `CREATE_SUSPENDED` + `ResumeThread` is supported |
 
 ## Open questions
@@ -266,6 +270,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | WinSCP's OpenSSL lacks the C fallbacks for its x86 assembly and every Unix source | `bn_asm.c`, `des_enc.c`, `bf_enc.c`, `c_enc.c`, `threads_pthread.c`, `rand_unix.c` absent from `libs/openssl` | 2026-10-11 |
 | Upstream libs3 returns `int` where neon's body provider returns `ssize_t` | `neon_read_func` in `libs3/src/request.c`; fixed by `libs3-64bit-body-provider.patch` | 2026-10-11 |
 | WinSCP `master` is being ported to 64-bit | `WinSCP.cbproj` has a `Win64` platform; libs are built with bcc64 (`libs/Makefile.inc`); `StartThread` returns `THandle`; AES-NI uses `_mm_setr_epi8` under `_WIN64` | 2026-10-11 |
+| The POSIX file functions match Win32 on everything `TestFiles` checks | The same test passes against the real API under Wine and against the POSIX layer | 2026-10-11 |
+| `std::wstring` is unusable on POSIX under `-fshort-wchar` | Its traits call glibc's 4-byte `wcslen`: `wstring(L"/tmp/") + L"x"` came out as "/tmp/" | 2026-10-11 |
 | mingw-w64 runs global constructors in reverse link order, Linux in link order | Three one-line units linked a, b, c print "c b a" under Wine and "a b c" natively | 2026-10-11 |
 | WinSCP `master`'s OpenSSL 3.5.9 differs from the release only by C++Builder workarounds (5 files) | `openssl_tree.py --check` | 2026-10-11 |
 | Upstream FileZilla truncates a pointer on x86-64 | `CAsyncSocketEx` stores `this` with `SetWindowLongPtr(hWnd, GWL_USERDATA, (LONG)this)`; fixed by `filezilla-64bit-window-userdata.patch` | 2026-10-11 |
@@ -436,7 +442,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-06c | Shim: `DynamicArray` + file API | done | sharing semantics tested |
 | P1-06d | Select INI backend on Linux | todo | frontend decision |
 | P1-07 | `port/platform` Win32 subset | done | types, FILETIME/SYSTEMTIME, errors, winsock names |
-| P1-07b | `port/platform` Win32 file/handle functions | todo | as the census asks |
+| P1-07b | `port/platform` Win32 file/handle functions | wip | `CreateFile`, `Get/SetFileTime`, `GetFileSize`, `Get/SetFileAttributes`, `GetTempPath`, descriptor-aware `CloseHandle`; tested against real Win32 under Wine |
 | P1-08 | Socket-event emulation | todo | R6 |
 | P1-09 | PuTTY unix backend re-import | todo | |
 | P1-10 | PuTTY delta reconciliation | todo | |

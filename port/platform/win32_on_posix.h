@@ -21,6 +21,8 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
+#include <sys/stat.h>
 
 // <windows.h> transitively provides these, and core relies on it: it calls
 // strlen, strcmp and memmove unqualified. Using the C headers rather than the
@@ -94,6 +96,7 @@ using HCURSOR = void *;
 #define INVALID_HANDLE_VALUE (reinterpret_cast<HANDLE>(-1))
 #define INVALID_FILE_ATTRIBUTES (static_cast<DWORD>(-1))
 #define INVALID_SET_FILE_POINTER (static_cast<DWORD>(-1))
+#define INVALID_FILE_SIZE (static_cast<DWORD>(0xFFFFFFFF))
 
 #ifndef MAX_PATH
   #define MAX_PATH 260
@@ -236,6 +239,75 @@ FILETIME TicksToFileTime(std::uint64_t Ticks);
 #define FILE_ATTRIBUTE_OFFLINE             0x00001000
 #define FILE_ATTRIBUTE_ENCRYPTED           0x00004000
 
+struct SECURITY_ATTRIBUTES;
+using LPSECURITY_ATTRIBUTES = SECURITY_ATTRIBUTES *;
+
+// Kernel-object handles start here; every value below is a descriptor.
+// Descriptors are bounded by RLIMIT_NOFILE, orders of magnitude lower.
+constexpr std::uintptr_t LinscpKernelHandleBase = 0x10000000;
+
+// --- files -----------------------------------------------------------------
+// A file HANDLE is the descriptor itself, as the shim's THandleStream takes it,
+// so a handle from CreateFile can be wrapped in a stream, read through it and
+// closed with CloseHandle. Kernel-object handles (threads, events) are issued
+// from a range no descriptor reaches, which is how CloseHandle tells the two
+// apart.
+//
+// Share modes are accepted and ignored: POSIX has no mandatory locking, so a
+// second opener is never refused with ERROR_SHARING_VIOLATION. See the
+// divergence table in doc/qt/TRACKER.md.
+#define GENERIC_READ                 0x80000000u
+#define GENERIC_WRITE                0x40000000u
+#define FILE_SHARE_READ              0x00000001
+#define FILE_SHARE_WRITE             0x00000002
+#define FILE_SHARE_DELETE            0x00000004
+#define CREATE_NEW                   1
+#define CREATE_ALWAYS                2
+#define OPEN_EXISTING                3
+#define OPEN_ALWAYS                  4
+#define TRUNCATE_EXISTING            5
+// Opens a directory (read-only, which is all futimens needs); core uses it to
+// set a directory's timestamps.
+#define FILE_FLAG_BACKUP_SEMANTICS   0x02000000
+// The name is unlinked as soon as the file is open, where Windows removes it
+// at the last close; either way nothing is left behind.
+#define FILE_FLAG_DELETE_ON_CLOSE    0x04000000
+
+// Attributes at creation: READONLY creates the file without write permission;
+// the others have no POSIX meaning and are ignored.
+HANDLE CreateFile(LPCWSTR FileName, DWORD DesiredAccess, DWORD ShareMode,
+  LPSECURITY_ATTRIBUTES SecurityAttributes, DWORD CreationDisposition,
+  DWORD FlagsAndAttributes, HANDLE TemplateFile);
+// Creation time is the file's birth time where the file system records one,
+// else its modification time; it cannot be set.
+BOOL GetFileTime(HANDLE File, FILETIME * CreationTime, FILETIME * LastAccessTime,
+  FILETIME * LastWriteTime);
+// A null time is left unchanged, as on Windows.
+BOOL SetFileTime(HANDLE File, const FILETIME * CreationTime,
+  const FILETIME * LastAccessTime, const FILETIME * LastWriteTime);
+DWORD GetFileSize(HANDLE File, LPDWORD FileSizeHigh);
+// The mapping the shim's FileGetAttr uses: DIRECTORY, REPARSE_POINT for a
+// symbolic link, READONLY without the owner's write bit, HIDDEN for a leading
+// dot, NORMAL when none applies. GetFileAttributes follows links, as Win32
+// does for everything but the link's own reparse bit.
+DWORD GetFileAttributes(LPCWSTR FileName);
+// READONLY clears every write bit, its absence restores the owner's; the
+// rest are ignored.
+BOOL SetFileAttributes(LPCWSTR FileName, DWORD FileAttributes);
+// $TMPDIR, else /tmp, with a trailing slash. As Win32: the length without the
+// terminator, or when the buffer is too small the size needed including it.
+DWORD GetTempPath(DWORD BufferLength, LPWSTR Buffer);
+
+namespace linscp {
+
+// UTF-16 to the UTF-8 the file system takes. An unpaired surrogate becomes
+// U+FFFD, as in the shim's own conversion.
+std::string WideToUtf8(const wchar_t * S);
+// The attributes of a stat result, for an entry with the given final name.
+DWORD AttributesFromStat(const struct stat & St, const char * Name);
+
+}  // namespace linscp
+
 // --- error codes -----------------------------------------------------------
 // Only the codes core actually tests for.
 #define NO_ERROR                      0
@@ -251,6 +323,7 @@ FILETIME TicksToFileTime(std::uint64_t Ticks);
 #define ERROR_NOT_SUPPORTED          50
 #define ERROR_FILE_EXISTS            80
 #define ERROR_INVALID_PARAMETER      87
+#define ERROR_INSUFFICIENT_BUFFER   122
 #define ERROR_DISK_FULL             112
 #define ERROR_ALREADY_EXISTS        183
 #define ERROR_MORE_DATA             234
@@ -274,8 +347,6 @@ DWORD Win32ErrorFromErrno(int Err);
 // at compile time where a stub would fail silently at run time.
 #define WINAPI
 
-struct SECURITY_ATTRIBUTES;
-using LPSECURITY_ATTRIBUTES = SECURITY_ATTRIBUTES *;
 using LPTHREAD_START_ROUTINE = DWORD (WINAPI *)(LPVOID Parameter);
 
 #define INFINITE              0xFFFFFFFF

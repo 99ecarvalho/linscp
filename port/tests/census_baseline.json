@@ -8,7 +8,7 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 81,
+        "errors": 68,
         "missing_types": 7
       },
       "source/core/Configuration.cpp": {
@@ -63,7 +63,7 @@
       },
       "source/core/FtpFileSystem.cpp": {
         "aborted": false,
-        "errors": 34,
+        "errors": 29,
         "missing_types": 2
       },
       "source/core/Global.cpp": {
@@ -73,7 +73,7 @@
       },
       "source/core/HierarchicalStorage.cpp": {
         "aborted": false,
-        "errors": 57,
+        "errors": 52,
         "missing_types": 17
       },
       "source/core/Http.cpp": {
@@ -113,12 +113,12 @@
       },
       "source/core/S3FileSystem.cpp": {
         "aborted": false,
-        "errors": 2,
+        "errors": 1,
         "missing_types": 0
       },
       "source/core/ScpFileSystem.cpp": {
         "aborted": false,
-        "errors": 3,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/Script.cpp": {
@@ -148,12 +148,12 @@
       },
       "source/core/SftpFileSystem.cpp": {
         "aborted": false,
-        "errors": 8,
+        "errors": 1,
         "missing_types": 0
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 25,
+        "errors": 5,
         "missing_types": 3
       },
       "source/core/Usage.cpp": {

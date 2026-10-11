@@ -73,7 +73,9 @@ std::mutex GKernelMutex;
 std::condition_variable GKernelChanged;
 std::unordered_map<std::uintptr_t, std::shared_ptr<TKernelObject>> GHandles;
 // Multiples of four, like Win32, and never reused.
-std::uintptr_t GNextHandle = 0x100;
+// Starting far above any descriptor number, so CloseHandle can tell a kernel
+// object from a file (a file HANDLE is its descriptor; see win32_on_posix.h).
+std::uintptr_t GNextHandle = LinscpKernelHandleBase;
 
 // One counter for both CreateThread and lazily-named foreign threads (the main
 // thread included), so ids are unique across the two.
@@ -436,9 +438,18 @@ BOOL CloseHandle(HANDLE Object)
   std::shared_ptr<TKernelObject> Released;
   {
     std::lock_guard<std::mutex> Lock(GKernelMutex);
-    const auto It = GHandles.find(reinterpret_cast<std::uintptr_t>(Object));
+    const auto Value = reinterpret_cast<std::uintptr_t>(Object);
+    const auto It = GHandles.find(Value);
     if (It == GHandles.end())
     {
+      if ((Object != INVALID_HANDLE_VALUE) && (Value < LinscpKernelHandleBase))
+      {
+        // A descriptor, from CreateFile.
+        if (::close(static_cast<int>(Value)) == 0)
+        {
+          return TRUE;
+        }
+      }
       SetLastError(ERROR_INVALID_HANDLE);
       return FALSE;
     }
