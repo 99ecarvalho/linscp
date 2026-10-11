@@ -64,11 +64,12 @@ EXPANDED = re.compile(
 IDENT = re.compile(r'[A-Za-z_]\w*')
 
 DISCOVERY_GEN = 'build/gen-unbound'
+# Relative to the generated tree being compiled, so FileZilla and PuTTY come
+# from the same transform as core.
+GEN_INCLUDES = ['source/core', 'source/filezilla', 'source/putty', 'source/putty/windows']
 INCLUDES = [
-    'port/shim', 'port/casefold', '3rd-party/winscp/libs/libs3/inc',
+    'port/shim', '3rd-party/winscp/libs/libs3/inc',
     '3rd-party/winscp/source/resource', '3rd-party/winscp/source/windows',
-    '3rd-party/winscp/source/filezilla', '3rd-party/winscp/source/putty',
-    '3rd-party/winscp/source/putty/windows',
     '3rd-party/winscp/libs/openssl/include', '3rd-party/winscp/libs/neon/src',
     '3rd-party/winscp/libs/expat/lib',
 ]
@@ -82,7 +83,7 @@ def compile_tu(path, gen, target='x86_64-w64-mingw32'):
            # from macro' notes that follow an error.
            '-fno-caret-diagnostics', '-fmacro-backtrace-limit=0',
            '-Wno-everything']
-    for inc in [os.path.join(gen, 'source/core')] + INCLUDES:
+    for inc in [os.path.join(gen, g) for g in GEN_INCLUDES] + INCLUDES:
         cmd += ['-I', inc]
     cmd += _upstream_defines().flags(target)
     cmd.append(path)

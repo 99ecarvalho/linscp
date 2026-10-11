@@ -1,0 +1,19 @@
+Spell <ws2tcpip.h> as the header is named.
+
+FileZilla includes <Ws2tcpip.h>, which only a case-insensitive file system
+resolves; mingw-w64 names it ws2tcpip.h, so a Linux host cannot find it even
+when cross-compiling for Windows. Lower case works everywhere, Windows and
+C++Builder included. The only such system include in the transformed trees,
+so a patch rather than a rule.
+
+--- a/source/filezilla/AsyncSocketEx.h	2026-10-11 13:22:26.423761794 -0300
++++ b/source/filezilla/AsyncSocketEx.h	2026-10-11 13:22:26.425882469 -0300
+@@ -67,7 +67,7 @@
+ #define FD_FORCEREAD (1<<15)
+ //---------------------------------------------------------------------------
+ #include <winsock2.h>
+-#include <Ws2tcpip.h>
++#include <ws2tcpip.h>
+ //---------------------------------------------------------------------------
+ class CAsyncSocketExHelperWindow;
+ class CAsyncSocketExLayer;

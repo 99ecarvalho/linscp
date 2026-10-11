@@ -62,19 +62,18 @@ def main():
         'clang++', f'--target={a.target}', '-std=c++17', '-fsyntax-only',
         '-fms-extensions', '-fshort-wchar', f'-ferror-limit={a.max_errors}',
         '-I', 'port/shim',
-        # Forwarders for upstream includes that differ from the file name only
-        # in case; see port/casefold/README.md.
-        '-I', 'port/casefold',
 
+        # Everything the transform covers comes from the generated tree, so a
+        # unit sees one consistent set of rewritten headers.
         '-I', os.path.join(a.gen, 'source/core'),
         '-I', os.path.join(up, 'resource'),
         '-I', os.path.join(up, 'windows'),
-        '-I', os.path.join(up, 'filezilla'),
-        '-I', os.path.join(up, 'putty'),
+        '-I', os.path.join(a.gen, 'source/filezilla'),
+        '-I', os.path.join(a.gen, 'source/putty'),
         # putty/windows supplies platform.h, which core reaches through
         # PuttyIntf.h. That is PuTTY's *Windows* platform layer, so on Linux
         # it accounts for much of the remaining excess; see P1-09.
-        '-I', os.path.join(up, 'putty/windows'),
+        '-I', os.path.join(a.gen, 'source/putty/windows'),
         '-I', os.path.join(up, 'components'),
         '-I', '3rd-party/winscp/libs/openssl/include',
         '-I', '3rd-party/winscp/libs/neon/src',

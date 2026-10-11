@@ -181,7 +181,9 @@ def closure_expression(text, start, ident):
 
 
 class Transformer:
-    def __init__(self, bind_sites=True):
+    def __init__(self, bind_sites=True, src_root=None):
+        # The pristine tree, so rules can consult the real file names.
+        self.src_root = src_root
         self.stats = Counter()
         self.unhandled = []
         self.notes = []
@@ -198,6 +200,7 @@ class Transformer:
         if path.lower().endswith('.h'):
             self.inline_header_definitions(path, lines)
         self.normalise_include_separators(path, lines)
+        self.fix_include_case(path, lines)
         out = []
         for lineno, line in enumerate(lines, 1):
             if '__property' not in line or '#define' in line:
@@ -251,6 +254,37 @@ class Transformer:
                 lines[i] = (line[:m.start(3)] + m.group(3).replace('\\', '/') +
                             line[m.end(3):])
                 self.stats['include_slash'] += 1
+
+    INCLUDE_NAME = re.compile(r'^(\s*#\s*include\s*[<"])([^>"/]+)([>"])')
+
+    def fix_include_case(self, path, lines):
+        """Spell an include as the file is actually named, when the two differ
+        only in case and the file is in the including file's own directory.
+
+        Only a case-insensitive file system resolves `FileZillaTools.h` to
+        FilezillaTools.h, so a Linux host fails even cross-compiling for
+        Windows. Same directory only, because that is what such a file system
+        finds first: putty/windows/gss.c includes `security.h`, the Windows SDK
+        header, which a match anywhere would map onto core's Security.h.
+        """
+        if self.src_root is None:
+            return
+        here = os.path.dirname(os.path.join(self.src_root, path))
+        try:
+            names = os.listdir(here)
+        except OSError:
+            return
+        exact = set(names)
+        folded = {n.lower(): n for n in names}
+        for i, line in enumerate(lines):
+            m = self.INCLUDE_NAME.match(line)
+            if not m:
+                continue
+            spelled = m.group(2)
+            real = folded.get(spelled.lower())
+            if real and spelled not in exact and real != spelled:
+                lines[i] = line[:m.start(2)] + real + line[m.end(2):]
+                self.stats['include_case'] += 1
 
     def bind_closure_sites(self, path, lines):
         """Rewrite Borland's implicit closures as explicit bindings.
@@ -522,7 +556,7 @@ class Transformer:
         self.stats['transformed'] += 1
         return f'{ind}{call};{tail}'
 
-EXTS = {'.h', '.hpp', '.cpp', '.c', '.inc'}
+EXTS = {'.h', '.hpp', '.cpp', '.c', '.inc', '.inl'}
 
 # Call sites where core names a bare member function where a closure is
 # expected. Discovered by the compiler (port/tools/bind_closures.py), recorded,
@@ -562,9 +596,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--src', default='3rd-party/winscp')
     ap.add_argument('--out', default='build/gen')
-    # PuTTY is compiled from the generated tree too: it needs the include rule
-    # and the patch series.
-    ap.add_argument('--subdirs', nargs='*', default=['source/core', 'source/putty'])
+    # PuTTY, FileZilla and WinSCP's MFC subset are compiled from the generated
+    # tree too: they need the include rule and the patch series.
+    ap.add_argument('--subdirs', nargs='*',
+                    default=['source/core', 'source/putty', 'source/filezilla', 'libs/mfc'])
     ap.add_argument('--check', action='store_true',
                     help='report only; do not write the output tree')
     ap.add_argument('--report')
@@ -572,7 +607,7 @@ def main():
                     help='skip binding recorded closure sites (for discovery)')
     a = ap.parse_args()
 
-    t = Transformer(bind_sites=not a.no_closure_sites)
+    t = Transformer(bind_sites=not a.no_closure_sites, src_root=a.src)
     patchset = _load_patchset()
     series = patchset.load_series()
     used = set()

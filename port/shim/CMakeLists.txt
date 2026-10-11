@@ -51,10 +51,6 @@ if(NOT WIN32)
   target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../platform")
 endif()
 target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
-# Forwarders for upstream includes whose spelling differs from the file only in
-# case, which only a case-insensitive file system resolves. Every target: a
-# Linux host cross-compiling for Windows is case-sensitive too.
-target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/../casefold")
 target_link_libraries(linscp-shim PUBLIC linscp-expat)
 find_package(Threads REQUIRED)
 target_link_libraries(linscp-shim PUBLIC Threads::Threads)

@@ -1,0 +1,42 @@
+Teach WinSCP's MFC subset that x86-64 exists.
+
+WinSCP is built for 32-bit Windows only, and its trimmed MFC keys several
+things off _X86_ that are really "not a 32-bit x86 build": it includes
+afxv_cpu.h, which is not vendored; it withholds CFileFind::GetLength64; and
+CString::Format asserts on the I64 modifier. x86-64 has 64-bit integers like
+x86 does, so each condition admits _M_X64 too. (DOUBLE_ARG already takes the
+right branch: plain double.) Line counts are unchanged.
+
+--- a/libs/mfc/include/afx.h	2026-10-11 13:18:33.946044985 -0300
++++ b/libs/mfc/include/afx.h	2026-10-11 13:18:33.986713863 -0300
+@@ -1428,7 +1428,7 @@
+ // Attributes
+ public:
+ 	DWORD GetLength() const;
+-#if defined(_X86_) || defined(_ALPHA_)
++#if defined(_X86_) || defined(_ALPHA_) || defined(_M_X64)
+ 	__int64 GetLength64() const;
+ #endif
+ 	virtual CString GetFileName() const;
+--- a/libs/mfc/include/afxver_.h	2026-10-11 13:18:33.957898055 -0300
++++ b/libs/mfc/include/afxver_.h	2026-10-11 13:18:33.986811531 -0300
+@@ -150,7 +150,7 @@
+ #include <afxv_w32.h>
+ 
+ // Include any non-Intel platform specific items
+-#ifndef _X86_
++#if !defined(_X86_) && !defined(_M_X64)
+ 	#include <afxv_cpu.h>
+ #endif
+ 
+--- a/libs/mfc/source/strex.cpp	2026-10-11 13:18:33.969058014 -0300
++++ b/libs/mfc/source/strex.cpp	2026-10-11 13:18:33.986861988 -0300
+@@ -505,7 +505,7 @@
+ 		{
+ 			lpsz += 3;
+ 			nModifier = FORCE_INT64;
+-#if !defined(_X86_) && !defined(_ALPHA_)
++#if !defined(_X86_) && !defined(_ALPHA_) && !defined(_M_X64)
+ 			// __int64 is only available on X86 and ALPHA platforms
+ 			ASSERT(FALSE);
+ #endif

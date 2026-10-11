@@ -15,6 +15,9 @@ A changed line must be one of:
               CLOSURE_OF(obj, Name). Recomputed here with a regex, not with
               transform.py's own scanner, so the two must agree
   slash     - an #include path with its backslashes made forward slashes
+  case      - an #include name respelled to match, except in case, a file
+              in the including file's directory that the original spelling
+              does not exactly name
   inline    - in a header, a namespace-scope function definition given
               `inline` and nothing else
   closeoff  - the line where a multi-line closure typedef ended, changed only
@@ -86,6 +89,19 @@ _BINDING_LEFT = _re.compile(
     r'(?:(?<!&)&\s*)?(?:(?P<obj>[A-Za-z_]\w*)\s*(?P<op>\.|->)\s*)?$')
 
 
+def include_case_ok(upstream_path, old, new):
+    """An include respelled to a same-directory file's exact name, where the
+    old spelling named no file exactly and differs from it only in case."""
+    mo = _re.match(r'(\s*#\s*include\s*[<"])([^>"/]+)([>"].*)$', old)
+    mn = _re.match(r'(\s*#\s*include\s*[<"])([^>"/]+)([>"].*)$', new)
+    if not (mo and mn) or mo.group(1) != mn.group(1) or mo.group(3) != mn.group(3):
+        return False
+    here = os.path.dirname(upstream_path)
+    names = set(os.listdir(here))
+    return (mn.group(2) in names and mo.group(2) not in names and
+            mo.group(2).lower() == mn.group(2).lower())
+
+
 def tryfinally_of(old_line):
     """The expected rewrite of one of the three try/__finally lines."""
     stripped = old_line.strip()
@@ -117,7 +133,7 @@ def _load_patchset():
 
 
 def main(gen='build/gen', src='3rd-party/winscp'):
-    changed = macros = files = closures = closeoffs = bindings = inlines = slashes = 0
+    changed = macros = files = closures = closeoffs = bindings = inlines = slashes = cases = 0
     tryfinallys = 0
     patched_lines = 0
     patchset = _load_patchset()
@@ -163,6 +179,8 @@ def main(gen='build/gen', src='3rd-party/winscp'):
                 elif (_re.match(r'\s*#\s*include\b', x) and '\\' in x and
                       y == x.replace('\\', '/')):
                     slashes += 1
+                elif include_case_ok(u, x, y):
+                    cases += 1
                 elif (u.lower().endswith('.h') and
                       y.lstrip() == 'inline ' + x.lstrip() and
                       y[:len(y) - len(y.lstrip())] == x[:len(x) - len(x.lstrip())]):
@@ -179,6 +197,7 @@ def main(gen='build/gen', src='3rd-party/winscp'):
     print(f'  closure bind: {bindings}')
     print(f'  inline:       {inlines}')
     print(f'  include /:    {slashes}')
+    print(f'  include case: {cases}')
     print(f'  patch series: {patched_lines}')
     print(f'  try/finally:  {tryfinallys}')
     if bad:

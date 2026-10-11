@@ -30,10 +30,10 @@ target_include_directories(linscp-core PUBLIC
   "${LINSCP_GEN}/source/core"
   "${_up}/resource"
   "${_up}/windows"
-  "${_up}/filezilla"
-  "${_up}/putty"
+  "${LINSCP_GEN}/source/filezilla"
+  "${LINSCP_GEN}/source/putty"
   # PuTTY's Windows platform layer; on Linux this is P1-09's to replace.
-  "${_up}/putty/windows"
+  "${LINSCP_GEN}/source/putty/windows"
   "${_up}/components"
   "${LINSCP_UPSTREAM}/libs/openssl/include"
   "${LINSCP_UPSTREAM}/libs/neon/src"
