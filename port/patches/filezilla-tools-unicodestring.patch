@@ -1,0 +1,79 @@
+Pass FileZilla's two tool strings as UnicodeString, not std::wstring.
+
+CFileZillaTools::GetClientString and CustomReason return std::wstring; the
+rest of the interface between core and FileZilla, and both sides' own code,
+use UnicodeString or wchar_t pointers. Built with a 2-byte wchar_t on a
+platform whose C++ library assumes 4 (-fshort-wchar on Linux),
+std::wstring is unusable: libstdc++ provides basic_string<wchar_t> as a
+precompiled extern template for its own wchar_t, and char_traits<wchar_t>
+calls the C library's 4-byte wcslen and wmemcpy -- the port's Linux build
+of FtpFileSystem.cpp imported wcslen through it. The values are only built from
+UnicodeString, compared with empty() and read with c_str(), so UnicodeString
+is a direct replacement (IsEmpty for empty). On Windows, where wchar_t is
+2 bytes throughout, behaviour is unchanged. Line counts are unchanged.
+
+--- a/source/filezilla/FilezillaTools.h	2026-10-11 19:32:25.752177705 -0300
++++ b/source/filezilla/FilezillaTools.h	2026-10-11 19:32:25.791843453 -0300
+@@ -15,9 +15,9 @@
+   virtual void PreserveDownloadFileTime(HANDLE Handle, void * UserData) = 0;
+   virtual bool GetFileModificationTimeInUtc(const wchar_t * FileName, struct tm & Time) = 0;
+   virtual wchar_t * LastSysErrorMessage() = 0;
+-  virtual std::wstring GetClientString() = 0;
++  virtual UnicodeString GetClientString() = 0;
+   virtual void SetupSsl(ssl_st * Ssl) = 0;
+-  virtual std::wstring CustomReason(int Err) = 0;
++  virtual UnicodeString CustomReason(int Err) = 0;
+ };
+ //---------------------------------------------------------------------------
+ #endif // FileZillaToolsH
+--- a/source/core/FtpFileSystem.cpp	2026-10-11 19:32:25.763234163 -0300
++++ b/source/core/FtpFileSystem.cpp	2026-10-11 19:32:25.793008124 -0300
+@@ -56,9 +56,9 @@
+   virtual void PreserveDownloadFileTime(HANDLE Handle, void * UserData);
+   virtual bool GetFileModificationTimeInUtc(const wchar_t * FileName, struct tm & Time);
+   virtual wchar_t * LastSysErrorMessage();
+-  virtual std::wstring GetClientString();
++  virtual UnicodeString GetClientString();
+   virtual void SetupSsl(ssl_st * Ssl);
+-  virtual std::wstring CustomReason(int Err);
++  virtual UnicodeString CustomReason(int Err);
+ 
+ private:
+   TFTPFileSystem * FFileSystem;
+@@ -155,9 +155,9 @@
+   return _wcsdup(::LastSysErrorMessage().c_str());
+ }
+ //---------------------------------------------------------------------------
+-std::wstring TFileZillaImpl::GetClientString()
++UnicodeString TFileZillaImpl::GetClientString()
+ {
+-  return std::wstring(SshVersionString().c_str());
++  return SshVersionString();
+ }
+ //---------------------------------------------------------------------------
+ void TFileZillaImpl::SetupSsl(ssl_st * Ssl)
+@@ -166,9 +166,9 @@
+   ::SetupSsl(Ssl, SessionData->MinTlsVersion, SessionData->MaxTlsVersion);
+ }
+ //---------------------------------------------------------------------------
+-std::wstring TFileZillaImpl::CustomReason(int Err)
++UnicodeString TFileZillaImpl::CustomReason(int Err)
+ {
+-  std::wstring Result;
++  UnicodeString Result;
+   int Lib = ERR_GET_LIB(Err);
+   int Reason = ERR_GET_REASON(Err);
+   if ((Lib == ERR_LIB_SSL) &&
+--- a/source/filezilla/AsyncSslSocketLayer.cpp	2026-10-11 19:32:25.774361391 -0300
++++ b/source/filezilla/AsyncSslSocketLayer.cpp	2026-10-11 19:32:25.793259257 -0300
+@@ -1730,8 +1730,8 @@
+     LogSocketMessageRaw(FZ_LOG_PROGRESS, UnicodeString(buffer).c_str());
+     delete [] buffer;
+ 
+-    std::wstring CustomReason = m_Tools->CustomReason(aerr);
+-    if (!CustomReason.empty())
++    UnicodeString CustomReason = m_Tools->CustomReason(aerr);
++    if (!CustomReason.IsEmpty())
+     {
+       LogSocketMessageRaw(FZ_LOG_WARNING, CustomReason.c_str());
+     }

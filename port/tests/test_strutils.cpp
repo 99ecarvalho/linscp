@@ -361,6 +361,9 @@ void TestWideSprintf()
   Buf.sprintf(L"T%lu 0 %lu 0", static_cast<unsigned long>(1700000000),
               static_cast<unsigned long>(1700000001));
   CHECK(Buf == UnicodeString(L"T1700000000 0 1700000001 0"));
+  // %l is Windows' 32-bit long, as core's LONG and ULONG are.
+  Buf.sprintf(L"%lu %ld %lx", static_cast<ULONG>(4000000000u), static_cast<LONG>(-5), static_cast<ULONG>(0xDEADBEEFu));
+  CHECK(Buf == UnicodeString(L"4000000000 -5 deadbeef"));
   // C++Builder's wide conventions: %s wide, %S narrow.
   Buf.sprintf(L"[%s|%S|%5s|%-4s|%.2s]", L"w\u00E9", "n", L"ab", L"c", L"xyz");
   CHECK(Buf == UnicodeString(L"[w\u00E9|n|   ab|c   |xy]"));

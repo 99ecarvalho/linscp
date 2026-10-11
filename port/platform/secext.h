@@ -32,17 +32,5 @@ BOOLEAN GetUserNameEx(EXTENDED_NAME_FORMAT Format, LPWSTR Name, ULONG * Size);
 BOOLEAN GetUserNameExA(EXTENDED_NAME_FORMAT Format, LPSTR Name, ULONG * Size);
 #ifdef __cplusplus
 }
-// PULONG is unsigned long on Windows (32 bits), which core passes; 64 bits
-// on LP64. See GetFileSize in win32_on_posix.h.
-inline BOOLEAN GetUserNameEx(EXTENDED_NAME_FORMAT Format, LPWSTR Name, unsigned long * Size)
-{
-  ULONG S = (Size != nullptr) ? static_cast<ULONG>(*Size) : 0;
-  const BOOLEAN R = GetUserNameEx(Format, Name, (Size != nullptr) ? &S : nullptr);
-  if (Size != nullptr)
-  {
-    *Size = S;
-  }
-  return R;
-}
 #endif
 #endif

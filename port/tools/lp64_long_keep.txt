@@ -1,0 +1,8 @@
+# Lines in core where `long` stays `long`: core defining or implementing
+# another library's interface, whose types are that library's. Read by
+# transform.py (lp64_long_types) and verify_transform.py. A missing entry is
+# a compile error (a definition conflicting with the library's declaration),
+# not a silent one.
+#
+#   <file> <identifier on the line>   reason
+source/core/PuttyIntf.cpp schedule_timer   PuTTY's frontend API (putty.h): unsigned long, PuTTY being LP64-clean

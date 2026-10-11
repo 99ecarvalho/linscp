@@ -24,6 +24,10 @@ A changed line must be one of:
               by turning its ";" into ">;"
   tryfinally- a `try`, `__finally` or closing brace rewritten to the
               LINSCP_TRY / LINSCP_FINALLY / LINSCP_END_FINALLY macros
+  long      - in source/core, the type `long` (optionally signed, or with
+              int) written LONG and `unsigned long` ULONG, outside comments
+              and literals; not `long long` or `long double`. Applied before
+              the other rules, so a line may carry it and one other
 
 Exit non-zero on any violation.
 """
@@ -142,6 +146,93 @@ def inline_tryfinally_of(old_line):
     return ''.join(out) if state == 'after' else None
 
 
+def _code_mask(lines):
+    """Per line, the set of columns that are code (not comment or literal)."""
+    masks = []
+    block = False
+    for line in lines:
+        code = set()
+        i = 0
+        while i < len(line):
+            if block:
+                if line[i:i + 2] == '*/':
+                    block = False
+                    i += 2
+                else:
+                    i += 1
+            elif line[i:i + 2] == '//':
+                break
+            elif line[i:i + 2] == '/*':
+                block = True
+                i += 2
+            elif line[i] in '"\'':
+                q = line[i]
+                i += 1
+                while i < len(line) and line[i] != q:
+                    i += 2 if line[i] == '\\' else 1
+                i += 1
+            else:
+                code.add(i)
+                i += 1
+        masks.append(code)
+    return masks
+
+
+_WORD = _re.compile(r'[A-Za-z_]\w*')
+
+
+def _long_keep():
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lp64_long_keep.txt')
+    keep = {}
+    for raw in open(path):
+        fields = raw.split('#', 1)[0].split()
+        if fields:
+            keep.setdefault(fields[0], set()).add(fields[1])
+    return keep
+
+
+_LONG_KEEP = _long_keep()
+
+
+def long_rule(rel_path, lines):
+    """The lines with core's long types respelled, by tokens."""
+    if not rel_path.startswith('source/core/'):
+        return lines
+    keep = _LONG_KEEP.get(rel_path, set())
+    out = []
+    for line, code in zip(lines, _code_mask(lines)):
+        toks = [(m.start(), m.end(), m.group()) for m in _WORD.finditer(line)
+                if m.start() in code]
+        if keep & {t[2] for t in toks}:
+            out.append(line)
+            continue
+        edits = []
+        k = 0
+        while k < len(toks):
+            s0, e0, w = toks[k]
+            first = k
+            if w in ('unsigned', 'signed') and k + 1 < len(toks) and toks[k + 1][2] == 'long':
+                k += 1
+            if toks[k][2] != 'long':
+                k = first + 1
+                continue
+            prev_long = first > 0 and toks[first - 1][2] == 'long'
+            nxt = toks[k + 1][2] if k + 1 < len(toks) else None
+            if prev_long or nxt in ('long', 'double'):
+                k += 1
+                continue
+            end = toks[k][1]
+            if nxt == 'int':
+                end = toks[k + 1][1]
+                k += 1
+            edits.append((toks[first][0], end, 'ULONG' if toks[first][2] == 'unsigned' else 'LONG'))
+            k += 1
+        for a, b, r in reversed(edits):
+            line = line[:a] + r + line[b:]
+        out.append(line)
+    return out
+
+
 def closeoff(old_line):
     """The expected rewrite of a line that merely closed a closure template."""
     k = old_line.rfind(';')
@@ -163,6 +254,7 @@ def _load_patchset():
 def main(gen='build/gen', src='3rd-party/winscp'):
     changed = macros = files = closures = closeoffs = bindings = inlines = slashes = cases = 0
     tryfinallys = 0
+    longs = 0
     patched_lines = 0
     patchset = _load_patchset()
     series = patchset.load_series()
@@ -185,10 +277,15 @@ def main(gen='build/gen', src='3rd-party/winscp'):
             if len(a) != len(b):
                 bad.append(f'{u}: line count {len(a)} -> {len(b)}'); continue
             files += 1
-            for i, (x, y) in enumerate(zip(a, b), 1):
-                if x == y:
+            relaxed = long_rule(rel_for_sites, a)
+            for i, (x0, x, y) in enumerate(zip(a, relaxed, b), 1):
+                if x0 == y:
                     continue
                 changed += 1
+                if x != x0:
+                    longs += 1
+                    if x == y:
+                        continue
                 if '__property' in x:
                     n = len(MINE.findall(y))
                     macros += n
@@ -228,6 +325,7 @@ def main(gen='build/gen', src='3rd-party/winscp'):
     print(f'  include case: {cases}')
     print(f'  patch series: {patched_lines}')
     print(f'  try/finally:  {tryfinallys}')
+    print(f'  long:         {longs}')
     if bad:
         print(f'\nVIOLATIONS ({len(bad)}):')
         for v in bad[:25]:

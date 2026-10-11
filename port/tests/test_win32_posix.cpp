@@ -560,6 +560,29 @@ void TestWideStrings()
   CHECK(wcstol(Number, &End, 10) == -42);
   CHECK(End == Number + 5);
   CHECK(_wtoi(L"221 reply") == 221);
+  CHECK(_wtoi64(L"  12345678901x") == 12345678901LL);
+  CHECK(_wcsicmp(L"MLSD", L"mlsd") == 0);
+  CHECK(_wcsicmp(L"a", L"B") < 0);
+  // SCP's time line, as ScpFileSystem.cpp parses it: %ld is Windows' 32-bit
+  // long, which core's ULONG is.
+  ULONG MTime = 0, ATime = 0;
+  CHECK(swscanf(L"1700000000 0 1700000001 0", L"%ld %*d %ld %*d", &MTime, &ATime) == 2);
+  CHECK((MTime == 1700000000u) && (ATime == 1700000001u));
+  // FileZilla's MLSD dates.
+  int Year = 0, Month = 0, Day = 0;
+  CHECK(swscanf(L"20261011", L"%4d%2d%2d", &Year, &Month, &Day) == 3);
+  CHECK((Year == 2026) && (Month == 10) && (Day == 11));
+#if !defined(_WIN32)
+  // Text conversions would write narrow text into wide buffers: refused.
+  wchar_t Word[8];
+  CHECK(swscanf(L"abc", L"%s", Word) == EOF);
+  // The CRT's original swprintf (no size) and C99-style snwprintf.
+  wchar_t Out[16];
+  CHECK(swprintf(Out, L"%d-%s", 42, L"x") == 4);
+  CHECK(P16(Out) == u"42-x");
+  CHECK(snwprintf(Out, 4, L"%d", 123456) == 6);
+  CHECK(P16(Out) == u"123");
+#endif
 }
 
 void TestFilePointer()
@@ -608,7 +631,7 @@ void TestMemoryRegions()
 void TestUserName()
 {
   wchar_t Name[UNLEN + 1];
-  unsigned long Size = UNLEN + 1;
+  ULONG Size = UNLEN + 1;
   CHECK(GetUserNameEx(NameSamCompatible, Name, &Size) != 0);
   const std::string N = Narrow(P16(Name));
   CHECK(Size == N.size());

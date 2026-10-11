@@ -3,6 +3,8 @@
 #include <cerrno>
 #include <chrono>
 #include <ctime>
+#include <cstdarg>
+#include <cstdio>
 #include <cstdlib>
 #include <locale.h>
 #include <wctype.h>
@@ -276,6 +278,62 @@ long long linscp_WideToInt64(const wchar_t * S)
     Narrow += static_cast<char>(*P);
   }
   return std::strtoll(Narrow.c_str(), nullptr, 10);
+}
+
+int linscp_WideScan(const wchar_t * S, const wchar_t * Format, ...)
+{
+  std::string Input, Narrow;
+  for (const wchar_t * P = S; *P != L'\0'; ++P)
+  {
+    Input += (static_cast<unsigned>(*P) < 0x80) ? static_cast<char>(*P) : '?';
+  }
+  for (const wchar_t * P = Format; *P != L'\0'; ++P)
+  {
+    if (static_cast<unsigned>(*P) >= 0x80)
+    {
+      return EOF;
+    }
+    if ((*P != L'%') || (P[1] == L'%'))
+    {
+      Narrow += static_cast<char>(*P);
+      if (*P == L'%')
+      {
+        Narrow += '%';
+        ++P;
+      }
+      continue;
+    }
+    // A conversion: flags, width and length, then the conversion itself.
+    std::string Spec = "%";
+    ++P;
+    while ((*P == L'*') || ((*P >= L'0') && (*P <= L'9')))
+    {
+      Spec += static_cast<char>(*P++);
+    }
+    std::string Length;
+    while ((*P == L'h') || (*P == L'l') || (*P == L'L') || (*P == L'j') || (*P == L'z') || (*P == L't'))
+    {
+      Length += static_cast<char>(*P++);
+    }
+    const wchar_t Conv = *P;
+    if ((Conv == L's') || (Conv == L'c') || (Conv == L'[') || (Conv == L'S') || (Conv == L'C') || (Conv == L'\0'))
+    {
+      return EOF;
+    }
+    const bool Integer = (Conv == L'd') || (Conv == L'i') || (Conv == L'o') || (Conv == L'u') ||
+                         (Conv == L'x') || (Conv == L'X') || (Conv == L'n');
+    if (Integer && (Length == "l"))
+    {
+      // Windows' long is 32 bits.
+      Length.clear();
+    }
+    Narrow += Spec + Length + static_cast<char>(Conv);
+  }
+  va_list Args;
+  va_start(Args, Format);
+  const int Result = std::vsscanf(Input.c_str(), Narrow.c_str(), Args);
+  va_end(Args);
+  return Result;
 }
 
 int linscp_WideIsAlpha(wchar_t C)

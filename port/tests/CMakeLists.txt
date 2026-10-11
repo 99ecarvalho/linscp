@@ -130,8 +130,6 @@ add_test(NAME sftp_session_build
   COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_sftp_session)
 # Once as negotiated, then pinned to each cipher family: each runs through
 # different PuTTY code (AES-NI or software AES, GCM, ChaCha20-Poly1305).
-# Linux builds the session but does not run it yet: it fails there (P1-17).
-if(WIN32)
 foreach(_case "default;" "aes_ctr;Ciphers aes128-ctr" "aes_gcm;Ciphers aes256-gcm@openssh.com"
               "chacha;Ciphers chacha20-poly1305@openssh.com")
   list(GET _case 0 _name)
@@ -151,7 +149,6 @@ foreach(_case "default;" "aes_ctr;Ciphers aes128-ctr" "aes_gcm;Ciphers aes256-gc
   set_tests_properties(${_test} PROPERTIES
     DEPENDS sftp_session_build SKIP_RETURN_CODE 77 TIMEOUT 180)
 endforeach()
-endif()
 
 
 # PuTTY's crypto primitives against published vectors, on both targets: the
@@ -233,6 +230,21 @@ if(TARGET linscp-putty)
 endif()
 add_test(NAME tryfinally_inline
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_tryfinally_inline.py")
+add_test(NAME lp64_long
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_lp64_long.py")
+# ADR 0001 at link level: nothing linked calls the C library's 4-byte wide
+# functions. POSIX only; Windows' runtime has a 2-byte wchar_t of its own.
+if(NOT WIN32)
+  set(_wide_archives)
+  foreach(_lib linscp-core linscp-putty linscp-puttyvs linscp-filezilla linscp-mfc linscp-libs3
+               linscp-neon linscp-shim linscp-frontend-headless)
+    list(APPEND _wide_archives "$<TARGET_FILE:${_lib}>")
+  endforeach()
+  add_test(NAME wide_imports
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/check_wide_imports.py"
+            "${CMAKE_NM}" ${_wide_archives})
+  set_tests_properties(wide_imports PROPERTIES DEPENDS core_link_build)
+endif()
 add_test(NAME closure_shapes
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_closure_shapes.py")
 add_test(NAME closure_sites

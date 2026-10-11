@@ -1031,14 +1031,16 @@ UnicodeString WideVFormat(const wchar_t * Format, va_list Args)
     {
       case L'd': case L'i':
         if ((Len == lLL) || (Len == lZ)) { Narrow(va_arg(Args, long long), "ll", 'd'); }
-        else if (Len == lL) { Narrow(va_arg(Args, long), "l", 'd'); }
+        // Windows' long is 32 bits: %ld is an int's worth, whatever the
+        // caller's long (one argument slot either way on x86-64).
+        else if (Len == lL) { Narrow(va_arg(Args, int), "", 'd'); }
         else { Narrow(va_arg(Args, int), "", 'd'); }
         break;
       case L'u': case L'x': case L'X': case L'o':
       {
         const char C = static_cast<char>(Conv);
         if ((Len == lLL) || (Len == lZ)) { Narrow(va_arg(Args, unsigned long long), "ll", C); }
-        else if (Len == lL) { Narrow(va_arg(Args, unsigned long), "l", C); }
+        else if (Len == lL) { Narrow(va_arg(Args, unsigned int), "", C); }
         else { Narrow(va_arg(Args, unsigned int), "", C); }
         break;
       }

@@ -9,11 +9,11 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 25 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 27 | 36 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 28 | 36 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **52** | **95** | |
+| **Total** | **53** | **95** | |
 
 ## Next three actions
 
@@ -60,11 +60,18 @@ message queues, timers, `WSAAsyncSelect` and `WSAAsyncGetHostByName` (P1-11,
 P1-12 done). ctest `messages` checks it against user32 and ws2_32 under Wine
 and against the emulation, with the same assertions.
 
-1. **P1-17**: the first SFTP session on Linux. It builds and starts, then
-   fails with heap corruption (`malloc(): corrupted top size`) before
-   connecting; the Linux session tests are registered once it passes.
-2. **P1-15**: the stdio command-line frontend, on both targets.
-3. **P1-06d**: INI storage on Linux, which a usable Linux build needs.
+**SFTP sessions run on Linux** (P1-17 done): the same four loopback-`sshd`
+tests as on Windows -- connect, list, download -- as negotiated and pinned to
+AES-CTR, AES-GCM and ChaCha20-Poly1305. Getting there took two fixes of
+general reach: core's `long` is respelled `LONG`/`ULONG` by the transform, so
+it keeps the 32 bits upstream relies on (TSFTPPacket read every uint32 as 8
+bytes), and nothing linked may call the C library's 4-byte wide functions,
+which ctest `wide_imports` now checks at link level.
+
+1. **P1-15**: the stdio command-line frontend, on both targets.
+2. **P1-06d**: INI storage on Linux, which a usable Linux build needs.
+3. The remaining protocols on Linux -- SCP, FTP/FTPS (FileZilla), WebDAV and
+   S3 (neon, libs3) -- against loopback servers, as SFTP is tested.
 
 ## Decisions taken
 
@@ -196,6 +203,9 @@ and against the emulation, with the same assertions.
 | 2026-10-11 | Direct Winsock calls from C++ reach the `ws2_32` module's functions through overloads on `SOCKET` | FileZilla calls `connect`, `send`, `recv`, `accept`, ... directly with `SOCKET`s and `int` lengths. Overloads on the `SOCKET` argument win over libc's, so those calls get Winsock's semantics; a `void *` buffer, which would match libc's better, is a deleted overload, so no call quietly takes BSD semantics. Functions with libc's exact signature (`socket`, `getaddrinfo`, ...) stay libc's: FileZilla tests only their results |
 | 2026-10-11 | `WSAGetLastError` is `GetLastError` on POSIX | As on Windows. FileZilla sets errors with `WSASetLastError` and reads them with `GetLastError`. The previous separate Winsock error, falling back to `errno`, predated the `ws2_32` module |
 | 2026-10-11 | The `*_build` tests share a ctest resource lock | Each builds this tree; two at once contend for Ninja's lock and fail spuriously under `ctest -j` (seen as flakes of `putty_overrides_build`, `core_init_build`, `sftp_session_build`) |
+| 2026-10-11 | Core's `long` is respelled `LONG` and `unsigned long` `ULONG` by a transform rule (`lp64_long`) | Upstream is written for Windows, where long is 32 bits (Win64 included, so WinSCP's own 64-bit port does not meet this), and depends on it: TSFTPPacket consumed `sizeof(unsigned long)` bytes per SFTP uint32 -- 8 on LP64 -- and sign-extends times through `signed long`. LONG and ULONG are `<windows.h>`'s typedefs of exactly those types, so C++Builder and mingw see no change; the POSIX layer makes them 32 bits, which is upstream's meaning everywhere at once instead of a long tail of per-site patches. Comments, literals, `long long` and `long double` are untouched; core files only. Lines where core implements another library's interface keep `long` (`port/tools/lp64_long_keep.txt`: PuTTY's `schedule_timer`); a missing entry is a conflicting-declaration error, not a silent one. No override is hidden (checked with `-Woverloaded-virtual`) |
+| 2026-10-11 | `%l` in the shim's formatter and in `swscanf` is 32 bits on POSIX | Windows' meaning, and what core's `LONG`/`ULONG` arguments now are. On x86-64 an `int` and a `long` take one argument slot each, so reading 32 bits is also safe for a caller passing a real `long` |
+| 2026-10-11 | Nothing linked may call the C library's wide functions (ctest `wide_imports`, at link level) | ADR 0001's source check covers `port/`; upstream reached glibc's 4-byte functions three ways: PuTTY utilities that include no platform header (`dupwcs.c`), `std::wstring` in FileZilla's tool interface (`char_traits<wchar_t>` calls `wcslen`), and `swscanf` (as glibc's `__isoc23_swscanf`). PuTTY now has the wide redirects forced in (`win32_on_posix_wide.h`), the interface takes `UnicodeString` (`filezilla-tools-unicodestring.patch`), and `swscanf` has a POSIX implementation |
 | 2026-10-10 | `Format` keeps malformed input visible | Delphi raises on a missing argument. Core routes user- and server-supplied text through these into logs, so an unknown specifier is echoed and a missing argument renders as `<missing>` rather than throwing from a log path |
 
 ## Correction: census figures before 2026-10-11 used the wrong configuration
@@ -299,6 +309,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | Windows on POSIX | Message targets only: a procedure, an owning thread, user data. No desktop, painting or `SendMessage`; creation and destruction send `WM_NCCREATE`/`WM_CREATE` and `WM_DESTROY`/`WM_NCDESTROY` only | Nothing headless needs more. `SendMessage` is undeclared, so a use fails to compile |
 | `IsBadWritePtr` on POSIX | Reports only a null block as bad | Windows probes the pages; POSIX has no probe that is not itself a hazard. FileZilla uses it as a sanity check on its own requests |
 | `MessageBox` on POSIX | Caption and text go to standard error; the answer is `IDOK` | No desktop. FileZilla raises one only for "cannot happen" TLS session errors |
+| `swscanf` on POSIX | Numeric conversions only; a format with `%s`, `%c` or `%[` fails (EOF) | Implemented by narrowing to `vsscanf`. Upstream parses only numbers with it (SCP's time line, FileZilla's MLSD dates); text conversions would write narrow text into wide buffers |
 | `SuspendThread` on POSIX | Not declared | A running pthread cannot be suspended. A missing declaration fails at compile time; a stub would fail silently. `CREATE_SUSPENDED` + `ResumeThread` is supported |
 
 ## Open questions
@@ -515,7 +526,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-14 | Drop `puttyvs` | done | the MSVC build is replaced by clang building the same files with the same defines, from `PuTTYVS.vcxproj` |
 | P1-15 | Console IPC → stdio | todo | |
 | P1-16 | Headless `Interface.h` frontend | done | `port/frontend`: all 17 functions plus startup/shutdown; core initialises and finalises under Wine. Linux follows core (P1-07b) |
-| P1-17 | First SFTP session on Linux | wip | Core links and initialises on Linux. The session test builds; it fails with heap corruption before connecting |
+| P1-17 | First SFTP session on Linux | done | Core links on Linux, and the four loopback-`sshd` session tests pass there as on Windows (negotiated, AES-CTR, AES-GCM, ChaCha20-Poly1305). Needed the `lp64_long` transform rule and the link-level wide-function check |
 | P1-18 | Windows cross-build + Wine | wip | Core, cross-built, runs real SFTP sessions under Wine (four cipher configurations); the CLI is P1-15's |
 | P1-19 | Golden suite green, both platforms | todo | **P1 gate** |
 | P1-20 | .NET assembly drives Linux CLI | todo | |

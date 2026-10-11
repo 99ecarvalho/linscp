@@ -55,6 +55,11 @@ if(NOT WIN32)
     -Werror=incompatible-pointer-types -Werror=int-conversion
     -Werror=implicit-function-declaration -Werror=incompatible-function-pointer-types)
   target_compile_definitions(linscp-putty PRIVATE _vsnprintf=vsnprintf)
+  # The runtime's wide functions under 2-byte wchar_t, in every unit: some of
+  # PuTTY's utilities (dupwcs.c, burnwcs.c) include no platform header, and
+  # reached glibc's 4-byte functions.
+  target_compile_options(linscp-putty PRIVATE
+    -include "${CMAKE_SOURCE_DIR}/port/platform/win32_on_posix_wide.h")
 endif()
 
 # PuTTY's performance-critical crypto -- the AES and SHA-256 loops, AES-NI and
@@ -84,6 +89,10 @@ linscp_upstream_defines(linscp-puttyvs PRIVATE ../libs/puttyvs/PuTTYVS.vcxproj)
 target_include_directories(linscp-puttyvs PRIVATE "${_p}")
 set_target_properties(linscp-puttyvs PROPERTIES C_STANDARD 11 C_EXTENSIONS ON)
 target_compile_options(linscp-puttyvs PRIVATE -w)
+if(NOT WIN32)
+  target_compile_options(linscp-puttyvs PRIVATE
+    -include "${CMAKE_SOURCE_DIR}/port/platform/win32_on_posix_wide.h")
+endif()
 # aes-ni.c uses SSE4.1 and AES-NI intrinsics without the per-function target
 # attributes vanilla PuTTY carries -- WinSCP dropped them, as MSVC does not
 # need them. The file is compiled with the ISA enabled instead, as MSVC

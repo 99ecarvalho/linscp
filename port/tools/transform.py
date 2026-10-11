@@ -101,6 +101,62 @@ def code_only_lines(lines):
     return out
 
 
+def masked_lines(lines):
+    """Each line with comments and string/character literals turned to spaces.
+
+    Unlike code_only_lines, every column keeps its position, so a match in the
+    mask is a match at the same place in the line.
+    """
+    out = []
+    in_block = False
+    for line in lines:
+        res = list(line)
+        i, n = 0, len(line)
+        while i < n:
+            if in_block:
+                if line.startswith('*/', i):
+                    in_block = False
+                    res[i] = res[i + 1] = ' '
+                    i += 2
+                else:
+                    res[i] = ' '
+                    i += 1
+                continue
+            if line.startswith('//', i):
+                for j in range(i, n):
+                    res[j] = ' '
+                break
+            if line.startswith('/*', i):
+                in_block = True
+                res[i] = res[i + 1] = ' '
+                i += 2
+                continue
+            c = line[i]
+            if c in '"\'':
+                quote = c
+                j = i + 1
+                while j < n and line[j] != quote:
+                    j += 2 if line[j] == '\\' else 1
+                for k in range(i, min(j + 1, n)):
+                    res[k] = ' '
+                i = j + 1
+                continue
+            i += 1
+        out.append(''.join(res))
+    return out
+
+
+def load_long_keep():
+    """{(file, identifier)} from lp64_long_keep.txt, next to this script."""
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'lp64_long_keep.txt')
+    keep = set()
+    for line in open(path):
+        line = line.split('#', 1)[0].split()
+        if line:
+            keep.add((line[0], line[1]))
+    return keep
+
+
 def strip_comments(text):
     """Remove // and /* */ comments. Deliberately simple: it is used only to
     decide whether a keyword really appears as code, so over-removing inside a
@@ -215,6 +271,7 @@ def inline_try_finally(code_line):
 
 class Transformer:
     def __init__(self, bind_sites=True, src_root=None):
+        self.long_keep = load_long_keep()
         # The pristine tree, so rules can consult the real file names.
         self.src_root = src_root
         self.stats = Counter()
@@ -225,8 +282,10 @@ class Transformer:
         self.closure_sites = load_closure_sites() if bind_sites else {}
 
     def transform_file(self, path, text):
-        methods = set(re.findall(r'\b(\w+)\s*\(', text))
         lines = text.split('\n')
+        self.lp64_long_types(path, lines)
+        text = '\n'.join(lines)
+        methods = set(re.findall(r'\b(\w+)\s*\(', text))
         self.transform_closures(path, lines)
         self.transform_try_finally(path, lines)
         self.bind_closure_sites(path, lines)
@@ -247,6 +306,44 @@ class Transformer:
                 new = None
             out.append(new if new is not None else line)
         return '\n'.join(out)
+
+    LONG_TYPE = re.compile(r'\b(?:(unsigned|signed)\s+)?long\b(?:\s+int\b)?')
+
+    def lp64_long_types(self, path, lines):
+        """In core, `long` becomes `LONG` and `unsigned long` `ULONG`.
+
+        Upstream is written for Windows, where long is 32 bits -- Win64
+        included -- and core relies on it: TSFTPPacket reads and writes
+        sizeof(unsigned long) bytes per SFTP uint32, and sign-extends 32-bit
+        times through `signed long`. On LP64 POSIX long is 64 bits. LONG and
+        ULONG are <windows.h>'s typedefs of long and unsigned long, so under
+        C++Builder and mingw nothing changes; the POSIX layer defines them as
+        32 bits, which is what upstream means. `long long`, `long double`
+        and literal suffixes are left alone, as are comments and strings.
+        """
+        path = path.replace('\\', '/')
+        if not path.startswith('source/core/'):
+            return
+        keep = [ident for f, ident in self.long_keep if f == path]
+        masks = masked_lines(lines)
+        for i, (line, mask) in enumerate(zip(lines, masks)):
+            if 'long' not in mask:
+                continue
+            if any(re.search(r'\b' + re.escape(k) + r'\b', mask) for k in keep):
+                self.stats['lp64_long_kept'] += 1
+                continue
+            pieces = []
+            last = 0
+            for m in self.LONG_TYPE.finditer(mask):
+                if (re.match(r'\s*\b(long|double)\b', mask[m.end():]) or
+                        re.search(r'\blong\s*$', mask[:m.start()])):
+                    continue
+                pieces.append(line[last:m.start()])
+                pieces.append('ULONG' if m.group(1) == 'unsigned' else 'LONG')
+                last = m.end()
+                self.stats['lp64_long'] += 1
+            if pieces:
+                lines[i] = ''.join(pieces) + line[last:]
 
     # A function defined on one line, at namespace scope, in a header.
     HEADER_DEFINITION = re.compile(
