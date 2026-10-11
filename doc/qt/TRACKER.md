@@ -8,21 +8,24 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 15 | 26 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 1 | 22 | Golden suite green, six protocols, both platforms |
+| P0 Foundation | 16 | 27 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P1 Headless core | 2 | 23 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **16** | **73** | |
+| **Total** | **18** | **75** | |
 
 ## Next three actions
 
-1. **P1-01b** — the free string routines, ranked by measured use: `LoadStr`
-   (288), `SameText` (113), `Pos` (89), `CutToChar` (70), `IntToStr` (58),
-   `Trim` (47), `IncludeTrailingBackslash` (39), `ContainsText` (37).
-2. **P1-02** — `TStrings` / `TStringList` (521 uses), the next type by weight.
-3. **P0-13** — the golden-output harness. Still the highest-leverage item for
-   everything after P1.
+Driven by `compile_census.py` rather than by grep counts — the compiler names
+what is actually blocking `Common.cpp`, in dependency order.
+
+1. **P1-03 / `TDateTime`** — 30 of the 70 remaining errors in `Common.cpp`, the
+   single largest blocker.
+2. **P1-02 / `TStrings` + `TStringList`** — 17 more, and 521 uses across core.
+3. **P1-04 / `Exception`**, plus `TCriticalSection`, `TSearchRec`,
+   `TFormatSettings`, `TMethod` and the `DELPHI_PACKAGE` macro: 12 errors
+   between them, all small.
 
 ## Decisions taken
 
@@ -48,6 +51,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | 2026-10-10 | **Accepted (Q-8):** `-fshort-wchar` with `std::u16string` storage; `std::wstring` banned in `port/` | Only option leaving upstream's thousands of `L"..."` literals untouched. Enforced by `check_wide_abi.py` and a `static_assert`. ADR 0001 |
 | 2026-10-10 | `-fshort-wchar` set globally, not per-target | One translation unit without it is an ABI landmine that links cleanly |
 | 2026-10-10 | `UnicodeString` case folding is ASCII-only for now | Delphi's is locale-aware; core uses it on protocol tokens and switch names. Recorded as a known limitation, not silently equivalent |
+| 2026-10-10 | `vcl.h` transitively exposes the Win32 API | Matches C++Builder, which upstream's `CorePCH.h` depends on: it includes `<vcl.h>` and core's headers before `<Winapi.Windows.hpp>`. Fixing this alone removed 9 of 24 missing types |
+| 2026-10-10 | UTF-8 decoding substitutes one U+FFFD per maximal subpart | Unicode's recommended practice. The first implementation emitted one per byte; a test on truncated input caught it |
+| 2026-10-10 | Byte strings keep C++Builder's code-page template shape | Core relies on `RawByteString` and `UTF8String` being distinct types; collapsing them would let byte reinterpretation happen silently |
 
 ## Open questions
 
@@ -98,6 +104,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | `char_traits<wchar_t>` really does call `wmemcmp`/`wcslen`/`wmemchr`; `char_traits<char16_t>` does not | `/usr/include/c++/14/bits/char_traits.h:512,522,534` | 2026-10-10 |
 | `UnicodeString` API scoped from measured use: `IsEmpty` 594, `Length` 444, `c_str` 247, `SubString` 184, `Pos` 86, `Delete` 79 | grep over the generated core | 2026-10-10 |
 | 6/6 tests pass on Linux and on Windows under Wine, including `UnicodeString` | `ctest` both build trees | 2026-10-10 |
+| **A real core TU compiles against the shim with 70 errors from 12 distinct missing VCL types** (was 109 / 24) | `compile_census.py` on `core/Common.cpp`, mingw target | 2026-10-10 |
+| On the mingw target every remaining diagnostic is a VCL gap, not a platform one | Win32 types all resolve via the real mingw headers | 2026-10-10 |
+| 7/7 tests pass on both targets after the byte-string family | `ctest` | 2026-10-10 |
 
 ## Task status
 
@@ -112,7 +121,7 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0-06 | `transform.py` fastcall/closure/ARRAYOFCONST | todo | properties done; these three not started |
 | P0-07 | Transform idempotence tests | done | idempotent + line-count parity asserted |
 | P0-08 | CMake skeleton | done | transform+verify wired as a build step; CTest on both targets |
-| P0-09 | Minimal shim for `core/Common.cpp` | todo | scope now measured by P0-24; blocked on Q-8 |
+| P0-09 | Minimal shim for `core/Common.cpp` | wip | 109 -> 70 errors; 12 distinct types left, all named |
 | P0-10 | mingw-w64 sysroot + clang toolchain file | done | `cmake/toolchain-mingw-w64.cmake`; clang + lld + Wine emulator |
 | P0-11 | CI matrix Linux + Windows cross | todo | |
 | P0-12 | Wine smoke tests in CI | wip | wired into CTest via `CMAKE_CROSSCOMPILING_EMULATOR`; GitHub Actions pending |
@@ -130,12 +139,14 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0-24 | VCL surface census | done | ~45 types; `build/shim_spec.txt` |
 | P0-25 | ADR 0001 character width | done | accepted: `-fshort-wchar` + `std::u16string` |
 | P0-26 | `check_wide_abi.py` ADR enforcement | done | `shim_no_wide_abi` test |
+| P0-27 | `compile_census.py` | done | classifies clang diagnostics into shim gaps |
 
 ### P1 — Headless core
 | ID | Task | Status | Note |
 |---|---|---|---|
 | P1-01 | Shim: `UnicodeString` class | done | 1-based API, UTF-16, 9 test groups incl. surrogate pairs |
-| P1-01b | Shim: free string routines | todo | next; ranked by measured use |
+| P1-01b | Shim: free string routines | todo | ranked by measured use |
+| P1-01c | Shim: byte-string family + UTF-8 codec | done | malformed-input behaviour tested explicitly |
 | P1-02 | Shim: `TObject`/`TList`/`TStrings` | todo | |
 | P1-03 | Shim: `TDateTime`/`SysUtils`/`IOUtils` | todo | |
 | P1-04 | Shim: exceptions | todo | |

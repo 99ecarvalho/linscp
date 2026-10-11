@@ -38,6 +38,7 @@ Goal: prove the keystone works, with no behaviour change anywhere.
 | P0-24 | Measure the VCL surface the core requires (`census.py`) | S | P0-05 | Resolves core identifiers against real mingw/OpenSSL/stdlib headers |
 | P0-25 | ADR 0001: character width for `UnicodeString` | S | P0-24 | Accepted: `-fshort-wchar`, `std::u16string` storage |
 | P0-26 | `check_wide_abi.py`: enforce ADR 0001 mechanically | S | P0-25 | Wrong-ABI code links cleanly then misbehaves, so grep it |
+| P0-27 | `compile_census.py`: classify what a real core TU still needs | S | P0-09 | Lets the compiler enumerate the shim gap instead of grep |
 
 ## P1 — Headless core on both platforms
 
@@ -47,6 +48,7 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 |---|---|---|---|---|
 | P1-01 | Shim: `UnicodeString` class | L | P0-25 | 6,248 uses. Class done; 1-based API from measured usage |
 | P1-01b | Shim: free string routines (`Format`, `LoadStr`, `SameText`, `Pos`, `IntToStr`, …) | L | P1-01 | Measured: `LoadStr` 288, `SameText` 113, `Pos` 89, `CutToChar` 70, `IntToStr` 58 |
+| P1-01c | Shim: `AnsiString` / `UTF8String` / `RawByteString` + UTF-8 codec | M | P1-01 | Distinct code-page types; wire-format correctness lives here |
 | P1-02 | Shim: `TObject`, `TList`, `TStrings`, `TStringList`, `Contnrs` | L | P1-01 | 497 `TStrings` uses |
 | P1-03 | Shim: `TDateTime`, `DateUtils`, `SysUtils`, `IOUtils`, `StrUtils` | L | P1-01 | |
 | P1-04 | Shim: `Exception` hierarchy + Delphi exception semantics | M | P1-01 | Core has no `__try`/`__except` — simplifies this |

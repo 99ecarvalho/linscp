@@ -5,6 +5,7 @@
 # wchar_t and would be an ABI mismatch. Enforced by the shim_no_wide_abi test.
 add_library(linscp-shim STATIC
   vcl_unicodestring.cpp
+  vcl_bytestring.cpp
 )
 target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_features(linscp-shim PUBLIC cxx_std_17)

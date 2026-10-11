@@ -8,11 +8,15 @@ add_executable(test_unicodestring test_unicodestring.cpp)
 target_link_libraries(test_unicodestring PRIVATE linscp-shim)
 add_test(NAME unicodestring COMMAND test_unicodestring)
 
+add_executable(test_bytestring test_bytestring.cpp)
+target_link_libraries(test_bytestring PRIVATE linscp-shim)
+add_test(NAME bytestring COMMAND test_bytestring)
+
 # When cross-compiling, the toolchain points CMAKE_CROSSCOMPILING_EMULATOR at
 # wine; these tell wine where the mingw runtime DLLs live and keep its output
 # off the test log.
 if(LINSCP_WINE_DLLDIR_GCC)
-  set(_wine_tests property_forms unicodestring)
+  set(_wine_tests property_forms unicodestring bytestring)
   # The backslash-escaped ';' is a literal Windows path separator inside the
   # WINEPATH value; the unescaped ';' separates the two environment entries.
   set_tests_properties(${_wine_tests} PROPERTIES ENVIRONMENT
