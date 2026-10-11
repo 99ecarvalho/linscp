@@ -7,3 +7,4 @@ mfc-standard-cxx.patch
 filezilla-64bit-window-userdata.patch
 mfc-winscp-dead-references.patch
 libs3-64bit-body-provider.patch
+putty-aes-ni-vector-constants.patch

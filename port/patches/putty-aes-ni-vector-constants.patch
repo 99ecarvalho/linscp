@@ -1,0 +1,45 @@
+Build PuTTY's AES-NI constants with _mm_setr_epi8 under clang and GCC.
+
+WinSCP replaced _mm_setr_epi8 in aes-ni.c with a macro expanding to a brace
+list, working around an MSVC link problem (its comment explains). That relies
+on MSVC's __m128i, a union whose first member is 16 bytes: sixteen values fill
+it byte by byte. Under clang and GCC __m128i is a vector of two 64-bit lanes,
+so a brace list fills it lane by lane -- only the first two values are used,
+each as a whole lane, and the excess is silently dropped. The counter
+increment (1, 0, ...) happens to come out right; the byte-reversal shuffle
+mask (15, 14, ...) does not, so AES-NI SDCTR produces wrong ciphertext, and an
+SSH session using it fails with "Incoming packet was garbled on decryption"
+(GCM: "Incorrect MAC"). Found by a first real session and confirmed against
+the NIST SP 800-38A vector, which PuTTY's software AES passes.
+
+MSVC keeps WinSCP's macro; clang and GCC, which have no such link problem,
+use the intrinsic it stands in for. Three comment lines are joined to make
+room for the conditional, so line counts are unchanged.
+
+--- a/source/putty/crypto/aes-ni.c	2026-10-11 16:04:55.715647838 -0300
++++ b/source/putty/crypto/aes-ni.c	2026-10-11 16:04:55.735287405 -0300
+@@ -139,17 +139,17 @@
+     }
+ }
+ 
+-// WINSCP
+-// WORKAROUND
++// WINSCP WORKAROUND
+ // Cannot use _mm_setr_epi* - it results in the constant being stored in .rdata segment.
+-// objconv reports:
+-// Warning 1060: Different alignments specified for same segment, %s. Using highest alignment.rdata
+-// Despite that the code crashes.
+-// This macro is based on:
+-// Based on https://stackoverflow.com/q/35268036/850848
++// objconv reports: Warning 1060: Different alignments specified for same segment, %s. Using highest alignment.rdata
++// Despite that the code crashes. This macro is based on: https://stackoverflow.com/q/35268036/850848
++#if !defined(__clang__) && !defined(__GNUC__) // linscp: MSVC's __m128i is a union filled byte by byte
+ #define _MM_SETR_EPI8(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab, ac, ad, ae, af) \
+     { (char)a0, (char)a1, (char)a2, (char)a3, (char)a4, (char)a5, (char)a6, (char)a7, \
+       (char)a8, (char)a9, (char)aa, (char)ab, (char)ac, (char)ad, (char)ae, (char)af }
++#else // linscp: clang's and GCC's is a vector of two 64-bit lanes, which a brace list fills lane by lane
++#define _MM_SETR_EPI8(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab, ac, ad, ae, af) _mm_setr_epi8(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab, ac, ad, ae, af)
++#endif
+ 
+ /*
+  * Auxiliary routine to increment the 128-bit counter used in SDCTR
