@@ -108,6 +108,7 @@ include(cmake/expat.cmake)
 
 add_subdirectory(port/shim)
 add_subdirectory(port/putty)
+add_subdirectory(port/filezilla)
 add_subdirectory(port/core)
 
 include(CTest)

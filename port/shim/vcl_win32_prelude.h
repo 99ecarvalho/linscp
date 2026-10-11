@@ -11,6 +11,11 @@
 #ifndef LINSCP_VCL_WIN32_PRELUDE_H
 #define LINSCP_VCL_WIN32_PRELUDE_H
 #if defined(_WIN32)
+  // No min/max macros from <windows.h>: libstdc++, unlike MSVC's library,
+  // does not survive them.
+  #ifndef NOMINMAX
+    #define NOMINMAX
+  #endif
   #include <winsock2.h>
   #include <windows.h>
   #include "vcl_win32_undef.h"
@@ -20,5 +25,14 @@
   // macros back. The check protects MSVC builds from include-order mistakes,
   // which a forced prelude rules out.
   #undef _WINDOWS_
+
+  // WinSCP's MFC defines `max` as std::max (and min likewise) in its
+  // stdafx.h, and strex.cpp includes <algorithm> after that. Included here
+  // first, its guard makes that later include a no-op -- as it evidently was
+  // under C++Builder -- instead of the macro rewriting libstdc++'s own
+  // declarations.
+  #ifdef __cplusplus
+    #include <algorithm>
+  #endif
 #endif
 #endif

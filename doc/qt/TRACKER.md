@@ -26,20 +26,23 @@ as a real library: `linscp-core`, built by CMake with the cross toolchain.
 Linux: **558 errors, 14/33 clean, 4 aborting.**
 
 **Link check** (`--target linscp-core-link`, every core object forced into
-one executable): **197 undefined symbols on Windows, none of them the VCL
-shim's or PuTTY's.** WinSCP's PuTTY (176 units) and the crypto it builds a
-second time with MSVC (`libs/puttyvs`) both build with clang from the
-submodule. What remains:
+one executable): **243 undefined symbols on Windows, none of them the VCL
+shim's, PuTTY's, FileZilla's or MFC's.** WinSCP's PuTTY (176 units), the
+crypto it builds a second time with MSVC (`libs/puttyvs`), FileZilla's 16
+units and the 13-unit MFC subset all build with clang from the submodule.
+(The count rose from 197 because FileZilla's own OpenSSL calls are now
+linked in.) What remains:
 
 | Missing | Symbols | Task |
 |---|---|---|
-| neon, OpenSSL, libs3 from `libs/` | ~150 | P1-13 |
-| FileZilla | 28 | P1-11 |
+| neon | 104 | P1-13 |
+| OpenSSL | 98 | P1-13 |
+| libs3 | 24 | P1-13 |
 | The frontend half of `Interface.h` (`StartThread`, `ProcessGUI`, ...) | 17 | P1-16 |
 
 1. **P1-13**: neon, libs3 and OpenSSL from the submodule.
-2. **P1-11**: FileZilla's 16 units (`FileZilla.cbproj`), with `UNICODE`.
-3. **P1-16**: the headless frontend, after which core links and can run.
+2. **P1-16**: the headless frontend, after which core links and can run.
+3. **P1-11**: the MFC subset on Linux -- it builds for Windows as is.
 
 ## Decisions taken
 
@@ -138,6 +141,11 @@ submodule. What remains:
 | 2026-10-10 | `port/platform` headers refuse to compile on Windows, and are POSIX-only on the include path | Putting them on a Windows target shadowed the genuine mingw headers, which presented as a 1,220 -> 783 "improvement". The `#error` makes that mistake loud |
 | 2026-10-10 | `port/compat` is separate from `port/platform` | `help.h` is missing from upstream itself rather than being a platform difference, so it is needed on every target |
 | 2026-10-10 | The ratchet records whether a unit aborted | An aborted parse reports a floor. Treating that as a distinct state stops a new abort from reading as sudden progress |
+| 2026-10-11 | WinSCP's MFC subset is built as is for Windows, as `libuafxcw.a` | `FileZillaIntf.cpp` links it by name with `#pragma comment(lib, "uafxcw.lib")`, meaning the subset `borland.mak` builds under that name; same name, on the link path, resolves the request to exactly that library. Replacing it is a Linux concern (P1-11) |
+| 2026-10-11 | MFC and FileZilla get a forced prelude (`vcl_win32_prelude.h`) with `NOMINMAX` and `<algorithm>` pre-included | WinSCP's MFC `stdafx.h` defines `min`/`max` as macros before a later `<algorithm>`; libstdc++, unlike MSVC's library, does not survive that. Included first, the later include is a no-op |
+| 2026-10-11 | `_AFX_NO_DAO_SUPPORT` for the MFC subset | DAO is 32-bit only; Microsoft's MFC turns it off for every non-x86 target, in the `afxv_cpu.h` WinSCP does not vendor |
+| 2026-10-11 | Dead MFC functions join upstream's `#ifndef WINSCP` exclusions (`mfc-winscp-dead-references.patch`) | `CObject::IsKindOf` and timecore's `CArchive` operators call code upstream never builds; nothing uses them. C++Builder's linker tolerated it, lld does not |
+| 2026-10-11 | Generated files are declared byproducts of the transform, which writes only what changed | Ninja otherwise stats them before the transform runs: a new patch reached `build/gen` but not the objects built from it. Unchanged files keep their mtimes, so a patch rebuilds only what it touches |
 | 2026-10-10 | `Format` keeps malformed input visible | Delphi raises on a missing argument. Core routes user- and server-supplied text through these into logs, so an unknown specifier is echoed and a missing argument renders as `<missing>` rather than throwing from a log path |
 
 ## Correction: census figures before 2026-10-11 used the wrong configuration
@@ -235,6 +243,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 
 | Fact | Evidence | Date |
 |---|---|---|
+| Upstream FileZilla truncates a pointer on x86-64 | `CAsyncSocketEx` stores `this` with `SetWindowLongPtr(hWnd, GWL_USERDATA, (LONG)this)`; fixed by `filezilla-64bit-window-userdata.patch` | 2026-10-11 |
+| lld reports undefined references in every object it pulls in, even from functions `--gc-sections` would drop | Local test: an unreferenced function calling an undefined symbol fails the link with and without `-ffunction-sections` | 2026-10-11 |
 | Upstream WinSCP is built for 32-bit Windows only | `PuTTYVS.vcxproj` has only `Win32` configurations, and PuTTY's option defaults cast string addresses to `int`, which only fits in 32 bits | 2026-10-11 |
 | clang accepts `static __declspec(property(...))` syntactically but treats it as an ordinary static data member | `-fsyntax-only` passes; linking fails with an undefined reference to the "property" on both targets | 2026-10-11 |
 | clang 19 supports `__declspec(property)` on Linux under `-fms-extensions` | Local test: field r/o, field r/w, method+validating setter, read-modify-write, indexed — all pass | 2026-10-10 |
@@ -405,7 +415,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-08 | Socket-event emulation | todo | R6 |
 | P1-09 | PuTTY unix backend re-import | todo | |
 | P1-10 | PuTTY delta reconciliation | todo | |
-| P1-11 | FileZilla MFC subset replacement | todo | |
+| P1-11 | FileZilla MFC subset replacement | wip | FileZilla and the MFC subset build and link for Windows from the submodule (three patches); Linux replacement next |
 | P1-12 | FileZilla epoll rewrite | todo | **R2** — budget generously |
 | P1-13 | System libs | wip | PuTTY and its MSVC-built crypto build for Windows from the submodule; neon, OpenSSL, libs3 next |
 | P1-14 | Drop `puttyvs` | done | the MSVC build is replaced by clang building the same files with the same defines, from `PuTTYVS.vcxproj` |

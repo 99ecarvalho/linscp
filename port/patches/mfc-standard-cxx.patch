@@ -1,0 +1,61 @@
+Let WinSCP's MFC subset compile as standard C++.
+
+Three things MSVC 6 and C++Builder accept that a conforming compiler does not:
+
+- afxtempl.h's CTypedPtrList specialisations for CObList and CPtrList need
+  afxcoll.h, which WinSCP does not vendor. WinSCP already excludes them for
+  C++Builder; compile them only where afxcoll.h has been included.
+- CTypedPtrMap names BASE_CLASS's nested types without `typename`.
+- AfxGetRoot uses a for-loop variable after the loop, MSVC 6's scoping rule.
+  The declaration moves before the loop, on the same line.
+
+All are valid under MSVC and C++Builder too. Line counts are unchanged.
+
+--- a/libs/mfc/include/afxtempl.h	2026-10-11 13:29:13.280368523 -0300
++++ b/libs/mfc/include/afxtempl.h	2026-10-11 13:29:13.314673223 -0300
+@@ -1627,7 +1627,7 @@
+ 		{ BASE_CLASS::AddTail(pNewList); }
+ };
+ 
+-#ifndef __BORLANDC__ // Illegal use of undefined symbol "TYPE" in specialization
++#if !defined(__BORLANDC__) && defined(__AFXCOLL_H__) // Illegal use of undefined symbol "TYPE" in specialization; needs afxcoll.h
+ // need specialized version for CObList because of AddHead/Tail ambiguity
+ template<> class CTypedPtrList<CObList, CObList*>
+ 	: public _CTypedPtrList<CObList, CObList*>
+@@ -1687,11 +1687,11 @@
+ 		: BASE_CLASS(nBlockSize) { }
+ 
+ 	// Lookup
+-	BOOL Lookup(BASE_CLASS::BASE_ARG_KEY key, VALUE& rValue) const
+-		{ return BASE_CLASS::Lookup(key, (BASE_CLASS::BASE_VALUE&)rValue); }
++	BOOL Lookup(typename BASE_CLASS::BASE_ARG_KEY key, VALUE& rValue) const
++		{ return BASE_CLASS::Lookup(key, (typename BASE_CLASS::BASE_VALUE&)rValue); }
+ 
+ 	// Lookup and add if not there
+-	VALUE& operator[](BASE_CLASS::BASE_ARG_KEY key)
++	VALUE& operator[](typename BASE_CLASS::BASE_ARG_KEY key)
+ 		{ return (VALUE&)BASE_CLASS::operator[](key); }
+ 
+ 	// add a new key (key, value) pair
+@@ -1704,8 +1704,8 @@
+ 
+ 	// iteration
+ 	void GetNextAssoc(POSITION& rPosition, KEY& rKey, VALUE& rValue) const
+-		{ BASE_CLASS::GetNextAssoc(rPosition, (BASE_CLASS::BASE_KEY&)rKey,
+-			(BASE_CLASS::BASE_VALUE&)rValue); }
++		{ BASE_CLASS::GetNextAssoc(rPosition, (typename BASE_CLASS::BASE_KEY&)rKey,
++			(typename BASE_CLASS::BASE_VALUE&)rValue); }
+ };
+ 
+ /////////////////////////////////////////////////////////////////////////////
+--- a/libs/mfc/source/filecore.cpp	2026-10-11 13:29:13.295489238 -0300
++++ b/libs/mfc/source/filecore.cpp	2026-10-11 13:29:13.314722541 -0300
+@@ -584,7 +584,7 @@
+ 	LPTSTR lpszRoot = strRoot.GetBuffer(_MAX_PATH);
+ 	memset(lpszRoot, 0, _MAX_PATH);
+ 	lstrcpyn(lpszRoot, lpszPath, _MAX_PATH);
+-	for (LPTSTR lpsz = lpszRoot; *lpsz != '\0'; lpsz = _tcsinc(lpsz))
++	LPTSTR lpsz; for (lpsz = lpszRoot; *lpsz != '\0'; lpsz = _tcsinc(lpsz))
+ 	{
+ 		// find first double slash and stop
+ 		if (IsDirSep(lpsz[0]) && IsDirSep(lpsz[1]))

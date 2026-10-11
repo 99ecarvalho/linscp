@@ -60,3 +60,6 @@ target_link_libraries(linscp-core-link PRIVATE
 if(TARGET linscp-putty)
   target_link_libraries(linscp-core-link PRIVATE linscp-putty linscp-puttyvs)
 endif()
+if(TARGET linscp-filezilla)
+  target_link_libraries(linscp-core-link PRIVATE linscp-filezilla)
+endif()

@@ -223,6 +223,17 @@ void TestCrossCodePageConversions()
   CHECK(R2.IsEmpty());
 }
 
+void TestTrim()
+{
+  // FtpListResult.cpp trims listing lines this way.
+  const RawByteString Line(" \t-rw-r--r-- 1 u g 0 file\r\n");
+  CHECK(Line.TrimRight() == RawByteString(" \t-rw-r--r-- 1 u g 0 file"));
+  CHECK(Line.TrimLeft() == RawByteString("-rw-r--r-- 1 u g 0 file\r\n"));
+  CHECK(Line.Trim() == RawByteString("-rw-r--r-- 1 u g 0 file"));
+  CHECK(RawByteString("   ").Trim().IsEmpty());
+  CHECK(RawByteString("caf\xC3\xA9 ").TrimRight() == RawByteString("caf\xC3\xA9"));  // high bytes kept
+}
+
 }  // namespace
 
 int main()
@@ -239,6 +250,8 @@ int main()
   TestWritableCStrAndCharAssignment();
 
   TestCrossCodePageConversions();
+
+  TestTrim();
 
   if (Failures == 0)
   {

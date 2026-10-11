@@ -104,6 +104,20 @@ public:
 
   AnsiStringT SubString(int Index, int Count) const;
   AnsiStringT SubString(int Index) const { return SubString(Index, Length() - Index + 1); }
+  // Delphi's: strip every character up to and including ' ' from the ends.
+  AnsiStringT TrimLeft() const
+  {
+    std::size_t B = 0;
+    while ((B < FData.size()) && (static_cast<unsigned char>(FData[B]) <= ' ')) { ++B; }
+    AnsiStringT R; R.FData = FData.substr(B); return R;
+  }
+  AnsiStringT TrimRight() const
+  {
+    std::size_t E = FData.size();
+    while ((E > 0) && (static_cast<unsigned char>(FData[E - 1]) <= ' ')) { --E; }
+    AnsiStringT R; R.FData = FData.substr(0, E); return R;
+  }
+  AnsiStringT Trim() const { return TrimLeft().TrimRight(); }
   int Pos(const AnsiStringT & Substr) const;
   int Pos(char C) const;
   void Delete(int Index, int Count);

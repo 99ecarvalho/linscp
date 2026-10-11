@@ -3,3 +3,6 @@
 putty-64bit-conf-defaults.patch
 mfc-x86-64.patch
 filezilla-ws2tcpip-case.patch
+mfc-standard-cxx.patch
+filezilla-64bit-window-userdata.patch
+mfc-winscp-dead-references.patch
