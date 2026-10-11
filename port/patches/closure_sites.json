@@ -200,6 +200,198 @@
     },
     {
       "file": "source/core/Script.cpp",
+      "line": 351,
+      "column": 69,
+      "identifier": "HelpProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 352,
+      "column": 53,
+      "identifier": "HelpProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 354,
+      "column": 71,
+      "identifier": "CallProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 355,
+      "column": 52,
+      "identifier": "CallProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 356,
+      "column": 66,
+      "identifier": "PwdProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 357,
+      "column": 63,
+      "identifier": "CdProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 358,
+      "column": 64,
+      "identifier": "LsProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 359,
+      "column": 52,
+      "identifier": "LsProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 360,
+      "column": 64,
+      "identifier": "RmProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 361,
+      "column": 72,
+      "identifier": "RmDirProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 362,
+      "column": 64,
+      "identifier": "MvProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 363,
+      "column": 55,
+      "identifier": "MvProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 364,
+      "column": 63,
+      "identifier": "CpProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 365,
+      "column": 73,
+      "identifier": "ChModProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 366,
+      "column": 63,
+      "identifier": "LnProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 367,
+      "column": 55,
+      "identifier": "LnProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 368,
+      "column": 72,
+      "identifier": "MkDirProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 369,
+      "column": 67,
+      "identifier": "GetProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 370,
+      "column": 54,
+      "identifier": "GetProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 371,
+      "column": 54,
+      "identifier": "GetProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 372,
+      "column": 67,
+      "identifier": "PutProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 373,
+      "column": 54,
+      "identifier": "PutProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 374,
+      "column": 54,
+      "identifier": "PutProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 375,
+      "column": 76,
+      "identifier": "OptionProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 376,
+      "column": 58,
+      "identifier": "AsciiProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 377,
+      "column": 59,
+      "identifier": "BinaryProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 378,
+      "column": 91,
+      "identifier": "SynchronizeProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 379,
+      "column": 94,
+      "identifier": "KeepUpToDateProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 381,
+      "column": 69,
+      "identifier": "EchoProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 382,
+      "column": 69,
+      "identifier": "StatProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 383,
+      "column": 81,
+      "identifier": "ChecksumProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 384,
+      "column": 46,
+      "identifier": "CopyIdProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
       "line": 517,
       "column": 36,
       "identifier": "LogOption"
@@ -221,6 +413,54 @@
       "line": 2224,
       "column": 36,
       "identifier": "TerminalSynchronizeDirectory"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 2226,
+      "column": 74,
+      "identifier": "ExitProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 2227,
+      "column": 53,
+      "identifier": "ExitProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 2228,
+      "column": 71,
+      "identifier": "OpenProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 2229,
+      "column": 72,
+      "identifier": "CloseProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 2230,
+      "column": 78,
+      "identifier": "SessionProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 2231,
+      "column": 69,
+      "identifier": "LPwdProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 2232,
+      "column": 66,
+      "identifier": "LCdProc"
+    },
+    {
+      "file": "source/core/Script.cpp",
+      "line": 2233,
+      "column": 67,
+      "identifier": "LLsProc"
     },
     {
       "file": "source/core/Script.cpp",
@@ -263,6 +503,18 @@
       "line": 1935,
       "column": 49,
       "identifier": "PoolForData"
+    },
+    {
+      "file": "source/core/SecureShell.cpp",
+      "line": 2643,
+      "column": 48,
+      "identifier": "Copy"
+    },
+    {
+      "file": "source/core/SecureShell.cpp",
+      "line": 2649,
+      "column": 48,
+      "identifier": "Paste"
     },
     {
       "file": "source/core/SessionInfo.cpp",
@@ -314,6 +566,18 @@
     },
     {
       "file": "source/core/SftpFileSystem.cpp",
+      "line": 4168,
+      "column": 53,
+      "identifier": "DoProgress"
+    },
+    {
+      "file": "source/core/SftpFileSystem.cpp",
+      "line": 4168,
+      "column": 77,
+      "identifier": "DoFinished"
+    },
+    {
+      "file": "source/core/SftpFileSystem.cpp",
       "line": 4789,
       "column": 32,
       "identifier": "SFTPOpenRemote"
@@ -323,6 +587,18 @@
       "line": 3871,
       "column": 34,
       "identifier": "DeleteFile"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 4084,
+      "column": 42,
+      "identifier": "DoProgress"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 4084,
+      "column": 55,
+      "identifier": "DoFinished"
     },
     {
       "file": "source/core/Terminal.cpp",
@@ -362,6 +638,18 @@
     },
     {
       "file": "source/core/Terminal.cpp",
+      "line": 4823,
+      "column": 40,
+      "identifier": "DoProgress"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 4823,
+      "column": 53,
+      "identifier": "DoFinished"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
       "line": 5069,
       "column": 51,
       "identifier": "MoveFile"
@@ -389,6 +677,18 @@
       "line": 5839,
       "column": 45,
       "identifier": "CalculateLocalFileSize"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 5863,
+      "column": 49,
+      "identifier": "DoProgress"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 5863,
+      "column": 62,
+      "identifier": "DoFinished"
     },
     {
       "file": "source/core/Terminal.cpp",
@@ -434,9 +734,39 @@
     },
     {
       "file": "source/core/Terminal.cpp",
+      "line": 7424,
+      "column": 51,
+      "identifier": "DoProgress"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 7424,
+      "column": 64,
+      "identifier": "DoFinished"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 7960,
+      "column": 51,
+      "identifier": "DoProgress"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 7960,
+      "column": 64,
+      "identifier": "DoFinished"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
       "line": 8284,
       "column": 36,
       "identifier": "SinkFile"
+    },
+    {
+      "file": "source/core/Terminal.cpp",
+      "line": 8587,
+      "column": 43,
+      "identifier": "Copy"
     },
     {
       "file": "source/core/WebDAVFileSystem.cpp",

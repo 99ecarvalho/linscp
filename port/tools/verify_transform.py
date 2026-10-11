@@ -10,8 +10,10 @@ Asserts the invariants the whole upstream-tracking model depends on:
 A changed line must be one of:
   property  - contained __property, now emits exactly one PROP_* macro
   closure   - contained __closure, now declares a TClosure alias
-  binding   - a bare member-function name wrapped in CLOSURE(), recorded in
-              port/patches/closure_sites.json
+  binding   - a Borland implicit closure at a position recorded in
+              port/patches/closure_sites.json, as CLOSURE(Name) or
+              CLOSURE_OF(obj, Name). Recomputed here with a regex, not with
+              transform.py's own scanner, so the two must agree
   closeoff  - the line where a multi-line closure typedef ended, changed only
               by turning its ";" into ">;"
   tryfinally- a `try`, `__finally` or closing brace rewritten to the
@@ -58,8 +60,24 @@ def binding_of(rel_path, lineno, old_line):
         start = col - 1
         if out[start:start + len(ident)] != ident:
             return None
-        out = out[:start] + 'CLOSURE(' + ident + ')' + out[start + len(ident):]
+        # What precedes the name: an optional & (not &&), then an optional
+        # `obj.` or `obj->`. The earliest position the pattern can start from
+        # is the start of the whole expression.
+        m = _BINDING_LEFT.search(out[:start])
+        begin = m.start()
+        obj, op = m.group('obj'), m.group('op')
+        if obj is None:
+            new = f'CLOSURE({ident})'
+        elif op == '->':
+            new = f'CLOSURE_OF({obj}, {ident})'
+        else:
+            new = f'CLOSURE_OF(&{obj}, {ident})'
+        out = out[:begin] + new + out[start + len(ident):]
     return out
+
+
+_BINDING_LEFT = _re.compile(
+    r'(?:(?<!&)&\s*)?(?:(?P<obj>[A-Za-z_]\w*)\s*(?P<op>\.|->)\s*)?$')
 
 
 def tryfinally_of(old_line):

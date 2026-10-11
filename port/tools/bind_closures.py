@@ -44,9 +44,15 @@ def _upstream_defines():
     return module
 
 SITES = 'port/patches/closure_sites.json'
+# Borland's implicit closure, in each shape clang reports differently: a bare
+# method name, and its address taken with & (unqualified, or of another
+# object's method). All three are recorded the same way -- the column of the
+# method name -- and transform.py works out the shape from the source.
 DIAG = re.compile(
     r'^(?P<file>[^:]+):(?P<line>\d+):(?P<col>\d+): error: '
-    r'reference to non-static member function must be called')
+    r'(reference to non-static member function must be called'
+    r'|must explicitly qualify name of member function when taking its address'
+    r'|cannot create a non-constant pointer to member function)')
 # When the offending token sits inside a macro body, clang reports the error at
 # the *expansion* point and then points at the definition with one of these per
 # level of nesting. The identifier we must wrap lives in the definition, not at
@@ -117,14 +123,33 @@ def discover(gen):
             chosen = None
             for path, lineno, col in chain:
                 rel = os.path.relpath(path, gen)
-                ident = identifier_at(gen, rel, lineno, col)
-                if ident is not None and ident not in macros:
-                    chosen = (rel, lineno, col)
+                found_at = method_name_at(gen, rel, lineno, col)
+                if found_at is not None and found_at[1] not in macros:
+                    chosen = (rel, lineno, found_at[0])
                     break
             if chosen is not None:
                 found[chosen] = None
             i = j
     return sorted(found)
+
+
+def method_name_at(gen, path, lineno, col):
+    """(column, name) of the method a diagnostic refers to. The & forms are
+    reported at the &, and of an object's method at the start of the chain,
+    so skip the & and take the last name of `a.b` or `a->b`."""
+    full = os.path.join(gen, path)
+    if not os.path.exists(full):
+        return None
+    lines = open(full, newline='', encoding='utf-8',
+                 errors='surrogateescape').read().split('\n')
+    if lineno < 1 or lineno > len(lines):
+        return None
+    m = re.compile(r'&?\s*([A-Za-z_]\w*)(?:\s*(?:\.|->)\s*([A-Za-z_]\w*))?').match(
+        lines[lineno - 1], col - 1)
+    if not m:
+        return None
+    group = 2 if m.group(2) else 1
+    return m.start(group) + 1, m.group(group)
 
 
 def identifier_at(gen, path, lineno, col):
@@ -141,6 +166,12 @@ def identifier_at(gen, path, lineno, col):
         return None
     m = IDENT.match(text[col - 1:])
     return m.group(0) if m else None
+
+
+def text_at(gen, site):
+    full = os.path.join(gen, site['file'])
+    return open(full, newline='', encoding='utf-8',
+                errors='surrogateescape').read().split('\n')[site['line'] - 1]
 
 
 def main():
@@ -208,6 +239,11 @@ def main():
             if text[s['column'] - 1:].startswith(f"CLOSURE({s['identifier']})"):
                 applied += 1
                 continue
+        # The & and object forms rewrite from a column left of the name.
+        if re.search(rf"CLOSURE\({s['identifier']}\)|CLOSURE_OF\([\w&>-]+, "
+                     rf"{s['identifier']}\)", text_at(a.gen, s)):
+            applied += 1
+            continue
         bad.append(f"{s['file']}:{s['line']}:{s['column']}: expected "
                    f"{s['identifier']!r}, found {ident!r}")
     print(f'recorded sites: {len(sites)}  ({applied} already bound)')

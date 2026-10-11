@@ -22,13 +22,13 @@ what is actually blocking each unit, in dependency order.
 
 **Eight of ten tracked units compile cleanly for Windows, seven for Linux**,
 nothing aborting on either, measured in upstream's own preprocessor
-configuration. Census: **146 errors on mingw, 290 on Linux.**
+configuration. Census: **128 errors on mingw, 272 on Linux.**
 
 | Unit | mingw | Linux |
 |---|---|---|
 | `Bookmarks`, `CopyParam`, `FileBuffer`, `FileMasks`, `NamedObjs`, `Option`, `Queue` | 0 | 0 |
 | `Configuration.cpp` | **0** | 67 |
-| `Terminal.cpp` | 46 | 70 |
+| `Terminal.cpp` | 28 | 52 |
 | `Common.cpp` | 100 | 153 |
 
 `Configuration.cpp`'s 67 Linux errors are not shim work in the usual sense:
@@ -38,7 +38,7 @@ layer. The rest are Win32 shell-folder and message constants.
 
 1. **P1-09**: PuTTY's Unix platform layer. It removes the bulk of the Linux
    excess in every unit that includes `PuttyIntf.h`.
-2. `Terminal.cpp` (46 / 70).
+2. `Terminal.cpp` (28 / 52).
 3. `Common.cpp` (100 / 153).
 
 ## Decisions taken
@@ -66,6 +66,7 @@ layer. The rest are Win32 shell-folder and message constants.
 | 2026-10-11 | Core is compiled with upstream's own preprocessor configuration, read from `ScpCore.cbproj` by `port/tools/upstream_defines.py` | Copying the list would drift. Applied by the census, closure discovery and CMake alike, shim included, because `UNICODE` decides which Win32 A/W function every macro names. Windows-only names are dropped on POSIX; `_CRTIMP=` is dropped everywhere, as C++Builder's CRT linkage |
 | 2026-10-11 | Census and discovery build the Debug configuration | Its `DebugAssert` expressions are code that must compile too; Release compiles them out, which hid ten closure comparisons |
 | 2026-10-11 | `port/compat` withdrawn; supersedes the 2026-10-10 decision creating it | `help.h` was compensating for the missing `WINSCP` define, not a gap in upstream: with `WINSCP` set, PuTTY's `platform.h` never includes it |
+| 2026-10-11 | Closure binding covers Borland's four shapes: `Name`, `&Name`, `obj.Name` / `&obj.Name`, `p->Name` / `&p->Name` | Recorded as the method name's column; the transform recovers the shape from the text and refuses longer chains or a call as the object. The verifier recomputes the rewrite with an independent regex, so a bug in either is caught by the other. The old binder had been emitting `obj.CLOSURE(Name)`, invalid C++, in two units nothing yet compiled |
 | 2026-10-10 | A PR-able branch against `winscp/winscp` will be **generated**, not hand-maintained | linscp shares no history with upstream, so its `qt` branch is not directly mergeable. Since the port is mechanical, the fork branch can be produced on demand (Q-7). Rehearsed end to end — see facts below |
 | 2026-10-10 | Transform must be byte-exact outside property lines | A full-file rewrite (CRLF loss) turned a 613-line change into 76,551. Now asserted by `verify_transform.py` |
 | 2026-10-10 | Field/accessor classification is convention-first, parens only as fallback | The parens heuristic false-positives on constructor initialiser lists; WinSCP's `F<Upper>` / `Get*`/`Set*` convention is airtight. Truly unclassifiable names now fail the run instead of producing a wrong-arity macro |

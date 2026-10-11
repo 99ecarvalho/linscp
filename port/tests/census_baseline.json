@@ -48,7 +48,7 @@
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 70,
+        "errors": 52,
         "missing_types": 4
       }
     },
@@ -100,7 +100,7 @@
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 46,
+        "errors": 28,
         "missing_types": 1
       }
     }

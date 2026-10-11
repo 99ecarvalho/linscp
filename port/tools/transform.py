@@ -88,6 +88,56 @@ class Ambiguous(Exception):
         self.name = name
 
 
+_IDENT_CHAR = re.compile(r'[A-Za-z0-9_]')
+
+
+def closure_expression(text, start, ident):
+    """(begin, end, replacement) for the closure whose method name starts at
+    `start`, or None when the shape is not one Borland's binding takes."""
+    end = start + len(ident)
+
+    def skip_space_left(k):
+        while k >= 0 and text[k] in ' \t':
+            k -= 1
+        return k
+
+    k = skip_space_left(start - 1)
+    obj, arrow, begin = None, False, start
+    if k >= 0 and text[k] == '.':
+        k -= 1
+    elif k >= 1 and text[k - 1:k + 1] == '->':
+        arrow = True
+        k -= 2
+    else:
+        k = None
+    if k is not None:
+        k = skip_space_left(k)
+        stop = k + 1
+        while k >= 0 and _IDENT_CHAR.match(text[k]):
+            k -= 1
+        if k + 1 == stop:
+            return None                 # a call, subscript or cast as the object
+        obj = text[k + 1:stop]
+        before = skip_space_left(k)
+        if before >= 0 and (text[before] == '.' or
+                            (before >= 1 and text[before - 1:before + 1] == '->')):
+            return None                 # a longer chain
+        begin = k + 1
+
+    # Address-of, but not logical and.
+    k = skip_space_left(begin - 1)
+    if k >= 0 and text[k] == '&' and not (k >= 1 and text[k - 1] == '&'):
+        begin = k
+
+    if obj is None:
+        replacement = f'CLOSURE({ident})'
+    elif arrow:
+        replacement = f'CLOSURE_OF({obj}, {ident})'
+    else:
+        replacement = f'CLOSURE_OF(&{obj}, {ident})'
+    return begin, end, replacement
+
+
 class Transformer:
     def __init__(self, bind_sites=True):
         self.stats = Counter()
@@ -118,11 +168,22 @@ class Transformer:
         return '\n'.join(out)
 
     def bind_closure_sites(self, path, lines):
-        """Wrap bare member-function names in CLOSURE(), preserving lines."""
+        """Rewrite Borland's implicit closures as explicit bindings.
+
+        Each recorded site is the column of a method name. Borland accepts it
+        in four shapes, recognised from the text around it:
+
+            Name     &Name      ->  CLOSURE(Name)
+            obj.Name &obj.Name  ->  CLOSURE_OF(&obj, Name)
+            p->Name  &p->Name   ->  CLOSURE_OF(p, Name)
+
+        Anything else -- a longer chain, a call or subscript as the object --
+        fails the run rather than being guessed at. Lines are preserved.
+        """
         sites = self.closure_sites.get(path.replace(os.sep, '/'))
         if not sites:
             return
-        # Right to left within each line, so wrapping one site does not shift
+        # Right to left within each line, so rewriting one site does not shift
         # the recorded column of another on the same line.
         for lineno, col, ident in sorted(sites, key=lambda s: (-s[0], -s[1])):
             if lineno < 1 or lineno > len(lines):
@@ -139,8 +200,15 @@ class Transformer:
                     (path, lineno,
                      f'site no longer holds {ident!r}: {text.strip()[:60]}'))
                 continue
-            lines[lineno - 1] = (text[:start] + 'CLOSURE(' + ident + ')' +
-                                 text[start + len(ident):])
+            bound = closure_expression(text, start, ident)
+            if bound is None:
+                self.stats['closure_site_unparsed'] += 1
+                self.unhandled.append(
+                    (path, lineno,
+                     f'closure shape not recognised for {ident!r}: {text.strip()[:60]}'))
+                continue
+            begin, end, replacement = bound
+            lines[lineno - 1] = text[:begin] + replacement + text[end:]
             self.stats['closure_bound'] += 1
 
     def transform_try_finally(self, path, lines):
