@@ -84,6 +84,22 @@ public:
 };
 
 //---------------------------------------------------------------------------
+// System.IOUtils.TFile, the two members core uses.
+//---------------------------------------------------------------------------
+class TFile
+{
+public:
+  // Decodes by byte-order mark (UTF-8, UTF-16 LE or BE). Without one, UTF-8 --
+  // Delphi uses TEncoding.Default there, which is ANSI on Windows; see the
+  // divergence table in doc/qt/TRACKER.md. Raises EFileNotFoundException for
+  // a missing file, as Delphi does.
+  static UnicodeString ReadAllText(const UnicodeString & Path);
+  // UTF-8 without a byte-order mark, as Delphi's one-argument overload writes.
+  // A BOM would break the one file core writes this way: authorized_keys.
+  static void WriteAllText(const UnicodeString & Path, const UnicodeString & Contents);
+};
+
+//---------------------------------------------------------------------------
 // System.TimeSpan, a duration. Core uses it to report elapsed times.
 //---------------------------------------------------------------------------
 class TTimeSpan

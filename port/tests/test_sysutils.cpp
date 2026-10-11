@@ -3,6 +3,8 @@
 // This is the first shim code with two genuinely different implementations
 // (Win32 FindFirstFileW, and dirent + fnmatch on POSIX), so the tests assert
 // behaviour rather than implementation and run on both targets.
+#include "vcl_streams.h"
+#include "vcl_misc.h"
 #include "vcl_sysutils.h"
 #include "vcl_strutils.h"
 
@@ -257,6 +259,61 @@ void TestDelphiCommandLineSplitting()
   CHECK(Split(L"", {}));
 }
 
+void TestFindDataAndAttributes()
+{
+  const UnicodeString Dir = IncludeTrailingBackslash(TPath::GetTempPath()) +
+                            L"linscp_attr_test";
+  const UnicodeString Deep = Dir + L"\\a\\b";
+  const UnicodeString DeepPosix = Dir + L"/a/b";
+#if defined(_WIN32)
+  const UnicodeString Target = Deep;
+#else
+  const UnicodeString Target = DeepPosix;
+#endif
+  CHECK(ForceDirectories(Target));
+  CHECK(DirectoryExists(Target));
+  CHECK(ForceDirectories(Target));           // already there: still true
+
+  const UnicodeString File = IncludeTrailingBackslash(Target) + L"f.txt";
+  {
+    TFileStream S(File, fmCreate);
+    S.WriteBuffer("abc", 3);
+  }
+
+  // FindData is populated, and agrees with the decoded TimeStamp.
+  TSearchRec F;
+  CHECK(FindFirst(File, faAnyFile, F) == 0);
+  CHECK(F.FindData.nFileSizeLow == 3);
+  CHECK((F.FindData.ftLastWriteTime.dwLowDateTime != 0) ||
+        (F.FindData.ftLastWriteTime.dwHighDateTime != 0));
+  FILETIME Local;
+  SYSTEMTIME Sys;
+  CHECK(FileTimeToLocalFileTime(&F.FindData.ftLastWriteTime, &Local) != 0);
+  CHECK(FileTimeToSystemTime(&Local, &Sys) != 0);
+  CHECK(SecondsBetween(F.TimeStamp,
+        EncodeDateTime(Sys.wYear, Sys.wMonth, Sys.wDay, Sys.wHour, Sys.wMinute,
+                       Sys.wSecond, 0)) <= 1);
+  FindClose(F);
+
+  // Read-only round-trips through FileSetAttr and FileGetAttr.
+  CHECK(FileSetAttr(File, faReadOnly) == 0);
+  CHECK((FileGetAttr(File) & faReadOnly) != 0);
+  CHECK(FileSetAttr(File, 0) == 0);
+  CHECK((FileGetAttr(File) & faReadOnly) == 0);
+  CHECK(FileSetAttr(IncludeTrailingBackslash(Target) + L"missing", 0) != 0);
+
+  DeleteFile(File);
+  RemoveDir(Target);
+  RemoveDir(ExtractFileDir(Target));
+  RemoveDir(Dir);
+  CHECK(!DirectoryExists(Dir));
+
+  bool Raised = false;
+  try { ForceDirectories(L""); }
+  catch (const EInOutError &) { Raised = true; }
+  CHECK(Raised);
+}
+
 }  // namespace
 
 int main()
@@ -275,6 +332,8 @@ int main()
 
   TestParamStr();
   TestDelphiCommandLineSplitting();
+
+  TestFindDataAndAttributes();
 
   if (Failures == 0)
   {

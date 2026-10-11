@@ -309,6 +309,67 @@ void TestUpdateCounterIsBalanced()
   CHECK(L.Count == 2);
 }
 
+// TStringList.Find, as Delphi defines it.
+void TestFind()
+{
+  TStringList L;
+  L.Sorted = true;
+  L.Duplicates = dupAccept;
+  L.Add(L"b"); L.Add(L"d"); L.Add(L"d"); L.Add(L"d"); L.Add(L"f");
+  int Index = -1;
+  CHECK(L.Find(L"d", Index));
+  CHECK(Index == 1);                  // the first of the duplicates
+  CHECK(L.Find(L"D", Index));         // case-insensitive by default
+  CHECK(!L.Find(L"c", Index));
+  CHECK(Index == 1);                  // where "c" would go
+  CHECK(!L.Find(L"z", Index));
+  CHECK(Index == 5);                  // past the end
+  CHECK(!L.Find(L"a", Index));
+  CHECK(Index == 0);
+  L.CaseSensitive = true;
+  CHECK(!L.Find(L"D", Index));
+}
+
+// An object that reports what its list looked like when it was freed.
+struct TWatcher : TObject
+{
+  TStringList * List;
+  int * SeenCount;
+  int * Freed;
+  TWatcher(TStringList * L, int * C, int * F) : List(L), SeenCount(C), Freed(F) {}
+  ~TWatcher() override { *SeenCount = List->Count; ++*Freed; }
+};
+
+void TestOwnsObjects()
+{
+  int Seen = -1, Freed = 0;
+  {
+    TStringList L;              // not owning by default
+    TWatcher * W = new TWatcher(&L, &Seen, &Freed);
+    L.AddObject(L"x", W);
+    L.Delete(0);
+    CHECK(Freed == 0);
+    delete W;
+    CHECK(Freed == 1);
+  }
+
+  Freed = 0;
+  TStringList * L = new TStringList();
+  L->OwnsObjects = true;
+  L->AddObject(L"a", new TWatcher(L, &Seen, &Freed));
+  L->AddObject(L"b", new TWatcher(L, &Seen, &Freed));
+  L->AddObject(L"c", new TWatcher(L, &Seen, &Freed));
+  L->Delete(0);
+  CHECK(Freed == 1);
+  CHECK(Seen == 2);             // removed from the list before being freed
+  L->Clear();
+  CHECK(Freed == 3);
+  CHECK(Seen == 0);             // Clear empties first, then frees
+  L->AddObject(L"d", new TWatcher(L, &Seen, &Freed));
+  delete L;                     // the destructor frees too
+  CHECK(Freed == 4);
+}
+
 }  // namespace
 
 int main()
@@ -323,6 +384,9 @@ int main()
   TestObjectsAreReferencedNotOwned();
   TestAssignMoveExchange();
   TestUpdateCounterIsBalanced();
+
+  TestFind();
+  TestOwnsObjects();
 
   if (Failures == 0)
   {

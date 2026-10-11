@@ -4,6 +4,9 @@
 // that break such matchers are adjacent stars, a trailing star over an empty
 // remainder, and a pattern longer than the name. Core uses this for the file
 // masks users type, so a wrong answer silently transfers the wrong files.
+#include <string>
+#include "vcl_streams.h"
+#include "vcl_variant.h"
 #include "vcl_misc.h"
 #include "vcl_strutils.h"
 
@@ -196,6 +199,85 @@ void TestIsDriveRooted()
   CHECK(!TPath::IsDriveRooted(L""));
 }
 
+void TestVariantArray()
+{
+  // SftpFileSystem's use, line for line.
+  Variant Numbers = VarArrayCreate(OPENARRAY(int, (0, 1)), varLongWord);
+  CHECK(Numbers.ArrayLowBound() == 0);
+  CHECK(Numbers.ArrayHighBound() == 1);
+  Numbers.PutElement(4000000000u, 1);              // beyond int, as LongWord allows
+  CHECK((unsigned int)Numbers.GetElement(1) == 4000000000u);
+  CHECK((unsigned int)Numbers.GetElement(0) == 0u);
+  Numbers.ArrayRedim(10);
+  CHECK(Numbers.ArrayHighBound() == 10);
+  CHECK((unsigned int)Numbers.GetElement(1) == 4000000000u);   // kept
+  Numbers.PutElement(Numbers.GetElement(1), 0);                // shifting down
+  CHECK((unsigned int)Numbers.GetElement(0) == 4000000000u);
+
+  const Variant Copy = Numbers;                     // deep, as VarCopy is
+  Numbers.PutElement(7u, 0);
+  CHECK((unsigned int)Copy.GetElement(0) == 4000000000u);
+
+  bool Raised = false;
+  try { Numbers.GetElement(11); }
+  catch (const EVariantBoundsError &) { Raised = true; }
+  CHECK(Raised);
+  Raised = false;
+  try { VarArrayCreate(OPENARRAY(int, (0, 1, 0, 1)), varLongWord); }
+  catch (const EVariantError &) { Raised = true; }
+  CHECK(Raised);                                    // two dimensions: refused
+}
+
+UnicodeString TempPath(const wchar_t * Name)
+{
+  return IncludeTrailingBackslash(TPath::GetTempPath()) + Name;
+}
+
+void WriteBytes(const UnicodeString & Path, const std::string & Bytes)
+{
+  TFileStream S(Path, fmCreate);
+  S.WriteBuffer(Bytes.data(), static_cast<int>(Bytes.size()));
+}
+
+std::string ReadBytes(const UnicodeString & Path)
+{
+  TFileStream S(Path, fmOpenRead);
+  std::string B(static_cast<std::size_t>(S.Size), '\0');
+  if (!B.empty()) { S.ReadBuffer(&B[0], static_cast<int>(B.size())); }
+  return B;
+}
+
+void TestTFile()
+{
+  const UnicodeString P = TempPath(L"linscp_tfile_test.txt");
+  const UnicodeString Text(L"ssh-ed25519 AAAA key caf\u00E9\n");
+  TFile::WriteAllText(P, Text);
+  const std::string Bytes = ReadBytes(P);
+  CHECK(Bytes == std::string("ssh-ed25519 AAAA key caf\xC3\xA9\n"));   // UTF-8, no BOM
+  CHECK(TFile::ReadAllText(P) == Text);
+
+  WriteBytes(P, std::string("\xEF\xBB\xBFx\xC3\xA9"));                 // UTF-8 BOM
+  CHECK(TFile::ReadAllText(P) == UnicodeString(L"x\u00E9"));
+  WriteBytes(P, std::string("\xFF\xFEx\0\xE9\0", 6));                   // UTF-16 LE
+  CHECK(TFile::ReadAllText(P) == UnicodeString(L"x\u00E9"));
+  WriteBytes(P, std::string("\xFE\xFF\0x\0\xE9", 6));                   // UTF-16 BE
+  CHECK(TFile::ReadAllText(P) == UnicodeString(L"x\u00E9"));
+  DeleteFile(P);
+
+  bool Raised = false;
+  try { TFile::ReadAllText(TempPath(L"linscp_no_such_file.txt")); }
+  catch (const EFileNotFoundException &) { Raised = true; }
+  CHECK(Raised);
+}
+
+void TestInt64FunctionalCast()
+{
+  // Terminal.cpp's spelling, which a `long long` macro would not compile.
+  const unsigned long HSize = 1, LSize = 2;
+  const __int64 Size = (__int64(HSize) << 32) + LSize;
+  CHECK(Size == 0x100000002LL);
+}
+
 }  // namespace
 
 void TestStripHotkey()
@@ -222,6 +304,10 @@ int main()
   TestStripHotkey();
 
   TestIsDriveRooted();
+
+  TestVariantArray();
+  TestTFile();
+  TestInt64FunctionalCast();
 
   if (Failures == 0)
   {

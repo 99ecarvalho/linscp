@@ -163,6 +163,23 @@ struct FILETIME
   DWORD dwHighDateTime = 0;
 };
 
+// Win32's directory-entry record, with its real field set. Core reads it
+// through Delphi's TSearchRec.FindData.
+struct WIN32_FIND_DATAW
+{
+  DWORD dwFileAttributes = 0;
+  FILETIME ftCreationTime;
+  FILETIME ftLastAccessTime;
+  FILETIME ftLastWriteTime;
+  DWORD nFileSizeHigh = 0;
+  DWORD nFileSizeLow = 0;
+  DWORD dwReserved0 = 0;
+  DWORD dwReserved1 = 0;
+  wchar_t cFileName[MAX_PATH] = {};
+  wchar_t cAlternateFileName[14] = {};
+};
+using WIN32_FIND_DATA = WIN32_FIND_DATAW;
+
 struct SYSTEMTIME
 {
   WORD wYear = 0;

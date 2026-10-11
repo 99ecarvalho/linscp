@@ -42,14 +42,10 @@ struct TResStringRec
 using PResStringRec = TResStringRec *;
 using UInt64   = std::uint64_t;
 
-#ifndef __BORLANDC__
-  // Embarcadero spells 64-bit integers this way; mingw's headers do too, so
-  // only define it where neither has.
-  #ifndef _MSC_VER
-    #ifndef __int64
-      #define __int64 long long
-    #endif
-  #endif
-#endif
+// __int64 is clang's Microsoft-extension keyword (-fms-extensions is
+// mandatory here), not a macro. A macro expanding to `long long` breaks core's
+// functional casts such as __int64(HSize), which is why mingw's own
+// #define __int64 is undone in vcl_win32_undef.h.
+static_assert(sizeof(__int64) == 8, "__int64 must be the 64-bit keyword");
 
 #endif // LINSCP_VCL_TYPES_H

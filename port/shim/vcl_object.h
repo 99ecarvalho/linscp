@@ -193,5 +193,8 @@ LINSCP_DERIVED_EXCEPTION(EVariantError, Exception);
 LINSCP_DERIVED_EXCEPTION(EEncodingError, Exception);
 LINSCP_DERIVED_EXCEPTION(EDirectoryNotFoundException, Exception);
 LINSCP_DERIVED_EXCEPTION(EOSError, Exception);
+LINSCP_DERIVED_EXCEPTION(EInvalidOperation, Exception);
+LINSCP_DERIVED_EXCEPTION(EVariantBoundsError, EVariantError);
+LINSCP_DERIVED_EXCEPTION(EFileNotFoundException, Exception);
 
 #endif // LINSCP_VCL_OBJECT_H

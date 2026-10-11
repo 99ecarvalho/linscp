@@ -4,6 +4,7 @@
 // fires and what it reports are load-bearing. TObjectList frees owned objects
 // from inside Notify, so a wrong Action means either a leak or a double free --
 // neither of which announces itself.
+#include "vcl_object.h"
 #include "vcl_containers.h"
 #include "vcl_set.h"
 
@@ -304,6 +305,20 @@ void TestSets()
   CHECK(Edge.Contains(ssHorizontal));
 }
 
+struct TTerminalLike : TObject { int Id = 0; };
+
+void TestObjectListItemsAreTObject()
+{
+  TObjectList L;
+  TTerminalLike * T = new TTerminalLike();
+  T->Id = 42;
+  L.Add(T);
+  // TTerminalList::GetTerminal's expression.
+  TTerminalLike * Back = dynamic_cast<TTerminalLike *>(L.Items[0]);
+  CHECK(Back == T);
+  CHECK(Back->Id == 42);
+}
+
 }  // namespace
 
 int main()
@@ -315,6 +330,8 @@ int main()
   TestObjectListTypedAccess();
   TestSort();
   TestSets();
+
+  TestObjectListItemsAreTObject();
 
   if (Failures == 0)
   {

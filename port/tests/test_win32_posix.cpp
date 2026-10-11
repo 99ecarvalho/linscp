@@ -12,6 +12,7 @@
 #endif
 
 #include <cstdint>
+#include <string>
 #include <cstdio>
 #include <ctime>
 
@@ -283,6 +284,30 @@ void TestConstantsMatchWin32()
   CHECK(TEXT("x")[0] == L'x');            // the literal macro core uses
 }
 
+// Core calls these Win32 APIs under the bare name. vcl_win32_undef.h removes
+// the A/W macros, so these exist only because forwarding functions replace
+// them -- in exactly core's shape, NULL arguments included.
+void TestBareWin32NamesCoreCalls()
+{
+#if defined(_WIN32)
+  wchar_t Temp[MAX_PATH];
+  const DWORD N = GetTempPath(MAX_PATH, Temp);
+  CHECK((N > 0) && (N < MAX_PATH));
+  std::wstring Path(Temp, N);
+  Path += L"linscp_bare_names.tmp";
+  HANDLE H = CreateFile(Path.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL,
+                        CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+  CHECK(H != INVALID_HANDLE_VALUE);
+  CloseHandle(H);
+  CHECK(SetFileAttributes(Path.c_str(), FILE_ATTRIBUTE_READONLY) != 0);
+  CHECK((GetFileAttributes(Path.c_str()) & FILE_ATTRIBUTE_READONLY) != 0);
+  CHECK(SetFileAttributes(Path.c_str(), FILE_ATTRIBUTE_NORMAL) != 0);
+  CHECK(DeleteFileW(Path.c_str()) != 0);
+  wchar_t Expanded[512];
+  CHECK(ExpandEnvironmentStrings(L"%SystemRoot%", Expanded, 512) > 1);
+#endif
+}
+
 }  // namespace
 
 int main()
@@ -296,6 +321,8 @@ int main()
   TestErrorHandling();
   TestWideCharacterFunctions();
   TestConstantsMatchWin32();
+
+  TestBareWin32NamesCoreCalls();
 
   if (Failures == 0)
   {

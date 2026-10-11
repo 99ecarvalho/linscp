@@ -9,7 +9,8 @@
 // the function, so it can stay hidden for a long while.
 //
 // Include this immediately after <windows.h>, everywhere. The shim always calls
-// the explicit W variants internally, so nothing here loses functionality.
+// the explicit W variants internally. Where core calls the API itself under the
+// bare name, a forwarding function replaces the macro (see the end).
 //
 // test_strutils.cpp references every one of these so the linker checks them.
 //---------------------------------------------------------------------------
@@ -44,6 +45,30 @@
   #undef CreateFile
   #undef GetVersionEx
   #undef OutputDebugString
+
+  // mingw's _mingw.h defines __int64 as `long long`; clang's keyword is the
+  // same type, and unlike the macro allows __int64(x). _mingw.h is guarded,
+  // so a later <windows.h> does not bring the macro back.
+  #undef __int64
+
+  // Core also calls some of these as the Win32 API, under the bare name. For
+  // those the macro is replaced by a real function forwarding to the W
+  // variant: what the macro gave core, without renaming anything else. Exact
+  // signatures rather than a forwarding template, so that core's NULL
+  // arguments still convert to pointers. Undefining these without a
+  // replacement left core's calls with nothing to bind to.
+  inline HANDLE CreateFile(LPCWSTR FileName, DWORD Access, DWORD Share,
+                           LPSECURITY_ATTRIBUTES Security, DWORD Disposition,
+                           DWORD Flags, HANDLE Template)
+    { return CreateFileW(FileName, Access, Share, Security, Disposition, Flags, Template); }
+  inline DWORD GetFileAttributes(LPCWSTR FileName)
+    { return GetFileAttributesW(FileName); }
+  inline BOOL SetFileAttributes(LPCWSTR FileName, DWORD Attributes)
+    { return SetFileAttributesW(FileName, Attributes); }
+  inline DWORD GetTempPath(DWORD BufferLength, LPWSTR Buffer)
+    { return GetTempPathW(BufferLength, Buffer); }
+  inline DWORD ExpandEnvironmentStrings(LPCWSTR Source, LPWSTR Destination, DWORD Size)
+    { return ExpandEnvironmentStringsW(Source, Destination, Size); }
 #endif
 
 #endif // LINSCP_VCL_WIN32_UNDEF_H

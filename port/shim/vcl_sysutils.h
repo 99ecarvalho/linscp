@@ -6,6 +6,17 @@
 
 #include <vector>
 
+// TSearchRec carries Win32's WIN32_FIND_DATAW, as Delphi's does on Windows.
+#if defined(_WIN32)
+  #ifndef WIN32_LEAN_AND_MEAN
+    #define WIN32_LEAN_AND_MEAN
+  #endif
+  #include <windows.h>
+  #include "vcl_win32_undef.h"
+#else
+  #include "win32_on_posix.h"
+#endif
+
 #include "vcl_datetime.h"
 #include "vcl_dynamicarray.h"
 #include "vcl_streams.h"
@@ -55,6 +66,12 @@ struct TSearchRec
 
   // Opaque platform state for the iteration in progress.
   void * FindState = nullptr;
+
+  // Delphi's Windows TSearchRec field; core reads ftLastWriteTime from it. On
+  // POSIX it is filled from lstat: attributes as Win32 bits, times as FILETIME
+  // (UTC). POSIX has no creation time, so ftCreationTime is the modification
+  // time.
+  WIN32_FIND_DATAW FindData{};
 };
 
 // Delphi's convention: 0 on success, a non-zero error code when there is
@@ -79,6 +96,19 @@ int FileWrite(THandle Handle, const TBytes Buffer, int Offset, int Count);
 
 bool FileExists(const UnicodeString & FileName);
 bool DirectoryExists(const UnicodeString & Name);
+
+// Delphi's FileSetAttr: 0 on success, otherwise the error code. On POSIX only
+// faReadOnly has a meaning -- it clears the write permission bits, and its
+// absence restores the owner's, mirroring how FileGetAttr reports it; archive,
+// hidden and system have no POSIX counterpart and are ignored.
+int FileSetAttr(const UnicodeString & FileName, int Attr, bool FollowLink = true);
+// Delphi's FileGetAttr: the fa* attributes, or -1 (faInvalid) on failure. On
+// POSIX the same mapping FindFirst reports, following links when asked.
+int FileGetAttr(const UnicodeString & FileName, bool FollowLink = true);
+
+// Delphi's ForceDirectories: creates every missing component. Raises
+// EInOutError on an empty name, as Delphi does.
+bool ForceDirectories(UnicodeString Dir);
 
 //---------------------------------------------------------------------------
 // Core spells some RTL names with their Delphi unit scope.

@@ -133,6 +133,25 @@ extern UnicodeString Win32CSDVersion;
 // Delphi's Abort raises the silent EAbort exception.
 [[noreturn]] void Abort();
 [[noreturn]] void RaiseLastOSError();
+// Delphi's overloads, with its message: "System Error.  Code: N." then the
+// system's text. A zero code raises "A call to an OS function failed" instead.
+// On POSIX the no-argument form reads the emulated Win32 last error, since
+// core calls it after Win32-style calls; errno only when that is unset.
+[[noreturn]] void RaiseLastOSError(int LastError);
+[[noreturn]] void RaiseLastOSError(int LastError, const UnicodeString & AdditionalInfo);
+// The system's text for an error code, with trailing whitespace and periods
+// trimmed as Delphi trims them. On POSIX, Windows' English text for the codes
+// the POSIX layer can produce, so both platforms report alike.
+UnicodeString SysErrorMessage(int ErrorCode);
+
+// --- System.Random --------------------------------------------------------
+// Delphi's own linear congruential generator, so a given RandSeed yields
+// Delphi's sequence. Not thread-safe, as Delphi's is not. RandSeed starts at 0;
+// core calls Randomize at startup.
+extern int RandSeed;
+void Randomize();
+int Random(int Range);       // 0 .. Range-1
+double Random();             // [0, 1)
 
 //---------------------------------------------------------------------------
 // Core also spells RTL names with their Delphi unit scope.

@@ -3,6 +3,12 @@
 // Delphi's conventions are the thing under test: 1-based positions with 0 for
 // absent, the *Text (case-insensitive) versus *Str (case-sensitive) split, and
 // Format's own specifier grammar, which is not printf's.
+#if defined(_WIN32)
+  #include <windows.h>
+  #include "vcl_win32_undef.h"
+#else
+  #include "win32_on_posix.h"
+#endif
 #include "vcl_format.h"
 #include "vcl_strutils.h"
 #include "vcl_sysutils.h"
@@ -272,6 +278,58 @@ void TestLeftRightMid()
   CHECK(LeftStr(S, Prefix.Length()) == Prefix);
 }
 
+bool Contains(const UnicodeString & S, const wchar_t * Part)
+{
+  return S.Pos(UnicodeString(Part)) > 0;
+}
+
+void TestRaiseLastOSError()
+{
+  try { RaiseLastOSError(ERROR_ACCESS_DENIED); CHECK(false); }
+  catch (const EOSError & E)
+  {
+    CHECK(Contains(E.Message, L"System Error.  Code: 5."));
+    CHECK(E.Message.Length() > 25);              // the system text follows
+  }
+  try { RaiseLastOSError(0); CHECK(false); }
+  catch (const EOSError & E)
+  {
+    CHECK(E.Message == UnicodeString(L"A call to an OS function failed"));
+  }
+  try { RaiseLastOSError(ERROR_FILE_NOT_FOUND, L" [extra]"); CHECK(false); }
+  catch (const EOSError & E)
+  {
+    CHECK(Contains(E.Message, L" [extra]"));
+  }
+  // Delphi trims trailing whitespace and periods from the system text.
+  const UnicodeString M = SysErrorMessage(ERROR_ACCESS_DENIED);
+  CHECK(!M.IsEmpty());
+  CHECK(M[M.Length()] != L'.');
+  CHECK(M[M.Length()] > L' ');
+}
+
+void TestDelphiRandom()
+{
+  // Turbo Pascal's and Delphi's published sequence for Random(100) from a
+  // zero seed: the generator is Delphi's own.
+  const int Expected[] = {0, 3, 86, 20, 27, 67, 31, 16, 37, 42};
+  RandSeed = 0;
+  for (int E : Expected)
+  {
+    CHECK(Random(100) == E);
+  }
+  RandSeed = 0;
+  const double D = Random();
+  CHECK((D >= 0.0) && (D < 1.0));
+  // Range bounds hold for any seed.
+  Randomize();
+  for (int I = 0; I < 1000; ++I)
+  {
+    const int R = Random(7);
+    CHECK((R >= 0) && (R < 7));
+  }
+}
+
 }  // namespace
 
 int main()
@@ -286,6 +344,9 @@ int main()
   TestConstructorsFromCore();
 
   TestLeftRightMid();
+
+  TestRaiseLastOSError();
+  TestDelphiRandom();
 
   if (Failures == 0)
   {

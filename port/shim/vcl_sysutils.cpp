@@ -8,6 +8,7 @@
 #endif
 
 #include "vcl_bytestring.h"
+#include "vcl_strutils.h"
 
 const UnicodeString EmptyStr;
 
@@ -21,6 +22,7 @@ namespace {
 // Translate a Win32 find result into Delphi's record shape.
 void FillFromFindData(const WIN32_FIND_DATAW & Data, TSearchRec & F)
 {
+  F.FindData = Data;
   F.Name = UnicodeString(Data.cFileName);
   F.Attr = static_cast<int>(Data.dwFileAttributes);
   F.Size = (static_cast<__int64>(Data.nFileSizeHigh) << 32) |
@@ -149,6 +151,37 @@ int AttrFromStat(const struct stat & St, const std::string & Name)
   return Attr;
 }
 
+FILETIME FileTimeFromTimespec(const struct timespec & T)
+{
+  // 100 ns ticks since 1601-01-01, the FILETIME epoch, 11644473600 s before
+  // the Unix one.
+  const unsigned long long Ticks =
+    (static_cast<unsigned long long>(T.tv_sec) + 11644473600ULL) * 10000000ULL +
+    static_cast<unsigned long long>(T.tv_nsec) / 100ULL;
+  FILETIME Result;
+  Result.dwLowDateTime = static_cast<DWORD>(Ticks & 0xFFFFFFFFULL);
+  Result.dwHighDateTime = static_cast<DWORD>(Ticks >> 32);
+  return Result;
+}
+
+void FillFindData(const struct stat & St, int Attr, const UnicodeString & Name,
+                  WIN32_FIND_DATAW & Data)
+{
+  Data = WIN32_FIND_DATAW();
+  Data.dwFileAttributes = static_cast<DWORD>(Attr);   // fa* are Win32's bits
+  Data.ftLastWriteTime = FileTimeFromTimespec(St.st_mtim);
+  Data.ftLastAccessTime = FileTimeFromTimespec(St.st_atim);
+  Data.ftCreationTime = Data.ftLastWriteTime;
+  const unsigned long long Size = static_cast<unsigned long long>(St.st_size);
+  Data.nFileSizeLow = static_cast<DWORD>(Size & 0xFFFFFFFFULL);
+  Data.nFileSizeHigh = static_cast<DWORD>(Size >> 32);
+  const int N = (Name.Length() < MAX_PATH - 1) ? Name.Length() : MAX_PATH - 1;
+  for (int I = 0; I < N; ++I)
+  {
+    Data.cFileName[I] = Name[I + 1];
+  }
+}
+
 TDateTime TimeStampFromStat(const struct stat & St)
 {
   std::tm Local{};
@@ -202,6 +235,7 @@ int Advance(TSearchRec & F)
     F.Attr = Attr;
     F.Size = static_cast<__int64>(St.st_size);
     F.TimeStamp = TimeStampFromStat(St);
+    FillFindData(St, Attr, F.Name, F.FindData);
     return 0;
   }
 }
@@ -490,4 +524,71 @@ UnicodeString ParamStr(int Index)
     return UnicodeString();
   }
   return Params[static_cast<std::size_t>(Index)];
+}
+
+int FileSetAttr(const UnicodeString & FileName, int Attr, bool FollowLink)
+{
+  (void)FollowLink;
+#if defined(_WIN32)
+  return SetFileAttributesW(FileName.c_str(), static_cast<DWORD>(Attr))
+    ? 0 : static_cast<int>(GetLastError());
+#else
+  const std::string Path = ToBytes(FileName);
+  struct stat St{};
+  if (stat(Path.c_str(), &St) != 0)
+  {
+    const DWORD Code = Win32ErrorFromErrno(errno);
+    SetLastError(Code);
+    return static_cast<int>(Code);
+  }
+  mode_t Mode = St.st_mode & 07777;
+  if ((Attr & faReadOnly) != 0)
+  {
+    Mode &= ~static_cast<mode_t>(S_IWUSR | S_IWGRP | S_IWOTH);
+  }
+  else
+  {
+    Mode |= S_IWUSR;
+  }
+  if (chmod(Path.c_str(), Mode) != 0)
+  {
+    const DWORD Code = Win32ErrorFromErrno(errno);
+    SetLastError(Code);
+    return static_cast<int>(Code);
+  }
+  return 0;
+#endif
+}
+
+bool ForceDirectories(UnicodeString Dir)
+{
+  if (Dir.IsEmpty())
+  {
+    throw EInOutError(UnicodeString(L"Unable to create directory"));
+  }
+  Dir = ExcludeTrailingPathDelimiter(Dir);
+  // Delphi's own guard, which also stops the recursion at a root or drive.
+  if ((Dir.Length() < 3) || DirectoryExists(Dir) || (ExtractFilePath(Dir) == Dir))
+  {
+    return true;
+  }
+  return ForceDirectories(ExtractFilePath(Dir)) && CreateDir(Dir);
+}
+
+int FileGetAttr(const UnicodeString & FileName, bool FollowLink)
+{
+#if defined(_WIN32)
+  (void)FollowLink;
+  return static_cast<int>(GetFileAttributesW(FileName.c_str()));
+#else
+  const std::string Path = ToBytes(FileName);
+  struct stat St{};
+  if ((FollowLink ? stat(Path.c_str(), &St) : lstat(Path.c_str(), &St)) != 0)
+  {
+    SetLastError(Win32ErrorFromErrno(errno));
+    return -1;
+  }
+  const std::size_t Slash = Path.rfind('/');
+  return AttrFromStat(St, (Slash == std::string::npos) ? Path : Path.substr(Slash + 1));
+#endif
 }

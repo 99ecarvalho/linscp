@@ -422,10 +422,66 @@ void TStringList::PutObject(int Index, TObject * Value)
   FItems[static_cast<std::size_t>(Index)].Object = Value;
 }
 
+TStringList::~TStringList()
+{
+  Clear();
+}
+
+void TStringList::Clear()
+{
+  std::vector<TObject *> Owned;
+  if (FOwnsObjects)
+  {
+    for (const TItem & Item : FItems)
+    {
+      Owned.push_back(Item.Object);
+    }
+  }
+  FItems.clear();
+  // Freed after the list is empty, in Delphi's order.
+  for (TObject * Object : Owned)
+  {
+    delete Object;
+  }
+}
+
 void TStringList::Delete(int Index)
 {
   CheckIndex(Index);
+  TObject * Owned = FOwnsObjects ? FItems[static_cast<std::size_t>(Index)].Object : nullptr;
   FItems.erase(FItems.begin() + Index);
+  delete Owned;
+}
+
+bool TStringList::Find(const UnicodeString & S, int & Index) const
+{
+  bool Result = false;
+  int L = 0;
+  int H = GetCount() - 1;
+  while (L <= H)
+  {
+    const int I = L + (H - L) / 2;
+    const int C = FCaseSensitive ? FItems[static_cast<std::size_t>(I)].Text.Compare(S)
+                                 : FItems[static_cast<std::size_t>(I)].Text.CompareIC(S);
+    if (C < 0)
+    {
+      L = I + 1;
+    }
+    else
+    {
+      H = I - 1;
+      if (C == 0)
+      {
+        Result = true;
+        if (FDuplicates != dupAccept)
+        {
+          L = I;
+        }
+      }
+    }
+  }
+  Index = L;
+  return Result;
 }
 
 void TStringList::Insert(int Index, const UnicodeString & S)

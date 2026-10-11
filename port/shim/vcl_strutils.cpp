@@ -1,6 +1,7 @@
 #include "vcl_strutils.h"
 
 #include <cerrno>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <string>
@@ -15,6 +16,7 @@
   const wchar_t PathDelim = L'\\';
   const UnicodeString sLineBreak(L"\r\n");
 #else
+  #include "win32_on_posix.h"
   #include <sys/stat.h>
   #include <sys/utsname.h>
   #include <unistd.h>
@@ -578,12 +580,123 @@ void Abort()
 void RaiseLastOSError()
 {
 #if defined(_WIN32)
-  const unsigned long Code = GetLastError();
+  const int Code = static_cast<int>(GetLastError());
 #else
-  const unsigned long Code = static_cast<unsigned long>(errno);
+  int Code = static_cast<int>(GetLastError());
+  if ((Code == 0) && (errno != 0))
+  {
+    Code = static_cast<int>(Win32ErrorFromErrno(errno));
+  }
 #endif
-  throw EOSError(UnicodeString(L"System error, code ") +
-                 IntToStr(static_cast<__int64>(Code)));
+  RaiseLastOSError(Code);
+}
+
+void RaiseLastOSError(int LastError)
+{
+  RaiseLastOSError(LastError, UnicodeString());
+}
+
+void RaiseLastOSError(int LastError, const UnicodeString & AdditionalInfo)
+{
+  if (LastError == 0)
+  {
+    throw EOSError(UnicodeString(L"A call to an OS function failed"));
+  }
+  throw EOSError(UnicodeString(L"System Error.  Code: ") +
+                 IntToStr(static_cast<__int64>(LastError)) + UnicodeString(L".") +
+                 sLineBreak + SysErrorMessage(LastError) + AdditionalInfo);
+}
+
+namespace {
+
+UnicodeString TrimSystemMessage(UnicodeString S)
+{
+  while ((S.Length() > 0) && ((S[S.Length()] <= L' ') || (S[S.Length()] == L'.')))
+  {
+    S.SetLength(S.Length() - 1);
+  }
+  return S;
+}
+
+}  // namespace
+
+UnicodeString SysErrorMessage(int ErrorCode)
+{
+#if defined(_WIN32)
+  wchar_t Buffer[1024];
+  const DWORD Len = FormatMessageW(
+    FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr,
+    static_cast<DWORD>(ErrorCode), 0, Buffer, sizeof(Buffer) / sizeof(Buffer[0]),
+    nullptr);
+  return TrimSystemMessage(UnicodeString(Buffer, static_cast<int>(Len)));
+#else
+  // Windows' own English wording, for every code port/platform can produce.
+  struct TMessage { int Code; const wchar_t * Text; };
+  static const TMessage Messages[] = {
+    {ERROR_SUCCESS, L"The operation completed successfully."},
+    {ERROR_FILE_NOT_FOUND, L"The system cannot find the file specified."},
+    {ERROR_PATH_NOT_FOUND, L"The system cannot find the path specified."},
+    {ERROR_ACCESS_DENIED, L"Access is denied."},
+    {ERROR_INVALID_HANDLE, L"The handle is invalid."},
+    {ERROR_NOT_ENOUGH_MEMORY, L"Not enough memory resources are available to process this command."},
+    {ERROR_NO_MORE_FILES, L"There are no more files."},
+    {ERROR_SHARING_VIOLATION, L"The process cannot access the file because it is being used by another process."},
+    {ERROR_HANDLE_DISK_FULL, L"The disk is full."},
+    {ERROR_NOT_SUPPORTED, L"The request is not supported."},
+    {ERROR_FILE_EXISTS, L"The file exists."},
+    {ERROR_INVALID_PARAMETER, L"The parameter is incorrect."},
+    {ERROR_DISK_FULL, L"There is not enough space on the disk."},
+    {ERROR_ALREADY_EXISTS, L"Cannot create a file when that file already exists."},
+    {ERROR_MORE_DATA, L"More data is available."},
+    {ERROR_NO_MORE_ITEMS, L"No more data is available."},
+    {ERROR_CANCELLED, L"The operation was canceled by the user."},
+  };
+  for (const TMessage & M : Messages)
+  {
+    if (M.Code == ErrorCode)
+    {
+      return TrimSystemMessage(UnicodeString(M.Text));
+    }
+  }
+  return UnicodeString(L"Unknown error ") + IntToStr(static_cast<__int64>(ErrorCode));
+#endif
+}
+
+// --- System.Random ----------------------------------------------------------
+
+int RandSeed = 0;
+
+void Randomize()
+{
+#if defined(_WIN32)
+  LARGE_INTEGER Counter;
+  RandSeed = QueryPerformanceCounter(&Counter)
+    ? static_cast<int>(Counter.LowPart) : static_cast<int>(GetTickCount());
+#else
+  RandSeed = static_cast<int>(GetTickCount64() * 2654435761u);
+#endif
+}
+
+namespace {
+
+std::uint32_t NextRandSeed()
+{
+  const std::uint32_t Next = static_cast<std::uint32_t>(RandSeed) * 0x08088405u + 1u;
+  RandSeed = static_cast<int>(Next);
+  return Next;
+}
+
+}  // namespace
+
+int Random(int Range)
+{
+  const std::uint64_t Next = NextRandSeed();
+  return static_cast<int>((static_cast<std::uint64_t>(static_cast<std::uint32_t>(Range)) * Next) >> 32);
+}
+
+double Random()
+{
+  return static_cast<double>(NextRandSeed()) * (1.0 / 4294967296.0);
 }
 
 // --- environment -----------------------------------------------------------

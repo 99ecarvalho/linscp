@@ -20,26 +20,29 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 Driven by `compile_census.py` rather than by grep counts — the compiler names
 what is actually blocking each unit, in dependency order.
 
-**Eight of ten tracked units compile cleanly for Windows, seven for Linux**,
+**Nine of ten tracked units compile cleanly for Windows, seven for Linux**,
 nothing aborting on either, measured in upstream's own preprocessor
-configuration. Census: **120 errors on mingw, 264 on Linux.**
+configuration. Census: **84 errors on mingw, 234 on Linux.**
 
 | Unit | mingw | Linux |
 |---|---|---|
 | `Bookmarks`, `CopyParam`, `FileBuffer`, `FileMasks`, `NamedObjs`, `Option`, `Queue` | 0 | 0 |
 | `Configuration.cpp` | **0** | 67 |
-| `Terminal.cpp` | 23 | 47 |
-| `Common.cpp` | 97 | 150 |
+| `Terminal.cpp` | **0** | 25 |
+| `Common.cpp` | 84 | 142 |
 
-`Configuration.cpp`'s 67 Linux errors are not shim work in the usual sense:
-**55 come from PuTTY headers** -- `putty/windows/platform.h` and the Windows
-GSSAPI declarations -- because WinSCP vendors only PuTTY's Windows platform
-layer. The rest are Win32 shell-folder and message constants.
+The Linux-only excess is now concentrated, and mostly not shim work:
+**55 of `Configuration.cpp`'s 67 Linux errors come from PuTTY headers** --
+`putty/windows/platform.h` and the Windows GSSAPI declarations -- because
+WinSCP vendors only PuTTY's Windows platform layer. WinSCP's PuTTY is 0.83
+with 121 of its 224 files modified (+5,276 / -1,962 lines), mostly in crypto
+and SSH, so P1-09 / P1-10 is a reconciliation, not a copy.
 
-1. **P1-09**: PuTTY's Unix platform layer. It removes the bulk of the Linux
-   excess in every unit that includes `PuttyIntf.h`.
-2. `Terminal.cpp` (23 / 47).
-3. `Common.cpp` (97 / 150).
+1. `Common.cpp` on mingw (**84**): the last unit for Windows.
+2. **P1-09**: PuTTY's Unix platform layer, a second pinned upstream plus a
+   patch series carrying WinSCP's platform changes to `unix/`.
+3. The Linux Win32 emulation `Terminal.cpp` still needs (25), starting with
+   `CreateFile` and `GetFileAttributes`.
 
 ## Decisions taken
 
@@ -67,6 +70,9 @@ layer. The rest are Win32 shell-folder and message constants.
 | 2026-10-11 | Census and discovery build the Debug configuration | Its `DebugAssert` expressions are code that must compile too; Release compiles them out, which hid ten closure comparisons |
 | 2026-10-11 | `port/compat` withdrawn; supersedes the 2026-10-10 decision creating it | `help.h` was compensating for the missing `WINSCP` define, not a gap in upstream: with `WINSCP` set, PuTTY's `platform.h` never includes it |
 | 2026-10-11 | Closure binding covers Borland's four shapes: `Name`, `&Name`, `obj.Name` / `&obj.Name`, `p->Name` / `&p->Name` | Recorded as the method name's column; the transform recovers the shape from the text and refuses longer chains or a call as the object. The verifier recomputes the rewrite with an independent regex, so a bug in either is caught by the other. The old binder had been emitting `obj.CLOSURE(Name)`, invalid C++, in two units nothing yet compiled |
+| 2026-10-11 | Win32 APIs core calls under the bare name get forwarding functions, not their A/W macros | `vcl_win32_undef.h` removes the macros so they cannot rename the shim's VCL functions; it had also removed `CreateFile` and four others core calls as the API, leaving those calls nothing to bind to. Exact signatures, so core's `NULL` arguments still convert |
+| 2026-10-11 | `__int64` is clang's MS-extension keyword, never a macro | A `long long` macro -- ours, and mingw's own -- breaks core's `__int64(x)` functional casts |
+| 2026-10-11 | `Random` is Delphi's own generator | It reproduces the published Turbo Pascal / Delphi sequence from a zero seed exactly, which the test pins |
 | 2026-10-10 | A PR-able branch against `winscp/winscp` will be **generated**, not hand-maintained | linscp shares no history with upstream, so its `qt` branch is not directly mergeable. Since the port is mechanical, the fork branch can be produced on demand (Q-7). Rehearsed end to end — see facts below |
 | 2026-10-10 | Transform must be byte-exact outside property lines | A full-file rewrite (CRLF loss) turned a 613-line change into 76,551. Now asserted by `verify_transform.py` |
 | 2026-10-10 | Field/accessor classification is convention-first, parens only as fallback | The parens heuristic false-positives on constructor initialiser lists; WinSCP's `F<Upper>` / `Get*`/`Set*` convention is airtight. Truly unclassifiable names now fail the run instead of producing a wrong-arity macro |
@@ -177,6 +183,10 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | `ParamStr(n)` splitting on Windows | Follows Delphi's `GetParamStr` rules as documented in the shim -- quotes toggle and are dropped, no backslash escapes, empty `""` skipped -- but has not been compared against a Delphi binary | Wine cannot check it: `CommandLineToArgvW` implements the MSVC rules, which differ deliberately. Core itself only uses `ParamStr(0)` |
 | `TPath::IsDriveRooted` on POSIX | Always false | As in Delphi's POSIX RTL. Core uses it only to locate Windows' UAC VirtualStore |
 | Calling a closure through a type it was cast to | Stops the program with a message | Borland reinterprets the (code, data) pair, so the call is undefined behaviour there. Core only casts to launder a closure and back, which round-trips exactly |
+| `TFile::ReadAllText` without a BOM | Decodes UTF-8 on both platforms | Delphi uses `TEncoding.Default`, ANSI on Windows. Core reads only `authorized_keys` this way and writes it back as UTF-8, so ANSI would double-encode non-ASCII comments. ASCII files are identical either way |
+| `FileSetAttr` on POSIX | Only `faReadOnly` acts, on the write permission bits; archive, hidden and system are ignored | They have no POSIX counterpart. Read-only mirrors how `FileGetAttr` reports it |
+| `FindData.ftCreationTime` on POSIX | The modification time | POSIX has no creation time |
+| `Variant` | Only one-dimensional integer variant arrays | Core's only use. Anything wider raises `EVariantError` so a new use is noticed |
 | `SuspendThread` on POSIX | Not declared | A running pthread cannot be suspended. A missing declaration fails at compile time; a stub would fail silently. `CREATE_SUSPENDED` + `ResumeThread` is supported |
 
 ## Open questions

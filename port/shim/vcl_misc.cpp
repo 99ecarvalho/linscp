@@ -1,4 +1,6 @@
 #include "vcl_misc.h"
+#include <string>
+#include "vcl_streams.h"
 
 #include "vcl_bytestring.h"
 #include "vcl_sysutils.h"
@@ -171,4 +173,48 @@ bool TPath::IsDriveRooted(const UnicodeString & Path)
   (void)Path;
   return false;
 #endif
+}
+
+UnicodeString TFile::ReadAllText(const UnicodeString & Path)
+{
+  if (!FileExists(Path))
+  {
+    throw EFileNotFoundException(UnicodeString(L"File not found: ") + Path);
+  }
+  TFileStream Stream(Path, fmOpenRead | fmShareDenyNone);
+  const __int64 Size = Stream.Size;
+  std::string Bytes(static_cast<std::size_t>(Size), '\0');
+  if (Size > 0)
+  {
+    Stream.ReadBuffer(&Bytes[0], static_cast<int>(Size));
+  }
+  const auto Byte = [&](std::size_t I) { return static_cast<unsigned char>(Bytes[I]); };
+  const std::size_t N = Bytes.size();
+  if ((N >= 3) && (Byte(0) == 0xEF) && (Byte(1) == 0xBB) && (Byte(2) == 0xBF))
+  {
+    return linscp::Utf8ToUtf16(Bytes.data() + 3, N - 3);
+  }
+  const bool Le = (N >= 2) && (Byte(0) == 0xFF) && (Byte(1) == 0xFE);
+  const bool Be = (N >= 2) && (Byte(0) == 0xFE) && (Byte(1) == 0xFF);
+  if (Le || Be)
+  {
+    UnicodeString Result;
+    for (std::size_t I = 2; I + 1 < N; I += 2)
+    {
+      const unsigned Unit = Le ? (Byte(I) | (Byte(I + 1) << 8)) : ((Byte(I) << 8) | Byte(I + 1));
+      Result += static_cast<wchar_t>(Unit);
+    }
+    return Result;
+  }
+  return linscp::Utf8ToUtf16(Bytes.data(), N);
+}
+
+void TFile::WriteAllText(const UnicodeString & Path, const UnicodeString & Contents)
+{
+  const std::string Bytes = linscp::Utf16ToUtf8(Contents);
+  TFileStream Stream(Path, fmCreate);
+  if (!Bytes.empty())
+  {
+    Stream.WriteBuffer(Bytes.data(), static_cast<int>(Bytes.size()));
+  }
 }

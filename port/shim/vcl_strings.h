@@ -102,14 +102,15 @@ class TStringList : public TStrings
 {
 public:
   TStringList() = default;
-  ~TStringList() override = default;
+  explicit TStringList(bool AOwnsObjects) : FOwnsObjects(AOwnsObjects) {}
+  ~TStringList() override;
 
   int GetCount() const override { return static_cast<int>(FItems.size()); }
   UnicodeString GetString(int Index) const override;
   void PutString(int Index, UnicodeString Value) override;
   TObject * GetObject(int Index) const override;
   void PutObject(int Index, TObject * Value) override;
-  void Clear() override { FItems.clear(); }
+  void Clear() override;
   void Delete(int Index) override;
   void Insert(int Index, const UnicodeString & S) override;
 
@@ -123,6 +124,17 @@ public:
 
   void Sort();
 
+  // Delphi's binary search: true when S is present. Index is then a match --
+  // the first one under dupAccept -- and otherwise the insertion point. Uses
+  // the same comparison as sorting, and like Delphi is meaningful only when
+  // the list is Sorted.
+  bool Find(const UnicodeString & S, int & Index) const;
+
+  // Delphi 2009's TStringList.OwnsObjects. When set, Delete, Clear and the
+  // destructor free the objects -- after removing the entries, as Delphi
+  // does. Off by default, matching the note on FItems below.
+  PROP_RW_FF(bool, OwnsObjects, FOwnsObjects);
+
 private:
   struct TItem
   {
@@ -134,6 +146,7 @@ private:
   std::vector<TItem> FItems;
   bool FSorted = false;
   TDuplicates FDuplicates = dupIgnore;   // Delphi's default
+  bool FOwnsObjects = false;
 };
 
 #endif // LINSCP_VCL_STRINGS_H

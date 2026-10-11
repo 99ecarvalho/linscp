@@ -74,6 +74,9 @@ public:
     { return static_cast<TObject *>(GetItem(Index)); }
   void PutObject(int Index, TObject * Item) { PutItem(Index, Item); }
   PROP_IDX_RW_GS(TObject *, Objects, int, GetObject, PutObject);
+  // Delphi's TObjectList retypes Items as TObject, which is what lets core
+  // write dynamic_cast<TTerminal *>(Items[Index]).
+  PROP_IDX_RW_GS(TObject *, Items, int, GetObject, PutObject);
 
   PROP_RW_FF(bool, OwnsObjects, FOwnsObjects);
 
