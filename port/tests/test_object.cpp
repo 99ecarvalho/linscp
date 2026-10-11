@@ -11,6 +11,11 @@
 #include <thread>
 #include <type_traits>
 
+// At file scope, so its qualified name is exactly Outer.TInner.
+namespace Outer {
+class TInner : public TObject {};
+}
+
 namespace {
 
 int Failures = 0;
@@ -195,6 +200,30 @@ void TestMethodPointer()
   CHECK(M.Data == &Dummy);
 }
 
+void TestMetaclasses()
+{
+  EAbort E(UnicodeString(L"x"));
+  const TObject * O = &E;
+  CHECK(O->InheritsFrom(__classid(EAbort)));      // itself
+  CHECK(O->InheritsFrom(__classid(Exception)));   // an ancestor
+  CHECK(O->InheritsFrom(__classid(TObject)));
+  CHECK(!O->InheritsFrom(__classid(TPersistent)));
+  CHECK(!O->InheritsFrom(static_cast<TClass>(nullptr)));
+  // One metaclass per type, as Delphi's TClass values compare.
+  CHECK(__classid(EAbort) == __classid(EAbort));
+  CHECK(__classid(EAbort) != __classid(Exception));
+}
+
+void TestClassName()
+{
+  EAbort E(UnicodeString(L"x"));
+  const TObject & AsRoot = E;
+  CHECK(AsRoot.ClassName() == UnicodeString(L"EAbort"));   // the dynamic type
+  Outer::TInner I;
+  CHECK(I.ClassName() == UnicodeString(L"TInner"));
+  CHECK(I.QualifiedClassName() == UnicodeString(L"Outer.TInner"));
+}
+
 }  // namespace
 
 int main()
@@ -207,6 +236,9 @@ int main()
   TestCriticalSectionIsRecursive();
   TestCriticalSectionExcludesThreads();
   TestMethodPointer();
+
+  TestMetaclasses();
+  TestClassName();
 
   if (Failures == 0)
   {

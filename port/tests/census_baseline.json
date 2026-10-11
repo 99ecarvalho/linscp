@@ -8,7 +8,7 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 153,
+        "errors": 150,
         "missing_types": 9
       },
       "source/core/Configuration.cpp": {
@@ -48,7 +48,7 @@
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 52,
+        "errors": 47,
         "missing_types": 4
       }
     },
@@ -60,7 +60,7 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 100,
+        "errors": 97,
         "missing_types": 2
       },
       "source/core/Configuration.cpp": {
@@ -100,7 +100,7 @@
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 28,
+        "errors": 23,
         "missing_types": 1
       }
     }

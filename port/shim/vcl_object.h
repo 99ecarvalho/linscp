@@ -18,6 +18,18 @@ class TVarRec;
   #define __declspec_delphirtti
 #endif
 
+class TObject;
+
+// Borland's metaclass, as far as core uses it: E->InheritsFrom(__classid(T)).
+// One instance per type; TClass is a pointer to it, as in Delphi.
+class TMetaClass
+{
+public:
+  virtual ~TMetaClass() = default;
+  virtual bool IsInstance(const TObject * Object) const = 0;
+};
+using TClass = const TMetaClass *;
+
 // Root of the Delphi object hierarchy. Core deletes through TObject* (see
 // SAFE_DESTROY in Common.h), so the destructor must be virtual.
 class TObject
@@ -33,7 +45,39 @@ public:
   // of a given type before downcasting.
   template <typename T>
   bool InheritsFrom() const { return dynamic_cast<const T *>(this) != nullptr; }
+
+  // Delphi's class-level check: this object's class is Class or derives from
+  // it. A null class matches nothing.
+  bool InheritsFrom(TClass Class) const
+    { return (Class != nullptr) && Class->IsInstance(this); }
+
+  // The dynamic type's name, from RTTI: unqualified, as Delphi's ClassName
+  // returns it; QualifiedClassName keeps the namespace path, written with '.'
+  // the way Delphi writes unit scopes.
+  UnicodeString ClassName() const;
+  UnicodeString QualifiedClassName() const;
 };
+
+namespace linscp {
+
+template <typename T>
+class TMetaClassOf final : public TMetaClass
+{
+public:
+  bool IsInstance(const TObject * Object) const override
+    { return dynamic_cast<const T *>(Object) != nullptr; }
+  static const TMetaClassOf Instance;
+};
+
+template <typename T>
+const TMetaClassOf<T> TMetaClassOf<T>::Instance{};
+
+}  // namespace linscp
+
+// Borland's __classid keyword.
+#ifndef __BORLANDC__
+  #define __classid(T) (static_cast<TClass>(&::linscp::TMetaClassOf<T>::Instance))
+#endif
 
 // Core's own declarations, and the closure typedefs the transform produces,
 // spell some of these with their Delphi unit scope.

@@ -22,14 +22,14 @@ what is actually blocking each unit, in dependency order.
 
 **Eight of ten tracked units compile cleanly for Windows, seven for Linux**,
 nothing aborting on either, measured in upstream's own preprocessor
-configuration. Census: **128 errors on mingw, 272 on Linux.**
+configuration. Census: **120 errors on mingw, 264 on Linux.**
 
 | Unit | mingw | Linux |
 |---|---|---|
 | `Bookmarks`, `CopyParam`, `FileBuffer`, `FileMasks`, `NamedObjs`, `Option`, `Queue` | 0 | 0 |
 | `Configuration.cpp` | **0** | 67 |
-| `Terminal.cpp` | 28 | 52 |
-| `Common.cpp` | 100 | 153 |
+| `Terminal.cpp` | 23 | 47 |
+| `Common.cpp` | 97 | 150 |
 
 `Configuration.cpp`'s 67 Linux errors are not shim work in the usual sense:
 **55 come from PuTTY headers** -- `putty/windows/platform.h` and the Windows
@@ -38,8 +38,8 @@ layer. The rest are Win32 shell-folder and message constants.
 
 1. **P1-09**: PuTTY's Unix platform layer. It removes the bulk of the Linux
    excess in every unit that includes `PuttyIntf.h`.
-2. `Terminal.cpp` (28 / 52).
-3. `Common.cpp` (100 / 153).
+2. `Terminal.cpp` (23 / 47).
+3. `Common.cpp` (97 / 150).
 
 ## Decisions taken
 
@@ -176,6 +176,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | `StripHotkey` in East Asian locales | The whole-`(&X)` suffix removal Delphi does under `SysLocale.FarEast` is not reproduced | Only the `&` is removed. Affects only CJK system locales |
 | `ParamStr(n)` splitting on Windows | Follows Delphi's `GetParamStr` rules as documented in the shim -- quotes toggle and are dropped, no backslash escapes, empty `""` skipped -- but has not been compared against a Delphi binary | Wine cannot check it: `CommandLineToArgvW` implements the MSVC rules, which differ deliberately. Core itself only uses `ParamStr(0)` |
 | `TPath::IsDriveRooted` on POSIX | Always false | As in Delphi's POSIX RTL. Core uses it only to locate Windows' UAC VirtualStore |
+| Calling a closure through a type it was cast to | Stops the program with a message | Borland reinterprets the (code, data) pair, so the call is undefined behaviour there. Core only casts to launder a closure and back, which round-trips exactly |
 | `SuspendThread` on POSIX | Not declared | A running pthread cannot be suspended. A missing declaration fails at compile time; a stub would fail silently. `CREATE_SUSPENDED` + `ResumeThread` is supported |
 
 ## Open questions

@@ -236,6 +236,57 @@ void TestTerminalThreadIdiom()
   CHECK(Second.StillOurs());
 }
 
+// --- casts between closure signatures --------------------------------------
+
+// Terminal.cpp's shapes: the Ex form takes one more argument.
+using TProcessFileEvent = TClosure<void(const UnicodeString &, void *)>;
+using TProcessFileEventEx = TClosure<void(const UnicodeString &, void *, int)>;
+
+struct TProcessor
+{
+  UnicodeString Name;
+  int Index = -1;
+  void ProcessEx(const UnicodeString & N, void *, int I) { Name = N; Index = I; }
+  TProcessFileEventEx Make() { return CLOSURE(ProcessEx); }
+};
+
+// ProcessFiles, which receives the Ex closure laundered as the plain type.
+void ProcessFiles(TProcessFileEvent ProcessFile, bool Ex)
+{
+  if (Ex)
+  {
+    TProcessFileEventEx ProcessFileEx = (TProcessFileEventEx)ProcessFile;
+    ProcessFileEx(L"file", nullptr, 7);
+  }
+}
+
+void TestLaunderedClosureRoundTrip()
+{
+  TProcessor P;
+  const TProcessFileEventEx Original = P.Make();
+  // ProcessFilesEx's call: a functional cast to the narrower type.
+  ProcessFiles(TProcessFileEvent(Original), true);
+  CHECK(P.Name == UnicodeString(L"file"));
+  CHECK(P.Index == 7);                     // the extra argument arrived
+
+  const TProcessFileEvent Laundered(Original);
+  CHECK(static_cast<bool>(Laundered));     // still non-null
+  const TProcessFileEventEx Back(Laundered);
+  CHECK(Back == Original);                 // identity survives the round trip
+
+  // Through a third type and back.
+  using TOther = TClosure<int(double)>;
+  const TOther Hop(Laundered);
+  const TProcessFileEventEx Back2(Hop);
+  CHECK(Back2 == Original);
+  Back2(L"again", nullptr, 3);
+  CHECK(P.Index == 3);
+
+  // Null stays null.
+  const TProcessFileEventEx Null;
+  CHECK(!TProcessFileEvent(Null));
+}
+
 }  // namespace
 
 int main()
@@ -249,6 +300,8 @@ int main()
   TestEqualityIsIdentity();
   TestNonMethodClosures();
   TestTerminalThreadIdiom();
+
+  TestLaunderedClosureRoundTrip();
 
   if (Failures == 0)
   {

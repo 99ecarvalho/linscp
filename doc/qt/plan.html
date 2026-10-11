@@ -1897,7 +1897,7 @@ the compiler names what is actually blocking each unit, in dependency
 order.</p>
 <p><strong>Eight of ten tracked units compile cleanly for Windows, seven
 for Linux</strong>, nothing aborting on either, measured in upstream’s
-own preprocessor configuration. Census: <strong>128 errors on mingw, 272
+own preprocessor configuration. Census: <strong>120 errors on mingw, 264
 on Linux.</strong></p>
 <table>
 <colgroup>
@@ -1927,13 +1927,13 @@ on Linux.</strong></p>
 </tr>
 <tr class="odd">
 <td><code>Terminal.cpp</code></td>
-<td>28</td>
-<td>52</td>
+<td>23</td>
+<td>47</td>
 </tr>
 <tr class="even">
 <td><code>Common.cpp</code></td>
-<td>100</td>
-<td>153</td>
+<td>97</td>
+<td>150</td>
 </tr>
 </tbody>
 </table>
@@ -1946,8 +1946,8 @@ layer. The rest are Win32 shell-folder and message constants.</p>
 <li><strong>P1-09</strong>: PuTTY’s Unix platform layer. It removes the
 bulk of the Linux excess in every unit that includes
 <code>PuttyIntf.h</code>.</li>
-<li><code>Terminal.cpp</code> (28 / 52).</li>
-<li><code>Common.cpp</code> (100 / 153).</li>
+<li><code>Terminal.cpp</code> (23 / 47).</li>
+<li><code>Common.cpp</code> (97 / 150).</li>
 </ol>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
@@ -2669,6 +2669,13 @@ MSVC rules, which differ deliberately. Core itself only uses
 VirtualStore</td>
 </tr>
 <tr class="odd">
+<td>Calling a closure through a type it was cast to</td>
+<td>Stops the program with a message</td>
+<td>Borland reinterprets the (code, data) pair, so the call is undefined
+behaviour there. Core only casts to launder a closure and back, which
+round-trips exactly</td>
+</tr>
+<tr class="even">
 <td><code>SuspendThread</code> on POSIX</td>
 <td>Not declared</td>
 <td>A running pthread cannot be suspended. A missing declaration fails

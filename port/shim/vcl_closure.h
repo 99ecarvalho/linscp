@@ -31,7 +31,10 @@
 #define LINSCP_VCL_CLOSURE_H
 
 #include <cstddef>
+#include <cstdio>
 #include <cstring>
+#include <exception>
+#include <typeinfo>
 #include <functional>
 #include <memory>
 #include <type_traits>
@@ -134,12 +137,57 @@ public:
     FFn = std::forward<F>(Callable);
   }
 
+  // Borland casts freely between closure types: a closure is a (code, data)
+  // pair, so the cast only reinterprets it. Core does this to launder a
+  // closure through another type and back -- Terminal.cpp passes a
+  // TProcessFileEventEx through ProcessFiles as a TProcessFileEvent and casts
+  // it back before calling it. So a cast keeps the original, a cast back
+  // recovers it exactly (identity included), and calling a closure through a
+  // signature it was not made for stops the program: in Borland that is
+  // undefined behaviour, and core never does it.
+  template <typename R2, typename... A2,
+            typename = std::enable_if_t<!std::is_same_v<R2(A2...), R(A...)>>>
+  explicit TClosure(const TClosure<R2(A2...)> & Other)
+  {
+    if (!Other)
+    {
+      return;
+    }
+    if (Other.FOriginalType == &typeid(TClosure))
+    {
+      *this = *static_cast<const TClosure *>(Other.FOriginal.get());
+      return;
+    }
+    if (Other.FOriginal)
+    {
+      // Already laundered from a third type: keep the true original.
+      FOriginal = Other.FOriginal;
+      FOriginalType = Other.FOriginalType;
+    }
+    else
+    {
+      FOriginal = std::make_shared<TClosure<R2(A2...)>>(Other);
+      FOriginalType = &typeid(TClosure<R2(A2...)>);
+    }
+    FBound = Other.FBound;
+    FIdentity = Other.FIdentity;
+    FToken = Other.FToken;
+    FFn = [](A...) -> R
+    {
+      std::fputs("linscp: closure called through a signature it was cast to, "
+                 "not made with\n", stderr);
+      std::terminate();
+    };
+  }
+
   TClosure & operator=(std::nullptr_t)
   {
     FFn = nullptr;
     FBound = false;
     FIdentity = linscp::TMethodIdentity();
     FToken.reset();
+    FOriginal.reset();
+    FOriginalType = nullptr;
     return *this;
   }
 
@@ -182,10 +230,15 @@ public:
     { return !(X == Y); }
 
 private:
+  template <typename> friend class TClosure;
+
   std::function<R(A...)> FFn;
   bool FBound = false;
   linscp::TMethodIdentity FIdentity;
   std::shared_ptr<char> FToken;  // identity of a non-method callable
+  // Set only on a closure produced by a cast between closure types.
+  std::shared_ptr<const void> FOriginal;
+  const std::type_info * FOriginalType = nullptr;
 };
 
 // Bind an instance to one of its member functions. Returns a TBoundMethod, so

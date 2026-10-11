@@ -1,5 +1,12 @@
 #include "vcl_object.h"
 
+#include <cstdlib>
+#include <memory>
+#include <string>
+#include <typeinfo>
+
+#include <cxxabi.h>
+
 #include "vcl_format.h"
 #include "vcl_resources.h"
 
@@ -80,3 +87,33 @@ Exception::Exception(PResStringRec ResStringRec, const TVarRec * Args,
                      int Args_Size, int AHelpContext)
   : FMessage(Formatted(FromResStringRec(ResStringRec), Args, Args_Size)),
     FHelpContext(AHelpContext) {}
+
+namespace {
+
+std::string DemangledName(const std::type_info & Type)
+{
+  int Status = 0;
+  std::unique_ptr<char, void (*)(void *)> Name(
+    abi::__cxa_demangle(Type.name(), nullptr, nullptr, &Status), std::free);
+  return (Status == 0) && Name ? std::string(Name.get()) : std::string(Type.name());
+}
+
+}  // namespace
+
+UnicodeString TObject::ClassName() const
+{
+  const std::string Full = DemangledName(typeid(*this));
+  const std::size_t Colon = Full.rfind("::");
+  return UnicodeString((Colon == std::string::npos) ? Full.c_str()
+                                                    : Full.c_str() + Colon + 2);
+}
+
+UnicodeString TObject::QualifiedClassName() const
+{
+  std::string Full = DemangledName(typeid(*this));
+  for (std::size_t I = Full.find("::"); I != std::string::npos; I = Full.find("::", I))
+  {
+    Full.replace(I, 2, ".");
+  }
+  return UnicodeString(Full.c_str());
+}
