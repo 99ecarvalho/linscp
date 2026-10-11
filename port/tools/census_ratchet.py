@@ -22,6 +22,19 @@ import argparse, json, os, re, subprocess, sys
 
 BASELINE = 'port/tests/census_baseline.json'
 TARGETS = ['x86_64-w64-mingw32', 'x86_64-pc-linux-gnu']
+GEN = 'build/gen'
+
+
+def regenerate():
+    """Measure the tree the current transform and patches produce, not whatever
+    build/gen held when someone last ran the transform by hand. Nothing else
+    regenerates it -- CMake writes its own trees -- so a stale one once hid two
+    newly recorded closure sites from the census."""
+    for cmd in (['port/tools/transform.py', '--out', GEN],
+                ['port/tools/verify_transform.py', GEN, '3rd-party/winscp']):
+        r = subprocess.run([sys.executable] + cmd, capture_output=True, text=True)
+        if r.returncode != 0:
+            sys.exit(f'{cmd[0]} failed:\n{r.stdout}{r.stderr}')
 
 def measure(tu, target):
     r = subprocess.run(
@@ -46,6 +59,7 @@ def main():
     ap.add_argument('--update', action='store_true')
     a = ap.parse_args()
 
+    regenerate()
     base = {}
     if os.path.exists(BASELINE):
         base = json.load(open(BASELINE))

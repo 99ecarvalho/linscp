@@ -89,11 +89,13 @@ class Ambiguous(Exception):
 
 
 class Transformer:
-    def __init__(self):
+    def __init__(self, bind_sites=True):
         self.stats = Counter()
         self.unhandled = []
         self.notes = []
-        self.closure_sites = load_closure_sites()
+        # Off only for bind_closures.py --discover, which must see every site
+        # still unbound so that each one errors and the list is rebuilt whole.
+        self.closure_sites = load_closure_sites() if bind_sites else {}
 
     def transform_file(self, path, text):
         methods = set(re.findall(r'\b(\w+)\s*\(', text))
@@ -394,9 +396,11 @@ def main():
     ap.add_argument('--check', action='store_true',
                     help='report only; do not write the output tree')
     ap.add_argument('--report')
+    ap.add_argument('--no-closure-sites', action='store_true',
+                    help='skip binding recorded closure sites (for discovery)')
     a = ap.parse_args()
 
-    t = Transformer()
+    t = Transformer(bind_sites=not a.no_closure_sites)
     nfiles = 0
     for sub in a.subdirs:
         root = os.path.join(a.src, sub)

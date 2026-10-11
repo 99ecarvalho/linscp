@@ -44,6 +44,10 @@ set(LINSCP_TRANSFORM "${CMAKE_SOURCE_DIR}/port/tools/transform.py")
 # The stamp lives outside LINSCP_GEN so the generated tree stays a faithful
 # mirror of upstream; verify_transform.py treats any extra file as a violation.
 set(LINSCP_GEN_STAMP "${CMAKE_BINARY_DIR}/transform.stamp")
+# The transform's inputs include the reviewed patch series, not just the
+# scripts. Without this, a change to closure_sites.json left the generated tree
+# silently stale.
+file(GLOB LINSCP_PATCHES CONFIGURE_DEPENDS "${CMAKE_SOURCE_DIR}/port/patches/*")
 add_custom_command(
   OUTPUT  "${LINSCP_GEN_STAMP}"
   COMMAND "${Python3_EXECUTABLE}" "${LINSCP_TRANSFORM}"
@@ -52,6 +56,7 @@ add_custom_command(
           "${LINSCP_GEN}" "${LINSCP_UPSTREAM}"
   COMMAND "${CMAKE_COMMAND}" -E touch "${LINSCP_GEN_STAMP}"
   DEPENDS "${LINSCP_TRANSFORM}" "${CMAKE_SOURCE_DIR}/port/tools/verify_transform.py"
+          ${LINSCP_PATCHES}
   COMMENT "Transforming upstream core and verifying the diff is property-only"
   VERBATIM)
 add_custom_target(transform ALL DEPENDS "${LINSCP_GEN_STAMP}")

@@ -19,6 +19,13 @@ tool records them; transform.py applies the list deterministically on every
 run, and fails loudly if a recorded site no longer holds the expected
 identifier, which is what an upstream change would look like.
 
+Discovery compiles a separate tree transformed *without* the recorded sites
+bound. Compiling the ordinary tree would see the known sites already wrapped --
+no longer errors -- and so "rediscover" only the new ones, silently dropping
+the rest; that happened once and cut 62 sites to 2. Against an unbound tree the
+list is rebuilt whole, discovery is idempotent, and the columns are in exactly
+the coordinates transform.py applies them in.
+
   bind_closures.py --discover   recompile and rewrite port/patches/closure_sites.json
   bind_closures.py              verify the recorded sites still match the source
 """
@@ -38,8 +45,9 @@ EXPANDED = re.compile(
     r"expanded from macro '(?P<macro>\w+)'")
 IDENT = re.compile(r'[A-Za-z_]\w*')
 
+DISCOVERY_GEN = 'build/gen-unbound'
 INCLUDES = [
-    'port/shim', 'port/compat', 'build/gen/source/core',
+    'port/shim', 'port/compat',
     '3rd-party/winscp/source/resource', '3rd-party/winscp/source/windows',
     '3rd-party/winscp/source/filezilla', '3rd-party/winscp/source/putty',
     '3rd-party/winscp/source/putty/windows',
@@ -48,7 +56,7 @@ INCLUDES = [
 ]
 
 
-def compile_tu(path, target='x86_64-w64-mingw32'):
+def compile_tu(path, gen, target='x86_64-w64-mingw32'):
     cmd = ['clang++', f'--target={target}', '-std=c++17', '-fsyntax-only',
            '-fms-extensions', '-fshort-wchar', '-ferror-limit=0',
            # One line per diagnostic. Without this clang interleaves the source
@@ -56,7 +64,7 @@ def compile_tu(path, target='x86_64-w64-mingw32'):
            # from macro' notes that follow an error.
            '-fno-caret-diagnostics', '-fmacro-backtrace-limit=0',
            '-Wno-everything']
-    for inc in INCLUDES:
+    for inc in [os.path.join(gen, 'source/core')] + INCLUDES:
         cmd += ['-I', inc]
     cmd.append(path)
     return subprocess.run(cmd, capture_output=True, text=True).stderr
@@ -69,7 +77,7 @@ def discover(gen):
     for name in sorted(os.listdir(core)):
         if not name.endswith('.cpp'):
             continue
-        lines = compile_tu(os.path.join(core, name)).split('\n')
+        lines = compile_tu(os.path.join(core, name), gen).split('\n')
         i = 0
         while i < len(lines):
             m = DIAG.match(lines[i])
@@ -129,10 +137,19 @@ def main():
     a = ap.parse_args()
 
     if a.discover:
+        r = subprocess.run(
+            [sys.executable, 'port/tools/transform.py', '--out', DISCOVERY_GEN,
+             '--no-closure-sites'], capture_output=True, text=True)
+        if r.returncode != 0:
+            sys.exit(f'transform for discovery failed:\n{r.stdout}{r.stderr}')
+        previous = set()
+        if os.path.exists(SITES):
+            previous = {(s['file'], s['line'], s['column'], s['identifier'])
+                        for s in json.load(open(SITES))['sites']}
         sites = []
         unresolved = []
-        for path, lineno, col in discover(a.gen):
-            ident = identifier_at(a.gen, path, lineno, col)
+        for path, lineno, col in discover(DISCOVERY_GEN):
+            ident = identifier_at(DISCOVERY_GEN, path, lineno, col)
             if ident is None:
                 unresolved.append(f'{path}:{lineno}:{col}')
                 continue
@@ -142,6 +159,12 @@ def main():
         json.dump({'sites': sites}, open(SITES, 'w'), indent=2)
         open(SITES, 'a').write('\n')
         print(f'discovered {len(sites)} closure call sites -> {SITES}')
+        now = {(s['file'], s['line'], s['column'], s['identifier']) for s in sites}
+        # Shown so a shrinking list is a visible decision, never a side effect.
+        print(f'  vs previous: +{len(now - previous)} added, '
+              f'-{len(previous - now)} removed')
+        for s in sorted(previous - now)[:10]:
+            print(f'     removed {s[0]}:{s[1]}:{s[2]} {s[3]}')
         by_file = {}
         for s in sites:
             by_file[s['file']] = by_file.get(s['file'], 0) + 1
