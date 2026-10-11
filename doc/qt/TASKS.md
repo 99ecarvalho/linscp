@@ -56,7 +56,7 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P1-01 | Shim: `UnicodeString` class | L | P0-25 | 6,248 uses. Class done; 1-based API from measured usage |
 | P1-01b | Shim: free string, number and path routines | L | P1-01 | Done. `Option.cpp` reaches 0 errors |
 | P1-01d | Shim: `TVarRec` + `Format` + `ARRAYOFCONST` | M | P1-01b | Done. Behind `FORMAT` (438 uses) and `FMTLOAD` (252) |
-| P1-01e | Resource strings: `LoadStr`/`FmtLoadStr` implementation | M | P1-01d | Declared only; `LoadStr` is core's own and reads the resource module |
+| P1-01e | Resource strings | M | P1-01d | Done with **zero core changes**: core's `LoadStr` is implemented in terms of Win32 `LoadString`, so only that is supplied, over a table generated from upstream's `.rc` files |
 | P1-01c | Shim: `AnsiString` / `UTF8String` / `RawByteString` + UTF-8 codec | M | P1-01 | Distinct code-page types; wire-format correctness lives here |
 | P1-02 | Shim: `TObject`, `TStrings`, `TStringList` | L | P1-01 | Done. 17 of the 30 `Common.cpp` errors |
 | P1-02b | Shim: `TList`, `TObjectList`, Delphi sets | M | P1-02 | Done. `Notify` is virtual and core overrides it |

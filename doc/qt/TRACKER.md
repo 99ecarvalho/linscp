@@ -9,11 +9,11 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 23 | 34 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 11 | 30 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 12 | 30 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **34** | **88** | |
+| **Total** | **35** | **88** | |
 
 ## Next three actions
 
@@ -40,8 +40,8 @@ Closest unit to clean next: `FileBuffer.cpp` (16 mingw / 24 Linux).
 2. **P0-06c / closure call sites** — 116 bare member-function names, each
    reported by clang with an exact position, so the rewrite can be
    compiler-guided.
-3. **P1-01e / resource strings** — `LoadStr` is declared by core but unimplemented;
-   `FMTLOAD` appears 252 times, so nothing will link without it.
+3. **P1-07b / Win32 file and handle functions** — `CreateFile`, `ReadFile`,
+   `CloseHandle` and the rest, as the census asks for them.
 
 ## Decisions taken
 
@@ -78,6 +78,8 @@ Closest unit to clean next: `FileBuffer.cpp` (16 mingw / 24 Linux).
 | 2026-10-10 | Chained subscripts on indexed properties are unsupported | clang reads `Prop[i][j]` as a two-argument getter call. Core has 0 occurrences; `check_properties.py` fails if an upstream change adds one |
 | 2026-10-10 | Win32 A/W name macros are undone in `vcl_win32_undef.h` | `<windows.h>` renamed the *definition* of `ReplaceText` to `ReplaceTextW` while the header still declared `ReplaceText`. Both compiled; only the link failed, and only because a test called it. A link-time guard now references every colliding name |
 | 2026-10-10 | `ARRAYOFCONST` pastes its parenthesised list onto a variadic call | C++Builder builds an open array of `TVarRec`, which needs compound literals. `ARRAYOFCONST((a, b))` becoming `MakeFormatArgs(a, b)` is ordinary C++ |
+| 2026-10-10 | **Resource strings: supply Win32 `LoadString`, not a `.res` loader, and do not patch core** | core's `LoadStr` is already implemented, in terms of `HInstance`, `LibModuleList` and Win32 `LoadString`. Supplying those three means no `.res` binary format to parse, no core edits, and a purely additive change — the kind upstream could take rather than a fork of its own code. The table is generated from upstream's `.rc` files, so the strings track the submodule automatically |
+| 2026-10-10 | `UnicodeString::c_str()` has a non-const overload returning a writable buffer | C++Builder's does, and core depends on it: `DoLoadStrFrom` calls `SetLength` and then passes `c_str()` to `LoadString` as the destination to fill |
 | 2026-10-10 | `TList::Notify` is virtual and fires before a removal, after an addition | Core overrides it. `TObjectList` frees owned objects from inside it, so a wrong `Action` means a leak or a double free, neither of which announces itself |
 | 2026-10-10 | `Extract` reports `lnExtracted`, never `lnDeleted` | That is how Delphi lets a caller take ownership back without the list freeing the object |
 | 2026-10-10 | `TList::Sort` is stable, where Delphi's quicksort is not | Relying on an unstable order would be a latent caller bug either way, and stable is the safer guarantee to provide |
@@ -208,6 +210,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | **`Option.cpp` and `NamedObjs.cpp` both compile clean on both targets** | `compile_census.py`, 0 errors each | 2026-10-10 |
 | Census after containers: mingw 1,070, Linux 1,299, 2/9 units clean | `census_ratchet.py` | 2026-10-10 |
 | 17/17 tests pass on both targets | `ctest` | 2026-10-10 |
+| Resource strings resolved with **no core changes**: 608 strings generated from upstream's `.rc`, all ids matched, 0 unknown, 0 duplicates | `gen_resources.py` | 2026-10-10 |
+| 18/18 tests pass on both targets | `ctest` | 2026-10-10 |
 | 12/12 tests pass on Linux and on Windows under Wine | `ctest` both trees | 2026-10-10 |
 | Directory search validated against both backends: real `FindFirstFileW` under Wine, and `dirent` + `fnmatch` on Linux | `test_sysutils` on both targets | 2026-10-10 |
 | `__closure` scope: 44 distinct closure types, 16 typedefs; call sites pass bare member-function names | grep over generated core | 2026-10-10 |
@@ -258,7 +262,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-01 | Shim: `UnicodeString` class | done | 1-based API, UTF-16, 9 test groups incl. surrogate pairs |
 | P1-01b | Shim: free string routines | done | `Option.cpp` reaches 0 errors |
 | P1-01d | Shim: `TVarRec`/`Format`/`ARRAYOFCONST` | done | `FORMAT` 438 + `FMTLOAD` 252 call sites |
-| P1-01e | Resource strings `LoadStr`/`FmtLoadStr` | todo | declared only; belongs with the resource layer |
+| P1-01e | Resource strings | done | 608 strings generated from upstream `.rc`; no core changes |
 | P1-01c | Shim: byte-string family + UTF-8 codec | done | malformed-input behaviour tested explicitly |
 | P1-02 | Shim: `TObject`/`TStrings`/`TStringList` | done | 0-based indexing, case-insensitive default, CommaText round trip |
 | P1-02b | Shim: `TList`/`TObjectList`/sets | done | ownership and `Notify` semantics tested |

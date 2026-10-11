@@ -8,7 +8,7 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 255,
+        "errors": 245,
         "missing_types": 20
       },
       "source/core/Configuration.cpp": {
@@ -18,7 +18,7 @@
       },
       "source/core/CopyParam.cpp": {
         "aborted": false,
-        "errors": 102,
+        "errors": 99,
         "missing_types": 6
       },
       "source/core/FileBuffer.cpp": {
@@ -55,7 +55,7 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 195,
+        "errors": 184,
         "missing_types": 10
       },
       "source/core/Configuration.cpp": {
@@ -65,7 +65,7 @@
       },
       "source/core/CopyParam.cpp": {
         "aborted": false,
-        "errors": 102,
+        "errors": 99,
         "missing_types": 6
       },
       "source/core/FileBuffer.cpp": {

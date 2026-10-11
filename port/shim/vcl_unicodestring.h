@@ -70,7 +70,12 @@ public:
 
   // --- raw access -----------------------------------------------------------
   // Null-terminated. Never returns nullptr: an empty string yields L"".
+  //
+  // The non-const overload hands back a *writable* buffer, as C++Builder's
+  // does. Core depends on that: DoLoadStrFrom calls SetLength and then passes
+  // c_str() to LoadString as the destination to fill.
   const wchar_t * c_str() const;
+  wchar_t * c_str();
   const wchar_t * data() const { return c_str(); }
   wchar_t * MutableData();
 

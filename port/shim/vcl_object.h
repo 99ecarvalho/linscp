@@ -90,12 +90,4 @@ LINSCP_DERIVED_EXCEPTION(EEncodingError, Exception);
 LINSCP_DERIVED_EXCEPTION(EDirectoryNotFoundException, Exception);
 LINSCP_DERIVED_EXCEPTION(EOSError, Exception);
 
-// Module registration record. Core walks this only to resolve resource
-// strings; an empty list is the correct behaviour until P1-01b lands LoadStr.
-struct TLibModule
-{
-  void * Instance = nullptr;
-  TLibModule * Next = nullptr;
-};
-
 #endif // LINSCP_VCL_OBJECT_H

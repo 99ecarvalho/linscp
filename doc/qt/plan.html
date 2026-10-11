@@ -1297,12 +1297,13 @@ platforms</h2>
 </tr>
 <tr class="even">
 <td>P1-01e</td>
-<td>Resource strings: <code>LoadStr</code>/<code>FmtLoadStr</code>
-implementation</td>
+<td>Resource strings</td>
 <td>M</td>
 <td>P1-01d</td>
-<td>Declared only; <code>LoadStr</code> is core’s own and reads the
-resource module</td>
+<td>Done with <strong>zero core changes</strong>: core’s
+<code>LoadStr</code> is implemented in terms of Win32
+<code>LoadString</code>, so only that is supplied, over a table
+generated from upstream’s <code>.rc</code> files</td>
 </tr>
 <tr class="odd">
 <td>P1-01c</td>
@@ -1780,7 +1781,7 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td>P1 Headless core</td>
-<td>11</td>
+<td>12</td>
 <td>30</td>
 <td>Golden suite green, six protocols, both platforms</td>
 </tr>
@@ -1804,7 +1805,7 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>34</strong></td>
+<td><strong>35</strong></td>
 <td><strong>88</strong></td>
 <td></td>
 </tr>
@@ -1835,9 +1836,9 @@ group.</li>
 <li><strong>P0-06c / closure call sites</strong> — 116 bare
 member-function names, each reported by clang with an exact position, so
 the rewrite can be compiler-guided.</li>
-<li><strong>P1-01e / resource strings</strong> — <code>LoadStr</code> is
-declared by core but unimplemented; <code>FMTLOAD</code> appears 252
-times, so nothing will link without it.</li>
+<li><strong>P1-07b / Win32 file and handle functions</strong> —
+<code>CreateFile</code>, <code>ReadFile</code>, <code>CloseHandle</code>
+and the rest, as the census asks for them.</li>
 </ol>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
@@ -2067,6 +2068,27 @@ variadic call</td>
 <td>C++Builder builds an open array of <code>TVarRec</code>, which needs
 compound literals. <code>ARRAYOFCONST((a, b))</code> becoming
 <code>MakeFormatArgs(a, b)</code> is ordinary C++</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td><strong>Resource strings: supply Win32 <code>LoadString</code>, not
+a <code>.res</code> loader, and do not patch core</strong></td>
+<td>core’s <code>LoadStr</code> is already implemented, in terms of
+<code>HInstance</code>, <code>LibModuleList</code> and Win32
+<code>LoadString</code>. Supplying those three means no
+<code>.res</code> binary format to parse, no core edits, and a purely
+additive change — the kind upstream could take rather than a fork of its
+own code. The table is generated from upstream’s <code>.rc</code> files,
+so the strings track the submodule automatically</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td><code>UnicodeString::c_str()</code> has a non-const overload
+returning a writable buffer</td>
+<td>C++Builder’s does, and core depends on it:
+<code>DoLoadStrFrom</code> calls <code>SetLength</code> and then passes
+<code>c_str()</code> to <code>LoadString</code> as the destination to
+fill</td>
 </tr>
 <tr class="even">
 <td>2026-10-10</td>
@@ -2709,6 +2731,18 @@ clean</td>
 <td>2026-10-10</td>
 </tr>
 <tr class="odd">
+<td>Resource strings resolved with <strong>no core changes</strong>: 608
+strings generated from upstream’s <code>.rc</code>, all ids matched, 0
+unknown, 0 duplicates</td>
+<td><code>gen_resources.py</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>18/18 tests pass on both targets</td>
+<td><code>ctest</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
 <td>12/12 tests pass on Linux and on Windows under Wine</td>
 <td><code>ctest</code> both trees</td>
 <td>2026-10-10</td>
@@ -3000,9 +3034,10 @@ resolution</td>
 </tr>
 <tr class="even">
 <td>P1-01e</td>
-<td>Resource strings <code>LoadStr</code>/<code>FmtLoadStr</code></td>
-<td>todo</td>
-<td>declared only; belongs with the resource layer</td>
+<td>Resource strings</td>
+<td>done</td>
+<td>608 strings generated from upstream <code>.rc</code>; no core
+changes</td>
 </tr>
 <tr class="odd">
 <td>P1-01c</td>

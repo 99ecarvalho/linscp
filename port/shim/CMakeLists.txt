@@ -3,6 +3,20 @@
 # std::wstring and <cwchar> are banned here: under -fshort-wchar, libstdc++'s
 # char_traits<wchar_t> and libc's wide functions are compiled for a 4-byte
 # wchar_t and would be an ABI mismatch. Enforced by the shim_no_wide_abi test.
+# Resource strings, generated from upstream's own .rc tables so they cannot
+# drift from the submodule. Declared here rather than at the top level because
+# a custom command only creates a build dependency for targets in the same
+# directory scope.
+set(LINSCP_RESOURCES "${CMAKE_BINARY_DIR}/gen_resources.cpp")
+add_custom_command(
+  OUTPUT  "${LINSCP_RESOURCES}"
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/gen_resources.py"
+          --src "${LINSCP_UPSTREAM}/source" --out "${LINSCP_RESOURCES}"
+  DEPENDS "${CMAKE_SOURCE_DIR}/port/tools/gen_resources.py"
+          "${LINSCP_UPSTREAM}/source/resource/TextsCore.h"
+  COMMENT "Generating resource string table from upstream .rc files"
+  VERBATIM)
+
 add_library(linscp-shim STATIC
   vcl_unicodestring.cpp
   vcl_bytestring.cpp
@@ -13,6 +27,8 @@ add_library(linscp-shim STATIC
   vcl_format.cpp
   vcl_streams.cpp
   vcl_containers.cpp
+  vcl_resources.cpp
+  "${CMAKE_BINARY_DIR}/gen_resources.cpp"
 )
 
 # The Win32 subset core calls directly. Only built for non-Windows targets; on

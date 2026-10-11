@@ -87,6 +87,13 @@ const wchar_t * UnicodeString::c_str() const
   return AsWide(FData.c_str());
 }
 
+wchar_t * UnicodeString::c_str()
+{
+  // Writable, and still null-terminated: std::u16string guarantees a
+  // terminator at data()[size()].
+  return const_cast<wchar_t *>(AsWide(FData.c_str()));
+}
+
 wchar_t * UnicodeString::MutableData()
 {
   return const_cast<wchar_t *>(AsWide(FData.data()));
