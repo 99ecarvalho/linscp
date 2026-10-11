@@ -8,6 +8,6 @@
 replace source/putty/windows/agent-client.c  agent-client.c  the agent is $SSH_AUTH_SOCK, not Pageant's named pipe
 replace source/putty/windows/gss.c           gss.c           GSSAPI from the system's Kerberos library, not SSPI or MIT's DLL
 drop    source/putty/windows/named-pipe-client.c        only Pageant's pipe used it
-drop    source/putty/windows/utils/security_p.c         named-pipe ACLs, only for Pageant's pipe
+replace source/putty/windows/utils/security_p.c  security_p.c  named-pipe ACLs, only for Pageant's pipe; keeps WinSCP's cleanup hook
 drop    source/putty/windows/utils/cryptoapi.c          obfuscates Pageant's pipe name
 drop    source/putty/windows/utils/agent_named_pipe_name.c  Pageant's pipe name

@@ -66,4 +66,6 @@ add_executable(linscp-core-link EXCLUDE_FROM_ALL "${CMAKE_CURRENT_BINARY_DIR}/li
 # linscp-runtime links every core object (in initialisation order) and every
 # library core uses; defined later, in port/frontend, and resolved when CMake
 # generates.
-target_link_libraries(linscp-core-link PRIVATE -Wl,--error-limit=0 linscp-runtime)
+# lld stops after 20 errors unless told otherwise; GNU ld reports them all.
+target_link_libraries(linscp-core-link PRIVATE
+  $<$<STREQUAL:${CMAKE_CXX_COMPILER_LINKER_ID},LLD>:-Wl,--error-limit=0> linscp-runtime)

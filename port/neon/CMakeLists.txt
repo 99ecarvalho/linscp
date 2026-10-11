@@ -4,10 +4,8 @@
 # which the transform's rules leave as it is; the tree gives it the patch
 # series.
 #
-# Windows only for now: src/config.h is neon's Win32 configuration.
-if(NOT WIN32)
-  return()
-endif()
+# src/config.h is neon's Win32 configuration and empty elsewhere; on POSIX
+# config-posix.h, from neon's configure, is force-included in its place.
 
 set(_neon "${LINSCP_UPSTREAM}/libs/neon")
 set(_neon_gen "${LINSCP_GEN}/libs/neon")
@@ -30,8 +28,13 @@ add_dependencies(linscp-neon transform)
 linscp_upstream_defines(linscp-neon PRIVATE ../libs/neon/Makefile.bcb)
 target_include_directories(linscp-neon PRIVATE "${_neon_gen}/src" "${_neon_gen}")
 target_link_libraries(linscp-neon PRIVATE linscp-openssl linscp-expat)
-target_link_libraries(linscp-neon INTERFACE linscp-openssl-ssl linscp-expat
-  ws2_32 secur32 iphlpapi)
+target_link_libraries(linscp-neon INTERFACE linscp-openssl-ssl linscp-expat)
+if(WIN32)
+  target_link_libraries(linscp-neon INTERFACE ws2_32 secur32 iphlpapi)
+else()
+  target_compile_options(linscp-neon PRIVATE
+    -include "${CMAKE_CURRENT_SOURCE_DIR}/config-posix.h")
+endif()
 set_target_properties(linscp-neon PROPERTIES C_STANDARD 11 C_EXTENSIONS ON)
 # Upstream's code is compiled as it is; its warnings are not ours to fix.
 # Two of the make file's defines are for C++Builder's own headers and break

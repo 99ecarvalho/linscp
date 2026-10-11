@@ -1,12 +1,6 @@
 # WinSCP's libs3, compiled from the generated tree (for the patch series) as
 # its Makefile builds it: the same units, include path and defines. WinSCP's copy does its HTTP through
 # neon rather than libcurl, so it links against linscp-neon.
-#
-# Windows only for now, like neon: inc/mingw supplies the POSIX headers
-# libs3 expects on Windows.
-if(NOT WIN32)
-  return()
-endif()
 
 set(_s3 "${LINSCP_UPSTREAM}/libs/libs3")
 set(_s3_gen "${LINSCP_GEN}/libs/libs3")
@@ -21,6 +15,12 @@ if(NOT _units_rc EQUAL 0)
   message(FATAL_ERROR "upstream_units.py failed for libs3's Makefile")
 endif()
 list(TRANSFORM LINSCP_LIBS3_UNITS PREPEND "${LINSCP_GEN}/")
+set(_mingw_functions "${_s3_gen}/src/mingw_functions.c")
+if(NOT WIN32)
+  # mingw_functions.c and inc/mingw are pthreads and uname over Win32; POSIX
+  # has the real ones.
+  list(REMOVE_ITEM LINSCP_LIBS3_UNITS "${_mingw_functions}")
+endif()
 
 # The Makefile compiles these .c files with bcc32 -P: as C++, regardless of
 # the extension. WinSCP's additions rely on it (struct names used without
@@ -40,7 +40,7 @@ target_include_directories(linscp-libs3 PRIVATE
 # threading support needs the real winpthreads pthread.h (C++Builder's library
 # never asks for one). request.c's own mutex calls then reach winpthreads,
 # linked anyway; libs3's versions, compiled as C++, have other names.
-set(_mingw_functions "${_s3_gen}/src/mingw_functions.c")
+if(WIN32)
 foreach(_unit IN LISTS LINSCP_LIBS3_UNITS)
   if(_unit STREQUAL _mingw_functions)
     set_property(SOURCE "${_unit}" APPEND PROPERTY INCLUDE_DIRECTORIES "${_s3_gen}/inc/mingw")
@@ -48,7 +48,14 @@ foreach(_unit IN LISTS LINSCP_LIBS3_UNITS)
     set_property(SOURCE "${_unit}" APPEND PROPERTY COMPILE_OPTIONS -idirafter "${_s3_gen}/inc/mingw")
   endif()
 endforeach()
+endif()
 target_link_libraries(linscp-libs3 PRIVATE linscp-openssl linscp-expat)
+if(NOT WIN32)
+  # WinSCP's additions use a little Win32 (GetSystemTime, strnicmp), which
+  # on Windows arrives through OpenSSL's headers including <windows.h>.
+  target_link_libraries(linscp-libs3 PRIVATE linscp-shim)
+  target_compile_options(linscp-libs3 PRIVATE -include windows.h)
+endif()
 target_link_libraries(linscp-libs3 INTERFACE linscp-neon)
 # Upstream's code is compiled as it is; its warnings are not ours to fix.
 target_compile_options(linscp-libs3 PRIVATE -w)

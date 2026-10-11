@@ -899,6 +899,7 @@ BOOL VerQueryValue(LPCVOID Block, LPCWSTR SubBlock, LPVOID * Buffer, UINT * Leng
 // The CRT's case-insensitive comparisons, under their POSIX names.
 #define _stricmp strcasecmp
 #define _strnicmp strncasecmp
+#define strnicmp strncasecmp
 // MSVC's: -1 when the output does not fit, where C99's returns the length
 // needed. Code written for Windows tests for the former.
 int _vsnprintf(char * Buffer, size_t Count, const char * Format, va_list Args);

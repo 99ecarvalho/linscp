@@ -9,11 +9,11 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 25 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 24 | 36 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 25 | 36 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **49** | **95** | |
+| **Total** | **50** | **95** | |
 
 ## Next three actions
 
@@ -47,11 +47,19 @@ Pageant's named pipe used. The crypto known-answer tests pass on Linux.
 test against real Winsock under Wine and against the emulation (ctest
 `winsock`).
 
-1. **P1-13**: neon and libs3 on Linux, so core can link there.
-2. **P1-12**: FileZilla on Linux -- its sockets are `WSAAsyncSelect`'s, driven
-   by window messages to a hidden window, which the emulation now needs.
-3. **P1-17**: the first SFTP session on Linux, against the same loopback
+**neon and libs3 build on Linux** (P1-13 done). neon takes a POSIX
+configuration from its own `configure` (`port/neon/config-posix.h`); WinSCP's
+Windows-only additions to it are guarded by one patch, and libs3's use the
+POSIX layer. Linking every core object on Linux (`linscp-core-link`) now
+leaves **28 undefined symbols, all FileZilla's** (`TFileZillaIntf`,
+`TFTPServerCapabilities`).
+
+1. **P1-12**: FileZilla on Linux -- its sockets are `WSAAsyncSelect`'s, driven
+   by window messages to a hidden window, which the emulation now needs. The
+   last thing between core and a Linux link.
+2. **P1-17**: the first SFTP session on Linux, against the same loopback
    `sshd` the Windows session tests use.
+3. **P1-15**: the stdio command-line frontend, on both targets.
 
 ## Decisions taken
 
@@ -175,6 +183,9 @@ test against real Winsock under Wine and against the emulation (ctest
 | 2026-10-11 | `_AFX_NO_DAO_SUPPORT` for the MFC subset | DAO is 32-bit only; Microsoft's MFC turns it off for every non-x86 target, in the `afxv_cpu.h` WinSCP does not vendor |
 | 2026-10-11 | Dead MFC functions join upstream's `#ifndef WINSCP` exclusions (`mfc-winscp-dead-references.patch`) | `CObject::IsKindOf` and timecore's `CArchive` operators call code upstream never builds; nothing uses them. C++Builder's linker tolerated it, lld does not |
 | 2026-10-11 | Generated files are declared byproducts of the transform, which writes only what changed | Ninja otherwise stats them before the transform runs: a new patch reached `build/gen` but not the objects built from it. Unchanged files keep their mtimes, so a patch rebuilds only what it touches |
+| 2026-10-11 | neon on POSIX: platform facts from neon's own `configure`, feature choices from WinSCP's Win32 `config.h` (`port/neon/config-posix.h`, force-included) | WinSCP's `src/config.h` is empty off Win32. Taking configure's feature answers too would make Linux differ from Windows in what it offers servers and shows users: SHA-512 digest auth (`HAVE_OPENSSL11`), IANA cipher names (`HAVE_SSL_CIPHER_STANDARD_NAME`). The sizes it records are checked by `_Static_assert` |
+| 2026-10-11 | WinSCP's Windows-only additions to neon are compiled on Windows only (`neon-winscp-additions-windows-only.patch`) | An unused `<windows.h>`, `ioctlsocket(FIONBIO)` where upstream's `fcntl` code sits beside it, and `ne_sock_sspi_init` calling SSPI unguarded. On POSIX neon uses BSD sockets directly, not the Winsock emulation |
+| 2026-10-11 | libs3 on POSIX is compiled over the POSIX layer (`-include windows.h`) | WinSCP's additions call `GetSystemTime` and `strnicmp`, which on Windows arrive through OpenSSL's headers including `<windows.h>`. Emulating them keeps libs3 unpatched |
 | 2026-10-10 | `Format` keeps malformed input visible | Delphi raises on a missing argument. Core routes user- and server-supplied text through these into logs, so an unknown specifier is echoed and a missing argument renders as `<missing>` rather than throwing from a log path |
 
 ## Correction: census figures before 2026-10-11 used the wrong configuration
@@ -273,6 +284,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | GSSAPI on Linux | Library slot 0 is the system's Kerberos library (MIT `libgssapi_krb5.so.2`, else Heimdal); slot 1, SSPI, is never available | Core addresses three fixed slots and asserts there are three; their settings keywords are unchanged |
 | Narrow (`A`) Win32 file names on POSIX | Taken as UTF-8, the file system's convention | Windows takes them in the ANSI code page. PuTTY passes paths through unchanged, so UTF-8 in, UTF-8 out |
 | Proxy commands on POSIX | Run with `/bin/sh -c` | Windows hands the command line to `CreateProcess` |
+| WebDAV authentication on Linux | No SSPI, so no Windows-integrated NTLM/Negotiate; `ne_sock_sspi_init` reports it unavailable, which core already handles. neon's GSSAPI is not enabled | SSPI is Windows'. GSSAPI for WebDAV would be a feature beyond upstream's |
+| Agent choice (`AuthAgent`) on Linux | Stored and restored, but Pageant and OpenSSH both mean `$SSH_AUTH_SOCK` | PuTTY's Unix Pageant and OpenSSH's agent listen on the same socket |
 | `SuspendThread` on POSIX | Not declared | A running pthread cannot be suspended. A missing declaration fails at compile time; a stub would fail silently. `CREATE_SUSPENDED` + `ResumeThread` is supported |
 
 ## Open questions
@@ -483,7 +496,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-10 | PuTTY delta reconciliation | todo | |
 | P1-11 | FileZilla MFC subset replacement | wip | FileZilla and the MFC subset build and link for Windows from the submodule (three patches); Linux replacement next |
 | P1-12 | FileZilla epoll rewrite | todo | **R2** — budget generously |
-| P1-13 | System libs | wip | Windows complete: PuTTY, puttyvs, FileZilla + MFC, neon, libs3 from the WinSCP submodule, OpenSSL 3.5.9 from its own (both targets); expat from its make file. Linux: neon and libs3 need POSIX configurations |
+| P1-13 | System libs | done | PuTTY, puttyvs, neon, libs3 from the WinSCP submodule, OpenSSL 3.5.9 from its own, expat from its make file, on both targets; FileZilla + MFC on Windows (Linux is P1-12). neon on POSIX: `config-posix.h` from its `configure` |
 | P1-14 | Drop `puttyvs` | done | the MSVC build is replaced by clang building the same files with the same defines, from `PuTTYVS.vcxproj` |
 | P1-15 | Console IPC → stdio | todo | |
 | P1-16 | Headless `Interface.h` frontend | done | `port/frontend`: all 17 functions plus startup/shutdown; core initialises and finalises under Wine. Linux follows core (P1-07b) |

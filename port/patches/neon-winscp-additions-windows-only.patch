@@ -1,0 +1,62 @@
+Compile WinSCP's Windows-only additions to neon on Windows only.
+
+WinSCP builds neon for Win32 alone, and three of its additions assume it:
+ne_openssl.c includes <windows.h> (it uses nothing from it), timed_connect
+switches the socket to non-blocking mode with Winsock's ioctlsocket instead
+of upstream's fcntl, and ne_sock_sspi_init calls into SSPI unconditionally.
+On POSIX neon uses BSD sockets directly, so the include is guarded with
+_WIN32, the two ioctlsocket branches are taken only on _WIN32 (upstream's
+fcntl code beside them is used otherwise), and ne_sock_sspi_init calls SSPI
+under HAVE_SSPI, as ne_sock_init's own call does, reporting failure (-1)
+without it -- which WebDAVFileSystem.cpp already handles as SSPI being
+unavailable. C++Builder defines _WIN32 and neon's Win32 config.h defines
+HAVE_SSPI, so upstream's build is unchanged. Line counts are unchanged.
+
+--- a/libs/neon/src/ne_openssl.c	2026-10-11 18:57:18.931676327 -0300
++++ b/libs/neon/src/ne_openssl.c	2026-10-11 18:57:18.952038646 -0300
+@@ -58,9 +58,9 @@
+ #ifdef WINSCP
+ #include "ne_private.h"
+ #endif
+-
++#ifdef _WIN32 /* linscp: Windows only */
+ #include <windows.h>
+-
++#endif
+ /* OpenSSL 0.9.6 compatibility */
+ #if OPENSSL_VERSION_NUMBER < 0x0090700fL
+ #define PKCS12_unpack_authsafes M_PKCS12_unpack_authsafes
+--- a/libs/neon/src/ne_socket.c	2026-10-11 18:57:18.937344678 -0300
++++ b/libs/neon/src/ne_socket.c	2026-10-11 18:57:18.952288596 -0300
+@@ -1374,7 +1374,7 @@
+     if (sock->cotimeout) {
+         int errnum, flags;
+ 
+-        #ifdef WINSCP
++        #if defined(WINSCP) && defined(_WIN32) /* linscp: else BSD sockets */
+         flags = 1;
+         ioctlsocket(fd, FIONBIO, &flags);
+         #else
+@@ -1428,7 +1428,7 @@
+         }
+         
+         /* Reset to old flags; fail on error if no previous error. */
+-        #ifdef WINSCP
++        #if defined(WINSCP) && defined(_WIN32) /* linscp: else BSD sockets */
+         flags = 0;
+         ioctlsocket(fd, FIONBIO, &flags);
+         #else
+@@ -2376,8 +2376,8 @@
+         do_ne_sock_sndbuf(sock, SO_RCVBUF, 4 * 1024 * 1024);
+     }
+ }
+-
+-int ne_sock_sspi_init(void)
+-{
+-    return ne_sspi_init();
+-}
++#ifdef HAVE_SSPI /* linscp: as ne_sock_init's own call */
++int ne_sock_sspi_init(void) { return ne_sspi_init(); }
++#else
++int ne_sock_sspi_init(void) { return -1; }
++#endif

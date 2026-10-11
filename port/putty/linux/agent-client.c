@@ -15,6 +15,7 @@
  */
 #include "putty.h"
 #include "pageant.h" /* for AGENT_MAX_MSGLEN */
+#include "puttyexp.h"
 
 #include <sys/socket.h>
 #include <sys/un.h>
@@ -22,6 +23,12 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
+
+/* WinSCP's choice between Pageant and OpenSSH's agent, which core stores
+ * and restores. Both are $SSH_AUTH_SOCK here -- OpenSSH's agent and PuTTY's
+ * Unix Pageant alike listen there -- so it is kept but changes nothing. The
+ * default is Windows'. */
+AuthAgentImplementation auth_agent_implementation = AAI_PAGEANT;
 
 /* The agent's socket path, or NULL if there is none to try. */
 static const char *agent_socket_path(void)

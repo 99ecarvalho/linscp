@@ -5,3 +5,4 @@ core-lp64-knock-address.patch
 core-shell-file-operation-windows-only.patch
 putty-lp64-ioctlsocket-argument.patch
 putty-aes-ni-non-win64-clang.patch
+neon-winscp-additions-windows-only.patch
