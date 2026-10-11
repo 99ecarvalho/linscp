@@ -205,6 +205,11 @@ DWORD WSAWaitForMultipleEvents(DWORD Count, const WSAEVENT * Events,
 #define WSAEOPNOTSUPP (WSABASEERR + 45)
 typedef void * LPWSAOVERLAPPED;
 typedef void * LPWSAOVERLAPPED_COMPLETION_ROUTINE;
+// The ws2_32 module's exports by name, for GetProcAddress: the socket
+// functions with Winsock's signatures and semantics (see
+// win32_winsock_posix.cpp), or null.
+FARPROC linscp_Ws2Proc(LPCSTR Name);
+
 int WSAIoctl(SOCKET S, DWORD IoControlCode, LPVOID InBuffer, DWORD InSize, LPVOID OutBuffer,
   DWORD OutSize, LPDWORD BytesReturned, LPWSAOVERLAPPED Overlapped,
   LPWSAOVERLAPPED_COMPLETION_ROUTINE Completion);

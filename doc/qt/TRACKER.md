@@ -9,11 +9,11 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 25 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 23 | 36 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 24 | 36 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **48** | **95** | |
+| **Total** | **49** | **95** | |
 
 ## Next three actions
 
@@ -41,12 +41,17 @@ its Windows platform layer included, over the POSIX layer, with
 GSSAPI (the system's Kerberos library) and dropping the four units only
 Pageant's named pipe used. The crypto known-answer tests pass on Linux.
 
-1. **P1-08**: Winsock on POSIX -- a `ws2_32` module whose `GetProcAddress`
-   gives `network.c` Winsock-signature functions, and `WSAEventSelect` /
-   `WSAEnumNetworkEvents` with Winsock's edge semantics, which core's SSH
-   event loop and PuTTY's network layer are written against.
-3. **P1-13**: neon and libs3 on Linux; then core links and P1-17's first
-   Linux session follows.
+**Winsock runs on Linux**: a `ws2_32` module whose `GetProcAddress` gives
+`network.c` Winsock-signature functions, and `WSAEventSelect` /
+`WSAEnumNetworkEvents` with Winsock's re-enabling rules, verified by one
+test against real Winsock under Wine and against the emulation (ctest
+`winsock`).
+
+1. **P1-13**: neon and libs3 on Linux, so core can link there.
+2. **P1-12**: FileZilla on Linux -- its sockets are `WSAAsyncSelect`'s, driven
+   by window messages to a hidden window, which the emulation now needs.
+3. **P1-17**: the first SFTP session on Linux, against the same loopback
+   `sshd` the Windows session tests use.
 
 ## Decisions taken
 
@@ -147,6 +152,7 @@ Pageant's named pipe used. The crypto known-answer tests pass on Linux.
 | 2026-10-10 | The ratchet records whether a unit aborted | An aborted parse reports a floor. Treating that as a distinct state stops a new abort from reading as sudden progress |
 | 2026-10-11 | On Linux, WinSCP's PuTTY is compiled with its Windows platform layer, over the Win32-on-POSIX layer; Linux-specific services replace individual units (refines P1-09) | Core is written against PuTTY's Windows platform API (`select_result`, `do_select`, `get_handle_wait_list`, `HandleWaitList`), and WinSCP's changes to that layer carry real behaviour (per-session `do_select`, connect timeouts, socket buffers, source address). Taking PuTTY's `unix/` layer instead would mean reimplementing both against core's model. Where Linux genuinely differs -- the agent (`SSH_AUTH_SOCK`), GSSAPI, entropy, proxy commands -- a unit is replaced by one implementing the same API, drawing on the pinned PuTTY 0.85 release's `unix/` code |
 | 2026-10-11 | On Linux PuTTY's narrow (`A`) Win32 names are distinct functions, and the bare names map to them in C without `UNICODE`; C++ keeps the wide bare names | PuTTY is C built without `UNICODE`, core C++ with it. In C a `char *` passed to a wide parameter is only a warning, so PuTTY on Linux is compiled with incompatible-pointer, int-conversion and implicit-declaration diagnostics as errors -- they found four such calls |
+| 2026-10-11 | Winsock on POSIX is a `ws2_32` module of Winsock-signature functions, with `WSAEventSelect` emulated by a monitor thread that applies Winsock's re-enabling rules | `network.c` takes every socket function through `GetProcAddress`, so the module is the exact boundary where Winsock semantics live; the libc names keep their POSIX meaning for anything else. Registering re-evaluates the socket; FD_READ waits for `recv`, FD_WRITE for a send that would block, FD_ACCEPT for `accept`; FD_CLOSE is detected with `POLLRDHUP` while read is disarmed, so a close with unread data is not missed and nothing spins |
 | 2026-10-11 | A Linux unit list for PuTTY (`port/putty/linux/units.txt`): `replace` or `drop` per unit, everything else as `Putty.cbproj` lists it | The agent client and GSSAPI are Windows services with Linux counterparts; the named-pipe client, its ACLs and Pageant's pipe name serve only Pageant. A rule naming a unit upstream no longer lists is an error |
 | 2026-10-11 | The Win32-on-POSIX headers are C as well as C++, with C linkage | PuTTY is C and includes `<windows.h>` as core does |
 | 2026-10-11 | The WinSCP pin tracks `master`, not a release tag (user's decision; supersedes P0-02's "release tag, not `master`") | Upstream is porting itself to 64-bit on `master` and fixing the same bugs this port was finding -- five of the six reported were already fixed there. Following it inherits those fixes instead of duplicating them. A bump re-runs the transform, the patch series and closure-site discovery, all of which fail loudly where upstream moved |
@@ -472,7 +478,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-06d | Select INI backend on Linux | todo | frontend decision |
 | P1-07 | `port/platform` Win32 subset | done | types, FILETIME/SYSTEMTIME, errors, winsock names |
 | P1-07b | `port/platform` Win32 file/handle functions | done | every Win32 call core makes: files, time zones (real transition rules), modules, processes (/proc), paths, string order, environment, XDG folders, MIME and type names, reparse points, trash, registry entry points, memory regions, version resources, user name, certificate chains (OpenSSL, system trust store); tested against real Win32 under Wine where observable. Core compiles on Linux |
-| P1-08 | Socket-event emulation | todo | R6 |
+| P1-08 | Socket-event emulation | done | `ws2_32` module and `WSAEventSelect`/`WSAEnumNetworkEvents`; one test passes against real Winsock (Wine) and the emulation. `WSAAsyncSelect` (FileZilla) is P1-12's |
 | P1-09 | PuTTY unix backend re-import | wip | WinSCP's PuTTY builds on Linux with its Windows layer over the emulation; agent and GSSAPI replaced (`port/putty/linux`). Runtime networking is P1-08's |
 | P1-10 | PuTTY delta reconciliation | todo | |
 | P1-11 | FileZilla MFC subset replacement | wip | FileZilla and the MFC subset build and link for Windows from the submodule (three patches); Linux replacement next |

@@ -690,18 +690,4 @@ int WSACleanup()
   return 0;
 }
 
-int closesocket(SOCKET S)
-{
-  return ::close(static_cast<int>(S));
-}
 
-int WSAIoctl(SOCKET, DWORD, LPVOID, DWORD, LPVOID, DWORD, LPDWORD BytesReturned,
-  LPWSAOVERLAPPED, LPWSAOVERLAPPED_COMPLETION_ROUTINE)
-{
-  if (BytesReturned != nullptr)
-  {
-    *BytesReturned = 0;
-  }
-  WSASetLastError(WSAEOPNOTSUPP);
-  return SOCKET_ERROR;
-}

@@ -5,6 +5,7 @@
 #include "win32_on_posix.h"
 #include "win32_kernel_internal.h"
 #include "secext.h"
+#include "winsock2.h"
 
 #include <pwd.h>
 
@@ -125,6 +126,7 @@ struct TModule
 };
 TModule Kernel32Module{"kernel32"};
 TModule NtDllModule{"ntdll"};
+TModule Ws2Module{"ws2_32"};
 
 TModule * KnownModule(LPCWSTR Name)
 {
@@ -145,6 +147,10 @@ TModule * KnownModule(LPCWSTR Name)
   if (SameIgnoringCase(N, "ntdll"))
   {
     return &NtDllModule;
+  }
+  if (SameIgnoringCase(N, "ws2_32"))
+  {
+    return &Ws2Module;
   }
   return nullptr;
 }
@@ -449,6 +455,13 @@ FARPROC GetProcAddress(HMODULE Module, LPCSTR ProcName)
       (std::strcmp(ProcName, "GetTimeZoneInformationForYear") == 0))
   {
     return reinterpret_cast<FARPROC>(&GetTimeZoneInformationForYear);
+  }
+  if ((Module == &Ws2Module) && (ProcName != nullptr))
+  {
+    if (FARPROC P = linscp_Ws2Proc(ProcName))
+    {
+      return P;
+    }
   }
   SetLastError(ERROR_PROC_NOT_FOUND);
   return nullptr;
