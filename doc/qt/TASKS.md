@@ -17,7 +17,8 @@ Goal: prove the keystone works, with no behaviour change anywhere.
 | P0-03 | **Dual-target property macro header** (`port/shim/vcl_property.h`) | S | — | The keystone; PLAN §2 |
 | P0-04 | **Verify C++Builder accepts macro-expanded `__property`** | S | P0-03 | **R1. Do this first.** Needs a licence + Windows. Blocks the zero-diff story |
 | P0-05 | `transform.py`: `__property` rewriter, line-preserving | M | P0-03 | 591 decls, 4 forms + 4 manual |
-| P0-06 | `transform.py`: `__fastcall`, `__closure`, `ARRAYOFCONST` | S | P0-05 | `__fastcall` → empty define |
+| P0-06 | `transform.py`: `__fastcall`, `ARRAYOFCONST` | S | P0-05 | `__fastcall` is an empty define |
+| P0-06b | `__closure`: closure type + typedef transform + call-site binding | L | P0-06 | **The only thing still blocking `Common.cpp`.** 44 distinct closure types, 16 typedefs. Call sites pass a bare member-function name, which Borland binds to `this` implicitly and which is not valid C++ at all |
 | P0-07 | Transform idempotence + line-count assertion tests | S | P0-05 | Guards against silent drift |
 | P0-08 | CMake skeleton: generate → compile one TU | M | P0-01, P0-05 | |
 | P0-09 | Minimal shim to compile `core/Common.cpp` on Linux clang | M | P0-08 | The real measurement of shim cost |
@@ -50,7 +51,8 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P1-01 | Shim: `UnicodeString` class | L | P0-25 | 6,248 uses. Class done; 1-based API from measured usage |
 | P1-01b | Shim: free string routines (`Format`, `LoadStr`, `SameText`, `Pos`, `IntToStr`, …) | L | P1-01 | Measured: `LoadStr` 288, `SameText` 113, `Pos` 89, `CutToChar` 70, `IntToStr` 58 |
 | P1-01c | Shim: `AnsiString` / `UTF8String` / `RawByteString` + UTF-8 codec | M | P1-01 | Distinct code-page types; wire-format correctness lives here |
-| P1-02 | Shim: `TObject`, `TList`, `TStrings`, `TStringList`, `Contnrs` | L | P1-01 | 497 `TStrings` uses |
+| P1-02 | Shim: `TObject`, `TStrings`, `TStringList` | L | P1-01 | Done. 17 of the 30 `Common.cpp` errors |
+| P1-02b | Shim: `TList`, `TObjectList`, `Contnrs` | M | P1-02 | `TObjectList` 14 uses; not yet needed by `Common.cpp` |
 | P1-03 | Shim: `TDateTime` + date/time RTL | L | P1-01 | Done. 30 of 70 `Common.cpp` errors |
 | P1-03b | Shim: `SysUtils` / `IOUtils` / `StrUtils` file and path routines | L | P1-03 | `IncludeTrailingBackslash` 39, `ExtractFileName` 29 |
 | P1-04 | Shim: `Exception` hierarchy + Delphi exception semantics | M | P1-01 | Core has no `__try`/`__except` — simplifies this |

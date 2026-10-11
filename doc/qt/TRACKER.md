@@ -8,24 +8,29 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 17 | 28 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 5 | 25 | Golden suite green, six protocols, both platforms |
+| P0 Foundation | 17 | 29 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P1 Headless core | 6 | 26 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **22** | **78** | |
+| **Total** | **23** | **80** | |
 
 ## Next three actions
 
 Driven by `compile_census.py` rather than by grep counts — the compiler names
 what is actually blocking `Common.cpp`, in dependency order.
 
-1. **P1-02 / `TStrings` + `TStringList`** — now the dominant blocker: 17 of the
-   30 remaining errors in `Common.cpp`, and 521 uses across core.
-2. **P0-06 / `__closure`** — `TProcessLocalFileEvent` and `TLogOptionEvent` are
-   closure typedefs. A bare `#define` makes them parse but breaks every
-   assignment site, so they need the `std::function` transform rule.
-3. **P1-03b / `TSearchRec`** plus `FindFirst`/`FindNext` — 3 errors, small.
+**`Common.cpp` is down to 5 errors and every one is `__closure`.** That makes
+P0-06b the whole critical path to the first core TU compiling.
+
+1. **P0-06b / `__closure`** — design the closure type, transform the 16 typedefs,
+   and solve call-site binding. Core passes a bare member-function name where a
+   closure is expected; Borland binds `this` implicitly, and the bare name is not
+   valid C++, so call sites must be rewritten rather than merely retyped.
+2. **P0-09** — finish the first TU, then add two or three more TUs to the ratchet
+   so the shim is measured against more than `Common.cpp`.
+3. **P0-13** — the golden-output harness, still the highest-leverage item for
+   everything after P1.
 
 ## Decisions taken
 
@@ -57,6 +62,20 @@ what is actually blocking `Common.cpp`, in dependency order.
 | 2026-10-10 | Date and time are combined only through `ComposeDateTime` | Delphi keeps the time of day positive for negative dates, so `Date + Time` lands a day late at the mirrored time. Correct for file timestamps, wrong in general and wrong silently |
 | 2026-10-10 | `TCriticalSection` wraps `std::recursive_mutex` | Delphi's is re-entrant; a plain `std::mutex` would deadlock on core's re-entrant paths rather than fail a test |
 | 2026-10-10 | Compile-census numbers are ratcheted in CI | No core TU compiles cleanly yet, so a reintroduced missing type would otherwise present as a passing build |
+| 2026-10-10 | `TStrings` is 0-based while `UnicodeString` is 1-based | Both match their Delphi originals. Two bases in one codebase is a hazard, so each is pinned by a boundary test rather than left to memory |
+| 2026-10-10 | `TStrings` references objects, never owns them | Delphi does not free them and core owns them elsewhere; freeing here would be a double-free. Asserted by a test that outlives the list |
+| 2026-10-10 | Chained subscripts on indexed properties are unsupported | clang reads `Prop[i][j]` as a two-argument getter call. Core has 0 occurrences; `check_properties.py` fails if an upstream change adds one |
+
+## Known divergences from Delphi
+
+Recorded deliberately, so they are findable when something behaves oddly.
+
+| Area | Divergence | Why |
+|---|---|---|
+| `UnicodeString::LowerCase` / `CompareIC` | ASCII-only case folding | Delphi's is locale-aware. Core uses these on protocol tokens and switch names. Must not be relied on for user-facing text |
+| `FindFirst` pattern matching | Case-sensitive on Linux, case-insensitive on Windows | Each matches its host filesystem. A pattern that matches on Windows may not on Linux |
+| `faHidden` on Linux | Set from a leading dot in the name | POSIX has no hidden attribute; the dot convention is what users expect |
+| `TFormatSettings` defaults | ISO-8601 rather than system locale | Deterministic across machines. Anything user-facing should set them explicitly |
 
 ## Open questions
 
@@ -115,6 +134,10 @@ what is actually blocking `Common.cpp`, in dependency order.
 | The ratchet detects a regression: baseline 25 against actual 30 fails | simulated baseline, exit 1 | 2026-10-10 |
 | `TDateTime` matches Delphi's four documented anchors, including -1.25 = 1899-12-29 06:00 | `test_datetime` | 2026-10-10 |
 | Delphi's `DayOfWeek` offset verified independently against five known dates | standalone cross-check, k=6 | 2026-10-10 |
+| **`Common.cpp`: 109 -> 5 errors, and all 5 are `__closure`** | `compile_census.py` | 2026-10-10 |
+| 12/12 tests pass on Linux and on Windows under Wine | `ctest` both trees | 2026-10-10 |
+| Directory search validated against both backends: real `FindFirstFileW` under Wine, and `dirent` + `fnmatch` on Linux | `test_sysutils` on both targets | 2026-10-10 |
+| `__closure` scope: 44 distinct closure types, 16 typedefs; call sites pass bare member-function names | grep over generated core | 2026-10-10 |
 
 ## Task status
 
@@ -126,10 +149,11 @@ what is actually blocking `Common.cpp`, in dependency order.
 | P0-03 | Dual-target property macro header | done | `port/shim/vcl_property.h`; 9 forms, self-tested |
 | P0-04 | Verify C++Builder accepts the macro | blocked | Q-2: needs licence + Windows |
 | P0-05 | `transform.py` property rewriter | done | 613/613, 0 unhandled |
-| P0-06 | `transform.py` fastcall/closure/ARRAYOFCONST | todo | properties done; these three not started |
+| P0-06 | `transform.py` fastcall/ARRAYOFCONST | todo | `__closure` split out as P0-06b |
+| P0-06b | `__closure` support | todo | the only remaining `Common.cpp` blocker |
 | P0-07 | Transform idempotence tests | done | idempotent + line-count parity asserted |
 | P0-08 | CMake skeleton | done | transform+verify wired as a build step; CTest on both targets |
-| P0-09 | Minimal shim for `core/Common.cpp` | wip | 109 -> 30 errors; 5 distinct types left |
+| P0-09 | Minimal shim for `core/Common.cpp` | wip | 109 -> 5 errors; all 5 are `__closure` |
 | P0-10 | mingw-w64 sysroot + clang toolchain file | done | `cmake/toolchain-mingw-w64.cmake`; clang + lld + Wine emulator |
 | P0-11 | CI matrix Linux + Windows cross | todo | |
 | P0-12 | Wine smoke tests in CI | wip | wired into CTest via `CMAKE_CROSSCOMPILING_EMULATOR`; GitHub Actions pending |
@@ -156,9 +180,10 @@ what is actually blocking `Common.cpp`, in dependency order.
 | P1-01 | Shim: `UnicodeString` class | done | 1-based API, UTF-16, 9 test groups incl. surrogate pairs |
 | P1-01b | Shim: free string routines | todo | ranked by measured use |
 | P1-01c | Shim: byte-string family + UTF-8 codec | done | malformed-input behaviour tested explicitly |
-| P1-02 | Shim: `TObject`/`TList`/`TStrings` | wip | `TObject`/`TPersistent` done; `TStrings` next |
+| P1-02 | Shim: `TObject`/`TStrings`/`TStringList` | done | 0-based indexing, case-insensitive default, CommaText round trip |
+| P1-02b | Shim: `TList`/`TObjectList`/`Contnrs` | todo | not yet needed by `Common.cpp` |
 | P1-03 | Shim: `TDateTime` + date/time RTL | done | documented anchors, negative composition, `FormatDateTime` |
-| P1-03b | Shim: `SysUtils`/`IOUtils`/`StrUtils` paths | todo | |
+| P1-03b | Shim: `SysUtils`/`IOUtils`/`StrUtils` paths | wip | `TSearchRec`, `FindFirst`/`FindNext`, `FileExists` done; path routines next |
 | P1-04 | Shim: exceptions | done | 17 Delphi classes; base and sibling matching tested |
 | P1-05 | Shim: `TCriticalSection`/`SyncObjs` | done | recursive; thread exclusion tested |
 | P1-05b | Shim: `TThread`/`StartThread` | todo | |

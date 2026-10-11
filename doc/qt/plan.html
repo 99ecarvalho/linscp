@@ -341,6 +341,9 @@ id="toc-p3-qt-parity-incremental-independently-shippable">P3 — Qt parity
 actions</a></li>
 <li><a href="#decisions-taken" id="toc-decisions-taken">Decisions
 taken</a></li>
+<li><a href="#known-divergences-from-delphi"
+id="toc-known-divergences-from-delphi">Known divergences from
+Delphi</a></li>
 <li><a href="#open-questions" id="toc-open-questions">Open
 questions</a></li>
 <li><a href="#verified-facts-re-check-if-the-environment-changes"
@@ -1010,26 +1013,38 @@ line-preserving</td>
 <tr class="even">
 <td>P0-06</td>
 <td><code>transform.py</code>: <code>__fastcall</code>,
-<code>__closure</code>, <code>ARRAYOFCONST</code></td>
+<code>ARRAYOFCONST</code></td>
 <td>S</td>
 <td>P0-05</td>
-<td><code>__fastcall</code> → empty define</td>
+<td><code>__fastcall</code> is an empty define</td>
 </tr>
 <tr class="odd">
+<td>P0-06b</td>
+<td><code>__closure</code>: closure type + typedef transform + call-site
+binding</td>
+<td>L</td>
+<td>P0-06</td>
+<td><strong>The only thing still blocking
+<code>Common.cpp</code>.</strong> 44 distinct closure types, 16
+typedefs. Call sites pass a bare member-function name, which Borland
+binds to <code>this</code> implicitly and which is not valid C++ at
+all</td>
+</tr>
+<tr class="even">
 <td>P0-07</td>
 <td>Transform idempotence + line-count assertion tests</td>
 <td>S</td>
 <td>P0-05</td>
 <td>Guards against silent drift</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-08</td>
 <td>CMake skeleton: generate → compile one TU</td>
 <td>M</td>
 <td>P0-01, P0-05</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-09</td>
 <td>Minimal shim to compile <code>core/Common.cpp</code> on Linux
 clang</td>
@@ -1037,7 +1052,7 @@ clang</td>
 <td>P0-08</td>
 <td>The real measurement of shim cost</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-10</td>
 <td>Install + script mingw-w64 sysroot; clang <code>--target</code>
 toolchain file</td>
@@ -1045,28 +1060,28 @@ toolchain file</td>
 <td>P0-08</td>
 <td>GCC is unusable — clang only</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-11</td>
 <td>CI matrix: Linux native + Windows cross, both clang</td>
 <td>M</td>
 <td>P0-10</td>
 <td>From the first commit</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-12</td>
 <td>Wine in CI for Windows smoke tests</td>
 <td>S</td>
 <td>P0-11</td>
 <td>Not release certification</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-13</td>
 <td>Golden-output harness: runner, XML normaliser, differ</td>
 <td>M</td>
 <td>—</td>
 <td>PLAN §5; highest leverage in P0</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-14</td>
 <td>Protocol server containers (OpenSSH, vsftpd, ProFTPD, WebDAV,
 MinIO)</td>
@@ -1074,21 +1089,21 @@ MinIO)</td>
 <td>P0-13</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-15</td>
 <td>Capture golden XML corpus from real WinSCP on Windows</td>
 <td>M</td>
 <td>P0-13, P0-14</td>
 <td>Needs a Windows host</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-16</td>
 <td>ADR log (<code>doc/qt/adr/</code>)</td>
 <td>S</td>
 <td>—</td>
 <td>Record toolchain/ABI choices as made</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-17</td>
 <td><code>check_properties.py</code>: compile-test every transformed
 declaration</td>
@@ -1097,14 +1112,14 @@ declaration</td>
 <td>Validates macro arity across the real corpus without the full
 shim</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-18</td>
 <td>HTML render of the plan docs (<code>build-html.sh</code>)</td>
 <td>S</td>
 <td>—</td>
 <td>pandoc, self-contained, light/dark</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-19</td>
 <td>Publish repository with licence and root README</td>
 <td>S</td>
@@ -1112,7 +1127,7 @@ shim</td>
 <td>Public, GPL-3.0; <code>main</code> released, <code>qt</code>
 active</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-20</td>
 <td>Generator for a PR-able branch against a <code>winscp/winscp</code>
 fork</td>
@@ -1120,7 +1135,7 @@ fork</td>
 <td>P1-19</td>
 <td>Defer until there is something worth proposing (Q-7)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-21</td>
 <td><code>verify_transform.py</code>: audit the generated tree against
 upstream</td>
@@ -1128,14 +1143,14 @@ upstream</td>
 <td>P0-05</td>
 <td>Byte-exactness is the invariant the whole model rests on</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-22</td>
 <td>Rehearse history import into a <code>winscp/winscp</code> fork</td>
 <td>S</td>
 <td>P0-05</td>
 <td>Validates Q-7 and measures the real conflict cost</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-23</td>
 <td><code>check_docs.py</code>: keep TASKS and TRACKER consistent</td>
 <td>S</td>
@@ -1143,7 +1158,7 @@ upstream</td>
 <td>Enforces the tracker rule mechanically rather than by
 discipline</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-24</td>
 <td>Measure the VCL surface the core requires
 (<code>census.py</code>)</td>
@@ -1152,7 +1167,7 @@ discipline</td>
 <td>Resolves core identifiers against real mingw/OpenSSL/stdlib
 headers</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-25</td>
 <td>ADR 0001: character width for <code>UnicodeString</code></td>
 <td>S</td>
@@ -1160,14 +1175,14 @@ headers</td>
 <td>Accepted: <code>-fshort-wchar</code>, <code>std::u16string</code>
 storage</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-26</td>
 <td><code>check_wide_abi.py</code>: enforce ADR 0001 mechanically</td>
 <td>S</td>
 <td>P0-25</td>
 <td>Wrong-ABI code links cleanly then misbehaves, so grep it</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-27</td>
 <td><code>compile_census.py</code>: classify what a real core TU still
 needs</td>
@@ -1175,7 +1190,7 @@ needs</td>
 <td>P0-09</td>
 <td>Lets the compiler enumerate the shim gap instead of grep</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-28</td>
 <td><code>census_ratchet.py</code>: pin the census so progress cannot
 slip back</td>
@@ -1235,21 +1250,29 @@ platforms</h2>
 </tr>
 <tr class="even">
 <td>P1-02</td>
-<td>Shim: <code>TObject</code>, <code>TList</code>,
-<code>TStrings</code>, <code>TStringList</code>,
-<code>Contnrs</code></td>
+<td>Shim: <code>TObject</code>, <code>TStrings</code>,
+<code>TStringList</code></td>
 <td>L</td>
 <td>P1-01</td>
-<td>497 <code>TStrings</code> uses</td>
+<td>Done. 17 of the 30 <code>Common.cpp</code> errors</td>
 </tr>
 <tr class="odd">
+<td>P1-02b</td>
+<td>Shim: <code>TList</code>, <code>TObjectList</code>,
+<code>Contnrs</code></td>
+<td>M</td>
+<td>P1-02</td>
+<td><code>TObjectList</code> 14 uses; not yet needed by
+<code>Common.cpp</code></td>
+</tr>
+<tr class="even">
 <td>P1-03</td>
 <td>Shim: <code>TDateTime</code> + date/time RTL</td>
 <td>L</td>
 <td>P1-01</td>
 <td>Done. 30 of 70 <code>Common.cpp</code> errors</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-03b</td>
 <td>Shim: <code>SysUtils</code> / <code>IOUtils</code> /
 <code>StrUtils</code> file and path routines</td>
@@ -1258,7 +1281,7 @@ platforms</h2>
 <td><code>IncludeTrailingBackslash</code> 39,
 <code>ExtractFileName</code> 29</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-04</td>
 <td>Shim: <code>Exception</code> hierarchy + Delphi exception
 semantics</td>
@@ -1267,21 +1290,21 @@ semantics</td>
 <td>Core has no <code>__try</code>/<code>__except</code> — simplifies
 this</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-05</td>
 <td>Shim: <code>TCriticalSection</code> + <code>SyncObjs</code></td>
 <td>M</td>
 <td>P1-02</td>
 <td>Done; recursive, as Delphi’s is</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-05b</td>
 <td>Shim: <code>TThread</code> / <code>StartThread</code></td>
 <td>M</td>
 <td>P1-05</td>
 <td><code>Interface.h</code> already abstracts thread creation</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-06</td>
 <td>Shim: <code>TStream</code>, <code>TMemIniFile</code>;
 <code>TRegistry</code> → file-backed</td>
@@ -1289,35 +1312,35 @@ this</td>
 <td>P1-02</td>
 <td>INI backend already exists in core</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-07</td>
 <td><code>port/platform/win32-on-posix</code>: ~40 functions</td>
 <td>L</td>
 <td>P1-06</td>
 <td>Keeps core diff at zero</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-08</td>
 <td><code>WSAEventSelect</code> / socket-event emulation</td>
 <td>M</td>
 <td>P1-07</td>
 <td>R6</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-09</td>
 <td>PuTTY: re-import upstream <code>unix/</code> backend</td>
 <td>M</td>
 <td>P1-03</td>
 <td>Upstream maintains it; reconcile WinSCP’s patches</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-10</td>
 <td>PuTTY: reconcile WinSCP deltas against vanilla 0.85</td>
 <td>M</td>
 <td>P1-09</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-11</td>
 <td>FileZilla: replace vendored MFC subset
 (<code>CString</code>/<code>CFile</code>/<code>CTime</code>)</td>
@@ -1325,7 +1348,7 @@ this</td>
 <td>P1-01</td>
 <td>Only 4 files in <code>libs/mfc</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-12</td>
 <td><strong>FileZilla: <code>WSAAsyncSelect</code> hidden-window pump →
 epoll/poll</strong></td>
@@ -1333,28 +1356,28 @@ epoll/poll</strong></td>
 <td>P1-11</td>
 <td><strong>R2.</strong> ~1,700 lines; least mechanical task in P1</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-13</td>
 <td>Switch <code>libs/</code> to system OpenSSL, expat, neon, libs3</td>
 <td>M</td>
 <td>P0-08</td>
 <td>All vanilla upstream already</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-14</td>
 <td>Drop <code>puttyvs</code> (MSVC wrapper, obsolete)</td>
 <td>S</td>
 <td>P1-09</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-15</td>
 <td><code>winscp.com</code> shared-memory IPC → plain stdio</td>
 <td>M</td>
 <td>P1-06</td>
 <td>Both platforms</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-16</td>
 <td>Headless frontend implementing <code>Interface.h</code></td>
 <td>L</td>
@@ -1362,28 +1385,28 @@ epoll/poll</strong></td>
 <td>Derive from <code>ConsoleRunner.cpp</code> — it has zero
 <code>forms/</code> deps</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-17</td>
 <td>First link + first real SFTP session on Linux</td>
 <td>M</td>
 <td>P1-16</td>
 <td>Expect a long tail of link/ABI issues</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-18</td>
 <td>Same core + CLI cross-built for Windows, Wine-smoked</td>
 <td>M</td>
 <td>P1-17, P0-12</td>
 <td>Proves “one codebase”</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-19</td>
 <td>Golden suite green across all six protocols, both platforms</td>
 <td>L</td>
 <td>P1-18, P0-15</td>
 <td><strong>P1 exit gate</strong></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-20</td>
 <td>Verify stock <code>netstandard2.0</code> .NET assembly drives the
 Linux CLI</td>
@@ -1391,7 +1414,7 @@ Linux CLI</td>
 <td>P1-19</td>
 <td>Should work unchanged</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-21</td>
 <td><code>#ifdef</code> out <code>dragext</code>,
 <code>Setup.cpp</code>, jump lists, file associations</td>
@@ -1671,14 +1694,14 @@ evaluation down and close it</td>
 <tr class="odd">
 <td>P0 Foundation</td>
 <td>17</td>
-<td>28</td>
+<td>29</td>
 <td><code>core/Common.cpp</code> compiles on Linux clang; VCL build
 green (R1)</td>
 </tr>
 <tr class="even">
 <td>P1 Headless core</td>
-<td>5</td>
-<td>25</td>
+<td>6</td>
+<td>26</td>
 <td>Golden suite green, six protocols, both platforms</td>
 </tr>
 <tr class="odd">
@@ -1701,8 +1724,8 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>22</strong></td>
-<td><strong>78</strong></td>
+<td><strong>23</strong></td>
+<td><strong>80</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -1711,18 +1734,21 @@ green (R1)</td>
 <p>Driven by <code>compile_census.py</code> rather than by grep counts —
 the compiler names what is actually blocking <code>Common.cpp</code>, in
 dependency order.</p>
+<p><strong><code>Common.cpp</code> is down to 5 errors and every one is
+<code>__closure</code>.</strong> That makes P0-06b the whole critical
+path to the first core TU compiling.</p>
 <ol type="1">
-<li><strong>P1-02 / <code>TStrings</code> +
-<code>TStringList</code></strong> — now the dominant blocker: 17 of the
-30 remaining errors in <code>Common.cpp</code>, and 521 uses across
-core.</li>
-<li><strong>P0-06 / <code>__closure</code></strong> —
-<code>TProcessLocalFileEvent</code> and <code>TLogOptionEvent</code> are
-closure typedefs. A bare <code>#define</code> makes them parse but
-breaks every assignment site, so they need the
-<code>std::function</code> transform rule.</li>
-<li><strong>P1-03b / <code>TSearchRec</code></strong> plus
-<code>FindFirst</code>/<code>FindNext</code> — 3 errors, small.</li>
+<li><strong>P0-06b / <code>__closure</code></strong> — design the
+closure type, transform the 16 typedefs, and solve call-site binding.
+Core passes a bare member-function name where a closure is expected;
+Borland binds <code>this</code> implicitly, and the bare name is not
+valid C++, so call sites must be rewritten rather than merely
+retyped.</li>
+<li><strong>P0-09</strong> — finish the first TU, then add two or three
+more TUs to the ratchet so the shim is measured against more than
+<code>Common.cpp</code>.</li>
+<li><strong>P0-13</strong> — the golden-output harness, still the
+highest-leverage item for everything after P1.</li>
 </ol>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
@@ -1913,6 +1939,71 @@ deadlock on core’s re-entrant paths rather than fail a test</td>
 <td>Compile-census numbers are ratcheted in CI</td>
 <td>No core TU compiles cleanly yet, so a reintroduced missing type
 would otherwise present as a passing build</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td><code>TStrings</code> is 0-based while <code>UnicodeString</code> is
+1-based</td>
+<td>Both match their Delphi originals. Two bases in one codebase is a
+hazard, so each is pinned by a boundary test rather than left to
+memory</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td><code>TStrings</code> references objects, never owns them</td>
+<td>Delphi does not free them and core owns them elsewhere; freeing here
+would be a double-free. Asserted by a test that outlives the list</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>Chained subscripts on indexed properties are unsupported</td>
+<td>clang reads <code>Prop[i][j]</code> as a two-argument getter call.
+Core has 0 occurrences; <code>check_properties.py</code> fails if an
+upstream change adds one</td>
+</tr>
+</tbody>
+</table>
+<h2 id="known-divergences-from-delphi">Known divergences from
+Delphi</h2>
+<p>Recorded deliberately, so they are findable when something behaves
+oddly.</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Area</th>
+<th>Divergence</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>UnicodeString::LowerCase</code> / <code>CompareIC</code></td>
+<td>ASCII-only case folding</td>
+<td>Delphi’s is locale-aware. Core uses these on protocol tokens and
+switch names. Must not be relied on for user-facing text</td>
+</tr>
+<tr class="even">
+<td><code>FindFirst</code> pattern matching</td>
+<td>Case-sensitive on Linux, case-insensitive on Windows</td>
+<td>Each matches its host filesystem. A pattern that matches on Windows
+may not on Linux</td>
+</tr>
+<tr class="odd">
+<td><code>faHidden</code> on Linux</td>
+<td>Set from a leading dot in the name</td>
+<td>POSIX has no hidden attribute; the dot convention is what users
+expect</td>
+</tr>
+<tr class="even">
+<td><code>TFormatSettings</code> defaults</td>
+<td>ISO-8601 rather than system locale</td>
+<td>Deterministic across machines. Anything user-facing should set them
+explicitly</td>
 </tr>
 </tbody>
 </table>
@@ -2245,6 +2336,30 @@ against five known dates</td>
 <td>standalone cross-check, k=6</td>
 <td>2026-10-10</td>
 </tr>
+<tr class="odd">
+<td><strong><code>Common.cpp</code>: 109 -&gt; 5 errors, and all 5 are
+<code>__closure</code></strong></td>
+<td><code>compile_census.py</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>12/12 tests pass on Linux and on Windows under Wine</td>
+<td><code>ctest</code> both trees</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>Directory search validated against both backends: real
+<code>FindFirstFileW</code> under Wine, and <code>dirent</code> +
+<code>fnmatch</code> on Linux</td>
+<td><code>test_sysutils</code> on both targets</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td><code>__closure</code> scope: 44 distinct closure types, 16
+typedefs; call sites pass bare member-function names</td>
+<td>grep over generated core</td>
+<td>2026-10-10</td>
+</tr>
 </tbody>
 </table>
 <h2 id="task-status">Task status</h2>
@@ -2298,144 +2413,150 @@ against five known dates</td>
 </tr>
 <tr class="even">
 <td>P0-06</td>
-<td><code>transform.py</code> fastcall/closure/ARRAYOFCONST</td>
+<td><code>transform.py</code> fastcall/ARRAYOFCONST</td>
 <td>todo</td>
-<td>properties done; these three not started</td>
+<td><code>__closure</code> split out as P0-06b</td>
 </tr>
 <tr class="odd">
+<td>P0-06b</td>
+<td><code>__closure</code> support</td>
+<td>todo</td>
+<td>the only remaining <code>Common.cpp</code> blocker</td>
+</tr>
+<tr class="even">
 <td>P0-07</td>
 <td>Transform idempotence tests</td>
 <td>done</td>
 <td>idempotent + line-count parity asserted</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-08</td>
 <td>CMake skeleton</td>
 <td>done</td>
 <td>transform+verify wired as a build step; CTest on both targets</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-09</td>
 <td>Minimal shim for <code>core/Common.cpp</code></td>
 <td>wip</td>
-<td>109 -&gt; 30 errors; 5 distinct types left</td>
+<td>109 -&gt; 5 errors; all 5 are <code>__closure</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-10</td>
 <td>mingw-w64 sysroot + clang toolchain file</td>
 <td>done</td>
 <td><code>cmake/toolchain-mingw-w64.cmake</code>; clang + lld + Wine
 emulator</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-11</td>
 <td>CI matrix Linux + Windows cross</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-12</td>
 <td>Wine smoke tests in CI</td>
 <td>wip</td>
 <td>wired into CTest via <code>CMAKE_CROSSCOMPILING_EMULATOR</code>;
 GitHub Actions pending</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-13</td>
 <td>Golden-output harness</td>
 <td>todo</td>
 <td>highest leverage in P0</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-14</td>
 <td>Protocol server containers</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-15</td>
 <td>Capture golden corpus from real WinSCP</td>
 <td>blocked</td>
 <td>Q-2: needs Windows host</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-16</td>
 <td>ADR log</td>
 <td>wip</td>
 <td><code>doc/qt/adr/</code> started with ADR 0001</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-17</td>
 <td>Property compile-check harness</td>
 <td>done</td>
 <td><code>check_properties.py</code>, 613 declarations, clang exit
 0</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-18</td>
 <td>HTML render of plan docs</td>
 <td>done</td>
 <td><code>doc/qt/plan.html</code> via <code>build-html.sh</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-19</td>
 <td>Publish repository, licence, root README</td>
 <td>done</td>
 <td>public at <code>99ecarvalho/linscp</code>; work on
 <code>qt</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-20</td>
 <td>Fork-branch generator</td>
 <td>todo</td>
 <td>deferred to P1-19 (Q-7); rehearsed manually in P0-22</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-21</td>
 <td><code>verify_transform.py</code> upstream-diff audit</td>
 <td>done</td>
 <td>asserts line parity, byte-exactness and 1 macro per changed
 line</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-22</td>
 <td>Rehearse history import into a winscp fork</td>
 <td>done</td>
 <td>zero-conflict merge; 613-line in-tree diff; mechanical conflict
 resolution</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-23</td>
 <td><code>check_docs.py</code> TASKS/TRACKER consistency</td>
 <td>done</td>
 <td>found 3 drifts on first run</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-24</td>
 <td>VCL surface census</td>
 <td>done</td>
 <td>~45 types; <code>build/shim_spec.txt</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-25</td>
 <td>ADR 0001 character width</td>
 <td>done</td>
 <td>accepted: <code>-fshort-wchar</code> +
 <code>std::u16string</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-26</td>
 <td><code>check_wide_abi.py</code> ADR enforcement</td>
 <td>done</td>
 <td><code>shim_no_wide_abi</code> test</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-27</td>
 <td><code>compile_census.py</code></td>
 <td>done</td>
 <td>classifies clang diagnostics into shim gaps</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-28</td>
 <td><code>census_ratchet.py</code></td>
 <td>done</td>
@@ -2481,135 +2602,144 @@ resolution</td>
 <tr class="even">
 <td>P1-02</td>
 <td>Shim:
-<code>TObject</code>/<code>TList</code>/<code>TStrings</code></td>
-<td>wip</td>
-<td><code>TObject</code>/<code>TPersistent</code> done;
-<code>TStrings</code> next</td>
+<code>TObject</code>/<code>TStrings</code>/<code>TStringList</code></td>
+<td>done</td>
+<td>0-based indexing, case-insensitive default, CommaText round
+trip</td>
 </tr>
 <tr class="odd">
+<td>P1-02b</td>
+<td>Shim:
+<code>TList</code>/<code>TObjectList</code>/<code>Contnrs</code></td>
+<td>todo</td>
+<td>not yet needed by <code>Common.cpp</code></td>
+</tr>
+<tr class="even">
 <td>P1-03</td>
 <td>Shim: <code>TDateTime</code> + date/time RTL</td>
 <td>done</td>
 <td>documented anchors, negative composition,
 <code>FormatDateTime</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-03b</td>
 <td>Shim:
 <code>SysUtils</code>/<code>IOUtils</code>/<code>StrUtils</code>
 paths</td>
-<td>todo</td>
-<td></td>
+<td>wip</td>
+<td><code>TSearchRec</code>,
+<code>FindFirst</code>/<code>FindNext</code>, <code>FileExists</code>
+done; path routines next</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-04</td>
 <td>Shim: exceptions</td>
 <td>done</td>
 <td>17 Delphi classes; base and sibling matching tested</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-05</td>
 <td>Shim: <code>TCriticalSection</code>/<code>SyncObjs</code></td>
 <td>done</td>
 <td>recursive; thread exclusion tested</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-05b</td>
 <td>Shim: <code>TThread</code>/<code>StartThread</code></td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-06</td>
 <td>Shim: streams/INI/registry</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-07</td>
 <td>win32-on-posix subset</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-08</td>
 <td>Socket-event emulation</td>
 <td>todo</td>
 <td>R6</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-09</td>
 <td>PuTTY unix backend re-import</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-10</td>
 <td>PuTTY delta reconciliation</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-11</td>
 <td>FileZilla MFC subset replacement</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-12</td>
 <td>FileZilla epoll rewrite</td>
 <td>todo</td>
 <td><strong>R2</strong> — budget generously</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-13</td>
 <td>System libs</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-14</td>
 <td>Drop <code>puttyvs</code></td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-15</td>
 <td>Console IPC → stdio</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-16</td>
 <td>Headless <code>Interface.h</code> frontend</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-17</td>
 <td>First SFTP session on Linux</td>
 <td>todo</td>
 <td>long tail expected</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-18</td>
 <td>Windows cross-build + Wine</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-19</td>
 <td>Golden suite green, both platforms</td>
 <td>todo</td>
 <td><strong>P1 gate</strong></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-20</td>
 <td>.NET assembly drives Linux CLI</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-21</td>
 <td><code>#ifdef</code> out Windows-only subsystems</td>
 <td>todo</td>

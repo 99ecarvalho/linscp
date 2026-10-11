@@ -5,6 +5,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <algorithm>
 #include <vector>
 
 // Embarcadero's <vcl.h> transitively exposes the Win32 API, and upstream's
@@ -24,6 +25,8 @@
 #include "vcl_unicodestring.h"
 #include "vcl_bytestring.h"
 #include "vcl_datetime.h"
+#include "vcl_strings.h"
+#include "vcl_sysutils.h"
 
 // Embarcadero calling-convention and closure keywords. __fastcall is a pure
 // calling convention and means nothing to us on x86-64; __closure becomes a

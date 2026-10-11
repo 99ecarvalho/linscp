@@ -7,6 +7,8 @@ add_library(linscp-shim STATIC
   vcl_unicodestring.cpp
   vcl_bytestring.cpp
   vcl_datetime.cpp
+  vcl_strings.cpp
+  vcl_sysutils.cpp
 )
 target_include_directories(linscp-shim PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_compile_features(linscp-shim PUBLIC cxx_std_17)

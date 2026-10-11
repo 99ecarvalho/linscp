@@ -80,7 +80,13 @@
   #define PROP_W_S(T, Name, Setter)                                           \
     __declspec(property(put = Setter)) T Name
 
-  // indexed
+  // Indexed properties.
+  //
+  // LIMITATION: clang reads a chained subscript on one of these -- Obj.Prop[i][j]
+  // -- as a single two-argument getter call, not as subscripting the result.
+  // Upstream core never does this (verified: 0 occurrences), and
+  // check_properties.py fails if that ever changes. Where you need it, take the
+  // result into a local first.
   #define PROP_IDX_R_G(T, Name, IT, Getter)                                   \
     __declspec(property(get = Getter)) T Name[]
 

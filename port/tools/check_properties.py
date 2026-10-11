@@ -94,6 +94,29 @@ with open(OUT, 'w') as f:
     f.write('\n'.join(body))
     f.write('\nint main() { return 0; }\n')
 
+# Chained subscripts on an indexed property compile as a two-argument getter
+# call under clang's __declspec(property), silently changing meaning. Core does
+# not do this today; fail loudly if an upstream change introduces it.
+indexed_names = {a[1] for macro, a, _ in items if macro.startswith('PROP_IDX')}
+chained = []
+if indexed_names:
+    alt = '|'.join(sorted(re.escape(n) for n in indexed_names))
+    chain_re = re.compile(r'\b(' + alt + r')\s*\[[^\]]+\]\s*\[')
+    for dirpath, _, names in os.walk(GEN):
+        for n in sorted(names):
+            fp = os.path.join(dirpath, n)
+            for lineno, line in enumerate(
+                    open(fp, encoding='utf-8', errors='ignore'), 1):
+                m = chain_re.search(line)
+                if m:
+                    chained.append(f'{n}:{lineno}: {m.group(1)}[...][...]')
+if chained:
+    print(f'CHAINED INDEXED-PROPERTY SUBSCRIPTS ({len(chained)}):')
+    for c in chained[:10]:
+        print('  ', c)
+    print('  clang treats these as a two-argument getter call; assign to a local first.')
+    sys.exit(1)
+
 print(f'declarations extracted: {len(items)}')
 print('by macro:', dict(collections.Counter(m for m, _, _ in items)))
 print(f'stub types declared: {len(types)} simple + {len(nested)} with nested members')
