@@ -9,11 +9,11 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 25 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 20 | 36 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 21 | 36 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **45** | **95** | |
+| **Total** | **46** | **95** | |
 
 ## Next three actions
 
@@ -26,22 +26,20 @@ as a real library: `linscp-core`, built by CMake with the cross toolchain.
 Linux: **558 errors, 14/33 clean, 4 aborting.**
 
 **Link check** (`--target linscp-core-link`, every core object forced into
-one executable): **352 undefined symbols on Windows, none of them the VCL
-shim's.** Every Delphi RTL function core calls now resolves. What remains is
-the work that was always separate:
+one executable): **197 undefined symbols on Windows, none of them the VCL
+shim's or PuTTY's.** WinSCP's PuTTY (176 units) and the crypto it builds a
+second time with MSVC (`libs/puttyvs`) both build with clang from the
+submodule. What remains:
 
 | Missing | Symbols | Task |
 |---|---|---|
-| PuTTY (WinSCP's vendored copy) | ~145 | P1-13 |
 | neon, OpenSSL, libs3 from `libs/` | ~150 | P1-13 |
 | FileZilla | 28 | P1-11 |
 | The frontend half of `Interface.h` (`StartThread`, `ProcessGUI`, ...) | 17 | P1-16 |
 
-1. **P1-13 for Windows**: build WinSCP's PuTTY, then neon, libs3 and OpenSSL
-   from the submodule as CMake libraries, and link them in.
-2. **P1-16**: the headless frontend -- the 17 `Interface.h` functions -- after
-   which core links and can run.
-3. **P1-09**: PuTTY's Unix platform layer, for Linux.
+1. **P1-13**: neon, libs3 and OpenSSL from the submodule.
+2. **P1-11**: FileZilla's 16 units (`FileZilla.cbproj`), with `UNICODE`.
+3. **P1-16**: the headless frontend, after which core links and can run.
 
 ## Decisions taken
 
@@ -85,6 +83,11 @@ the work that was always separate:
 | 2026-10-11 | The transform finds its patch series relative to itself, and a missing one is an error | CMake runs it from the build tree, where the relative path found nothing: every CMake-built tree had **no closure bindings at all**, and the verifier, loading the same way, agreed. The census ran from the repo root and never saw it. `bind_closures.py --require-bound` now checks the tree the build compiles |
 | 2026-10-11 | Header function definitions at namespace scope get `inline` (transform rule, verified) | `Common.h` defines `IsWideChar` without it: one definition per including unit, 31 in all, which C++Builder's linker tolerates and the standard forbids. A rule rather than a patch, so a new one upstream is handled too; a global `--allow-multiple-definition` would have hidden real duplicates |
 | 2026-10-11 | The shim's `ExpandEnvironmentVariables` removed | Core defines it itself, with Windows `%VAR%` semantics through `ExpandEnvironmentStrings`. The shim's was an invented POSIX `$VAR` variant, a duplicate the syntax-only census could not see. Linux gets `ExpandEnvironmentStrings` with Windows semantics instead (P1-07b) |
+| 2026-10-11 | Include paths with backslashes are normalised to `/` (transform rule, verified) | Only Windows resolves `#include "ssh\gss.h"`; clang accepts it when targeting Windows and not otherwise. Six such includes, five in core: part of why units abort on Linux. A forwarding file named with a backslash would break Windows checkouts |
+| 2026-10-11 | The patch series exists, applied before the rules, strictly: exact context, line counts preserved | First patch: `putty-64bit-conf-defaults.patch`. WinSCP stores string option defaults as `(int)"..."` in an int-first union, which truncates pointers on x86-64; the first union member becomes `intptr_t`. Upstream is built 32-bit only, so this is new territory for its code |
+| 2026-10-11 | Defines are per project, not global | PuTTY is built without `UNICODE`, core and FileZilla with it, and `UNICODE` decides which Win32 A/W function each macro names. Core's are public on the shim, so everything built against it sees them |
+| 2026-10-11 | Core's overrides of PuTTY symbols are expressed by weakening PuTTY's copies in the archive | `PuttyIntf.cpp` redefines `appname` and `get_remote_username`, relying on C++Builder's linker keeping the first definition. GNU objcopy marks PuTTY's weak (llvm-objcopy cannot for COFF); `check_overrides.py` keeps `overrides.txt` exact. Sources untouched, and dual-target, which a weak attribute in a patch would not be |
+| 2026-10-11 | `aes-ni.c` is compiled with `-msse4.1 -maes`, its CPU check verified free of those instructions | WinSCP dropped PuTTY's per-function target attributes, which MSVC does not need; restoring them would break the MSVC build of the same file. `check_isa_free.py` disassembles `aes_ni_available` and fails on any SSE4.1 or AES-NI instruction |
 | 2026-10-10 | A PR-able branch against `winscp/winscp` will be **generated**, not hand-maintained | linscp shares no history with upstream, so its `qt` branch is not directly mergeable. Since the port is mechanical, the fork branch can be produced on demand (Q-7). Rehearsed end to end — see facts below |
 | 2026-10-10 | Transform must be byte-exact outside property lines | A full-file rewrite (CRLF loss) turned a 613-line change into 76,551. Now asserted by `verify_transform.py` |
 | 2026-10-10 | Field/accessor classification is convention-first, parens only as fallback | The parens heuristic false-positives on constructor initialiser lists; WinSCP's `F<Upper>` / `Get*`/`Set*` convention is airtight. Truly unclassifiable names now fail the run instead of producing a wrong-arity macro |
@@ -229,6 +232,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 
 | Fact | Evidence | Date |
 |---|---|---|
+| Upstream WinSCP is built for 32-bit Windows only | `PuTTYVS.vcxproj` has only `Win32` configurations, and PuTTY's option defaults cast string addresses to `int`, which only fits in 32 bits | 2026-10-11 |
 | clang accepts `static __declspec(property(...))` syntactically but treats it as an ordinary static data member | `-fsyntax-only` passes; linking fails with an undefined reference to the "property" on both targets | 2026-10-11 |
 | clang 19 supports `__declspec(property)` on Linux under `-fms-extensions` | Local test: field r/o, field r/w, method+validating setter, read-modify-write, indexed — all pass | 2026-10-10 |
 | GCC 14 rejects it outright | `error: 'property' has not been declared` | 2026-10-10 |
@@ -400,8 +404,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-10 | PuTTY delta reconciliation | todo | |
 | P1-11 | FileZilla MFC subset replacement | todo | |
 | P1-12 | FileZilla epoll rewrite | todo | **R2** — budget generously |
-| P1-13 | System libs | todo | |
-| P1-14 | Drop `puttyvs` | todo | |
+| P1-13 | System libs | wip | PuTTY and its MSVC-built crypto build for Windows from the submodule; neon, OpenSSL, libs3 next |
+| P1-14 | Drop `puttyvs` | done | the MSVC build is replaced by clang building the same files with the same defines, from `PuTTYVS.vcxproj` |
 | P1-15 | Console IPC → stdio | todo | |
 | P1-16 | Headless `Interface.h` frontend | todo | |
 | P1-17 | First SFTP session on Linux | todo | long tail expected |

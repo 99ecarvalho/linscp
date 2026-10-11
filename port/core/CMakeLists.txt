@@ -57,3 +57,6 @@ add_executable(linscp-core-link EXCLUDE_FROM_ALL "${CMAKE_CURRENT_BINARY_DIR}/li
 target_link_libraries(linscp-core-link PRIVATE
   -Wl,--error-limit=0
   -Wl,--whole-archive linscp-core -Wl,--no-whole-archive linscp-shim)
+if(TARGET linscp-putty)
+  target_link_libraries(linscp-core-link PRIVATE linscp-putty linscp-puttyvs)
+endif()

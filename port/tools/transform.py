@@ -197,6 +197,7 @@ class Transformer:
         self.bind_closure_sites(path, lines)
         if path.lower().endswith('.h'):
             self.inline_header_definitions(path, lines)
+        self.normalise_include_separators(path, lines)
         out = []
         for lineno, line in enumerate(lines, 1):
             if '__property' not in line or '#define' in line:
@@ -234,6 +235,22 @@ class Transformer:
                 lines[i] = line[:indent] + 'inline ' + line[indent:]
                 self.stats['header_inline'] += 1
             depth += code[i].count('{') - code[i].count('}')
+
+    INCLUDE_WITH_BACKSLASH = re.compile(r'^(\s*#\s*include\s*)([<"])([^>"]*\\[^>"]*)([>"])')
+
+    def normalise_include_separators(self, path, lines):
+        """`#include "ssh\\gss.h"` becomes `#include "ssh/gss.h"`.
+
+        Only Windows resolves a backslash in an include; clang accepts it when
+        targeting Windows and not otherwise. A forward slash works everywhere,
+        Windows included, so this changes nothing there.
+        """
+        for i, line in enumerate(lines):
+            m = self.INCLUDE_WITH_BACKSLASH.match(line)
+            if m:
+                lines[i] = (line[:m.start(3)] + m.group(3).replace('\\', '/') +
+                            line[m.end(3):])
+                self.stats['include_slash'] += 1
 
     def bind_closure_sites(self, path, lines):
         """Rewrite Borland's implicit closures as explicit bindings.
@@ -531,11 +548,23 @@ def load_closure_sites():
             (site['line'], site['column'], site['identifier']))
     return by_file
 
+def _load_patchset():
+    # By path: under python -I the script's directory is not on sys.path.
+    import importlib.util
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'patchset.py')
+    spec = importlib.util.spec_from_file_location('patchset', path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--src', default='3rd-party/winscp')
     ap.add_argument('--out', default='build/gen')
-    ap.add_argument('--subdirs', nargs='*', default=['source/core'])
+    # PuTTY is compiled from the generated tree too: it needs the include rule
+    # and the patch series.
+    ap.add_argument('--subdirs', nargs='*', default=['source/core', 'source/putty'])
     ap.add_argument('--check', action='store_true',
                     help='report only; do not write the output tree')
     ap.add_argument('--report')
@@ -544,6 +573,9 @@ def main():
     a = ap.parse_args()
 
     t = Transformer(bind_sites=not a.no_closure_sites)
+    patchset = _load_patchset()
+    series = patchset.load_series()
+    used = set()
     nfiles = 0
     for sub in a.subdirs:
         root = os.path.join(a.src, sub)
@@ -557,7 +589,11 @@ def main():
                 if os.path.splitext(n)[1].lower() not in EXTS:
                     continue
                 text = open(src, encoding='utf-8', errors='surrogateescape', newline='').read()
-                new = t.transform_file(rel, text)
+                try:
+                    patched = patchset.apply(rel, text, series, used)
+                except patchset.PatchError as e:
+                    sys.exit(str(e))
+                new = t.transform_file(rel, patched)
                 nlines_ok = len(text.split('\n')) == len(new.split('\n'))
                 if not nlines_ok:
                     sys.exit(f'LINE COUNT CHANGED in {rel} — transform is not 1:1')
@@ -565,6 +601,17 @@ def main():
                 if not a.check:
                     os.makedirs(os.path.dirname(dst), exist_ok=True)
                     open(dst, 'w', encoding='utf-8', errors='surrogateescape', newline='').write(new)
+
+    # A hunk for a file in scope that never applied means the file is gone or
+    # renamed upstream; the patch needs attention either way.
+    in_scope = {h for h in patchset.all_hunks(series)
+                if any(h[1].startswith(sub.rstrip('/') + '/') for sub in a.subdirs)}
+    unused = sorted(in_scope - used)
+    if unused:
+        sys.exit('patch hunks that applied nowhere: ' +
+                 ', '.join(f'{n} ({r} #{i + 1})' for n, r, i in unused))
+    if series:
+        t.stats['patch_hunks'] = len(used)
 
     print(f'files processed: {nfiles}')
     for k, v in sorted(t.stats.items()):

@@ -1861,7 +1861,7 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td>P1 Headless core</td>
-<td>20</td>
+<td>21</td>
 <td>36</td>
 <td>Golden suite green, six protocols, both platforms</td>
 </tr>
@@ -1885,7 +1885,7 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>45</strong></td>
+<td><strong>46</strong></td>
 <td><strong>95</strong></td>
 <td></td>
 </tr>
@@ -1901,10 +1901,11 @@ only in the syntax-only census but as a real library:
 <code>linscp-core</code>, built by CMake with the cross toolchain.
 Linux: <strong>558 errors, 14/33 clean, 4 aborting.</strong></p>
 <p><strong>Link check</strong> (<code>--target linscp-core-link</code>,
-every core object forced into one executable): <strong>352 undefined
-symbols on Windows, none of them the VCL shim’s.</strong> Every Delphi
-RTL function core calls now resolves. What remains is the work that was
-always separate:</p>
+every core object forced into one executable): <strong>197 undefined
+symbols on Windows, none of them the VCL shim’s or PuTTY’s.</strong>
+WinSCP’s PuTTY (176 units) and the crypto it builds a second time with
+MSVC (<code>libs/puttyvs</code>) both build with clang from the
+submodule. What remains:</p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -1920,21 +1921,16 @@ always separate:</p>
 </thead>
 <tbody>
 <tr class="odd">
-<td>PuTTY (WinSCP’s vendored copy)</td>
-<td>~145</td>
-<td>P1-13</td>
-</tr>
-<tr class="even">
 <td>neon, OpenSSL, libs3 from <code>libs/</code></td>
 <td>~150</td>
 <td>P1-13</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>FileZilla</td>
 <td>28</td>
 <td>P1-11</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>The frontend half of <code>Interface.h</code>
 (<code>StartThread</code>, <code>ProcessGUI</code>, …)</td>
 <td>17</td>
@@ -1943,13 +1939,12 @@ always separate:</p>
 </tbody>
 </table>
 <ol type="1">
-<li><strong>P1-13 for Windows</strong>: build WinSCP’s PuTTY, then neon,
-libs3 and OpenSSL from the submodule as CMake libraries, and link them
-in.</li>
-<li><strong>P1-16</strong>: the headless frontend – the 17
-<code>Interface.h</code> functions – after which core links and can
-run.</li>
-<li><strong>P1-09</strong>: PuTTY’s Unix platform layer, for Linux.</li>
+<li><strong>P1-13</strong>: neon, libs3 and OpenSSL from the
+submodule.</li>
+<li><strong>P1-11</strong>: FileZilla’s 16 units
+(<code>FileZilla.cbproj</code>), with <code>UNICODE</code>.</li>
+<li><strong>P1-16</strong>: the headless frontend, after which core
+links and can run.</li>
 </ol>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
@@ -2281,6 +2276,54 @@ census could not see. Linux gets <code>ExpandEnvironmentStrings</code>
 with Windows semantics instead (P1-07b)</td>
 </tr>
 <tr class="odd">
+<td>2026-10-11</td>
+<td>Include paths with backslashes are normalised to <code>/</code>
+(transform rule, verified)</td>
+<td>Only Windows resolves <code>#include "ssh\gss.h"</code>; clang
+accepts it when targeting Windows and not otherwise. Six such includes,
+five in core: part of why units abort on Linux. A forwarding file named
+with a backslash would break Windows checkouts</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>The patch series exists, applied before the rules, strictly: exact
+context, line counts preserved</td>
+<td>First patch: <code>putty-64bit-conf-defaults.patch</code>. WinSCP
+stores string option defaults as <code>(int)"..."</code> in an int-first
+union, which truncates pointers on x86-64; the first union member
+becomes <code>intptr_t</code>. Upstream is built 32-bit only, so this is
+new territory for its code</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>Defines are per project, not global</td>
+<td>PuTTY is built without <code>UNICODE</code>, core and FileZilla with
+it, and <code>UNICODE</code> decides which Win32 A/W function each macro
+names. Core’s are public on the shim, so everything built against it
+sees them</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>Core’s overrides of PuTTY symbols are expressed by weakening PuTTY’s
+copies in the archive</td>
+<td><code>PuttyIntf.cpp</code> redefines <code>appname</code> and
+<code>get_remote_username</code>, relying on C++Builder’s linker keeping
+the first definition. GNU objcopy marks PuTTY’s weak (llvm-objcopy
+cannot for COFF); <code>check_overrides.py</code> keeps
+<code>overrides.txt</code> exact. Sources untouched, and dual-target,
+which a weak attribute in a patch would not be</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td><code>aes-ni.c</code> is compiled with <code>-msse4.1 -maes</code>,
+its CPU check verified free of those instructions</td>
+<td>WinSCP dropped PuTTY’s per-function target attributes, which MSVC
+does not need; restoring them would break the MSVC build of the same
+file. <code>check_isa_free.py</code> disassembles
+<code>aes_ni_available</code> and fails on any SSE4.1 or AES-NI
+instruction</td>
+</tr>
+<tr class="even">
 <td>2026-10-10</td>
 <td>A PR-able branch against <code>winscp/winscp</code> will be
 <strong>generated</strong>, not hand-maintained</td>
@@ -2289,13 +2332,13 @@ branch is not directly mergeable. Since the port is mechanical, the fork
 branch can be produced on demand (Q-7). Rehearsed end to end — see facts
 below</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>Transform must be byte-exact outside property lines</td>
 <td>A full-file rewrite (CRLF loss) turned a 613-line change into
 76,551. Now asserted by <code>verify_transform.py</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>Field/accessor classification is convention-first, parens only as
 fallback</td>
@@ -2305,26 +2348,26 @@ lists; WinSCP’s <code>F&lt;Upper&gt;</code> /
 unclassifiable names now fail the run instead of producing a wrong-arity
 macro</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>Windows releases link statically via lld</td>
 <td><code>-fuse-ld=lld -static -L/usr/x86_64-w64-mingw32/lib</code>;
 leaves only KERNEL32 and msvcrt as deps</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>CMake hard-fails on non-clang compilers</td>
 <td>A clear configure-time error beats a confusing failure in the first
 transformed header</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>The transform stamp lives outside the generated tree</td>
 <td><code>verify_transform.py</code> treats any extra file as a
 violation, which is the behaviour we want; the stamp was the first thing
 it caught</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><strong>Accepted (Q-8):</strong> <code>-fshort-wchar</code> with
 <code>std::u16string</code> storage; <code>std::wstring</code> banned in
@@ -2333,19 +2376,19 @@ it caught</td>
 literals untouched. Enforced by <code>check_wide_abi.py</code> and a
 <code>static_assert</code>. ADR 0001</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>-fshort-wchar</code> set globally, not per-target</td>
 <td>One translation unit without it is an ABI landmine that links
 cleanly</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>UnicodeString</code> case folding is ASCII-only for now</td>
 <td>Delphi’s is locale-aware; core uses it on protocol tokens and switch
 names. Recorded as a known limitation, not silently equivalent</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>vcl.h</code> transitively exposes the Win32 API</td>
 <td>Matches C++Builder, which upstream’s <code>CorePCH.h</code> depends
@@ -2353,20 +2396,20 @@ on: it includes <code>&lt;vcl.h&gt;</code> and core’s headers before
 <code>&lt;Winapi.Windows.hpp&gt;</code>. Fixing this alone removed 9 of
 24 missing types</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>UTF-8 decoding substitutes one U+FFFD per maximal subpart</td>
 <td>Unicode’s recommended practice. The first implementation emitted one
 per byte; a test on truncated input caught it</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>Byte strings keep C++Builder’s code-page template shape</td>
 <td>Core relies on <code>RawByteString</code> and
 <code>UTF8String</code> being distinct types; collapsing them would let
 byte reinterpretation happen silently</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>Date and time are combined only through
 <code>ComposeDateTime</code></td>
@@ -2374,20 +2417,20 @@ byte reinterpretation happen silently</td>
 <code>Date + Time</code> lands a day late at the mirrored time. Correct
 for file timestamps, wrong in general and wrong silently</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>TCriticalSection</code> wraps
 <code>std::recursive_mutex</code></td>
 <td>Delphi’s is re-entrant; a plain <code>std::mutex</code> would
 deadlock on core’s re-entrant paths rather than fail a test</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>Compile-census numbers are ratcheted in CI</td>
 <td>No core TU compiles cleanly yet, so a reintroduced missing type
 would otherwise present as a passing build</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>TStrings</code> is 0-based while <code>UnicodeString</code> is
 1-based</td>
@@ -2395,20 +2438,20 @@ would otherwise present as a passing build</td>
 hazard, so each is pinned by a boundary test rather than left to
 memory</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>TStrings</code> references objects, never owns them</td>
 <td>Delphi does not free them and core owns them elsewhere; freeing here
 would be a double-free. Asserted by a test that outlives the list</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>Chained subscripts on indexed properties are unsupported</td>
 <td>clang reads <code>Prop[i][j]</code> as a two-argument getter call.
 Core has 0 occurrences; <code>check_properties.py</code> fails if an
 upstream change adds one</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>Win32 A/W name macros are undone in
 <code>vcl_win32_undef.h</code></td>
@@ -2418,7 +2461,7 @@ still declared <code>ReplaceText</code>. Both compiled; only the link
 failed, and only because a test called it. A link-time guard now
 references every colliding name</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>ARRAYOFCONST</code> pastes its parenthesised list onto a
 variadic call</td>
@@ -2426,7 +2469,7 @@ variadic call</td>
 compound literals. <code>ARRAYOFCONST((a, b))</code> becoming
 <code>MakeFormatArgs(a, b)</code> is ordinary C++</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>XML is parsed for real, using the expat upstream vendors, rather
 than stubbed</td>
@@ -2434,7 +2477,7 @@ than stubbed</td>
 sysroot has no expat, so the vendored source is compiled for both
 targets, which also keeps them on one version</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td>Wide-character functions are renamed and the CRT names redirected by
 macro</td>
@@ -2443,7 +2486,7 @@ macro</td>
 only in return type – and a macro also guarantees core’s calls reach
 ours rather than glibc’s</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td><code>towlower</code>/<code>towupper</code> fold ASCII only, on both
 platforms</td>
@@ -2451,7 +2494,7 @@ platforms</td>
 running the test against it. Folding Latin-1 on POSIX alone would make
 the platforms disagree, which is worse than being narrow</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td><code>try</code>/<code>__finally</code> uses the same lambda
 expansion on <em>both</em> targets</td>
@@ -2459,7 +2502,7 @@ expansion on <em>both</em> targets</td>
 worth more than relying on it, and it removes a way for the two to
 diverge in behaviour</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>The <code>try</code>/<code>__finally</code> transform measures brace
 depth on the <em>pristine</em> lines and applies every edit
@@ -2468,7 +2511,7 @@ afterwards</td>
 containing no brace, so editing in place miscounted the depth of any
 enclosing block – and core nests these</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td>One bare <code>return</code> inside a guarded body is permitted, by
 checked condition</td>
@@ -2477,7 +2520,7 @@ then falls off the end of the function, which is what Borland does – but
 only when the block ends the function and the return carries no value.
 Both are verified rather than assumed</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>Every property form routes through a generated public wrapper</td>
 <td>Borland’s <code>__property</code> grants access to a private
@@ -2487,7 +2530,7 @@ ordinary member call at the use site. The wrappers restore both
 behaviours, and the getter casts its result to the declared type because
 C++Builder is lax where the two differ in constness</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td><code>UnicodeString</code> accepts numbers implicitly, yielding
 their decimal text</td>
@@ -2495,7 +2538,7 @@ their decimal text</td>
 <code>UnicodeString s = 0;</code> gives <code>"0"</code> – but diverging
 would mean editing core</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>Globals that need dynamic initialisation are declared
 <em>before</em> the object that initialises them</td>
@@ -2504,13 +2547,13 @@ declaration order. Putting the initialiser first had its constructor
 assign to a <code>UnicodeString</code> that was not yet constructed,
 which segfaulted rather than failing to compile</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td><code>TMask</code> matching is case-insensitive</td>
 <td>Delphi’s is, and core uses it for file masks users type without
 regard to case</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>Closure call sites are <strong>compiler-discovered, committed, then
 replayed</strong></td>
@@ -2521,7 +2564,7 @@ so discovery records them to
 <code>transform.py</code> replays that list, failing loudly if a
 recorded site no longer holds the expected identifier</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td>A diagnostic inside a macro expansion is resolved to the macro
 <em>definition</em></td>
@@ -2530,7 +2573,7 @@ recorded site no longer holds the expected identifier</td>
 61 duplicate reports. Binding the definition once fixes every call site,
 and cut the work from 118 sites to 62</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td><code>TRegistry</code> on POSIX reports every key absent rather than
 empty</td>
@@ -2539,19 +2582,19 @@ actually set would look to them like their configuration had vanished.
 The INI backend, which core already supports, is the correct one there
 (P1-06d)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td>INI section and key names match case-insensitively</td>
 <td>Delphi’s do, and files written by WinSCP on Windows have
 inconsistent casing</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td>INI sections and keys keep their file order</td>
 <td>Sorting them would churn the user’s configuration on every save and
 make diffs useless</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-11</td>
 <td><code>DynamicArray</code> shares its buffer on copy, as Delphi’s
 does</td>
@@ -2559,7 +2602,7 @@ does</td>
 <em>by value</em> and fills it for the caller. A deep-copying version
 would compile and silently return no data</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-11</td>
 <td><code>win32_on_posix.h</code> exposes <code>&lt;string.h&gt;</code>,
 <code>&lt;stdlib.h&gt;</code> and <code>&lt;stdio.h&gt;</code></td>
@@ -2567,7 +2610,7 @@ would compile and silently return no data</td>
 <code>strlen</code>, <code>strcmp</code> and <code>memmove</code>
 unqualified</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><strong>Resource strings: supply Win32 <code>LoadString</code>, not
 a <code>.res</code> loader, and do not patch core</strong></td>
@@ -2579,7 +2622,7 @@ additive change — the kind upstream could take rather than a fork of its
 own code. The table is generated from upstream’s <code>.rc</code> files,
 so the strings track the submodule automatically</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>UnicodeString::c_str()</code> has a non-const overload
 returning a writable buffer</td>
@@ -2588,7 +2631,7 @@ returning a writable buffer</td>
 <code>c_str()</code> to <code>LoadString</code> as the destination to
 fill</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>TList::Notify</code> is virtual and fires before a removal,
 after an addition</td>
@@ -2596,28 +2639,28 @@ after an addition</td>
 inside it, so a wrong <code>Action</code> means a leak or a double free,
 neither of which announces itself</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>Extract</code> reports <code>lnExtracted</code>, never
 <code>lnDeleted</code></td>
 <td>That is how Delphi lets a caller take ownership back without the
 list freeing the object</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>TList::Sort</code> is stable, where Delphi’s quicksort is
 not</td>
 <td>Relying on an unstable order would be a latent caller bug either
 way, and stable is the safer guarantee to provide</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>Derived streams re-expose the base’s legacy <code>Seek</code> with a
 using-declaration</td>
 <td>Overriding one overload hides the other. Core calls both on derived
 streams, so without this the legacy origins would stop resolving</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td>Stream exceptions follow Delphi’s shape exactly</td>
 <td><code>EFilerError</code>, <code>EFOpenError</code> and
@@ -2625,7 +2668,7 @@ streams, so without this the legacy origins would stop resolving</td>
 with <code>EReadError</code>/<code>EWriteError</code> beneath
 <code>EFilerError</code>. Core catches at both levels</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td><code>port/platform</code> headers refuse to compile on Windows, and
 are POSIX-only on the include path</td>
@@ -2633,20 +2676,20 @@ are POSIX-only on the include path</td>
 which presented as a 1,220 -&gt; 783 “improvement”. The
 <code>#error</code> makes that mistake loud</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>port/compat</code> is separate from
 <code>port/platform</code></td>
 <td><code>help.h</code> is missing from upstream itself rather than
 being a platform difference, so it is needed on every target</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>2026-10-10</td>
 <td>The ratchet records whether a unit aborted</td>
 <td>An aborted parse reports a floor. Treating that as a distinct state
 stops a new abort from reading as sudden progress</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>2026-10-10</td>
 <td><code>Format</code> keeps malformed input visible</td>
 <td>Delphi raises on a missing argument. Core routes user- and
@@ -3013,168 +3056,175 @@ facts (re-check if the environment changes)</h2>
 </thead>
 <tbody>
 <tr class="odd">
+<td>Upstream WinSCP is built for 32-bit Windows only</td>
+<td><code>PuTTYVS.vcxproj</code> has only <code>Win32</code>
+configurations, and PuTTY’s option defaults cast string addresses to
+<code>int</code>, which only fits in 32 bits</td>
+<td>2026-10-11</td>
+</tr>
+<tr class="even">
 <td>clang accepts <code>static __declspec(property(...))</code>
 syntactically but treats it as an ordinary static data member</td>
 <td><code>-fsyntax-only</code> passes; linking fails with an undefined
 reference to the “property” on both targets</td>
 <td>2026-10-11</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>clang 19 supports <code>__declspec(property)</code> on Linux under
 <code>-fms-extensions</code></td>
 <td>Local test: field r/o, field r/w, method+validating setter,
 read-modify-write, indexed — all pass</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>GCC 14 rejects it outright</td>
 <td><code>error: 'property' has not been declared</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>clang cross-emits x86-64 COFF for <code>windows-gnu</code> and
 <code>windows-msvc</code></td>
 <td>Local test, property emulation intact</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Qt6 present on this host; Qt6-for-mingw absent from Debian</td>
 <td><code>apt-cache search</code> returns nothing for mingw+qt</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Wine 10.0 installable from apt</td>
 <td><code>apt-cache policy wine</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Core has 591 <code>__property</code> decls; 0 use
 <code>default</code>/<code>nodefault</code>/<code>stored</code></td>
 <td>grep over <code>source/core/*.h</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Core has no <code>__try</code>/<code>__except</code></td>
 <td>grep</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>ConsoleRunner.cpp</code> has zero <code>forms/</code>
 dependencies</td>
 <td>include analysis</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Stored-password crypto is not DPAPI</td>
 <td>no DPAPI symbols in core</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>WinSCP’s own compiler is already clang-based</td>
 <td><code>#ifdef __clang__</code> in
 <code>source/core/Global.h:37</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Far-NetBox tracks WinSCP 6.5.6, last commit 2026-07-24, ~16.3k-line
 VCL shim</td>
 <td>repo inspection</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Core has 613 <code>__property</code> declarations across 69 files
 (<code>.h</code> and <code>.cpp</code>)</td>
 <td><code>transform.py --check</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>0 of 613 span multiple lines; 0 have comma-bearing or template
 types</td>
 <td>AST-free scan of <code>core/*.h</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>All 613 transform to 9 macro forms with <strong>0
 unhandled</strong></td>
 <td><code>transform.py</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>All 613 transformed declarations compile under clang</td>
 <td><code>check_properties.py</code>, exit 0</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Transform is idempotent and line-count-preserving across all 69
 files</td>
 <td><code>transform.py</code>, second pass is a no-op</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>All 8 property shapes behave correctly at runtime (incl. validating
 setters, read-modify-write, indexed)</td>
 <td><code>vcl_property.h</code> self-test, assertions pass</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Cross-built Windows PE32+ binary passes the full property suite
 under Wine</td>
 <td><code>clang --target=x86_64-w64-mingw32</code>, exit 0</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Static Windows link needs lld plus explicit <code>-L</code> for
 <code>libwinpthread</code></td>
 <td>GNU ld fails; lld leaves only KERNEL32 + msvcrt</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Dynamic Wine runs need <strong>two</strong> DLL dirs on
 <code>WINEPATH</code></td>
 <td><code>libwinpthread-1.dll</code> lives apart from
 libstdc++/libgcc</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Importing linscp history into a winscp fork merges with <strong>zero
 conflicts</strong></td>
 <td><code>git merge --allow-unrelated-histories</code>; 10,602 commits,
 both roots, all port commits preserved</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Applied in-tree, the core transform is a <strong>613-line diff
 across 23 files</strong></td>
 <td>measured on the rehearsal fork</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>After conversion, an upstream release touching a property line
 conflicts in <strong>1 file</strong>, resolvable mechanically</td>
 <td>simulated release; <code>checkout --theirs</code> + re-run
 transform; new upstream property transformed automatically</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Transform is byte-exact outside property lines; CRLF fully
 preserved</td>
 <td>76,551 CRLF, 0 bare LF; <code>Terminal.h</code> 1003 = 1003</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>linscp tracks <strong>0</strong> WinSCP source files; only the
 submodule gitlink</td>
 <td><code>git ls-files</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Both targets build and pass 4/4 tests; Windows runs under Wine via
 CTest</td>
 <td><code>ctest</code> on <code>build/linux</code> and
 <code>build/win</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>VCL surface the core needs: ~45 real types, dominated by
 <code>UnicodeString</code> (6,248), <code>TStrings</code> (521),
 <code>Exception</code> (438), <code>TDateTime</code> (250)</td>
@@ -3182,26 +3232,26 @@ CTest</td>
 headers</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Core’s Win32 headers (<code>shlobj</code>, <code>psapi</code>,
 <code>winioctl</code>…) are satisfied free on the mingw target</td>
 <td>only VCL needs shimming for Windows</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>-fshort-wchar</code> yields <code>sizeof(wchar_t) == 2</code>
 on both linux-gnu and mingw32</td>
 <td><code>static_assert</code> compiled for both targets</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>char_traits&lt;wchar_t&gt;</code> really does call
 <code>wmemcmp</code>/<code>wcslen</code>/<code>wmemchr</code>;
 <code>char_traits&lt;char16_t&gt;</code> does not</td>
 <td><code>/usr/include/c++/14/bits/char_traits.h:512,522,534</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>UnicodeString</code> API scoped from measured use:
 <code>IsEmpty</code> 594, <code>Length</code> 444, <code>c_str</code>
 247, <code>SubString</code> 184, <code>Pos</code> 86,
@@ -3209,323 +3259,323 @@ on both linux-gnu and mingw32</td>
 <td>grep over the generated core</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>6/6 tests pass on Linux and on Windows under Wine, including
 <code>UnicodeString</code></td>
 <td><code>ctest</code> both build trees</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong>A real core TU compiles against the shim with 70 errors from
 12 distinct missing VCL types</strong> (was 109 / 24)</td>
 <td><code>compile_census.py</code> on <code>core/Common.cpp</code>,
 mingw target</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>On the mingw target every remaining diagnostic is a VCL gap, not a
 platform one</td>
 <td>Win32 types all resolve via the real mingw headers</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>7/7 tests pass on both targets after the byte-string family</td>
 <td><code>ctest</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>Common.cpp</code> down to <strong>30 errors / 5 distinct
 missing types</strong> (from 109 / 24)</td>
 <td><code>compile_census.py</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>10/10 tests pass on Linux and on Windows under Wine</td>
 <td><code>ctest</code> both trees</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>The ratchet detects a regression: baseline 25 against actual 30
 fails</td>
 <td>simulated baseline, exit 1</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>TDateTime</code> matches Delphi’s four documented anchors,
 including -1.25 = 1899-12-29 06:00</td>
 <td><code>test_datetime</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Delphi’s <code>DayOfWeek</code> offset verified independently
 against five known dates</td>
 <td>standalone cross-check, k=6</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><del><code>Common.cpp</code>: 109 -&gt; 5 errors</del> —
 <strong>superseded</strong>: the parse was aborting at a missing
 header</td>
 <td>see the correction above</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Upstream pinned to <strong>6.5.8</strong>, the latest stable
 release</td>
 <td><code>git tag</code>; 6.6.x is entirely RC/beta</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>The transform handled the version change with <strong>no script
 edits</strong>: 624 declarations across 70 files, 0 unhandled</td>
 <td><code>transform.py</code> on 6.5.8, which differs from the old pin
 by ~2,500 lines across 58 core files</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>All 624 transformed declarations compile on 6.5.8</td>
 <td><code>check_properties.py</code>, exit 0</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Honest aggregate census: <strong>2,409 errors across 9 core
 TUs</strong>, ratcheted</td>
 <td><code>census_ratchet.py</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>12/12 tests pass on both targets after the version change</td>
 <td><code>ctest</code> both trees</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>All 44 <code>__closure</code> typedefs rewrite to
 <code>TClosure&lt;Sig&gt;</code>; 16 single-line, 28 spanning lines, 0
 unhandled</td>
 <td><code>transform.py</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Changed lines now fully accounted for: 624 property + 44 closure +
 28 template-end = 696</td>
 <td><code>verify_transform.py</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>CLOSURE()</code> binds the enclosing instance correctly on
 both targets, including non-void returns and reference arguments</td>
 <td><code>test_closure</code> on Linux and under Wine</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Aggregate census <strong>2,409 -&gt; 1,924</strong> across 9 TUs;
 <code>Terminal.cpp</code> missing types 51 -&gt; 20</td>
 <td><code>census_ratchet.py</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>116 call sites pass a bare member-function name where a closure is
 expected</td>
 <td>clang diagnostic count across all core TUs</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>13/13 tests pass on both targets</td>
 <td><code>ctest</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong><code>core/Option.cpp</code> compiles clean on mingw: exit
 0, 0 errors, 0 fatal</strong></td>
 <td>direct clang run, verified rather than inferred from the census</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>The same TU still fails on Linux with 10 Win32-type errors</td>
 <td>the deferred P1-07 gap</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Aggregate census <strong>1,924 -&gt; 1,220</strong> across 9
 TUs</td>
 <td><code>census_ratchet.py</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>Format</code> handles width, alignment, precision and explicit
 argument indices; unknown specifiers and missing arguments stay visible
 instead of dropping text</td>
 <td><code>test_strutils</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>161 narrow string literals in core require
 <code>UnicodeString(const char *)</code></td>
 <td>grep over generated core</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>14/14 tests pass on both targets</td>
 <td><code>ctest</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong><code>core/Option.cpp</code> compiles clean on Linux
 <em>and</em> Windows: 0 errors each</strong></td>
 <td>direct clang runs on both targets</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>FILETIME conversions validated against the real Win32 API under
 Wine, using epoch anchors fixed by the format</td>
 <td><code>test_win32_posix</code> on both targets</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Real Win32 <code>FileTimeToSystemTime</code> faults on a null
 argument; the POSIX version rejects it</td>
 <td>Wine crash dump, <code>cmpq $0, (%rcx)</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Honest totals with 0 units aborting: mingw 1,334, Linux 1,575</td>
 <td><code>census_ratchet.py</code>, both targets</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>15/15 tests pass on both targets</td>
 <td><code>ctest</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Census after streams: mingw 1,242, Linux 1,483, 0 aborting</td>
 <td><code>census_ratchet.py</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>16/16 tests pass on both targets</td>
 <td><code>ctest</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><strong><code>Option.cpp</code> and <code>NamedObjs.cpp</code> both
 compile clean on both targets</strong></td>
 <td><code>compile_census.py</code>, 0 errors each</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Census after containers: mingw 1,070, Linux 1,299, 2/9 units
 clean</td>
 <td><code>census_ratchet.py</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>17/17 tests pass on both targets</td>
 <td><code>ctest</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Resource strings resolved with <strong>no core changes</strong>: 608
 strings generated from upstream’s <code>.rc</code>, all ids matched, 0
 unknown, 0 duplicates</td>
 <td><code>gen_resources.py</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>18/18 tests pass on both targets</td>
 <td><code>ctest</code></td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><strong><code>FileBuffer.cpp</code> joins the clean set: 3/9 units
 at 0 errors on both targets</strong></td>
 <td><code>compile_census.py</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Census after storage and arrays: mingw 963, Linux 1,182, 0
 aborting</td>
 <td><code>census_ratchet.py</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>TRegistry</code> round-trips against the real Windows registry
 under Wine</td>
 <td><code>test_storage</code> on the mingw target</td>
 <td>2026-10-11</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>20/20 tests pass on both targets</td>
 <td><code>ctest</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Closure call sites: <strong>62</strong>, not 118 — resolving
 macro-expansion diagnostics to their definitions collapsed the
 duplicates</td>
 <td><code>bind_closures.py --discover</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>DynamicArray::Length</code> is a read/write property, not a
 method; 56 of the original 118 reports were this, not closures</td>
 <td><code>Buffer.Length = 10*1024</code> in core</td>
 <td>2026-10-11</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>All 758 changed lines accounted for: 624 property + 44 closure
 typedef + 28 template end + 62 binding</td>
 <td><code>verify_transform.py</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Census after closure binding: mingw 933, Linux 1,152</td>
 <td><code>census_ratchet.py</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>21/21 tests pass on both targets</td>
 <td><code>ctest</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Census after the long tail: mingw <strong>619</strong>, Linux
 <strong>863</strong> (from 933 / 1,152)</td>
 <td><code>census_ratchet.py</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Every <code>__closure</code> in core converted: 44 typedefs, 2
 inline parameters, 62 bound sites</td>
 <td><code>transform.py</code>, 0 remaining</td>
 <td>2026-10-11</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>22/22 tests pass on both targets</td>
 <td><code>ctest</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Census after the property-access fix: mingw <strong>342</strong>,
 Linux <strong>586</strong>; 4/9 clean on mingw</td>
 <td><code>census_ratchet.py</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Borland’s <code>__property</code> reaches <em>private</em>
 accessors; <code>__declspec(property)</code> does not</td>
 <td><code>TBookmark</code> declares public properties over private
 setters</td>
 <td>2026-10-11</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>__finally</code> in core: <strong>182 blocks</strong>, 0
 <code>__try</code>, 0 <code>__except</code>; only 2 bodies contain a
 <code>return</code></td>
 <td>grep plus brace analysis</td>
 <td>2026-10-11</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>UnicodeString</code> has implicit numeric constructors in
 C++Builder</td>
 <td><code>EXT_EXCEPTION_METHODS</code> calls
@@ -3533,70 +3583,70 @@ C++Builder</td>
 only viable overload takes a string</td>
 <td>2026-10-11</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>All <strong>179</strong> <code>try</code>/<code>__finally</code>
 blocks transformed, 0 unhandled; the patch series is still empty</td>
 <td><code>transform.py</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Changed lines: 1,297, every one accounted for — 624 property, 46
 closure, 28 template end, 62 binding, 537 try/finally (179 x 3)</td>
 <td><code>verify_transform.py</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Census after try/finally: mingw <strong>314</strong>, Linux
 <strong>496</strong>; 4/9 clean on <em>both</em> targets</td>
 <td><code>census_ratchet.py</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>23/23 tests pass on both targets</td>
 <td><code>ctest</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>FileMasks.cpp</code> clean on both targets; <strong>5/9 units
 clean on both</strong></td>
 <td><code>compile_census.py</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Census: mingw <strong>266</strong>, Linux <strong>441</strong></td>
 <td><code>census_ratchet.py</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Vendored expat compiles for both targets; the mingw sysroot has no
 expat</td>
 <td><code>cmake/expat.cmake</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>The Windows CRT’s <code>towlower</code> folds only ASCII in the
 default locale</td>
 <td>the same test run against the real CRT under Wine</td>
 <td>2026-10-11</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>24/24 tests pass on both targets</td>
 <td><code>ctest</code></td>
 <td>2026-10-11</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>12/12 tests pass on Linux and on Windows under Wine</td>
 <td><code>ctest</code> both trees</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>Directory search validated against both backends: real
 <code>FindFirstFileW</code> under Wine, and <code>dirent</code> +
 <code>fnmatch</code> on Linux</td>
 <td><code>test_sysutils</code> on both targets</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>__closure</code> scope: 44 distinct closure types, 16
 typedefs; call sites pass bare member-function names</td>
 <td>grep over generated core</td>
@@ -4037,14 +4087,16 @@ upstream</td>
 <tr class="even">
 <td>P1-13</td>
 <td>System libs</td>
-<td>todo</td>
-<td></td>
+<td>wip</td>
+<td>PuTTY and its MSVC-built crypto build for Windows from the
+submodule; neon, OpenSSL, libs3 next</td>
 </tr>
 <tr class="odd">
 <td>P1-14</td>
 <td>Drop <code>puttyvs</code></td>
-<td>todo</td>
-<td></td>
+<td>done</td>
+<td>the MSVC build is replaced by clang building the same files with the
+same defines, from <code>PuTTYVS.vcxproj</code></td>
 </tr>
 <tr class="even">
 <td>P1-15</td>

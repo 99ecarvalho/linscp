@@ -37,34 +37,36 @@ endif()
 find_package(Python3 3.9 REQUIRED COMPONENTS Interpreter)
 
 # ---------------------------------------------------------------------------
-# The preprocessor configuration upstream compiles core with, read from its
-# own ScpCore.cbproj (port/tools/upstream_defines.py) so it follows upstream.
-# Applied to everything, shim included: on Windows UNICODE decides whether each
-# A/W Win32 macro means the narrow or the wide function, so the shim must see
-# exactly what core sees.
+# Upstream's preprocessor configuration, per project, read from its own .cbproj
+# (port/tools/upstream_defines.py) so it follows upstream. Per project because
+# they differ where it matters: core and FileZilla are built with UNICODE and
+# PuTTY without, and UNICODE decides which Win32 A/W function every macro names.
+# Applied with linscp_upstream_defines(target scope project).
 # ---------------------------------------------------------------------------
-set(LINSCP_CBPROJ "${LINSCP_UPSTREAM}/source/ScpCore.cbproj")
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-             "${LINSCP_CBPROJ}" "${CMAKE_SOURCE_DIR}/port/tools/upstream_defines.py")
-execute_process(
-  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/upstream_defines.py"
-          --target "${CMAKE_SYSTEM_NAME}" --config Base
-  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-  OUTPUT_VARIABLE LINSCP_UPSTREAM_FLAGS
-  RESULT_VARIABLE _defines_rc
-  OUTPUT_STRIP_TRAILING_WHITESPACE)
-if(NOT _defines_rc EQUAL 0)
-  message(FATAL_ERROR "upstream_defines.py failed reading ${LINSCP_CBPROJ}")
-endif()
-string(REPLACE "\n" ";" LINSCP_UPSTREAM_FLAGS "${LINSCP_UPSTREAM_FLAGS}")
-foreach(_flag IN LISTS LINSCP_UPSTREAM_FLAGS)
-  string(REGEX REPLACE "^-D" "" _def "${_flag}")
-  add_compile_definitions("${_def}")
-endforeach()
-# Debug adds _DEBUG as upstream's Debug configuration does; Release gets
-# NDEBUG from CMake itself.
-add_compile_definitions("$<$<CONFIG:Debug>:_DEBUG>")
-message(STATUS "Upstream defines: ${LINSCP_UPSTREAM_FLAGS}")
+             "${CMAKE_SOURCE_DIR}/port/tools/upstream_defines.py")
+function(linscp_upstream_defines TARGET SCOPE PROJECT)
+  # Normalised: Ninja folds "source/../libs/x" and "libs/x" into one path and
+  # rejects the dependency as registered twice.
+  get_filename_component(_cbproj "${LINSCP_UPSTREAM}/source/${PROJECT}" ABSOLUTE)
+  set_property(DIRECTORY "${CMAKE_SOURCE_DIR}" APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${_cbproj}")
+  execute_process(
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/upstream_defines.py"
+            --target "${CMAKE_SYSTEM_NAME}" --config Base --project "${_cbproj}"
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    OUTPUT_VARIABLE _flags
+    RESULT_VARIABLE _rc
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(NOT _rc EQUAL 0)
+    message(FATAL_ERROR "upstream_defines.py failed reading ${_cbproj}")
+  endif()
+  string(REPLACE "\n" ";" _flags "${_flags}")
+  list(TRANSFORM _flags REPLACE "^-D" "")
+  # Debug adds _DEBUG as upstream's Debug configurations do; Release gets
+  # NDEBUG from CMake itself.
+  target_compile_definitions(${TARGET} ${SCOPE} ${_flags} "$<$<CONFIG:Debug>:_DEBUG>")
+  message(STATUS "${TARGET}: upstream defines from ${PROJECT}: ${_flags}")
+endfunction()
 
 # ---------------------------------------------------------------------------
 # Transform the pristine upstream tree. Never edited in place; the generated
@@ -94,6 +96,7 @@ add_custom_target(transform ALL DEPENDS "${LINSCP_GEN_STAMP}")
 include(cmake/expat.cmake)
 
 add_subdirectory(port/shim)
+add_subdirectory(port/putty)
 add_subdirectory(port/core)
 
 include(CTest)

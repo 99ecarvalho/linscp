@@ -1,0 +1,12 @@
+# PuTTY definitions that WinSCP's core overrides with its own.
+#
+# core/PuttyIntf.cpp defines these deliberately, and upstream relies on
+# C++Builder's linker letting that first definition win over the copy in the
+# PuTTY library. A standard linker refuses the duplicate, so the build marks
+# PuTTY's copies weak in the built archive -- the same outcome, at the same
+# level, with every source file untouched.
+#
+# check_overrides.py fails if a symbol here is no longer defined by both, or
+# if both start defining one that is not listed.
+appname
+get_remote_username

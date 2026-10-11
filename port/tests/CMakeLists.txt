@@ -123,6 +123,25 @@ set_tests_properties(transform_verify transform_properties_compile docs_consiste
 add_test(NAME include_case
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/check_include_case.py")
 set_tests_properties(include_case PROPERTIES WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+add_test(NAME patch_series
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_patchset.py")
+if(TARGET linscp-putty)
+  # Builds core and PuTTY first: the check reads the two archives.
+  add_test(NAME putty_overrides_build
+    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target linscp-core linscp-putty)
+  add_test(NAME putty_overrides
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/check_overrides.py"
+            "${LINSCP_TARGET_NM}" "$<TARGET_FILE:linscp-core>" "$<TARGET_FILE:linscp-putty>"
+            "${CMAKE_SOURCE_DIR}/port/putty/overrides.txt")
+  set_tests_properties(putty_overrides PROPERTIES DEPENDS putty_overrides_build)
+  find_program(LINSCP_TARGET_OBJDUMP NAMES "${LINSCP_TARGET_TRIPLE}-objdump" REQUIRED)
+  add_test(NAME aes_ni_guard_build
+    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target linscp-puttyvs)
+  add_test(NAME aes_ni_guard
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/check_isa_free.py"
+            "${LINSCP_TARGET_OBJDUMP}" "$<TARGET_FILE:linscp-puttyvs>" aes-ni.c.obj aes_ni_available)
+  set_tests_properties(aes_ni_guard PROPERTIES DEPENDS aes_ni_guard_build)
+endif()
 add_test(NAME closure_shapes
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_closure_shapes.py")
 add_test(NAME closure_sites

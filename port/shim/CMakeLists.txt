@@ -62,4 +62,7 @@ if(WIN32)
   target_link_libraries(linscp-shim PUBLIC ole32)
 endif()
 target_compile_features(linscp-shim PUBLIC cxx_std_17)
+# Core's configuration, publicly: the shim must see exactly what core sees, and
+# so must everything built against it.
+linscp_upstream_defines(linscp-shim PUBLIC ScpCore.cbproj)
 target_compile_options(linscp-shim PUBLIC -fms-extensions -fshort-wchar)

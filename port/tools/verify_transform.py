@@ -14,6 +14,7 @@ A changed line must be one of:
               port/patches/closure_sites.json, as CLOSURE(Name) or
               CLOSURE_OF(obj, Name). Recomputed here with a regex, not with
               transform.py's own scanner, so the two must agree
+  slash     - an #include path with its backslashes made forward slashes
   inline    - in a header, a namespace-scope function definition given
               `inline` and nothing else
   closeoff  - the line where a multi-line closure typedef ended, changed only
@@ -105,9 +106,22 @@ def closeoff(old_line):
     return old_line[:k] + '>;' + old_line[k + 1:]
 
 
+def _load_patchset():
+    # By path: under python -I the script's directory is not on sys.path.
+    import importlib.util
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'patchset.py')
+    spec = importlib.util.spec_from_file_location('patchset', path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 def main(gen='build/gen', src='3rd-party/winscp'):
-    changed = macros = files = closures = closeoffs = bindings = inlines = 0
+    changed = macros = files = closures = closeoffs = bindings = inlines = slashes = 0
     tryfinallys = 0
+    patched_lines = 0
+    patchset = _load_patchset()
+    series = patchset.load_series()
     bad = []
     for dp, _, ns in os.walk(gen):
         for n in ns:
@@ -116,7 +130,13 @@ def main(gen='build/gen', src='3rd-party/winscp'):
             if not os.path.exists(u):
                 bad.append(f'{g}: no upstream counterpart'); continue
             rel_for_sites = os.path.relpath(g, gen).replace(os.sep, '/')
-            a = open(u, newline='', encoding='utf-8', errors='surrogateescape').read().split('\n')
+            pristine = open(u, newline='', encoding='utf-8', errors='surrogateescape').read()
+            # The reviewed patch series is the baseline the rules apply to; the
+            # lines it changes are accounted for by the patch itself.
+            patched = patchset.apply(rel_for_sites, pristine, series)
+            patched_lines += sum(1 for p, q in zip(pristine.split('\n'), patched.split('\n'))
+                                 if p != q)
+            a = patched.split('\n')
             b = open(g, newline='', encoding='utf-8', errors='surrogateescape').read().split('\n')
             if len(a) != len(b):
                 bad.append(f'{u}: line count {len(a)} -> {len(b)}'); continue
@@ -140,6 +160,9 @@ def main(gen='build/gen', src='3rd-party/winscp'):
                     bindings += 1
                 elif y == closeoff(x):
                     closeoffs += 1
+                elif (_re.match(r'\s*#\s*include\b', x) and '\\' in x and
+                      y == x.replace('\\', '/')):
+                    slashes += 1
                 elif (u.lower().endswith('.h') and
                       y.lstrip() == 'inline ' + x.lstrip() and
                       y[:len(y) - len(y.lstrip())] == x[:len(x) - len(x.lstrip())]):
@@ -155,6 +178,8 @@ def main(gen='build/gen', src='3rd-party/winscp'):
     print(f'  template end: {closeoffs}')
     print(f'  closure bind: {bindings}')
     print(f'  inline:       {inlines}')
+    print(f'  include /:    {slashes}')
+    print(f'  patch series: {patched_lines}')
     print(f'  try/finally:  {tryfinallys}')
     if bad:
         print(f'\nVIOLATIONS ({len(bad)}):')

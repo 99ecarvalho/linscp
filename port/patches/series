@@ -1,0 +1,3 @@
+# The reviewed patch series, applied in order to the pristine submodule before
+# transform.py's rules. See port/tools/patchset.py.
+putty-64bit-conf-defaults.patch

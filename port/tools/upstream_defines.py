@@ -94,9 +94,33 @@ def project_defines(config, path=CBPROJ):
     return result
 
 
+def vcxproj_defines(config, path):
+    """An MSVC project's PreprocessorDefinitions. 'Base' is what its Debug and
+    Release configurations share, as for a .cbproj."""
+    root = ET.parse(path).getroot()
+    by_config = {}
+    for group in root.iter():
+        if _strip_ns(group.tag) != 'ItemDefinitionGroup':
+            continue
+        cond = group.get('Condition', '')
+        name = 'Debug' if "'Debug|" in cond else 'Release' if "'Release|" in cond else None
+        for el in group.iter():
+            if name and _strip_ns(el.tag) == 'PreprocessorDefinitions':
+                by_config[name] = [d for d in (el.text or '').split(';')
+                                   if d and not d.startswith('%(')]
+    if set(by_config) != {'Debug', 'Release'}:
+        sys.exit(f'{path}: expected Debug and Release definitions')
+    if config == 'Base':
+        common = set(by_config['Debug']) & set(by_config['Release'])
+        return [d for d in by_config['Release'] if d in common]
+    return by_config[config]
+
+
 def defines(target, config='Debug', path=CBPROJ):
     out = []
-    for d in project_defines(config, path):
+    source = (vcxproj_defines(config, path) if path.endswith('.vcxproj')
+              else project_defines(config, path))
+    for d in source:
         name = d.split('=', 1)[0]
         if name in DROPPED:
             continue
@@ -114,8 +138,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--target', required=True)
     ap.add_argument('--config', default='Debug', choices=['Debug', 'Release', 'Base'])
+    # Per project: PuTTY is built without UNICODE, core and FileZilla with it,
+    # and UNICODE decides which Win32 A/W function each macro names.
+    ap.add_argument('--project', default=CBPROJ)
     a = ap.parse_args()
-    for f in flags(a.target, a.config):
+    for f in flags(a.target, a.config, a.project):
         print(f)
     return 0
 
