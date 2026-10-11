@@ -60,6 +60,19 @@ public:
             typename = std::enable_if_t<std::is_same_v<C, wchar_t>>>
   UnicodeString(C Ch) : FData(1, static_cast<char16_t>(Ch)) {}
 
+  // Numbers, implicitly, producing their decimal representation. C++Builder
+  // has these and core depends on one: EXT_EXCEPTION_METHODS calls
+  // ExtException(E, Ident) with an int, and the only viable overload takes a
+  // UnicodeString, so the id becomes its own message text.
+  //
+  // The hazard is real -- `UnicodeString s = 0;` yields "0" rather than an
+  // empty string -- but C++Builder behaves the same way, and diverging would
+  // mean editing core.
+  UnicodeString(int Value);
+  UnicodeString(unsigned int Value);
+  UnicodeString(__int64 Value);
+  UnicodeString(double Value);
+
   // Repeated character; explicit, since the count makes intent clear anyway.
   explicit UnicodeString(wchar_t C, int Count);
 

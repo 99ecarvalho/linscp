@@ -5,7 +5,11 @@
 #define LINSCP_VCL_OBJECT_H
 
 #include "vcl_property.h"
+#include "vcl_types.h"
 #include "vcl_unicodestring.h"
+
+// Declared later; the exception constructors only take them by pointer.
+class TVarRec;
 
 // Embarcadero package/export decorations: meaningless outside C++Builder.
 #ifndef __BORLANDC__
@@ -58,23 +62,50 @@ struct TMethod
 class Exception
 {
 public:
-  explicit Exception(const UnicodeString & Msg) : FMessage(Msg) {}
+  // C++Builder's full constructor set. Core's own Exceptions.h declares
+  // descendants that delegate to every one of these, so all must exist even
+  // though most call sites use only the first: 77 of them are
+  // Exception(FMTLOAD(...)), where FMTLOAD has already produced a string.
+  //
+  // The Ident and ResStringRec forms resolve a resource string, which is why
+  // these live in a .cpp rather than inline -- the resource table and TVarRec
+  // are declared after this header.
+  explicit Exception(const UnicodeString & Msg);
+  Exception(const UnicodeString & Msg, int AHelpContext);
+  Exception(const UnicodeString & Msg, const TVarRec * Args, int Args_Size);
+  Exception(const UnicodeString & Msg, const TVarRec * Args, int Args_Size,
+            int AHelpContext);
+  explicit Exception(NativeUInt Ident);
+  Exception(NativeUInt Ident, int AHelpContext);
+  Exception(NativeUInt Ident, const TVarRec * Args, int Args_Size);
+  Exception(NativeUInt Ident, const TVarRec * Args, int Args_Size,
+            int AHelpContext);
+  explicit Exception(PResStringRec ResStringRec);
+  Exception(PResStringRec ResStringRec, int AHelpContext);
+  Exception(PResStringRec ResStringRec, const TVarRec * Args, int Args_Size);
+  Exception(PResStringRec ResStringRec, const TVarRec * Args, int Args_Size,
+            int AHelpContext);
+
   virtual ~Exception() = default;
 
   PROP_RW_FF(UnicodeString, Message, FMessage);
+  PROP_RW_FF(int, HelpContext, FHelpContext);
 
-  // Delphi exposes Message as a property; core also reads it directly.
+  // Core also reads the message directly.
   const UnicodeString & GetMessage() const { return FMessage; }
 
 protected:
   UnicodeString FMessage;
+  int FHelpContext = 0;
 };
 
+// Inherits every constructor, so a descendant can be thrown with any of the
+// forms the base accepts.
 #define LINSCP_DERIVED_EXCEPTION(NAME, BASE)                                  \
   class NAME : public BASE                                                    \
   {                                                                           \
   public:                                                                     \
-    explicit NAME(const UnicodeString & Msg) : BASE(Msg) {}                   \
+    using BASE::BASE;                                                         \
   }
 
 LINSCP_DERIVED_EXCEPTION(EAbort, Exception);

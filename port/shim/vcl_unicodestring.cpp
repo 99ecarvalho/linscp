@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <cstdio>
 
 namespace {
 
@@ -67,6 +68,50 @@ UnicodeString::UnicodeString(const char * S)
   {
     *this = linscp::Utf8ToUtf16(S, std::char_traits<char>::length(S));
   }
+}
+
+namespace {
+
+// Decimal rendering without libc's wide printf, which is compiled against a
+// 4-byte wchar_t (ADR 0001).
+UnicodeString FromNarrow(const char * S)
+{
+  UnicodeString R;
+  for (const char * P = S; *P != '\0'; ++P)
+  {
+    R += static_cast<wchar_t>(static_cast<unsigned char>(*P));
+  }
+  return R;
+}
+
+}  // namespace
+
+UnicodeString::UnicodeString(int Value)
+{
+  char Buf[24];
+  std::snprintf(Buf, sizeof(Buf), "%d", Value);
+  *this = FromNarrow(Buf);
+}
+
+UnicodeString::UnicodeString(unsigned int Value)
+{
+  char Buf[24];
+  std::snprintf(Buf, sizeof(Buf), "%u", Value);
+  *this = FromNarrow(Buf);
+}
+
+UnicodeString::UnicodeString(__int64 Value)
+{
+  char Buf[32];
+  std::snprintf(Buf, sizeof(Buf), "%lld", static_cast<long long>(Value));
+  *this = FromNarrow(Buf);
+}
+
+UnicodeString::UnicodeString(double Value)
+{
+  char Buf[64];
+  std::snprintf(Buf, sizeof(Buf), "%g", Value);
+  *this = FromNarrow(Buf);
 }
 
 UnicodeString::UnicodeString(wchar_t C, int Count)

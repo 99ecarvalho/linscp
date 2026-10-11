@@ -3,22 +3,22 @@
     "x86_64-pc-linux-gnu": {
       "source/core/Bookmarks.cpp": {
         "aborted": false,
-        "errors": 19,
+        "errors": 2,
         "missing_types": 0
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 223,
+        "errors": 210,
         "missing_types": 13
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 160,
+        "errors": 126,
         "missing_types": 24
       },
       "source/core/CopyParam.cpp": {
         "aborted": false,
-        "errors": 62,
+        "errors": 34,
         "missing_types": 1
       },
       "source/core/FileBuffer.cpp": {
@@ -28,7 +28,7 @@
       },
       "source/core/FileMasks.cpp": {
         "aborted": false,
-        "errors": 48,
+        "errors": 13,
         "missing_types": 1
       },
       "source/core/NamedObjs.cpp": {
@@ -43,29 +43,29 @@
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 351,
+        "errors": 201,
         "missing_types": 5
       }
     },
     "x86_64-w64-mingw32": {
       "source/core/Bookmarks.cpp": {
         "aborted": false,
-        "errors": 17,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 160,
+        "errors": 147,
         "missing_types": 3
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 74,
+        "errors": 40,
         "missing_types": 2
       },
       "source/core/CopyParam.cpp": {
         "aborted": false,
-        "errors": 62,
+        "errors": 34,
         "missing_types": 1
       },
       "source/core/FileBuffer.cpp": {
@@ -75,7 +75,7 @@
       },
       "source/core/FileMasks.cpp": {
         "aborted": false,
-        "errors": 45,
+        "errors": 10,
         "missing_types": 1
       },
       "source/core/NamedObjs.cpp": {
@@ -90,7 +90,7 @@
       },
       "source/core/Terminal.cpp": {
         "aborted": false,
-        "errors": 261,
+        "errors": 111,
         "missing_types": 2
       }
     }

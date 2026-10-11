@@ -999,7 +999,8 @@ anywhere.</p>
 (<code>port/shim/vcl_property.h</code>)</td>
 <td>S</td>
 <td>—</td>
-<td>The keystone; PLAN §2</td>
+<td>The keystone; PLAN §2. Every form routes through a public wrapper so
+private accessors stay reachable, as Borland’s do</td>
 </tr>
 <tr class="even">
 <td>P0-04</td>
@@ -1358,8 +1359,7 @@ generated from upstream’s <code>.rc</code> files</td>
 semantics</td>
 <td>M</td>
 <td>P1-01</td>
-<td>Core has no <code>__try</code>/<code>__except</code> — simplifies
-this</td>
+<td>Done. Full C++Builder constructor set; descendants inherit it</td>
 </tr>
 <tr class="odd">
 <td>P1-05</td>
@@ -1386,6 +1386,17 @@ this</td>
 cleared</td>
 </tr>
 <tr class="even">
+<td>P1-09b</td>
+<td><code>try</code>/<code>__finally</code> for POSIX</td>
+<td>L</td>
+<td>P1-08b</td>
+<td><strong>182 blocks</strong>, 0 <code>__try</code>, 0
+<code>__except</code>. clang maps Borland’s <code>__finally</code> to
+SEH, which the mingw target supports and Linux does not. Only 2 of 182
+contain a <code>return</code> in the guarded body, so a line-preserving
+lambda transform covers 180 and those 2 go in the patch series</td>
+</tr>
+<tr class="odd">
 <td>P1-06</td>
 <td>Shim:
 <code>TStream</code>/<code>THandleStream</code>/<code>TMemoryStream</code></td>
@@ -1393,7 +1404,7 @@ cleared</td>
 <td>P1-02</td>
 <td>~31 uses each; now the largest non-closure group</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-06b</td>
 <td>Shim:
 <code>TCustomIniFile</code>/<code>TMemIniFile</code>/<code>TRegistry</code></td>
@@ -1402,7 +1413,7 @@ cleared</td>
 <td>Done. Real registry on Windows; on POSIX every key reports
 absent</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-06c</td>
 <td>Shim: <code>DynamicArray</code>, Delphi handle-based file API</td>
 <td>S</td>
@@ -1410,7 +1421,7 @@ absent</td>
 <td>Done. Reference-counted, as core’s by-value <code>Read</code>
 requires</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-07</td>
 <td><code>port/platform</code>: Win32 types, time and error subset</td>
 <td>L</td>
@@ -1418,7 +1429,7 @@ requires</td>
 <td>Done for the compiling surface: <code>Option.cpp</code> builds on
 Linux too</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-07b</td>
 <td><code>port/platform</code>: Win32 file and handle functions</td>
 <td>L</td>
@@ -1426,7 +1437,7 @@ Linux too</td>
 <td><code>CreateFile</code>/<code>ReadFile</code>/<code>WriteFile</code>/<code>CloseHandle</code>
 etc., as the census asks</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-06d</td>
 <td>Frontend decision: select the INI storage backend on Linux</td>
 <td>S</td>
@@ -1434,28 +1445,28 @@ etc., as the census asks</td>
 <td><code>TRegistryStorage</code> cannot work there; core already
 supports the INI path</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-08</td>
 <td><code>WSAEventSelect</code> / socket-event emulation</td>
 <td>M</td>
 <td>P1-07</td>
 <td>R6</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-09</td>
 <td>PuTTY: re-import upstream <code>unix/</code> backend</td>
 <td>M</td>
 <td>P1-03</td>
 <td>Upstream maintains it; reconcile WinSCP’s patches</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-10</td>
 <td>PuTTY: reconcile WinSCP deltas against vanilla 0.85</td>
 <td>M</td>
 <td>P1-09</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-11</td>
 <td>FileZilla: replace vendored MFC subset
 (<code>CString</code>/<code>CFile</code>/<code>CTime</code>)</td>
@@ -1463,7 +1474,7 @@ supports the INI path</td>
 <td>P1-01</td>
 <td>Only 4 files in <code>libs/mfc</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-12</td>
 <td><strong>FileZilla: <code>WSAAsyncSelect</code> hidden-window pump →
 epoll/poll</strong></td>
@@ -1471,28 +1482,28 @@ epoll/poll</strong></td>
 <td>P1-11</td>
 <td><strong>R2.</strong> ~1,700 lines; least mechanical task in P1</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-13</td>
 <td>Switch <code>libs/</code> to system OpenSSL, expat, neon, libs3</td>
 <td>M</td>
 <td>P0-08</td>
 <td>All vanilla upstream already</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-14</td>
 <td>Drop <code>puttyvs</code> (MSVC wrapper, obsolete)</td>
 <td>S</td>
 <td>P1-09</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-15</td>
 <td><code>winscp.com</code> shared-memory IPC → plain stdio</td>
 <td>M</td>
 <td>P1-06</td>
 <td>Both platforms</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-16</td>
 <td>Headless frontend implementing <code>Interface.h</code></td>
 <td>L</td>
@@ -1500,28 +1511,28 @@ epoll/poll</strong></td>
 <td>Derive from <code>ConsoleRunner.cpp</code> — it has zero
 <code>forms/</code> deps</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-17</td>
 <td>First link + first real SFTP session on Linux</td>
 <td>M</td>
 <td>P1-16</td>
 <td>Expect a long tail of link/ABI issues</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-18</td>
 <td>Same core + CLI cross-built for Windows, Wine-smoked</td>
 <td>M</td>
 <td>P1-17, P0-12</td>
 <td>Proves “one codebase”</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-19</td>
 <td>Golden suite green across all six protocols, both platforms</td>
 <td>L</td>
 <td>P1-18, P0-15</td>
 <td><strong>P1 exit gate</strong></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-20</td>
 <td>Verify stock <code>netstandard2.0</code> .NET assembly drives the
 Linux CLI</td>
@@ -1529,7 +1540,7 @@ Linux CLI</td>
 <td>P1-19</td>
 <td>Should work unchanged</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-21</td>
 <td><code>#ifdef</code> out <code>dragext</code>,
 <code>Setup.cpp</code>, jump lists, file associations</td>
@@ -1816,7 +1827,7 @@ green (R1)</td>
 <tr class="even">
 <td>P1 Headless core</td>
 <td>15</td>
-<td>33</td>
+<td>34</td>
 <td>Golden suite green, six protocols, both platforms</td>
 </tr>
 <tr class="odd">
@@ -1840,7 +1851,7 @@ green (R1)</td>
 <tr class="even">
 <td><strong>Total</strong></td>
 <td><strong>41</strong></td>
-<td><strong>92</strong></td>
+<td><strong>93</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -1867,17 +1878,17 @@ aborting.</p>
 targets:</strong> <code>Option.cpp</code>, <code>NamedObjs.cpp</code>
 and <code>FileBuffer.cpp</code>. Census is <strong>963 on mingw, 1,182
 on Linux</strong>.</p>
-<p>Census is <strong>619 on mingw, 863 on Linux</strong>, 3 of 9 units
-clean. Every <code>__closure</code> in core is now converted: 44
-typedefs, 2 inline parameters, 62 bound call sites.</p>
+<p>Census is <strong>342 on mingw, 586 on Linux</strong>. Four of nine
+units are clean on mingw; <code>Bookmarks.cpp</code> is clean there and
+2 errors from clean on Linux, both <code>__finally</code>.</p>
 <ol type="1">
-<li><code>Bookmarks.cpp</code> at <strong>17 / 19</strong> is close
-enough to finish next.</li>
+<li><strong>P1-09b / <code>try</code>/<code>__finally</code></strong> —
+the main thing holding Linux behind now. 182 blocks, and the Linux-only
+gap in several units is exactly this.</li>
+<li><code>FileMasks.cpp</code> at <strong>10 / 13</strong> is next
+closest to clean.</li>
 <li><strong>P1-05b / <code>TThread</code></strong> and
 <code>StartThread</code>.</li>
-<li><code>_di_IXMLNode</code> (10 uses) — the MSXML interface behind
-WebDAV’s property parsing, and the last sizeable item that is not a long
-tail.</li>
 </ol>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
@@ -2107,6 +2118,24 @@ variadic call</td>
 <td>C++Builder builds an open array of <code>TVarRec</code>, which needs
 compound literals. <code>ARRAYOFCONST((a, b))</code> becoming
 <code>MakeFormatArgs(a, b)</code> is ordinary C++</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>Every property form routes through a generated public wrapper</td>
+<td>Borland’s <code>__property</code> grants access to a private
+accessor from outside the class and ignores constness;
+<code>__declspec(property)</code> does neither, because it expands to an
+ordinary member call at the use site. The wrappers restore both
+behaviours, and the getter casts its result to the declared type because
+C++Builder is lax where the two differ in constness</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td><code>UnicodeString</code> accepts numbers implicitly, yielding
+their decimal text</td>
+<td>C++Builder does, and core depends on it. The hazard is real –
+<code>UnicodeString s = 0;</code> gives <code>"0"</code> – but diverging
+would mean editing core</td>
 </tr>
 <tr class="even">
 <td>2026-10-11</td>
@@ -2936,6 +2965,34 @@ inline parameters, 62 bound sites</td>
 <td>2026-10-11</td>
 </tr>
 <tr class="odd">
+<td>Census after the property-access fix: mingw <strong>342</strong>,
+Linux <strong>586</strong>; 4/9 clean on mingw</td>
+<td><code>census_ratchet.py</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="even">
+<td>Borland’s <code>__property</code> reaches <em>private</em>
+accessors; <code>__declspec(property)</code> does not</td>
+<td><code>TBookmark</code> declares public properties over private
+setters</td>
+<td>2026-10-11</td>
+</tr>
+<tr class="odd">
+<td><code>__finally</code> in core: <strong>182 blocks</strong>, 0
+<code>__try</code>, 0 <code>__except</code>; only 2 bodies contain a
+<code>return</code></td>
+<td>grep plus brace analysis</td>
+<td>2026-10-11</td>
+</tr>
+<tr class="even">
+<td><code>UnicodeString</code> has implicit numeric constructors in
+C++Builder</td>
+<td><code>EXT_EXCEPTION_METHODS</code> calls
+<code>ExtException(E, Ident)</code> with an <code>int</code>, and the
+only viable overload takes a string</td>
+<td>2026-10-11</td>
+</tr>
+<tr class="odd">
 <td>12/12 tests pass on Linux and on Windows under Wine</td>
 <td><code>ctest</code> both trees</td>
 <td>2026-10-10</td>
@@ -3300,120 +3357,126 @@ done; path routines next</td>
 <td>the census long tail</td>
 </tr>
 <tr class="even">
+<td>P1-09b</td>
+<td><code>try</code>/<code>__finally</code> for POSIX</td>
+<td>todo</td>
+<td>182 blocks; the main Linux blocker now</td>
+</tr>
+<tr class="odd">
 <td>P1-06</td>
 <td>Shim: streams</td>
 <td>done</td>
 <td><code>TStream</code>/<code>THandleStream</code>/<code>TFileStream</code>/<code>TMemoryStream</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-06b</td>
 <td>Shim: INI/registry storage</td>
 <td>done</td>
 <td>INI parses real-world files; registry real on Windows</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-06c</td>
 <td>Shim: <code>DynamicArray</code> + file API</td>
 <td>done</td>
 <td>sharing semantics tested</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-06d</td>
 <td>Select INI backend on Linux</td>
 <td>todo</td>
 <td>frontend decision</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-07</td>
 <td><code>port/platform</code> Win32 subset</td>
 <td>done</td>
 <td>types, FILETIME/SYSTEMTIME, errors, winsock names</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-07b</td>
 <td><code>port/platform</code> Win32 file/handle functions</td>
 <td>todo</td>
 <td>as the census asks</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-08</td>
 <td>Socket-event emulation</td>
 <td>todo</td>
 <td>R6</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-09</td>
 <td>PuTTY unix backend re-import</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-10</td>
 <td>PuTTY delta reconciliation</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-11</td>
 <td>FileZilla MFC subset replacement</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-12</td>
 <td>FileZilla epoll rewrite</td>
 <td>todo</td>
 <td><strong>R2</strong> — budget generously</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-13</td>
 <td>System libs</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-14</td>
 <td>Drop <code>puttyvs</code></td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-15</td>
 <td>Console IPC → stdio</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-16</td>
 <td>Headless <code>Interface.h</code> frontend</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-17</td>
 <td>First SFTP session on Linux</td>
 <td>todo</td>
 <td>long tail expected</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-18</td>
 <td>Windows cross-build + Wine</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-19</td>
 <td>Golden suite green, both platforms</td>
 <td>todo</td>
 <td><strong>P1 gate</strong></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-20</td>
 <td>.NET assembly drives Linux CLI</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-21</td>
 <td><code>#ifdef</code> out Windows-only subsystems</td>
 <td>todo</td>

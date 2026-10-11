@@ -92,4 +92,7 @@ constexpr TDuplicates dupError  = ::dupError;
 }  // namespace Types
 }  // namespace System
 
+// Core also writes these unqualified by System.
+namespace Types = System::Types;
+
 #endif // LINSCP_VCL_SYSUTILS_H

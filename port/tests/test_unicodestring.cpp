@@ -43,6 +43,12 @@ void TestConstruction()
   // c_str is always null-terminated and never null
   CHECK(UnicodeString().c_str() != nullptr);
   CHECK(UnicodeString().c_str()[0] == L'\0');
+
+  // Numbers convert implicitly to their decimal text, as in C++Builder.
+  CHECK(Eq(UnicodeString(42), L"42"));
+  CHECK(Eq(UnicodeString(-7), L"-7"));
+  CHECK(Eq(UnicodeString(0), L"0"));
+  CHECK(Eq(UnicodeString(static_cast<__int64>(9000000000LL)), L"9000000000"));
   CHECK(S.c_str()[5] == L'\0');
 }
 

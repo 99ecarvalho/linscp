@@ -15,6 +15,8 @@
 #ifndef LINSCP_VCL_PROPERTY_H
 #define LINSCP_VCL_PROPERTY_H
 
+#include <type_traits>
+
 #if defined(__BORLANDC__)
 
   #define PROP_R_F(T, Name, Field)              __property T Name = { read = Field }
@@ -32,44 +34,80 @@
 
 #elif defined(__clang__)
 
+  // Every form routes through a generated wrapper rather than naming the
+  // accessor in the __declspec, even when a direct reference would compile.
+  //
+  // This is not cosmetic. Borland's __property grants access to a *private*
+  // accessor from outside the class -- core relies on it, e.g. TBookmark
+  // declares public properties over private SetName/SetLocal/SetRemote.
+  // __declspec(property) has no such rule: it expands to an ordinary member
+  // call at the use site, which fails on a private accessor. The wrappers are
+  // declared where the property is (public) and call the accessor from inside
+  // the class, which restores Borland's behaviour.
+
   // read = <field>
   #define PROP_R_F(T, Name, Field)                                            \
-    T __gp_##Name() const { return Field; }                                   \
+    T __gp_##Name() const { return LINSCP_AS(T, Field); }                     \
     __declspec(property(get = __gp_##Name)) T Name
 
-  // read = <method>
+  // Method-backed reads go through LINSCP_SELF, which drops constness before
+  // calling the accessor.
+  //
+  // That mirrors Borland: __property has no const-correctness, so reading a
+  // property on a const object calls the getter whether or not the getter is
+  // const -- and core's getters are often non-const because they genuinely
+  // mutate, as TStream's Position getter does by seeking. Marking the wrapper
+  // const without the cast would reject reads on const objects; leaving the
+  // wrapper non-const would reject them too, from the other direction.
+  #define LINSCP_SELF                                                         \
+    const_cast<std::remove_const_t<                                           \
+      std::remove_reference_t<decltype(*this)>> *>(this)
+
+  // The result is cast to the property's declared type as well. Borland is lax
+  // about the two differing in constness -- TConfiguration declares
+  // `__property TSshHostCAList * SshHostCAList` over a getter returning
+  // `const TSshHostCAList *` -- and a C++ wrapper has to reproduce that or the
+  // declaration does not compile. A cast rather than a const_cast because the
+  // same wrapper serves value-typed properties, where it is a no-op.
+  #define LINSCP_AS(T, EXPR) ((T)(EXPR))
   #define PROP_R_G(T, Name, Getter)                                           \
-    __declspec(property(get = Getter)) T Name
+    T __gp_##Name() const { return LINSCP_AS(T, LINSCP_SELF->Getter()); }     \
+    __declspec(property(get = __gp_##Name)) T Name
 
   // read = <field>, write = <same field>
   #define PROP_RW_FF(T, Name, Field)                                          \
-    T __gp_##Name() const { return Field; }                                   \
-    void __sp_##Name(T __v) { Field = __v; }                                  \
+    T __gp_##Name() const { return LINSCP_AS(T, Field); }                     \
+    void __sp_##Name(T __v) { Field = __v; }                                   \
     __declspec(property(get = __gp_##Name, put = __sp_##Name)) T Name
 
   // read = <field>, write = <a different field>
   #define PROP_RW_F2(T, Name, RField, WField)                                 \
-    T __gp_##Name() const { return RField; }                                  \
+    T __gp_##Name() const { return LINSCP_AS(T, RField); }                    \
     void __sp_##Name(T __v) { WField = __v; }                                 \
     __declspec(property(get = __gp_##Name, put = __sp_##Name)) T Name
 
   // read = <field>, write = <method>
   #define PROP_RW_FS(T, Name, Field, Setter)                                  \
-    T __gp_##Name() const { return Field; }                                   \
-    __declspec(property(get = __gp_##Name, put = Setter)) T Name
+    T __gp_##Name() const { return LINSCP_AS(T, Field); }                     \
+    void __sp_##Name(T __v) { Setter(__v); }                                  \
+    __declspec(property(get = __gp_##Name, put = __sp_##Name)) T Name
 
   // read = <method>, write = <field>
   #define PROP_RW_GF(T, Name, Getter, Field)                                  \
+    T __gp_##Name() const { return LINSCP_AS(T, LINSCP_SELF->Getter()); }     \
     void __sp_##Name(T __v) { Field = __v; }                                  \
-    __declspec(property(get = Getter, put = __sp_##Name)) T Name
+    __declspec(property(get = __gp_##Name, put = __sp_##Name)) T Name
 
   // read = <method>, write = <method>
   #define PROP_RW_GS(T, Name, Getter, Setter)                                 \
-    __declspec(property(get = Getter, put = Setter)) T Name
+    T __gp_##Name() const { return LINSCP_AS(T, LINSCP_SELF->Getter()); }     \
+    void __sp_##Name(T __v) { Setter(__v); }                                  \
+    __declspec(property(get = __gp_##Name, put = __sp_##Name)) T Name
 
   // read = <method>, index = <constant>  (Borland passes Idx to the getter)
   #define PROP_R_GI(T, Name, Getter, Idx)                                     \
-    auto __gp_##Name() const -> T { return Getter(Idx); }                     \
+    auto __gp_##Name() const -> T                                             \
+      { return LINSCP_AS(T, LINSCP_SELF->Getter(Idx)); }                      \
     __declspec(property(get = __gp_##Name)) T Name
 
   // write-only
@@ -78,7 +116,8 @@
     __declspec(property(put = __sp_##Name)) T Name
 
   #define PROP_W_S(T, Name, Setter)                                           \
-    __declspec(property(put = Setter)) T Name
+    void __sp_##Name(T __v) { Setter(__v); }                                  \
+    __declspec(property(put = __sp_##Name)) T Name
 
   // Indexed properties.
   //
@@ -88,10 +127,15 @@
   // check_properties.py fails if that ever changes. Where you need it, take the
   // result into a local first.
   #define PROP_IDX_R_G(T, Name, IT, Getter)                                   \
-    __declspec(property(get = Getter)) T Name[]
+    T __gp_##Name(IT __i) const                                               \
+      { return LINSCP_AS(T, LINSCP_SELF->Getter(__i)); }                      \
+    __declspec(property(get = __gp_##Name)) T Name[]
 
   #define PROP_IDX_RW_GS(T, Name, IT, G, S)                                   \
-    __declspec(property(get = G, put = S)) T Name[]
+    T __gp_##Name(IT __i) const                                               \
+      { return LINSCP_AS(T, LINSCP_SELF->G(__i)); }                           \
+    void __sp_##Name(IT __i, T __v) { S(__i, __v); }                          \
+    __declspec(property(get = __gp_##Name, put = __sp_##Name)) T Name[]
 
 #else
   #error "linscp requires clang or C++Builder: GCC has no __declspec(property)."

@@ -14,7 +14,7 @@ Goal: prove the keystone works, with no behaviour change anywhere.
 |---|---|---|---|---|
 | P0-01 | Repo layout: `port/`, `qt/`, `cmake/`, `build/gen/` gitignored | S | — | Per PLAN §3 |
 | P0-02 | Pin submodule to a release tag, not `master` | S | P0-01 | Done: 6.5.8, the latest stable. The 6.6.x line is all RC/beta |
-| P0-03 | **Dual-target property macro header** (`port/shim/vcl_property.h`) | S | — | The keystone; PLAN §2 |
+| P0-03 | **Dual-target property macro header** (`port/shim/vcl_property.h`) | S | — | The keystone; PLAN §2. Every form routes through a public wrapper so private accessors stay reachable, as Borland's do |
 | P0-04 | **Verify C++Builder accepts macro-expanded `__property`** | S | P0-03 | **R1. Do this first.** Needs a licence + Windows. Blocks the zero-diff story |
 | P0-05 | `transform.py`: `__property` rewriter, line-preserving | M | P0-03 | 591 decls, 4 forms + 4 manual |
 | P0-06 | `transform.py`: `__fastcall`, `ARRAYOFCONST` | S | P0-05 | Done. `__fastcall` is an empty define; `ARRAYOFCONST` pastes onto a variadic call |
@@ -63,10 +63,11 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P1-02b | Shim: `TList`, `TObjectList`, Delphi sets | M | P1-02 | Done. `Notify` is virtual and core overrides it |
 | P1-03 | Shim: `TDateTime` + date/time RTL | L | P1-01 | Done. 30 of 70 `Common.cpp` errors |
 | P1-03b | Shim: `SysUtils` / `IOUtils` / `StrUtils` file and path routines | L | P1-03 | `IncludeTrailingBackslash` 39, `ExtractFileName` 29 |
-| P1-04 | Shim: `Exception` hierarchy + Delphi exception semantics | M | P1-01 | Core has no `__try`/`__except` — simplifies this |
+| P1-04 | Shim: `Exception` hierarchy + Delphi exception semantics | M | P1-01 | Done. Full C++Builder constructor set; descendants inherit it |
 | P1-05 | Shim: `TCriticalSection` + `SyncObjs` | M | P1-02 | Done; recursive, as Delphi's is |
 | P1-05b | Shim: `TThread` / `StartThread` | M | P1-05 | `Interface.h` already abstracts thread creation |
 | P1-08b | Shim: `Masks`, `TPath`, `TTimeSpan`, `TEncoding`, `TNotifyEvent`, env/version globals | M | P1-01b | Done. The long tail the census named after the big groups cleared |
+| P1-09b | `try`/`__finally` for POSIX | L | P1-08b | **182 blocks**, 0 `__try`, 0 `__except`. clang maps Borland's `__finally` to SEH, which the mingw target supports and Linux does not. Only 2 of 182 contain a `return` in the guarded body, so a line-preserving lambda transform covers 180 and those 2 go in the patch series |
 | P1-06 | Shim: `TStream`/`THandleStream`/`TMemoryStream` | M | P1-02 | ~31 uses each; now the largest non-closure group |
 | P1-06b | Shim: `TCustomIniFile`/`TMemIniFile`/`TRegistry` | M | P1-06 | Done. Real registry on Windows; on POSIX every key reports absent |
 | P1-06c | Shim: `DynamicArray`, Delphi handle-based file API | S | P1-06 | Done. Reference-counted, as core's by-value `Read` requires |

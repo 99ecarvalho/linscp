@@ -34,6 +34,65 @@ struct TStub {
   PROP_IDX_RW_GS(std::string, Slots, int, GetSlot, PutSlot);
 };
 
+// Properties must reach *private* accessors from outside the class.
+//
+// Borland's __property grants that; __declspec(property) does not, because it
+// expands to an ordinary member call at the use site. Core relies on the
+// Borland rule -- TBookmark declares public properties over private
+// SetName/SetLocal/SetRemote -- so the shim routes every form through a
+// wrapper declared alongside the property. Without that, these reads and
+// writes fail to compile.
+struct TPrivateAccessors
+{
+public:
+  PROP_R_G(int, ReadOnly, GetValue);
+  PROP_RW_GS(int, Both, GetValue, SetValue);
+  PROP_RW_FS(int, FieldRead, FValue, SetValue);
+  PROP_W_S(int, WriteOnly, SetValue);
+  PROP_IDX_RW_GS(int, Items, int, GetItem, SetItem);
+
+  int Raw() const { return FValue; }
+
+private:
+  int GetValue() const { return FValue; }
+  void SetValue(int V) { FValue = V * 2; }
+  int GetItem(int I) const { return FItems[I]; }
+  void SetItem(int I, int V) { FItems[I] = V; }
+
+  int FValue = 5;
+  int FItems[4] = { 0, 0, 0, 0 };
+};
+
+// A const object must still be readable: Borland's properties have no
+// const-correctness, and core's getters are frequently non-const because they
+// genuinely mutate.
+int ReadFromConst(const TPrivateAccessors & P)
+{
+  return P.ReadOnly + P.Both + P.FieldRead;
+}
+
+void TestPrivateAccessorsAreReachable()
+{
+  TPrivateAccessors P;
+  assert(P.ReadOnly == 5);
+  assert(P.Both == 5);
+  assert(P.FieldRead == 5);
+
+  P.Both = 10;
+  assert(P.Raw() == 20);          // the private setter ran, doubling
+
+  P.FieldRead = 3;
+  assert(P.Raw() == 6);
+
+  P.WriteOnly = 4;
+  assert(P.Raw() == 8);
+
+  P.Items[2] = 7;
+  assert(P.Items[2] == 7);
+
+  assert(ReadFromConst(P) == 8 * 3);
+}
+
 }  // namespace
 
 int main() {
@@ -68,6 +127,8 @@ int main() {
 
   // index-constant property passes its constant to the getter
   assert(s.Scaled == 70);
+
+  TestPrivateAccessorsAreReachable();
 
   // indexed property, read and write
   s.Slots[2] = "hi";

@@ -31,6 +31,7 @@ add_library(linscp-shim STATIC
   vcl_inifiles.cpp
   vcl_registry.cpp
   vcl_misc.cpp
+  vcl_exceptions.cpp
   "${CMAKE_BINARY_DIR}/gen_resources.cpp"
 )
 
