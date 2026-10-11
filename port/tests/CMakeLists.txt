@@ -102,6 +102,45 @@ if(WIN32)
     COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_core_init)
   add_test(NAME core_init COMMAND test_core_init /ini=nul)
   set_tests_properties(core_init PROPERTIES DEPENDS core_init_build)
+
+  # A real session against a throwaway loopback sshd: connect, list, download.
+  add_executable(test_sftp_session EXCLUDE_FROM_ALL test_sftp_session.cpp)
+  target_link_libraries(test_sftp_session PRIVATE linscp-runtime)
+  add_test(NAME sftp_session_build
+    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_sftp_session)
+  # Once as negotiated, then pinned to each cipher family: each runs through
+  # different PuTTY code (AES-NI or software AES, GCM, ChaCha20-Poly1305).
+  foreach(_case "default;" "aes_ctr;Ciphers aes128-ctr" "aes_gcm;Ciphers aes256-gcm@openssh.com"
+                "chacha;Ciphers chacha20-poly1305@openssh.com")
+    list(GET _case 0 _name)
+    list(GET _case 1 _line)
+    set(_extra)
+    if(_line)
+      set(_extra --sshd "${_line}")
+    endif()
+    set(_test sftp_session)
+    if(NOT _name STREQUAL "default")
+      set(_test sftp_session_${_name})
+    endif()
+    add_test(NAME ${_test}
+      COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_sftp_session.py"
+              --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" ${_extra}
+              "$<TARGET_FILE:test_sftp_session>")
+    set_tests_properties(${_test} PROPERTIES
+      DEPENDS sftp_session_build SKIP_RETURN_CODE 77 TIMEOUT 180)
+  endforeach()
+
+  # PuTTY's crypto primitives against published vectors.
+  add_executable(test_putty_crypto EXCLUDE_FROM_ALL test_putty_crypto.c)
+  target_include_directories(test_putty_crypto PRIVATE
+    $<TARGET_PROPERTY:linscp-putty,INCLUDE_DIRECTORIES>)
+  linscp_upstream_defines(test_putty_crypto PRIVATE Putty.cbproj)
+  target_link_libraries(test_putty_crypto PRIVATE linscp-runtime)
+  set_target_properties(test_putty_crypto PROPERTIES LINKER_LANGUAGE CXX)
+  add_test(NAME putty_crypto_build
+    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_putty_crypto)
+  add_test(NAME putty_crypto COMMAND test_putty_crypto)
+  set_tests_properties(putty_crypto PROPERTIES DEPENDS putty_crypto_build)
 endif()
 
 # Executable tests go above this line.

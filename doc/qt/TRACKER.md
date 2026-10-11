@@ -25,20 +25,23 @@ what is actually blocking each unit, in dependency order.
 as a real library: `linscp-core`, built by CMake with the cross toolchain.
 Linux: **558 errors, 14/33 clean, 4 aborting.**
 
-**Core links and runs on Windows.** Core, every library it uses and the
-headless frontend (`port/frontend`) link with nothing undefined -- the VCL
-shim, WinSCP's PuTTY (176 units) and its MSVC-built crypto (`libs/puttyvs`),
-FileZilla's 16 units with the 13-unit MFC subset, neon (25), libs3 (14) and
-OpenSSL 3.3.7, all built with clang from pinned submodules. Under Wine, every
-static initialiser runs (ctest `core_link_run`) and core's own
-`CoreInitialize`/`CoreFinalize` complete: configuration, PuTTY, FileZilla,
-neon and stored sessions come up and go down, reporting version 6.5.8
-(ctest `core_init`).
+**A first real session works on Windows** (under Wine): core connects to
+an OpenSSH server over SFTP, authenticates with a key it converted to PPK
+itself, lists a directory and downloads a file byte for byte -- once as
+negotiated and once pinned to each cipher family (AES-CTR, AES-GCM,
+ChaCha20-Poly1305). The server is a throwaway unprivileged `sshd` on
+loopback (`port/tests/run_sftp_session.py`). Getting there found a real
+upstream portability bug: PuTTY's AES-NI counter mode is wrong under any
+compiler but MSVC (`putty-aes-ni-vector-constants.patch`), now also guarded
+by known-answer tests (`putty_crypto`).
 
-1. **P1-18**: a first real session on Windows under Wine, against a local
-   SSH server -- the earliest point a protocol runs end to end.
-2. **P1-07b**: the Win32 calls core makes that Linux lacks; the Linux census
-   (558 errors, 14/33 clean) is now the larger gap.
+Core, every library it uses and the headless frontend link with nothing
+undefined, all built with clang from pinned submodules.
+
+1. **P1-07b**: the Win32 calls core makes that Linux lacks; the Linux census
+   (558 errors, 14/33 clean) is now the gap between this and P1-17.
+2. **P1-15**: `winscp.com`'s scripting front end over plain stdio, so the
+   session above can be driven by script rather than by a test program.
 3. **P1-13**: neon and libs3 on Linux -- each needs a POSIX configuration
    in place of `src/config.h` and `inc/mingw`. OpenSSL already builds there.
 
@@ -139,6 +142,8 @@ neon and stored sessions come up and go down, reporting version 6.5.8
 | 2026-10-10 | `port/platform` headers refuse to compile on Windows, and are POSIX-only on the include path | Putting them on a Windows target shadowed the genuine mingw headers, which presented as a 1,220 -> 783 "improvement". The `#error` makes that mistake loud |
 | 2026-10-10 | `port/compat` is separate from `port/platform` | `help.h` is missing from upstream itself rather than being a platform difference, so it is needed on every target |
 | 2026-10-10 | The ratchet records whether a unit aborted | An aborted parse reports a floor. Treating that as a distinct state stops a new abort from reading as sudden progress |
+| 2026-10-11 | Every non-Debug build defines `NDEBUG`, including one with no build type | Upstream has only Debug (`_DEBUG`) and Release (`NDEBUG`). With neither, PuTTY's standard `assert` stays live, which upstream never builds -- and core depends on that: `get_remote_username` reads `CONF_username` with `conf_get_str`, which asserts on its type |
+| 2026-10-11 | Session tests run against a throwaway unprivileged `sshd` on loopback | Real protocol code, no network and no credentials: fresh host and client keys per run, the client key the only one authorized, and sshd can only log in the user running it. Skips where no sshd is installed |
 | 2026-10-11 | linscp names itself to servers but keeps WinSCP's stored settings (user's decision) | `AppNameString` is "linscp" and the SSH banner `linscp-release-<version>` -- the HTTP User-Agent, S3 role session, FTP CSID and PuTTY appname follow. The registry keys stay `Software\Martin Prikryl\WinSCP 2`, so on Windows existing sites carry over |
 | 2026-10-11 | The VERSIONINFO resource is generated from `WinSCP.cbproj`'s `VerInfo_*` settings (`gen_versioninfo.py`) | Core reads its own version from the running module's resource, which C++Builder writes from those settings; generated, it follows the pin. POSIX has no resources: P1-07b's |
 | 2026-10-11 | The headless frontend compiles upstream's `windows/ProgParams.cpp` as is and copies `UniqTempDir` from `GUITools.cpp` | `TProgramParams` needs nothing beyond core; `GUITools.cpp` is otherwise GUI. Startup follows `wWinMain`'s order: the application log exists before `CoreInitialize` |
@@ -253,6 +258,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 
 | Fact | Evidence | Date |
 |---|---|---|
+| PuTTY's AES-NI SDCTR is wrong when built by clang or GCC | WinSCP's `_MM_SETR_EPI8` brace-initialises `__m128i`, which is a byte union under MSVC but a two-lane vector elsewhere: the byte-reversal mask loses all but two values. NIST SP 800-38A F.5.1 fails, software AES passes; sessions fail with "Incoming packet was garbled on decryption" | 2026-10-11 |
+| `CopyToLocal` needs each name's `TRemoteFile` in `Objects[]` | A bare name list crashes in `TRemoteFile::GetLinkedFile`; WinSCP's callers always pass the listed files | 2026-10-11 |
 | WinSCP's OpenSSL differs from the 3.3.7 release in 17 files, one of them functionally (a CVE-2026-45447 backport in `pk7_smime.c`) | `openssl_tree.py --check`, CRLF ignored; WinSCP commit bb46bb15d | 2026-10-11 |
 | WinSCP's OpenSSL lacks the C fallbacks for its x86 assembly and every Unix source | `bn_asm.c`, `des_enc.c`, `bf_enc.c`, `c_enc.c`, `threads_pthread.c`, `rand_unix.c` absent from `libs/openssl` | 2026-10-11 |
 | Upstream libs3 returns `int` where neon's body provider returns `ssize_t` | `neon_read_func` in `libs3/src/request.c`; fixed by `libs3-64bit-body-provider.patch` | 2026-10-11 |
@@ -435,7 +442,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-15 | Console IPC → stdio | todo | |
 | P1-16 | Headless `Interface.h` frontend | done | `port/frontend`: all 17 functions plus startup/shutdown; core initialises and finalises under Wine. Linux follows core (P1-07b) |
 | P1-17 | First SFTP session on Linux | todo | long tail expected |
-| P1-18 | Windows cross-build + Wine | todo | |
+| P1-18 | Windows cross-build + Wine | wip | Core, cross-built, runs real SFTP sessions under Wine (four cipher configurations); the CLI is P1-15's |
 | P1-19 | Golden suite green, both platforms | todo | **P1 gate** |
 | P1-20 | .NET assembly drives Linux CLI | todo | |
 | P1-21 | `#ifdef` out Windows-only subsystems | todo | |

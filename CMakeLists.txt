@@ -66,9 +66,14 @@ function(linscp_upstream_defines TARGET SCOPE PROJECT)
   endif()
   string(REPLACE "\n" ";" _flags "${_flags}")
   list(TRANSFORM _flags REPLACE "^-D" "")
-  # Debug adds _DEBUG as upstream's Debug configurations do; Release gets
-  # NDEBUG from CMake itself.
-  target_compile_definitions(${TARGET} ${SCOPE} ${_flags} "$<$<CONFIG:Debug>:_DEBUG>")
+  # Upstream has two configurations: Debug defines _DEBUG, Release NDEBUG.
+  # Every non-Debug build is the latter, including one with no build type,
+  # for which CMake adds nothing itself. Neither would leave PuTTY's standard
+  # assert live, which upstream never builds: Debug routes it to core's
+  # DoAssertC, Release compiles it out -- and core relies on that, reading
+  # CONF_username with conf_get_str, which asserts on its type.
+  target_compile_definitions(${TARGET} ${SCOPE} ${_flags}
+    "$<IF:$<CONFIG:Debug>,_DEBUG,NDEBUG>")
   message(STATUS "${TARGET}: upstream defines from ${PROJECT}: ${_flags}")
 endfunction()
 

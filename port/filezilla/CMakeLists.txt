@@ -35,7 +35,7 @@ target_compile_definitions(linscp-mfc PRIVATE
   _AFX_NO_AFXCMN_SUPPORT _AFX_NO_RICHEDIT_SUPPORT _AFX_NO_INET_SUPPORT
   _AFX_NO_DHTML_SUPPORT _AFX_NO_OLE_SUPPORT _AFX_NO_SOCKET_SUPPORT _AFX_NO_SYNC_SUPPORT
   _AFX_NO_DAO_SUPPORT
-  "$<$<CONFIG:Debug>:_DEBUG>")
+  "$<IF:$<CONFIG:Debug>,_DEBUG,NDEBUG>")
 target_include_directories(linscp-mfc PRIVATE
   "${_g}/libs/mfc/include" "${_g}/libs/mfc/source" ${_shim_includes})
 target_compile_options(linscp-mfc PRIVATE -include "${_prelude}" -w)
