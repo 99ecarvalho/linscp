@@ -20,27 +20,26 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 Driven by `compile_census.py` rather than by grep counts — the compiler names
 what is actually blocking each unit, in dependency order.
 
-**Seven of ten tracked units compile cleanly on both targets**, nothing
-aborting on either, measured in upstream's own preprocessor configuration (see
-the correction below). Census: **159 errors on mingw, 303 on Linux.**
+**Eight of ten tracked units compile cleanly for Windows, seven for Linux**,
+nothing aborting on either, measured in upstream's own preprocessor
+configuration. Census: **146 errors on mingw, 290 on Linux.**
 
 | Unit | mingw | Linux |
 |---|---|---|
 | `Bookmarks`, `CopyParam`, `FileBuffer`, `FileMasks`, `NamedObjs`, `Option`, `Queue` | 0 | 0 |
-| `Configuration.cpp` | 7 | 74 |
+| `Configuration.cpp` | **0** | 67 |
 | `Terminal.cpp` | 46 | 70 |
-| `Common.cpp` | 106 | 159 |
+| `Common.cpp` | 100 | 153 |
 
-Most of the Linux-only excess is not shim work: **55 of `Configuration.cpp`'s
-74 Linux errors come from PuTTY headers** -- `putty/windows/platform.h` and the
-Windows GSSAPI declarations -- because WinSCP vendors only PuTTY's Windows
-platform layer. That is P1-09.
+`Configuration.cpp`'s 67 Linux errors are not shim work in the usual sense:
+**55 come from PuTTY headers** -- `putty/windows/platform.h` and the Windows
+GSSAPI declarations -- because WinSCP vendors only PuTTY's Windows platform
+layer. The rest are Win32 shell-folder and message constants.
 
-1. `Configuration.cpp` on mingw (**7**): `RawByteString` to `UnicodeString`,
-   `LeftStr`, `ParamStr`, `TPath::IsDriveRooted`.
-2. **P1-09**: PuTTY's Unix platform layer, which removes the bulk of the Linux
-   excess across every unit that includes `PuttyIntf.h`.
-3. `Terminal.cpp` (46 / 70), then `Common.cpp` (106 / 159).
+1. **P1-09**: PuTTY's Unix platform layer. It removes the bulk of the Linux
+   excess in every unit that includes `PuttyIntf.h`.
+2. `Terminal.cpp` (46 / 70).
+3. `Common.cpp` (100 / 153).
 
 ## Decisions taken
 
@@ -174,6 +173,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | `ExitThread` / `EndThread` on POSIX | Unwinds to the entry point by exception, so destructors run; Win32 skips them | A `catch (...)` between the call and the entry point would intercept it. Core calls it only as the last statement of a thread entry point |
 | Named events on POSIX | `CreateEvent` with a name fails with `ERROR_NOT_SUPPORTED` | Would need to be cross-process. Core never names one; refusing beats quietly creating a private event |
 | `StripHotkey` in East Asian locales | The whole-`(&X)` suffix removal Delphi does under `SysLocale.FarEast` is not reproduced | Only the `&` is removed. Affects only CJK system locales |
+| `ParamStr(n)` splitting on Windows | Follows Delphi's `GetParamStr` rules as documented in the shim -- quotes toggle and are dropped, no backslash escapes, empty `""` skipped -- but has not been compared against a Delphi binary | Wine cannot check it: `CommandLineToArgvW` implements the MSVC rules, which differ deliberately. Core itself only uses `ParamStr(0)` |
+| `TPath::IsDriveRooted` on POSIX | Always false | As in Delphi's POSIX RTL. Core uses it only to locate Windows' UAC VirtualStore |
 | `SuspendThread` on POSIX | Not declared | A running pthread cannot be suspended. A missing declaration fails at compile time; a stub would fail silently. `CREATE_SUSPENDED` + `ResumeThread` is supported |
 
 ## Open questions

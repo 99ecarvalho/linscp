@@ -77,6 +77,10 @@ public:
   static UnicodeString GetFullPath(const UnicodeString & Path)
     { return ExpandUNCFileName(Path); }
   static bool IsPathRooted(const UnicodeString & Path);
+  // "X:\" or "X:/": absolute and on a drive. Always false on POSIX, as in
+  // Delphi's own POSIX RTL -- core uses it only to reach Windows' UAC
+  // VirtualStore, which has no counterpart there.
+  static bool IsDriveRooted(const UnicodeString & Path);
 };
 
 //---------------------------------------------------------------------------

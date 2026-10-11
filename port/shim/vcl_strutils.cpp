@@ -726,3 +726,22 @@ struct TVersionInit
 const TVersionInit GVersionInit;
 
 }  // namespace
+
+UnicodeString LeftStr(const UnicodeString & AText, int ACount)
+{
+  return AText.SubString(1, ACount);
+}
+
+UnicodeString RightStr(const UnicodeString & AText, int ACount)
+{
+  if (ACount >= AText.Length())
+  {
+    return AText;
+  }
+  return AText.SubString(AText.Length() + 1 - ACount, ACount);
+}
+
+UnicodeString MidStr(const UnicodeString & AText, int AStart, int ACount)
+{
+  return AText.SubString(AStart, ACount);
+}

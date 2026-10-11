@@ -4,6 +4,8 @@
 #ifndef LINSCP_VCL_SYSUTILS_H
 #define LINSCP_VCL_SYSUTILS_H
 
+#include <vector>
+
 #include "vcl_datetime.h"
 #include "vcl_dynamicarray.h"
 #include "vcl_streams.h"
@@ -94,5 +96,24 @@ constexpr TDuplicates dupError  = ::dupError;
 
 // Core also writes these unqualified by System.
 namespace Types = System::Types;
+
+// System.ParamStr / ParamCount. Index 0 is the full path of the running
+// executable, as in Delphi; core uses it to find a portable INI beside the
+// program. Arguments come from the OS rather than from main(), so nothing has
+// to be initialised: GetCommandLineW on Windows, /proc/self/cmdline on Linux.
+// An index past the end yields an empty string.
+int ParamCount();
+UnicodeString ParamStr(int Index);
+
+namespace linscp {
+
+// Delphi's Windows command-line splitting (System.GetParamStr), which is not
+// the MSVC CRT's: any character up to ' ' separates, '"' toggles quoting and
+// is dropped, there are no backslash escapes, and an empty "" before a token
+// is skipped. Element 0 is the program token. Splitting stops at the first
+// empty token, as ParamCount does.
+std::vector<UnicodeString> SplitDelphiCommandLine(const UnicodeString & CommandLine);
+
+}  // namespace linscp
 
 #endif // LINSCP_VCL_SYSUTILS_H

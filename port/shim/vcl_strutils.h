@@ -151,4 +151,9 @@ using ::TStrings;
 using ::TStringList;
 }  // namespace Classes
 
+// StrUtils' substring helpers, over SubString so they share Copy's clamping.
+UnicodeString LeftStr(const UnicodeString & AText, int ACount);
+UnicodeString RightStr(const UnicodeString & AText, int ACount);
+UnicodeString MidStr(const UnicodeString & AText, int AStart, int ACount);
+
 #endif // LINSCP_VCL_STRUTILS_H

@@ -4,6 +4,9 @@
 // (Win32 FindFirstFileW, and dirent + fnmatch on POSIX), so the tests assert
 // behaviour rather than implementation and run on both targets.
 #include "vcl_sysutils.h"
+#include "vcl_strutils.h"
+
+#include <vector>
 
 #include <cstdio>
 #include <filesystem>
@@ -203,6 +206,57 @@ void TestMiscellany()
   CHECK(static_cast<int>(faReadOnly) == 0x01);
 }
 
+bool EndsWithText(const UnicodeString & S, const UnicodeString & Tail)
+{
+  return (S.Length() >= Tail.Length()) &&
+         SameText(S.SubString(S.Length() - Tail.Length() + 1), Tail);
+}
+
+void TestParamStr()
+{
+  // ctest runs us with no arguments.
+  const UnicodeString Self = ParamStr(0);
+#if defined(_WIN32)
+  CHECK(EndsWithText(Self, L"test_sysutils.exe"));
+  CHECK((Self.Length() > 3) && (Self[2] == L':'));   // a full path
+#else
+  CHECK(EndsWithText(Self, L"test_sysutils"));
+  CHECK((Self.Length() > 0) && (Self[1] == L'/'));
+#endif
+  CHECK(ParamCount() == 0);
+  CHECK(ParamStr(1).IsEmpty());
+  CHECK(ParamStr(-1).IsEmpty());
+}
+
+bool Split(const wchar_t * Line, std::vector<UnicodeString> Expected)
+{
+  const std::vector<UnicodeString> Got = linscp::SplitDelphiCommandLine(Line);
+  if (Got.size() != Expected.size())
+  {
+    return false;
+  }
+  for (std::size_t I = 0; I < Got.size(); ++I)
+  {
+    if (Got[I] != Expected[I])
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+void TestDelphiCommandLineSplitting()
+{
+  CHECK(Split(L"prog a b", {L"prog", L"a", L"b"}));
+  CHECK(Split(L"\"C:\\Program Files\\x.exe\" \"a b\" c",
+              {L"C:\\Program Files\\x.exe", L"a b", L"c"}));
+  CHECK(Split(L"prog a\"b c\"d", {L"prog", L"ab cd"}));    // quotes join, are dropped
+  CHECK(Split(L"prog \"\" x", {L"prog", L"x"}));            // empty "" skipped
+  CHECK(Split(L"prog a\\\"b", {L"prog", L"a\\b"}));        // no backslash escape
+  CHECK(Split(L"prog\ta   ", {L"prog", L"a"}));             // tab; trailing space
+  CHECK(Split(L"", {}));
+}
+
 }  // namespace
 
 int main()
@@ -218,6 +272,9 @@ int main()
 
   std::error_code Ec;
   fs::remove_all(Root, Ec);
+
+  TestParamStr();
+  TestDelphiCommandLineSplitting();
 
   if (Failures == 0)
   {

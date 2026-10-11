@@ -179,6 +179,23 @@ void TestHostVersion()
   CHECK(MSecsPerDay == 86400000);
 }
 
+void TestIsDriveRooted()
+{
+#if defined(_WIN32)
+  CHECK(TPath::IsDriveRooted(L"C:\\Users\\x.ini"));
+  CHECK(TPath::IsDriveRooted(L"d:/data"));
+  CHECK(!TPath::IsDriveRooted(L"C:relative"));     // drive-relative, not absolute
+  CHECK(!TPath::IsDriveRooted(L"C:"));
+  CHECK(!TPath::IsDriveRooted(L"\\\\server\\share"));
+  CHECK(!TPath::IsDriveRooted(L"1:\\x"));
+#else
+  // No drives on POSIX, as in Delphi's POSIX RTL.
+  CHECK(!TPath::IsDriveRooted(L"/home/user"));
+  CHECK(!TPath::IsDriveRooted(L"C:\\Users"));
+#endif
+  CHECK(!TPath::IsDriveRooted(L""));
+}
+
 }  // namespace
 
 void TestStripHotkey()
@@ -203,6 +220,8 @@ int main()
   TestEnvironment();
   TestHostVersion();
   TestStripHotkey();
+
+  TestIsDriveRooted();
 
   if (Failures == 0)
   {

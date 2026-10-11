@@ -8,12 +8,12 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 159,
+        "errors": 153,
         "missing_types": 9
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 74,
+        "errors": 67,
         "missing_types": 17
       },
       "source/core/CopyParam.cpp": {
@@ -60,12 +60,12 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 106,
+        "errors": 100,
         "missing_types": 2
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
-        "errors": 7,
+        "errors": 0,
         "missing_types": 0
       },
       "source/core/CopyParam.cpp": {

@@ -160,6 +160,28 @@ void TestAnsiStringApiIsOneBased()
   CHECK(AnsiString('x', 3) == AnsiString("xxx"));
 }
 
+// C++Builder converts byte strings to UnicodeString implicitly; core relies on
+// it (Configuration.cpp passes ReadBinaryData's RawByteString to a
+// UnicodeString parameter). Same result as the explicit conversion.
+UnicodeString TakesUnicode(const UnicodeString & S) { return S; }
+
+void TestImplicitToUnicode()
+{
+  const RawByteString Raw("a\xE9z", 3);
+  CHECK(TakesUnicode(Raw) == ToUnicodeString(Raw));
+  CHECK(TakesUnicode(Raw).Length() == 3);       // byte for byte
+  CHECK(TakesUnicode(Raw)[2] == static_cast<wchar_t>(0x00E9));
+
+  const UTF8String Utf8("a\xC3\xA9z", 4);
+  CHECK(TakesUnicode(Utf8) == UnicodeString(L"a\u00E9z"));  // real UTF-8 decode
+
+  // Core's cache round-trip: UnicodeString -> binary -> UnicodeString.
+  const UnicodeString Original(L"dir\u00E9/\u00FFend");
+  const RawByteString Stored = Original;
+  const UnicodeString Back = Stored;
+  CHECK(Back == Original);
+}
+
 }  // namespace
 
 int main()
@@ -170,6 +192,8 @@ int main()
   TestRawPreservesBytes();
   TestTypesAreDistinct();
   TestAnsiStringApiIsOneBased();
+
+  TestImplicitToUnicode();
 
   if (Failures == 0)
   {

@@ -254,6 +254,24 @@ void TestConstructorsFromCore()
   CHECK(UnicodeString(L'x') == U(L"x"));
 }
 
+void TestLeftRightMid()
+{
+  const UnicodeString S(L"abcdef");
+  CHECK(LeftStr(S, 2) == UnicodeString(L"ab"));
+  CHECK(LeftStr(S, 99) == S);
+  CHECK(LeftStr(S, 0).IsEmpty());
+  CHECK(LeftStr(S, -1).IsEmpty());
+  CHECK(RightStr(S, 2) == UnicodeString(L"ef"));
+  CHECK(RightStr(S, 99) == S);
+  CHECK(RightStr(S, 0).IsEmpty());
+  CHECK(MidStr(S, 2, 3) == UnicodeString(L"bcd"));
+  CHECK(MidStr(S, 5, 99) == UnicodeString(L"ef"));
+  CHECK(MidStr(S, 7, 1).IsEmpty());
+  // Configuration.cpp's idiom: does a key start with a prefix?
+  const UnicodeString Prefix(L"abc");
+  CHECK(LeftStr(S, Prefix.Length()) == Prefix);
+}
+
 }  // namespace
 
 int main()
@@ -266,6 +284,8 @@ int main()
   TestFormat();
   TestNoWin32MacroCollisions();
   TestConstructorsFromCore();
+
+  TestLeftRightMid();
 
   if (Failures == 0)
   {

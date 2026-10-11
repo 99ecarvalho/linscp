@@ -1895,10 +1895,10 @@ green (R1)</td>
 <p>Driven by <code>compile_census.py</code> rather than by grep counts —
 the compiler names what is actually blocking each unit, in dependency
 order.</p>
-<p><strong>Seven of ten tracked units compile cleanly on both
-targets</strong>, nothing aborting on either, measured in upstream’s own
-preprocessor configuration (see the correction below). Census:
-<strong>159 errors on mingw, 303 on Linux.</strong></p>
+<p><strong>Eight of ten tracked units compile cleanly for Windows, seven
+for Linux</strong>, nothing aborting on either, measured in upstream’s
+own preprocessor configuration. Census: <strong>146 errors on mingw, 290
+on Linux.</strong></p>
 <table>
 <colgroup>
 <col style="width: 33%" />
@@ -1922,8 +1922,8 @@ preprocessor configuration (see the correction below). Census:
 </tr>
 <tr class="even">
 <td><code>Configuration.cpp</code></td>
-<td>7</td>
-<td>74</td>
+<td><strong>0</strong></td>
+<td>67</td>
 </tr>
 <tr class="odd">
 <td><code>Terminal.cpp</code></td>
@@ -1932,26 +1932,22 @@ preprocessor configuration (see the correction below). Census:
 </tr>
 <tr class="even">
 <td><code>Common.cpp</code></td>
-<td>106</td>
-<td>159</td>
+<td>100</td>
+<td>153</td>
 </tr>
 </tbody>
 </table>
-<p>Most of the Linux-only excess is not shim work: <strong>55 of
-<code>Configuration.cpp</code>’s 74 Linux errors come from PuTTY
-headers</strong> – <code>putty/windows/platform.h</code> and the Windows
-GSSAPI declarations – because WinSCP vendors only PuTTY’s Windows
-platform layer. That is P1-09.</p>
+<p><code>Configuration.cpp</code>’s 67 Linux errors are not shim work in
+the usual sense: <strong>55 come from PuTTY headers</strong> –
+<code>putty/windows/platform.h</code> and the Windows GSSAPI
+declarations – because WinSCP vendors only PuTTY’s Windows platform
+layer. The rest are Win32 shell-folder and message constants.</p>
 <ol type="1">
-<li><code>Configuration.cpp</code> on mingw (<strong>7</strong>):
-<code>RawByteString</code> to <code>UnicodeString</code>,
-<code>LeftStr</code>, <code>ParamStr</code>,
-<code>TPath::IsDriveRooted</code>.</li>
-<li><strong>P1-09</strong>: PuTTY’s Unix platform layer, which removes
-the bulk of the Linux excess across every unit that includes
+<li><strong>P1-09</strong>: PuTTY’s Unix platform layer. It removes the
+bulk of the Linux excess in every unit that includes
 <code>PuttyIntf.h</code>.</li>
-<li><code>Terminal.cpp</code> (46 / 70), then <code>Common.cpp</code>
-(106 / 159).</li>
+<li><code>Terminal.cpp</code> (46 / 70).</li>
+<li><code>Common.cpp</code> (100 / 153).</li>
 </ol>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
@@ -2642,6 +2638,22 @@ quietly creating a private event</td>
 <code>SysLocale.FarEast</code> is not reproduced</td>
 <td>Only the <code>&amp;</code> is removed. Affects only CJK system
 locales</td>
+</tr>
+<tr class="odd">
+<td><code>ParamStr(n)</code> splitting on Windows</td>
+<td>Follows Delphi’s <code>GetParamStr</code> rules as documented in the
+shim – quotes toggle and are dropped, no backslash escapes, empty
+<code>""</code> skipped – but has not been compared against a Delphi
+binary</td>
+<td>Wine cannot check it: <code>CommandLineToArgvW</code> implements the
+MSVC rules, which differ deliberately. Core itself only uses
+<code>ParamStr(0)</code></td>
+</tr>
+<tr class="even">
+<td><code>TPath::IsDriveRooted</code> on POSIX</td>
+<td>Always false</td>
+<td>As in Delphi’s POSIX RTL. Core uses it only to locate Windows’ UAC
+VirtualStore</td>
 </tr>
 <tr class="odd">
 <td><code>SuspendThread</code> on POSIX</td>

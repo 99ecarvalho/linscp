@@ -48,6 +48,10 @@ public:
   // direction only where C++Builder is also implicit, so upstream compiles.
   AnsiStringT(const UnicodeString & S) { Assign(S); }
   AnsiStringT & operator=(const UnicodeString & S) { Assign(S); return *this; }
+  // And back, implicitly, as C++Builder's AnsiStringT has it: core passes a
+  // RawByteString where a UnicodeString is expected. Uses the per-code-page
+  // conversion below, so it adds no new encoding rule.
+  operator UnicodeString() const;
 
   int Length() const { return static_cast<int>(FData.size()); }
   bool IsEmpty() const { return FData.empty(); }
@@ -112,5 +116,11 @@ UnicodeString RawToUtf16(const char * Bytes, std::size_t Count);
 UnicodeString ToUnicodeString(const AnsiString & S);
 UnicodeString ToUnicodeString(const UTF8String & S);
 UnicodeString ToUnicodeString(const RawByteString & S);
+
+template <unsigned short CodePage>
+inline AnsiStringT<CodePage>::operator UnicodeString() const
+{
+  return ToUnicodeString(*this);
+}
 
 #endif // LINSCP_VCL_BYTESTRING_H

@@ -155,3 +155,20 @@ UnicodeString StripHotkey(const UnicodeString & Text)
   }
   return Result;
 }
+
+bool TPath::IsDriveRooted(const UnicodeString & Path)
+{
+#if defined(_WIN32)
+  if (Path.Length() < 3)
+  {
+    return false;
+  }
+  const wchar_t Drive = Path[1];
+  const bool Letter = ((Drive >= L'A') && (Drive <= L'Z')) ||
+                      ((Drive >= L'a') && (Drive <= L'z'));
+  return Letter && (Path[2] == L':') && ((Path[3] == L'\\') || (Path[3] == L'/'));
+#else
+  (void)Path;
+  return false;
+#endif
+}

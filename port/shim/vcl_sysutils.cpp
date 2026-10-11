@@ -1,5 +1,6 @@
 #include "vcl_sysutils.h"
 
+#include <cstdio>
 #include <cstring>
 
 #if !defined(_WIN32)
@@ -356,4 +357,137 @@ int FileWrite(THandle Handle, const TBytes Buffer, int Offset, int Count)
     return 0;
   }
   return FileWrite(Handle, Buffer.data() + Offset, Count);
+}
+
+namespace linscp {
+
+std::vector<UnicodeString> SplitDelphiCommandLine(const UnicodeString & CommandLine)
+{
+  std::vector<UnicodeString> Result;
+  const int Len = CommandLine.Length();
+  int P = 1;
+  // 1-based; past the end reads as the terminator, as Delphi's PChar does.
+  auto At = [&](int I) -> wchar_t { return (I <= Len) ? CommandLine[I] : L'\0'; };
+  for (;;)
+  {
+    for (;;)
+    {
+      while ((At(P) != L'\0') && (At(P) <= L' '))
+      {
+        ++P;
+      }
+      if ((At(P) == L'"') && (At(P + 1) == L'"'))
+      {
+        P += 2;
+      }
+      else
+      {
+        break;
+      }
+    }
+    UnicodeString Param;
+    while (At(P) > L' ')
+    {
+      if (At(P) == L'"')
+      {
+        ++P;
+        while ((At(P) != L'\0') && (At(P) != L'"'))
+        {
+          Param += At(P);
+          ++P;
+        }
+        if (At(P) != L'\0')
+        {
+          ++P;
+        }
+      }
+      else
+      {
+        Param += At(P);
+        ++P;
+      }
+    }
+    if (Param.IsEmpty())
+    {
+      break;
+    }
+    Result.push_back(Param);
+  }
+  return Result;
+}
+
+}  // namespace linscp
+
+namespace {
+
+// The program token at 0, then the arguments.
+std::vector<UnicodeString> CommandLineParams()
+{
+#if defined(_WIN32)
+  return linscp::SplitDelphiCommandLine(UnicodeString(GetCommandLineW()));
+#else
+  std::vector<UnicodeString> Result;
+  FILE * F = std::fopen("/proc/self/cmdline", "rb");
+  if (F == nullptr)
+  {
+    return Result;
+  }
+  std::string All;
+  char Buf[4096];
+  std::size_t N;
+  while ((N = std::fread(Buf, 1, sizeof(Buf), F)) > 0)
+  {
+    All.append(Buf, N);
+  }
+  std::fclose(F);
+  // NUL-separated argv, UTF-8 by convention.
+  std::size_t Start = 0;
+  while (Start < All.size())
+  {
+    const std::size_t End = All.find('\0', Start);
+    const std::size_t Stop = (End == std::string::npos) ? All.size() : End;
+    Result.push_back(linscp::Utf8ToUtf16(All.data() + Start, Stop - Start));
+    Start = Stop + 1;
+  }
+  return Result;
+#endif
+}
+
+UnicodeString ExecutablePath()
+{
+#if defined(_WIN32)
+  std::vector<wchar_t> Buf(32768);
+  const DWORD N = GetModuleFileNameW(nullptr, Buf.data(), static_cast<DWORD>(Buf.size()));
+  return UnicodeString(Buf.data(), static_cast<int>(N));
+#else
+  char Buf[4096];
+  const ssize_t N = readlink("/proc/self/exe", Buf, sizeof(Buf));
+  if (N <= 0)
+  {
+    return UnicodeString();
+  }
+  return linscp::Utf8ToUtf16(Buf, static_cast<std::size_t>(N));
+#endif
+}
+
+}  // namespace
+
+int ParamCount()
+{
+  const std::size_t N = CommandLineParams().size();
+  return (N > 0) ? static_cast<int>(N - 1) : 0;
+}
+
+UnicodeString ParamStr(int Index)
+{
+  if (Index == 0)
+  {
+    return ExecutablePath();
+  }
+  const std::vector<UnicodeString> Params = CommandLineParams();
+  if ((Index < 0) || (static_cast<std::size_t>(Index) >= Params.size()))
+  {
+    return UnicodeString();
+  }
+  return Params[static_cast<std::size_t>(Index)];
 }
