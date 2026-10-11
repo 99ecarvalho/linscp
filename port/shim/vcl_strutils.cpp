@@ -5,6 +5,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <string>
+#include <type_traits>
 
 #include "vcl_object.h"
 #include "vcl_sysutils.h"
@@ -788,57 +789,79 @@ bool AnsiSameStr(const UnicodeString & A, const UnicodeString & B)
 // is the nearest honest answer to what core asks for when reporting the
 // environment.
 
-unsigned Win32MajorVersion = 0;
-unsigned Win32MinorVersion = 0;
-unsigned Win32BuildNumber = 0;
-UnicodeString Win32CSDVersion;
-
 namespace {
 
-void InitHostVersion()
+struct THostVersion
 {
+  unsigned Major = 0;
+  unsigned Minor = 0;
+  unsigned Build = 0;
+  UnicodeString CSD;
+};
+
+THostVersion ReadHostVersion()
+{
+  THostVersion V;
 #if defined(_WIN32)
+  // RtlGetVersion takes the same record as GetVersionExW.
+  using TRtlGetVersion = LONG (WINAPI *)(OSVERSIONINFOW *);
   OSVERSIONINFOW Info{};
   Info.dwOSVersionInfoSize = sizeof(Info);
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-  if (GetVersionExW(&Info) != 0)
+  const HMODULE Ntdll = GetModuleHandleW(L"ntdll.dll");
+  const auto RtlGetVersion = (Ntdll != nullptr)
+    ? reinterpret_cast<TRtlGetVersion>(reinterpret_cast<void *>(GetProcAddress(Ntdll, "RtlGetVersion")))
+    : nullptr;
+  bool Got = (RtlGetVersion != nullptr) && (RtlGetVersion(&Info) == 0);
+  if (!Got)
   {
-    Win32MajorVersion = Info.dwMajorVersion;
-    Win32MinorVersion = Info.dwMinorVersion;
-    Win32BuildNumber = Info.dwBuildNumber;
-    Win32CSDVersion = UnicodeString(Info.szCSDVersion);
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    Got = (GetVersionExW(&Info) != 0);
+    #pragma clang diagnostic pop
   }
-  #pragma clang diagnostic pop
+  if (Got)
+  {
+    V.Major = Info.dwMajorVersion;
+    V.Minor = Info.dwMinorVersion;
+    V.Build = Info.dwBuildNumber;
+    V.CSD = UnicodeString(Info.szCSDVersion);
+  }
 #else
+  // The kernel, the nearest honest answer to what core asks when it reports
+  // the environment.
   struct utsname Name{};
   if (uname(&Name) == 0)
   {
-    int Major = 0;
-    int Minor = 0;
-    int Patch = 0;
+    int Major = 0, Minor = 0, Patch = 0;
     std::sscanf(Name.release, "%d.%d.%d", &Major, &Minor, &Patch);
-    Win32MajorVersion = static_cast<unsigned>(Major);
-    Win32MinorVersion = static_cast<unsigned>(Minor);
-    Win32BuildNumber = static_cast<unsigned>(Patch);
-    Win32CSDVersion = linscp::Utf8ToUtf16(Name.sysname,
-                                          std::char_traits<char>::length(Name.sysname));
+    V.Major = static_cast<unsigned>(Major);
+    V.Minor = static_cast<unsigned>(Minor);
+    V.Build = static_cast<unsigned>(Patch);
+    V.CSD = linscp::Utf8ToUtf16(Name.sysname, std::char_traits<char>::length(Name.sysname));
   }
 #endif
+  return V;
 }
 
-// Declared *after* the variables above deliberately. Dynamic initialisation
-// within a translation unit runs in declaration order, so putting this first
-// made the constructor assign to a UnicodeString that had not been constructed
-// yet -- which segfaulted exactly that way.
-struct TVersionInit
+const THostVersion & HostVersion()
 {
-  TVersionInit() { InitHostVersion(); }
-};
-
-const TVersionInit GVersionInit;
+  static const THostVersion Version = ReadHostVersion();
+  return Version;
+}
 
 }  // namespace
+
+unsigned Win32MajorVersion() { return HostVersion().Major; }
+unsigned Win32MinorVersion() { return HostVersion().Minor; }
+unsigned Win32BuildNumber() { return HostVersion().Build; }
+UnicodeString Win32CSDVersion() { return HostVersion().CSD; }
+
+bool CheckWin32Version(int AMajor, int AMinor)
+{
+  const int Major = static_cast<int>(Win32MajorVersion());
+  const int Minor = static_cast<int>(Win32MinorVersion());
+  return (Major > AMajor) || ((Major == AMajor) && (Minor >= AMinor));
+}
 
 UnicodeString LeftStr(const UnicodeString & AText, int ACount)
 {
@@ -857,4 +880,67 @@ UnicodeString RightStr(const UnicodeString & AText, int ACount)
 UnicodeString MidStr(const UnicodeString & AText, int AStart, int ACount)
 {
   return AText.SubString(AStart, ACount);
+}
+
+UnicodeString AnsiLowerCase(const UnicodeString & S) { return LowerCase(S); }
+UnicodeString AnsiUpperCase(const UnicodeString & S) { return UpperCase(S); }
+
+UnicodeString AnsiReplaceStr(const UnicodeString & AText, const UnicodeString & AFromText,
+                             const UnicodeString & AToText)
+{
+  return ReplaceStr(AText, AFromText, AToText);
+}
+
+bool IsDelimiter(const UnicodeString & Delimiters, const UnicodeString & S, int Index)
+{
+  if ((Index <= 0) || (Index > S.Length()))
+  {
+    return false;
+  }
+  return Delimiters.Pos(UnicodeString(S[Index])) > 0;
+}
+
+namespace {
+
+template <typename T>
+UnicodeString HexOfWidth(T Value)
+{
+  using U = std::make_unsigned_t<T>;
+  return IntToHex(static_cast<__int64>(static_cast<unsigned __int64>(static_cast<U>(Value))),
+                  static_cast<int>(sizeof(T) * 2));
+}
+
+}  // namespace
+
+UnicodeString IntToHex(signed char Value) { return HexOfWidth(Value); }
+UnicodeString IntToHex(unsigned char Value) { return HexOfWidth(Value); }
+UnicodeString IntToHex(short Value) { return HexOfWidth(Value); }
+UnicodeString IntToHex(unsigned short Value) { return HexOfWidth(Value); }
+UnicodeString IntToHex(int Value) { return HexOfWidth(Value); }
+UnicodeString IntToHex(unsigned int Value) { return HexOfWidth(Value); }
+UnicodeString IntToHex(__int64 Value) { return HexOfWidth(Value); }
+UnicodeString IntToHex(unsigned __int64 Value) { return HexOfWidth(Value); }
+
+int IndexStr(const UnicodeString & AText, const UnicodeString * AValues, int AValues_High)
+{
+  for (int I = 0; I <= AValues_High; ++I)
+  {
+    if (AValues[I] == AText)
+    {
+      return I;
+    }
+  }
+  return -1;
+}
+
+int IndexText(const UnicodeString & AText, const UnicodeString * AValues, int AValues_High)
+{
+  for (int I = 0; I <= AValues_High; ++I)
+  {
+    if (SameText(AValues[I], AText))
+    {
+      return I;
+    }
+  }
+  return -1;
 }

@@ -107,10 +107,59 @@ const wchar_t * const LongMonthNames[] =
 
 }  // namespace
 
+TFormatSettings::TFormatSettings()
+{
+  static const wchar_t * const ShortDays[] = {L"Sun", L"Mon", L"Tue", L"Wed", L"Thu", L"Fri", L"Sat"};
+  static const wchar_t * const LongDays[] = {L"Sunday", L"Monday", L"Tuesday", L"Wednesday",
+                                             L"Thursday", L"Friday", L"Saturday"};
+  for (int I = 0; I < 12; ++I)
+  {
+    // The file's own name tables; the members of the same name hide them.
+    ShortMonthNames[I] = ::ShortMonthNames[I];
+    LongMonthNames[I] = ::LongMonthNames[I];
+  }
+  for (int I = 0; I < 7; ++I)
+  {
+    ShortDayNames[I] = ShortDays[I];
+    LongDayNames[I] = LongDays[I];
+  }
+  const UnicodeString NoMatch(L"\uFFFF");
+  ShortMonthNames.Slack() = NoMatch;
+  LongMonthNames.Slack() = NoMatch;
+  ShortDayNames.Slack() = NoMatch;
+  LongDayNames.Slack() = NoMatch;
+}
+
 TFormatSettings & TFormatSettings::Default()
 {
   static TFormatSettings Settings;
   return Settings;
+}
+
+TFormatSettings TFormatSettings::Create() { return TFormatSettings(); }
+TFormatSettings TFormatSettings::Create(TLocaleID) { return TFormatSettings(); }
+TFormatSettings TFormatSettings::Create(const UnicodeString &) { return TFormatSettings(); }
+
+TFormatSettings FormatSettings;
+
+const TDateTime MinDateTime(-657434.0);
+const TDateTime MaxDateTime(2958465.99999999);
+
+TTimeStamp DateTimeToTimeStamp(const TDateTime & DT)
+{
+  // Delphi's: round to the millisecond, take whole days toward zero, and the
+  // time of day as the magnitude of what remains.
+  const long long Total = static_cast<long long>(std::nearbyint(DT.Val() * 86400000.0));
+  TTimeStamp Result;
+  Result.Date = DateDelta + static_cast<int>(Total / MSecsPerDayInt);
+  Result.Time = static_cast<int>(std::llabs(Total) % MSecsPerDayInt);
+  return Result;
+}
+
+TDateTime TimeStampToDateTime(const TTimeStamp & TS)
+{
+  return ComposeDateTime(TDateTime(static_cast<double>(TS.Date - DateDelta)),
+                         TDateTime(static_cast<double>(TS.Time) / 86400000.0));
 }
 
 bool IsLeapYear(Word Year)
@@ -386,6 +435,33 @@ __int64 DaysBetween(const TDateTime & A, const TDateTime & B)
                                         std::trunc(B.Val())));
 }
 
+__int64 MinutesBetween(const TDateTime & A, const TDateTime & B)
+{
+  return MilliSecondsBetween(A, B) / (1000 * 60);
+}
+
+__int64 HoursBetween(const TDateTime & A, const TDateTime & B)
+{
+  return MilliSecondsBetween(A, B) / (1000 * 60 * 60);
+}
+
+int MonthsBetween(const TDateTime & A, const TDateTime & B)
+{
+  return static_cast<int>(std::trunc(std::fabs(A.Val() - B.Val()) / 30.4375));
+}
+
+int YearsBetween(const TDateTime & A, const TDateTime & B)
+{
+  return static_cast<int>(std::trunc(std::fabs(A.Val() - B.Val()) / 365.25));
+}
+
+bool IsSameDay(const TDateTime & Value, const TDateTime & Basis)
+{
+  // Delphi's definition, literally.
+  const double Day = std::trunc(Basis.Val());
+  return (Value.Val() >= Day) && (Value.Val() < Day + 1);
+}
+
 UnicodeString FormatDateTime(const UnicodeString & Format, const TDateTime & DT)
 {
   Word Y = 0, Mo = 0, D = 0, H = 0, Mi = 0, S = 0, Z = 0;
@@ -491,31 +567,138 @@ UnicodeString DateTimeToStr(const TDateTime & DT)
 
 bool TryStrToDateTime(const UnicodeString & S, TDateTime & DT)
 {
-  // Accepts the ISO-ish shape the shim emits: YYYY-MM-DD[ HH:MM[:SS[.mmm]]].
-  int Y = 0, Mo = 0, D = 0, H = 0, Mi = 0, Sec = 0, Ms = 0;
-  std::string A;
-  for (int I = 1; I <= S.Length(); ++I)
+  return TryStrToDateTime(S, DT, TFormatSettings::Default());
+}
+
+namespace {
+
+// Reads an unsigned decimal at I (1-based); false when there is none.
+bool ReadNumber(const UnicodeString & S, int & I, int & Value, int & Digits)
+{
+  Value = 0;
+  Digits = 0;
+  while ((I <= S.Length()) && (S[I] >= L'0') && (S[I] <= L'9') && (Digits < 9))
   {
-    A += static_cast<char>(static_cast<unsigned char>(S[I] & 0xFF));
+    Value = Value * 10 + (S[I] - L'0');
+    ++I;
+    ++Digits;
   }
-  const int Got = std::sscanf(A.c_str(), "%d-%d-%d %d:%d:%d.%d",
-                              &Y, &Mo, &D, &H, &Mi, &Sec, &Ms);
-  if (Got < 3)
+  return Digits > 0;
+}
+
+bool Consume(const UnicodeString & S, int & I, const UnicodeString & Token)
+{
+  if (Token.IsEmpty() || (S.SubString(I, Token.Length()) != Token))
   {
     return false;
+  }
+  I += Token.Length();
+  return true;
+}
+
+void SkipSpaces(const UnicodeString & S, int & I)
+{
+  while ((I <= S.Length()) && (S[I] == L' '))
+  {
+    ++I;
+  }
+}
+
+}  // namespace
+
+bool TryStrToDateTime(const UnicodeString & S, TDateTime & DT,
+                      const TFormatSettings & Settings)
+{
+  // The order of y, m and d as they first appear in ShortDateFormat.
+  wchar_t Order[3] = {0, 0, 0};
+  int N = 0;
+  for (int I = 1; (I <= Settings.ShortDateFormat.Length()) && (N < 3); ++I)
+  {
+    const wchar_t C = static_cast<wchar_t>(Settings.ShortDateFormat[I] | 0x20);
+    if (((C == L'y') || (C == L'm') || (C == L'd')) &&
+        ((N == 0) || (Order[N - 1] != C)) &&
+        !((N >= 2) && (Order[N - 2] == C)))
+    {
+      Order[N++] = C;
+    }
+  }
+  if (N != 3)
+  {
+    return false;
+  }
+
+  int I = 1;
+  SkipSpaces(S, I);
+  int Y = -1, Mo = -1, D = -1, YearDigits = 0;
+  for (int F = 0; F < 3; ++F)
+  {
+    if ((F > 0) && !Consume(S, I, Settings.DateSeparator))
+    {
+      return false;
+    }
+    int Value, Digits;
+    if (!ReadNumber(S, I, Value, Digits))
+    {
+      return false;
+    }
+    switch (Order[F])
+    {
+      case L'y': Y = Value; YearDigits = Digits; break;
+      case L'm': Mo = Value; break;
+      default:   D = Value; break;
+    }
+  }
+  if (YearDigits <= 2)
+  {
+    // Delphi's default TwoDigitYearCenturyWindow of 50, around the current year.
+    Word CurYear, CurMonth, CurDay;
+    DecodeDate(Now(), CurYear, CurMonth, CurDay);
+    const int Pivot = CurYear - 50;
+    Y += (Pivot / 100) * 100;
+    if (Y < Pivot)
+    {
+      Y += 100;
+    }
   }
   TDateTime DatePart;
-  if (!TryEncodeDate(static_cast<Word>(Y), static_cast<Word>(Mo),
-                     static_cast<Word>(D), DatePart))
+  if (!TryEncodeDate(static_cast<Word>(Y), static_cast<Word>(Mo), static_cast<Word>(D), DatePart))
   {
     return false;
   }
+
   TDateTime TimePart;
-  if (Got >= 5 && !TryEncodeTime(static_cast<Word>(H), static_cast<Word>(Mi),
-                                 static_cast<Word>(Got >= 6 ? Sec : 0),
-                                 static_cast<Word>(Got >= 7 ? Ms : 0), TimePart))
+  SkipSpaces(S, I);
+  if (I <= S.Length())
   {
-    return false;
+    int H, Mi, Sec = 0, Ms = 0, Digits;
+    if (!ReadNumber(S, I, H, Digits) || !Consume(S, I, Settings.TimeSeparator) ||
+        !ReadNumber(S, I, Mi, Digits))
+    {
+      return false;
+    }
+    if (Consume(S, I, Settings.TimeSeparator))
+    {
+      if (!ReadNumber(S, I, Sec, Digits))
+      {
+        return false;
+      }
+      if (Consume(S, I, Settings.DecimalSeparator))
+      {
+        if (!ReadNumber(S, I, Ms, Digits))
+        {
+          return false;
+        }
+        while (Digits < 3) { Ms *= 10; ++Digits; }
+        while (Digits > 3) { Ms /= 10; --Digits; }
+      }
+    }
+    SkipSpaces(S, I);
+    if ((I <= S.Length()) ||
+        !TryEncodeTime(static_cast<Word>(H), static_cast<Word>(Mi), static_cast<Word>(Sec),
+                       static_cast<Word>(Ms), TimePart))
+    {
+      return false;
+    }
   }
   DT = ComposeDateTime(DatePart, TimePart);
   return true;

@@ -10,6 +10,7 @@
 // The negative case is the one that matters most: Delphi treats the fractional
 // part as a positive time of day even when the date is negative. Core stores
 // file timestamps in these, so a sign error would shift times rather than fail.
+#include "vcl_strutils.h"
 #include "vcl_datetime.h"
 
 #include <cmath>
@@ -355,6 +356,73 @@ void TestNowIsSane()
   CHECK(Time().Val() >= 0.0 && Time().Val() < 1.0);
 }
 
+void TestTimeStamp()
+{
+  // Delphi's documented anchor, -1.25 = 1899-12-29 06:00.
+  const TTimeStamp TS = DateTimeToTimeStamp(TDateTime(-1.25));
+  CHECK(TS.Date == DateDelta - 1);
+  CHECK(TS.Time == 6 * 60 * 60 * 1000);
+  CHECK(std::fabs(TimeStampToDateTime(TS).Val() - (-1.25)) < 1e-9);
+  // Common.cpp: TimeStamp.Date - DateDelta is the whole-day part.
+  const TTimeStamp Now2024 = DateTimeToTimeStamp(EncodeDateTime(2024, 3, 5, 13, 0, 0, 0));
+  CHECK(Now2024.Date - DateDelta == static_cast<int>(EncodeDate(2024, 3, 5).Val()));
+  CHECK(UnixDateDelta == static_cast<int>(EncodeDate(1970, 1, 1).Val()));
+  CHECK(MinsPerDay == 1440);
+  CHECK(MinDateTime.Val() < EncodeDate(100, 1, 2).Val());
+  CHECK(MaxDateTime.Val() > EncodeDateTime(9999, 12, 31, 23, 59, 59, 0).Val());
+}
+
+void TestBetweenFamily()
+{
+  const TDateTime A = EncodeDateTime(2024, 1, 1, 0, 0, 0, 0);
+  CHECK(MinutesBetween(A, IncMinute(A, 90)) == 90);
+  CHECK(HoursBetween(IncHour(A, 49), A) == 49);
+  // Delphi's approximations: 30.4375 days a month, 365.25 a year.
+  CHECK(MonthsBetween(A, IncDay(A, 31)) == 1);
+  CHECK(MonthsBetween(A, IncDay(A, 30)) == 0);
+  CHECK(YearsBetween(A, IncDay(A, 366)) == 1);
+  CHECK(YearsBetween(A, IncDay(A, 365)) == 0);
+  CHECK(IsSameDay(IncHour(A, 23), A));
+  CHECK(!IsSameDay(IncHour(A, 24), A));
+}
+
+void TestTryStrToDateTimeWithSettings()
+{
+  // Exactly TryStrToDateTimeStandard's settings.
+  TFormatSettings FS = TFormatSettings::Create((TLocaleID)1033);
+  FS.DateSeparator = L'-';
+  FS.TimeSeparator = L':';
+  FS.ShortDateFormat = "yyyy/mm/dd";
+  FS.ShortTimeFormat = "hh:nn:ss";
+  TDateTime DT;
+  CHECK(TryStrToDateTime(L"2024-03-05 13:14:15", DT, FS));
+  CHECK(IsMoment(DT, 2024, 3, 5, 13, 14, 15, 0));
+  CHECK(TryStrToDateTime(L"2024-03-05", DT, FS));
+  CHECK(IsMoment(DT, 2024, 3, 5, 0, 0, 0, 0));
+  CHECK(!TryStrToDateTime(L"2024-13-05", DT, FS));
+  CHECK(!TryStrToDateTime(L"2024-03-05 13:14 junk", DT, FS));
+  CHECK(!TryStrToDateTime(L"nonsense", DT, FS));
+
+  // Field order comes from the format.
+  FS.ShortDateFormat = "dd/mm/yyyy";
+  FS.DateSeparator = L'.';
+  CHECK(TryStrToDateTime(L"05.03.2024 08:09", DT, FS));
+  CHECK(IsMoment(DT, 2024, 3, 5, 8, 9, 0, 0));
+}
+
+void TestMonthNames()
+{
+  // ParseShortEngMonthName, which passes Size() as the high index.
+  TFormatSettings FS = TFormatSettings::Create((TLocaleID)1033);
+  CHECK(FS.ShortMonthNames.Size() == 12);
+  CHECK(IndexStr(L"Mar", FS.ShortMonthNames, FS.ShortMonthNames.Size()) + 1 == 3);
+  CHECK(IndexStr(L"Dec", FS.ShortMonthNames, FS.ShortMonthNames.Size()) + 1 == 12);
+  // The over-read lands on the slack, which matches nothing: "not found".
+  CHECK(IndexStr(L"January", FS.ShortMonthNames, FS.ShortMonthNames.Size()) + 1 == 0);
+  CHECK(IndexStr(L"", FS.ShortMonthNames, FS.ShortMonthNames.Size()) + 1 == 0);
+  CHECK(FS.LongDayNames[0] == UnicodeString(L"Sunday"));
+}
+
 }  // namespace
 
 int main()
@@ -374,6 +442,11 @@ int main()
   TestFormatDateTime();
   TestStrToDateTime();
   TestNowIsSane();
+
+  TestTimeStamp();
+  TestBetweenFamily();
+  TestTryStrToDateTimeWithSettings();
+  TestMonthNames();
 
   if (Failures == 0)
   {

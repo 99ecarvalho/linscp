@@ -19,6 +19,7 @@
 
 #include "vcl_bytestring.h"
 #include "vcl_types.h"
+#include "vcl_datetime.h"
 #include "vcl_unicodestring.h"
 
 // Delphi's variant record. Core declares these directly in a few places, so
@@ -85,5 +86,14 @@ UnicodeString Format(const UnicodeString & Fmt, const TFormatArgs & Args);
 // (Common.h) and reads from the resource module, so the definition belongs with
 // the resource layer rather than the RTL shim.
 UnicodeString FmtLoadStr(int Ident, const TFormatArgs & Args);
+
+// Delphi's FormatFloat, for the placeholder subset: '0' and '#' digits, ','
+// grouping, '.' decimals, quoted or plain literal text, and up to three ';'
+// sections (positive;negative;zero). Separators from FormatSettings. Rounds
+// half away from zero. Scientific notation is not supported and raises
+// EConvertError, so a new use in upstream is noticed.
+UnicodeString FormatFloat(const UnicodeString & Format, double Value);
+UnicodeString FormatFloat(const UnicodeString & Format, double Value,
+                          const TFormatSettings & Settings);
 
 #endif // LINSCP_VCL_FORMAT_H

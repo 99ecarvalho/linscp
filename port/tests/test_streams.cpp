@@ -301,6 +301,24 @@ void TestHandleStreamOverAFileStreamHandle()
   fs::remove_all(Dir, Ec);
 }
 
+void TestTBytesOverloads()
+{
+  TMemoryStream M;
+  TBytes Out;
+  Out.Length = 5;
+  for (int I = 0; I < 5; ++I) { Out[I] = static_cast<unsigned char>('a' + I); }
+  CHECK(M.Write(Out, 1, 3) == 3);                 // "bcd"
+  M.Position = 0;
+  TBytes In;
+  In.Length = 6;
+  CHECK(M.Read(In, 2, 3) == 3);
+  CHECK((In[2] == 'b') && (In[3] == 'c') && (In[4] == 'd'));
+  TStream * Base = &M;                            // through the base, as core calls it
+  Base->Position = 0;
+  CHECK(Base->Read(In, 0, 1) == 1);
+  CHECK(In[0] == 'b');
+}
+
 }  // namespace
 
 int main()
@@ -313,6 +331,8 @@ int main()
   TestSaveAndLoad();
   TestFileStream();
   TestHandleStreamOverAFileStreamHandle();
+
+  TestTBytesOverloads();
 
   if (Failures == 0)
   {

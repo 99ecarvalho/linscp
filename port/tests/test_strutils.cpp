@@ -330,6 +330,30 @@ void TestDelphiRandom()
   }
 }
 
+void TestIntToHexWidths()
+{
+  CHECK(IntToHex(-1) == UnicodeString(L"FFFFFFFF"));
+  CHECK(IntToHex(static_cast<unsigned int>(255)) == UnicodeString(L"000000FF"));
+  CHECK(IntToHex(static_cast<__int64>(-1)) == UnicodeString(L"FFFFFFFFFFFFFFFF"));
+  CHECK(IntToHex(static_cast<short>(-1)) == UnicodeString(L"FFFF"));
+  CHECK(IntToHex(static_cast<unsigned char>(10)) == UnicodeString(L"0A"));
+  CHECK(IntToHex(static_cast<__int64>(255), 2) == UnicodeString(L"FF"));   // unchanged
+}
+
+void TestSmallStringHelpers()
+{
+  CHECK(AnsiReplaceStr(L"a%Ab%a", L"%a", L"!") == UnicodeString(L"a%Ab!"));
+  CHECK(IsDelimiter(L",;", L"a,b", 2));
+  CHECK(!IsDelimiter(L",;", L"a,b", 1));
+  CHECK(!IsDelimiter(L",;", L"a,b", 4));
+  CHECK(AnsiLowerCase(L"MiXeD") == UnicodeString(L"mixed"));
+  const UnicodeString Values[] = {L"one", L"Two", L"three"};
+  CHECK(IndexStr(L"Two", Values, 2) == 1);
+  CHECK(IndexStr(L"two", Values, 2) == -1);
+  CHECK(IndexText(L"two", Values, 2) == 1);
+  CHECK(UnicodeString::StringOfChar(L'-', 3) == UnicodeString(L"---"));
+}
+
 }  // namespace
 
 int main()
@@ -347,6 +371,9 @@ int main()
 
   TestRaiseLastOSError();
   TestDelphiRandom();
+
+  TestIntToHexWidths();
+  TestSmallStringHelpers();
 
   if (Failures == 0)
   {

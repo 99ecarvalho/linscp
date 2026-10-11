@@ -19,6 +19,8 @@
 
 // Delphi constants core references directly.
 extern const UnicodeString sLineBreak;
+// Winapi.Windows' module-name constant.
+inline constexpr wchar_t kernel32[] = L"kernel32.dll";
 constexpr bool True = true;
 constexpr bool False = false;
 constexpr int MSecsPerSec = 1000;
@@ -32,6 +34,17 @@ constexpr int MSecsPerDayConst = MSecsPerDay;
 // --- numbers ---------------------------------------------------------------
 UnicodeString IntToStr(__int64 Value);
 UnicodeString IntToHex(__int64 Value, int Digits);
+// Delphi's one-argument overloads, one per integer width, each giving twice
+// the size in hex digits: IntToHex(-1) is FFFFFFFF. No long overloads, as
+// Delphi has none -- core casts DWORD to unsigned int for exactly that reason.
+UnicodeString IntToHex(signed char Value);
+UnicodeString IntToHex(unsigned char Value);
+UnicodeString IntToHex(short Value);
+UnicodeString IntToHex(unsigned short Value);
+UnicodeString IntToHex(int Value);
+UnicodeString IntToHex(unsigned int Value);
+UnicodeString IntToHex(__int64 Value);
+UnicodeString IntToHex(unsigned __int64 Value);
 UnicodeString UIntToStr(unsigned __int64 Value);
 int StrToInt(const UnicodeString & S);                 // raises EConvertError
 int StrToIntDef(const UnicodeString & S, int Default);
@@ -68,6 +81,19 @@ UnicodeString TrimLeft(const UnicodeString & S);
 UnicodeString TrimRight(const UnicodeString & S);
 UnicodeString LowerCase(const UnicodeString & S);
 UnicodeString UpperCase(const UnicodeString & S);
+// Delphi's Ansi* forms are locale-aware. These fold ASCII only, like LowerCase
+// above, so the two platforms agree; see the case-folding divergence.
+UnicodeString AnsiLowerCase(const UnicodeString & S);
+UnicodeString AnsiUpperCase(const UnicodeString & S);
+// Case-sensitive, as Delphi's AnsiReplaceStr is.
+UnicodeString AnsiReplaceStr(const UnicodeString & AText, const UnicodeString & AFromText,
+                             const UnicodeString & AToText);
+// Delphi's: S[Index] is one of Delimiters; false for an index outside S.
+bool IsDelimiter(const UnicodeString & Delimiters, const UnicodeString & S, int Index);
+// StrUtils' open-array lookups: the index of AText among AValues[0..High],
+// or -1. IndexStr is case-sensitive, IndexText not.
+int IndexStr(const UnicodeString & AText, const UnicodeString * AValues, int AValues_High);
+int IndexText(const UnicodeString & AText, const UnicodeString * AValues, int AValues_High);
 UnicodeString ReplaceStr(const UnicodeString & S, const UnicodeString & From,
                          const UnicodeString & To);
 UnicodeString ReplaceText(const UnicodeString & S, const UnicodeString & From,
@@ -124,10 +150,19 @@ bool AnsiSameStr(const UnicodeString & A, const UnicodeString & B);
 // VCL globals describing the host. Read by core when reporting the
 // environment; on POSIX they describe the kernel instead, which is the nearest
 // honest answer.
-extern unsigned Win32MajorVersion;
-extern unsigned Win32MinorVersion;
-extern unsigned Win32BuildNumber;
-extern UnicodeString Win32CSDVersion;
+//
+// Functions, as core calls them -- Win32MajorVersion() -- and computed on
+// first use, which also removes the static-initialisation-order hazard a
+// global filled by a dynamic initialiser carries. On Windows from
+// RtlGetVersion, which reports the true version whether or not the executable
+// carries a compatibility manifest; GetVersionEx reports 6.2 without one,
+// which would make core's IsWin10() false on Windows 10 and 11.
+unsigned Win32MajorVersion();
+unsigned Win32MinorVersion();
+unsigned Win32BuildNumber();
+UnicodeString Win32CSDVersion();
+// Delphi's: the running OS is at least AMajor.AMinor.
+bool CheckWin32Version(int AMajor, int AMinor = 0);
 
 // --- control flow ----------------------------------------------------------
 // Delphi's Abort raises the silent EAbort exception.

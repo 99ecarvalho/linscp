@@ -4,6 +4,8 @@
 // that break such matchers are adjacent stars, a trailing star over an empty
 // remainder, and a pattern longer than the name. Core uses this for the file
 // masks users type, so a wrong answer silently transfers the wrong files.
+#include "vcl_format.h"
+#include <initializer_list>
 #include <string>
 #include "vcl_streams.h"
 #include "vcl_variant.h"
@@ -117,23 +119,62 @@ void TestTimeSpan()
         TTimeSpan::TicksPerHour * 24);
 }
 
+TBytes MakeBytes(std::initializer_list<unsigned char> Values)
+{
+  TBytes B;
+  B.Length = static_cast<int>(Values.size());
+  int I = 0;
+  for (unsigned char V : Values) { B[I++] = V; }
+  return B;
+}
+
 void TestEncoding()
 {
   const UnicodeString S = U(L"caf\u00e9");
 
-  const RawByteString Utf8 = TEncoding::UTF8()->GetBytes(S);
-  CHECK(Utf8.Length() == 5);                    // the e-acute takes two bytes
-  CHECK(TEncoding::UTF8()->GetString(Utf8) == S);
+  const TBytes Utf8 = TEncoding::UTF8->GetBytes(S);
+  CHECK(Utf8.Length == 5);                      // the e-acute takes two bytes
+  CHECK(TEncoding::UTF8->GetString(Utf8) == S);
+  CHECK(TEncoding::UTF8->GetString(Utf8, 1, 2) == UnicodeString(L"af"));
 
-  const RawByteString Ansi = TEncoding::ANSI()->GetBytes(S);
-  CHECK(Ansi.Length() == 4);                    // one byte per character
-  CHECK(TEncoding::ANSI()->GetString(Ansi) == S);
+  const TBytes Ansi = TEncoding::ANSI->GetBytes(S);
+  CHECK(Ansi.Length == 4);                      // one byte per character
+  CHECK(TEncoding::ANSI->GetString(Ansi) == S);
+  CHECK(TEncoding::ASCII->GetString(Ansi) == UnicodeString(L"caf?"));
 
-  // Default must round-trip as well, whichever it is.
-  CHECK(TEncoding::Default()->GetString(
-          TEncoding::Default()->GetBytes(S)) == S);
+  const TBytes Le = TEncoding::Unicode->GetBytes(L"A");
+  CHECK((Le.Length == 2) && (Le[0] == 0x41) && (Le[1] == 0));
+  const TBytes Be = TEncoding::BigEndianUnicode->GetBytes(L"A");
+  CHECK((Be.Length == 2) && (Be[0] == 0) && (Be[1] == 0x41));
 
-  CHECK(TEncoding::UTF8()->GetBytes(UnicodeString()).Length() == 0);
+  CHECK(TEncoding::Default->GetString(TEncoding::Default->GetBytes(S)) == S);
+  CHECK(TEncoding::UTF8->GetBytes(UnicodeString()).Length == 0);
+
+  bool Raised = false;
+  try { TEncoding::UTF8->GetString(Utf8, 3, 9); }
+  catch (const EEncodingError &) { Raised = true; }
+  CHECK(Raised);
+}
+
+// Common.cpp's use: detect a BOM, defaulting to UTF-8, and skip it.
+void TestGetBufferEncoding()
+{
+  TEncoding * E = nullptr;
+  CHECK(TEncoding::GetBufferEncoding(MakeBytes({0xEF, 0xBB, 0xBF, 'x'}), E, TEncoding::UTF8) == 3);
+  CHECK(E == TEncoding::UTF8);
+  E = nullptr;
+  CHECK(TEncoding::GetBufferEncoding(MakeBytes({0xFF, 0xFE, 'x', 0}), E, TEncoding::UTF8) == 2);
+  CHECK(E == TEncoding::Unicode);
+  E = nullptr;
+  CHECK(TEncoding::GetBufferEncoding(MakeBytes({0xFE, 0xFF, 0, 'x'}), E, TEncoding::UTF8) == 2);
+  CHECK(E == TEncoding::BigEndianUnicode);
+  E = nullptr;
+  CHECK(TEncoding::GetBufferEncoding(MakeBytes({'p', 'l', 'a', 'i', 'n'}), E, TEncoding::ANSI) == 0);
+  CHECK(E == TEncoding::ANSI);                  // no BOM: the default
+  // With an encoding given: its preamble's length only if the buffer has it.
+  E = TEncoding::UTF8;
+  CHECK(TEncoding::GetBufferEncoding(MakeBytes({0xFF, 0xFE}), E) == 0);
+  CHECK(E == TEncoding::UTF8);
 }
 
 void TestInheritsFrom()
@@ -178,7 +219,9 @@ void TestHostVersion()
 {
   // Cannot assert exact values, but they must have been populated rather than
   // left at zero, which is what a failed query would leave behind.
-  CHECK(Win32MajorVersion > 0);
+  CHECK(Win32MajorVersion() > 0);
+  CHECK(CheckWin32Version(1));
+  CHECK(!CheckWin32Version(1000));
   CHECK(MSecsPerDay == 86400000);
 }
 
@@ -278,6 +321,77 @@ void TestInt64FunctionalCast()
   CHECK(Size == 0x100000002LL);
 }
 
+void TestTimeSpanComponents()
+{
+  // FormatTimeZone's input: UTC+05:30 arrives as -19800 seconds.
+  const TTimeSpan Span = TTimeSpan::FromSeconds(-19800);
+  CHECK(Span.Hours == -5);
+  CHECK(Span.Minutes == -30);
+  CHECK(Span.Seconds == 0);
+  CHECK(Span <= TTimeSpan::Zero);
+  CHECK(!(TTimeSpan::FromSeconds(1) <= TTimeSpan::Zero));
+  const TTimeSpan Long = TTimeSpan::FromSeconds(90061.5);   // 1d 1h 1m 1.5s
+  CHECK((Long.Days == 1) && (Long.Hours == 1) && (Long.Minutes == 1) &&
+        (Long.Seconds == 1) && (Long.Milliseconds == 500));
+}
+
+void TestBase64()
+{
+  CHECK(EncodeBase64("Man", 3) == UnicodeString(L"TWFu"));
+  CHECK(EncodeBase64("Ma", 2) == UnicodeString(L"TWE="));
+  CHECK(EncodeBase64("M", 1) == UnicodeString(L"TQ=="));
+  // Line breaks every 76 characters, which core strips (EncodeStrToBase64).
+  std::string Long(100, 'x');
+  const UnicodeString Encoded = EncodeBase64(Long.data(), static_cast<int>(Long.size()));
+  CHECK(Encoded.Pos(sLineBreak) == 77);
+  const UnicodeString Stripped = ReplaceStr(Encoded, sLineBreak, L"");
+  CHECK(Stripped.Length() == 136);
+  const TBytes Back = DecodeBase64(Encoded);           // breaks ignored
+  CHECK(Back.Length == 100);
+  bool Same = true;
+  for (int I = 0; I < Back.Length; ++I) { Same = Same && (Back[I] == 'x'); }
+  CHECK(Same);
+  CHECK(DecodeBase64(L"TQ==").Length == 1);
+}
+
+void TestExceptObject()
+{
+  CHECK(ExceptObject() == nullptr);                   // outside a handler
+  try
+  {
+    throw EAbort(UnicodeString(L"stopped"));
+  }
+  catch (...)
+  {
+    TObject * O = ExceptObject();
+    CHECK(O != nullptr);
+    CHECK(O->ClassName() == UnicodeString(L"EAbort"));
+    wchar_t Buffer[256];
+    const int N = ExceptionErrorMessage(O, ExceptAddr(), Buffer, 256);
+    const UnicodeString M(Buffer, N);
+    CHECK(M.Pos(UnicodeString(L"Exception EAbort in module ")) == 1);
+    CHECK(M.Pos(UnicodeString(L"stopped.")) > 0);      // a period appended
+  }
+  try { throw 42; }
+  catch (...) { CHECK(ExceptObject() == nullptr); }   // not a Delphi object
+}
+
+void TestFormatFloat()
+{
+  CHECK(FormatFloat(L"#,##0", 1234567.4) == UnicodeString(L"1,234,567"));
+  CHECK(FormatFloat(L"#,##0", 999.5) == UnicodeString(L"1,000"));
+  CHECK(FormatFloat(L"#,##0", 0) == UnicodeString(L"0"));
+  CHECK(FormatFloat(L"#,##0", -1234.5) == UnicodeString(L"-1,235"));
+  CHECK(FormatFloat(L"0.00", 3.14159) == UnicodeString(L"3.14"));
+  CHECK(FormatFloat(L"0.##", 2.5) == UnicodeString(L"2.5"));
+  CHECK(FormatFloat(L"0;(0)", -5) == UnicodeString(L"(5)"));
+  CHECK(FormatFloat(L"0 'KB'", 12) == UnicodeString(L"12 KB"));
+  bool Raised = false;
+  try { FormatFloat(L"0.00E+00", 1.0); }
+  catch (const EConvertError &) { Raised = true; }
+  CHECK(Raised);
+}
+
 }  // namespace
 
 void TestStripHotkey()
@@ -298,6 +412,7 @@ int main()
   TestPath();
   TestTimeSpan();
   TestEncoding();
+  TestGetBufferEncoding();
   TestInheritsFrom();
   TestEnvironment();
   TestHostVersion();
@@ -308,6 +423,11 @@ int main()
   TestVariantArray();
   TestTFile();
   TestInt64FunctionalCast();
+
+  TestTimeSpanComponents();
+  TestBase64();
+  TestExceptObject();
+  TestFormatFloat();
 
   if (Failures == 0)
   {

@@ -36,6 +36,17 @@ static_assert(sizeof(wchar_t) == 2,
 class UnicodeString
 {
 public:
+  // C++Builder's static form of StringOfChar.
+  static UnicodeString StringOfChar(wchar_t C, int Count)
+  {
+    UnicodeString Result;
+    for (int I = 0; I < Count; ++I)
+    {
+      Result += C;
+    }
+    return Result;
+  }
+
   using size_type = int;
 
   UnicodeString() = default;

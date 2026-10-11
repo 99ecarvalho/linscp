@@ -8,8 +8,8 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 142,
-        "missing_types": 9
+        "errors": 70,
+        "missing_types": 8
       },
       "source/core/Configuration.cpp": {
         "aborted": false,
@@ -60,8 +60,8 @@
       },
       "source/core/Common.cpp": {
         "aborted": false,
-        "errors": 84,
-        "missing_types": 2
+        "errors": 0,
+        "missing_types": 0
       },
       "source/core/Configuration.cpp": {
         "aborted": false,

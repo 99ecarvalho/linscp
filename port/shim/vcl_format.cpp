@@ -1,4 +1,8 @@
 #include "vcl_format.h"
+#include "vcl_datetime.h"
+#include <vector>
+#include <cmath>
+#include <algorithm>
 
 #include <cstdarg>
 #include <cstdio>
@@ -224,4 +228,130 @@ UnicodeString Format(const UnicodeString & Fmt, const TFormatArgs & Args)
     Out += Pad(Piece, Width, LeftAlign);
   }
   return Out;
+}
+
+UnicodeString FormatFloat(const UnicodeString & Format, double Value)
+{
+  return FormatFloat(Format, Value, FormatSettings);
+}
+
+UnicodeString FormatFloat(const UnicodeString & Format, double Value,
+                          const TFormatSettings & Settings)
+{
+  // Split into sections, honouring quotes.
+  std::vector<UnicodeString> Sections(1);
+  wchar_t Quote = 0;
+  for (int I = 1; I <= Format.Length(); ++I)
+  {
+    const wchar_t C = Format[I];
+    if (Quote != 0)
+    {
+      if (C == Quote) { Quote = 0; }
+    }
+    else if ((C == L'"') || (C == L'\'')) { Quote = C; }
+    else if (C == L';') { Sections.emplace_back(); continue; }
+    Sections.back() += C;
+  }
+  UnicodeString Section = Sections[0];
+  bool NegativeSection = false;
+  if ((Value < 0) && (Sections.size() >= 2) && !Sections[1].IsEmpty())
+  {
+    Section = Sections[1];
+    NegativeSection = true;
+  }
+  else if ((Value == 0) && (Sections.size() >= 3) && !Sections[2].IsEmpty())
+  {
+    Section = Sections[2];
+  }
+
+  // Scan the placeholders.
+  int IntZeros = 0, IntDigits = 0, DecZeros = 0, DecDigits = 0;
+  bool Grouping = false, InDecimals = false;
+  for (int I = 1; I <= Section.Length(); ++I)
+  {
+    const wchar_t C = Section[I];
+    if ((C == L'"') || (C == L'\''))
+    {
+      const int End = Section.SubString(I + 1).Pos(UnicodeString(C));
+      I = (End > 0) ? I + End : Section.Length();
+    }
+    else if ((C == L'E') || (C == L'e'))
+    {
+      throw EConvertError(UnicodeString(L"FormatFloat: scientific notation is not supported"));
+    }
+    else if (C == L'.') { InDecimals = true; }
+    else if (C == L',') { Grouping = true; }
+    else if (C == L'0') { if (InDecimals) { ++DecZeros; ++DecDigits; } else { ++IntZeros; ++IntDigits; } }
+    else if (C == L'#') { if (InDecimals) { ++DecDigits; } else { ++IntDigits; } }
+  }
+
+  // Round half away from zero to the available decimals, then lay out digits.
+  const double Magnitude = std::fabs(Value);
+  const double Scale = std::pow(10.0, DecDigits);
+  const unsigned long long Scaled =
+    static_cast<unsigned long long>(std::floor(Magnitude * Scale + 0.5));
+  std::string IntPart = std::to_string(Scaled / static_cast<unsigned long long>(Scale));
+  std::string DecPart = std::to_string(Scaled % static_cast<unsigned long long>(Scale));
+  if (DecDigits > 0)
+  {
+    DecPart.insert(0, static_cast<std::size_t>(DecDigits) - std::min<std::size_t>(DecPart.size(), DecDigits), '0');
+    while ((static_cast<int>(DecPart.size()) > DecZeros) && (DecPart.back() == '0'))
+    {
+      DecPart.pop_back();
+    }
+  }
+  else
+  {
+    DecPart.clear();
+  }
+  if (IntPart == "0" && IntZeros == 0)
+  {
+    IntPart.clear();
+  }
+  while (static_cast<int>(IntPart.size()) < IntZeros)
+  {
+    IntPart.insert(0, 1, '0');
+  }
+  UnicodeString Number;
+  for (std::size_t K = 0; K < IntPart.size(); ++K)
+  {
+    if (Grouping && (K > 0) && ((IntPart.size() - K) % 3 == 0))
+    {
+      Number += Settings.ThousandSeparator;
+    }
+    Number += static_cast<wchar_t>(IntPart[K]);
+  }
+  if (!DecPart.empty())
+  {
+    Number += Settings.DecimalSeparator;
+    for (char C : DecPart) { Number += static_cast<wchar_t>(C); }
+  }
+
+  // Emit: literals in place, the number where the first placeholder was.
+  UnicodeString Result;
+  if ((Value < 0) && !NegativeSection && (Scaled != 0))
+  {
+    Result += L"-";
+  }
+  bool Placed = false;
+  for (int I = 1; I <= Section.Length(); ++I)
+  {
+    const wchar_t C = Section[I];
+    if ((C == L'"') || (C == L'\''))
+    {
+      const int End = Section.SubString(I + 1).Pos(UnicodeString(C));
+      const int Len = (End > 0) ? End - 1 : Section.Length() - I;
+      Result += Section.SubString(I + 1, Len);
+      I += Len + 1;
+    }
+    else if ((C == L'0') || (C == L'#') || (C == L'.') || (C == L','))
+    {
+      if (!Placed) { Result += Number; Placed = true; }
+    }
+    else
+    {
+      Result += C;
+    }
+  }
+  return Result;
 }

@@ -48,4 +48,30 @@ using UInt64   = std::uint64_t;
 // #define __int64 is undone in vcl_win32_undef.h.
 static_assert(sizeof(__int64) == 8, "__int64 must be the 64-bit keyword");
 
+namespace System {
+
+// C++Builder's fixed-size array, 0-based. One slot of slack is kept past N:
+// core passes Size() where an open-array parameter expects the *high index*
+// (Common.cpp's ParseShortEngMonthName), so it reads element N. In
+// C++Builder that silently reads whatever follows; here it reads the slack,
+// which owners fill with a value no input matches. Defined behaviour, and
+// "not found" rather than a bogus index.
+template <typename T, int N>
+class StaticArray
+{
+public:
+  int Size() const { return N; }
+  T & operator[](int Index) { return FData[Index]; }
+  const T & operator[](int Index) const { return FData[Index]; }
+  operator T *() { return FData; }
+  operator const T *() const { return FData; }
+  T & Slack() { return FData[N]; }
+
+private:
+  T FData[N + 1] = {};
+};
+
+}  // namespace System
+using System::StaticArray;
+
 #endif // LINSCP_VCL_TYPES_H

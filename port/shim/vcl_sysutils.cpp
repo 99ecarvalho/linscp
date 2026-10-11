@@ -1,6 +1,7 @@
 #include "vcl_sysutils.h"
 
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 
 #if !defined(_WIN32)
@@ -590,5 +591,76 @@ int FileGetAttr(const UnicodeString & FileName, bool FollowLink)
   }
   const std::size_t Slash = Path.rfind('/');
   return AttrFromStat(St, (Slash == std::string::npos) ? Path : Path.substr(Slash + 1));
+#endif
+}
+
+TDateTime SystemTimeToDateTime(const SYSTEMTIME & SystemTime)
+{
+  return ComposeDateTime(
+    EncodeDate(SystemTime.wYear, SystemTime.wMonth, SystemTime.wDay),
+    EncodeTime(SystemTime.wHour, SystemTime.wMinute, SystemTime.wSecond,
+               SystemTime.wMilliseconds));
+}
+
+bool FileGetSymLinkTarget(const UnicodeString & FileName, UnicodeString & TargetName)
+{
+#if defined(_WIN32)
+  const DWORD Attr = GetFileAttributesW(FileName.c_str());
+  if ((Attr == INVALID_FILE_ATTRIBUTES) || ((Attr & FILE_ATTRIBUTE_REPARSE_POINT) == 0))
+  {
+    return false;
+  }
+  const HANDLE H = CreateFileW(FileName.c_str(), 0,
+                               FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                               nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
+  if (H == INVALID_HANDLE_VALUE)
+  {
+    return false;   // dangling
+  }
+  wchar_t Buf[32768];
+  const DWORD N = GetFinalPathNameByHandleW(H, Buf, 32768, FILE_NAME_NORMALIZED);
+  CloseHandle(H);
+  if ((N == 0) || (N >= 32768))
+  {
+    return false;
+  }
+  UnicodeString Path(Buf, static_cast<int>(N));
+  // Drop the \\?\ namespace prefix, keeping UNC paths as \\server\share.
+  if (Path.SubString(1, 8) == UnicodeString(L"\\\\?\\UNC\\"))
+  {
+    Path = UnicodeString(L"\\\\") + Path.SubString(9);
+  }
+  else if (Path.SubString(1, 4) == UnicodeString(L"\\\\?\\"))
+  {
+    Path = Path.SubString(5);
+  }
+  TargetName = Path;
+  return true;
+#else
+  const std::string Path = ToBytes(FileName);
+  struct stat St{};
+  if ((lstat(Path.c_str(), &St) != 0) || !S_ISLNK(St.st_mode))
+  {
+    return false;
+  }
+  char * Resolved = realpath(Path.c_str(), nullptr);
+  if (Resolved == nullptr)
+  {
+    return false;   // dangling
+  }
+  TargetName = linscp::Utf8ToUtf16(Resolved, std::strlen(Resolved));
+  std::free(Resolved);
+  return true;
+#endif
+}
+
+UnicodeString ExtractShortPathName(const UnicodeString & FileName)
+{
+#if defined(_WIN32)
+  wchar_t Buf[32768];
+  const DWORD N = GetShortPathNameW(FileName.c_str(), Buf, 32768);
+  return ((N == 0) || (N >= 32768)) ? UnicodeString() : UnicodeString(Buf, static_cast<int>(N));
+#else
+  return FileName;
 #endif
 }

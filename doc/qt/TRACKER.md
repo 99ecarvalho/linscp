@@ -20,29 +20,29 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 Driven by `compile_census.py` rather than by grep counts — the compiler names
 what is actually blocking each unit, in dependency order.
 
-**Nine of ten tracked units compile cleanly for Windows, seven for Linux**,
-nothing aborting on either, measured in upstream's own preprocessor
-configuration. Census: **84 errors on mingw, 234 on Linux.**
+**All ten tracked core units compile cleanly for Windows** -- 0 errors on
+mingw, nothing aborting -- in upstream's own preprocessor configuration. Seven
+of the ten are clean for Linux too. Census: **0 on mingw, 162 on Linux.**
 
 | Unit | mingw | Linux |
 |---|---|---|
 | `Bookmarks`, `CopyParam`, `FileBuffer`, `FileMasks`, `NamedObjs`, `Option`, `Queue` | 0 | 0 |
-| `Configuration.cpp` | **0** | 67 |
-| `Terminal.cpp` | **0** | 25 |
-| `Common.cpp` | 84 | 142 |
+| `Terminal.cpp` | 0 | 25 |
+| `Configuration.cpp` | 0 | 67 |
+| `Common.cpp` | 0 | 70 |
 
-The Linux-only excess is now concentrated, and mostly not shim work:
-**55 of `Configuration.cpp`'s 67 Linux errors come from PuTTY headers** --
-`putty/windows/platform.h` and the Windows GSSAPI declarations -- because
-WinSCP vendors only PuTTY's Windows platform layer. WinSCP's PuTTY is 0.83
-with 121 of its 224 files modified (+5,276 / -1,962 lines), mostly in crypto
-and SSH, so P1-09 / P1-10 is a reconciliation, not a copy.
+What remains on Linux is of two kinds, neither of them VCL: PuTTY's platform
+layer (55 of `Configuration.cpp`'s 67 come from `putty/windows/platform.h` and
+the Windows GSSAPI declarations), and Win32 calls core makes directly --
+`CreateFile`, `GetFileAttributes`, `GetModuleHandle` and friends. WinSCP's
+PuTTY is 0.83 with 121 of its 224 files modified (+5,276 / -1,962 lines),
+mostly in crypto and SSH, so P1-09 / P1-10 is a reconciliation, not a copy.
 
-1. `Common.cpp` on mingw (**84**): the last unit for Windows.
-2. **P1-09**: PuTTY's Unix platform layer, a second pinned upstream plus a
+1. **Widen the census to every unit in `ScpCore.cbproj`.** Ten units were a
+   sample; the honest Windows figure is the whole core library.
+2. **P1-09**: PuTTY's Unix platform layer -- a second pinned upstream plus a
    patch series carrying WinSCP's platform changes to `unix/`.
-3. The Linux Win32 emulation `Terminal.cpp` still needs (25), starting with
-   `CreateFile` and `GetFileAttributes`.
+3. The Win32 file and module calls core makes directly, in `port/platform`.
 
 ## Decisions taken
 
@@ -73,6 +73,9 @@ and SSH, so P1-09 / P1-10 is a reconciliation, not a copy.
 | 2026-10-11 | Win32 APIs core calls under the bare name get forwarding functions, not their A/W macros | `vcl_win32_undef.h` removes the macros so they cannot rename the shim's VCL functions; it had also removed `CreateFile` and four others core calls as the API, leaving those calls nothing to bind to. Exact signatures, so core's `NULL` arguments still convert |
 | 2026-10-11 | `__int64` is clang's MS-extension keyword, never a macro | A `long long` macro -- ours, and mingw's own -- breaks core's `__int64(x)` functional casts |
 | 2026-10-11 | `Random` is Delphi's own generator | It reproduces the published Turbo Pascal / Delphi sequence from a zero seed exactly, which the test pins |
+| 2026-10-11 | C++Builder's static class properties become static `const` pointers (`TEncoding::UTF8`) | clang accepts `static __declspec(property)` but compiles it as a plain static member, failing only at link (see verified facts). Pointers serve both of core's spellings, as a value and through `->`; `[[clang::require_constant_initialization]]` guarantees no static-init-order exposure |
+| 2026-10-11 | `Win32MajorVersion()` and friends are functions, read from `RtlGetVersion` | Core calls them as functions. `GetVersionEx` reports 6.2 to an unmanifested executable, which would turn core's `IsWin10()` false on 10 and 11. Computed on first use, which also removes a dynamic-initialiser hazard |
+| 2026-10-11 | `StaticArray<T, N>` keeps one slack element, filled by its owner with a value no input matches | Core passes `Size()` as an open array's *high index* (`ParseShortEngMonthName`) and reads one past the end. In C++Builder that is whatever follows; here it is defined and means "not found" |
 | 2026-10-10 | A PR-able branch against `winscp/winscp` will be **generated**, not hand-maintained | linscp shares no history with upstream, so its `qt` branch is not directly mergeable. Since the port is mechanical, the fork branch can be produced on demand (Q-7). Rehearsed end to end — see facts below |
 | 2026-10-10 | Transform must be byte-exact outside property lines | A full-file rewrite (CRLF loss) turned a 613-line change into 76,551. Now asserted by `verify_transform.py` |
 | 2026-10-10 | Field/accessor classification is convention-first, parens only as fallback | The parens heuristic false-positives on constructor initialiser lists; WinSCP's `F<Upper>` / `Get*`/`Set*` convention is airtight. Truly unclassifiable names now fail the run instead of producing a wrong-arity macro |
@@ -168,7 +171,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 
 | Area | Divergence | Why |
 |---|---|---|
-| `UnicodeString::LowerCase` / `CompareIC` | ASCII-only case folding | Delphi's is locale-aware. Core uses these on protocol tokens and switch names. Must not be relied on for user-facing text |
+| `UnicodeString::LowerCase` / `CompareIC`, `AnsiLowerCase` / `AnsiUpperCase` | ASCII-only case folding | Delphi's is locale-aware. Core uses these on protocol tokens and switch names. Must not be relied on for user-facing text |
 | `FindFirst` pattern matching | Case-sensitive on Linux, case-insensitive on Windows | Each matches its host filesystem. A pattern that matches on Windows may not on Linux |
 | `faHidden` on Linux | Set from a leading dot in the name | POSIX has no hidden attribute; the dot convention is what users expect |
 | `TFormatSettings` defaults | ISO-8601 rather than system locale | Deterministic across machines. Anything user-facing should set them explicitly |
@@ -187,6 +190,13 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | `FileSetAttr` on POSIX | Only `faReadOnly` acts, on the write permission bits; archive, hidden and system are ignored | They have no POSIX counterpart. Read-only mirrors how `FileGetAttr` reports it |
 | `FindData.ftCreationTime` on POSIX | The modification time | POSIX has no creation time |
 | `Variant` | Only one-dimensional integer variant arrays | Core's only use. Anything wider raises `EVariantError` so a new use is noticed |
+| `ParseShortEngMonthName("January")` | Returns 0, "not found" | Upstream reads past `ShortMonthNames` into `LongMonthNames[0]` and returns 13, an invalid month. Every other input agrees |
+| `TFormatSettings::Create(locale)` | Every locale yields the shim's deterministic defaults, with English month and day names | Core asks by LCID 1033 for protocol parsing, which this matches; user-facing formatting should set fields explicitly |
+| `TEncoding::Default` | UTF-8 on both platforms | Delphi's is ANSI on Windows |
+| `FileGetSymLinkTarget` | Resolves the whole chain to an absolute path | Delphi returns the immediate target. Core only reads the target's attributes |
+| `ExtractShortPathName` on POSIX | The name unchanged | No 8.3 names exist |
+| `ExceptAddr` / `ExceptionErrorMessage` | No addresses are recorded: `ExceptAddr` is null and the module is the executable | The class name and message, the useful part, are exact |
+| `FormatFloat` | Digits, grouping, decimals, literals and sections only; scientific notation raises `EConvertError` | Core's one use is `"#,##0"` |
 | `SuspendThread` on POSIX | Not declared | A running pthread cannot be suspended. A missing declaration fails at compile time; a stub would fail silently. `CREATE_SUSPENDED` + `ResumeThread` is supported |
 
 ## Open questions
@@ -206,6 +216,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 
 | Fact | Evidence | Date |
 |---|---|---|
+| clang accepts `static __declspec(property(...))` syntactically but treats it as an ordinary static data member | `-fsyntax-only` passes; linking fails with an undefined reference to the "property" on both targets | 2026-10-11 |
 | clang 19 supports `__declspec(property)` on Linux under `-fms-extensions` | Local test: field r/o, field r/w, method+validating setter, read-modify-write, indexed — all pass | 2026-10-10 |
 | GCC 14 rejects it outright | `error: 'property' has not been declared` | 2026-10-10 |
 | clang cross-emits x86-64 COFF for `windows-gnu` and `windows-msvc` | Local test, property emulation intact | 2026-10-10 |

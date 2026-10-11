@@ -52,8 +52,12 @@ private:
 // Locale-ish settings. Defaults are ISO-8601 rather than system locale so
 // behaviour is deterministic across machines; anything user-facing should set
 // these explicitly rather than rely on the defaults.
+using TLocaleID = unsigned int;   // an LCID, as on Windows
+
 struct TFormatSettings
 {
+  TFormatSettings();
+
   UnicodeString ShortDateFormat = L"yyyy-mm-dd";
   UnicodeString LongDateFormat  = L"dddd, d mmmm yyyy";
   UnicodeString ShortTimeFormat = L"hh:nn";
@@ -61,9 +65,45 @@ struct TFormatSettings
   UnicodeString DateSeparator   = L"-";
   UnicodeString TimeSeparator   = L":";
   UnicodeString DecimalSeparator = L".";
+  UnicodeString ThousandSeparator = L",";
+
+  // English, whatever the locale: core asks for these by LCID 1033 to parse
+  // protocol dates, and the shim does not localise. The slack slot past the
+  // end (see StaticArray) holds U+FFFF, which no input contains.
+  StaticArray<UnicodeString, 12> ShortMonthNames;
+  StaticArray<UnicodeString, 12> LongMonthNames;
+  StaticArray<UnicodeString, 7> ShortDayNames;
+  StaticArray<UnicodeString, 7> LongDayNames;
 
   static TFormatSettings & Default();
+  // Delphi's constructors. Locale-independent here: every locale yields the
+  // shim's deterministic defaults; see the divergence table.
+  static TFormatSettings Create();
+  static TFormatSettings Create(TLocaleID Locale);
+  static TFormatSettings Create(const UnicodeString & LocaleName);
 };
+
+// SysUtils' global settings variable.
+extern TFormatSettings FormatSettings;
+
+// --- constants -------------------------------------------------------------
+// The rest of the family (MSecsPerSec ... MSecsPerDay) is in vcl_strutils.h.
+constexpr int MinsPerDay = 24 * 60;
+constexpr int SecsPerHour = 60 * 60;
+constexpr int DateDelta = 693594;       // days from 0001-01-01 to 1899-12-31
+constexpr int UnixDateDelta = 25569;    // days from 1899-12-30 to 1970-01-01
+extern const TDateTime MinDateTime;     // 0100-01-01 00:00:00.000
+extern const TDateTime MaxDateTime;     // 9999-12-31 23:59:59.999
+
+// Delphi's TTimeStamp: milliseconds into the day, and days since 0001-01-01
+// plus one -- so Date - DateDelta is the serial's whole-day part.
+struct TTimeStamp
+{
+  int Time = 0;
+  int Date = 0;
+};
+TTimeStamp DateTimeToTimeStamp(const TDateTime & DT);
+TDateTime TimeStampToDateTime(const TTimeStamp & TS);
 
 // --- civil date <-> serial -------------------------------------------------
 bool TryEncodeDate(Word Year, Word Month, Word Day, TDateTime & Date);
@@ -116,11 +156,23 @@ Word DaysInMonth(Word Year, Word Month);
 __int64 MilliSecondsBetween(const TDateTime & A, const TDateTime & B);
 __int64 SecondsBetween(const TDateTime & A, const TDateTime & B);
 __int64 DaysBetween(const TDateTime & A, const TDateTime & B);
+__int64 MinutesBetween(const TDateTime & A, const TDateTime & B);
+__int64 HoursBetween(const TDateTime & A, const TDateTime & B);
+// Delphi's documented approximations: 30.4375 days a month, 365.25 a year.
+int MonthsBetween(const TDateTime & A, const TDateTime & B);
+int YearsBetween(const TDateTime & A, const TDateTime & B);
+bool IsSameDay(const TDateTime & Value, const TDateTime & Basis);
 
 // --- formatting ------------------------------------------------------------
 UnicodeString FormatDateTime(const UnicodeString & Format, const TDateTime & DT);
 UnicodeString DateTimeToStr(const TDateTime & DT);
 bool TryStrToDateTime(const UnicodeString & S, TDateTime & DT);
+// Delphi's scan: field order from ShortDateFormat (in which '/' stands for
+// DateSeparator), the time after whitespace with TimeSeparator, milliseconds
+// after DecimalSeparator. Two-digit years pivot on 50, as Delphi's default
+// TwoDigitYearCenturyWindow does.
+bool TryStrToDateTime(const UnicodeString & S, TDateTime & DT,
+                      const TFormatSettings & Settings);
 TDateTime StrToDateTime(const UnicodeString & S);
 
 #endif // LINSCP_VCL_DATETIME_H

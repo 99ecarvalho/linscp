@@ -106,6 +106,20 @@ int FileSetAttr(const UnicodeString & FileName, int Attr, bool FollowLink = true
 // POSIX the same mapping FindFirst reports, following links when asked.
 int FileGetAttr(const UnicodeString & FileName, bool FollowLink = true);
 
+// Delphi's, with its sign rule for dates before 1899-12-30, which every
+// SYSTEMTIME from 1601 to 1899 needs.
+TDateTime SystemTimeToDateTime(const SYSTEMTIME & SystemTime);
+
+// True for a symbolic link, with TargetName its target. Resolves the whole
+// chain to an absolute path (GetFinalPathNameByHandle / realpath), where
+// Delphi returns the immediate target; core reads only the target's
+// attributes. False for anything else, or a dangling link.
+bool FileGetSymLinkTarget(const UnicodeString & FileName, UnicodeString & TargetName);
+
+// The 8.3 form on Windows, empty on failure as Delphi's is. POSIX has no short
+// names, so the name comes back unchanged.
+UnicodeString ExtractShortPathName(const UnicodeString & FileName);
+
 // Delphi's ForceDirectories: creates every missing component. Raises
 // EInOutError on an empty name, as Delphi does.
 bool ForceDirectories(UnicodeString Dir);

@@ -3,6 +3,7 @@
 // Weighted toward UTF-8 conversion: WinSCP sends these bytes on the wire, so a
 // mistake here is silent protocol corruption rather than a crash. Malformed
 // input is tested explicitly, because it arrives from remote servers.
+#include <cstring>
 #include "vcl_bytestring.h"
 
 #include <cstdio>
@@ -182,6 +183,20 @@ void TestImplicitToUnicode()
   CHECK(Back == Original);
 }
 
+void TestWritableCStrAndCharAssignment()
+{
+  // Common.cpp's Shred: wipe a secret in place.
+  AnsiString Secret("password");
+  std::memset(Secret.c_str(), 0, static_cast<std::size_t>(Secret.Length()));
+  CHECK(Secret.Length() == 8);
+  CHECK(Secret[1] == '\0');
+  RawByteString Raw;
+  Raw = "abc";                                   // not ambiguous
+  CHECK(Raw.Length() == 3);
+  Raw = Raw.c_str();
+  CHECK(Raw == RawByteString("abc"));
+}
+
 }  // namespace
 
 int main()
@@ -194,6 +209,8 @@ int main()
   TestAnsiStringApiIsOneBased();
 
   TestImplicitToUnicode();
+
+  TestWritableCStrAndCharAssignment();
 
   if (Failures == 0)
   {

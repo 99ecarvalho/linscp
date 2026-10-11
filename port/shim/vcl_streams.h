@@ -21,6 +21,7 @@
 #include <cstddef>
 #include <vector>
 
+#include "vcl_dynamicarray.h"
 #include "vcl_object.h"
 #include "vcl_property.h"
 #include "vcl_types.h"
@@ -55,6 +56,11 @@ public:
   // --- implemented by descendants -----------------------------------------
   virtual int Read(void * Buffer, int Count) = 0;
   virtual int Write(const void * Buffer, int Count) = 0;
+  // Delphi's TBytes overloads, reading into or writing from Buffer at Offset.
+  int Read(TBytes & Buffer, int Offset, int Count)
+    { return (Count > 0) ? Read(&Buffer[Offset], Count) : 0; }
+  int Write(const TBytes & Buffer, int Offset, int Count)
+    { return (Count > 0) ? Write(&Buffer[Offset], Count) : 0; }
   virtual __int64 Seek(const __int64 Offset, TSeekOrigin Origin) = 0;
 
   // Legacy overload. Delphi routes it to the modern one, and so do we.
@@ -93,6 +99,8 @@ public:
   // derived streams, so the legacy one is re-exposed here rather than silently
   // disappearing.
   using TStream::Seek;
+  using TStream::Read;
+  using TStream::Write;
 
   PROP_R_F(THandle, Handle, FHandle);
 
@@ -135,6 +143,8 @@ public:
   // derived streams, so the legacy one is re-exposed here rather than silently
   // disappearing.
   using TStream::Seek;
+  using TStream::Read;
+  using TStream::Write;
 
   void Clear();
   void SaveToStream(TStream * Stream);

@@ -3,9 +3,13 @@
 // This is the first shim code with two genuinely different implementations
 // (Win32 FindFirstFileW, and dirent + fnmatch on POSIX), so the tests assert
 // behaviour rather than implementation and run on both targets.
+#include "vcl_bytestring.h"
 #include "vcl_streams.h"
 #include "vcl_misc.h"
 #include "vcl_sysutils.h"
+#if !defined(_WIN32)
+  #include <unistd.h>
+#endif
 #include "vcl_strutils.h"
 
 #include <vector>
@@ -314,6 +318,47 @@ void TestFindDataAndAttributes()
   CHECK(Raised);
 }
 
+void TestSystemTimeToDateTime()
+{
+  SYSTEMTIME S{};
+  S.wYear = 2024; S.wMonth = 3; S.wDay = 5; S.wHour = 6;
+  CHECK(SystemTimeToDateTime(S).Val() == EncodeDateTime(2024, 3, 5, 6, 0, 0, 0).Val());
+  // Before 1899-12-30 the time of day must be subtracted, not added.
+  S.wYear = 1601; S.wMonth = 1; S.wDay = 1; S.wHour = 6;
+  Word Y, Mo, D, H, Mi, Sec, Ms;
+  const TDateTime DT = SystemTimeToDateTime(S);
+  DecodeDate(DT, Y, Mo, D);
+  DecodeTime(DT, H, Mi, Sec, Ms);
+  CHECK((Y == 1601) && (Mo == 1) && (D == 1) && (H == 6));
+}
+
+void TestSymLinkAndShortPath()
+{
+  const UnicodeString Dir = IncludeTrailingBackslash(TPath::GetTempPath());
+  const UnicodeString File = Dir + L"linscp_link_target.txt";
+  {
+    TFileStream S(File, fmCreate);
+  }
+  UnicodeString Target;
+  CHECK(!FileGetSymLinkTarget(File, Target));        // not a link
+  CHECK(!ExtractShortPathName(File).IsEmpty());
+#if !defined(_WIN32)
+  // Creating links on Windows needs a privilege, so only POSIX checks one.
+  const UnicodeString Link = Dir + L"linscp_link";
+  DeleteFile(Link);
+  CHECK(symlink(linscp::Utf16ToUtf8(File).c_str(), linscp::Utf16ToUtf8(Link).c_str()) == 0);
+  CHECK(FileGetSymLinkTarget(Link, Target));
+  CHECK(ExtractFileName(Target) == UnicodeString(L"linscp_link_target.txt"));
+  CHECK((Target.Length() > 0) && (Target[1] == L'/'));
+  CHECK(ExtractShortPathName(File) == File);         // no short names here
+  DeleteFile(File);
+  CHECK(!FileGetSymLinkTarget(Link, Target));        // dangling
+  DeleteFile(Link);
+#else
+  DeleteFile(File);
+#endif
+}
+
 }  // namespace
 
 int main()
@@ -334,6 +379,9 @@ int main()
   TestDelphiCommandLineSplitting();
 
   TestFindDataAndAttributes();
+
+  TestSystemTimeToDateTime();
+  TestSymLinkAndShortPath();
 
   if (Failures == 0)
   {

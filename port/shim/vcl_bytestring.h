@@ -48,6 +48,9 @@ public:
   // direction only where C++Builder is also implicit, so upstream compiles.
   AnsiStringT(const UnicodeString & S) { Assign(S); }
   AnsiStringT & operator=(const UnicodeString & S) { Assign(S); return *this; }
+  // Bytes as they are. Without this, `Str = Str.c_str()` is ambiguous between
+  // the byte constructor and the UnicodeString conversion.
+  AnsiStringT & operator=(const char * S) { FData = (S != nullptr) ? S : ""; return *this; }
   // And back, implicitly, as C++Builder's AnsiStringT has it: core passes a
   // RawByteString where a UnicodeString is expected. Uses the per-code-page
   // conversion below, so it adds no new encoding rule.
@@ -59,6 +62,9 @@ public:
     { FData.resize(NewLength > 0 ? static_cast<std::size_t>(NewLength) : 0); }
 
   const char * c_str() const { return FData.c_str(); }
+  // Writable, as C++Builder's c_str() is: core shreds secrets in place with
+  // memset(Str.c_str(), 0, ...).
+  char * c_str() { return FData.data(); }
   const char * data() const { return FData.c_str(); }
   char * MutableData() { return const_cast<char *>(FData.data()); }
 

@@ -8,7 +8,10 @@
 #ifndef LINSCP_VCL_MISC_H
 #define LINSCP_VCL_MISC_H
 
+#include <string>
+
 #include "vcl_datetime.h"
+#include "vcl_dynamicarray.h"
 #include "vcl_object.h"
 #include "vcl_strings.h"
 #include "vcl_strutils.h"
@@ -84,6 +87,27 @@ public:
 };
 
 //---------------------------------------------------------------------------
+// System's current-exception queries, valid inside a handler.
+//---------------------------------------------------------------------------
+// The exception being handled, if it is a Delphi object; null otherwise.
+TObject * ExceptObject();
+// Always null: no instruction addresses are recorded.
+void * ExceptAddr();
+// Delphi's "Exception <class> in module <module> at <address>." followed by
+// the message, written into Buffer. Returns the length written.
+int ExceptionErrorMessage(TObject * ExceptObject, void * ExceptAddr,
+                          wchar_t * Buffer, int Size);
+
+//---------------------------------------------------------------------------
+// Soap.EncdDecd's Base64.
+//---------------------------------------------------------------------------
+// Inserts sLineBreak after every 76 characters, as Delphi's encoder does --
+// core strips sLineBreak from the result, which is what shows it.
+UnicodeString EncodeBase64(const void * Input, int Size);
+// Ignores anything outside the alphabet, line breaks included.
+TBytes DecodeBase64(const UnicodeString & Input);
+
+//---------------------------------------------------------------------------
 // System.IOUtils.TFile, the two members core uses.
 //---------------------------------------------------------------------------
 class TFile
@@ -106,7 +130,7 @@ class TTimeSpan
 {
 public:
   TTimeSpan() = default;
-  explicit TTimeSpan(__int64 Ticks) : FTicks(Ticks) {}
+  constexpr explicit TTimeSpan(__int64 Ticks) : FTicks(Ticks) {}
 
   // 100-nanosecond ticks, as in Delphi and .NET.
   static constexpr __int64 TicksPerMillisecond = 10000;
@@ -126,9 +150,31 @@ public:
   double GetTotalSeconds() const
     { return static_cast<double>(FTicks) / TicksPerSecond; }
 
+  // Components, truncating toward zero as Delphi's do, so a negative span has
+  // negative components -- core's FormatTimeZone relies on that.
+  int GetDays() const { return static_cast<int>(FTicks / TicksPerDay); }
+  int GetHours() const { return static_cast<int>((FTicks / TicksPerHour) % 24); }
+  int GetMinutes() const { return static_cast<int>((FTicks / TicksPerMinute) % 60); }
+  int GetSeconds() const { return static_cast<int>((FTicks / TicksPerSecond) % 60); }
+  int GetMilliseconds() const { return static_cast<int>((FTicks / TicksPerMillisecond) % 1000); }
+
   PROP_R_G(__int64, Ticks, GetTicks);
   PROP_R_G(double, TotalMilliseconds, GetTotalMilliseconds);
   PROP_R_G(double, TotalSeconds, GetTotalSeconds);
+  PROP_R_G(int, Days, GetDays);
+  PROP_R_G(int, Hours, GetHours);
+  PROP_R_G(int, Minutes, GetMinutes);
+  PROP_R_G(int, Seconds, GetSeconds);
+  PROP_R_G(int, Milliseconds, GetMilliseconds);
+
+  static const TTimeSpan Zero;
+
+  friend bool operator==(const TTimeSpan & A, const TTimeSpan & B) { return A.FTicks == B.FTicks; }
+  friend bool operator!=(const TTimeSpan & A, const TTimeSpan & B) { return A.FTicks != B.FTicks; }
+  friend bool operator<(const TTimeSpan & A, const TTimeSpan & B) { return A.FTicks < B.FTicks; }
+  friend bool operator<=(const TTimeSpan & A, const TTimeSpan & B) { return A.FTicks <= B.FTicks; }
+  friend bool operator>(const TTimeSpan & A, const TTimeSpan & B) { return A.FTicks > B.FTicks; }
+  friend bool operator>=(const TTimeSpan & A, const TTimeSpan & B) { return A.FTicks >= B.FTicks; }
 
 private:
   __int64 FTicks = 0;
@@ -140,13 +186,38 @@ private:
 class TEncoding
 {
 public:
-  static TEncoding * UTF8();
-  static TEncoding * ANSI();
-  static TEncoding * Default();
+  // Delphi's class properties. Static pointers rather than static properties:
+  // clang accepts `static __declspec(property(...))` but compiles it as a
+  // plain static data member, so it fails only at link time. Core uses them
+  // as values (TEncoding::UTF8) and through -> (TEncoding::ANSI->GetString).
+  static TEncoding * const ASCII;
+  static TEncoding * const ANSI;
+  static TEncoding * const UTF8;
+  static TEncoding * const Unicode;           // UTF-16 LE
+  static TEncoding * const BigEndianUnicode;  // UTF-16 BE
+  // UTF-8 on both platforms: it is what WinSCP writes and what Linux uses.
+  // Delphi's is ANSI on Windows; see the divergence table.
+  static TEncoding * const Default;
 
   virtual ~TEncoding() = default;
-  virtual RawByteString GetBytes(const UnicodeString & S) const = 0;
-  virtual UnicodeString GetString(const RawByteString & Bytes) const = 0;
+
+  TBytes GetBytes(const UnicodeString & S) const;
+  UnicodeString GetString(const TBytes & Bytes) const;
+  // Raises EEncodingError when the range falls outside Bytes, as Delphi does.
+  UnicodeString GetString(const TBytes & Bytes, int ByteIndex, int ByteCount) const;
+  virtual TBytes GetPreamble() const;
+
+  // Delphi's: with AEncoding null, detect it from a byte-order mark -- or fall
+  // back to ADefaultEncoding -- and return the mark's length, 0 without one.
+  // With AEncoding already set, return its preamble's length if Buffer starts
+  // with it, otherwise 0.
+  static int GetBufferEncoding(const TBytes & Buffer, TEncoding *& AEncoding);
+  static int GetBufferEncoding(const TBytes & Buffer, TEncoding *& AEncoding,
+                               TEncoding * ADefaultEncoding);
+
+protected:
+  virtual std::string Encode(const UnicodeString & S) const = 0;
+  virtual UnicodeString Decode(const unsigned char * Bytes, std::size_t Count) const = 0;
 };
 
 #endif // LINSCP_VCL_MISC_H

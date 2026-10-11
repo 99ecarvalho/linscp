@@ -19,6 +19,8 @@
   // COM, which core initialises per thread (Queue.cpp). WIN32_LEAN_AND_MEAN
   // drops it from <windows.h>, where Embarcadero's <vcl.h> has it.
   #include <objbase.h>
+  // The shell API (SHFileOperation), which WIN32_LEAN_AND_MEAN also drops.
+  #include <shellapi.h>
 
   #include "vcl_win32_undef.h"
 #else
