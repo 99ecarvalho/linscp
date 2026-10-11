@@ -596,10 +596,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--src', default='3rd-party/winscp')
     ap.add_argument('--out', default='build/gen')
-    # PuTTY, FileZilla and WinSCP's MFC subset are compiled from the generated
-    # tree too: they need the include rule and the patch series.
+    # PuTTY, FileZilla, WinSCP's MFC subset, neon and libs3 are compiled from
+    # the generated tree too: they need the include rule or the patch series.
     ap.add_argument('--subdirs', nargs='*',
-                    default=['source/core', 'source/putty', 'source/filezilla', 'libs/mfc'])
+                    default=['source/core', 'source/putty', 'source/filezilla', 'libs/mfc',
+                             'libs/neon', 'libs/libs3'])
     ap.add_argument('--check', action='store_true',
                     help='report only; do not write the output tree')
     ap.add_argument('--report')

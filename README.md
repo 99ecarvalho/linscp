@@ -30,6 +30,8 @@ existing Windows build is never broken by the port.
 
 ```
 3rd-party/winscp   pinned upstream submodule, never modified
+3rd-party/openssl  pinned OpenSSL release (the version WinSCP vendors)
+port/patches       reviewed patch series applied to the generated tree
 port/shim          VCL runtime replacement
 port/platform      POSIX and Win32 compatibility
 port/tools         transformation and verification scripts
@@ -48,13 +50,15 @@ the live status.
 Not yet buildable end to end. To run what exists:
 
 ```sh
-git clone --recurse-submodules https://github.com/99ecarvalho/linscp
+git clone https://github.com/99ecarvalho/linscp
 cd linscp
+# Not --recurse-submodules: OpenSSL's own submodules are test suites.
+git submodule update --init --depth 1
 python3 port/tools/transform.py --out build/gen   # rewrite upstream core
 python3 port/tools/check_properties.py            # verify the rewrite compiles
 ```
 
-Requires **clang** and Python 3. GCC is not supported: it has no
+Requires **clang**, Python 3, and Perl and make for OpenSSL's `Configure`. GCC is not supported: it has no
 `__declspec(property)` equivalent, which the VCL property shim depends on.
 
 ## Licence

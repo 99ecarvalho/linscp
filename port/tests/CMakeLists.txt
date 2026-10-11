@@ -122,6 +122,11 @@ set_tests_properties(transform_verify transform_properties_compile docs_consiste
 # wrong token.
 add_test(NAME patch_series
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_patchset.py")
+# WinSCP's OpenSSL changes are all reviewed: adopted or knowingly skipped.
+add_test(NAME openssl_tree
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_openssl_tree.py")
+add_test(NAME upstream_units
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_upstream_units.py")
 if(TARGET linscp-putty)
   # Builds core and PuTTY first: the check reads the two archives.
   add_test(NAME putty_overrides_build

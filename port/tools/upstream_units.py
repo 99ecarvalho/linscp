@@ -17,13 +17,35 @@ CBPROJ = '3rd-party/winscp/source/ScpCore.cbproj'
 def project_units(path=CBPROJ):
     """Every .c/.cpp a project builds, as source/<path> with forward slashes.
 
-    A .cbproj (C++Builder) or a .vcxproj (MSVC; WinSCP builds PuTTY's hot
-    crypto loops that way, in libs/puttyvs)."""
+    A .cbproj (C++Builder), a .vcxproj (MSVC; WinSCP builds PuTTY's hot
+    crypto loops that way, in libs/puttyvs), or a Borland make file: every
+    `$(OBJ_D)\\x.obj` it names, compiled from the source its explicit rule
+    gives (neon's Makefile.bcb) or else from x.c in its `.PATH.c` directory
+    (libs3's Makefile)."""
     text = open(path, encoding='utf-8', errors='replace').read()
+    here = os.path.dirname(os.path.abspath(path))
+    root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                        '..', '..', '3rd-party', 'winscp'))
+    if path.endswith(('.bcb', '.mak')) or os.path.basename(path) == 'Makefile':
+        rules = dict(re.findall(
+            r'^\$\(OBJ_D\)\\(\w+)\.obj:\s*\$\(SRC_D\)[/\\](\S+\.c)\b', text, re.M))
+        search = re.search(r'^\.PATH\.c\s*=\s*(\S+)', text, re.M)
+        units = []
+        for name in sorted(set(re.findall(r'\$\(OBJ_D\)\\(\w+)\.obj', text))):
+            if name in rules:
+                src = rules[name]
+            elif search:
+                src = f'{search.group(1)}/{name}.c'
+            else:
+                sys.exit(f'{path}: no rule or .PATH.c for {name}.obj')
+            full = os.path.normpath(os.path.join(here, src.replace('\\', '/')))
+            if not os.path.isfile(full):
+                sys.exit(f'{path}: {name}.obj: {full} does not exist')
+            units.append(os.path.relpath(full, root).replace(os.sep, '/'))
+        if not units:
+            sys.exit(f'{path}: no objects found')
+        return sorted(units)
     if path.endswith('.vcxproj'):
-        here = os.path.dirname(os.path.abspath(path))
-        root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                            '..', '..', '3rd-party', 'winscp'))
         units = []
         for m in re.findall(r'ClCompile Include="([^"]+\.(?:c|cpp))"', text):
             full = os.path.normpath(os.path.join(here, m.replace('\\', '/')))

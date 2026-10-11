@@ -71,9 +71,10 @@ linscp_upstream_defines(linscp-filezilla PRIVATE FileZilla.cbproj)
 # FileZilla.cbproj's IncludePath, in its order, then what core's headers need.
 target_include_directories(linscp-filezilla PRIVATE
   "${_g}/source/filezilla/misc" "${_g}/source/filezilla" "${LINSCP_UPSTREAM}/source/resource"
-  "${_g}/source/core" "${LINSCP_UPSTREAM}/libs/openssl/include" "${_g}/libs/mfc/include"
-  "${_g}/source/putty" "${_g}/source/putty/windows" "${LINSCP_UPSTREAM}/libs/neon/src"
+  "${_g}/source/core" "${_g}/libs/mfc/include"
+  "${_g}/source/putty" "${_g}/source/putty/windows" "${LINSCP_GEN}/libs/neon/src"
   "${LINSCP_UPSTREAM}/libs/expat/lib"
   ${_shim_includes})
 target_compile_options(linscp-filezilla PRIVATE -include "${_prelude}" -w)
-target_link_libraries(linscp-filezilla PUBLIC linscp-mfc)
+# OpenSSL from the configured release, as for core.
+target_link_libraries(linscp-filezilla PUBLIC linscp-mfc linscp-openssl)

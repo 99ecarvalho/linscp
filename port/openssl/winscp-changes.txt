@@ -1,0 +1,27 @@
+# Every file WinSCP's trimmed copy (3rd-party/winscp/libs/openssl) changed
+# relative to the pinned OpenSSL release (3rd-party/openssl), and what this
+# port does with it. port/tools/openssl_tree.py --check fails when the two
+# trees differ in a file not listed here, or a listed file no longer differs:
+# a WinSCP upgrade or a new backport must be reviewed, not picked up silently.
+#
+#   adopt   WinSCP's version replaces the release's in the build tree
+#   skip    the release's version is built; the reason says why that is right
+#
+# file                                      action  reason
+crypto/pkcs7/pk7_smime.c                    adopt   CVE-2026-45447 fix backported from OpenSSL 3.4.6 (WinSCP bb46bb15d); 3.3 is end of life
+crypto/conf/conf_mod.c                      skip    C++Builder: RCU mapped to plain locks, no Interlocked intrinsics
+crypto/threads_win.c                        skip    C++Builder: RCU implementation compiled out, the other half of conf_mod.c
+crypto/thread/arch/thread_win.c             skip    C++Builder: ossl_crypto_mem_barrier compiled out
+crypto/cryptlib.c                           skip    C++Builder: FARPROC replaced by a plain function pointer
+include/internal/e_os.h                     skip    C++Builder: wspiapi.h suppressed
+crypto/bn/bn_const.c                        skip    C++Builder: explicit bn_local.h include
+crypto/dh/dh_rfc5114.c                      skip    C++Builder: explicit bn_local.h include
+crypto/ffc/ffc_dh.c                         skip    C++Builder: explicit bn_local.h include
+crypto/rsa/rsa_sp800_56b_check.c            skip    C++Builder: explicit bn_local.h include
+crypto/srp/srp_lib.c                        skip    C++Builder: explicit bn_local.h include
+crypto/ec/curve448/word.h                   skip    C++Builder: ULL suffix moved into SC_LIMB
+crypto/ec/curve448/arch_32/f_impl.h         skip    C++Builder: ULL suffix moved into LIMB
+crypto/ec/curve448/scalar.c                 skip    C++Builder: ULL suffixes dropped, the other half of word.h
+crypto/ec/curve448/curve448.c               skip    C++Builder: ULL suffixes dropped, the other half of word.h
+crypto/ec/curve448/curve448_tables.c        skip    C++Builder: ULL suffixes dropped, the other half of f_impl.h
+crypto/ec/curve448/f_generic.c              skip    C++Builder: ULL suffixes dropped, the other half of f_impl.h

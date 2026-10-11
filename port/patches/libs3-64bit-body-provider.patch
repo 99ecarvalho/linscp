@@ -1,0 +1,22 @@
+Return ssize_t from libs3's neon body provider.
+
+neon declares the provider as ssize_t (*)(void *, char *, size_t); libs3's
+neon_read_func returns int. On 32-bit Windows, the only target upstream
+builds, both are 32 bits wide and the call is fine. On x86-64 the caller
+reads all of RAX while the callee sets only EAX: the -1 that aborts an
+upload would arrive as 4294967295, a byte count. As C++, which libs3 is
+compiled as, the mismatch does not even convert. The function's returns
+are all small values, so widening the type is the whole fix; it is right on
+32-bit too. Line counts are unchanged.
+
+--- a/libs/libs3/src/request.c	2026-10-11 13:48:18.130543088 -0300
++++ b/libs/libs3/src/request.c	2026-10-11 13:48:18.135647425 -0300
+@@ -202,7 +202,7 @@
+ 
+ 
+ // WINSCP (neon)
+-static int neon_read_func(void * userdata, char * buf, size_t len)
++static ssize_t neon_read_func(void * userdata, char * buf, size_t len)
+ {
+     Request *request = (Request *) userdata;
+ 

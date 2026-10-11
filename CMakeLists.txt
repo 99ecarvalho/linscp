@@ -105,10 +105,13 @@ add_custom_command(
 add_custom_target(transform ALL DEPENDS "${LINSCP_GEN_STAMP}")
 
 include(cmake/expat.cmake)
+include(cmake/openssl.cmake)
 
 add_subdirectory(port/shim)
 add_subdirectory(port/putty)
 add_subdirectory(port/filezilla)
+add_subdirectory(port/neon)
+add_subdirectory(port/libs3)
 add_subdirectory(port/core)
 
 include(CTest)

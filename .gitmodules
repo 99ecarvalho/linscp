@@ -1,3 +1,7 @@
 [submodule "3rd-party/winscp"]
 	path = 3rd-party/winscp
 	url = https://github.com/winscp/winscp.git
+[submodule "3rd-party/openssl"]
+	path = 3rd-party/openssl
+	url = https://github.com/openssl/openssl.git
+	shallow = true

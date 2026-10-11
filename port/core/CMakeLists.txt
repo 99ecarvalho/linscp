@@ -23,7 +23,9 @@ set_source_files_properties(${LINSCP_CORE_SOURCES} PROPERTIES GENERATED TRUE)
 
 add_library(linscp-core STATIC EXCLUDE_FROM_ALL ${LINSCP_CORE_SOURCES})
 add_dependencies(linscp-core transform)
-target_link_libraries(linscp-core PUBLIC linscp-shim)
+# OpenSSL's headers come from the configured release (cmake/openssl.cmake),
+# not WinSCP's copy, whose configuration.h describes 32-bit Windows.
+target_link_libraries(linscp-core PUBLIC linscp-shim linscp-openssl)
 
 set(_up "${LINSCP_UPSTREAM}/source")
 target_include_directories(linscp-core PUBLIC
@@ -35,10 +37,9 @@ target_include_directories(linscp-core PUBLIC
   # PuTTY's Windows platform layer; on Linux this is P1-09's to replace.
   "${LINSCP_GEN}/source/putty/windows"
   "${_up}/components"
-  "${LINSCP_UPSTREAM}/libs/openssl/include"
-  "${LINSCP_UPSTREAM}/libs/neon/src"
+  "${LINSCP_GEN}/libs/neon/src"
   "${LINSCP_UPSTREAM}/libs/expat/lib"
-  "${LINSCP_UPSTREAM}/libs/libs3/inc")
+  "${LINSCP_GEN}/libs/libs3/inc")
 # The Win32 import libraries core calls into directly: sockets, CryptoAPI
 # certificate chains, shell path helpers, version resources, GetUserNameEx and
 # MIME sniffing.
@@ -62,4 +63,7 @@ if(TARGET linscp-putty)
 endif()
 if(TARGET linscp-filezilla)
   target_link_libraries(linscp-core-link PRIVATE linscp-filezilla)
+endif()
+if(TARGET linscp-libs3)
+  target_link_libraries(linscp-core-link PRIVATE linscp-libs3 linscp-neon)
 endif()

@@ -26,23 +26,19 @@ as a real library: `linscp-core`, built by CMake with the cross toolchain.
 Linux: **558 errors, 14/33 clean, 4 aborting.**
 
 **Link check** (`--target linscp-core-link`, every core object forced into
-one executable): **243 undefined symbols on Windows, none of them the VCL
-shim's, PuTTY's, FileZilla's or MFC's.** WinSCP's PuTTY (176 units), the
-crypto it builds a second time with MSVC (`libs/puttyvs`), FileZilla's 16
-units and the 13-unit MFC subset all build with clang from the submodule.
-(The count rose from 197 because FileZilla's own OpenSSL calls are now
-linked in.) What remains:
+one executable): **17 undefined symbols on Windows, all of them the frontend
+half of `Interface.h`** (`StartThread`, `ProcessGUI`, `CreateConfiguration`,
+...), which core expects the application to supply. Every library resolves:
+the VCL shim, WinSCP's PuTTY (176 units) and its MSVC-built crypto
+(`libs/puttyvs`), FileZilla's 16 units with the 13-unit MFC subset, neon (25
+units), libs3 (14) and OpenSSL 3.3.7 -- all built with clang from pinned
+submodules.
 
-| Missing | Symbols | Task |
-|---|---|---|
-| neon | 104 | P1-13 |
-| OpenSSL | 98 | P1-13 |
-| libs3 | 24 | P1-13 |
-| The frontend half of `Interface.h` (`StartThread`, `ProcessGUI`, ...) | 17 | P1-16 |
-
-1. **P1-13**: neon, libs3 and OpenSSL from the submodule.
-2. **P1-16**: the headless frontend, after which core links and can run.
-3. **P1-11**: the MFC subset on Linux -- it builds for Windows as is.
+1. **P1-16**: the headless frontend, after which core links and can run.
+2. **P1-13**: neon and libs3 on Linux -- each needs a POSIX configuration
+   in place of `src/config.h` and `inc/mingw`. OpenSSL already builds there.
+3. **P1-07b**: the Win32 calls core makes that Linux lacks, now that the
+   Linux census is the larger gap (558 errors, 14/33 clean).
 
 ## Decisions taken
 
@@ -141,6 +137,11 @@ linked in.) What remains:
 | 2026-10-10 | `port/platform` headers refuse to compile on Windows, and are POSIX-only on the include path | Putting them on a Windows target shadowed the genuine mingw headers, which presented as a 1,220 -> 783 "improvement". The `#error` makes that mistake loud |
 | 2026-10-10 | `port/compat` is separate from `port/platform` | `help.h` is missing from upstream itself rather than being a platform difference, so it is needed on every target |
 | 2026-10-10 | The ratchet records whether a unit aborted | An aborted parse reports a floor. Treating that as a distinct state stops a new abort from reading as sudden progress |
+| 2026-10-11 | OpenSSL is built from the pinned release WinSCP vendors (3.3.7, `3rd-party/openssl`) with OpenSSL's own `Configure`, not from `libs/openssl` | WinSCP's copy is trimmed for 32-bit Windows: x86 assembly without its C fallbacks (`bn_asm.c`, `des_enc.c`, ...), no Unix sources, a 32-bit `configuration.h`. It cannot build for x86-64 or Linux. Disabled features mirror WinSCP's `OPENSSL_NO_*` set |
+| 2026-10-11 | WinSCP's changes to OpenSSL are adopted or skipped by a reviewed list, `port/openssl/winscp-changes.txt` | 17 files differ. One is a security backport (CVE-2026-45447, from 3.4.6), adopted; the rest are C++Builder workarounds, skipped. `openssl_tree.py --check` (ctest `openssl_tree`) fails on a difference the list does not cover, so a WinSCP backport cannot be missed on an upgrade |
+| 2026-10-11 | neon and libs3 are compiled from the generated tree, from the unit lists in their make files | The transform's rules leave them byte-identical; the tree gives them the patch series, which libs3 already needs. `upstream_units.py` reads Borland make files as well as projects |
+| 2026-10-11 | libs3 is compiled as C++ | Its Makefile passes bcc32 `-P`. WinSCP's additions depend on it (struct names without `struct`) and core declares libs3's functions with C++ linkage |
+| 2026-10-11 | neon drops `NOUSER` and tolerates one implicit declaration | mingw-w64's `iphlpapi.h` reaches `ole2.h`, which needs `MSG`. `ne_socket.c` calls WinSCP's `ne_init_ssl_session` undeclared, as bcc32's C89 allows; pointer arguments, result unused, so the implicit signature is ABI-correct |
 | 2026-10-11 | WinSCP's MFC subset is built as is for Windows, as `libuafxcw.a` | `FileZillaIntf.cpp` links it by name with `#pragma comment(lib, "uafxcw.lib")`, meaning the subset `borland.mak` builds under that name; same name, on the link path, resolves the request to exactly that library. Replacing it is a Linux concern (P1-11) |
 | 2026-10-11 | MFC and FileZilla get a forced prelude (`vcl_win32_prelude.h`) with `NOMINMAX` and `<algorithm>` pre-included | WinSCP's MFC `stdafx.h` defines `min`/`max` as macros before a later `<algorithm>`; libstdc++, unlike MSVC's library, does not survive that. Included first, the later include is a no-op |
 | 2026-10-11 | `_AFX_NO_DAO_SUPPORT` for the MFC subset | DAO is 32-bit only; Microsoft's MFC turns it off for every non-x86 target, in the `afxv_cpu.h` WinSCP does not vendor |
@@ -238,11 +239,15 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | Q-6 | Far-NetBox licence: README says GPLv3, `LICENSE.txt` is the GPLv2 text | verbatim reuse of its shim (reference use is unaffected) | — |
 | Q-7 | Build the fork-branch generator now, or when there is something worth proposing upstream? | nothing today; recommend deferring until P1 lands | — |
 | ~~Q-8~~ | ~~Confirm ADR 0001~~ — **resolved 2026-10-10**: accepted | — | — |
+| Q-9 | OpenSSL 3.3 reached end of life in April 2026; WinSCP keeps it alive with backports, which the port follows through `winscp-changes.txt`. Move to a supported LTS (3.5) ahead of WinSCP, or stay on WinSCP's version? | nothing today; recommend staying in step with WinSCP | — |
 
 ## Verified facts (re-check if the environment changes)
 
 | Fact | Evidence | Date |
 |---|---|---|
+| WinSCP's OpenSSL differs from the 3.3.7 release in 17 files, one of them functionally (a CVE-2026-45447 backport in `pk7_smime.c`) | `openssl_tree.py --check`, CRLF ignored; WinSCP commit bb46bb15d | 2026-10-11 |
+| WinSCP's OpenSSL lacks the C fallbacks for its x86 assembly and every Unix source | `bn_asm.c`, `des_enc.c`, `bf_enc.c`, `c_enc.c`, `threads_pthread.c`, `rand_unix.c` absent from `libs/openssl` | 2026-10-11 |
+| Upstream libs3 returns `int` where neon's body provider returns `ssize_t` | `neon_read_func` in `libs3/src/request.c`; fixed by `libs3-64bit-body-provider.patch` | 2026-10-11 |
 | Upstream FileZilla truncates a pointer on x86-64 | `CAsyncSocketEx` stores `this` with `SetWindowLongPtr(hWnd, GWL_USERDATA, (LONG)this)`; fixed by `filezilla-64bit-window-userdata.patch` | 2026-10-11 |
 | lld reports undefined references in every object it pulls in, even from functions `--gc-sections` would drop | Local test: an unreferenced function calling an undefined symbol fails the link with and without `-ffunction-sections` | 2026-10-11 |
 | Upstream WinSCP is built for 32-bit Windows only | `PuTTYVS.vcxproj` has only `Win32` configurations, and PuTTY's option defaults cast string addresses to `int`, which only fits in 32 bits | 2026-10-11 |
@@ -417,7 +422,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-10 | PuTTY delta reconciliation | todo | |
 | P1-11 | FileZilla MFC subset replacement | wip | FileZilla and the MFC subset build and link for Windows from the submodule (three patches); Linux replacement next |
 | P1-12 | FileZilla epoll rewrite | todo | **R2** — budget generously |
-| P1-13 | System libs | wip | PuTTY and its MSVC-built crypto build for Windows from the submodule; neon, OpenSSL, libs3 next |
+| P1-13 | System libs | wip | Windows complete: PuTTY, puttyvs, FileZilla + MFC, neon, libs3 from the WinSCP submodule, OpenSSL 3.3.7 from its own (both targets). Linux: neon and libs3 need POSIX configurations |
 | P1-14 | Drop `puttyvs` | done | the MSVC build is replaced by clang building the same files with the same defines, from `PuTTYVS.vcxproj` |
 | P1-15 | Console IPC → stdio | todo | |
 | P1-16 | Headless `Interface.h` frontend | todo | |
