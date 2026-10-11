@@ -17,7 +17,8 @@ Goal: prove the keystone works, with no behaviour change anywhere.
 | P0-03 | **Dual-target property macro header** (`port/shim/vcl_property.h`) | S | — | The keystone; PLAN §2 |
 | P0-04 | **Verify C++Builder accepts macro-expanded `__property`** | S | P0-03 | **R1. Do this first.** Needs a licence + Windows. Blocks the zero-diff story |
 | P0-05 | `transform.py`: `__property` rewriter, line-preserving | M | P0-03 | 591 decls, 4 forms + 4 manual |
-| P0-06 | `transform.py`: `__fastcall`, `ARRAYOFCONST` | S | P0-05 | `__fastcall` is an empty define |
+| P0-06 | `transform.py`: `__fastcall`, `ARRAYOFCONST` | S | P0-05 | Done. `__fastcall` is an empty define; `ARRAYOFCONST` pastes onto a variadic call |
+| P0-06d | `__closure`: inline parameter form | S | P0-06b | Done. Two sites in `SessionInfo`; declaration and definition must agree or nothing links |
 | P0-06b | `__closure`: `TClosure` type + typedef transform | M | P0-06 | Done. 44 typedefs rewritten to `TClosure<Sig>`; contract measured from core (`!= NULL` 62, `== NULL` 31, `= NULL` 51) |
 | P0-06c | `__closure`: bind the bare-member-name call sites | M | P0-06b | Done. 62 sites, compiler-discovered and committed to `port/patches/closure_sites.json`; resolving macro expansions to their definitions collapsed 118 reports to 62 |
 | P0-07 | Transform idempotence + line-count assertion tests | S | P0-05 | Guards against silent drift |
@@ -65,6 +66,7 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P1-04 | Shim: `Exception` hierarchy + Delphi exception semantics | M | P1-01 | Core has no `__try`/`__except` — simplifies this |
 | P1-05 | Shim: `TCriticalSection` + `SyncObjs` | M | P1-02 | Done; recursive, as Delphi's is |
 | P1-05b | Shim: `TThread` / `StartThread` | M | P1-05 | `Interface.h` already abstracts thread creation |
+| P1-08b | Shim: `Masks`, `TPath`, `TTimeSpan`, `TEncoding`, `TNotifyEvent`, env/version globals | M | P1-01b | Done. The long tail the census named after the big groups cleared |
 | P1-06 | Shim: `TStream`/`THandleStream`/`TMemoryStream` | M | P1-02 | ~31 uses each; now the largest non-closure group |
 | P1-06b | Shim: `TCustomIniFile`/`TMemIniFile`/`TRegistry` | M | P1-06 | Done. Real registry on Windows; on POSIX every key reports absent |
 | P1-06c | Shim: `DynamicArray`, Delphi handle-based file API | S | P1-06 | Done. Reference-counted, as core's by-value `Read` requires |

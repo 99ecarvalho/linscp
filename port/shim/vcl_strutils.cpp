@@ -16,6 +16,7 @@
   const UnicodeString sLineBreak(L"\r\n");
 #else
   #include <sys/stat.h>
+  #include <sys/utsname.h>
   #include <unistd.h>
   const wchar_t PathDelim = L'/';
   const UnicodeString sLineBreak(L"\n");
@@ -25,6 +26,14 @@ namespace {
 
 // Both separators are recognised when parsing, whatever the host, so a path
 // that arrived from a remote server is split the same way on either platform.
+// ASCII alphanumeric test, written out rather than calling iswalnum: that is
+// one of the libc wide functions compiled against a 4-byte wchar_t (ADR 0001).
+bool IsAsciiAlnum(wchar_t C)
+{
+  return (C >= L'0' && C <= L'9') || (C >= L'A' && C <= L'Z') ||
+         (C >= L'a' && C <= L'z');
+}
+
 bool IsSep(wchar_t C)
 {
   return C == L'\\' || C == L'/';
@@ -576,3 +585,144 @@ void RaiseLastOSError()
   throw EOSError(UnicodeString(L"System error, code ") +
                  IntToStr(static_cast<__int64>(Code)));
 }
+
+// --- environment -----------------------------------------------------------
+
+UnicodeString GetEnvironmentVariable(const UnicodeString & Name)
+{
+#if defined(_WIN32)
+  wchar_t Buf[32767];
+  const DWORD N = GetEnvironmentVariableW(
+    Name.c_str(), Buf, static_cast<DWORD>(sizeof(Buf) / sizeof(Buf[0])));
+  return N == 0 ? UnicodeString() : UnicodeString(Buf, static_cast<int>(N));
+#else
+  const char * V = ::getenv(Narrow(Name).c_str());
+  return V == nullptr ? UnicodeString()
+                      : linscp::Utf8ToUtf16(V, std::char_traits<char>::length(V));
+#endif
+}
+
+bool SetEnvironmentVariable(const UnicodeString & Name,
+                            const UnicodeString & Value)
+{
+#if defined(_WIN32)
+  return SetEnvironmentVariableW(Name.c_str(), Value.c_str()) != 0;
+#else
+  return ::setenv(Narrow(Name).c_str(), Narrow(Value).c_str(), 1) == 0;
+#endif
+}
+
+UnicodeString ExpandFileName(const UnicodeString & FileName)
+{
+  return ExpandUNCFileName(FileName);
+}
+
+UnicodeString ExpandEnvironmentVariables(const UnicodeString & S)
+{
+#if defined(_WIN32)
+  wchar_t Buf[32767];
+  const DWORD N = ExpandEnvironmentStringsW(
+    S.c_str(), Buf, static_cast<DWORD>(sizeof(Buf) / sizeof(Buf[0])));
+  return N == 0 ? S : UnicodeString(Buf);
+#else
+  // $VAR and ${VAR}, the POSIX equivalent of Windows' %VAR%.
+  UnicodeString Out;
+  int I = 1;
+  while (I <= S.Length())
+  {
+    if (S[I] != L'$')
+    {
+      Out += S[I];
+      ++I;
+      continue;
+    }
+    ++I;
+    const bool Braced = (I <= S.Length() && S[I] == L'{');
+    if (Braced)
+    {
+      ++I;
+    }
+    UnicodeString Name;
+    while (I <= S.Length() &&
+           (Braced ? S[I] != L'}' : (IsAsciiAlnum(S[I]) || S[I] == L'_')))
+    {
+      Name += S[I];
+      ++I;
+    }
+    if (Braced && I <= S.Length())
+    {
+      ++I;
+    }
+    Out += GetEnvironmentVariable(Name);
+  }
+  return Out;
+#endif
+}
+
+bool AnsiSameText(const UnicodeString & A, const UnicodeString & B)
+{
+  return A.CompareIC(B) == 0;
+}
+
+bool AnsiSameStr(const UnicodeString & A, const UnicodeString & B)
+{
+  return A == B;
+}
+
+// --- host version ----------------------------------------------------------
+//
+// On Windows these are the OS version; on POSIX they describe the kernel, which
+// is the nearest honest answer to what core asks for when reporting the
+// environment.
+
+unsigned Win32MajorVersion = 0;
+unsigned Win32MinorVersion = 0;
+unsigned Win32BuildNumber = 0;
+UnicodeString Win32CSDVersion;
+
+namespace {
+
+void InitHostVersion()
+{
+#if defined(_WIN32)
+  OSVERSIONINFOW Info{};
+  Info.dwOSVersionInfoSize = sizeof(Info);
+  #pragma clang diagnostic push
+  #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+  if (GetVersionExW(&Info) != 0)
+  {
+    Win32MajorVersion = Info.dwMajorVersion;
+    Win32MinorVersion = Info.dwMinorVersion;
+    Win32BuildNumber = Info.dwBuildNumber;
+    Win32CSDVersion = UnicodeString(Info.szCSDVersion);
+  }
+  #pragma clang diagnostic pop
+#else
+  struct utsname Name{};
+  if (uname(&Name) == 0)
+  {
+    int Major = 0;
+    int Minor = 0;
+    int Patch = 0;
+    std::sscanf(Name.release, "%d.%d.%d", &Major, &Minor, &Patch);
+    Win32MajorVersion = static_cast<unsigned>(Major);
+    Win32MinorVersion = static_cast<unsigned>(Minor);
+    Win32BuildNumber = static_cast<unsigned>(Patch);
+    Win32CSDVersion = linscp::Utf8ToUtf16(Name.sysname,
+                                          std::char_traits<char>::length(Name.sysname));
+  }
+#endif
+}
+
+// Declared *after* the variables above deliberately. Dynamic initialisation
+// within a translation unit runs in declaration order, so putting this first
+// made the constructor assign to a UnicodeString that had not been constructed
+// yet -- which segfaulted exactly that way.
+struct TVersionInit
+{
+  TVersionInit() { InitHostVersion(); }
+};
+
+const TVersionInit GVersionInit;
+
+}  // namespace

@@ -26,7 +26,8 @@ constexpr int SecsPerMin = 60;
 constexpr int MinsPerHour = 60;
 constexpr int HoursPerDay = 24;
 constexpr int SecsPerDay = SecsPerMin * MinsPerHour * HoursPerDay;
-constexpr int MSecsPerDayConst = SecsPerDay * MSecsPerSec;
+constexpr int MSecsPerDay = SecsPerDay * MSecsPerSec;
+constexpr int MSecsPerDayConst = MSecsPerDay;
 
 // --- numbers ---------------------------------------------------------------
 UnicodeString IntToStr(__int64 Value);
@@ -106,6 +107,27 @@ bool RemoveDir(const UnicodeString & Dir);
 bool DeleteFile(const UnicodeString & FileName);
 bool RenameFile(const UnicodeString & OldName, const UnicodeString & NewName);
 UnicodeString ExpandUNCFileName(const UnicodeString & FileName);
+
+// --- environment and version ----------------------------------------------
+UnicodeString GetEnvironmentVariable(const UnicodeString & Name);
+bool SetEnvironmentVariable(const UnicodeString & Name,
+                            const UnicodeString & Value);
+UnicodeString ExpandFileName(const UnicodeString & FileName);
+UnicodeString ExpandEnvironmentVariables(const UnicodeString & S);
+
+// AnsiSameText is Delphi's byte-wise case-insensitive compare. It is not a
+// synonym for SameText: Delphi's folds only the ANSI range, which is what the
+// shim's ASCII folding already does, so the two coincide here.
+bool AnsiSameText(const UnicodeString & A, const UnicodeString & B);
+bool AnsiSameStr(const UnicodeString & A, const UnicodeString & B);
+
+// VCL globals describing the host. Read by core when reporting the
+// environment; on POSIX they describe the kernel instead, which is the nearest
+// honest answer.
+extern unsigned Win32MajorVersion;
+extern unsigned Win32MinorVersion;
+extern unsigned Win32BuildNumber;
+extern UnicodeString Win32CSDVersion;
 
 // --- control flow ----------------------------------------------------------
 // Delphi's Abort raises the silent EAbort exception.

@@ -100,6 +100,11 @@ auto MakeClosure(const C * Instance, R (C::*Method)(A...) const)
   };
 }
 
+// The classic VCL event signature, used across core and declared by the VCL
+// rather than by WinSCP, so it has to come from here.
+class TObject;
+using TNotifyEvent = TClosure<void(TObject *)>;
+
 // Used at the call sites the transform rewrites. The enclosing class comes from
 // decltype(*this), so the macro needs only the method name -- which is all the
 // original Borland source gives us.

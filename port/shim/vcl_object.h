@@ -23,7 +23,20 @@ public:
   virtual ~TObject() = default;
   TObject(const TObject &) = delete;
   TObject & operator=(const TObject &) = delete;
+
+  // Delphi's RTTI check. Implemented with dynamic_cast rather than a class
+  // registry, which covers what core uses it for: asking whether an object is
+  // of a given type before downcasting.
+  template <typename T>
+  bool InheritsFrom() const { return dynamic_cast<const T *>(this) != nullptr; }
 };
+
+// Core's own declarations, and the closure typedefs the transform produces,
+// spell some of these with their Delphi unit scope.
+namespace System {
+using TObject = ::TObject;
+using Boolean = bool;
+}  // namespace System
 
 class TPersistent : public TObject
 {

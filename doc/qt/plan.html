@@ -1024,9 +1024,18 @@ line-preserving</td>
 <code>ARRAYOFCONST</code></td>
 <td>S</td>
 <td>P0-05</td>
-<td><code>__fastcall</code> is an empty define</td>
+<td>Done. <code>__fastcall</code> is an empty define;
+<code>ARRAYOFCONST</code> pastes onto a variadic call</td>
 </tr>
 <tr class="odd">
+<td>P0-06d</td>
+<td><code>__closure</code>: inline parameter form</td>
+<td>S</td>
+<td>P0-06b</td>
+<td>Done. Two sites in <code>SessionInfo</code>; declaration and
+definition must agree or nothing links</td>
+</tr>
+<tr class="even">
 <td>P0-06b</td>
 <td><code>__closure</code>: <code>TClosure</code> type + typedef
 transform</td>
@@ -1036,7 +1045,7 @@ transform</td>
 contract measured from core (<code>!= NULL</code> 62,
 <code>== NULL</code> 31, <code>= NULL</code> 51)</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-06c</td>
 <td><code>__closure</code>: bind the bare-member-name call sites</td>
 <td>M</td>
@@ -1045,21 +1054,21 @@ contract measured from core (<code>!= NULL</code> 62,
 <code>port/patches/closure_sites.json</code>; resolving macro expansions
 to their definitions collapsed 118 reports to 62</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-07</td>
 <td>Transform idempotence + line-count assertion tests</td>
 <td>S</td>
 <td>P0-05</td>
 <td>Guards against silent drift</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-08</td>
 <td>CMake skeleton: generate → compile one TU</td>
 <td>M</td>
 <td>P0-01, P0-05</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-09</td>
 <td>Minimal shim to compile <code>core/Common.cpp</code> on Linux
 clang</td>
@@ -1067,7 +1076,7 @@ clang</td>
 <td>P0-08</td>
 <td>The real measurement of shim cost</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-10</td>
 <td>Install + script mingw-w64 sysroot; clang <code>--target</code>
 toolchain file</td>
@@ -1075,28 +1084,28 @@ toolchain file</td>
 <td>P0-08</td>
 <td>GCC is unusable — clang only</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-11</td>
 <td>CI matrix: Linux native + Windows cross, both clang</td>
 <td>M</td>
 <td>P0-10</td>
 <td>From the first commit</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-12</td>
 <td>Wine in CI for Windows smoke tests</td>
 <td>S</td>
 <td>P0-11</td>
 <td>Not release certification</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-13</td>
 <td>Golden-output harness: runner, XML normaliser, differ</td>
 <td>M</td>
 <td>—</td>
 <td>PLAN §5; highest leverage in P0</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-14</td>
 <td>Protocol server containers (OpenSSH, vsftpd, ProFTPD, WebDAV,
 MinIO)</td>
@@ -1104,21 +1113,21 @@ MinIO)</td>
 <td>P0-13</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-15</td>
 <td>Capture golden XML corpus from real WinSCP on Windows</td>
 <td>M</td>
 <td>P0-13, P0-14</td>
 <td>Needs a Windows host</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-16</td>
 <td>ADR log (<code>doc/qt/adr/</code>)</td>
 <td>S</td>
 <td>—</td>
 <td>Record toolchain/ABI choices as made</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-17</td>
 <td><code>check_properties.py</code>: compile-test every transformed
 declaration</td>
@@ -1127,14 +1136,14 @@ declaration</td>
 <td>Validates macro arity across the real corpus without the full
 shim</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-18</td>
 <td>HTML render of the plan docs (<code>build-html.sh</code>)</td>
 <td>S</td>
 <td>—</td>
 <td>pandoc, self-contained, light/dark</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-19</td>
 <td>Publish repository with licence and root README</td>
 <td>S</td>
@@ -1142,7 +1151,7 @@ shim</td>
 <td>Public, GPL-3.0; <code>main</code> released, <code>qt</code>
 active</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-20</td>
 <td>Generator for a PR-able branch against a <code>winscp/winscp</code>
 fork</td>
@@ -1150,7 +1159,7 @@ fork</td>
 <td>P1-19</td>
 <td>Defer until there is something worth proposing (Q-7)</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-21</td>
 <td><code>verify_transform.py</code>: audit the generated tree against
 upstream</td>
@@ -1158,14 +1167,14 @@ upstream</td>
 <td>P0-05</td>
 <td>Byte-exactness is the invariant the whole model rests on</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-22</td>
 <td>Rehearse history import into a <code>winscp/winscp</code> fork</td>
 <td>S</td>
 <td>P0-05</td>
 <td>Validates Q-7 and measures the real conflict cost</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-23</td>
 <td><code>check_docs.py</code>: keep TASKS and TRACKER consistent</td>
 <td>S</td>
@@ -1173,7 +1182,7 @@ upstream</td>
 <td>Enforces the tracker rule mechanically rather than by
 discipline</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-24</td>
 <td>Measure the VCL surface the core requires
 (<code>census.py</code>)</td>
@@ -1182,7 +1191,7 @@ discipline</td>
 <td>Resolves core identifiers against real mingw/OpenSSL/stdlib
 headers</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-25</td>
 <td>ADR 0001: character width for <code>UnicodeString</code></td>
 <td>S</td>
@@ -1190,14 +1199,14 @@ headers</td>
 <td>Accepted: <code>-fshort-wchar</code>, <code>std::u16string</code>
 storage</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-26</td>
 <td><code>check_wide_abi.py</code>: enforce ADR 0001 mechanically</td>
 <td>S</td>
 <td>P0-25</td>
 <td>Wrong-ABI code links cleanly then misbehaves, so grep it</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-27</td>
 <td><code>compile_census.py</code>: classify what a real core TU still
 needs</td>
@@ -1205,7 +1214,7 @@ needs</td>
 <td>P0-09</td>
 <td>Lets the compiler enumerate the shim gap instead of grep</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-29</td>
 <td>Shim stubs for the unqualified legacy RTL header names</td>
 <td>S</td>
@@ -1213,7 +1222,7 @@ needs</td>
 <td><code>Classes.hpp</code> etc.; their absence was aborting most TUs
 early</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-30</td>
 <td>Undo Win32 A/W name macros that collide with RTL names</td>
 <td>S</td>
@@ -1222,7 +1231,7 @@ early</td>
 <code>&lt;windows.h&gt;</code> renamed the definition, link failed.
 Guarded by a link-time test</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-31</td>
 <td>Ratchet both targets and track early aborts</td>
 <td>S</td>
@@ -1230,7 +1239,7 @@ Guarded by a link-time test</td>
 <td>Linux compiles core now; an aborting unit reports a floor, which
 once read as progress</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-32</td>
 <td><code>port/compat</code> for headers missing from upstream
 itself</td>
@@ -1239,7 +1248,7 @@ itself</td>
 <td><code>help.h</code>, which PuTTY’s <code>platform.h</code> includes
 but WinSCP does not vendor</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-28</td>
 <td><code>census_ratchet.py</code>: pin the census so progress cannot
 slip back</td>
@@ -1367,6 +1376,16 @@ this</td>
 <td><code>Interface.h</code> already abstracts thread creation</td>
 </tr>
 <tr class="odd">
+<td>P1-08b</td>
+<td>Shim: <code>Masks</code>, <code>TPath</code>,
+<code>TTimeSpan</code>, <code>TEncoding</code>,
+<code>TNotifyEvent</code>, env/version globals</td>
+<td>M</td>
+<td>P1-01b</td>
+<td>Done. The long tail the census named after the big groups
+cleared</td>
+</tr>
+<tr class="even">
 <td>P1-06</td>
 <td>Shim:
 <code>TStream</code>/<code>THandleStream</code>/<code>TMemoryStream</code></td>
@@ -1374,7 +1393,7 @@ this</td>
 <td>P1-02</td>
 <td>~31 uses each; now the largest non-closure group</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-06b</td>
 <td>Shim:
 <code>TCustomIniFile</code>/<code>TMemIniFile</code>/<code>TRegistry</code></td>
@@ -1383,7 +1402,7 @@ this</td>
 <td>Done. Real registry on Windows; on POSIX every key reports
 absent</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-06c</td>
 <td>Shim: <code>DynamicArray</code>, Delphi handle-based file API</td>
 <td>S</td>
@@ -1391,7 +1410,7 @@ absent</td>
 <td>Done. Reference-counted, as core’s by-value <code>Read</code>
 requires</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-07</td>
 <td><code>port/platform</code>: Win32 types, time and error subset</td>
 <td>L</td>
@@ -1399,7 +1418,7 @@ requires</td>
 <td>Done for the compiling surface: <code>Option.cpp</code> builds on
 Linux too</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-07b</td>
 <td><code>port/platform</code>: Win32 file and handle functions</td>
 <td>L</td>
@@ -1407,7 +1426,7 @@ Linux too</td>
 <td><code>CreateFile</code>/<code>ReadFile</code>/<code>WriteFile</code>/<code>CloseHandle</code>
 etc., as the census asks</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-06d</td>
 <td>Frontend decision: select the INI storage backend on Linux</td>
 <td>S</td>
@@ -1415,28 +1434,28 @@ etc., as the census asks</td>
 <td><code>TRegistryStorage</code> cannot work there; core already
 supports the INI path</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-08</td>
 <td><code>WSAEventSelect</code> / socket-event emulation</td>
 <td>M</td>
 <td>P1-07</td>
 <td>R6</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-09</td>
 <td>PuTTY: re-import upstream <code>unix/</code> backend</td>
 <td>M</td>
 <td>P1-03</td>
 <td>Upstream maintains it; reconcile WinSCP’s patches</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-10</td>
 <td>PuTTY: reconcile WinSCP deltas against vanilla 0.85</td>
 <td>M</td>
 <td>P1-09</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-11</td>
 <td>FileZilla: replace vendored MFC subset
 (<code>CString</code>/<code>CFile</code>/<code>CTime</code>)</td>
@@ -1444,7 +1463,7 @@ supports the INI path</td>
 <td>P1-01</td>
 <td>Only 4 files in <code>libs/mfc</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-12</td>
 <td><strong>FileZilla: <code>WSAAsyncSelect</code> hidden-window pump →
 epoll/poll</strong></td>
@@ -1452,28 +1471,28 @@ epoll/poll</strong></td>
 <td>P1-11</td>
 <td><strong>R2.</strong> ~1,700 lines; least mechanical task in P1</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-13</td>
 <td>Switch <code>libs/</code> to system OpenSSL, expat, neon, libs3</td>
 <td>M</td>
 <td>P0-08</td>
 <td>All vanilla upstream already</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-14</td>
 <td>Drop <code>puttyvs</code> (MSVC wrapper, obsolete)</td>
 <td>S</td>
 <td>P1-09</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-15</td>
 <td><code>winscp.com</code> shared-memory IPC → plain stdio</td>
 <td>M</td>
 <td>P1-06</td>
 <td>Both platforms</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-16</td>
 <td>Headless frontend implementing <code>Interface.h</code></td>
 <td>L</td>
@@ -1481,28 +1500,28 @@ epoll/poll</strong></td>
 <td>Derive from <code>ConsoleRunner.cpp</code> — it has zero
 <code>forms/</code> deps</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-17</td>
 <td>First link + first real SFTP session on Linux</td>
 <td>M</td>
 <td>P1-16</td>
 <td>Expect a long tail of link/ABI issues</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-18</td>
 <td>Same core + CLI cross-built for Windows, Wine-smoked</td>
 <td>M</td>
 <td>P1-17, P0-12</td>
 <td>Proves “one codebase”</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-19</td>
 <td>Golden suite green across all six protocols, both platforms</td>
 <td>L</td>
 <td>P1-18, P0-15</td>
 <td><strong>P1 exit gate</strong></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-20</td>
 <td>Verify stock <code>netstandard2.0</code> .NET assembly drives the
 Linux CLI</td>
@@ -1510,7 +1529,7 @@ Linux CLI</td>
 <td>P1-19</td>
 <td>Should work unchanged</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-21</td>
 <td><code>#ifdef</code> out <code>dragext</code>,
 <code>Setup.cpp</code>, jump lists, file associations</td>
@@ -1789,15 +1808,15 @@ evaluation down and close it</td>
 <tbody>
 <tr class="odd">
 <td>P0 Foundation</td>
-<td>24</td>
-<td>34</td>
+<td>26</td>
+<td>35</td>
 <td><code>core/Common.cpp</code> compiles on Linux clang; VCL build
 green (R1)</td>
 </tr>
 <tr class="even">
 <td>P1 Headless core</td>
-<td>14</td>
-<td>32</td>
+<td>15</td>
+<td>33</td>
 <td>Golden suite green, six protocols, both platforms</td>
 </tr>
 <tr class="odd">
@@ -1820,8 +1839,8 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>38</strong></td>
-<td><strong>90</strong></td>
+<td><strong>41</strong></td>
+<td><strong>92</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -1848,15 +1867,17 @@ aborting.</p>
 targets:</strong> <code>Option.cpp</code>, <code>NamedObjs.cpp</code>
 and <code>FileBuffer.cpp</code>. Census is <strong>963 on mingw, 1,182
 on Linux</strong>.</p>
-<p>Census is <strong>933 on mingw, 1,152 on Linux</strong>, 3 of 9 units
-clean.</p>
+<p>Census is <strong>619 on mingw, 863 on Linux</strong>, 3 of 9 units
+clean. Every <code>__closure</code> in core is now converted: 44
+typedefs, 2 inline parameters, 62 bound call sites.</p>
 <ol type="1">
-<li><strong>P1-07b / Win32 file and handle functions</strong> —
-<code>CreateFile</code>, <code>ReadFile</code>, <code>CloseHandle</code>
-and the rest, as the census asks for them.</li>
-<li><code>Bookmarks.cpp</code> is next closest at 43 / 45.</li>
-<li><strong>P1-05b / <code>TThread</code></strong> and the remaining
-event typedefs.</li>
+<li><code>Bookmarks.cpp</code> at <strong>17 / 19</strong> is close
+enough to finish next.</li>
+<li><strong>P1-05b / <code>TThread</code></strong> and
+<code>StartThread</code>.</li>
+<li><code>_di_IXMLNode</code> (10 uses) — the MSXML interface behind
+WebDAV’s property parsing, and the last sizeable item that is not a long
+tail.</li>
 </ol>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
@@ -2086,6 +2107,21 @@ variadic call</td>
 <td>C++Builder builds an open array of <code>TVarRec</code>, which needs
 compound literals. <code>ARRAYOFCONST((a, b))</code> becoming
 <code>MakeFormatArgs(a, b)</code> is ordinary C++</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>Globals that need dynamic initialisation are declared
+<em>before</em> the object that initialises them</td>
+<td>Within a translation unit, dynamic initialisation runs in
+declaration order. Putting the initialiser first had its constructor
+assign to a <code>UnicodeString</code> that was not yet constructed,
+which segfaulted rather than failing to compile</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td><code>TMask</code> matching is case-insensitive</td>
+<td>Delphi’s is, and core uses it for file masks users type without
+regard to case</td>
 </tr>
 <tr class="even">
 <td>2026-10-11</td>
@@ -2883,18 +2919,35 @@ typedef + 28 template end + 62 binding</td>
 <td>2026-10-11</td>
 </tr>
 <tr class="even">
+<td>Census after the long tail: mingw <strong>619</strong>, Linux
+<strong>863</strong> (from 933 / 1,152)</td>
+<td><code>census_ratchet.py</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="odd">
+<td>Every <code>__closure</code> in core converted: 44 typedefs, 2
+inline parameters, 62 bound sites</td>
+<td><code>transform.py</code>, 0 remaining</td>
+<td>2026-10-11</td>
+</tr>
+<tr class="even">
+<td>22/22 tests pass on both targets</td>
+<td><code>ctest</code></td>
+<td>2026-10-11</td>
+</tr>
+<tr class="odd">
 <td>12/12 tests pass on Linux and on Windows under Wine</td>
 <td><code>ctest</code> both trees</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>Directory search validated against both backends: real
 <code>FindFirstFileW</code> under Wine, and <code>dirent</code> +
 <code>fnmatch</code> on Linux</td>
 <td><code>test_sysutils</code> on both targets</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>__closure</code> scope: 44 distinct closure types, 16
 typedefs; call sites pass bare member-function names</td>
 <td>grep over generated core</td>
@@ -2954,8 +3007,8 @@ typedefs; call sites pass bare member-function names</td>
 <tr class="even">
 <td>P0-06</td>
 <td><code>transform.py</code> fastcall/ARRAYOFCONST</td>
-<td>todo</td>
-<td><code>__closure</code> split out as P0-06b</td>
+<td>done</td>
+<td><code>__closure</code> handled by P0-06b/c/d</td>
 </tr>
 <tr class="odd">
 <td>P0-06b</td>
@@ -2971,164 +3024,170 @@ targets</td>
 <td>62 sites; verified as a test</td>
 </tr>
 <tr class="odd">
+<td>P0-06d</td>
+<td><code>__closure</code> inline parameter form</td>
+<td>done</td>
+<td>2 sites in <code>SessionInfo</code></td>
+</tr>
+<tr class="even">
 <td>P0-07</td>
 <td>Transform idempotence tests</td>
 <td>done</td>
 <td>idempotent + line-count parity asserted</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-08</td>
 <td>CMake skeleton</td>
 <td>done</td>
 <td>transform+verify wired as a build step; CTest on both targets</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-09</td>
 <td>Minimal shim for <code>core/Common.cpp</code></td>
 <td>wip</td>
 <td>224 errors; <code>Option.cpp</code> is the first TU at 0</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-10</td>
 <td>mingw-w64 sysroot + clang toolchain file</td>
 <td>done</td>
 <td><code>cmake/toolchain-mingw-w64.cmake</code>; clang + lld + Wine
 emulator</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-11</td>
 <td>CI matrix Linux + Windows cross</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-12</td>
 <td>Wine smoke tests in CI</td>
 <td>wip</td>
 <td>wired into CTest via <code>CMAKE_CROSSCOMPILING_EMULATOR</code>;
 GitHub Actions pending</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-13</td>
 <td>Golden-output harness</td>
 <td>todo</td>
 <td>highest leverage in P0</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-14</td>
 <td>Protocol server containers</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-15</td>
 <td>Capture golden corpus from real WinSCP</td>
 <td>blocked</td>
 <td>Q-2: needs Windows host</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-16</td>
 <td>ADR log</td>
 <td>wip</td>
 <td><code>doc/qt/adr/</code> started with ADR 0001</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-17</td>
 <td>Property compile-check harness</td>
 <td>done</td>
 <td><code>check_properties.py</code>, 613 declarations, clang exit
 0</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-18</td>
 <td>HTML render of plan docs</td>
 <td>done</td>
 <td><code>doc/qt/plan.html</code> via <code>build-html.sh</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-19</td>
 <td>Publish repository, licence, root README</td>
 <td>done</td>
 <td>public at <code>99ecarvalho/linscp</code>; work on
 <code>qt</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-20</td>
 <td>Fork-branch generator</td>
 <td>todo</td>
 <td>deferred to P1-19 (Q-7); rehearsed manually in P0-22</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-21</td>
 <td><code>verify_transform.py</code> upstream-diff audit</td>
 <td>done</td>
 <td>asserts line parity, byte-exactness and 1 macro per changed
 line</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-22</td>
 <td>Rehearse history import into a winscp fork</td>
 <td>done</td>
 <td>zero-conflict merge; 613-line in-tree diff; mechanical conflict
 resolution</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-23</td>
 <td><code>check_docs.py</code> TASKS/TRACKER consistency</td>
 <td>done</td>
 <td>found 3 drifts on first run</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-24</td>
 <td>VCL surface census</td>
 <td>done</td>
 <td>~45 types; <code>build/shim_spec.txt</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-25</td>
 <td>ADR 0001 character width</td>
 <td>done</td>
 <td>accepted: <code>-fshort-wchar</code> +
 <code>std::u16string</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-26</td>
 <td><code>check_wide_abi.py</code> ADR enforcement</td>
 <td>done</td>
 <td><code>shim_no_wide_abi</code> test</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-27</td>
 <td><code>compile_census.py</code></td>
 <td>done</td>
 <td>classifies clang diagnostics into shim gaps</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-29</td>
 <td>Legacy unqualified RTL header stubs</td>
 <td>done</td>
 <td><code>Classes.hpp</code> etc.; absence was aborting most TUs</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-30</td>
 <td>Win32 A/W macro collisions undone</td>
 <td>done</td>
 <td>link-time guard test</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-31</td>
 <td>Ratchet both targets, track aborts</td>
 <td>done</td>
 <td>an abort is a distinct state, not a low number</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P0-32</td>
 <td><code>port/compat</code> for upstream gaps</td>
 <td>done</td>
 <td><code>help.h</code>; on every target, unlike
 <code>port/platform</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P0-28</td>
 <td><code>census_ratchet.py</code></td>
 <td>done</td>
@@ -3235,120 +3294,126 @@ done; path routines next</td>
 <td></td>
 </tr>
 <tr class="odd">
+<td>P1-08b</td>
+<td>Shim: masks, paths, timespan, encoding, env</td>
+<td>done</td>
+<td>the census long tail</td>
+</tr>
+<tr class="even">
 <td>P1-06</td>
 <td>Shim: streams</td>
 <td>done</td>
 <td><code>TStream</code>/<code>THandleStream</code>/<code>TFileStream</code>/<code>TMemoryStream</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-06b</td>
 <td>Shim: INI/registry storage</td>
 <td>done</td>
 <td>INI parses real-world files; registry real on Windows</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-06c</td>
 <td>Shim: <code>DynamicArray</code> + file API</td>
 <td>done</td>
 <td>sharing semantics tested</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-06d</td>
 <td>Select INI backend on Linux</td>
 <td>todo</td>
 <td>frontend decision</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-07</td>
 <td><code>port/platform</code> Win32 subset</td>
 <td>done</td>
 <td>types, FILETIME/SYSTEMTIME, errors, winsock names</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-07b</td>
 <td><code>port/platform</code> Win32 file/handle functions</td>
 <td>todo</td>
 <td>as the census asks</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-08</td>
 <td>Socket-event emulation</td>
 <td>todo</td>
 <td>R6</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-09</td>
 <td>PuTTY unix backend re-import</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-10</td>
 <td>PuTTY delta reconciliation</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-11</td>
 <td>FileZilla MFC subset replacement</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-12</td>
 <td>FileZilla epoll rewrite</td>
 <td>todo</td>
 <td><strong>R2</strong> — budget generously</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-13</td>
 <td>System libs</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-14</td>
 <td>Drop <code>puttyvs</code></td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-15</td>
 <td>Console IPC → stdio</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-16</td>
 <td>Headless <code>Interface.h</code> frontend</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-17</td>
 <td>First SFTP session on Linux</td>
 <td>todo</td>
 <td>long tail expected</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-18</td>
 <td>Windows cross-build + Wine</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-19</td>
 <td>Golden suite green, both platforms</td>
 <td>todo</td>
 <td><strong>P1 gate</strong></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-20</td>
 <td>.NET assembly drives Linux CLI</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-21</td>
 <td><code>#ifdef</code> out Windows-only subsystems</td>
 <td>todo</td>

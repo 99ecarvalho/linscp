@@ -53,6 +53,17 @@ def parse_body(body):
 # the same way the original was split: "TClosure<RET" closes the first line and
 # the final ";" becomes ">;", because TClosure<RET(ARGS)> is exactly
 # "TClosure<RET" + "(ARGS)" + ">".
+# An inline closure *parameter*, as opposed to a typedef:
+#   void __fastcall (__closure *f)(TLogLineType Type, const UnicodeString & Line)
+# becomes
+#   TClosure<void(TLogLineType Type, const UnicodeString & Line)> f
+# Only two of these exist in core, both in SessionInfo, but they have to be
+# handled: the declaration and the definition must agree or nothing links.
+CLOSURE_PARAM_RE = re.compile(
+    r'(?P<ret>[A-Za-z_][\w:*&<>\s]*?)\s*(?:__fastcall\s*)?'
+    r'\(\s*__closure\s*\*\s*(?P<name>\w+)\s*\)\s*'
+    r'\((?P<args>[^()]*)\)')
+
 CLOSURE_RE = re.compile(
     r'^(?P<indent>\s*)typedef\s+(?P<ret>.+?)\s*'
     r'\(\s*__closure\s*\*\s*(?P<name>\w+)\s*\)'
@@ -123,10 +134,20 @@ class Transformer:
     def transform_closures(self, path, lines):
         """Rewrite __closure typedefs in place, preserving the line count."""
         for i, line in enumerate(lines):
-            if '__closure' not in line or 'typedef' not in line:
+            if '__closure' not in line:
                 continue
             m = CLOSURE_RE.match(line)
             if not m:
+                # Not a typedef: try the inline-parameter form.
+                pm = CLOSURE_PARAM_RE.search(line)
+                if pm:
+                    ret = pm.group('ret').replace('__fastcall', '').strip()
+                    replacement = (f"TClosure<{ret}({pm.group('args')})> "
+                                   f"{pm.group('name')}")
+                    lines[i] = (line[:pm.start()] + replacement +
+                                line[pm.end():])
+                    self.stats['closure_param'] += 1
+                    continue
                 self.stats['closure_unmatched'] += 1
                 self.unhandled.append((path, i + 1, line.strip()[:90]))
                 continue

@@ -44,6 +44,7 @@
 #include "vcl_resources.h"
 #include "vcl_inifiles.h"
 #include "vcl_registry.h"
+#include "vcl_misc.h"
 
 // Embarcadero calling-convention and closure keywords. __fastcall is a pure
 // calling convention and means nothing to us on x86-64; __closure becomes a
