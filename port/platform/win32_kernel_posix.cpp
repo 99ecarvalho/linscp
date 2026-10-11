@@ -110,6 +110,15 @@ std::shared_ptr<linscp::TKernelObject> linscp::FindKernelObject(HANDLE Handle)
   return Find<TKernelObject>(Handle);
 }
 
+void linscp::ChangeKernelObject(const std::function<void()> & Change)
+{
+  {
+    std::lock_guard<std::mutex> Lock(GKernelMutex);
+    Change();
+  }
+  GKernelChanged.notify_all();
+}
+
 namespace {
 
 void * ThreadEntry(void * Arg) noexcept

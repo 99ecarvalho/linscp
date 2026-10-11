@@ -28,6 +28,8 @@ extern "C" {
 // in characters, terminator included, and on success becomes the length.
 // Other formats fail with ERROR_NONE_MAPPED.
 BOOLEAN GetUserNameEx(EXTENDED_NAME_FORMAT Format, LPWSTR Name, ULONG * Size);
+// The narrow form, NameSamCompatible only, as the wide one.
+BOOLEAN GetUserNameExA(EXTENDED_NAME_FORMAT Format, LPSTR Name, ULONG * Size);
 #ifdef __cplusplus
 }
 // PULONG is unsigned long on Windows (32 bits), which core passes; 64 bits

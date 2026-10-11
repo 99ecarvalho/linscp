@@ -24,7 +24,8 @@ def main(objdump, archive, obj, function):
     out = subprocess.run([objdump, '-d', '--no-show-raw-insn', archive],
                          capture_output=True, text=True, check=True).stdout
     # Sections per member: find the member, then the function's block in it.
-    member = out.split(f'{obj}:', 1)
+    # GNU objdump heads one "member:", llvm-objdump "archive(member):".
+    member = re.split(rf'(?:^|\(){re.escape(obj)}\)?:', out, maxsplit=1, flags=re.M)
     if len(member) < 2:
         sys.exit(f'{obj} not found in {archive}')
     body = re.search(rf'<{re.escape(function)}>:\n(.*?)(?:\n\n|\Z)', member[1], re.S)

@@ -138,17 +138,52 @@ def make_defines(path):
     return seen
 
 
+def apply_rules(units, rules_path):
+    """A platform's departures from upstream's unit list (port/putty/linux/
+    units.txt): `drop <unit> reason` removes a unit, `replace <unit> <ours>
+    reason` substitutes one of ours, given as an absolute path. A rule naming
+    a unit upstream no longer lists is an error, so an upstream change cannot
+    leave a stale rule silently doing nothing."""
+    here = os.path.dirname(os.path.abspath(rules_path))
+    out = list(units)
+    for n, line in enumerate(open(rules_path, encoding='utf-8'), 1):
+        line = line.split('#', 1)[0].strip()
+        if not line:
+            continue
+        parts = line.split()
+        if parts[0] == 'drop' and len(parts) >= 2:
+            target, ours = parts[1], None
+        elif parts[0] == 'replace' and len(parts) >= 3:
+            target, ours = parts[1], os.path.join(here, parts[2])
+        else:
+            sys.exit(f'{rules_path}:{n}: expected "drop <unit>" or "replace <unit> <ours>"')
+        if target not in out:
+            sys.exit(f'{rules_path}:{n}: {target} is not in the upstream unit list')
+        if ours is not None and not os.path.isfile(ours):
+            sys.exit(f'{rules_path}:{n}: {ours} does not exist')
+        i = out.index(target)
+        if ours is None:
+            del out[i]
+        else:
+            out[i] = ours
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--project', default=CBPROJ, help='a .cbproj under the submodule')
     ap.add_argument('--separator', default='\n')
     ap.add_argument('--defines', action='store_true',
                     help='a make file\'s preprocessor defines instead of its units')
+    ap.add_argument('--rules', help='a platform\'s drop/replace rules to apply')
     a = ap.parse_args()
     if a.defines:
         print(a.separator.join(make_defines(a.project)))
         return 0
-    print(a.separator.join(project_units(a.project)))
+    units = project_units(a.project)
+    if a.rules:
+        units = apply_rules(units, a.rules)
+    print(a.separator.join(units))
     return 0
 
 

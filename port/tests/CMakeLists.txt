@@ -133,12 +133,16 @@ if(WIN32)
       DEPENDS sftp_session_build SKIP_RETURN_CODE 77 TIMEOUT 180)
   endforeach()
 
-  # PuTTY's crypto primitives against published vectors.
-  add_executable(test_putty_crypto EXCLUDE_FROM_ALL test_putty_crypto.c)
+endif()
+
+# PuTTY's crypto primitives against published vectors, on both targets: the
+# PuTTY libraries alone, with a stub for the one frontend function they need.
+if(TARGET linscp-putty)
+  add_executable(test_putty_crypto EXCLUDE_FROM_ALL test_putty_crypto.c test_putty_crypto_stubs.c)
   target_include_directories(test_putty_crypto PRIVATE
     $<TARGET_PROPERTY:linscp-putty,INCLUDE_DIRECTORIES>)
   linscp_upstream_defines(test_putty_crypto PRIVATE Putty.cbproj)
-  target_link_libraries(test_putty_crypto PRIVATE linscp-runtime)
+  target_link_libraries(test_putty_crypto PRIVATE linscp-putty linscp-puttyvs linscp-shim)
   set_target_properties(test_putty_crypto PROPERTIES LINKER_LANGUAGE CXX)
   add_test(NAME putty_crypto_build
     COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_putty_crypto)
@@ -203,12 +207,16 @@ if(TARGET linscp-putty)
             "${LINSCP_TARGET_NM}" "$<TARGET_FILE:linscp-core>" "$<TARGET_FILE:linscp-putty>"
             "${CMAKE_SOURCE_DIR}/port/putty/overrides.txt")
   set_tests_properties(putty_overrides PROPERTIES DEPENDS putty_overrides_build)
-  find_program(LINSCP_TARGET_OBJDUMP NAMES "${LINSCP_TARGET_TRIPLE}-objdump" REQUIRED)
+  if(WIN32)
+    find_program(LINSCP_TARGET_OBJDUMP NAMES "${LINSCP_TARGET_TRIPLE}-objdump" REQUIRED)
+  else()
+    find_program(LINSCP_TARGET_OBJDUMP NAMES objdump llvm-objdump REQUIRED)
+  endif()
   add_test(NAME aes_ni_guard_build
     COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target linscp-puttyvs)
   add_test(NAME aes_ni_guard
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/check_isa_free.py"
-            "${LINSCP_TARGET_OBJDUMP}" "$<TARGET_FILE:linscp-puttyvs>" aes-ni.c.obj aes_ni_available)
+            "${LINSCP_TARGET_OBJDUMP}" "$<TARGET_FILE:linscp-puttyvs>" "aes-ni.c${CMAKE_C_OUTPUT_EXTENSION}" aes_ni_available)
   set_tests_properties(aes_ni_guard PROPERTIES DEPENDS aes_ni_guard_build)
 endif()
 add_test(NAME tryfinally_inline

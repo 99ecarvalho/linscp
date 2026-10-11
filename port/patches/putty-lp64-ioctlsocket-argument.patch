@@ -1,0 +1,20 @@
+Declare the SIOCATMARK result as ULONG, the type p_ioctlsocket takes.
+
+network.c declares ioctlsocket as taking ULONG * (its DECL_WINDOWS_FUNCTION)
+but passes a u_long. Both are 32 bits on Windows, so the two agree there.
+On an LP64 platform u_long is 64 bits and ULONG 32, so the pointer types
+differ and the callee would write half the variable. ULONG is what the
+declaration says, and is the same type on Windows. Line counts are
+unchanged.
+
+--- a/source/putty/windows/network.c	2026-10-11 18:40:03.028383533 -0300
++++ b/source/putty/windows/network.c	2026-10-11 18:40:03.032031213 -0300
+@@ -1779,7 +1779,7 @@
+          * (data prior to urgent).
+          */
+         if (s->oobinline) {
+-            u_long atmark_from_ioctl = 1;
++            ULONG atmark_from_ioctl = 1;
+             p_ioctlsocket(s->s, SIOCATMARK, &atmark_from_ioctl);
+             /*
+              * Avoid checking the return value from ioctlsocket(),

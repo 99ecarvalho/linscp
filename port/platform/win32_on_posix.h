@@ -22,9 +22,11 @@
 // C and C++ alike: WinSCP's PuTTY, which is C, includes this through
 // <windows.h> as core does. The API has C linkage so both reach the same
 // definitions; the few C++-only helpers are fenced off with __cplusplus.
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <pthread.h>
+#include <strings.h>
 #include <sys/stat.h>
 #ifdef __cplusplus
   #include <cstddef>
@@ -38,6 +40,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
 
 #ifdef __cplusplus
   #define LINSCP_NORETURN [[noreturn]]
@@ -96,6 +99,8 @@ typedef BYTE * LPBYTE;
 typedef DWORD * LPDWORD;
 typedef BOOL * LPBOOL;
 typedef DWORD * PDWORD;
+typedef ULONG * PULONG;
+typedef USHORT * PUSHORT;
 typedef uint32_t UINT32;
 typedef int64_t INT64;
 typedef uint64_t UINT64;
@@ -232,7 +237,9 @@ typedef struct _WIN32_FIND_DATAW
   wchar_t cFileName[MAX_PATH];
   wchar_t cAlternateFileName[14];
 } WIN32_FIND_DATAW;
+#if defined(__cplusplus) || defined(UNICODE)
 typedef WIN32_FIND_DATAW WIN32_FIND_DATA;
+#endif
 
 typedef struct _SYSTEMTIME
 {
@@ -873,6 +880,271 @@ const linscp_VersionInfoData * linscp_OwnVersionInfo(void);
 DWORD GetFileVersionInfoSize(LPCWSTR FileName, LPDWORD Handle);
 BOOL GetFileVersionInfo(LPCWSTR FileName, DWORD Handle, DWORD Size, LPVOID Data);
 BOOL VerQueryValue(LPCVOID Block, LPCWSTR SubBlock, LPVOID * Buffer, UINT * Length);
+
+// --- PuTTY's Windows platform layer --------------------------------------------
+// What WinSCP's PuTTY, compiled with its Windows platform layer on POSIX (see
+// the decisions table), calls beyond core's needs. PuTTY is C and built
+// without UNICODE, so it calls the narrow (A) forms; see the end of this file.
+
+#define FAR
+#define NEAR
+#define CONST const
+#define MAKEWORD(a, b) ((WORD)(((BYTE)(((DWORD_PTR)(a)) & 0xff)) | ((WORD)((BYTE)(((DWORD_PTR)(b)) & 0xff))) << 8))
+#define LOBYTE(w) ((BYTE)(((DWORD_PTR)(w)) & 0xff))
+#define HIBYTE(w) ((BYTE)((((DWORD_PTR)(w)) >> 8) & 0xff))
+#define LANG_NEUTRAL 0x00
+#define SUBLANG_DEFAULT 0x01
+#define MAKELANGID(p, s) ((((WORD)(s)) << 10) | (WORD)(p))
+
+// The CRT's case-insensitive comparisons, under their POSIX names.
+#define _stricmp strcasecmp
+#define _strnicmp strncasecmp
+// MSVC's: -1 when the output does not fit, where C99's returns the length
+// needed. Code written for Windows tests for the former.
+int _vsnprintf(char * Buffer, size_t Count, const char * Format, va_list Args);
+
+typedef union _LARGE_INTEGER
+{
+  struct { DWORD LowPart; LONG HighPart; };
+  struct { DWORD LowPart; LONG HighPart; } u;
+  LONGLONG QuadPart;
+} LARGE_INTEGER;
+// A monotonic clock in nanoseconds.
+BOOL QueryPerformanceCounter(LARGE_INTEGER * Count);
+BOOL QueryPerformanceFrequency(LARGE_INTEGER * Frequency);
+
+typedef struct _MEMORYSTATUS
+{
+  DWORD dwLength;
+  DWORD dwMemoryLoad;
+  SIZE_T dwTotalPhys;
+  SIZE_T dwAvailPhys;
+  SIZE_T dwTotalPageFile;
+  SIZE_T dwAvailPageFile;
+  SIZE_T dwTotalVirtual;
+  SIZE_T dwAvailVirtual;
+} MEMORYSTATUS;
+// From sysinfo(2).
+void GlobalMemoryStatus(MEMORYSTATUS * Status);
+// The thread's pseudo-handle, as on Windows: (HANDLE)-2.
+HANDLE GetCurrentThread(void);
+// From getrusage(2): this process, or with GetCurrentThread() this thread.
+BOOL GetProcessTimes(HANDLE Process, FILETIME * Creation, FILETIME * Exit, FILETIME * Kernel, FILETIME * User);
+BOOL GetThreadTimes(HANDLE Thread, FILETIME * Creation, FILETIME * Exit, FILETIME * Kernel, FILETIME * User);
+
+// Window and input state, which PuTTY's noise.c mixes into its entropy pool
+// as a light extra source. There are no windows: nothing to report.
+#define QS_ALLEVENTS 0x04BF
+// Font character sets, for the default terminal font PuTTY's settings
+// carry (WinSCP shows no terminal).
+#define ANSI_CHARSET     0
+#define DEFAULT_CHARSET  1
+#define OEM_CHARSET    255
+HWND GetForegroundWindow(void);
+HWND GetCapture(void);
+HWND GetClipboardOwner(void);
+DWORD GetQueueStatus(UINT Flags);
+BOOL GetCursorPos(POINT * Point);
+
+// Code pages. The ANSI and OEM code pages are Latin-1, as the shim takes the
+// ANSI one to be; conversion handles CP_UTF8 and Latin-1 (28591, and CP_ACP /
+// CP_OEMCP as such), and fails with ERROR_INVALID_PARAMETER for any other.
+#define MB_PRECOMPOSED        0x00000001
+#define MB_USEGLYPHCHARS      0x00000004
+#define MB_ERR_INVALID_CHARS  0x00000008
+#define WC_NO_BEST_FIT_CHARS  0x00000400
+UINT GetACP(void);
+UINT GetOEMCP(void);
+BOOL IsDBCSLeadByteEx(UINT CodePage, BYTE Byte);
+int MultiByteToWideChar(UINT CodePage, DWORD Flags, LPCSTR Src, int SrcLength, LPWSTR Dst, int DstLength);
+int WideCharToMultiByte(UINT CodePage, DWORD Flags, LPCWSTR Src, int SrcLength, LPSTR Dst, int DstLength,
+  LPCSTR DefaultChar, BOOL * UsedDefaultChar);
+
+// System messages for Win32 and Winsock error codes, in English, as Windows'
+// own en-US text. Codes without a message fail, as Windows does.
+#define FORMAT_MESSAGE_ALLOCATE_BUFFER 0x00000100
+#define FORMAT_MESSAGE_IGNORE_INSERTS  0x00000200
+#define FORMAT_MESSAGE_FROM_STRING     0x00000400
+#define FORMAT_MESSAGE_FROM_HMODULE    0x00000800
+#define FORMAT_MESSAGE_FROM_SYSTEM     0x00001000
+#define FORMAT_MESSAGE_ARGUMENT_ARRAY  0x00002000
+#define FORMAT_MESSAGE_MAX_WIDTH_MASK  0x000000FF
+DWORD FormatMessageA(DWORD Flags, LPCVOID Source, DWORD MessageId, DWORD LanguageId, LPSTR Buffer, DWORD Size,
+  va_list * Arguments);
+DWORD FormatMessageW(DWORD Flags, LPCVOID Source, DWORD MessageId, DWORD LanguageId, LPWSTR Buffer, DWORD Size,
+  va_list * Arguments);
+// The text alone, for the shim's SysErrorMessage; null for an unknown code.
+const char * linscp_SystemMessage(DWORD Code);
+
+DWORD GetEnvironmentVariableA(LPCSTR Name, LPSTR Buffer, DWORD Size);
+// Where load_system32_dll looks; LoadLibrary only goes by the file's name.
+UINT GetSystemDirectoryA(LPSTR Buffer, UINT Size);
+UINT GetWindowsDirectoryA(LPSTR Buffer, UINT Size);
+HMODULE LoadLibraryA(LPCSTR FileName);
+HMODULE GetModuleHandleA(LPCSTR ModuleName);
+HRESULT SHGetFolderPathA(HWND Owner, int Folder, HANDLE Token, DWORD Flags, LPSTR Path);
+
+// Files, the narrow forms and the rest of PuTTY's use.
+#define ERROR_BROKEN_PIPE        109
+#define ERROR_IO_PENDING         997
+#define ERROR_HANDLE_EOF          38
+struct _OVERLAPPED
+{
+  ULONG_PTR Internal;
+  ULONG_PTR InternalHigh;
+  union { struct { DWORD Offset; DWORD OffsetHigh; } s; PVOID Pointer; } u;
+  HANDLE hEvent;
+};
+// Blocking reads and writes on a descriptor; an OVERLAPPED is accepted and
+// completed synchronously, so GetOverlappedResult reports what was done.
+BOOL ReadFile(HANDLE File, LPVOID Buffer, DWORD Count, LPDWORD Read, LPOVERLAPPED Overlapped);
+BOOL WriteFile(HANDLE File, LPCVOID Buffer, DWORD Count, LPDWORD Written, LPOVERLAPPED Overlapped);
+BOOL GetOverlappedResult(HANDLE File, LPOVERLAPPED Overlapped, LPDWORD Transferred, BOOL Wait);
+HANDLE CreateFileA(LPCSTR FileName, DWORD DesiredAccess, DWORD ShareMode,
+  LPSECURITY_ATTRIBUTES SecurityAttributes, DWORD CreationDisposition, DWORD FlagsAndAttributes,
+  HANDLE TemplateFile);
+DWORD GetFileAttributesA(LPCSTR FileName);
+BOOL DeleteFileA(LPCSTR FileName);
+typedef enum _GET_FILEEX_INFO_LEVELS { GetFileExInfoStandard, GetFileExMaxInfoLevel } GET_FILEEX_INFO_LEVELS;
+typedef struct _WIN32_FILE_ATTRIBUTE_DATA
+{
+  DWORD dwFileAttributes;
+  FILETIME ftCreationTime;
+  FILETIME ftLastAccessTime;
+  FILETIME ftLastWriteTime;
+  DWORD nFileSizeHigh;
+  DWORD nFileSizeLow;
+} WIN32_FILE_ATTRIBUTE_DATA;
+BOOL GetFileAttributesExW(LPCWSTR FileName, GET_FILEEX_INFO_LEVELS Level, LPVOID Info);
+BOOL GetFileAttributesExA(LPCSTR FileName, GET_FILEEX_INFO_LEVELS Level, LPVOID Info);
+typedef struct _WIN32_FIND_DATAA
+{
+  DWORD dwFileAttributes;
+  FILETIME ftCreationTime;
+  FILETIME ftLastAccessTime;
+  FILETIME ftLastWriteTime;
+  DWORD nFileSizeHigh;
+  DWORD nFileSizeLow;
+  DWORD dwReserved0;
+  DWORD dwReserved1;
+  CHAR cFileName[MAX_PATH];
+  CHAR cAlternateFileName[14];
+} WIN32_FIND_DATAA;
+// Directory enumeration: the final component of the name may hold * and ?
+// wildcards, matched as Windows matches them ("*.*" is everything).
+HANDLE FindFirstFileA(LPCSTR FileName, WIN32_FIND_DATAA * Data);
+BOOL FindNextFileA(HANDLE Find, WIN32_FIND_DATAA * Data);
+HANDLE FindFirstFileW(LPCWSTR FileName, WIN32_FIND_DATAW * Data);
+BOOL FindNextFileW(HANDLE Find, WIN32_FIND_DATAW * Data);
+BOOL FindClose(HANDLE Find);
+
+// Processes and pipes, for PuTTY's local proxy commands. A command line runs
+// under /bin/sh -c, the POSIX counterpart of handing a command line to
+// Windows; handles marked inheritable and named in STARTF_USESTDHANDLES
+// become the child's standard descriptors, and no others are inherited.
+#define HANDLE_FLAG_INHERIT            0x00000001
+#define HANDLE_FLAG_PROTECT_FROM_CLOSE 0x00000002
+#define STARTF_USESHOWWINDOW   0x00000001
+#define STARTF_USESTDHANDLES   0x00000100
+#define CREATE_NO_WINDOW       0x08000000
+#define NORMAL_PRIORITY_CLASS  0x00000020
+#define DETACHED_PROCESS       0x00000008
+struct _SECURITY_ATTRIBUTES
+{
+  DWORD nLength;
+  LPVOID lpSecurityDescriptor;
+  BOOL bInheritHandle;
+};
+typedef struct _STARTUPINFOA
+{
+  DWORD cb;
+  LPSTR lpReserved;
+  LPSTR lpDesktop;
+  LPSTR lpTitle;
+  DWORD dwX, dwY, dwXSize, dwYSize, dwXCountChars, dwYCountChars, dwFillAttribute;
+  DWORD dwFlags;
+  WORD wShowWindow;
+  WORD cbReserved2;
+  LPBYTE lpReserved2;
+  HANDLE hStdInput;
+  HANDLE hStdOutput;
+  HANDLE hStdError;
+} STARTUPINFOA;
+typedef struct _PROCESS_INFORMATION
+{
+  HANDLE hProcess;
+  HANDLE hThread;
+  DWORD dwProcessId;
+  DWORD dwThreadId;
+} PROCESS_INFORMATION;
+BOOL CreatePipe(HANDLE * Read, HANDLE * Write, LPSECURITY_ATTRIBUTES Attributes, DWORD Size);
+BOOL SetHandleInformation(HANDLE Object, DWORD Mask, DWORD Flags);
+// hProcess is signalled when the child exits (waitable, and its exit code
+// readable with GetExitCodeProcess); hThread is a handle to the same.
+BOOL CreateProcessA(LPCSTR Application, LPSTR CommandLine, LPSECURITY_ATTRIBUTES ProcessAttributes,
+  LPSECURITY_ATTRIBUTES ThreadAttributes, BOOL InheritHandles, DWORD CreationFlags, LPVOID Environment,
+  LPCSTR CurrentDirectory, STARTUPINFOA * StartupInfo, PROCESS_INFORMATION * ProcessInformation);
+BOOL GetExitCodeProcess(HANDLE Process, LPDWORD ExitCode);
+// No named pipes exist, so no handle is one's server end: fails.
+BOOL GetNamedPipeClientProcessId(HANDLE Pipe, PULONG ClientProcessId);
+// The plain user name, from the password database.
+BOOL GetUserNameA(LPSTR Buffer, LPDWORD Size);
+BOOL TerminateProcess(HANDLE Process, UINT ExitCode);
+
+// The registry's narrow forms: as with the wide ones, no key ever opens.
+#define REG_OPTION_NON_VOLATILE 0x00000000
+#define REG_CREATED_NEW_KEY     0x00000001
+LONG RegOpenKeyExA(HKEY Key, LPCSTR SubKey, DWORD Options, REGSAM Desired, HKEY * Result);
+LONG RegCreateKeyExA(HKEY Key, LPCSTR SubKey, DWORD Reserved, LPSTR Class, DWORD Options, REGSAM Desired,
+  LPSECURITY_ATTRIBUTES Security, HKEY * Result, LPDWORD Disposition);
+LONG RegCloseKey(HKEY Key);
+LONG RegEnumKeyA(HKEY Key, DWORD Index, LPSTR Name, DWORD NameSize);
+LONG RegQueryValueExA(HKEY Key, LPCSTR ValueName, LPDWORD Reserved, LPDWORD Type, LPBYTE Data, LPDWORD DataSize);
+LONG RegSetValueExA(HKEY Key, LPCSTR ValueName, DWORD Reserved, DWORD Type, const BYTE * Data, DWORD DataSize);
+LONG RegDeleteKeyA(HKEY Key, LPCSTR SubKey);
+LONG RegDeleteValueA(HKEY Key, LPCSTR ValueName);
+
+// CryptoAPI's random numbers, which PuTTY seeds its generator from: the
+// kernel's (getrandom), through a provider that needs no key container.
+typedef ULONG_PTR HCRYPTPROV;
+#define PROV_RSA_FULL        1
+#define CRYPT_VERIFYCONTEXT  0xF0000000
+BOOL CryptAcquireContextA(HCRYPTPROV * Provider, LPCSTR Container, LPCSTR ProviderName, DWORD Type, DWORD Flags);
+BOOL CryptGenRandom(HCRYPTPROV Provider, DWORD Length, BYTE * Buffer);
+BOOL CryptReleaseContext(HCRYPTPROV Provider, DWORD Flags);
+
+// In C built without UNICODE -- PuTTY -- the bare names are the narrow
+// forms, as <windows.h> maps them. C++ (core, built with UNICODE) keeps the
+// wide functions under the bare names.
+#if !defined(__cplusplus) && !defined(UNICODE)
+  #define LoadLibrary LoadLibraryA
+  #define GetModuleHandle GetModuleHandleA
+  #define CreateFile CreateFileA
+  #define GetFileAttributes GetFileAttributesA
+  #define GetFileAttributesEx GetFileAttributesExA
+  #define DeleteFile DeleteFileA
+  #define FindFirstFile FindFirstFileA
+  #define FindNextFile FindNextFileA
+  #define WIN32_FIND_DATA WIN32_FIND_DATAA
+  #define CreateProcess CreateProcessA
+  #define STARTUPINFO STARTUPINFOA
+  #define GetEnvironmentVariable GetEnvironmentVariableA
+  #define GetUserName GetUserNameA
+  #define FormatMessage FormatMessageA
+  #define GetSystemDirectory GetSystemDirectoryA
+  #define GetWindowsDirectory GetWindowsDirectoryA
+  #define SHGetFolderPath SHGetFolderPathA
+  #define RegOpenKeyEx RegOpenKeyExA
+  #define RegCreateKeyEx RegCreateKeyExA
+  #define RegEnumKey RegEnumKeyA
+  #define RegQueryValueEx RegQueryValueExA
+  #define RegSetValueEx RegSetValueExA
+  #define RegDeleteKey RegDeleteKeyA
+  #define RegDeleteValue RegDeleteValueA
+  #define CryptAcquireContext CryptAcquireContextA
+#else
+  #define STARTUPINFO STARTUPINFOA
+#endif
 
 #ifdef __cplusplus
 }  // extern "C"

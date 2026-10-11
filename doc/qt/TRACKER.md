@@ -35,11 +35,16 @@ the behaviour is observable there.
 On Windows, core links and runs real SFTP sessions under Wine, as negotiated
 and pinned to AES-CTR, AES-GCM and ChaCha20-Poly1305.
 
-1. **P1-09**: WinSCP's PuTTY on Linux -- its headers compile; its Windows
-   platform units are next, over the emulation, with Linux implementations
-   for the agent (`SSH_AUTH_SOCK`), GSSAPI, entropy and proxy commands.
-2. **P1-08**: `WSAEventSelect`/`WSAEnumNetworkEvents` on POSIX, which core's
-   SSH event loop and PuTTY's network layer are written against.
+**WinSCP's PuTTY builds on Linux** too: all 176 units of `Putty.cbproj`,
+its Windows platform layer included, over the POSIX layer, with
+`port/putty/linux/units.txt` replacing the agent (`SSH_AUTH_SOCK`) and
+GSSAPI (the system's Kerberos library) and dropping the four units only
+Pageant's named pipe used. The crypto known-answer tests pass on Linux.
+
+1. **P1-08**: Winsock on POSIX -- a `ws2_32` module whose `GetProcAddress`
+   gives `network.c` Winsock-signature functions, and `WSAEventSelect` /
+   `WSAEnumNetworkEvents` with Winsock's edge semantics, which core's SSH
+   event loop and PuTTY's network layer are written against.
 3. **P1-13**: neon and libs3 on Linux; then core links and P1-17's first
    Linux session follows.
 
@@ -141,6 +146,8 @@ and pinned to AES-CTR, AES-GCM and ChaCha20-Poly1305.
 | 2026-10-10 | `port/compat` is separate from `port/platform` | `help.h` is missing from upstream itself rather than being a platform difference, so it is needed on every target |
 | 2026-10-10 | The ratchet records whether a unit aborted | An aborted parse reports a floor. Treating that as a distinct state stops a new abort from reading as sudden progress |
 | 2026-10-11 | On Linux, WinSCP's PuTTY is compiled with its Windows platform layer, over the Win32-on-POSIX layer; Linux-specific services replace individual units (refines P1-09) | Core is written against PuTTY's Windows platform API (`select_result`, `do_select`, `get_handle_wait_list`, `HandleWaitList`), and WinSCP's changes to that layer carry real behaviour (per-session `do_select`, connect timeouts, socket buffers, source address). Taking PuTTY's `unix/` layer instead would mean reimplementing both against core's model. Where Linux genuinely differs -- the agent (`SSH_AUTH_SOCK`), GSSAPI, entropy, proxy commands -- a unit is replaced by one implementing the same API, drawing on the pinned PuTTY 0.85 release's `unix/` code |
+| 2026-10-11 | On Linux PuTTY's narrow (`A`) Win32 names are distinct functions, and the bare names map to them in C without `UNICODE`; C++ keeps the wide bare names | PuTTY is C built without `UNICODE`, core C++ with it. In C a `char *` passed to a wide parameter is only a warning, so PuTTY on Linux is compiled with incompatible-pointer, int-conversion and implicit-declaration diagnostics as errors -- they found four such calls |
+| 2026-10-11 | A Linux unit list for PuTTY (`port/putty/linux/units.txt`): `replace` or `drop` per unit, everything else as `Putty.cbproj` lists it | The agent client and GSSAPI are Windows services with Linux counterparts; the named-pipe client, its ACLs and Pageant's pipe name serve only Pageant. A rule naming a unit upstream no longer lists is an error |
 | 2026-10-11 | The Win32-on-POSIX headers are C as well as C++, with C linkage | PuTTY is C and includes `<windows.h>` as core does |
 | 2026-10-11 | The WinSCP pin tracks `master`, not a release tag (user's decision; supersedes P0-02's "release tag, not `master`") | Upstream is porting itself to 64-bit on `master` and fixing the same bugs this port was finding -- five of the six reported were already fixed there. Following it inherits those fixes instead of duplicating them. A bump re-runs the transform, the patch series and closure-site discovery, all of which fail loudly where upstream moved |
 | 2026-10-11 | Static initialisation follows upstream's project order: executables link core's objects directly, in `ScpCore.cbproj` order, reversed for Windows | Core's globals depend on each other across units (`EscapedBom` in HierarchicalStorage.cpp is built from `Bom` in Common.cpp). C++Builder runs constructors in link order; mingw-w64 runs them in reverse link order and Linux in link order, and archive extraction gives no order at all |
@@ -256,6 +263,10 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | File share modes on POSIX | Accepted and ignored; a second opener is never refused with `ERROR_SHARING_VIOLATION` | POSIX has no mandatory locking. Core retries on that error (HierarchicalStorage.cpp), so never seeing it only removes a wait |
 | `FILE_FLAG_DELETE_ON_CLOSE` on POSIX | The name is unlinked at open, not at the last close | Either way nothing is left behind; core uses it only to probe that a directory is writable |
 | File creation time on POSIX | The birth time where the file system records one (`statx`), else the modification time; it cannot be set | POSIX has no settable creation time |
+| SSH agent on Linux | `$SSH_AUTH_SOCK`; Pageant's window-message protocol has no counterpart | Every Linux agent (ssh-agent, gpg-agent, KeePassXC, ...) serves that socket |
+| GSSAPI on Linux | Library slot 0 is the system's Kerberos library (MIT `libgssapi_krb5.so.2`, else Heimdal); slot 1, SSPI, is never available | Core addresses three fixed slots and asserts there are three; their settings keywords are unchanged |
+| Narrow (`A`) Win32 file names on POSIX | Taken as UTF-8, the file system's convention | Windows takes them in the ANSI code page. PuTTY passes paths through unchanged, so UTF-8 in, UTF-8 out |
+| Proxy commands on POSIX | Run with `/bin/sh -c` | Windows hands the command line to `CreateProcess` |
 | `SuspendThread` on POSIX | Not declared | A running pthread cannot be suspended. A missing declaration fails at compile time; a stub would fail silently. `CREATE_SUSPENDED` + `ResumeThread` is supported |
 
 ## Open questions
@@ -291,6 +302,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | `std::wstring` is unusable on POSIX under `-fshort-wchar` | Its traits call glibc's 4-byte `wcslen`: `wstring(L"/tmp/") + L"x"` came out as "/tmp/" | 2026-10-11 |
 | mingw-w64 runs global constructors in reverse link order, Linux in link order | Three one-line units linked a, b, c print "c b a" under Wine and "a b c" natively | 2026-10-11 |
 | WinSCP `master`'s OpenSSL 3.5.9 differs from the release only by C++Builder workarounds (5 files) | `openssl_tree.py --check` | 2026-10-11 |
+| WinSCP `master`'s `aes-ni.c` pops its clang attribute pragma under `_WIN64` but pushes it under `__clang__`, and picks `_mm_setr_epi8` only under `_WIN64` | Fails to compile with clang for any other target, and would bring back the AES-NI SDCTR bug; fixed by `putty-aes-ni-non-win64-clang.patch` | 2026-10-11 |
 | Upstream FileZilla truncates a pointer on x86-64 | `CAsyncSocketEx` stores `this` with `SetWindowLongPtr(hWnd, GWL_USERDATA, (LONG)this)`; fixed by `filezilla-64bit-window-userdata.patch` | 2026-10-11 |
 | lld reports undefined references in every object it pulls in, even from functions `--gc-sections` would drop | Local test: an unreferenced function calling an undefined symbol fails the link with and without `-ffunction-sections` | 2026-10-11 |
 | Upstream WinSCP is built for 32-bit Windows only | `PuTTYVS.vcxproj` has only `Win32` configurations, and PuTTY's option defaults cast string addresses to `int`, which only fits in 32 bits | 2026-10-11 |
@@ -461,7 +473,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-07 | `port/platform` Win32 subset | done | types, FILETIME/SYSTEMTIME, errors, winsock names |
 | P1-07b | `port/platform` Win32 file/handle functions | done | every Win32 call core makes: files, time zones (real transition rules), modules, processes (/proc), paths, string order, environment, XDG folders, MIME and type names, reparse points, trash, registry entry points, memory regions, version resources, user name, certificate chains (OpenSSL, system trust store); tested against real Win32 under Wine where observable. Core compiles on Linux |
 | P1-08 | Socket-event emulation | todo | R6 |
-| P1-09 | PuTTY unix backend re-import | todo | |
+| P1-09 | PuTTY unix backend re-import | wip | WinSCP's PuTTY builds on Linux with its Windows layer over the emulation; agent and GSSAPI replaced (`port/putty/linux`). Runtime networking is P1-08's |
 | P1-10 | PuTTY delta reconciliation | todo | |
 | P1-11 | FileZilla MFC subset replacement | wip | FileZilla and the MFC subset build and link for Windows from the submodule (three patches); Linux replacement next |
 | P1-12 | FileZilla epoll rewrite | todo | **R2** — budget generously |

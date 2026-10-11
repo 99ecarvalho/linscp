@@ -1,0 +1,13 @@
+# How WinSCP's PuTTY is built on Linux, relative to Putty.cbproj's unit list.
+# Every unit is compiled as upstream lists it -- its Windows platform layer
+# included, over port/platform -- except these. See the decisions table.
+#
+#   replace <upstream unit>  <our unit, relative to port/putty/linux>  reason
+#   drop    <upstream unit>  reason
+#
+replace source/putty/windows/agent-client.c  agent-client.c  the agent is $SSH_AUTH_SOCK, not Pageant's named pipe
+replace source/putty/windows/gss.c           gss.c           GSSAPI from the system's Kerberos library, not SSPI or MIT's DLL
+drop    source/putty/windows/named-pipe-client.c        only Pageant's pipe used it
+drop    source/putty/windows/utils/security_p.c         named-pipe ACLs, only for Pageant's pipe
+drop    source/putty/windows/utils/cryptoapi.c          obfuscates Pageant's pipe name
+drop    source/putty/windows/utils/agent_named_pipe_name.c  Pageant's pipe name

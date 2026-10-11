@@ -2,15 +2,18 @@
 # and the patch series apply to it), as upstream's Putty.cbproj builds it: the
 # same units, the same include path, the same defines. C, as upstream's is.
 #
-# Windows only for now: the units include PuTTY's Windows platform layer.
-# Linux needs PuTTY's Unix one instead, which is P1-09.
+# On Linux too, with its Windows platform layer, over port/platform; the few
+# units that are Windows services rather than platform code are replaced or
+# dropped by port/putty/linux/units.txt (see the decisions table).
+set(_putty_rules)
 if(NOT WIN32)
-  return()
+  set(_putty_rules --rules "${CMAKE_CURRENT_SOURCE_DIR}/linux/units.txt")
+  set_property(DIRECTORY "${CMAKE_SOURCE_DIR}" APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
+               "${CMAKE_CURRENT_SOURCE_DIR}/linux/units.txt")
 endif()
-
 execute_process(
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/upstream_units.py"
-          --project "${LINSCP_UPSTREAM}/source/Putty.cbproj" --separator ";"
+          --project "${LINSCP_UPSTREAM}/source/Putty.cbproj" --separator ";" ${_putty_rules}
   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
   OUTPUT_VARIABLE LINSCP_PUTTY_UNITS
   RESULT_VARIABLE _units_rc
@@ -21,9 +24,13 @@ endif()
 
 set(LINSCP_PUTTY_SOURCES "")
 foreach(_unit IN LISTS LINSCP_PUTTY_UNITS)
-  list(APPEND LINSCP_PUTTY_SOURCES "${LINSCP_GEN}/${_unit}")
+  if(IS_ABSOLUTE "${_unit}")
+    list(APPEND LINSCP_PUTTY_SOURCES "${_unit}")    # a Linux replacement
+  else()
+    list(APPEND LINSCP_PUTTY_SOURCES "${LINSCP_GEN}/${_unit}")
+    set_source_files_properties("${LINSCP_GEN}/${_unit}" PROPERTIES GENERATED TRUE)
+  endif()
 endforeach()
-set_source_files_properties(${LINSCP_PUTTY_SOURCES} PROPERTIES GENERATED TRUE)
 
 add_library(linscp-putty STATIC EXCLUDE_FROM_ALL ${LINSCP_PUTTY_SOURCES})
 add_dependencies(linscp-putty transform)
@@ -37,6 +44,18 @@ target_include_directories(linscp-putty PRIVATE
 set_target_properties(linscp-putty PROPERTIES C_STANDARD 11 C_EXTENSIONS ON)
 # Upstream's code is compiled as it is; its warnings are not ours to fix.
 target_compile_options(linscp-putty PRIVATE -w)
+if(NOT WIN32)
+  target_include_directories(linscp-putty PRIVATE "${CMAKE_SOURCE_DIR}/port/platform")
+  # These diagnostics are errors on Linux, where they mean a mismatch with the
+  # POSIX layer -- a narrow string passed to a wide function, a 64-bit long
+  # where Win32 has 32 bits -- that would otherwise compile and misbehave.
+  # dupprintf.c names vsnprintf _vsnprintf under _WINDOWS, and handles C99's
+  # return convention explicitly.
+  target_compile_options(linscp-putty PRIVATE
+    -Werror=incompatible-pointer-types -Werror=int-conversion
+    -Werror=implicit-function-declaration -Werror=incompatible-function-pointer-types)
+  target_compile_definitions(linscp-putty PRIVATE _vsnprintf=vsnprintf)
+endif()
 
 # PuTTY's performance-critical crypto -- the AES and SHA-256 loops, AES-NI and
 # Argon2 -- which WinSCP compiles a second time with MSVC (libs/puttyvs),
@@ -77,8 +96,13 @@ set_source_files_properties("${LINSCP_GEN}/source/putty/crypto/aes-ni.c"
 # C++Builder's linker letting the first definition win; mark PuTTY's copies
 # weak in the archive so a standard linker reaches the same result. GNU objcopy
 # for the target: llvm-objcopy cannot weaken COFF symbols.
-find_program(LINSCP_TARGET_OBJCOPY NAMES "${LINSCP_TARGET_TRIPLE}-objcopy" REQUIRED)
-find_program(LINSCP_TARGET_NM NAMES "${LINSCP_TARGET_TRIPLE}-nm" REQUIRED)
+if(WIN32)
+  find_program(LINSCP_TARGET_OBJCOPY NAMES "${LINSCP_TARGET_TRIPLE}-objcopy" REQUIRED)
+  find_program(LINSCP_TARGET_NM NAMES "${LINSCP_TARGET_TRIPLE}-nm" REQUIRED)
+else()
+  find_program(LINSCP_TARGET_OBJCOPY NAMES llvm-objcopy objcopy REQUIRED)
+  find_program(LINSCP_TARGET_NM NAMES llvm-nm nm REQUIRED)
+endif()
 set(LINSCP_PUTTY_OVERRIDES "${CMAKE_CURRENT_SOURCE_DIR}/overrides.txt")
 set_property(DIRECTORY "${CMAKE_SOURCE_DIR}" APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
              "${LINSCP_PUTTY_OVERRIDES}")

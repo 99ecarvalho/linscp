@@ -640,33 +640,11 @@ UnicodeString SysErrorMessage(int ErrorCode)
     nullptr);
   return TrimSystemMessage(UnicodeString(Buffer, static_cast<int>(Len)));
 #else
-  // Windows' own English wording, for every code port/platform can produce.
-  struct TMessage { int Code; const wchar_t * Text; };
-  static const TMessage Messages[] = {
-    {ERROR_SUCCESS, L"The operation completed successfully."},
-    {ERROR_FILE_NOT_FOUND, L"The system cannot find the file specified."},
-    {ERROR_PATH_NOT_FOUND, L"The system cannot find the path specified."},
-    {ERROR_ACCESS_DENIED, L"Access is denied."},
-    {ERROR_INVALID_HANDLE, L"The handle is invalid."},
-    {ERROR_NOT_ENOUGH_MEMORY, L"Not enough memory resources are available to process this command."},
-    {ERROR_NO_MORE_FILES, L"There are no more files."},
-    {ERROR_SHARING_VIOLATION, L"The process cannot access the file because it is being used by another process."},
-    {ERROR_HANDLE_DISK_FULL, L"The disk is full."},
-    {ERROR_NOT_SUPPORTED, L"The request is not supported."},
-    {ERROR_FILE_EXISTS, L"The file exists."},
-    {ERROR_INVALID_PARAMETER, L"The parameter is incorrect."},
-    {ERROR_DISK_FULL, L"There is not enough space on the disk."},
-    {ERROR_ALREADY_EXISTS, L"Cannot create a file when that file already exists."},
-    {ERROR_MORE_DATA, L"More data is available."},
-    {ERROR_NO_MORE_ITEMS, L"No more data is available."},
-    {ERROR_CANCELLED, L"The operation was canceled by the user."},
-  };
-  for (const TMessage & M : Messages)
+  // Windows' own English wording, from the platform layer's table, which
+  // FormatMessage serves too.
+  if (const char * Text = linscp_SystemMessage(static_cast<DWORD>(ErrorCode)))
   {
-    if (M.Code == ErrorCode)
-    {
-      return TrimSystemMessage(UnicodeString(M.Text));
-    }
+    return TrimSystemMessage(UTF8ToString(Text));
   }
   return UnicodeString(L"Unknown error ") + IntToStr(static_cast<__int64>(ErrorCode));
 #endif

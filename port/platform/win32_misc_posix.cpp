@@ -1313,3 +1313,28 @@ DWORD_PTR SHGetFileInfo(LPCWSTR Path, DWORD FileAttributes, SHFILEINFOW * Info, 
   // SHGFI_SYSICONINDEX is asked for.
   return 1;
 }
+
+BOOLEAN GetUserNameExA(EXTENDED_NAME_FORMAT Format, LPSTR Name, ULONG * Size)
+{
+  if (Size == nullptr)
+  {
+    SetLastError(ERROR_INVALID_PARAMETER);
+    return 0;
+  }
+  wchar_t Wide[512];
+  ULONG WideSize = 512;
+  if (!GetUserNameEx(Format, Wide, &WideSize))
+  {
+    return 0;
+  }
+  const std::string N = linscp::WideToUtf8(Wide);
+  if ((Name == nullptr) || (*Size < N.size() + 1))
+  {
+    *Size = static_cast<ULONG>(N.size() + 1);
+    SetLastError(ERROR_MORE_DATA);
+    return 0;
+  }
+  std::memcpy(Name, N.c_str(), N.size() + 1);
+  *Size = static_cast<ULONG>(N.size());
+  return 1;
+}

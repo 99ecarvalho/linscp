@@ -125,6 +125,14 @@ typedef struct WSAData
 #define WSAECONNREFUSED         (WSABASEERR + 61)
 #define WSAEHOSTDOWN            (WSABASEERR + 64)
 #define WSAEHOSTUNREACH         (WSABASEERR + 65)
+#define WSAEPROTOTYPE           (WSABASEERR + 41)
+#define WSAENOPROTOOPT          (WSABASEERR + 42)
+#define WSAEPROTONOSUPPORT      (WSABASEERR + 43)
+#define WSAESOCKTNOSUPPORT      (WSABASEERR + 44)
+#define WSAEPFNOSUPPORT         (WSABASEERR + 46)
+#define WSAEAFNOSUPPORT         (WSABASEERR + 47)
+#define WSAEPROCLIM             (WSABASEERR + 67)
+#define WSAEDISCON              (WSABASEERR + 101)
 #define WSAHOST_NOT_FOUND       (WSABASEERR + 1001)
 #define WSATRY_AGAIN            (WSABASEERR + 1002)
 #define WSANO_RECOVERY          (WSABASEERR + 1003)
@@ -139,7 +147,44 @@ int WSAStartup(WORD VersionRequested, WSADATA * Data);
 int WSACleanup();
 
 int closesocket(SOCKET S);
-int ioctlsocket(SOCKET S, long Cmd, unsigned long * Argp);
+int ioctlsocket(SOCKET S, LONG Cmd, ULONG * Argp);
+
+// shutdown's directions.
+#define SD_RECEIVE 0
+#define SD_SEND    1
+#define SD_BOTH    2
+// Windows' exclusive binding has no POSIX equivalent beyond the default:
+// a POSIX listener is already exclusive unless SO_REUSEPORT is set.
+#define SO_EXCLUSIVEADDRUSE ((int)(~SO_REUSEADDR))
+
+typedef struct sockaddr * LPSOCKADDR;
+typedef WSADATA * LPWSADATA;
+typedef struct _WSAPROTOCOL_INFOA WSAPROTOCOL_INFOA;
+typedef WSAPROTOCOL_INFOA * LPWSAPROTOCOL_INFO;
+// The address as text, "a.b.c.d:port" or "[v6]:port" when the port is set.
+int WSAAddressToStringA(LPSOCKADDR Address, DWORD AddressLength, LPWSAPROTOCOL_INFO ProtocolInfo,
+  LPSTR String, LPDWORD StringLength);
+// Window-message notification needs a window, of which there are none:
+// fails with WSAEOPNOTSUPP. PuTTY on Windows uses WSAEventSelect as core does.
+int WSAAsyncSelect(SOCKET S, HWND Window, UINT Message, LONG Events);
+
+// The local interfaces' addresses (SIO_GET_INTERFACE_LIST), from getifaddrs.
+#define SIO_GET_INTERFACE_LIST 0x4004747F
+// iiFlags uses Winsock's IFF_* values, which are not defined here: they
+// differ from <net/if.h>'s, and neon includes that.
+typedef union sockaddr_gen
+{
+  struct sockaddr Address;
+  struct sockaddr_in AddressIn;
+  struct sockaddr_in6 AddressIn6;
+} sockaddr_gen;
+typedef struct _INTERFACE_INFO
+{
+  ULONG iiFlags;
+  sockaddr_gen iiAddress;
+  sockaddr_gen iiBroadcastAddress;
+  sockaddr_gen iiNetmask;
+} INTERFACE_INFO;
 
 // The event model. Declared so core compiles; the implementation lands with
 // P1-08, which replaces FileZilla's hidden-window message pump.
