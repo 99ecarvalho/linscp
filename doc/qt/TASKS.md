@@ -90,6 +90,7 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P1-19 | Golden suite green across all six protocols, both platforms | L | P1-18, P0-15 | **P1 exit gate** |
 | P1-20 | Verify stock `netstandard2.0` .NET assembly drives the Linux CLI | S | P1-19 | Should work unchanged |
 | P1-21 | `#ifdef` out `dragext`, `Setup.cpp`, jump lists, file associations | M | P1-16 | Windows-only or dropped |
+| P1-22 | `keepuptodate` in the CLI: directory watching (upstream's `TDiscMonitor`; inotify on Linux) behind `TSynchronizeController` | M | P1-15 | The script aborts the command while no handler is set |
 
 ## P2 — Qt shell: minimal usable client
 

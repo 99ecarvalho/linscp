@@ -1,3 +1,5 @@
+#include <cstring>
+#include <new>
 #include "vcl_object.h"
 
 #include <cstdlib>
@@ -111,4 +113,81 @@ UnicodeString TObject::QualifiedClassName() const
     Full.replace(I, 2, ".");
   }
   return UnicodeString(Full.c_str());
+}
+
+//---------------------------------------------------------------------------
+// Delphi zeroes an object's memory before any constructor runs
+// (TObject.InitInstance), so a field no constructor sets is 0, false or
+// null, and upstream relies on it: TSessionData's constructor reaches
+// Modify(), which writes through FUnsafeSettings, before anything sets it.
+// C++Builder gives every Delphi-style class that guarantee. A class-scoped
+// operator new on TObject cannot provide it -- core derives privately from
+// TStringList (TRemoteDirectoryCache), which makes the base's operator
+// inaccessible -- so every allocation is zeroed. That is a superset no
+// correct code can tell apart; the cost is a calloc per allocation.
+//
+// In this unit because it is always linked: it defines Exception.
+//---------------------------------------------------------------------------
+namespace {
+
+void * ZeroedAllocate(std::size_t Size)
+{
+  if (Size == 0)
+  {
+    Size = 1;
+  }
+  for (;;)
+  {
+    void * Result = std::calloc(1, Size);
+    if (Result != nullptr)
+    {
+      return Result;
+    }
+    std::new_handler Handler = std::get_new_handler();
+    if (Handler == nullptr)
+    {
+      throw std::bad_alloc();
+    }
+    Handler();
+  }
+}
+
+void * ZeroedAllocateNoThrow(std::size_t Size) noexcept
+{
+  try
+  {
+    return ZeroedAllocate(Size);
+  }
+  catch (...)
+  {
+    return nullptr;
+  }
+}
+
+}  // namespace
+
+void * operator new(std::size_t Size) { return ZeroedAllocate(Size); }
+void * operator new[](std::size_t Size) { return ZeroedAllocate(Size); }
+void * operator new(std::size_t Size, const std::nothrow_t &) noexcept { return ZeroedAllocateNoThrow(Size); }
+void * operator new[](std::size_t Size, const std::nothrow_t &) noexcept { return ZeroedAllocateNoThrow(Size); }
+void operator delete(void * Pointer) noexcept { std::free(Pointer); }
+void operator delete[](void * Pointer) noexcept { std::free(Pointer); }
+void operator delete(void * Pointer, std::size_t) noexcept { std::free(Pointer); }
+void operator delete[](void * Pointer, std::size_t) noexcept { std::free(Pointer); }
+void operator delete(void * Pointer, const std::nothrow_t &) noexcept { std::free(Pointer); }
+void operator delete[](void * Pointer, const std::nothrow_t &) noexcept { std::free(Pointer); }
+
+// A thrown object is built in the runtime's exception storage, not by
+// operator new, and libstdc++ zeroes only its own header there. Core throws
+// Delphi-style exceptions by value (`throw ESshFatal(...)`), constructed in
+// place in that storage, and ExtException's constructor reads FMoreMessages
+// before setting it. The executables link with
+// --wrap=__cxa_allocate_exception (linscp-shim's link options), which routes
+// every allocation here to be zeroed as Delphi's would be.
+extern "C" void * __real___cxa_allocate_exception(std::size_t Size) noexcept;
+extern "C" void * __wrap___cxa_allocate_exception(std::size_t Size) noexcept
+{
+  void * Result = __real___cxa_allocate_exception(Size);
+  std::memset(Result, 0, Size);
+  return Result;
 }

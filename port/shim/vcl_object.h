@@ -40,6 +40,9 @@ public:
   TObject(const TObject &) = delete;
   TObject & operator=(const TObject &) = delete;
 
+  // Instances start zeroed, as Delphi's InitInstance leaves them: see
+  // vcl_exceptions.cpp's operator new.
+
   // Delphi's RTTI check. Implemented with dynamic_cast rather than a class
   // registry, which covers what core uses it for: asking whether an object is
   // of a given type before downcasting.

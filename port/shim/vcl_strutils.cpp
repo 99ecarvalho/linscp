@@ -245,6 +245,11 @@ int Pos(const UnicodeString & Substr, const UnicodeString & S)
   return S.Pos(Substr);
 }
 
+int Pos(const UnicodeString & Substr, const UnicodeString & S, int Offset)
+{
+  return PosEx(Substr, S, Offset);
+}
+
 int PosEx(const UnicodeString & Substr, const UnicodeString & S, int Offset)
 {
   if (Offset < 1)

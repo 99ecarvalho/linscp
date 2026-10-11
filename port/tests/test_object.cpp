@@ -4,6 +4,7 @@
 // EFilerError and expects EReadError to be caught by it. If the hierarchy were
 // flattened, those handlers would stop matching and errors would escape as
 // unhandled rather than fail to compile.
+#include <cstring>
 #include "vcl_object.h"
 #include "vcl_syncobjs.h"
 
@@ -40,6 +41,35 @@ void TestExceptionMessage()
 
 // Delphi: Exception = class(TObject). Core passes exceptions where a TObject
 // is expected, and downcasts them back.
+// A field no constructor sets reads as zero, as Delphi zeroes an instance.
+class TUnset : public TObject
+{
+public:
+  TUnset() {}
+  int Number;
+  bool Flag;
+  void * Pointer;
+  double Real;
+};
+
+void TestInstancesStartZeroed()
+{
+  // Dirty the heap first, so a zero is not just fresh memory.
+  for (int I = 0; I < 64; I++)
+  {
+    char * Junk = new char[sizeof(TUnset)];
+    std::memset(Junk, 0xA5, sizeof(TUnset));
+    delete[] Junk;
+  }
+  for (int I = 0; I < 64; I++)
+  {
+    TUnset * U = new TUnset();
+    CHECK((U->Number == 0) && !U->Flag && (U->Pointer == nullptr) && (U->Real == 0.0));
+    std::memset(static_cast<void *>(&U->Number), 0x5A, sizeof(U->Number));
+    delete U;
+  }
+}
+
 void TestExceptionIsATObject()
 {
   TObject * O = new EAbort(UnicodeString(L"abort"));
@@ -243,6 +273,7 @@ int main()
   TestExceptionMessage();
   TestExceptionHierarchy();
   TestExceptionIsATObject();
+  TestInstancesStartZeroed();
   TestExceptionCopyKeepsEveryMember();
   TestObjectIsPolymorphic();
   TestCriticalSectionIsRecursive();

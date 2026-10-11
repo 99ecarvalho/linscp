@@ -71,6 +71,8 @@ int CompareStr(const UnicodeString & A, const UnicodeString & B);
 
 // --- searching (1-based; 0 means not found) --------------------------------
 int Pos(const UnicodeString & Substr, const UnicodeString & S);
+// System.Pos's overload with a 1-based start, as StrUtils.PosEx.
+int Pos(const UnicodeString & Substr, const UnicodeString & S, int Offset);
 int PosEx(const UnicodeString & Substr, const UnicodeString & S, int Offset = 1);
 int LastDelimiter(const UnicodeString & Delimiters, const UnicodeString & S);
 

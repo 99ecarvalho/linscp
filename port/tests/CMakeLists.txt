@@ -151,6 +151,17 @@ foreach(_case "default;" "aes_ctr;Ciphers aes128-ctr" "aes_gcm;Ciphers aes256-gc
 endforeach()
 
 
+# The scripting client against the same loopback sshd: /keygen, a session
+# by /command, a failing command's exit code, commands on standard input,
+# /stdout and /script with /parameter.
+add_test(NAME cli_session_build
+  COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target linscp-cli)
+add_test(NAME cli_session
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_cli_session.py"
+          --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:linscp-cli>")
+set_tests_properties(cli_session PROPERTIES
+  DEPENDS cli_session_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+
 # PuTTY's crypto primitives against published vectors, on both targets: the
 # PuTTY libraries alone, with a stub for the one frontend function they need.
 if(TARGET linscp-putty)

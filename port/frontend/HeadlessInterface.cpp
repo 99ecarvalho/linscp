@@ -11,6 +11,7 @@
 #include <cstdio>
 
 #include <Common.h>
+#include <memory>
 #include <Configuration.h>
 #include <CoreMain.h>
 #include <Exceptions.h>
@@ -60,9 +61,8 @@ public:
 };
 }
 //---------------------------------------------------------------------------
-// The /ini switch, as UserInterface.cpp handles it. The GUI-only switches
-// (raw configuration through the options storage, CheckSafe's elevation
-// guard) are the GUI's to add.
+// The /ini and /rawconfig switches, as UserInterface.cpp handles them; the
+// raw configuration only without /unsafe, as its CheckSafe has it.
 TConfiguration * __fastcall CreateConfiguration()
 {
   TConfiguration * Result = new THeadlessConfiguration();
@@ -78,6 +78,14 @@ TConfiguration * __fastcall CreateConfiguration()
     {
       IniFileName = ExpandFileName(ExpandEnvironmentVariables(IniFileName));
       Result->SetExplicitIniFileStorageName(IniFileName);
+    }
+  }
+  if (!Params->FindSwitch(L"Unsafe"))
+  {
+    std::unique_ptr<TStrings> RawConfig(new TStringList());
+    if (Params->FindSwitch(L"RawConfig", RawConfig.get()))
+    {
+      Result->OptionsStorage = RawConfig.get();
     }
   }
   return Result;

@@ -811,7 +811,17 @@ wchar_t * InitCmdLine()
     {
       Line += L" ";
     }
-    Line += (Arg.Pos(UnicodeString(L" ")) > 0) ? UnicodeString(L"\"") + Arg + L"\"" : Arg;
+    // Quoted as core's CutToken reads it back: within quotes, "" is a
+    // quote. An argument with a space, tab or quote needs quoting.
+    if ((Arg.Pos(UnicodeString(L" ")) > 0) || (Arg.Pos(UnicodeString(L"\t")) > 0) ||
+        (Arg.Pos(UnicodeString(L"\"")) > 0))
+    {
+      Line += UnicodeString(L"\"") + ReplaceStr(Arg, L"\"", L"\"\"") + L"\"";
+    }
+    else
+    {
+      Line += Arg;
+    }
   }
   return Line.c_str();
 #endif

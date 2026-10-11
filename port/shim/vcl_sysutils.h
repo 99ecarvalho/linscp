@@ -129,7 +129,8 @@ bool FileAge(const UnicodeString & FileName, TDateTime & FileDateTime, bool Foll
 TDateTime ISO8601ToDate(const UnicodeString & AISODate, bool AReturnUTC = true);
 
 // System's CmdLine: the whole command line. Windows' own string there; on
-// POSIX the arguments joined by spaces, quoted where they contain one. A
+// POSIX the arguments joined by spaces, quoted where they contain a space,
+// tab or quote, with quotes doubled -- as core's CutToken reads them. A
 // variable, as in Delphi -- core also has a parameter of that name, which a
 // macro would break.
 extern wchar_t * CmdLine;

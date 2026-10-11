@@ -60,3 +60,9 @@ if(NOT WIN32)
   target_sources(linscp-runtime INTERFACE $<TARGET_OBJECTS:linscp-versioninfo>)
   add_dependencies(linscp-runtime linscp-versioninfo)
 endif()
+
+# The scripting client, winscp.com's counterpart: core's script on standard
+# input and output (CliMain.cpp, StdioConsole.cpp).
+add_executable(linscp-cli EXCLUDE_FROM_ALL CliMain.cpp StdioConsole.cpp)
+target_include_directories(linscp-cli PRIVATE "${LINSCP_UPSTREAM}/source/resource")
+target_link_libraries(linscp-cli PRIVATE linscp-runtime)

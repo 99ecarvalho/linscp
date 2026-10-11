@@ -77,3 +77,5 @@ target_compile_features(linscp-shim PUBLIC cxx_std_17)
 # so must everything built against it.
 linscp_upstream_defines(linscp-shim PUBLIC ScpCore.cbproj)
 target_compile_options(linscp-shim PUBLIC -fms-extensions -fshort-wchar)
+# Thrown objects start zeroed, as Delphi's instances do (vcl_exceptions.cpp).
+target_link_options(linscp-shim INTERFACE "LINKER:--wrap=__cxa_allocate_exception")

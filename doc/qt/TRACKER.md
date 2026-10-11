@@ -9,11 +9,11 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 25 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 28 | 36 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 30 | 37 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **53** | **95** | |
+| **Total** | **55** | **96** | |
 
 ## Next three actions
 
@@ -68,10 +68,19 @@ it keeps the 32 bits upstream relies on (TSFTPPacket read every uint32 as 8
 bytes), and nothing linked may call the C library's 4-byte wide functions,
 which ctest `wide_imports` now checks at link level.
 
-1. **P1-15**: the stdio command-line frontend, on both targets.
-2. **P1-06d**: INI storage on Linux, which a usable Linux build needs.
-3. The remaining protocols on Linux -- SCP, FTP/FTPS (FileZilla), WebDAV and
-   S3 (neon, libs3) -- against loopback servers, as SFTP is tested.
+**The scripting client runs on both targets** (P1-15, P1-18 done):
+`linscp-cli`, winscp.com's counterpart, runs core's script on standard input
+and output -- `/command`, `/script`, `/parameter`, piped commands, a terminal
+prompt, `/stdout`, `/keygen`, exit codes -- tested against the loopback `sshd`
+on Linux and under Wine (ctest `cli_session`). On the way: Delphi's
+zero-initialised instances, which upstream relies on, are now given by the
+shim (every allocation and every thrown object starts zeroed).
+
+1. **P1-06d**: INI storage on Linux, which a usable Linux build needs.
+2. The remaining protocols on Linux -- SCP, FTP/FTPS (FileZilla), WebDAV and
+   S3 (neon, libs3) -- against loopback servers, as SFTP is tested, towards
+   the golden suite (P1-19).
+3. **P1-22**: `keepuptodate` (directory watching) in the CLI.
 
 ## Decisions taken
 
@@ -206,6 +215,9 @@ which ctest `wide_imports` now checks at link level.
 | 2026-10-11 | Core's `long` is respelled `LONG` and `unsigned long` `ULONG` by a transform rule (`lp64_long`) | Upstream is written for Windows, where long is 32 bits (Win64 included, so WinSCP's own 64-bit port does not meet this), and depends on it: TSFTPPacket consumed `sizeof(unsigned long)` bytes per SFTP uint32 -- 8 on LP64 -- and sign-extends times through `signed long`. LONG and ULONG are `<windows.h>`'s typedefs of exactly those types, so C++Builder and mingw see no change; the POSIX layer makes them 32 bits, which is upstream's meaning everywhere at once instead of a long tail of per-site patches. Comments, literals, `long long` and `long double` are untouched; core files only. Lines where core implements another library's interface keep `long` (`port/tools/lp64_long_keep.txt`: PuTTY's `schedule_timer`); a missing entry is a conflicting-declaration error, not a silent one. No override is hidden (checked with `-Woverloaded-virtual`) |
 | 2026-10-11 | `%l` in the shim's formatter and in `swscanf` is 32 bits on POSIX | Windows' meaning, and what core's `LONG`/`ULONG` arguments now are. On x86-64 an `int` and a `long` take one argument slot each, so reading 32 bits is also safe for a caller passing a real `long` |
 | 2026-10-11 | Nothing linked may call the C library's wide functions (ctest `wide_imports`, at link level) | ADR 0001's source check covers `port/`; upstream reached glibc's 4-byte functions three ways: PuTTY utilities that include no platform header (`dupwcs.c`), `std::wstring` in FileZilla's tool interface (`char_traits<wchar_t>` calls `wcslen`), and `swscanf` (as glibc's `__isoc23_swscanf`). PuTTY now has the wide redirects forced in (`win32_on_posix_wide.h`), the interface takes `UnicodeString` (`filezilla-tools-unicodestring.patch`), and `swscanf` has a POSIX implementation |
+| 2026-10-11 | The scripting client (`linscp-cli`) is a runner of its own over core's `TManagementScript`, following `TConsoleRunner` and winscp.com | Upstream's runner (windows/ConsoleRunner.cpp) cannot be compiled without the VCL forms: its header is the GUI's `WinInterface.h` (117 VCL types, `WinConfiguration.h`, Delphi components). The script and its output are core's either way; the runner carries how queries (accelerators, batch answers, timeouts), prompts and input meet the console, and the console has winscp.com's semantics (UTF-8, from-beginning prints held on pipes, piped input echoed, a choice from a pipe breaks). It names itself linscp (`linscp> `), per the naming decision |
+| 2026-10-11 | Every allocation, and every thrown object, starts zeroed (global `operator new`; `--wrap=__cxa_allocate_exception`) | Delphi's InitInstance zeroes an instance before its constructor, and upstream relies on it: `TSessionData`'s constructor reaches `Modify()`, which writes through an unset `FUnsafeSettings`; `ExtException`'s reads `FMoreMessages`. A class-scoped `operator new` on `TObject` cannot be reached through core's private inheritance from `TStringList`, and thrown objects are built in the runtime's exception storage, so both paths are zeroed instead. A superset no correct code can tell apart; one `calloc` per allocation |
+| 2026-10-11 | On POSIX, `CmdLine` quotes an argument with a space, tab or quote, doubling its quotes | Core's `CutToken` reads `""` within quotes as a quote, the convention winscp.com's users write by hand. Embedded quotes were passed through, which cut `-hostkey="ssh-ed25519 255 ..."` at its first space |
 | 2026-10-10 | `Format` keeps malformed input visible | Delphi raises on a missing argument. Core routes user- and server-supplied text through these into logs, so an unknown specifier is echoed and a missing argument renders as `<missing>` rather than throwing from a log path |
 
 ## Correction: census figures before 2026-10-11 used the wrong configuration
@@ -310,6 +322,9 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | `IsBadWritePtr` on POSIX | Reports only a null block as bad | Windows probes the pages; POSIX has no probe that is not itself a hazard. FileZilla uses it as a sanity check on its own requests |
 | `MessageBox` on POSIX | Caption and text go to standard error; the answer is `IDOK` | No desktop. FileZilla raises one only for "cannot happen" TLS session errors |
 | `swscanf` on POSIX | Numeric conversions only; a format with `%s`, `%c` or `%[` fails (EOF) | Implemented by narrowing to `vsscanf`. Upstream parses only numbers with it (SCP's time line, FileZilla's MLSD dates); text conversions would write narrow text into wide buffers |
+| CLI input timer on a terminal | POSIX: counts from the start of the line; Windows: runs until the first key | winscp.com restarts it on every key press. In canonical mode POSIX sees nothing until Enter. Affects only batch-mode prompts, which time out after 10 s |
+| CLI terminal title | Not set on POSIX | Escape sequences would land in logs of a redirected terminal; Windows sets the console title as winscp.com does |
+| CLI `keepuptodate` | Not available yet (P1-22): the command fails | Needs directory watching behind `TSynchronizeController` |
 | `SuspendThread` on POSIX | Not declared | A running pthread cannot be suspended. A missing declaration fails at compile time; a stub would fail silently. `CREATE_SUSPENDED` + `ResumeThread` is supported |
 
 ## Open questions
@@ -524,13 +539,14 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-12 | FileZilla epoll rewrite | done | Not rewritten: FileZilla builds unmodified on Linux over an emulated user32 subset (windows, message queues, timers, `WSAAsyncSelect`, `WSAAsyncGetHostByName`); ctest `messages` passes against user32/ws2_32 (Wine) and the emulation. One patch (`in_addr`'s `s_addr`) |
 | P1-13 | System libs | done | PuTTY, puttyvs, neon, libs3 from the WinSCP submodule, OpenSSL 3.5.9 from its own, expat from its make file, on both targets; FileZilla + MFC on Windows (Linux is P1-12). neon on POSIX: `config-posix.h` from its `configure` |
 | P1-14 | Drop `puttyvs` | done | the MSVC build is replaced by clang building the same files with the same defines, from `PuTTYVS.vcxproj` |
-| P1-15 | Console IPC → stdio | todo | |
+| P1-15 | Console IPC → stdio | done | `linscp-cli` (port/frontend/CliMain.cpp, StdioConsole.cpp): core's script on stdin/stdout with TConsoleRunner's query, prompt and input handling and winscp.com's console semantics; `/command`, `/script`, `/parameter`, `/stdout`, `/stdin`, `/log`, `/xmllog`, `/loglevel`, `/logsize`, `/ini`, `/rawconfig`, `/keygen`, `/help`. ctest `cli_session` on both targets |
 | P1-16 | Headless `Interface.h` frontend | done | `port/frontend`: all 17 functions plus startup/shutdown; core initialises and finalises under Wine. Linux follows core (P1-07b) |
 | P1-17 | First SFTP session on Linux | done | Core links on Linux, and the four loopback-`sshd` session tests pass there as on Windows (negotiated, AES-CTR, AES-GCM, ChaCha20-Poly1305). Needed the `lp64_long` transform rule and the link-level wide-function check |
-| P1-18 | Windows cross-build + Wine | wip | Core, cross-built, runs real SFTP sessions under Wine (four cipher configurations); the CLI is P1-15's |
+| P1-18 | Windows cross-build + Wine | done | Core and the CLI, cross-built, run real SFTP sessions and scripts under Wine (`sftp_session*`, `cli_session`) |
 | P1-19 | Golden suite green, both platforms | todo | **P1 gate** |
 | P1-20 | .NET assembly drives Linux CLI | todo | |
 | P1-21 | `#ifdef` out Windows-only subsystems | todo | |
+| P1-22 | CLI `keepuptodate` (directory watching) | todo | |
 
 ### P2 — Qt shell
 | ID | Task | Status | Note |

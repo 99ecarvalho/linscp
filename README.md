@@ -36,7 +36,7 @@ existing Windows build is never broken by the port.
 port/patches       reviewed patch series applied to the generated tree
 port/shim          VCL runtime replacement
 port/platform      POSIX and Win32 compatibility
-port/frontend      headless implementation of core's frontend interface
+port/frontend      headless frontend interface and linscp-cli, the scripting client
 port/tools         transformation and verification scripts
 qt/                Qt 6 frontend
 doc/qt/            plan, tasks, tracker, estimates
