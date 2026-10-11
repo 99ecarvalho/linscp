@@ -2037,150 +2037,621 @@ public, GPL-3.0</td>
 <tr class="even">
 <td>2026-10-11</td>
 <td>Compute cost recorded as measured token usage, not an estimate</td>
-<td>The branch so far cost <span class="math inline">$297 of Opus 5
-inference (99% of tokens are cache reads). Confirms compute is not the
-constraint, and shows Opus 5.5 would halve it — see
-[ESTIMATES.md](#estimates) |
-| 2026-10-11 | VCL's `TThread` class not shimmed | Its only user,
-`KeyGen.cpp`, is in none of upstream's `.cbproj` files and
-`TKeyGenerator` is referenced nowhere else — dead code upstream. Core's
-own `TSimpleThread` uses `StartThread` and Win32 directly |
-| 2026-10-11 | P1-05b scoped as Win32 kernel objects on POSIX, plus
-Delphi `BeginThread`/`EndThread` on both targets | That is what core
-actually calls: 28 `CloseHandle`, 6 waits, 5 `CreateEvent`, 10
-`GetCurrentThreadId`. `BeginThread` is written once over `CreateThread`,
-so upstream's frontend `StartThread` ports unchanged |
-| 2026-10-11 | POSIX kernel objects share one handle table, one lock and
-one condition variable; handle values are never reused | Makes
-`WaitForMultipleObjects` over mixed threads and events — including
-atomic `WaitAll` — correct by construction. Core has a handful of
-threads, so the coarse lock costs nothing measurable. Never reusing
-values turns use-after-close into `ERROR_INVALID_HANDLE` |
-| 2026-10-11 | Shim XML interfaces live in `Xml::Xmlintf`; only the
-`_di_` aliases are global | Embarcadero's own layout. At global scope
-ours collided on Windows with the COM `IXMLDocument` from
-`&lt;msxml.h&gt;`. Core names them only through `_di_` aliases and
-`Xmlintf::` |
-| 2026-10-11 | Closure-site discovery compiles a separately transformed,
-*unbound* tree | Compiling the ordinary tree saw the known sites already
-wrapped and "rediscovered" only new ones — it cut 62 sites to 2. Now
-idempotent: a second run is byte-identical |
-| 2026-10-11 | VCL's implicit `SysUtils::LoadStr` and
-`Vcl.Menus::StripHotkey` supplied by the shim, not by patching core |
-Core receives both through `&lt;vcl.h&gt;` and never declares them.
-`LoadStr` is built on the existing `LoadString` table, so there is still
-one resource path |
-| 2026-10-11 | Core is compiled with upstream's own preprocessor
-configuration, read from `ScpCore.cbproj` by
-`port/tools/upstream_defines.py` | Copying the list would drift. Applied
-by the census, closure discovery and CMake alike, shim included, because
-`UNICODE` decides which Win32 A/W function every macro names.
-Windows-only names are dropped on POSIX; `_CRTIMP=` is dropped
-everywhere, as C++Builder's CRT linkage |
-| 2026-10-11 | Census and discovery build the Debug configuration | Its
-`DebugAssert` expressions are code that must compile too; Release
-compiles them out, which hid ten closure comparisons |
-| 2026-10-11 | `port/compat` withdrawn; supersedes the 2026-10-10
-decision creating it | `help.h` was compensating for the missing
-`WINSCP` define, not a gap in upstream: with `WINSCP` set, PuTTY's
-`platform.h` never includes it |
-| 2026-10-11 | Closure binding covers Borland's four shapes: `Name`,
-`&amp;Name`, `obj.Name` / `&amp;obj.Name`, `p-&gt;Name` /
-`&amp;p-&gt;Name` | Recorded as the method name's column; the transform
-recovers the shape from the text and refuses longer chains or a call as
-the object. The verifier recomputes the rewrite with an independent
-regex, so a bug in either is caught by the other. The old binder had
-been emitting `obj.CLOSURE(Name)`, invalid C++, in two units nothing yet
-compiled |
-| 2026-10-11 | Win32 APIs core calls under the bare name get forwarding
-functions, not their A/W macros | `vcl_win32_undef.h` removes the macros
-so they cannot rename the shim's VCL functions; it had also removed
-`CreateFile` and four others core calls as the API, leaving those calls
-nothing to bind to. Exact signatures, so core's `NULL` arguments still
-convert |
-| 2026-10-11 | `__int64` is clang's MS-extension keyword, never a macro
-| A `long long` macro -- ours, and mingw's own -- breaks core's
-`__int64(x)` functional casts |
-| 2026-10-11 | `Random` is Delphi's own generator | It reproduces the
-published Turbo Pascal / Delphi sequence from a zero seed exactly, which
-the test pins |
-| 2026-10-11 | C++Builder's static class properties become static
-`const` pointers (`TEncoding::UTF8`) | clang accepts `static
-__declspec(property)` but compiles it as a plain static member, failing
-only at link (see verified facts). Pointers serve both of core's
-spellings, as a value and through `-&gt;`;
-`[[clang::require_constant_initialization]]` guarantees no
-static-init-order exposure |
-| 2026-10-11 | `Win32MajorVersion()` and friends are functions, read
-from `RtlGetVersion` | Core calls them as functions. `GetVersionEx`
-reports 6.2 to an unmanifested executable, which would turn core's
-`IsWin10()` false on 10 and 11. Computed on first use, which also
-removes a dynamic-initialiser hazard |
-| 2026-10-11 | `StaticArray&lt;T, N&gt;` keeps one slack element, filled
-by its owner with a value no input matches | Core passes `Size()` as an
-open array's *high index* (`ParseShortEngMonthName`) and reads one past
-the end. In C++Builder that is whatever follows; here it is defined and
-means "not found" |
-| 2026-10-11 | The census measures every core unit in `ScpCore.cbproj`,
-read from the project, in parallel | Ten units were a sample. Reading
-the list from upstream means a unit it adds fails the ratchet until
-baselined, rather than going unmeasured. 66 compiles take about 5 s |
-| 2026-10-11 | Case-mismatched upstream includes get checked-in
-forwarding headers in `port/casefold` | They resolve only on
-case-insensitive file systems, so a Linux host fails even when
-cross-compiling for Windows. Explicit, not generated: a basename match
-would have mapped `putty/windows/gss.c`'s `security.h` -- the Windows
-SDK header -- onto core's `Security.h`. `check_include_case.py` applies
-a same-directory rule and fails on drift either way |
-| 2026-10-11 | `ARRAYOFCONST` expands to C++Builder's two arguments, a
-`TVarRec` pointer and the high index | Core's own functions take open
-arrays that way (`ExecCommand`, `ExtException`), so a single container
-argument cannot reach them. The count comes from `sizeof` over an
-unevaluated call, so each value is evaluated once -- C++Builder's macro
-evaluates them twice |
-| 2026-10-11 | The XML DOM follows Delphi's model: text and comment
-nodes as children, Null attribute variants, raising loaders | FileZilla
-keeps a site's name as a text node among element children, found by
-`NodeType`; core tests absent attributes with `IsNull()`; and
-`ImportFromFilezilla` has no handler around `LoadFromFile`, so a
-malformed file must raise rather than import nothing. The earlier `bool`
-loaders were a divergence justified by a wrong reading of core |
-| 2026-10-11 | `TCustomIniFile`'s virtuals take parameters by value, and
-its abstract set is Delphi's eight | C++Builder declares Delphi virtuals
-that way and core's `TOptionsIniFile` overrides with exactly those
-signatures; by-reference parameters made its methods new functions and
-left the class abstract |
-| 2026-10-11 | `TStrings::Text` uses CRLF on both platforms | Delphi's
-POSIX RTL uses LF. Core builds configuration and server-facing text
-through `Text`, and identical output everywhere matters more |
-| 2026-10-11 | try/__finally brace depth is measured over code only | A
-`}` inside a comment in a `__finally` body put `LINSCP_END_FINALLY` one
-brace early in ScpFileSystem.cpp. Comments and string/character literals
-are now blanked before counting; still 179 blocks |
-| 2026-10-11 | The transform finds its patch series relative to itself,
-and a missing one is an error | CMake runs it from the build tree, where
-the relative path found nothing: every CMake-built tree had **no closure
-bindings at all**, and the verifier, loading the same way, agreed. The
-census ran from the repo root and never saw it. `bind_closures.py
---require-bound` now checks the tree the build compiles |
-| 2026-10-11 | Header function definitions at namespace scope get
-`inline` (transform rule, verified) | `Common.h` defines `IsWideChar`
-without it: one definition per including unit, 31 in all, which
-C++Builder's linker tolerates and the standard forbids. A rule rather
-than a patch, so a new one upstream is handled too; a global
-`--allow-multiple-definition` would have hidden real duplicates |
-| 2026-10-11 | The shim's `ExpandEnvironmentVariables` removed | Core
-defines it itself, with Windows `%VAR%` semantics through
-`ExpandEnvironmentStrings`. The shim's was an invented POSIX
-`$</span>VAR<code>variant, a duplicate the syntax-only census could not see. Linux gets</code>ExpandEnvironmentStrings<code>with Windows semantics instead (P1-07b) | | 2026-10-10 | A PR-able branch against</code>winscp/winscp<code>will be **generated**, not hand-maintained | linscp shares no history with upstream, so its</code>qt<code>branch is not directly mergeable. Since the port is mechanical, the fork branch can be produced on demand (Q-7). Rehearsed end to end — see facts below | | 2026-10-10 | Transform must be byte-exact outside property lines | A full-file rewrite (CRLF loss) turned a 613-line change into 76,551. Now asserted by</code>verify_transform.py<code>| | 2026-10-10 | Field/accessor classification is convention-first, parens only as fallback | The parens heuristic false-positives on constructor initialiser lists; WinSCP's</code>F<Upper><code>/</code>Get<em><code>/</code>Set</em><code>convention is airtight. Truly unclassifiable names now fail the run instead of producing a wrong-arity macro | | 2026-10-10 | Windows releases link statically via lld |</code>-fuse-ld=lld
--static
--L/usr/x86_64-w64-mingw32/lib<code>; leaves only KERNEL32 and msvcrt as deps | | 2026-10-10 | CMake hard-fails on non-clang compilers | A clear configure-time error beats a confusing failure in the first transformed header | | 2026-10-10 | The transform stamp lives outside the generated tree |</code>verify_transform.py<code>treats any extra file as a violation, which is the behaviour we want; the stamp was the first thing it caught | | 2026-10-10 | **Accepted (Q-8):**</code>-fshort-wchar<code>with</code>std::u16string<code>storage;</code>std::wstring<code>banned in</code>port/<code>| Only option leaving upstream's thousands of</code>L”…“<code>literals untouched. Enforced by</code>check_wide_abi.py<code>and a</code>static_assert<code>. ADR 0001 | | 2026-10-10 |</code>-fshort-wchar<code>set globally, not per-target | One translation unit without it is an ABI landmine that links cleanly | | 2026-10-10 |</code>UnicodeString<code>case folding is ASCII-only for now | Delphi's is locale-aware; core uses it on protocol tokens and switch names. Recorded as a known limitation, not silently equivalent | | 2026-10-10 |</code>vcl.h<code>transitively exposes the Win32 API | Matches C++Builder, which upstream's</code>CorePCH.h<code>depends on: it includes</code>&lt;vcl.h&gt;<code>and core's headers before</code>&lt;Winapi.Windows.hpp&gt;<code>. Fixing this alone removed 9 of 24 missing types | | 2026-10-10 | UTF-8 decoding substitutes one U+FFFD per maximal subpart | Unicode's recommended practice. The first implementation emitted one per byte; a test on truncated input caught it | | 2026-10-10 | Byte strings keep C++Builder's code-page template shape | Core relies on</code>RawByteString<code>and</code>UTF8String<code>being distinct types; collapsing them would let byte reinterpretation happen silently | | 2026-10-10 | Date and time are combined only through</code>ComposeDateTime<code>| Delphi keeps the time of day positive for negative dates, so</code>Date
-+
-Time<code>lands a day late at the mirrored time. Correct for file timestamps, wrong in general and wrong silently | | 2026-10-10 |</code>TCriticalSection<code>wraps</code>std::recursive_mutex<code>| Delphi's is re-entrant; a plain</code>std::mutex<code>would deadlock on core's re-entrant paths rather than fail a test | | 2026-10-10 | Compile-census numbers are ratcheted in CI | No core TU compiles cleanly yet, so a reintroduced missing type would otherwise present as a passing build | | 2026-10-10 |</code>TStrings<code>is 0-based while</code>UnicodeString<code>is 1-based | Both match their Delphi originals. Two bases in one codebase is a hazard, so each is pinned by a boundary test rather than left to memory | | 2026-10-10 |</code>TStrings<code>references objects, never owns them | Delphi does not free them and core owns them elsewhere; freeing here would be a double-free. Asserted by a test that outlives the list | | 2026-10-10 | Chained subscripts on indexed properties are unsupported | clang reads</code>Prop[i][j]<code>as a two-argument getter call. Core has 0 occurrences;</code>check_properties.py<code>fails if an upstream change adds one | | 2026-10-10 | Win32 A/W name macros are undone in</code>vcl_win32_undef.h<code>|</code>&lt;windows.h&gt;<code>renamed the *definition* of</code>ReplaceText<code>to</code>ReplaceTextW<code>while the header still declared</code>ReplaceText<code>. Both compiled; only the link failed, and only because a test called it. A link-time guard now references every colliding name | | 2026-10-10 |</code>ARRAYOFCONST<code>pastes its parenthesised list onto a variadic call | C++Builder builds an open array of</code>TVarRec<code>, which needs compound literals.</code>ARRAYOFCONST((a,
-b))<code>becoming</code>MakeFormatArgs(a,
-b)<code>is ordinary C++ | | 2026-10-11 | XML is parsed for real, using the expat upstream vendors, rather than stubbed | A stub would silently import no FileZilla sessions. The mingw sysroot has no expat, so the vendored source is compiled for both targets, which also keeps them on one version | | 2026-10-11 | Wide-character functions are renamed and the CRT names redirected by macro | They cannot be redeclared --</code><string><code>pulls in</code><cwchar><code>, whose</code>wcschr<code>differs from ours only in return type -- and a macro also guarantees core's calls reach ours rather than glibc's | | 2026-10-11 |</code>towlower<code>/</code>towupper<code>fold ASCII only, on both platforms | The Windows CRT folds only ASCII in the default locale, confirmed by running the test against it. Folding Latin-1 on POSIX alone would make the platforms disagree, which is worse than being narrow | | 2026-10-11 |</code>try<code>/</code>__finally<code>uses the same lambda expansion on *both* targets | SEH would work on mingw, but one code path on both platforms is worth more than relying on it, and it removes a way for the two to diverge in behaviour | | 2026-10-11 | The</code>try<code>/</code>__finally<code>transform measures brace depth on the *pristine* lines and applies every edit afterwards |</code>LINSCP_END_FINALLY<code>replaces a</code>}<code>with text containing no brace, so editing in place miscounted the depth of any enclosing block -- and core nests these | | 2026-10-11 | One bare</code>return<code>inside a guarded body is permitted, by checked condition | Returning from the lambda runs the cleanup through the guard and then falls off the end of the function, which is what Borland does -- but only when the block ends the function and the return carries no value. Both are verified rather than assumed | | 2026-10-11 | Every property form routes through a generated public wrapper | Borland's</code>__property<code>grants access to a private accessor from outside the class and ignores constness;</code>__declspec(property)<code>does neither, because it expands to an ordinary member call at the use site. The wrappers restore both behaviours, and the getter casts its result to the declared type because C++Builder is lax where the two differ in constness | | 2026-10-11 |</code>UnicodeString<code>accepts numbers implicitly, yielding their decimal text | C++Builder does, and core depends on it. The hazard is real --</code>UnicodeString
-s =
-0;<code>gives</code>“0”<code>-- but diverging would mean editing core | | 2026-10-11 | Globals that need dynamic initialisation are declared *before* the object that initialises them | Within a translation unit, dynamic initialisation runs in declaration order. Putting the initialiser first had its constructor assign to a</code>UnicodeString<code>that was not yet constructed, which segfaulted rather than failing to compile | | 2026-10-11 |</code>TMask<code>matching is case-insensitive | Delphi's is, and core uses it for file masks users type without regard to case | | 2026-10-11 | Closure call sites are **compiler-discovered, committed, then replayed** | The sites cannot be inferred by regex: whether an argument is a closure depends on the callee's signature. clang names each one exactly, so discovery records them to</code>port/patches/closure_sites.json<code>and</code>transform.py<code>replays that list, failing loudly if a recorded site no longer holds the expected identifier | | 2026-10-11 | A diagnostic inside a macro expansion is resolved to the macro *definition* | clang reports it at the expansion point, so</code>SessionInfo.cpp<code>'s</code>ADSTR<code>macro alone produced 61 duplicate reports. Binding the definition once fixes every call site, and cut the work from 118 sites to 62 | | 2026-10-11 |</code>TRegistry<code>on POSIX reports every key absent rather than empty | There is no registry, and returning defaults for settings a user had actually set would look to them like their configuration had vanished. The INI backend, which core already supports, is the correct one there (P1-06d) | | 2026-10-11 | INI section and key names match case-insensitively | Delphi's do, and files written by WinSCP on Windows have inconsistent casing | | 2026-10-11 | INI sections and keys keep their file order | Sorting them would churn the user's configuration on every save and make diffs useless | | 2026-10-11 |</code>DynamicArray<code>shares its buffer on copy, as Delphi's does | Core declares</code>TSafeHandleStream::Read<code>as taking one *by value* and fills it for the caller. A deep-copying version would compile and silently return no data | | 2026-10-11 |</code>win32_on_posix.h<code>exposes</code>&lt;string.h&gt;<code>,</code>&lt;stdlib.h&gt;<code>and</code>&lt;stdio.h&gt;<code>|</code>&lt;windows.h&gt;<code>does transitively, and core calls</code>strlen<code>,</code>strcmp<code>and</code>memmove<code>unqualified | | 2026-10-10 | **Resource strings: supply Win32</code>LoadString<code>, not a</code>.res<code>loader, and do not patch core** | core's</code>LoadStr<code>is already implemented, in terms of</code>HInstance<code>,</code>LibModuleList<code>and Win32</code>LoadString<code>. Supplying those three means no</code>.res<code>binary format to parse, no core edits, and a purely additive change — the kind upstream could take rather than a fork of its own code. The table is generated from upstream's</code>.rc<code>files, so the strings track the submodule automatically | | 2026-10-10 |</code>UnicodeString::c_str()<code>has a non-const overload returning a writable buffer | C++Builder's does, and core depends on it:</code>DoLoadStrFrom<code>calls</code>SetLength<code>and then passes</code>c_str()<code>to</code>LoadString<code>as the destination to fill | | 2026-10-10 |</code>TList::Notify<code>is virtual and fires before a removal, after an addition | Core overrides it.</code>TObjectList<code>frees owned objects from inside it, so a wrong</code>Action<code>means a leak or a double free, neither of which announces itself | | 2026-10-10 |</code>Extract<code>reports</code>lnExtracted<code>, never</code>lnDeleted<code>| That is how Delphi lets a caller take ownership back without the list freeing the object | | 2026-10-10 |</code>TList::Sort<code>is stable, where Delphi's quicksort is not | Relying on an unstable order would be a latent caller bug either way, and stable is the safer guarantee to provide | | 2026-10-10 | Derived streams re-expose the base's legacy</code>Seek<code>with a using-declaration | Overriding one overload hides the other. Core calls both on derived streams, so without this the legacy origins would stop resolving | | 2026-10-10 | Stream exceptions follow Delphi's shape exactly |</code>EFilerError<code>,</code>EFOpenError<code>and</code>EFCreateError<code>are siblings under</code>EStreamError<code>, with</code>EReadError<code>/</code>EWriteError<code>beneath</code>EFilerError<code>. Core catches at both levels | | 2026-10-10 |</code>port/platform<code>headers refuse to compile on Windows, and are POSIX-only on the include path | Putting them on a Windows target shadowed the genuine mingw headers, which presented as a 1,220 -&gt; 783 "improvement". The</code>#error<code>makes that mistake loud | | 2026-10-10 |</code>port/compat<code>is separate from</code>port/platform<code>|</code>help.h<code>is missing from upstream itself rather than being a platform difference, so it is needed on every target | | 2026-10-10 | The ratchet records whether a unit aborted | An aborted parse reports a floor. Treating that as a distinct state stops a new abort from reading as sudden progress | | 2026-10-10 |</code>Format<code>keeps malformed input visible | Delphi raises on a missing argument. Core routes user- and server-supplied text through these into logs, so an unknown specifier is echoed and a missing argument renders as</code><missing>`
+<td>The branch so far cost $297 of Opus 5 inference (99% of tokens are
+cache reads). Confirms compute is not the constraint, and shows Opus 5.5
+would halve it — see <a href="#estimates">ESTIMATES.md</a></td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>VCL’s <code>TThread</code> class not shimmed</td>
+<td>Its only user, <code>KeyGen.cpp</code>, is in none of upstream’s
+<code>.cbproj</code> files and <code>TKeyGenerator</code> is referenced
+nowhere else — dead code upstream. Core’s own <code>TSimpleThread</code>
+uses <code>StartThread</code> and Win32 directly</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>P1-05b scoped as Win32 kernel objects on POSIX, plus Delphi
+<code>BeginThread</code>/<code>EndThread</code> on both targets</td>
+<td>That is what core actually calls: 28 <code>CloseHandle</code>, 6
+waits, 5 <code>CreateEvent</code>, 10 <code>GetCurrentThreadId</code>.
+<code>BeginThread</code> is written once over <code>CreateThread</code>,
+so upstream’s frontend <code>StartThread</code> ports unchanged</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>POSIX kernel objects share one handle table, one lock and one
+condition variable; handle values are never reused</td>
+<td>Makes <code>WaitForMultipleObjects</code> over mixed threads and
+events — including atomic <code>WaitAll</code> — correct by
+construction. Core has a handful of threads, so the coarse lock costs
+nothing measurable. Never reusing values turns use-after-close into
+<code>ERROR_INVALID_HANDLE</code></td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>Shim XML interfaces live in <code>Xml::Xmlintf</code>; only the
+<code>_di_</code> aliases are global</td>
+<td>Embarcadero’s own layout. At global scope ours collided on Windows
+with the COM <code>IXMLDocument</code> from
+<code>&lt;msxml.h&gt;</code>. Core names them only through
+<code>_di_</code> aliases and <code>Xmlintf::</code></td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>Closure-site discovery compiles a separately transformed,
+<em>unbound</em> tree</td>
+<td>Compiling the ordinary tree saw the known sites already wrapped and
+“rediscovered” only new ones — it cut 62 sites to 2. Now idempotent: a
+second run is byte-identical</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>VCL’s implicit <code>SysUtils::LoadStr</code> and
+<code>Vcl.Menus::StripHotkey</code> supplied by the shim, not by
+patching core</td>
+<td>Core receives both through <code>&lt;vcl.h&gt;</code> and never
+declares them. <code>LoadStr</code> is built on the existing
+<code>LoadString</code> table, so there is still one resource path</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>Core is compiled with upstream’s own preprocessor configuration,
+read from <code>ScpCore.cbproj</code> by
+<code>port/tools/upstream_defines.py</code></td>
+<td>Copying the list would drift. Applied by the census, closure
+discovery and CMake alike, shim included, because <code>UNICODE</code>
+decides which Win32 A/W function every macro names. Windows-only names
+are dropped on POSIX; <code>_CRTIMP=</code> is dropped everywhere, as
+C++Builder’s CRT linkage</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>Census and discovery build the Debug configuration</td>
+<td>Its <code>DebugAssert</code> expressions are code that must compile
+too; Release compiles them out, which hid ten closure comparisons</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td><code>port/compat</code> withdrawn; supersedes the 2026-10-10
+decision creating it</td>
+<td><code>help.h</code> was compensating for the missing
+<code>WINSCP</code> define, not a gap in upstream: with
+<code>WINSCP</code> set, PuTTY’s <code>platform.h</code> never includes
+it</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>Closure binding covers Borland’s four shapes: <code>Name</code>,
+<code>&amp;Name</code>, <code>obj.Name</code> /
+<code>&amp;obj.Name</code>, <code>p-&gt;Name</code> /
+<code>&amp;p-&gt;Name</code></td>
+<td>Recorded as the method name’s column; the transform recovers the
+shape from the text and refuses longer chains or a call as the object.
+The verifier recomputes the rewrite with an independent regex, so a bug
+in either is caught by the other. The old binder had been emitting
+<code>obj.CLOSURE(Name)</code>, invalid C++, in two units nothing yet
+compiled</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>Win32 APIs core calls under the bare name get forwarding functions,
+not their A/W macros</td>
+<td><code>vcl_win32_undef.h</code> removes the macros so they cannot
+rename the shim’s VCL functions; it had also removed
+<code>CreateFile</code> and four others core calls as the API, leaving
+those calls nothing to bind to. Exact signatures, so core’s
+<code>NULL</code> arguments still convert</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td><code>__int64</code> is clang’s MS-extension keyword, never a
+macro</td>
+<td>A <code>long long</code> macro – ours, and mingw’s own – breaks
+core’s <code>__int64(x)</code> functional casts</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td><code>Random</code> is Delphi’s own generator</td>
+<td>It reproduces the published Turbo Pascal / Delphi sequence from a
+zero seed exactly, which the test pins</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>C++Builder’s static class properties become static
+<code>const</code> pointers (<code>TEncoding::UTF8</code>)</td>
+<td>clang accepts <code>static __declspec(property)</code> but compiles
+it as a plain static member, failing only at link (see verified facts).
+Pointers serve both of core’s spellings, as a value and through
+<code>-&gt;</code>;
+<code>[[clang::require_constant_initialization]]</code> guarantees no
+static-init-order exposure</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td><code>Win32MajorVersion()</code> and friends are functions, read
+from <code>RtlGetVersion</code></td>
+<td>Core calls them as functions. <code>GetVersionEx</code> reports 6.2
+to an unmanifested executable, which would turn core’s
+<code>IsWin10()</code> false on 10 and 11. Computed on first use, which
+also removes a dynamic-initialiser hazard</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td><code>StaticArray&lt;T, N&gt;</code> keeps one slack element, filled
+by its owner with a value no input matches</td>
+<td>Core passes <code>Size()</code> as an open array’s <em>high
+index</em> (<code>ParseShortEngMonthName</code>) and reads one past the
+end. In C++Builder that is whatever follows; here it is defined and
+means “not found”</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>The census measures every core unit in <code>ScpCore.cbproj</code>,
+read from the project, in parallel</td>
+<td>Ten units were a sample. Reading the list from upstream means a unit
+it adds fails the ratchet until baselined, rather than going unmeasured.
+66 compiles take about 5 s</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>Case-mismatched upstream includes get checked-in forwarding headers
+in <code>port/casefold</code></td>
+<td>They resolve only on case-insensitive file systems, so a Linux host
+fails even when cross-compiling for Windows. Explicit, not generated: a
+basename match would have mapped <code>putty/windows/gss.c</code>’s
+<code>security.h</code> – the Windows SDK header – onto core’s
+<code>Security.h</code>. <code>check_include_case.py</code> applies a
+same-directory rule and fails on drift either way</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td><code>ARRAYOFCONST</code> expands to C++Builder’s two arguments, a
+<code>TVarRec</code> pointer and the high index</td>
+<td>Core’s own functions take open arrays that way
+(<code>ExecCommand</code>, <code>ExtException</code>), so a single
+container argument cannot reach them. The count comes from
+<code>sizeof</code> over an unevaluated call, so each value is evaluated
+once – C++Builder’s macro evaluates them twice</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>The XML DOM follows Delphi’s model: text and comment nodes as
+children, Null attribute variants, raising loaders</td>
+<td>FileZilla keeps a site’s name as a text node among element children,
+found by <code>NodeType</code>; core tests absent attributes with
+<code>IsNull()</code>; and <code>ImportFromFilezilla</code> has no
+handler around <code>LoadFromFile</code>, so a malformed file must raise
+rather than import nothing. The earlier <code>bool</code> loaders were a
+divergence justified by a wrong reading of core</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td><code>TCustomIniFile</code>’s virtuals take parameters by value, and
+its abstract set is Delphi’s eight</td>
+<td>C++Builder declares Delphi virtuals that way and core’s
+<code>TOptionsIniFile</code> overrides with exactly those signatures;
+by-reference parameters made its methods new functions and left the
+class abstract</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td><code>TStrings::Text</code> uses CRLF on both platforms</td>
+<td>Delphi’s POSIX RTL uses LF. Core builds configuration and
+server-facing text through <code>Text</code>, and identical output
+everywhere matters more</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>try/__finally brace depth is measured over code only</td>
+<td>A <code>}</code> inside a comment in a <code>__finally</code> body
+put <code>LINSCP_END_FINALLY</code> one brace early in
+ScpFileSystem.cpp. Comments and string/character literals are now
+blanked before counting; still 179 blocks</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>The transform finds its patch series relative to itself, and a
+missing one is an error</td>
+<td>CMake runs it from the build tree, where the relative path found
+nothing: every CMake-built tree had <strong>no closure bindings at
+all</strong>, and the verifier, loading the same way, agreed. The census
+ran from the repo root and never saw it.
+<code>bind_closures.py --require-bound</code> now checks the tree the
+build compiles</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>Header function definitions at namespace scope get
+<code>inline</code> (transform rule, verified)</td>
+<td><code>Common.h</code> defines <code>IsWideChar</code> without it:
+one definition per including unit, 31 in all, which C++Builder’s linker
+tolerates and the standard forbids. A rule rather than a patch, so a new
+one upstream is handled too; a global
+<code>--allow-multiple-definition</code> would have hidden real
+duplicates</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>The shim’s <code>ExpandEnvironmentVariables</code> removed</td>
+<td>Core defines it itself, with Windows <code>%VAR%</code> semantics
+through <code>ExpandEnvironmentStrings</code>. The shim’s was an
+invented POSIX <code>$VAR</code> variant, a duplicate the syntax-only
+census could not see. Linux gets <code>ExpandEnvironmentStrings</code>
+with Windows semantics instead (P1-07b)</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>A PR-able branch against <code>winscp/winscp</code> will be
+<strong>generated</strong>, not hand-maintained</td>
+<td>linscp shares no history with upstream, so its <code>qt</code>
+branch is not directly mergeable. Since the port is mechanical, the fork
+branch can be produced on demand (Q-7). Rehearsed end to end — see facts
+below</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>Transform must be byte-exact outside property lines</td>
+<td>A full-file rewrite (CRLF loss) turned a 613-line change into
+76,551. Now asserted by <code>verify_transform.py</code></td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>Field/accessor classification is convention-first, parens only as
+fallback</td>
+<td>The parens heuristic false-positives on constructor initialiser
+lists; WinSCP’s <code>F&lt;Upper&gt;</code> /
+<code>Get*</code>/<code>Set*</code> convention is airtight. Truly
+unclassifiable names now fail the run instead of producing a wrong-arity
+macro</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>Windows releases link statically via lld</td>
+<td><code>-fuse-ld=lld -static -L/usr/x86_64-w64-mingw32/lib</code>;
+leaves only KERNEL32 and msvcrt as deps</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>CMake hard-fails on non-clang compilers</td>
+<td>A clear configure-time error beats a confusing failure in the first
+transformed header</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>The transform stamp lives outside the generated tree</td>
+<td><code>verify_transform.py</code> treats any extra file as a
+violation, which is the behaviour we want; the stamp was the first thing
+it caught</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td><strong>Accepted (Q-8):</strong> <code>-fshort-wchar</code> with
+<code>std::u16string</code> storage; <code>std::wstring</code> banned in
+<code>port/</code></td>
+<td>Only option leaving upstream’s thousands of <code>L"..."</code>
+literals untouched. Enforced by <code>check_wide_abi.py</code> and a
+<code>static_assert</code>. ADR 0001</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td><code>-fshort-wchar</code> set globally, not per-target</td>
+<td>One translation unit without it is an ABI landmine that links
+cleanly</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td><code>UnicodeString</code> case folding is ASCII-only for now</td>
+<td>Delphi’s is locale-aware; core uses it on protocol tokens and switch
+names. Recorded as a known limitation, not silently equivalent</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td><code>vcl.h</code> transitively exposes the Win32 API</td>
+<td>Matches C++Builder, which upstream’s <code>CorePCH.h</code> depends
+on: it includes <code>&lt;vcl.h&gt;</code> and core’s headers before
+<code>&lt;Winapi.Windows.hpp&gt;</code>. Fixing this alone removed 9 of
+24 missing types</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>UTF-8 decoding substitutes one U+FFFD per maximal subpart</td>
+<td>Unicode’s recommended practice. The first implementation emitted one
+per byte; a test on truncated input caught it</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>Byte strings keep C++Builder’s code-page template shape</td>
+<td>Core relies on <code>RawByteString</code> and
+<code>UTF8String</code> being distinct types; collapsing them would let
+byte reinterpretation happen silently</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>Date and time are combined only through
+<code>ComposeDateTime</code></td>
+<td>Delphi keeps the time of day positive for negative dates, so
+<code>Date + Time</code> lands a day late at the mirrored time. Correct
+for file timestamps, wrong in general and wrong silently</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td><code>TCriticalSection</code> wraps
+<code>std::recursive_mutex</code></td>
+<td>Delphi’s is re-entrant; a plain <code>std::mutex</code> would
+deadlock on core’s re-entrant paths rather than fail a test</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>Compile-census numbers are ratcheted in CI</td>
+<td>No core TU compiles cleanly yet, so a reintroduced missing type
+would otherwise present as a passing build</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td><code>TStrings</code> is 0-based while <code>UnicodeString</code> is
+1-based</td>
+<td>Both match their Delphi originals. Two bases in one codebase is a
+hazard, so each is pinned by a boundary test rather than left to
+memory</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td><code>TStrings</code> references objects, never owns them</td>
+<td>Delphi does not free them and core owns them elsewhere; freeing here
+would be a double-free. Asserted by a test that outlives the list</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>Chained subscripts on indexed properties are unsupported</td>
+<td>clang reads <code>Prop[i][j]</code> as a two-argument getter call.
+Core has 0 occurrences; <code>check_properties.py</code> fails if an
+upstream change adds one</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>Win32 A/W name macros are undone in
+<code>vcl_win32_undef.h</code></td>
+<td><code>&lt;windows.h&gt;</code> renamed the <em>definition</em> of
+<code>ReplaceText</code> to <code>ReplaceTextW</code> while the header
+still declared <code>ReplaceText</code>. Both compiled; only the link
+failed, and only because a test called it. A link-time guard now
+references every colliding name</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td><code>ARRAYOFCONST</code> pastes its parenthesised list onto a
+variadic call</td>
+<td>C++Builder builds an open array of <code>TVarRec</code>, which needs
+compound literals. <code>ARRAYOFCONST((a, b))</code> becoming
+<code>MakeFormatArgs(a, b)</code> is ordinary C++</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>XML is parsed for real, using the expat upstream vendors, rather
+than stubbed</td>
+<td>A stub would silently import no FileZilla sessions. The mingw
+sysroot has no expat, so the vendored source is compiled for both
+targets, which also keeps them on one version</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>Wide-character functions are renamed and the CRT names redirected by
+macro</td>
+<td>They cannot be redeclared – <code>&lt;string&gt;</code> pulls in
+<code>&lt;cwchar&gt;</code>, whose <code>wcschr</code> differs from ours
+only in return type – and a macro also guarantees core’s calls reach
+ours rather than glibc’s</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td><code>towlower</code>/<code>towupper</code> fold ASCII only, on both
+platforms</td>
+<td>The Windows CRT folds only ASCII in the default locale, confirmed by
+running the test against it. Folding Latin-1 on POSIX alone would make
+the platforms disagree, which is worse than being narrow</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td><code>try</code>/<code>__finally</code> uses the same lambda
+expansion on <em>both</em> targets</td>
+<td>SEH would work on mingw, but one code path on both platforms is
+worth more than relying on it, and it removes a way for the two to
+diverge in behaviour</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>The <code>try</code>/<code>__finally</code> transform measures brace
+depth on the <em>pristine</em> lines and applies every edit
+afterwards</td>
+<td><code>LINSCP_END_FINALLY</code> replaces a <code>}</code> with text
+containing no brace, so editing in place miscounted the depth of any
+enclosing block – and core nests these</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>One bare <code>return</code> inside a guarded body is permitted, by
+checked condition</td>
+<td>Returning from the lambda runs the cleanup through the guard and
+then falls off the end of the function, which is what Borland does – but
+only when the block ends the function and the return carries no value.
+Both are verified rather than assumed</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>Every property form routes through a generated public wrapper</td>
+<td>Borland’s <code>__property</code> grants access to a private
+accessor from outside the class and ignores constness;
+<code>__declspec(property)</code> does neither, because it expands to an
+ordinary member call at the use site. The wrappers restore both
+behaviours, and the getter casts its result to the declared type because
+C++Builder is lax where the two differ in constness</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td><code>UnicodeString</code> accepts numbers implicitly, yielding
+their decimal text</td>
+<td>C++Builder does, and core depends on it. The hazard is real –
+<code>UnicodeString s = 0;</code> gives <code>"0"</code> – but diverging
+would mean editing core</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>Globals that need dynamic initialisation are declared
+<em>before</em> the object that initialises them</td>
+<td>Within a translation unit, dynamic initialisation runs in
+declaration order. Putting the initialiser first had its constructor
+assign to a <code>UnicodeString</code> that was not yet constructed,
+which segfaulted rather than failing to compile</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td><code>TMask</code> matching is case-insensitive</td>
+<td>Delphi’s is, and core uses it for file masks users type without
+regard to case</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>Closure call sites are <strong>compiler-discovered, committed, then
+replayed</strong></td>
+<td>The sites cannot be inferred by regex: whether an argument is a
+closure depends on the callee’s signature. clang names each one exactly,
+so discovery records them to
+<code>port/patches/closure_sites.json</code> and
+<code>transform.py</code> replays that list, failing loudly if a
+recorded site no longer holds the expected identifier</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>A diagnostic inside a macro expansion is resolved to the macro
+<em>definition</em></td>
+<td>clang reports it at the expansion point, so
+<code>SessionInfo.cpp</code>’s <code>ADSTR</code> macro alone produced
+61 duplicate reports. Binding the definition once fixes every call site,
+and cut the work from 118 sites to 62</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td><code>TRegistry</code> on POSIX reports every key absent rather than
+empty</td>
+<td>There is no registry, and returning defaults for settings a user had
+actually set would look to them like their configuration had vanished.
+The INI backend, which core already supports, is the correct one there
+(P1-06d)</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td>INI section and key names match case-insensitively</td>
+<td>Delphi’s do, and files written by WinSCP on Windows have
+inconsistent casing</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td>INI sections and keys keep their file order</td>
+<td>Sorting them would churn the user’s configuration on every save and
+make diffs useless</td>
+</tr>
+<tr class="even">
+<td>2026-10-11</td>
+<td><code>DynamicArray</code> shares its buffer on copy, as Delphi’s
+does</td>
+<td>Core declares <code>TSafeHandleStream::Read</code> as taking one
+<em>by value</em> and fills it for the caller. A deep-copying version
+would compile and silently return no data</td>
+</tr>
+<tr class="odd">
+<td>2026-10-11</td>
+<td><code>win32_on_posix.h</code> exposes <code>&lt;string.h&gt;</code>,
+<code>&lt;stdlib.h&gt;</code> and <code>&lt;stdio.h&gt;</code></td>
+<td><code>&lt;windows.h&gt;</code> does transitively, and core calls
+<code>strlen</code>, <code>strcmp</code> and <code>memmove</code>
+unqualified</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td><strong>Resource strings: supply Win32 <code>LoadString</code>, not
+a <code>.res</code> loader, and do not patch core</strong></td>
+<td>core’s <code>LoadStr</code> is already implemented, in terms of
+<code>HInstance</code>, <code>LibModuleList</code> and Win32
+<code>LoadString</code>. Supplying those three means no
+<code>.res</code> binary format to parse, no core edits, and a purely
+additive change — the kind upstream could take rather than a fork of its
+own code. The table is generated from upstream’s <code>.rc</code> files,
+so the strings track the submodule automatically</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td><code>UnicodeString::c_str()</code> has a non-const overload
+returning a writable buffer</td>
+<td>C++Builder’s does, and core depends on it:
+<code>DoLoadStrFrom</code> calls <code>SetLength</code> and then passes
+<code>c_str()</code> to <code>LoadString</code> as the destination to
+fill</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td><code>TList::Notify</code> is virtual and fires before a removal,
+after an addition</td>
+<td>Core overrides it. <code>TObjectList</code> frees owned objects from
+inside it, so a wrong <code>Action</code> means a leak or a double free,
+neither of which announces itself</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td><code>Extract</code> reports <code>lnExtracted</code>, never
+<code>lnDeleted</code></td>
+<td>That is how Delphi lets a caller take ownership back without the
+list freeing the object</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td><code>TList::Sort</code> is stable, where Delphi’s quicksort is
+not</td>
+<td>Relying on an unstable order would be a latent caller bug either
+way, and stable is the safer guarantee to provide</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>Derived streams re-expose the base’s legacy <code>Seek</code> with a
+using-declaration</td>
+<td>Overriding one overload hides the other. Core calls both on derived
+streams, so without this the legacy origins would stop resolving</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td>Stream exceptions follow Delphi’s shape exactly</td>
+<td><code>EFilerError</code>, <code>EFOpenError</code> and
+<code>EFCreateError</code> are siblings under <code>EStreamError</code>,
+with <code>EReadError</code>/<code>EWriteError</code> beneath
+<code>EFilerError</code>. Core catches at both levels</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td><code>port/platform</code> headers refuse to compile on Windows, and
+are POSIX-only on the include path</td>
+<td>Putting them on a Windows target shadowed the genuine mingw headers,
+which presented as a 1,220 -&gt; 783 “improvement”. The
+<code>#error</code> makes that mistake loud</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td><code>port/compat</code> is separate from
+<code>port/platform</code></td>
+<td><code>help.h</code> is missing from upstream itself rather than
+being a platform difference, so it is needed on every target</td>
+</tr>
+<tr class="odd">
+<td>2026-10-10</td>
+<td>The ratchet records whether a unit aborted</td>
+<td>An aborted parse reports a floor. Treating that as a distinct state
+stops a new abort from reading as sudden progress</td>
+</tr>
+<tr class="even">
+<td>2026-10-10</td>
+<td><code>Format</code> keeps malformed input visible</td>
+<td>Delphi raises on a missing argument. Core routes user- and
+server-supplied text through these into logs, so an unknown specifier is
+echoed and a missing argument renders as <code>&lt;missing&gt;</code>
 rather than throwing from a log path</td>
 </tr>
 </tbody>
