@@ -8,29 +8,30 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 17 | 29 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 6 | 26 | Golden suite green, six protocols, both platforms |
+| P0 Foundation | 19 | 30 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P1 Headless core | 6 | 27 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **23** | **80** | |
+| **Total** | **25** | **82** | |
 
 ## Next three actions
 
 Driven by `compile_census.py` rather than by grep counts — the compiler names
 what is actually blocking `Common.cpp`, in dependency order.
 
-**`Common.cpp` is down to 5 errors and every one is `__closure`.** That makes
-P0-06b the whole critical path to the first core TU compiling.
+Ranked by the aggregate census across nine core TUs (2,409 errors total).
 
-1. **P0-06b / `__closure`** — design the closure type, transform the 16 typedefs,
-   and solve call-site binding. Core passes a bare member-function name where a
-   closure is expected; Borland binds `this` implicitly, and the bare name is not
-   valid C++, so call sites must be rewritten rather than merely retyped.
-2. **P0-09** — finish the first TU, then add two or three more TUs to the ratchet
-   so the shim is measured against more than `Common.cpp`.
-3. **P0-13** — the golden-output harness, still the highest-leverage item for
-   everything after P1.
+1. **P0-06b / `__closure`** — still the largest single group once the event
+   typedefs are counted together: `TProcessLocalFileEvent` 33,
+   `TTransferOutEvent`/`TTransferInEvent` 30 each, `TLogOptionEvent` 28,
+   `TQueryParamsTimerEvent` 21, `TButtonSubmitEvent` 21, `TAddLogEntryEvent` 20.
+2. **P1-06 / streams** — `TStream`, `THandleStream`, `TMemoryStream`, ~31 each.
+3. **P1-02b / `TList`** (28) and **P1-06b / `TRegistry`** (29) plus
+   `TCustomIniFile` (28).
+
+Also outstanding and cheap: `TVarRec` + `ARRAYOFCONST` (the varargs formatting
+path), `TShiftState`, `TThreadID`/`TThreadFunc`, `PResStringRec`.
 
 ## Decisions taken
 
@@ -65,6 +66,28 @@ P0-06b the whole critical path to the first core TU compiling.
 | 2026-10-10 | `TStrings` is 0-based while `UnicodeString` is 1-based | Both match their Delphi originals. Two bases in one codebase is a hazard, so each is pinned by a boundary test rather than left to memory |
 | 2026-10-10 | `TStrings` references objects, never owns them | Delphi does not free them and core owns them elsewhere; freeing here would be a double-free. Asserted by a test that outlives the list |
 | 2026-10-10 | Chained subscripts on indexed properties are unsupported | clang reads `Prop[i][j]` as a two-argument getter call. Core has 0 occurrences; `check_properties.py` fails if an upstream change adds one |
+
+## Correction: the earlier "5 errors left" figure was wrong
+
+Recorded because the mistake is instructive, not just to log it.
+
+`compile_census.py` filtered clang diagnostics on `': error:'`, which does not
+match `': fatal error:'`. A missing header emits only a *fatal* error and aborts
+the parse, so a translation unit that never got past its first include was
+reported as having **zero** problems. The progression logged earlier for
+`Common.cpp` (109 -> 83 -> 70 -> 30 -> 13 -> 5) was real for the portion that
+parsed, but it was a floor, not a total: the parse was stopping at
+`#include <Classes.hpp>`.
+
+Two fixes. The census now counts fatal errors and prints `ABORTED EARLY` with the
+cause, so an aborted unit can never again look like a clean one. And
+`port/shim` now stubs the unqualified legacy RTL header names (`Classes.hpp`,
+`SysUtils.hpp`, `Contnrs.hpp`, ...) alongside the `System.*` spellings, since
+core uses both.
+
+The honest figure for `Common.cpp` is **417 errors across 29 missing types**, and
+the ratchet now covers nine translation units rather than one, precisely so a
+single unit cannot give a falsely rosy picture again.
 
 ## Known divergences from Delphi
 
@@ -134,7 +157,12 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | The ratchet detects a regression: baseline 25 against actual 30 fails | simulated baseline, exit 1 | 2026-10-10 |
 | `TDateTime` matches Delphi's four documented anchors, including -1.25 = 1899-12-29 06:00 | `test_datetime` | 2026-10-10 |
 | Delphi's `DayOfWeek` offset verified independently against five known dates | standalone cross-check, k=6 | 2026-10-10 |
-| **`Common.cpp`: 109 -> 5 errors, and all 5 are `__closure`** | `compile_census.py` | 2026-10-10 |
+| ~~`Common.cpp`: 109 -> 5 errors~~ — **superseded**: the parse was aborting at a missing header | see the correction above | 2026-10-10 |
+| Upstream pinned to **6.5.8**, the latest stable release | `git tag`; 6.6.x is entirely RC/beta | 2026-10-10 |
+| The transform handled the version change with **no script edits**: 624 declarations across 70 files, 0 unhandled | `transform.py` on 6.5.8, which differs from the old pin by ~2,500 lines across 58 core files | 2026-10-10 |
+| All 624 transformed declarations compile on 6.5.8 | `check_properties.py`, exit 0 | 2026-10-10 |
+| Honest aggregate census: **2,409 errors across 9 core TUs**, ratcheted | `census_ratchet.py` | 2026-10-10 |
+| 12/12 tests pass on both targets after the version change | `ctest` both trees | 2026-10-10 |
 | 12/12 tests pass on Linux and on Windows under Wine | `ctest` both trees | 2026-10-10 |
 | Directory search validated against both backends: real `FindFirstFileW` under Wine, and `dirent` + `fnmatch` on Linux | `test_sysutils` on both targets | 2026-10-10 |
 | `__closure` scope: 44 distinct closure types, 16 typedefs; call sites pass bare member-function names | grep over generated core | 2026-10-10 |
@@ -145,7 +173,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | ID | Task | Status | Note |
 |---|---|---|---|
 | P0-01 | Repo layout | done | `port/{shim,platform,tools,patches}`, `qt/`, `cmake/` |
-| P0-02 | Pin submodule to a release tag | todo | currently a `master` commit |
+| P0-02 | Pin submodule to a release tag | done | 6.5.8, latest stable; 6.6.x is all RC/beta |
 | P0-03 | Dual-target property macro header | done | `port/shim/vcl_property.h`; 9 forms, self-tested |
 | P0-04 | Verify C++Builder accepts the macro | blocked | Q-2: needs licence + Windows |
 | P0-05 | `transform.py` property rewriter | done | 613/613, 0 unhandled |
@@ -153,7 +181,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P0-06b | `__closure` support | todo | the only remaining `Common.cpp` blocker |
 | P0-07 | Transform idempotence tests | done | idempotent + line-count parity asserted |
 | P0-08 | CMake skeleton | done | transform+verify wired as a build step; CTest on both targets |
-| P0-09 | Minimal shim for `core/Common.cpp` | wip | 109 -> 5 errors; all 5 are `__closure` |
+| P0-09 | Minimal shim for `core/Common.cpp` | wip | 417 errors / 29 types, measured honestly (see correction below) |
 | P0-10 | mingw-w64 sysroot + clang toolchain file | done | `cmake/toolchain-mingw-w64.cmake`; clang + lld + Wine emulator |
 | P0-11 | CI matrix Linux + Windows cross | todo | |
 | P0-12 | Wine smoke tests in CI | wip | wired into CTest via `CMAKE_CROSSCOMPILING_EMULATOR`; GitHub Actions pending |
@@ -172,6 +200,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P0-25 | ADR 0001 character width | done | accepted: `-fshort-wchar` + `std::u16string` |
 | P0-26 | `check_wide_abi.py` ADR enforcement | done | `shim_no_wide_abi` test |
 | P0-27 | `compile_census.py` | done | classifies clang diagnostics into shim gaps |
+| P0-29 | Legacy unqualified RTL header stubs | done | `Classes.hpp` etc.; absence was aborting most TUs |
 | P0-28 | `census_ratchet.py` | done | baseline pinned at 30 errors / 5 types |
 
 ### P1 — Headless core
@@ -187,7 +216,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-04 | Shim: exceptions | done | 17 Delphi classes; base and sibling matching tested |
 | P1-05 | Shim: `TCriticalSection`/`SyncObjs` | done | recursive; thread exclusion tested |
 | P1-05b | Shim: `TThread`/`StartThread` | todo | |
-| P1-06 | Shim: streams/INI/registry | todo | |
+| P1-06 | Shim: streams | todo | `TStream`/`THandleStream`/`TMemoryStream`, ~31 uses each |
+| P1-06b | Shim: INI/registry storage | todo | `TRegistry` 29, `TCustomIniFile` 28 |
 | P1-07 | win32-on-posix subset | todo | |
 | P1-08 | Socket-event emulation | todo | R6 |
 | P1-09 | PuTTY unix backend re-import | todo | |

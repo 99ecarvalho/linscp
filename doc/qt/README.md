@@ -19,16 +19,17 @@ C++Builder in the toolchain.
 
 ## Current state (2026-10-10)
 
-Phase 0 under way — 7 of 18 tasks done. Upstream pinned as a submodule at
-`3rd-party/winscp` — WinSCP `6.6.4-RC-3-gaaae9dcb5` (commit `aaae9dcb`, 2026-10-09).
+Phase 0 is 19 of 30 done; Phase 1 is 6 of 27. Upstream is pinned to the latest
+**stable** release, `6.5.8`, as a submodule at `3rd-party/winscp`.
 
-Landed: the dual-target `__property` shim, the transformation script, and a
-compile-check harness. **All 613 `__property` declarations in WinSCP's core
-transform with zero unhandled cases and compile under clang.** The keystone of
-the plan is no longer theoretical.
+Landed: the dual-target `__property` shim and transform, plus `UnicodeString`,
+the byte-string family with a UTF-8 codec, `TDateTime`, the Delphi exception
+hierarchy, `TCriticalSection`, `TStrings`/`TStringList`, and directory search on
+both Win32 and POSIX. 12 test binaries pass on Linux and on Windows under Wine.
 
-Next: `core/Common.cpp` against a minimal shim (P0-09) — the cheapest way to
-replace the Phase 1 estimate with a measurement.
+Real core code compiles against the shim: **2,409 errors across 9 translation
+units**, ratcheted so the number can only go down. The largest remaining group
+is `__closure` support.
 
 ## The three findings the plan rests on
 
@@ -40,8 +41,8 @@ replace the Phase 1 estimate with a measurement.
    compiler-family change.
 
 2. **Windows binaries can be produced on Linux.** clang emits valid x86-64 COFF
-   for both `x86_64-w64-windows-gnu` and `x86_64-pc-windows-msvc`, with property
-   emulation intact. Verified locally.
+   for `x86_64-w64-mingw32`, lld static-links it, and the result runs under Wine
+   — the full test suite does exactly that on every build.
 
 3. **The de-VCL'd core already exists and is maintained.** `Far-NetBox`
    (last commit 2026-07-24, tracking WinSCP 6.5.6 — one minor behind our pin)

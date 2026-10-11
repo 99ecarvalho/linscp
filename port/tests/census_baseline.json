@@ -1,9 +1,41 @@
 {
   "target": "x86_64-w64-mingw32",
   "units": {
+    "source/core/Bookmarks.cpp": {
+      "errors": 157,
+      "missing_types": 16
+    },
     "source/core/Common.cpp": {
-      "errors": 5,
+      "errors": 417,
+      "missing_types": 29
+    },
+    "source/core/Configuration.cpp": {
+      "errors": 120,
+      "missing_types": 18
+    },
+    "source/core/CopyParam.cpp": {
+      "errors": 270,
+      "missing_types": 23
+    },
+    "source/core/FileBuffer.cpp": {
+      "errors": 56,
+      "missing_types": 7
+    },
+    "source/core/FileMasks.cpp": {
+      "errors": 364,
+      "missing_types": 46
+    },
+    "source/core/NamedObjs.cpp": {
+      "errors": 25,
       "missing_types": 2
+    },
+    "source/core/Option.cpp": {
+      "errors": 17,
+      "missing_types": 2
+    },
+    "source/core/Terminal.cpp": {
+      "errors": 983,
+      "missing_types": 51
     }
   }
 }

@@ -14,6 +14,17 @@ using Shortint = std::int8_t;
 using Longint  = std::int32_t;
 using Longword = std::uint32_t;
 using Int64    = std::int64_t;
+
+// Delphi's capitalised aliases for the built-in types. Core uses these
+// interchangeably with the C++ spellings.
+using Integer  = std::int32_t;
+using Boolean  = bool;
+using Double   = double;
+using Single   = float;
+using Extended = long double;
+using NativeInt  = std::intptr_t;
+using NativeUInt = std::uintptr_t;
+using Pointer  = void *;
 using UInt64   = std::uint64_t;
 
 #ifndef __BORLANDC__

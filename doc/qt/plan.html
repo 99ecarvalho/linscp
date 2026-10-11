@@ -341,6 +341,9 @@ id="toc-p3-qt-parity-incremental-independently-shippable">P3 — Qt parity
 actions</a></li>
 <li><a href="#decisions-taken" id="toc-decisions-taken">Decisions
 taken</a></li>
+<li><a href="#correction-the-earlier-5-errors-left-figure-was-wrong"
+id="toc-correction-the-earlier-5-errors-left-figure-was-wrong">Correction:
+the earlier “5 errors left” figure was wrong</a></li>
 <li><a href="#known-divergences-from-delphi"
 id="toc-known-divergences-from-delphi">Known divergences from
 Delphi</a></li>
@@ -428,17 +431,19 @@ merge cost.</p>
 <p>One codebase. Qt UI. Builds and runs on Linux and Windows. No
 Embarcadero C++Builder in the toolchain.</p>
 <h2 id="current-state-2026-10-10">Current state (2026-10-10)</h2>
-<p>Phase 0 under way — 7 of 18 tasks done. Upstream pinned as a
-submodule at <code>3rd-party/winscp</code> — WinSCP
-<code>6.6.4-RC-3-gaaae9dcb5</code> (commit <code>aaae9dcb</code>,
-2026-10-09).</p>
-<p>Landed: the dual-target <code>__property</code> shim, the
-transformation script, and a compile-check harness. <strong>All 613
-<code>__property</code> declarations in WinSCP’s core transform with
-zero unhandled cases and compile under clang.</strong> The keystone of
-the plan is no longer theoretical.</p>
-<p>Next: <code>core/Common.cpp</code> against a minimal shim (P0-09) —
-the cheapest way to replace the Phase 1 estimate with a measurement.</p>
+<p>Phase 0 is 19 of 30 done; Phase 1 is 6 of 27. Upstream is pinned to
+the latest <strong>stable</strong> release, <code>6.5.8</code>, as a
+submodule at <code>3rd-party/winscp</code>.</p>
+<p>Landed: the dual-target <code>__property</code> shim and transform,
+plus <code>UnicodeString</code>, the byte-string family with a UTF-8
+codec, <code>TDateTime</code>, the Delphi exception hierarchy,
+<code>TCriticalSection</code>,
+<code>TStrings</code>/<code>TStringList</code>, and directory search on
+both Win32 and POSIX. 12 test binaries pass on Linux and on Windows
+under Wine.</p>
+<p>Real core code compiles against the shim: <strong>2,409 errors across
+9 translation units</strong>, ratcheted so the number can only go down.
+The largest remaining group is <code>__closure</code> support.</p>
 <h2 id="the-three-findings-the-plan-rests-on">The three findings the
 plan rests on</h2>
 <ol type="1">
@@ -451,9 +456,9 @@ GCC does not — <strong>clang is mandatory</strong>. WinSCP’s own
 compiler is already clang-based, so this is not a compiler-family
 change.</p></li>
 <li><p><strong>Windows binaries can be produced on Linux.</strong> clang
-emits valid x86-64 COFF for both <code>x86_64-w64-windows-gnu</code> and
-<code>x86_64-pc-windows-msvc</code>, with property emulation intact.
-Verified locally.</p></li>
+emits valid x86-64 COFF for <code>x86_64-w64-mingw32</code>, lld
+static-links it, and the result runs under Wine — the full test suite
+does exactly that on every build.</p></li>
 <li><p><strong>The de-VCL’d core already exists and is
 maintained.</strong> <code>Far-NetBox</code> (last commit 2026-07-24,
 tracking WinSCP 6.5.6 — one minor behind our pin) builds WinSCP core
@@ -983,7 +988,7 @@ anywhere.</p>
 <td>Pin submodule to a release tag, not <code>master</code></td>
 <td>S</td>
 <td>P0-01</td>
-<td>Currently a <code>master</code> commit</td>
+<td>Done: 6.5.8, the latest stable. The 6.6.x line is all RC/beta</td>
 </tr>
 <tr class="odd">
 <td>P0-03</td>
@@ -1191,6 +1196,14 @@ needs</td>
 <td>Lets the compiler enumerate the shim gap instead of grep</td>
 </tr>
 <tr class="odd">
+<td>P0-29</td>
+<td>Shim stubs for the unqualified legacy RTL header names</td>
+<td>S</td>
+<td>P0-27</td>
+<td><code>Classes.hpp</code> etc.; their absence was aborting most TUs
+early</td>
+</tr>
+<tr class="even">
 <td>P0-28</td>
 <td><code>census_ratchet.py</code>: pin the census so progress cannot
 slip back</td>
@@ -1306,41 +1319,50 @@ this</td>
 </tr>
 <tr class="odd">
 <td>P1-06</td>
-<td>Shim: <code>TStream</code>, <code>TMemIniFile</code>;
-<code>TRegistry</code> → file-backed</td>
+<td>Shim:
+<code>TStream</code>/<code>THandleStream</code>/<code>TMemoryStream</code></td>
 <td>M</td>
 <td>P1-02</td>
-<td>INI backend already exists in core</td>
+<td>~31 uses each; now the largest non-closure group</td>
 </tr>
 <tr class="even">
+<td>P1-06b</td>
+<td>Shim: <code>TMemIniFile</code>/<code>TCustomIniFile</code>;
+<code>TRegistry</code> → file-backed</td>
+<td>M</td>
+<td>P1-06</td>
+<td><code>TRegistry</code> 29, <code>TCustomIniFile</code> 28. INI
+backend already exists in core</td>
+</tr>
+<tr class="odd">
 <td>P1-07</td>
 <td><code>port/platform/win32-on-posix</code>: ~40 functions</td>
 <td>L</td>
 <td>P1-06</td>
 <td>Keeps core diff at zero</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-08</td>
 <td><code>WSAEventSelect</code> / socket-event emulation</td>
 <td>M</td>
 <td>P1-07</td>
 <td>R6</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-09</td>
 <td>PuTTY: re-import upstream <code>unix/</code> backend</td>
 <td>M</td>
 <td>P1-03</td>
 <td>Upstream maintains it; reconcile WinSCP’s patches</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-10</td>
 <td>PuTTY: reconcile WinSCP deltas against vanilla 0.85</td>
 <td>M</td>
 <td>P1-09</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-11</td>
 <td>FileZilla: replace vendored MFC subset
 (<code>CString</code>/<code>CFile</code>/<code>CTime</code>)</td>
@@ -1348,7 +1370,7 @@ this</td>
 <td>P1-01</td>
 <td>Only 4 files in <code>libs/mfc</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-12</td>
 <td><strong>FileZilla: <code>WSAAsyncSelect</code> hidden-window pump →
 epoll/poll</strong></td>
@@ -1356,28 +1378,28 @@ epoll/poll</strong></td>
 <td>P1-11</td>
 <td><strong>R2.</strong> ~1,700 lines; least mechanical task in P1</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-13</td>
 <td>Switch <code>libs/</code> to system OpenSSL, expat, neon, libs3</td>
 <td>M</td>
 <td>P0-08</td>
 <td>All vanilla upstream already</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-14</td>
 <td>Drop <code>puttyvs</code> (MSVC wrapper, obsolete)</td>
 <td>S</td>
 <td>P1-09</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-15</td>
 <td><code>winscp.com</code> shared-memory IPC → plain stdio</td>
 <td>M</td>
 <td>P1-06</td>
 <td>Both platforms</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-16</td>
 <td>Headless frontend implementing <code>Interface.h</code></td>
 <td>L</td>
@@ -1385,28 +1407,28 @@ epoll/poll</strong></td>
 <td>Derive from <code>ConsoleRunner.cpp</code> — it has zero
 <code>forms/</code> deps</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-17</td>
 <td>First link + first real SFTP session on Linux</td>
 <td>M</td>
 <td>P1-16</td>
 <td>Expect a long tail of link/ABI issues</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-18</td>
 <td>Same core + CLI cross-built for Windows, Wine-smoked</td>
 <td>M</td>
 <td>P1-17, P0-12</td>
 <td>Proves “one codebase”</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-19</td>
 <td>Golden suite green across all six protocols, both platforms</td>
 <td>L</td>
 <td>P1-18, P0-15</td>
 <td><strong>P1 exit gate</strong></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-20</td>
 <td>Verify stock <code>netstandard2.0</code> .NET assembly drives the
 Linux CLI</td>
@@ -1414,7 +1436,7 @@ Linux CLI</td>
 <td>P1-19</td>
 <td>Should work unchanged</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-21</td>
 <td><code>#ifdef</code> out <code>dragext</code>,
 <code>Setup.cpp</code>, jump lists, file associations</td>
@@ -1693,15 +1715,15 @@ evaluation down and close it</td>
 <tbody>
 <tr class="odd">
 <td>P0 Foundation</td>
-<td>17</td>
-<td>29</td>
+<td>19</td>
+<td>30</td>
 <td><code>core/Common.cpp</code> compiles on Linux clang; VCL build
 green (R1)</td>
 </tr>
 <tr class="even">
 <td>P1 Headless core</td>
 <td>6</td>
-<td>26</td>
+<td>27</td>
 <td>Golden suite green, six protocols, both platforms</td>
 </tr>
 <tr class="odd">
@@ -1724,8 +1746,8 @@ green (R1)</td>
 </tr>
 <tr class="even">
 <td><strong>Total</strong></td>
-<td><strong>23</strong></td>
-<td><strong>80</strong></td>
+<td><strong>25</strong></td>
+<td><strong>82</strong></td>
 <td></td>
 </tr>
 </tbody>
@@ -1734,22 +1756,27 @@ green (R1)</td>
 <p>Driven by <code>compile_census.py</code> rather than by grep counts —
 the compiler names what is actually blocking <code>Common.cpp</code>, in
 dependency order.</p>
-<p><strong><code>Common.cpp</code> is down to 5 errors and every one is
-<code>__closure</code>.</strong> That makes P0-06b the whole critical
-path to the first core TU compiling.</p>
+<p>Ranked by the aggregate census across nine core TUs (2,409 errors
+total).</p>
 <ol type="1">
-<li><strong>P0-06b / <code>__closure</code></strong> — design the
-closure type, transform the 16 typedefs, and solve call-site binding.
-Core passes a bare member-function name where a closure is expected;
-Borland binds <code>this</code> implicitly, and the bare name is not
-valid C++, so call sites must be rewritten rather than merely
-retyped.</li>
-<li><strong>P0-09</strong> — finish the first TU, then add two or three
-more TUs to the ratchet so the shim is measured against more than
-<code>Common.cpp</code>.</li>
-<li><strong>P0-13</strong> — the golden-output harness, still the
-highest-leverage item for everything after P1.</li>
+<li><strong>P0-06b / <code>__closure</code></strong> — still the largest
+single group once the event typedefs are counted together:
+<code>TProcessLocalFileEvent</code> 33,
+<code>TTransferOutEvent</code>/<code>TTransferInEvent</code> 30 each,
+<code>TLogOptionEvent</code> 28, <code>TQueryParamsTimerEvent</code> 21,
+<code>TButtonSubmitEvent</code> 21, <code>TAddLogEntryEvent</code>
+20.</li>
+<li><strong>P1-06 / streams</strong> — <code>TStream</code>,
+<code>THandleStream</code>, <code>TMemoryStream</code>, ~31 each.</li>
+<li><strong>P1-02b / <code>TList</code></strong> (28) and <strong>P1-06b
+/ <code>TRegistry</code></strong> (29) plus <code>TCustomIniFile</code>
+(28).</li>
 </ol>
+<p>Also outstanding and cheap: <code>TVarRec</code> +
+<code>ARRAYOFCONST</code> (the varargs formatting path),
+<code>TShiftState</code>,
+<code>TThreadID</code>/<code>TThreadFunc</code>,
+<code>PResStringRec</code>.</p>
 <h2 id="decisions-taken">Decisions taken</h2>
 <table>
 <colgroup>
@@ -1963,6 +1990,30 @@ upstream change adds one</td>
 </tr>
 </tbody>
 </table>
+<h2
+id="correction-the-earlier-5-errors-left-figure-was-wrong">Correction:
+the earlier “5 errors left” figure was wrong</h2>
+<p>Recorded because the mistake is instructive, not just to log it.</p>
+<p><code>compile_census.py</code> filtered clang diagnostics on
+<code>': error:'</code>, which does not match
+<code>': fatal error:'</code>. A missing header emits only a
+<em>fatal</em> error and aborts the parse, so a translation unit that
+never got past its first include was reported as having
+<strong>zero</strong> problems. The progression logged earlier for
+<code>Common.cpp</code> (109 -&gt; 83 -&gt; 70 -&gt; 30 -&gt; 13 -&gt;
+5) was real for the portion that parsed, but it was a floor, not a
+total: the parse was stopping at
+<code>#include &lt;Classes.hpp&gt;</code>.</p>
+<p>Two fixes. The census now counts fatal errors and prints
+<code>ABORTED EARLY</code> with the cause, so an aborted unit can never
+again look like a clean one. And <code>port/shim</code> now stubs the
+unqualified legacy RTL header names (<code>Classes.hpp</code>,
+<code>SysUtils.hpp</code>, <code>Contnrs.hpp</code>, …) alongside the
+<code>System.*</code> spellings, since core uses both.</p>
+<p>The honest figure for <code>Common.cpp</code> is <strong>417 errors
+across 29 missing types</strong>, and the ratchet now covers nine
+translation units rather than one, precisely so a single unit cannot
+give a falsely rosy picture again.</p>
 <h2 id="known-divergences-from-delphi">Known divergences from
 Delphi</h2>
 <p>Recorded deliberately, so they are findable when something behaves
@@ -2337,24 +2388,54 @@ against five known dates</td>
 <td>2026-10-10</td>
 </tr>
 <tr class="odd">
-<td><strong><code>Common.cpp</code>: 109 -&gt; 5 errors, and all 5 are
-<code>__closure</code></strong></td>
-<td><code>compile_census.py</code></td>
+<td><del><code>Common.cpp</code>: 109 -&gt; 5 errors</del> —
+<strong>superseded</strong>: the parse was aborting at a missing
+header</td>
+<td>see the correction above</td>
 <td>2026-10-10</td>
 </tr>
 <tr class="even">
-<td>12/12 tests pass on Linux and on Windows under Wine</td>
+<td>Upstream pinned to <strong>6.5.8</strong>, the latest stable
+release</td>
+<td><code>git tag</code>; 6.6.x is entirely RC/beta</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>The transform handled the version change with <strong>no script
+edits</strong>: 624 declarations across 70 files, 0 unhandled</td>
+<td><code>transform.py</code> on 6.5.8, which differs from the old pin
+by ~2,500 lines across 58 core files</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>All 624 transformed declarations compile on 6.5.8</td>
+<td><code>check_properties.py</code>, exit 0</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="odd">
+<td>Honest aggregate census: <strong>2,409 errors across 9 core
+TUs</strong>, ratcheted</td>
+<td><code>census_ratchet.py</code></td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
+<td>12/12 tests pass on both targets after the version change</td>
 <td><code>ctest</code> both trees</td>
 <td>2026-10-10</td>
 </tr>
 <tr class="odd">
+<td>12/12 tests pass on Linux and on Windows under Wine</td>
+<td><code>ctest</code> both trees</td>
+<td>2026-10-10</td>
+</tr>
+<tr class="even">
 <td>Directory search validated against both backends: real
 <code>FindFirstFileW</code> under Wine, and <code>dirent</code> +
 <code>fnmatch</code> on Linux</td>
 <td><code>test_sysutils</code> on both targets</td>
 <td>2026-10-10</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>__closure</code> scope: 44 distinct closure types, 16
 typedefs; call sites pass bare member-function names</td>
 <td>grep over generated core</td>
@@ -2390,8 +2471,8 @@ typedefs; call sites pass bare member-function names</td>
 <tr class="even">
 <td>P0-02</td>
 <td>Pin submodule to a release tag</td>
-<td>todo</td>
-<td>currently a <code>master</code> commit</td>
+<td>done</td>
+<td>6.5.8, latest stable; 6.6.x is all RC/beta</td>
 </tr>
 <tr class="odd">
 <td>P0-03</td>
@@ -2439,7 +2520,7 @@ typedefs; call sites pass bare member-function names</td>
 <td>P0-09</td>
 <td>Minimal shim for <code>core/Common.cpp</code></td>
 <td>wip</td>
-<td>109 -&gt; 5 errors; all 5 are <code>__closure</code></td>
+<td>417 errors / 29 types, measured honestly (see correction below)</td>
 </tr>
 <tr class="odd">
 <td>P0-10</td>
@@ -2557,6 +2638,12 @@ resolution</td>
 <td>classifies clang diagnostics into shim gaps</td>
 </tr>
 <tr class="odd">
+<td>P0-29</td>
+<td>Legacy unqualified RTL header stubs</td>
+<td>done</td>
+<td><code>Classes.hpp</code> etc.; absence was aborting most TUs</td>
+</tr>
+<tr class="even">
 <td>P0-28</td>
 <td><code>census_ratchet.py</code></td>
 <td>done</td>
@@ -2651,95 +2738,102 @@ done; path routines next</td>
 </tr>
 <tr class="odd">
 <td>P1-06</td>
-<td>Shim: streams/INI/registry</td>
+<td>Shim: streams</td>
 <td>todo</td>
-<td></td>
+<td><code>TStream</code>/<code>THandleStream</code>/<code>TMemoryStream</code>,
+~31 uses each</td>
 </tr>
 <tr class="even">
+<td>P1-06b</td>
+<td>Shim: INI/registry storage</td>
+<td>todo</td>
+<td><code>TRegistry</code> 29, <code>TCustomIniFile</code> 28</td>
+</tr>
+<tr class="odd">
 <td>P1-07</td>
 <td>win32-on-posix subset</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-08</td>
 <td>Socket-event emulation</td>
 <td>todo</td>
 <td>R6</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-09</td>
 <td>PuTTY unix backend re-import</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-10</td>
 <td>PuTTY delta reconciliation</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-11</td>
 <td>FileZilla MFC subset replacement</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-12</td>
 <td>FileZilla epoll rewrite</td>
 <td>todo</td>
 <td><strong>R2</strong> — budget generously</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-13</td>
 <td>System libs</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-14</td>
 <td>Drop <code>puttyvs</code></td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-15</td>
 <td>Console IPC → stdio</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-16</td>
 <td>Headless <code>Interface.h</code> frontend</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-17</td>
 <td>First SFTP session on Linux</td>
 <td>todo</td>
 <td>long tail expected</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-18</td>
 <td>Windows cross-build + Wine</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-19</td>
 <td>Golden suite green, both platforms</td>
 <td>todo</td>
 <td><strong>P1 gate</strong></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>P1-20</td>
 <td>.NET assembly drives Linux CLI</td>
 <td>todo</td>
 <td></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>P1-21</td>
 <td><code>#ifdef</code> out Windows-only subsystems</td>
 <td>todo</td>

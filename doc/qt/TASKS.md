@@ -13,7 +13,7 @@ Goal: prove the keystone works, with no behaviour change anywhere.
 | ID | Task | Size | Depends | Notes |
 |---|---|---|---|---|
 | P0-01 | Repo layout: `port/`, `qt/`, `cmake/`, `build/gen/` gitignored | S | — | Per PLAN §3 |
-| P0-02 | Pin submodule to a release tag, not `master` | S | P0-01 | Currently a `master` commit |
+| P0-02 | Pin submodule to a release tag, not `master` | S | P0-01 | Done: 6.5.8, the latest stable. The 6.6.x line is all RC/beta |
 | P0-03 | **Dual-target property macro header** (`port/shim/vcl_property.h`) | S | — | The keystone; PLAN §2 |
 | P0-04 | **Verify C++Builder accepts macro-expanded `__property`** | S | P0-03 | **R1. Do this first.** Needs a licence + Windows. Blocks the zero-diff story |
 | P0-05 | `transform.py`: `__property` rewriter, line-preserving | M | P0-03 | 591 decls, 4 forms + 4 manual |
@@ -40,6 +40,7 @@ Goal: prove the keystone works, with no behaviour change anywhere.
 | P0-25 | ADR 0001: character width for `UnicodeString` | S | P0-24 | Accepted: `-fshort-wchar`, `std::u16string` storage |
 | P0-26 | `check_wide_abi.py`: enforce ADR 0001 mechanically | S | P0-25 | Wrong-ABI code links cleanly then misbehaves, so grep it |
 | P0-27 | `compile_census.py`: classify what a real core TU still needs | S | P0-09 | Lets the compiler enumerate the shim gap instead of grep |
+| P0-29 | Shim stubs for the unqualified legacy RTL header names | S | P0-27 | `Classes.hpp` etc.; their absence was aborting most TUs early |
 | P0-28 | `census_ratchet.py`: pin the census so progress cannot slip back | S | P0-27 | Nothing in core compiles cleanly yet, so a reintroduced type would look like a passing build |
 
 ## P1 — Headless core on both platforms
@@ -58,7 +59,8 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P1-04 | Shim: `Exception` hierarchy + Delphi exception semantics | M | P1-01 | Core has no `__try`/`__except` — simplifies this |
 | P1-05 | Shim: `TCriticalSection` + `SyncObjs` | M | P1-02 | Done; recursive, as Delphi's is |
 | P1-05b | Shim: `TThread` / `StartThread` | M | P1-05 | `Interface.h` already abstracts thread creation |
-| P1-06 | Shim: `TStream`, `TMemIniFile`; `TRegistry` → file-backed | M | P1-02 | INI backend already exists in core |
+| P1-06 | Shim: `TStream`/`THandleStream`/`TMemoryStream` | M | P1-02 | ~31 uses each; now the largest non-closure group |
+| P1-06b | Shim: `TMemIniFile`/`TCustomIniFile`; `TRegistry` → file-backed | M | P1-06 | `TRegistry` 29, `TCustomIniFile` 28. INI backend already exists in core |
 | P1-07 | `port/platform/win32-on-posix`: ~40 functions | L | P1-06 | Keeps core diff at zero |
 | P1-08 | `WSAEventSelect` / socket-event emulation | M | P1-07 | R6 |
 | P1-09 | PuTTY: re-import upstream `unix/` backend | M | P1-03 | Upstream maintains it; reconcile WinSCP's patches |

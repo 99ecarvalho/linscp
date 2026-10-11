@@ -53,6 +53,8 @@ def main():
         '-I', os.path.join(up, 'windows'),
         '-I', os.path.join(up, 'filezilla'),
         '-I', os.path.join(up, 'putty'),
+        '-I', os.path.join(up, 'putty/windows'),
+        '-I', os.path.join(up, 'components'),
         '-I', '3rd-party/winscp/libs/openssl/include',
         '-I', '3rd-party/winscp/libs/neon/src',
         '-I', '3rd-party/winscp/libs/expat/lib',
@@ -62,7 +64,12 @@ def main():
     r = subprocess.run(cmd, capture_output=True, text=True)
     err = r.stderr
 
-    errors = [l for l in err.split('\n') if ': error:' in l]
+    # Count fatal errors too. A missing header produces only a *fatal* error and
+    # aborts the parse, so filtering on ': error:' alone reported such a unit as
+    # having zero problems -- the most misleading result possible.
+    errors = [l for l in err.split('\n')
+              if ': error:' in l or ': fatal error:' in l]
+    fatal = [l for l in err.split('\n') if ': fatal error:' in l]
     found = collections.defaultdict(collections.Counter)
     unmatched = []
     for line in errors:
@@ -78,6 +85,11 @@ def main():
     print(f'target           : {a.target}')
     print(f'clang exit        : {r.returncode}')
     print(f'total errors      : {len(errors)}')
+    if fatal:
+        print(f'ABORTED EARLY     : {len(fatal)} fatal error(s) -- the parse '
+              f'stopped, so this count is a floor, not a total')
+        for l in fatal[:3]:
+            print('   ', l.split('fatal error:')[-1].strip()[:90])
     print()
     for kind in dict.fromkeys(k for k, _ in PATTERNS):
         if kind not in found:
@@ -93,6 +105,10 @@ def main():
         print(f'--- unclassified diagnostics: {len(unmatched)} ---')
         for l in unmatched[:8]:
             print('  ', l.split('error:')[-1].strip()[:100])
+
+    if fatal and not found:
+        print('\n(no classified diagnostics: compilation never got past the '
+              'fatal error above)')
 
     os.makedirs('build', exist_ok=True)
     with open('build/compile_census.txt', 'w') as f:
