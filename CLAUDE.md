@@ -35,5 +35,6 @@ Plan and task tracker live in [doc/qt/](doc/qt/).
 - **The transform must stay dual-target**: output compiles under both C++Builder
   (native `__property`) and clang (`__declspec(property)`).
 - CI builds Linux native and Windows cross on every pull request.
-- Upstream's decisions never block progress: carry what linscp needs in
-  `port/patches/` and offer it upstream in parallel (ADR 0006).
+- Waiting on upstream never blocks progress: carry what linscp needs in
+  `port/patches/` and offer it upstream in parallel (ADR 0006). The goal is
+  still to merge upstream eventually, so carried changes must stay mergeable.

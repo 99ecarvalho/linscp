@@ -144,8 +144,8 @@ mapping. `linscp-cli` speaks both transports. linscp carries the assembly
 change (`port/patches/dotnet/`) and builds the assembly from the pinned
 source with it; it drives `linscp-cli` on Linux over SFTP, FTP, FTPES,
 WebDAV and S3 (ctest `dotnet`, in CI), and natively on Windows through
-`/consoleinstance`. Offered upstream as winscp/winscp#73; nothing waits on
-the answer.
+`/consoleinstance`. Offered upstream as winscp/winscp#73; work does not wait
+on the answer.
 
 1. **P1-10, P1-21**: the remaining P1 tasks.
 2. **P0-20**: the last open P0 task not blocked.
@@ -298,7 +298,7 @@ the answer.
 | 2026-10-12 | P1-19 closes with SCP outside the golden comparison | No SCP server runs on both platforms (Windows' OpenSSH has no POSIX shell, which SCP needs); SCP is tested against OpenSSH in ctest `protocols` |
 | 2026-10-12 | ctest `protocols` also runs against servers the suite did not write -- pyftpdlib (FTP, FTPES), moto (S3, checked through boto3) -- and through proxies that must see the traffic and require credentials: microsocks (SOCKS5: SFTP, FTP with its data connections) and tinyproxy (HTTP CONNECT: SFTP, WebDAV) | The suite's own FTP and S3 servers test against its own reading of the protocols; independent implementations do not. Proxy support (PuTTY's, FileZilla's, neon's) was untested. The workstation's packages: python3-pyftpdlib, python3-moto, python3-flask-cors, microsocks, tinyproxy |
 | 2026-10-12 | `linscp-cli` implements winscp.com's console protocol (`/consoleinstance`, `ExternalConsole.cpp`) on Windows, over upstream's own `console/Console.h` structure | WinSCP's .NET assembly and winscp.com both drive WinSCP.exe that way; with it, the stock assembly and winscp.com drive linscp unchanged. The CLI's console is now an interface (`CliConsole.h`) with the stdio and external implementations |
-| 2026-10-12 | Upstream's decisions never block the port: changes linscp needs are carried in its own patches and offered upstream in parallel (ADR 0006, amended) | The user's direction. Waiting on review of a project that takes few outside changes would stall P1 and P2 |
+| 2026-10-12 | Waiting on upstream never blocks the port: changes linscp needs are carried in its own patches and offered upstream in parallel (ADR 0006, amended). Merging upstream remains the intention, so carried changes stay mergeable | The user's direction. Waiting on review would stall P1 and P2; but the port is still meant to go upstream one day |
 | 2026-10-12 | Work is committed to `main` directly; pull requests only to put a change through CI, branches deleted once merged (`qt` merged into `main` and retired) | The user's direction; CI runs on pull requests only |
 | 2026-10-12 | Off Windows, winscp.com's console protocol runs over two inherited anonymous pipes (`/consolepipes`), the structure unchanged; proposed upstream for the assembly (ADR 0010) | Over a Unix socket, which needs `netstandard2.1` and a file system name another local user could connect to first: pipes have no name, exist in `netstandard2.0` and `net40`, and their end tells each side the other has gone, as the job object does |
 | 2026-10-12 | P1-20 is met on Windows only; Linux becomes P1-23 | The assembly's transport is Windows-only: named events and named file mappings, which .NET does not provide elsewhere, so "unchanged on Linux" cannot hold |

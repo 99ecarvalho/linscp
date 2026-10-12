@@ -24,11 +24,13 @@ WinSCP, sometimes trimmed or changed.
 - Bugs found in upstream code are reported to the project that owns them,
   against its current `master`, with the fix where there is one:
   winscp/winscp#68, winscp/winscp#69.
-- *Amended 2026-10-12:* upstream's decisions never block the port. A change
-  linscp needs is carried in its own patches -- the series, or
+- *Amended 2026-10-12:* waiting on upstream's review never blocks the port. A
+  change linscp needs is carried in its own patches -- the series, or
   `port/patches/dotnet/` for the .NET assembly -- and offered upstream in
   parallel; it is dropped from the patches when upstream merges an
-  equivalent, and kept if upstream declines. (winscp/winscp has GitHub issues
+  equivalent. The intention is still to merge the port upstream eventually,
+  so every carried change stays one upstream could take: dual-target, small,
+  reviewed, and offered rather than kept quietly. (winscp/winscp has GitHub issues
   and discussions disabled, so reports and proposals are pull requests, a
   draft for one that needs discussion.)
 
