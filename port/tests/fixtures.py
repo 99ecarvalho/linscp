@@ -165,3 +165,69 @@ def rclone_sftp(root, user, password, host_key_dir):
     finally:
         server.terminate()
         server.wait(timeout=10)
+
+
+def have_module(name):
+    import importlib.util
+    return importlib.util.find_spec(name) is not None
+
+
+@contextlib.contextmanager
+def moto_s3():
+    """moto's S3 server (an AWS mock the suite did not write). Yields the port."""
+    binary = shutil.which('moto_server')
+    if not binary or not have_module('boto3') or not have_module('flask_cors'):
+        raise Missing('moto_server, boto3 and flask_cors (python3-flask-cors)')
+    port = free_port()
+    server = subprocess.Popen([binary, '-H', '127.0.0.1', '-p', str(port)],
+                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        wait_for_port(port, server)
+        yield port
+    finally:
+        server.terminate()
+        server.wait(timeout=10)
+
+
+@contextlib.contextmanager
+def socks5_proxy(user, password, log_path):
+    """microsocks requiring user/password; its connection log goes to
+    log_path. Yields the port."""
+    binary = shutil.which('microsocks')
+    if not binary:
+        raise Missing('microsocks')
+    port = free_port()
+    log = open(log_path, 'wb')
+    server = subprocess.Popen([binary, '-i', '127.0.0.1', '-p', str(port), '-u', user, '-P', password],
+                              stdout=log, stderr=subprocess.STDOUT)
+    try:
+        wait_for_port(port, server)
+        yield port
+    finally:
+        server.terminate()
+        server.wait(timeout=10)
+        log.close()
+
+
+@contextlib.contextmanager
+def http_proxy(tmp, user, password):
+    """tinyproxy requiring basic auth, logging connections. Yields
+    (port, log path)."""
+    binary = shutil.which('tinyproxy')
+    if not binary:
+        raise Missing('tinyproxy')
+    port = free_port()
+    log_path = os.path.join(tmp, 'tinyproxy.log')
+    config = os.path.join(tmp, 'tinyproxy.conf')
+    with open(config, 'w') as f:
+        f.write('\n'.join([f'Port {port}', 'Listen 127.0.0.1', 'Timeout 60', f'LogFile "{log_path}"',
+                           'LogLevel Connect', 'MaxClients 20', 'Allow 127.0.0.1',
+                           f'BasicAuth {user} {password}', '']))
+    server = subprocess.Popen([binary, '-d', '-c', config],
+                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        wait_for_port(port, server)
+        yield port, log_path
+    finally:
+        server.terminate()
+        server.wait(timeout=10)
