@@ -80,3 +80,20 @@ misbehaves at runtime:
   under `port/` or `qt/`.
 - `-fshort-wchar` is applied globally in the top-level `CMakeLists.txt`, not
   per-target, so no translation unit can miss it.
+
+## Amendment 2026-10-12: enforcement at link level
+
+The source check covers only `port/`. The first Linux SFTP session corrupted
+the heap through glibc's 4-byte wide functions reached from *upstream* code,
+three ways: PuTTY utilities that include no platform header (`dupwcs.c`),
+`std::wstring` in FileZilla's tool interface, and `swscanf` (as glibc's
+`__isoc23_swscanf`). So enforcement now also covers everything linked:
+
+- `port/tools/check_wide_imports.py` (test `wide_imports`) fails on any C
+  library wide-function import in any linked archive.
+- PuTTY's units get the wide redirects forced in (`win32_on_posix_wide.h`).
+- FileZilla's tool interface takes `UnicodeString`
+  (`filezilla-tools-unicodestring.patch`); `swscanf` has a POSIX
+  implementation for the numeric conversions upstream uses.
+- Windows-only lines calling the CRT's wide functions, where `wchar_t` is
+  2 bytes, are marked `// ADR 0001: Windows CRT` and exempted line by line.

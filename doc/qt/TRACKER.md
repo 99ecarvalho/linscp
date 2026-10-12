@@ -8,12 +8,12 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 29 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P0 Foundation | 30 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 35 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **64** | **97** | |
+| **Total** | **65** | **97** | |
 
 ## Next three actions
 
@@ -559,7 +559,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P0-13 | Golden-output harness | done | `port/tests/golden/run_golden.py` (capture, normalise, compare, check), cases in `golden/cases`; ctest `golden` against `golden/expected`. Linux and Windows linscp agree on all 35 logs |
 | P0-14 | Protocol server containers | done | Not containers: loopback servers per test (`fixtures.py`: OpenSSH, rclone, the suite's FTP and S3 servers), on Linux and Windows alike |
 | P0-15 | Capture golden corpus from real WinSCP | done | WinSCP 6.5.7 on a Windows 11 VM, rclone v1.75.2: 35 logs in `port/tests/golden/expected` |
-| P0-16 | ADR log | wip | `doc/qt/adr/` started with ADR 0001 |
+| P0-16 | ADR log | done | `doc/qt/adr/`: ADRs 0001-0009 and an index; kept up as decisions are made |
 | P0-17 | Property compile-check harness | done | `check_properties.py`, 613 declarations, clang exit 0 |
 | P0-18 | HTML render of plan docs | done | `doc/qt/plan.html` via `build-html.sh` |
 | P0-19 | Publish repository, licence, root README | done | public at `99ecarvalho/linscp`; work on `qt` |
