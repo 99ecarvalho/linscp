@@ -9,11 +9,11 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 28 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 32 | 37 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 33 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **60** | **96** | |
+| **Total** | **61** | **97** | |
 
 ## Next three actions
 
@@ -115,9 +115,19 @@ linscp's patch removes the directory (`known-differences.txt`).
 Script `rmdir` over WebDAV is reported upstream with its fix:
 winscp/winscp#69 (`core-script-rmdir-full-path.patch` until it lands).
 
-1. **P1-20**: the stock .NET assembly driving `linscp-cli` (it expects
-   winscp.com's switches and XML log), on the Windows VM and on Linux.
-2. **P1-22**: `keepuptodate` (directory watching) in the CLI.
+**linscp-cli speaks winscp.com's protocol** (P1-20 done, on Windows):
+started with `/consoleinstance`, it talks to its caller through the shared
+`TConsoleRunner` structure and events, as WinSCP.exe does. On the Windows
+VM, real winscp.com drives it (copied beside it as WinSCP.exe) and the
+golden corpus matches through that path too, and WinSCP's .NET assembly,
+built from the same source, runs full sessions through it over SFTP, FTP,
+FTPES, WebDAV and S3 (`port/tests/dotnet/run_dotnet.py`). Natively on
+Windows linscp matches the corpus as under Wine.
+
+1. **P1-22**: `keepuptodate` (directory watching) in the CLI.
+2. **P1-23**: the .NET assembly on Linux, which needs a transport other than
+   named events and file mappings -- a change to the assembly, to propose
+   upstream.
 3. Smaller upstream bugs still to report: FileGetSymLinkTargetSafe's handle
    leak, GetParentProcessId's swapped memset arguments, the AES-NI pragma
    mismatch.
@@ -268,6 +278,8 @@ winscp/winscp#69 (`core-script-rmdir-full-path.patch` until it lands).
 | 2026-10-12 | The golden corpus is captured on a native Windows VM (192.168.0.33, reached over SSH; tools kept in `C:\temp`) and pins its servers' versions (`expected/SERVERS.txt`, `CLIENT.txt`); `ctest golden` skips, saying why, unless the same rclone is at `LINSCP_RCLONE` (`port/tools/fetch_rclone.py`) | A newer rclone answers WebDAV synchronization differently (seen: 1.60 against 1.75.2), which would read as a client difference |
 | 2026-10-12 | P1-19 closes with SCP outside the golden comparison | No SCP server runs on both platforms (Windows' OpenSSH has no POSIX shell, which SCP needs); SCP is tested against OpenSSH in ctest `protocols` |
 | 2026-10-12 | ctest `protocols` also runs against servers the suite did not write -- pyftpdlib (FTP, FTPES), moto (S3, checked through boto3) -- and through proxies that must see the traffic and require credentials: microsocks (SOCKS5: SFTP, FTP with its data connections) and tinyproxy (HTTP CONNECT: SFTP, WebDAV) | The suite's own FTP and S3 servers test against its own reading of the protocols; independent implementations do not. Proxy support (PuTTY's, FileZilla's, neon's) was untested. The workstation's packages: python3-pyftpdlib, python3-moto, python3-flask-cors, microsocks, tinyproxy |
+| 2026-10-12 | `linscp-cli` implements winscp.com's console protocol (`/consoleinstance`, `ExternalConsole.cpp`) on Windows, over upstream's own `console/Console.h` structure | WinSCP's .NET assembly and winscp.com both drive WinSCP.exe that way; with it, the stock assembly and winscp.com drive linscp unchanged. The CLI's console is now an interface (`CliConsole.h`) with the stdio and external implementations |
+| 2026-10-12 | P1-20 is met on Windows only; Linux becomes P1-23 | The assembly's transport is Windows-only: named events and named file mappings, which .NET does not provide elsewhere, so "unchanged on Linux" cannot hold |
 | 2026-10-10 | `Format` keeps malformed input visible | Delphi raises on a missing argument. Core routes user- and server-supplied text through these into logs, so an unknown specifier is echoed and a missing argument renders as `<missing>` rather than throwing from a log path |
 
 ## Correction: census figures before 2026-10-11 used the wrong configuration
@@ -594,9 +606,10 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-17 | First SFTP session on Linux | done | Core links on Linux, and the four loopback-`sshd` session tests pass there as on Windows (negotiated, AES-CTR, AES-GCM, ChaCha20-Poly1305). Needed the `lp64_long` transform rule and the link-level wide-function check |
 | P1-18 | Windows cross-build + Wine | done | Core and the CLI, cross-built, run real SFTP sessions and scripts under Wine (`sftp_session*`, `cli_session`) |
 | P1-19 | Golden suite green, both platforms | done | ctest `golden`: Linux and Windows linscp match real WinSCP on SFTP, WebDAV(S), FTP, FTPES, FTPS and S3 (two documented differences); SCP in ctest `protocols` only. **P1 gate** |
-| P1-20 | .NET assembly drives Linux CLI | todo | |
+| P1-20 | .NET assembly drives Linux CLI | done | On Windows: the assembly built from the pinned source runs sessions through linscp-cli over SFTP, FTP, FTPES, WebDAV and S3 (`port/tests/dotnet`); Linux needs another transport (P1-23) |
 | P1-21 | `#ifdef` out Windows-only subsystems | todo | |
 | P1-22 | CLI `keepuptodate` (directory watching) | todo | |
+| P1-23 | .NET assembly on Linux (new transport) | todo | upstream proposal |
 
 ### P2 — Qt shell
 | ID | Task | Status | Note |

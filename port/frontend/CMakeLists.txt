@@ -63,6 +63,8 @@ endif()
 
 # The scripting client, winscp.com's counterpart: core's script on standard
 # input and output (CliMain.cpp, StdioConsole.cpp).
-add_executable(linscp-cli EXCLUDE_FROM_ALL CliMain.cpp StdioConsole.cpp)
-target_include_directories(linscp-cli PRIVATE "${LINSCP_UPSTREAM}/source/resource")
+add_executable(linscp-cli EXCLUDE_FROM_ALL CliMain.cpp StdioConsole.cpp ExternalConsole.cpp)
+# console/Console.h: winscp.com's protocol structure, used as upstream's.
+target_include_directories(linscp-cli PRIVATE "${LINSCP_UPSTREAM}/source/resource"
+  "${LINSCP_UPSTREAM}/source/console")
 target_link_libraries(linscp-cli PRIVATE linscp-runtime)

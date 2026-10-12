@@ -222,10 +222,6 @@ void TStdioConsole::Print(UnicodeString Str, bool FromBeginning, bool /*Error*/)
   Flush();
 }
 //---------------------------------------------------------------------------
-void TStdioConsole::PrintLine(const UnicodeString & Str, bool Error)
-{
-  Print(Str + L"\n", false, Error);
-}
 //---------------------------------------------------------------------------
 bool TStdioConsole::PendingAbort()
 {
@@ -483,7 +479,8 @@ int TStdioConsole::ReadTerminalKey(
 }
 //---------------------------------------------------------------------------
 int TStdioConsole::Choice(
-  const UnicodeString & Options, int Cancel, int Break, int Timeouted, bool Timeouting, unsigned int Timer)
+  const UnicodeString & Options, int Cancel, int Break, int /*Continue*/, int Timeouted, bool Timeouting,
+  unsigned int Timer, const UnicodeString & /*Message*/)
 {
   Flush();
   if (!FInputIsTerminal)

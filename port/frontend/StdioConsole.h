@@ -18,38 +18,31 @@
 #ifndef LINSCP_STDIO_CONSOLE_H
 #define LINSCP_STDIO_CONSOLE_H
 
-#include <Classes.hpp>
-#include <cstddef>
+#include "CliConsole.h"
 
-class TStdioConsole
+class TStdioConsole : public TCliConsole
 {
 public:
-  enum TStdInOut { StdOff, StdBinary, StdChunked };
-
   TStdioConsole(TStdInOut StdOut, TStdInOut StdIn, bool NoInteractiveInput);
-  ~TStdioConsole();
+  ~TStdioConsole() override;
 
-  void Print(UnicodeString Str, bool FromBeginning = false, bool Error = false);
-  void PrintLine(const UnicodeString & Str = UnicodeString(), bool Error = false);
-  // A line, without its end. Timer is in milliseconds, 0 for none.
-  bool Input(UnicodeString & Str, bool Echo, unsigned int Timer);
-  // The 1-based index of the accelerator pressed in Options, or Cancel,
-  // Break or Timeouted.
-  int Choice(const UnicodeString & Options, int Cancel, int Break, int Timeouted, bool Timeouting,
-    unsigned int Timer);
-  // Whether Ctrl+C was pressed since the last call.
-  bool PendingAbort();
-  void SetTitle(const UnicodeString & Title);
-  void TransferOut(const unsigned char * Data, size_t Len);
-  size_t TransferIn(unsigned char * Data, size_t Len);
+  void Print(UnicodeString Str, bool FromBeginning = false, bool Error = false) override;
+  bool Input(UnicodeString & Str, bool Echo, unsigned int Timer) override;
+  int Choice(const UnicodeString & Options, int Cancel, int Break, int Continue, int Timeouted,
+    bool Timeouting, unsigned int Timer, const UnicodeString & Message) override;
+  // Ctrl+C.
+  bool PendingAbort() override;
+  void SetTitle(const UnicodeString & Title) override;
+  void TransferOut(const unsigned char * Data, size_t Len) override;
+  size_t TransferIn(unsigned char * Data, size_t Len) override;
 
-  // TConsole's flags, as TExternalConsole derives them.
-  bool LimitedOutput() const { return FOutputIsTerminal; }
-  bool LiveOutput() const { return FOutputIsTerminal; }
-  bool Interactive() const { return FInputIsTerminal; }
-  bool NoInteractiveInput() const { return FNoInteractiveInput; }
-  bool StdOut() const { return FStdOut != StdOff; }
-  bool StdIn() const { return FStdIn != StdOff; }
+  // TConsole's flags, as TExternalConsole derives them from winscp.com's.
+  bool LimitedOutput() const override { return FOutputIsTerminal; }
+  bool LiveOutput() const override { return FOutputIsTerminal; }
+  bool Interactive() const override { return FInputIsTerminal; }
+  bool NoInteractiveInput() const override { return FNoInteractiveInput; }
+  bool StdOut() const override { return FStdOut != StdOff; }
+  bool StdIn() const override { return FStdIn != StdOff; }
 
 private:
   TStdInOut FStdOut;

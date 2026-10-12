@@ -29,6 +29,7 @@
 
 #include "HeadlessMain.h"
 #include "ProgParams.h"
+#include "ExternalConsole.h"
 #include "StdioConsole.h"
 //---------------------------------------------------------------------------
 namespace {
@@ -163,20 +164,20 @@ void ApplyLogSwitches(TProgramParams * Params)
   }
 }
 
-TStdioConsole::TStdInOut ParseStdInOut(TProgramParams * Params, const UnicodeString & Switch, bool AllowChunked)
+TCliConsole::TStdInOut ParseStdInOut(TProgramParams * Params, const UnicodeString & Switch, bool AllowChunked)
 {
   UnicodeString Value;
   if (!Params->FindSwitch(Switch, Value))
   {
-    return TStdioConsole::StdOff;
+    return TCliConsole::StdOff;
   }
   if (Value.IsEmpty() || SameText(Value, L"binary"))
   {
-    return TStdioConsole::StdBinary;
+    return TCliConsole::StdBinary;
   }
   if (AllowChunked && SameText(Value, L"chunked"))
   {
-    return TStdioConsole::StdChunked;
+    return TCliConsole::StdChunked;
   }
   throw Exception(FORMAT(LoadStr(SCRIPT_VALUE_UNKNOWN), (Value, Switch)));
 }
@@ -185,7 +186,7 @@ TStdioConsole::TStdInOut ParseStdInOut(TProgramParams * Params, const UnicodeStr
 class TCliRunner
 {
 public:
-  explicit TCliRunner(TStdioConsole * Console);
+  explicit TCliRunner(TCliConsole * Console);
   ~TCliRunner();
 
   int Run(const UnicodeString & Session, TOptions * Options, TStrings * ScriptCommands,
@@ -206,9 +207,10 @@ public:
   void __fastcall ScriptTransferOut(TObject * Sender, const unsigned char * Data, size_t Len);
   size_t __fastcall ScriptTransferIn(TObject * Sender, unsigned char * Data, size_t Len);
   void __fastcall ConfigurationChange(TObject * Sender);
+  void __fastcall ScriptProgress(TScript * Script, TScriptProgress & Progress);
 
 private:
-  TStdioConsole * FConsole;
+  TCliConsole * FConsole;
   TManagementScript * FScript;
   int FLastProgressLen;
   bool FCommandError;
@@ -228,7 +230,7 @@ private:
   void Failed(bool & AnyError);
 };
 //---------------------------------------------------------------------------
-TCliRunner::TCliRunner(TStdioConsole * Console) :
+TCliRunner::TCliRunner(TCliConsole * Console) :
   FConsole(Console),
   FScript(NULL),
   FLastProgressLen(0),
@@ -447,10 +449,13 @@ void __fastcall TCliRunner::ScriptTerminalQueryUser(TObject * /*Sender*/, const 
   }
 
   AQuery = ApplyTabs(RemoveInteractiveMsgTag(UnformatMessage(AQuery)));
+  // The whole query, for a console that shows it apart (the .NET assembly).
+  UnicodeString Message = AQuery;
   PrintMessage(AQuery);
   if ((MoreMessages != NULL) && (MoreMessages->Count > 0))
   {
     PrintMessage(MoreMessages->Text);
+    Message += L"\n" + MoreMessages->Text;
   }
 
   std::vector<unsigned int> Buttons;
@@ -621,7 +626,8 @@ void __fastcall TCliRunner::ScriptTerminalQueryUser(TObject * /*Sender*/, const 
         }
         else
         {
-          AnswerIndex = FConsole->Choice(Accels, CancelIndex, -1, -2, Timeouting, ActualTimer);
+          AnswerIndex = FConsole->Choice(Accels, CancelIndex, -1, ContinueIndex, -2, Timeouting, ActualTimer,
+            Message);
         }
         if (AnswerIndex == -1)
         {
@@ -711,6 +717,11 @@ void __fastcall TCliRunner::ScriptTransferOut(TObject *, const unsigned char * D
 size_t __fastcall TCliRunner::ScriptTransferIn(TObject *, unsigned char * Data, size_t Len)
 {
   return FConsole->TransferIn(Data, Len);
+}
+//---------------------------------------------------------------------------
+void __fastcall TCliRunner::ScriptProgress(TScript * /*Script*/, TScriptProgress & Progress)
+{
+  FConsole->Progress(Progress);
 }
 //---------------------------------------------------------------------------
 void __fastcall TCliRunner::ConfigurationChange(TObject * /*Sender*/)
@@ -827,7 +838,8 @@ int TCliRunner::Run(const UnicodeString & Session, TOptions * Options, TStrings 
     FScript = new TManagementScript(StoredSessions, FConsole->LimitedOutput());
     FScript->CopyParam = TCopyParamType();
     FScript->SynchronizeParams = static_cast<int>(+TTerminal::spDefault);
-    FScript->WantsProgress = false;
+    FScript->WantsProgress = FConsole->WantsProgress();
+    FScript->OnProgress = CLOSURE(ScriptProgress);
     FScript->OnPrint = CLOSURE(ScriptPrint);
     FScript->OnPrintProgress = CLOSURE(ScriptPrintProgress);
     FScript->OnInput = CLOSURE(ScriptInput);
@@ -928,6 +940,12 @@ int TCliRunner::Run(const UnicodeString & Session, TOptions * Options, TStrings 
     if (Configuration->ActualLogProtocol >= 1)
     {
       FConsole->Print(ExitCodeMessage + L"\n");
+      const UnicodeString LogMessage = FConsole->FinalLogMessage();
+      if (!LogMessage.IsEmpty())
+      {
+        FScript->Log(llMessage, LogMessage);
+        FConsole->Print(LogMessage + L"\n");
+      }
     }
   }
   delete FScript;
@@ -936,7 +954,7 @@ int TCliRunner::Run(const UnicodeString & Session, TOptions * Options, TStrings 
 }
 
 //---------------------------------------------------------------------------
-int HandleException(TStdioConsole * Console, Exception & E)
+int HandleException(TCliConsole * Console, Exception & E)
 {
   UnicodeString Message;
   if (ExceptionFullMessage(&E, Message))
@@ -966,7 +984,7 @@ bool FindNixCompatibleSwitch(TProgramParams * Params, const UnicodeString & Name
 //---------------------------------------------------------------------------
 // Upstream's /keygen: converts a key to PuTTY's format, optionally changing
 // its comment, passphrase or certificate.
-int KeyGen(TStdioConsole * Console, TProgramParams * Params)
+int KeyGen(TCliConsole * Console, TProgramParams * Params)
 {
   int Result = ResultSuccess;
   UnicodeString Passphrase;
@@ -1105,7 +1123,7 @@ int KeyGen(TStdioConsole * Console, TProgramParams * Params)
 }
 //---------------------------------------------------------------------------
 // The switches this client has, with upstream's descriptions.
-void Usage(TStdioConsole * Console)
+void Usage(TCliConsole * Console)
 {
   Console->PrintLine(FORMAT(L"%s, %s", (AppNameString(), Configuration->VersionStr)));
   Console->PrintLine(ReplaceText(LoadStr(WINSCP_COPYRIGHT), L"©", L"(c)"));
@@ -1166,7 +1184,7 @@ void Usage(TStdioConsole * Console)
   }
 }
 //---------------------------------------------------------------------------
-int RunScripting(TStdioConsole * Console, TProgramParams * Params)
+int RunScripting(TCliConsole * Console, TProgramParams * Params)
 {
   std::unique_ptr<TStrings> ScriptCommands(new TStringList());
   std::unique_ptr<TStrings> ScriptParameters(new TStringList());
@@ -1223,20 +1241,33 @@ int main()
     try
     {
       TProgramParams * Params = TProgramParams::Instance();
-      const TStdioConsole::TStdInOut StdOut = ParseStdInOut(Params, StdOutSwitch, true);
-      const TStdioConsole::TStdInOut StdIn = ParseStdInOut(Params, StdInSwitch, false);
-      TStdioConsole Console(StdOut, StdIn, Params->FindSwitch(NoInteractiveInputSwitch));
+      const TCliConsole::TStdInOut StdOut = ParseStdInOut(Params, StdOutSwitch, true);
+      const TCliConsole::TStdInOut StdIn = ParseStdInOut(Params, StdInSwitch, false);
+      const bool NoInteractiveInput = Params->FindSwitch(NoInteractiveInputSwitch);
+      std::unique_ptr<TCliConsole> Console;
+#if defined(_WIN32)
+      // Started by winscp.com or WinSCP's .NET assembly, as WinSCP.exe is.
+      UnicodeString ConsoleInstance;
+      if (Params->FindSwitch(L"consoleinstance", ConsoleInstance))
+      {
+        Console.reset(new TExternalConsole(ConsoleInstance, NoInteractiveInput, StdOut, StdIn));
+      }
+#endif
+      if (!Console)
+      {
+        Console.reset(new TStdioConsole(StdOut, StdIn, NoInteractiveInput));
+      }
       if (Params->FindSwitch(L"help") || Params->FindSwitch(L"?"))
       {
-        Usage(&Console);
+        Usage(Console.get());
       }
       else if (Params->FindSwitch(KeyGenSwitch))
       {
-        Result = CheckSafe(Params) ? KeyGen(&Console, Params) : ResultAnyError;
+        Result = CheckSafe(Params) ? KeyGen(Console.get(), Params) : ResultAnyError;
       }
       else
       {
-        Result = RunScripting(&Console, Params);
+        Result = RunScripting(Console.get(), Params);
       }
     }
     catch (Exception & E)

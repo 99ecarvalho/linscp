@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- WinSCP's .NET assembly driving a WinSCP-compatible executable (linscp-cli),
+       built against WinSCPnet.dll from the same WinSCP source: run_dotnet.py. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <WinSCPnetPath Condition="'$(WinSCPnetPath)' == ''">WinSCPnet.dll</WinSCPnetPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="WinSCPnet">
+      <HintPath>$(WinSCPnetPath)</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
