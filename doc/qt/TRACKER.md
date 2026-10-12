@@ -145,8 +145,9 @@ speaks both transports; built from the fork's branch, the assembly drives it
 on Linux over SFTP, FTP, FTPES, WebDAV and S3 (ctest `dotnet`), and still
 drives it natively on Windows through `/consoleinstance`.
 
-1. **P1-23**: upstream's answer to the proposal (a draft pull request:
-   upstream has no issues or discussions on GitHub), and with it Q-11.
+1. **P1-23**: upstream's answer to the proposal, winscp/winscp#73 (a draft
+   pull request: upstream has no issues or discussions on GitHub), and with
+   it Q-11.
 2. **P1-10, P1-21**: the remaining P1 tasks.
 3. **P0-20**: the last open P0 task not blocked.
 
@@ -631,7 +632,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-20 | .NET assembly drives Linux CLI | done | On Windows: the assembly built from the pinned source runs sessions through linscp-cli over SFTP, FTP, FTPES, WebDAV and S3 (`port/tests/dotnet`); Linux needs another transport (P1-23) |
 | P1-21 | `#ifdef` out Windows-only subsystems | todo | |
 | P1-22 | CLI `keepuptodate` (directory watching) | done | `port/frontend/DirectoryWatcher.cpp` (inotify; ReadDirectoryChangesW), the controller's logic in CliMain.cpp; tested on Linux (ctest) and natively on Windows |
-| P1-23 | .NET assembly on Linux (new transport) | wip | ADR 0010: `/consolepipes` in `linscp-cli` (ctest `console_pipes`); the assembly change on 99ecarvalho/winscp `dotnet-console-pipes-transport` drives linscp on Linux (ctest `dotnet`), offered upstream as a draft pull request |
+| P1-23 | .NET assembly on Linux (new transport) | wip | ADR 0010: `/consolepipes` in `linscp-cli` (ctest `console_pipes`); the assembly change on 99ecarvalho/winscp `dotnet-console-pipes-transport` drives linscp on Linux (ctest `dotnet`), offered upstream as winscp/winscp#73 (draft) |
 
 ### P2 — Qt shell
 | ID | Task | Status | Note |

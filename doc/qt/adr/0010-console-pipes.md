@@ -46,9 +46,10 @@ means the caller has gone; the program reports it as an abort
 
 ## Consequences
 
-- The assembly needs the change: the
-  `dotnet-console-pipes-transport` branch of 99ecarvalho/winscp, offered upstream. Until
-  it is merged, .NET on Linux needs an assembly built from that branch.
+- The assembly needs the change, offered upstream as a draft pull request
+  (winscp/winscp#73, branch `dotnet-console-pipes-transport` of
+  99ecarvalho/winscp). Until it is merged, .NET on Linux needs an assembly
+  built from that branch.
 - On Linux the assembly cannot read the executable's version resource (an
   ELF file has none), so the test sets `Session.DisableVersionCheck`; how the
   assembly should check the version there is an open question upstream.
