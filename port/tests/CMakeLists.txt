@@ -169,6 +169,15 @@ add_test(NAME cli_session
           --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:linscp-cli>")
 set_tests_properties(cli_session PROPERTIES
   DEPENDS cli_session_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+# keepuptodate: local changes made while the client watches must reach the
+# server, Ctrl+C must end it. Native POSIX here; the Windows build is run
+# natively on a Windows host (run_keepuptodate.py works there as well).
+if(NOT WIN32)
+  add_test(NAME keepuptodate
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_keepuptodate.py" "$<TARGET_FILE:linscp-cli>")
+  set_tests_properties(keepuptodate PROPERTIES
+    DEPENDS cli_session_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+endif()
 # One everyday script over every protocol whose server is installed here,
 # each checked on the server's side (run_protocols.py, fixtures.py).
 add_test(NAME protocols

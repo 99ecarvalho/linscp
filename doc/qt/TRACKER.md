@@ -8,12 +8,12 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 28 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 33 | 38 | Golden suite green, six protocols, both platforms |
+| P0 Foundation | 29 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P1 Headless core | 35 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **61** | **97** | |
+| **Total** | **64** | **97** | |
 
 ## Next three actions
 
@@ -124,7 +124,16 @@ built from the same source, runs full sessions through it over SFTP, FTP,
 FTPES, WebDAV and S3 (`port/tests/dotnet/run_dotnet.py`). Natively on
 Windows linscp matches the corpus as under Wine.
 
-1. **P1-22**: `keepuptodate` (directory watching) in the CLI.
+**keepuptodate works** (P1-22 done): `TDirectoryWatcher` (inotify on Linux,
+`ReadDirectoryChangesW` on Windows) in place of upstream's `TDiscMonitor`,
+driven as `TSynchronizeController` drives it -- per changed directory, after
+the 500 ms change delay, excluded directories not watched, upstream's
+messages. `run_keepuptodate.py` passes on Linux (ctest `keepuptodate`) and
+natively on the Windows VM.
+
+1. **P0-11, P0-12**: CI. CLAUDE.md says CI builds both targets on every
+   change, but the repository has no workflow yet: GitHub Actions building
+   Linux and the Windows cross-build, running ctest natively and under Wine.
 2. **P1-23**: the .NET assembly on Linux, which needs a transport other than
    named events and file mappings -- a change to the assembly, to propose
    upstream.
@@ -386,7 +395,6 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | `swscanf` on POSIX | Numeric conversions only; a format with `%s`, `%c` or `%[` fails (EOF) | Implemented by narrowing to `vsscanf`. Upstream parses only numbers with it (SCP's time line, FileZilla's MLSD dates); text conversions would write narrow text into wide buffers |
 | CLI input timer on a terminal | POSIX: counts from the start of the line; Windows: runs until the first key | winscp.com restarts it on every key press. In canonical mode POSIX sees nothing until Enter. Affects only batch-mode prompts, which time out after 10 s |
 | CLI terminal title | Not set on POSIX | Escape sequences would land in logs of a redirected terminal; Windows sets the console title as winscp.com does |
-| CLI `keepuptodate` | Not available yet (P1-22): the command fails | Needs directory watching behind `TSynchronizeController` |
 | `SuspendThread` on POSIX | Not declared | A running pthread cannot be suspended. A missing declaration fails at compile time; a stub would fail silently. `CREATE_SUSPENDED` + `ResumeThread` is supported |
 
 ## Open questions
@@ -544,7 +552,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P0-06d | `__closure` inline parameter form | done | 2 sites in `SessionInfo` |
 | P0-07 | Transform idempotence tests | done | idempotent + line-count parity asserted |
 | P0-08 | CMake skeleton | done | transform+verify wired as a build step; CTest on both targets |
-| P0-09 | Minimal shim for `core/Common.cpp` | wip | 224 errors; `Option.cpp` is the first TU at 0 |
+| P0-09 | Minimal shim for `core/Common.cpp` | done | Overtaken: all 33 core units compile and link on both targets |
 | P0-10 | mingw-w64 sysroot + clang toolchain file | done | `cmake/toolchain-mingw-w64.cmake`; clang + lld + Wine emulator |
 | P0-11 | CI matrix Linux + Windows cross | todo | |
 | P0-12 | Wine smoke tests in CI | wip | wired into CTest via `CMAKE_CROSSCOMPILING_EMULATOR`; GitHub Actions pending |
@@ -595,7 +603,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-07 | `port/platform` Win32 subset | done | types, FILETIME/SYSTEMTIME, errors, winsock names |
 | P1-07b | `port/platform` Win32 file/handle functions | done | every Win32 call core makes: files, time zones (real transition rules), modules, processes (/proc), paths, string order, environment, XDG folders, MIME and type names, reparse points, trash, registry entry points, memory regions, version resources, user name, certificate chains (OpenSSL, system trust store); tested against real Win32 under Wine where observable. Core compiles on Linux |
 | P1-08 | Socket-event emulation | done | `ws2_32` module and `WSAEventSelect`/`WSAEnumNetworkEvents`; one test passes against real Winsock (Wine) and the emulation. `WSAAsyncSelect` (FileZilla) is P1-12's |
-| P1-09 | PuTTY unix backend re-import | wip | WinSCP's PuTTY builds on Linux with its Windows layer over the emulation; agent and GSSAPI replaced (`port/putty/linux`). Runtime networking is P1-08's |
+| P1-09 | PuTTY unix backend re-import | done | As decided 2026-10-11: WinSCP's PuTTY with its Windows layer over the emulation, Linux services replaced per unit (`port/putty/linux`); SFTP/SCP sessions pass on Linux, proxied ones included |
 | P1-10 | PuTTY delta reconciliation | todo | |
 | P1-11 | FileZilla MFC subset replacement | done | Not replaced: WinSCP's subset (`CString`/`CFile`/`CTime` over the shim) builds as is on both targets |
 | P1-12 | FileZilla epoll rewrite | done | Not rewritten: FileZilla builds unmodified on Linux over an emulated user32 subset (windows, message queues, timers, `WSAAsyncSelect`, `WSAAsyncGetHostByName`); ctest `messages` passes against user32/ws2_32 (Wine) and the emulation. One patch (`in_addr`'s `s_addr`) |
@@ -608,7 +616,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-19 | Golden suite green, both platforms | done | ctest `golden`: Linux and Windows linscp match real WinSCP on SFTP, WebDAV(S), FTP, FTPES, FTPS and S3 (two documented differences); SCP in ctest `protocols` only. **P1 gate** |
 | P1-20 | .NET assembly drives Linux CLI | done | On Windows: the assembly built from the pinned source runs sessions through linscp-cli over SFTP, FTP, FTPES, WebDAV and S3 (`port/tests/dotnet`); Linux needs another transport (P1-23) |
 | P1-21 | `#ifdef` out Windows-only subsystems | todo | |
-| P1-22 | CLI `keepuptodate` (directory watching) | todo | |
+| P1-22 | CLI `keepuptodate` (directory watching) | done | `port/frontend/DirectoryWatcher.cpp` (inotify; ReadDirectoryChangesW), the controller's logic in CliMain.cpp; tested on Linux (ctest) and natively on Windows |
 | P1-23 | .NET assembly on Linux (new transport) | todo | upstream proposal |
 
 ### P2 — Qt shell

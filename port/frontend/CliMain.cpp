@@ -29,6 +29,7 @@
 
 #include "HeadlessMain.h"
 #include "ProgParams.h"
+#include "DirectoryWatcher.h"
 #include "ExternalConsole.h"
 #include "StdioConsole.h"
 //---------------------------------------------------------------------------
@@ -49,6 +50,9 @@ const wchar_t * const NoInteractiveInputSwitch = L"NoInteractiveInput";
 const wchar_t * const StdOutSwitch = L"StdOut";
 const wchar_t * const StdInSwitch = L"StdIn";
 const wchar_t * const ExitCommand = L"exit";
+// GUIConfiguration's KeepUpToDateChangeDelay default: how long a directory
+// must be quiet before keepuptodate synchronizes it.
+const unsigned int KeepUpToDateChangeDelay = 500;
 // Upstream waits this long for input in batch mode before giving up.
 const unsigned int BatchInputTimeout = 10000;
 const UnicodeString TimestampVarName(L"TIMESTAMP");
@@ -208,6 +212,8 @@ public:
   size_t __fastcall ScriptTransferIn(TObject * Sender, unsigned char * Data, size_t Len);
   void __fastcall ConfigurationChange(TObject * Sender);
   void __fastcall ScriptProgress(TScript * Script, TScriptProgress & Progress);
+  void __fastcall ScriptSynchronizeStartStop(TScript * Script, const UnicodeString LocalDirectory,
+    const UnicodeString RemoteDirectory, const TCopyParamType & CopyParam, int SynchronizeParams);
 
 private:
   TCliConsole * FConsole;
@@ -228,6 +234,9 @@ private:
   void UpdateTitle();
   UnicodeString ExpandCommand(UnicodeString Command, TStrings * ScriptParameters);
   void Failed(bool & AnyError);
+  void SynchronizeLog(const UnicodeString & Message);
+  bool SynchronizeChange(const UnicodeString & LocalRoot, const UnicodeString & RemoteRoot,
+    const UnicodeString & Directory, const TCopyParamType & CopyParam, int SynchronizeParams);
 };
 //---------------------------------------------------------------------------
 TCliRunner::TCliRunner(TCliConsole * Console) :
@@ -724,6 +733,111 @@ void __fastcall TCliRunner::ScriptProgress(TScript * /*Script*/, TScriptProgress
   FConsole->Progress(Progress);
 }
 //---------------------------------------------------------------------------
+// keepuptodate, as TConsoleRunner runs it over TSynchronizeController: the
+// local tree is watched, and each directory that changed, once quiet for
+// the change delay, is synchronized on its own (the script's parameters
+// include spNoRecurse and spSubDirs); until Ctrl+C or a failure.
+void __fastcall TCliRunner::ScriptSynchronizeStartStop(TScript * /*Script*/, const UnicodeString LocalDirectory,
+  const UnicodeString RemoteDirectory, const TCopyParamType & CopyParam, int SynchronizeParams)
+{
+  TCopyParamType Params = CopyParam;
+  Params.IncludeFileMask.SetRoots(LocalDirectory, RemoteDirectory);
+  // Directories the copy parameters exclude are not watched (SynchronizeFilter).
+  auto Filter = [&Params](const UnicodeString & Directory) -> bool
+  {
+    if (Params.AllowAnyTransfer())
+    {
+      return true;
+    }
+    TFileMasks::TParams MaskParams;
+    const bool Hidden = FLAGSET(FileGetAttrFix(Directory), faHidden);
+    return Params.AllowTransfer(Directory, osLocal, true, MaskParams, Hidden);
+  };
+  SynchronizeLog(FMTLOAD(SYNCHRONIZE_SCAN, (LocalDirectory)));
+  TDirectoryWatcher Watcher(LocalDirectory, true, Filter);
+  int Directories = Watcher.Directories();
+  SynchronizeLog(FMTLOAD(SYNCHRONIZE_START, (Directories)));
+
+  bool Stop = false;
+  while (!Stop && !Aborted(false))
+  {
+    Watcher.Wait(100);
+    if (!Watcher.Error().IsEmpty())
+    {
+      // SynchronizeControllerSynchronizeInvalid, then the abort.
+      PrintMessage(Watcher.ErrorDirectory().IsEmpty() ? LoadStr(WATCH_ERROR_GENERAL) :
+        FMTLOAD(WATCH_ERROR_DIRECTORY, (Watcher.ErrorDirectory())), true);
+      PrintMessage(Watcher.Error(), true);
+      NotifyAbort();
+      break;
+    }
+    for (const UnicodeString & Directory : Watcher.TakeSettled(KeepUpToDateChangeDelay))
+    {
+      if (!SynchronizeChange(LocalDirectory, RemoteDirectory, Directory, Params, SynchronizeParams))
+      {
+        Stop = true;
+        break;
+      }
+    }
+    if (Watcher.Directories() != Directories)
+    {
+      Directories = Watcher.Directories();
+      SynchronizeLog(FMTLOAD(SYNCHRONIZE_START, (Directories)));
+    }
+    if (FScript->Terminal != NULL)
+    {
+      FScript->Terminal->Idle();
+    }
+  }
+}
+//---------------------------------------------------------------------------
+void TCliRunner::SynchronizeLog(const UnicodeString & Message)
+{
+  PrintMessage(Message);
+  if (FScript->Terminal != NULL)
+  {
+    FScript->Terminal->LogEvent(FORMAT(L"Keep up to date: %s", (Message)));
+  }
+}
+//---------------------------------------------------------------------------
+// TSynchronizeController::SynchronizeChange and TConsoleRunner's
+// SynchronizeControllerSynchronize: the changed directory and its remote
+// counterpart, synchronized. False when keepuptodate is to stop.
+bool TCliRunner::SynchronizeChange(const UnicodeString & LocalRoot, const UnicodeString & RemoteRoot,
+  const UnicodeString & Directory, const TCopyParamType & CopyParam, int SynchronizeParams)
+{
+  const UnicodeString Root = IncludeTrailingBackslash(LocalRoot);
+  const UnicodeString Local = IncludeTrailingBackslash(Directory);
+  const UnicodeString Remote = UnixIncludeTrailingBackslash(RemoteRoot) +
+    ToUnixPath(Local.SubString(Root.Length() + 1, Local.Length() - Root.Length()));
+  SynchronizeLog(FMTLOAD(SYNCHRONIZE_CHANGE, (ExcludeTrailingBackslash(Local))));
+  try
+  {
+    TSynchronizeChecklist * Checklist = NULL;
+    try
+    {
+      FScript->Synchronize(Local, Remote, CopyParam, SynchronizeParams, &Checklist);
+    }
+    catch (Exception &)
+    {
+      delete Checklist;
+      if ((FScript->Batch == TScript::BatchContinue) && FScript->Terminal->Active)
+      {
+        return true;
+      }
+      throw;
+    }
+    delete Checklist;
+  }
+  catch (Exception &)
+  {
+    // SynchronizeAbort: the error is the script's to report.
+    NotifyAbort();
+    return false;
+  }
+  return true;
+}
+//---------------------------------------------------------------------------
 void __fastcall TCliRunner::ConfigurationChange(TObject * /*Sender*/)
 {
   if (FScript != NULL)
@@ -840,6 +954,7 @@ int TCliRunner::Run(const UnicodeString & Session, TOptions * Options, TStrings 
     FScript->SynchronizeParams = static_cast<int>(+TTerminal::spDefault);
     FScript->WantsProgress = FConsole->WantsProgress();
     FScript->OnProgress = CLOSURE(ScriptProgress);
+    FScript->OnSynchronizeStartStop = CLOSURE(ScriptSynchronizeStartStop);
     FScript->OnPrint = CLOSURE(ScriptPrint);
     FScript->OnPrintProgress = CLOSURE(ScriptPrintProgress);
     FScript->OnInput = CLOSURE(ScriptInput);
