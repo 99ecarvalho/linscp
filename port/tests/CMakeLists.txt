@@ -186,16 +186,24 @@ if(NOT WIN32)
   set_tests_properties(console_pipes PROPERTIES
     DEPENDS cli_session_build SKIP_RETURN_CODE 77 TIMEOUT 120)
 endif()
-# WinSCP's .NET assembly driving linscp-cli (dotnet/run_dotnet.py), given a
-# dotnet and a WinSCPnet.dll built from WinSCP's source. Off Windows the
-# assembly must be one with console pipes (ADR 0010).
-set(LINSCP_DOTNET "" CACHE FILEPATH "dotnet, for ctest dotnet")
-set(LINSCP_WINSCPNET "" CACHE FILEPATH "WinSCPnet.dll, for ctest dotnet")
-if(LINSCP_DOTNET AND LINSCP_WINSCPNET AND NOT CMAKE_CROSSCOMPILING)
+# WinSCP's .NET assembly driving linscp-cli (dotnet/run_dotnet.py): the
+# assembly built from the pinned source with linscp's patches
+# (port/patches/dotnet: console pipes off Windows, ADR 0010), by the .NET SDK
+# port/tools/fetch_dotnet.py puts at LINSCP_DOTNET. Both skip without it.
+# Native builds only: the SDK does not run under Wine.
+if(NOT CMAKE_CROSSCOMPILING)
+  set(LINSCP_DOTNET "${CMAKE_BINARY_DIR}/tools/dotnet/dotnet${CMAKE_EXECUTABLE_SUFFIX}" CACHE FILEPATH
+      "the .NET SDK's dotnet, for ctest dotnet (port/tools/fetch_dotnet.py)")
+  add_test(NAME winscpnet_build
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/build_winscpnet.py"
+            --dotnet "${LINSCP_DOTNET}" --upstream "${LINSCP_UPSTREAM}" --dest "${CMAKE_BINARY_DIR}/winscpnet")
+  set_tests_properties(winscpnet_build PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 600)
   add_test(NAME dotnet
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/dotnet/run_dotnet.py"
-            --dotnet "${LINSCP_DOTNET}" --winscpnet "${LINSCP_WINSCPNET}" --client "$<TARGET_FILE:linscp-cli>")
-  set_tests_properties(dotnet PROPERTIES DEPENDS cli_session_build TIMEOUT 900)
+            --dotnet "${LINSCP_DOTNET}" --winscpnet "${CMAKE_BINARY_DIR}/winscpnet/bin/WinSCPnet.dll"
+            --client "$<TARGET_FILE:linscp-cli>")
+  set_tests_properties(dotnet PROPERTIES
+    DEPENDS "cli_session_build;winscpnet_build" SKIP_RETURN_CODE 77 TIMEOUT 900)
 endif()
 # One everyday script over every protocol whose server is installed here,
 # each checked on the server's side (run_protocols.py, fixtures.py).

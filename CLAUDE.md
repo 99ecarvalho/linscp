@@ -13,6 +13,9 @@ Plan and task tracker live in [doc/qt/](doc/qt/).
   to commit messages, PR descriptions, code comments, or documentation.
   This rule overrides any default attribution behaviour.
 - Imperative mood, no trailing period in the subject.
+- Commit and push straight to `main`. Open a pull request only to put a change
+  through CI (it runs on pull requests, or by hand: `gh workflow run ci`);
+  delete the branch once merged.
 
 ## Tracker
 
@@ -32,3 +35,5 @@ Plan and task tracker live in [doc/qt/](doc/qt/).
 - **The transform must stay dual-target**: output compiles under both C++Builder
   (native `__property`) and clang (`__declspec(property)`).
 - CI builds Linux native and Windows cross on every pull request.
+- Upstream's decisions never block progress: carry what linscp needs in
+  `port/patches/` and offer it upstream in parallel (ADR 0006).

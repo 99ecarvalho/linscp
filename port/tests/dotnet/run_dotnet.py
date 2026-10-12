@@ -34,6 +34,10 @@ def main():
     ap.add_argument('--winscpnet', required=True)
     ap.add_argument('--client', required=True)
     a = ap.parse_args()
+    for path, what in ((a.dotnet, 'dotnet (port/tools/fetch_dotnet.py)'), (a.winscpnet, 'WinSCPnet.dll')):
+        if not os.path.isfile(path):
+            print(f'SKIP: no {what} at {path}')
+            return 77
     tmp = tempfile.mkdtemp(prefix='linscp-dotnet-')
     failures = 0
     try:

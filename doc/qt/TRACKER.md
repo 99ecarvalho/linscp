@@ -9,11 +9,11 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 35 | 38 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 36 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **67** | **97** | |
+| **Total** | **68** | **97** | |
 
 ## Next three actions
 
@@ -137,19 +137,19 @@ suite, natively and under Wine (`.github/workflows/ci.yml`). The smaller
 upstream bugs are reported: winscp/winscp#70 (FileGetSymLinkTargetSafe's
 handle leak), #71 (GetParentProcessId's memset), #72 (aes-ni.c's pragma pop).
 
-**The .NET assembly runs on Linux** with a change offered upstream (P1-23
-wip, ADR 0010): off Windows the assembly hands winscp.com's
-`TConsoleCommStruct` to the executable over two inherited pipes
-(`/consolepipes`) in place of named events and a file mapping. `linscp-cli`
-speaks both transports; built from the fork's branch, the assembly drives it
-on Linux over SFTP, FTP, FTPES, WebDAV and S3 (ctest `dotnet`), and still
-drives it natively on Windows through `/consoleinstance`.
+**The .NET assembly runs on Linux** (P1-23 done, ADR 0010): off Windows
+the assembly hands winscp.com's `TConsoleCommStruct` to the executable over
+two inherited pipes (`/consolepipes`) in place of named events and a file
+mapping. `linscp-cli` speaks both transports. linscp carries the assembly
+change (`port/patches/dotnet/`) and builds the assembly from the pinned
+source with it; it drives `linscp-cli` on Linux over SFTP, FTP, FTPES,
+WebDAV and S3 (ctest `dotnet`, in CI), and natively on Windows through
+`/consoleinstance`. Offered upstream as winscp/winscp#73; nothing waits on
+the answer.
 
-1. **P1-23**: upstream's answer to the proposal, winscp/winscp#73 (a draft
-   pull request: upstream has no issues or discussions on GitHub), and with
-   it Q-11.
-2. **P1-10, P1-21**: the remaining P1 tasks.
-3. **P0-20**: the last open P0 task not blocked.
+1. **P1-10, P1-21**: the remaining P1 tasks.
+2. **P0-20**: the last open P0 task not blocked.
+3. **P2**: the Qt shell, once P1's gate is met.
 
 ## Decisions taken
 
@@ -298,6 +298,8 @@ drives it natively on Windows through `/consoleinstance`.
 | 2026-10-12 | P1-19 closes with SCP outside the golden comparison | No SCP server runs on both platforms (Windows' OpenSSH has no POSIX shell, which SCP needs); SCP is tested against OpenSSH in ctest `protocols` |
 | 2026-10-12 | ctest `protocols` also runs against servers the suite did not write -- pyftpdlib (FTP, FTPES), moto (S3, checked through boto3) -- and through proxies that must see the traffic and require credentials: microsocks (SOCKS5: SFTP, FTP with its data connections) and tinyproxy (HTTP CONNECT: SFTP, WebDAV) | The suite's own FTP and S3 servers test against its own reading of the protocols; independent implementations do not. Proxy support (PuTTY's, FileZilla's, neon's) was untested. The workstation's packages: python3-pyftpdlib, python3-moto, python3-flask-cors, microsocks, tinyproxy |
 | 2026-10-12 | `linscp-cli` implements winscp.com's console protocol (`/consoleinstance`, `ExternalConsole.cpp`) on Windows, over upstream's own `console/Console.h` structure | WinSCP's .NET assembly and winscp.com both drive WinSCP.exe that way; with it, the stock assembly and winscp.com drive linscp unchanged. The CLI's console is now an interface (`CliConsole.h`) with the stdio and external implementations |
+| 2026-10-12 | Upstream's decisions never block the port: changes linscp needs are carried in its own patches and offered upstream in parallel (ADR 0006, amended) | The user's direction. Waiting on review of a project that takes few outside changes would stall P1 and P2 |
+| 2026-10-12 | Work is committed to `main` directly; pull requests only to put a change through CI, branches deleted once merged (`qt` merged into `main` and retired) | The user's direction; CI runs on pull requests only |
 | 2026-10-12 | Off Windows, winscp.com's console protocol runs over two inherited anonymous pipes (`/consolepipes`), the structure unchanged; proposed upstream for the assembly (ADR 0010) | Over a Unix socket, which needs `netstandard2.1` and a file system name another local user could connect to first: pipes have no name, exist in `netstandard2.0` and `net40`, and their end tells each side the other has gone, as the job object does |
 | 2026-10-12 | P1-20 is met on Windows only; Linux becomes P1-23 | The assembly's transport is Windows-only: named events and named file mappings, which .NET does not provide elsewhere, so "unchanged on Linux" cannot hold |
 | 2026-10-12 | CI runs on pull requests (and by hand), not on every push; in `debian:trixie`, with the tests as an unprivileged user | The repository is public, so Actions are free, but a run takes ~12 minutes (Wine) and pushes to a branch under review need not each run. trixie is the development toolchain (clang 19, mingw-w64, Wine 10); the fixtures start sshd and the other servers unprivileged, as locally. Wine uses its `null` graphics driver, since FileZilla's sockets and timers need windows and CI has no display |
@@ -423,7 +425,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | ~~Q-8~~ | ~~Confirm ADR 0001~~ — **resolved 2026-10-10**: accepted | — | — |
 | ~~Q-9~~ | ~~Stay on WinSCP's OpenSSL 3.3, or move to a supported LTS?~~ — **resolved 2026-10-11** by the third-party library policy (decisions table): stay while it is straightforward | — | — |
 | ~~Q-10~~ | ~~Bump the WinSCP pin to upstream's first 64-bit release?~~ — **resolved 2026-10-11**: pinned to `master` instead (decisions table) | — | — |
-| Q-11 | How should the assembly check the executable's version off Windows, where an ELF file has no version resource? The test sets `DisableVersionCheck` | P1-23 closing | upstream |
+| Q-11 | How should the assembly check the executable's version off Windows, where an ELF file has no version resource? The test sets `DisableVersionCheck`; the patch could skip the check off Windows or carry the version in INIT | nothing (linscp's assembly can decide alone) | — |
 
 ## Verified facts (re-check if the environment changes)
 
@@ -632,7 +634,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-20 | .NET assembly drives Linux CLI | done | On Windows: the assembly built from the pinned source runs sessions through linscp-cli over SFTP, FTP, FTPES, WebDAV and S3 (`port/tests/dotnet`); Linux needs another transport (P1-23) |
 | P1-21 | `#ifdef` out Windows-only subsystems | todo | |
 | P1-22 | CLI `keepuptodate` (directory watching) | done | `port/frontend/DirectoryWatcher.cpp` (inotify; ReadDirectoryChangesW), the controller's logic in CliMain.cpp; tested on Linux (ctest) and natively on Windows |
-| P1-23 | .NET assembly on Linux (new transport) | wip | ADR 0010: `/consolepipes` in `linscp-cli` (ctest `console_pipes`); the assembly change on 99ecarvalho/winscp `dotnet-console-pipes-transport` drives linscp on Linux (ctest `dotnet`), offered upstream as winscp/winscp#73 (draft) |
+| P1-23 | .NET assembly on Linux (new transport) | done | ADR 0010: `/consolepipes` in `linscp-cli` (ctest `console_pipes`); the assembly built with `port/patches/dotnet/console-pipes.patch` drives linscp on Linux (ctests `winscpnet_build`, `dotnet`, in CI); offered upstream as winscp/winscp#73 (draft), not waited on |
 
 ### P2 — Qt shell
 | ID | Task | Status | Note |

@@ -1,6 +1,7 @@
 # ADR 0010 — winscp.com's console protocol over inherited pipes on POSIX
 
-**Status:** accepted 2026-10-12 (for linscp; proposed upstream for the assembly)
+**Status:** accepted 2026-10-12; the assembly change carried in
+`port/patches/dotnet/` and proposed upstream (winscp/winscp#73)
 **Date:** 2026-10-12
 
 ## Context
@@ -46,10 +47,13 @@ means the caller has gone; the program reports it as an abort
 
 ## Consequences
 
-- The assembly needs the change, offered upstream as a draft pull request
-  (winscp/winscp#73, branch `dotnet-console-pipes-transport` of
-  99ecarvalho/winscp). Until it is merged, .NET on Linux needs an assembly
-  built from that branch.
+- The assembly needs the change. linscp carries it
+  (`port/patches/dotnet/console-pipes.patch`, the commit offered upstream as
+  winscp/winscp#73) and builds the assembly from the pinned source with it
+  (`port/tools/build_winscpnet.py`, ctest `winscpnet_build`), as ADR 0006
+  has it: whatever upstream decides, .NET on Linux works with linscp's
+  assembly. Not part of the patch series, which may not add lines; the
+  assembly is not in the generated tree.
 - On Linux the assembly cannot read the executable's version resource (an
   ELF file has none), so the test sets `Session.DisableVersionCheck`; how the
   assembly should check the version there is an open question upstream.
@@ -62,7 +66,8 @@ means the caller has gone; the program reports it as an abort
 - `console_pipes` (`run_console_pipes.py`) plays the caller: the handshake,
   PRINT and INPUT events, a structure of another size refused, and the
   program exiting promptly when the caller goes mid-request.
-- `dotnet` (`dotnet/run_dotnet.py`, when `LINSCP_DOTNET` and
-  `LINSCP_WINSCPNET` are set): the assembly from that branch drives
-  `linscp-cli` on Linux over SFTP, FTP, FTPES, WebDAV and S3; on Windows the
-  same assembly, and the stock one, still pass through `/consoleinstance`.
+- `dotnet` (`dotnet/run_dotnet.py`, with the SDK
+  `port/tools/fetch_dotnet.py` installs; run in CI's Linux job): the patched
+  assembly drives `linscp-cli` on Linux over SFTP, FTP, FTPES, WebDAV and S3.
+  On Windows the same assembly, and the stock one, still pass through
+  `/consoleinstance` (run natively on the VM).

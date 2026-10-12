@@ -31,7 +31,8 @@ jobs:
         include:
           - name: linux
             configure: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
-            packages: ''
+            # The .NET SDK's runtime dependency.
+            packages: libicu76
           - name: windows-cross
             configure: -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-mingw-w64.cmake
             packages: wine wine64
@@ -65,6 +66,12 @@ jobs:
         run: >-
           runuser -u ci -- python3 port/tools/fetch_rclone.py
           --corpus port/tests/golden/expected --dest build/tools
+
+      # The SDK ctest dotnet builds and runs WinSCP's assembly with; the
+      # native build only, as the SDK does not run under Wine.
+      - name: Fetch the .NET SDK
+        if: matrix.name == 'linux'
+        run: runuser -u ci -- python3 port/tools/fetch_dotnet.py --dest build/tools/dotnet
 
       # FileZilla's sockets and timers need windows, which Wine creates
       # only with a display driver; the null driver needs no display.
