@@ -112,12 +112,15 @@ Linux and on the Windows build: all 35 logs identical but the two WebDAV
 `rmdir` cases, where WinSCP 6.5.7 fails with "Invalid access to memory" and
 linscp's patch removes the directory (`known-differences.txt`).
 
-1. Report the upstream bugs found so far: script `rmdir` over WebDAV
-   (reproduced in WinSCP 6.5.7), FileGetSymLinkTargetSafe's handle leak,
-   GetParentProcessId's swapped memset arguments, the AES-NI pragma mismatch.
-2. **P1-20**: the stock .NET assembly driving `linscp-cli` (it expects
+Script `rmdir` over WebDAV is reported upstream with its fix:
+winscp/winscp#69 (`core-script-rmdir-full-path.patch` until it lands).
+
+1. **P1-20**: the stock .NET assembly driving `linscp-cli` (it expects
    winscp.com's switches and XML log), on the Windows VM and on Linux.
-3. **P1-22**: `keepuptodate` (directory watching) in the CLI.
+2. **P1-22**: `keepuptodate` (directory watching) in the CLI.
+3. Smaller upstream bugs still to report: FileGetSymLinkTargetSafe's handle
+   leak, GetParentProcessId's swapped memset arguments, the AES-NI pragma
+   mismatch.
 
 ## Decisions taken
 

@@ -9,6 +9,8 @@ fails; elsewhere the process crashes. The entry now carries its absolute
 path, resolved as TTerminal::DoDeleteFile resolves the same name. Line
 counts are unchanged.
 
+Reported upstream with the same fix: https://github.com/winscp/winscp/pull/69
+
 --- a/source/core/Script.cpp	2026-10-11 20:37:20.851630602 -0300
 +++ b/source/core/Script.cpp	2026-10-11 20:37:33.538102140 -0300
 @@ -586,7 +586,7 @@
