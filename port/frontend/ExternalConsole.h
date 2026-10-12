@@ -1,18 +1,19 @@
-// winscp.com's console protocol (/consoleinstance), for the program WinSCP's
-// .NET assembly and winscp.com start: see ExternalConsole.cpp. Windows only.
+// winscp.com's console protocol, for the program WinSCP's .NET assembly and
+// winscp.com start: over named events and a file mapping (/consoleinstance)
+// on Windows, over inherited pipes (/consolepipes) elsewhere. See
+// ExternalConsole.cpp.
 #ifndef LINSCP_EXTERNAL_CONSOLE_H
 #define LINSCP_EXTERNAL_CONSOLE_H
 
 #include "CliConsole.h"
-
-#if defined(_WIN32)
 
 #include <memory>
 
 class TExternalConsole : public TCliConsole
 {
 public:
-  TExternalConsole(const UnicodeString & Instance, bool NoInteractiveInput, TStdInOut StdOut, TStdInOut StdIn);
+  // Connection: /consoleinstance's name on Windows, /consolepipes' "<read>,<write>" elsewhere.
+  TExternalConsole(const UnicodeString & Connection, bool NoInteractiveInput, TStdInOut StdOut, TStdInOut StdIn);
   ~TExternalConsole() override;
 
   void Print(UnicodeString Str, bool FromBeginning = false, bool Error = false) override;
@@ -45,7 +46,5 @@ private:
   bool FInteractive = false;
   bool FWantsProgress = false;
 };
-
-#endif
 
 #endif

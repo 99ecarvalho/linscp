@@ -1,20 +1,25 @@
 // winscp.com's console protocol, as TExternalConsole speaks it in upstream's
-// windows/ConsoleRunner.cpp: the caller -- winscp.com, or WinSCP's .NET
-// assembly, which starts the program with /console /consoleinstance=<name>
-// -- owns a file mapping holding a TConsoleCommStruct (console/Console.h,
-// upstream's own header) and three events. Each exchange fills in the
-// structure, signals the request event and waits for the response; the
-// cancel event says the user asked to abort. The process joins the caller's
-// job object, so it ends when the caller does.
+// windows/ConsoleRunner.cpp: each exchange fills in a TConsoleCommStruct
+// (console/Console.h, upstream's own header), hands it to the caller -- winscp.com,
+// or WinSCP's .NET assembly -- and waits for it to come back answered.
 //
-// Windows only: the .NET assembly relies on named events and file mappings,
-// which .NET provides only there.
+// On Windows, as upstream: the caller starts the program with
+// /console /consoleinstance=<name> and owns a file mapping holding the
+// structure and three events. The request event hands it over, the response
+// event hands it back, and the cancel event says the user asked to abort. The
+// process joins the caller's job object, so it ends when the caller does.
+//
+// Elsewhere, where .NET has neither named events nor file mappings, the
+// caller starts it with /console /consolepipes=<read>,<write>: two inherited
+// pipe descriptors. The caller first writes the structure as it initialised
+// it, header and all; then each request is the whole structure written to
+// <write>, and its response the whole structure read back from <read>. With
+// the descriptors the only references to the pipes' ends, the end of <read>
+// means the caller has gone, and the process aborts as the job would end it.
 #include <vcl.h>
 #pragma hdrstop
 
 #include "ExternalConsole.h"
-
-#if defined(_WIN32)
 
 #include <Common.h>
 #include <Script.h>
@@ -26,6 +31,14 @@
 #include <cstring>
 #include <iterator>
 #include <mutex>
+
+#if !defined(_WIN32)
+  #include <cerrno>
+  #include <csignal>
+  #include <fcntl.h>
+  #include <poll.h>
+  #include <unistd.h>
+#endif
 
 #include "Console.h"
 
@@ -50,48 +63,112 @@ void TrimNewLine(UnicodeString & Str)
 
 struct TExternalConsole::TImpl
 {
+#if defined(_WIN32)
   HANDLE RequestEvent = NULL;
   HANDLE ResponseEvent = NULL;
   HANDLE CancelEvent = NULL;
   HANDLE FileMapping = NULL;
+#else
+  int ReadFd = -1;
+  int WriteFd = -1;
+  std::unique_ptr<TConsoleCommStruct> Buffer;
+#endif
   TConsoleCommStruct * Comm = NULL;
   // FTP calls TransferOut and TransferIn from its own thread.
   std::recursive_mutex Section;
   unsigned int MaxSend = 0;
 
-  // Signals the request and waits for the response.
+  // Hands the request over and waits for the response.
   void Send()
   {
-    SetEvent(RequestEvent);
     const DWORD Start = GetTickCount();
+#if defined(_WIN32)
+    SetEvent(RequestEvent);
     if (WaitForSingleObject(ResponseEvent, INFINITE) != WAIT_OBJECT_0)
     {
       throw Exception(LoadStr(CONSOLE_SEND_TIMEOUT));
     }
+#else
+    if (!WriteAll(Comm, sizeof(*Comm)) || !ReadAll(Comm, sizeof(*Comm)))
+    {
+      throw Exception(LoadStr(CONSOLE_COMM_ERROR));
+    }
+#endif
     MaxSend = std::max(MaxSend, static_cast<unsigned int>(GetTickCount() - Start));
   }
+
+#if !defined(_WIN32)
+  bool WriteAll(const void * Data, size_t Len)
+  {
+    const char * P = static_cast<const char *>(Data);
+    while (Len > 0)
+    {
+      const ssize_t N = write(WriteFd, P, Len);
+      if ((N < 0) && (errno == EINTR))
+      {
+        continue;
+      }
+      if (N <= 0)
+      {
+        return false;
+      }
+      P += N;
+      Len -= static_cast<size_t>(N);
+    }
+    return true;
+  }
+
+  bool ReadAll(void * Data, size_t Len)
+  {
+    char * P = static_cast<char *>(Data);
+    while (Len > 0)
+    {
+      const ssize_t N = read(ReadFd, P, Len);
+      if ((N < 0) && (errno == EINTR))
+      {
+        continue;
+      }
+      if (N <= 0)
+      {
+        return false;
+      }
+      P += N;
+      Len -= static_cast<size_t>(N);
+    }
+    return true;
+  }
+#endif
 };
 
 namespace {
 
+void InitError(const UnicodeString & Desc)
+{
+  throw ExtException(LoadStr(EXTERNAL_CONSOLE_INIT_ERROR), FORMAT(L"%s\n%s", (Desc, LastSysErrorMessage())));
+}
+
+#if defined(_WIN32)
 HANDLE Checked(HANDLE Handle, const wchar_t * Desc)
 {
   if (Handle == NULL)
   {
-    throw ExtException(LoadStr(EXTERNAL_CONSOLE_INIT_ERROR), FORMAT(L"%s\n%s", (Desc, LastSysErrorMessage())));
+    InitError(Desc);
   }
   return Handle;
 }
+#endif
 
 }  // namespace
 
-TExternalConsole::TExternalConsole(const UnicodeString & Instance, bool NoInteractiveInput,
+TExternalConsole::TExternalConsole(const UnicodeString & Connection, bool NoInteractiveInput,
   TStdInOut StdOut, TStdInOut StdIn) :
   F(new TImpl()),
   FNoInteractiveInput(NoInteractiveInput || (StdIn != StdOff)),
   FStdOut(StdOut),
   FStdIn(StdIn)
 {
+#if defined(_WIN32)
+  const UnicodeString & Instance = Connection;
   F->RequestEvent = Checked(OpenEventW(EVENT_ALL_ACCESS, FALSE,
     (UnicodeString(CONSOLE_EVENT_REQUEST) + Instance).c_str()), L"Request event");
   F->ResponseEvent = Checked(OpenEventW(EVENT_ALL_ACCESS, FALSE,
@@ -115,6 +192,35 @@ TExternalConsole::TExternalConsole(const UnicodeString & Instance, bool NoIntera
   {
     throw Exception(LoadStr(CONSOLE_COMM_ERROR));
   }
+#else
+  const int Comma = Connection.Pos(L",");
+  F->ReadFd = (Comma > 1) ? StrToIntDef(Connection.SubString(1, Comma - 1), -1) : -1;
+  F->WriteFd = (Comma > 1) ? StrToIntDef(Connection.SubString(Comma + 1, Connection.Length()), -1) : -1;
+  if ((F->ReadFd < 0) || (F->WriteFd < 0) ||
+      (fcntl(F->ReadFd, F_SETFD, FD_CLOEXEC) < 0) || (fcntl(F->WriteFd, F_SETFD, FD_CLOEXEC) < 0))
+  {
+    InitError(FORMAT(L"Console pipes \"%s\"", (Connection)));
+  }
+  // A caller gone mid-write is an error to report, not a signal to die of.
+  signal(SIGPIPE, SIG_IGN);
+  F->Buffer.reset(new TConsoleCommStruct());
+  F->Comm = F->Buffer.get();
+  // The structure as the caller initialised it; its size first, so that a
+  // structure of another size is refused rather than misread.
+  const size_t HeaderSize = offsetof(TConsoleCommStruct, PrintEvent);
+  if (!F->ReadAll(F->Comm, HeaderSize))
+  {
+    throw Exception(LoadStr(CONSOLE_COMM_ERROR));
+  }
+  if (F->Comm->Size != sizeof(TConsoleCommStruct))
+  {
+    throw Exception(FMTLOAD(EXTERNAL_CONSOLE_INCOMPATIBLE, (F->Comm->Version)));
+  }
+  if (!F->ReadAll(reinterpret_cast<char *>(F->Comm) + HeaderSize, sizeof(TConsoleCommStruct) - HeaderSize))
+  {
+    throw Exception(LoadStr(CONSOLE_COMM_ERROR));
+  }
+#endif
   if (F->Comm->Version != TConsoleCommStruct::CurrentVersion)
   {
     throw Exception(FMTLOAD(EXTERNAL_CONSOLE_INCOMPATIBLE, (F->Comm->Version)));
@@ -141,6 +247,7 @@ TExternalConsole::TExternalConsole(const UnicodeString & Instance, bool NoIntera
 
 TExternalConsole::~TExternalConsole()
 {
+#if defined(_WIN32)
   if (F->Comm != NULL)
   {
     UnmapViewOfFile(F->Comm);
@@ -152,6 +259,15 @@ TExternalConsole::~TExternalConsole()
       CloseHandle(H);
     }
   }
+#else
+  for (int Fd : { F->ReadFd, F->WriteFd })
+  {
+    if (Fd >= 0)
+    {
+      close(Fd);
+    }
+  }
+#endif
 }
 
 void TExternalConsole::Print(UnicodeString Str, bool FromBeginning, bool Error)
@@ -208,7 +324,14 @@ int TExternalConsole::Choice(const UnicodeString & Options, int Cancel, int Brea
 
 bool TExternalConsole::PendingAbort()
 {
+#if defined(_WIN32)
   return WaitForSingleObject(F->CancelEvent, 0) == WAIT_OBJECT_0;
+#else
+  // No cancel event: the caller going is the abort. A response pending for
+  // another thread is readable data, not a hang-up, so this needs no lock.
+  pollfd Poll = { F->ReadFd, POLLIN, 0 };
+  return (poll(&Poll, 1, 0) > 0) && ((Poll.revents & (POLLHUP | POLLERR)) != 0);
+#endif
 }
 
 void TExternalConsole::SetTitle(const UnicodeString & Title)
@@ -284,5 +407,3 @@ UnicodeString TExternalConsole::FinalLogMessage()
 {
   return FORMAT(L"Max roundtrip: %d", (static_cast<int>(F->MaxSend)));
 }
-
-#endif

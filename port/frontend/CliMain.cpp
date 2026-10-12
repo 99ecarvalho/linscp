@@ -1360,14 +1360,17 @@ int main()
       const TCliConsole::TStdInOut StdIn = ParseStdInOut(Params, StdInSwitch, false);
       const bool NoInteractiveInput = Params->FindSwitch(NoInteractiveInputSwitch);
       std::unique_ptr<TCliConsole> Console;
-#if defined(_WIN32)
       // Started by winscp.com or WinSCP's .NET assembly, as WinSCP.exe is.
-      UnicodeString ConsoleInstance;
-      if (Params->FindSwitch(L"consoleinstance", ConsoleInstance))
-      {
-        Console.reset(new TExternalConsole(ConsoleInstance, NoInteractiveInput, StdOut, StdIn));
-      }
+#if defined(_WIN32)
+      const wchar_t * const ConsoleSwitch = L"consoleinstance";
+#else
+      const wchar_t * const ConsoleSwitch = L"consolepipes";
 #endif
+      UnicodeString ConsoleConnection;
+      if (Params->FindSwitch(ConsoleSwitch, ConsoleConnection))
+      {
+        Console.reset(new TExternalConsole(ConsoleConnection, NoInteractiveInput, StdOut, StdIn));
+      }
       if (!Console)
       {
         Console.reset(new TStdioConsole(StdOut, StdIn, NoInteractiveInput));

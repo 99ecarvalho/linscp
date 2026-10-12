@@ -15,6 +15,7 @@ the decisions table in [TRACKER.md](../TRACKER.md).
 | [0007](0007-verification.md) | Verification against real servers and a golden corpus from real WinSCP |
 | [0008](0008-command-line-client.md) | `linscp-cli`: own runner over core's script; winscp.com's protocol on Windows |
 | [0009](0009-posix-configuration.md) | Configuration on POSIX is `WinSCP.ini`, in the XDG directory by default |
+| [0010](0010-console-pipes.md) | winscp.com's console protocol over inherited pipes on POSIX, for the .NET assembly |
 
 Write one when a decision constrains later work or would be costly to undo;
 number in order, never renumber, and amend rather than rewrite an accepted

@@ -323,6 +323,12 @@ typedef SECURITY_ATTRIBUTES * LPSECURITY_ATTRIBUTES;
 // The name is unlinked as soon as the file is open, where Windows removes it
 // at the last close; either way nothing is left behind.
 #define FILE_FLAG_DELETE_ON_CLOSE    0x04000000
+// GetFileType's answers, which winscp.com's console protocol reports for the
+// caller's input and output; there is no GetFileType here.
+#define FILE_TYPE_UNKNOWN            0x0000
+#define FILE_TYPE_DISK               0x0001
+#define FILE_TYPE_CHAR               0x0002
+#define FILE_TYPE_PIPE               0x0003
 
 // Attributes at creation: READONLY creates the file without write permission;
 // the others have no POSIX meaning and are ignored.

@@ -1,6 +1,6 @@
 // A session through WinSCP's .NET assembly, as a user's code drives it: the
-// assembly starts the executable with /console /consoleinstance and speaks
-// winscp.com's protocol to it. Arguments:
+// assembly starts the executable with /console /consoleinstance (Windows) or
+// /consolepipes (elsewhere) and speaks winscp.com's protocol to it. Arguments:
 //   executable protocol(sftp|ftp|ftpes|webdav|s3) port remote-dir local-dir
 // The servers are run_dotnet.py's: user linscp, password secret on
 // 127.0.0.1 (S3: key LINSCPKEY, secret "secret", path-style, plain HTTP).
@@ -62,6 +62,9 @@ internal static class Program
             using (var session = new Session())
             {
                 session.ExecutablePath = executable;
+                // The assembly checks the executable's version resource, which
+                // only a Windows executable has.
+                session.DisableVersionCheck = !OperatingSystem.IsWindows();
                 int transferred = 0;
                 session.FileTransferred += (sender, e) => transferred++;
                 session.Open(options);

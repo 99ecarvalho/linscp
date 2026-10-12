@@ -178,6 +178,25 @@ if(NOT WIN32)
   set_tests_properties(keepuptodate PROPERTIES
     DEPENDS cli_session_build SKIP_RETURN_CODE 77 TIMEOUT 300)
 endif()
+# winscp.com's console protocol over /consolepipes, the script in the
+# caller's place (ADR 0010). POSIX's transport; Windows' is /consoleinstance.
+if(NOT WIN32)
+  add_test(NAME console_pipes
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_console_pipes.py" "$<TARGET_FILE:linscp-cli>")
+  set_tests_properties(console_pipes PROPERTIES
+    DEPENDS cli_session_build SKIP_RETURN_CODE 77 TIMEOUT 120)
+endif()
+# WinSCP's .NET assembly driving linscp-cli (dotnet/run_dotnet.py), given a
+# dotnet and a WinSCPnet.dll built from WinSCP's source. Off Windows the
+# assembly must be one with console pipes (ADR 0010).
+set(LINSCP_DOTNET "" CACHE FILEPATH "dotnet, for ctest dotnet")
+set(LINSCP_WINSCPNET "" CACHE FILEPATH "WinSCPnet.dll, for ctest dotnet")
+if(LINSCP_DOTNET AND LINSCP_WINSCPNET AND NOT CMAKE_CROSSCOMPILING)
+  add_test(NAME dotnet
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/dotnet/run_dotnet.py"
+            --dotnet "${LINSCP_DOTNET}" --winscpnet "${LINSCP_WINSCPNET}" --client "$<TARGET_FILE:linscp-cli>")
+  set_tests_properties(dotnet PROPERTIES DEPENDS cli_session_build TIMEOUT 900)
+endif()
 # One everyday script over every protocol whose server is installed here,
 # each checked on the server's side (run_protocols.py, fixtures.py).
 add_test(NAME protocols

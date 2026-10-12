@@ -5,10 +5,11 @@ FTP, FTPES, WebDAV and S3 against the suite's loopback servers.
 
   run_dotnet.py --dotnet dotnet.exe --winscpnet WinSCPnet.dll --client linscp-cli.exe
 
-Windows only: the assembly speaks winscp.com's protocol through named
-events and file mappings, which .NET provides only there. WinSCPnet.dll
-must be built from the same WinSCP source as the executable -- the
-assembly refuses an executable of another product version.
+The stock assembly speaks winscp.com's protocol through named events and
+file mappings, which .NET provides only on Windows; elsewhere it needs the
+assembly with console pipes (ADR 0010, offered upstream). WinSCPnet.dll
+must be built from the same WinSCP source as the executable -- on Windows
+the assembly refuses an executable of another product version.
 """
 import argparse, os, shutil, subprocess, sys, tempfile
 
@@ -36,7 +37,12 @@ def main():
     tmp = tempfile.mkdtemp(prefix='linscp-dotnet-')
     failures = 0
     try:
-        build = subprocess.run([a.dotnet, 'build', os.path.join(HERE, 'DotnetSession.csproj'), '-c', 'Release',
+        # Built from a copy, so that the build's obj/ stays out of the source tree.
+        project = os.path.join(tmp, 'project')
+        os.makedirs(project)
+        for name in ('DotnetSession.csproj', 'Program.cs'):
+            shutil.copy(os.path.join(HERE, name), project)
+        build = subprocess.run([a.dotnet, 'build', os.path.join(project, 'DotnetSession.csproj'), '-c', 'Release',
                                 '-o', os.path.join(tmp, 'bin'), f'-p:WinSCPnetPath={os.path.abspath(a.winscpnet)}'],
                                capture_output=True, text=True)
         if build.returncode != 0:
