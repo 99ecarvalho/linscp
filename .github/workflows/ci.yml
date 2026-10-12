@@ -3,8 +3,9 @@
 # toolchain the port is developed with (clang 19, lld, mingw-w64, Wine 10).
 #
 # Both jobs install the mingw-w64 sysroot: the census_ratchet test compiles
-# core for both targets. The tests run as an unprivileged user: sshd and the other fixtures are
-# started unprivileged on loopback, as on a developer's machine.
+# core for both targets. The tests run as an unprivileged user: sshd and the
+# other fixtures are started unprivileged on loopback, as on a developer's
+# machine.
 name: ci
 
 on:

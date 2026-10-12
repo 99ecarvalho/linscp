@@ -31,4 +31,4 @@ Plan and task tracker live in [doc/qt/](doc/qt/).
 - **clang only.** GCC cannot compile the `__declspec(property)` shim.
 - **The transform must stay dual-target**: output compiles under both C++Builder
   (native `__property`) and clang (`__declspec(property)`).
-- CI builds Linux native and Windows cross on every change.
+- CI builds Linux native and Windows cross on every pull request.

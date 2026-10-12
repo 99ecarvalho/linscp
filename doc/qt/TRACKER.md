@@ -1,6 +1,6 @@
 # Tracker
 
-Last updated: **2026-10-11**
+Last updated: **2026-10-12**
 
 Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
@@ -8,12 +8,12 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 30 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 35 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **65** | **97** | |
+| **Total** | **67** | **97** | |
 
 ## Next three actions
 
@@ -131,15 +131,17 @@ the 500 ms change delay, excluded directories not watched, upstream's
 messages. `run_keepuptodate.py` passes on Linux (ctest `keepuptodate`) and
 natively on the Windows VM.
 
-1. **P0-11, P0-12**: CI. CLAUDE.md says CI builds both targets on every
-   change, but the repository has no workflow yet: GitHub Actions building
-   Linux and the Windows cross-build, running ctest natively and under Wine.
-2. **P1-23**: the .NET assembly on Linux, which needs a transport other than
-   named events and file mappings -- a change to the assembly, to propose
-   upstream.
-3. Smaller upstream bugs still to report: FileGetSymLinkTargetSafe's handle
-   leak, GetParentProcessId's swapped memset arguments, the AES-NI pragma
-   mismatch.
+**CI runs on pull requests** (P0-11, P0-12 done): GitHub Actions builds
+Linux and the Windows cross-build in Debian trixie and runs the whole ctest
+suite, natively and under Wine (`.github/workflows/ci.yml`). The smaller
+upstream bugs are reported: winscp/winscp#70 (FileGetSymLinkTargetSafe's
+handle leak), #71 (GetParentProcessId's memset), #72 (aes-ni.c's pragma pop).
+
+1. **P1-23**: the .NET assembly on Linux, which needs a transport other than
+   named events and file mappings: a Unix socket carrying the same
+   `ConsoleCommStruct` -- prototyped here, then proposed upstream.
+2. **P1-10, P1-21**: the remaining P1 tasks.
+3. **P0-20**: the last open P0 task not blocked.
 
 ## Decisions taken
 
@@ -289,6 +291,7 @@ natively on the Windows VM.
 | 2026-10-12 | ctest `protocols` also runs against servers the suite did not write -- pyftpdlib (FTP, FTPES), moto (S3, checked through boto3) -- and through proxies that must see the traffic and require credentials: microsocks (SOCKS5: SFTP, FTP with its data connections) and tinyproxy (HTTP CONNECT: SFTP, WebDAV) | The suite's own FTP and S3 servers test against its own reading of the protocols; independent implementations do not. Proxy support (PuTTY's, FileZilla's, neon's) was untested. The workstation's packages: python3-pyftpdlib, python3-moto, python3-flask-cors, microsocks, tinyproxy |
 | 2026-10-12 | `linscp-cli` implements winscp.com's console protocol (`/consoleinstance`, `ExternalConsole.cpp`) on Windows, over upstream's own `console/Console.h` structure | WinSCP's .NET assembly and winscp.com both drive WinSCP.exe that way; with it, the stock assembly and winscp.com drive linscp unchanged. The CLI's console is now an interface (`CliConsole.h`) with the stdio and external implementations |
 | 2026-10-12 | P1-20 is met on Windows only; Linux becomes P1-23 | The assembly's transport is Windows-only: named events and named file mappings, which .NET does not provide elsewhere, so "unchanged on Linux" cannot hold |
+| 2026-10-12 | CI runs on pull requests (and by hand), not on every push; in `debian:trixie`, with the tests as an unprivileged user | The repository is public, so Actions are free, but a run takes ~12 minutes (Wine) and pushes to a branch under review need not each run. trixie is the development toolchain (clang 19, mingw-w64, Wine 10); the fixtures start sshd and the other servers unprivileged, as locally. Wine uses its `null` graphics driver, since FileZilla's sockets and timers need windows and CI has no display |
 | 2026-10-10 | `Format` keeps malformed input visible | Delphi raises on a missing argument. Core routes user- and server-supplied text through these into logs, so an unknown specifier is echoed and a missing argument renders as `<missing>` rather than throwing from a log path |
 
 ## Correction: census figures before 2026-10-11 used the wrong configuration
@@ -532,6 +535,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | Vendored expat compiles for both targets; the mingw sysroot has no expat | `cmake/expat.cmake` | 2026-10-11 |
 | The Windows CRT's `towlower` folds only ASCII in the default locale | the same test run against the real CRT under Wine | 2026-10-11 |
 | 24/24 tests pass on both targets | `ctest` | 2026-10-11 |
+| CI green: 57/57 tests on Linux, 55/55 on Windows under Wine, none skipped | GitHub Actions, PR #1 | 2026-10-12 |
 | 12/12 tests pass on Linux and on Windows under Wine | `ctest` both trees | 2026-10-10 |
 | Directory search validated against both backends: real `FindFirstFileW` under Wine, and `dirent` + `fnmatch` on Linux | `test_sysutils` on both targets | 2026-10-10 |
 | `__closure` scope: 44 distinct closure types, 16 typedefs; call sites pass bare member-function names | grep over generated core | 2026-10-10 |
@@ -554,8 +558,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P0-08 | CMake skeleton | done | transform+verify wired as a build step; CTest on both targets |
 | P0-09 | Minimal shim for `core/Common.cpp` | done | Overtaken: all 33 core units compile and link on both targets |
 | P0-10 | mingw-w64 sysroot + clang toolchain file | done | `cmake/toolchain-mingw-w64.cmake`; clang + lld + Wine emulator |
-| P0-11 | CI matrix Linux + Windows cross | todo | |
-| P0-12 | Wine smoke tests in CI | wip | wired into CTest via `CMAKE_CROSSCOMPILING_EMULATOR`; GitHub Actions pending |
+| P0-11 | CI matrix Linux + Windows cross | done | `.github/workflows/ci.yml`, on pull requests; both jobs run the full ctest suite |
+| P0-12 | Wine smoke tests in CI | done | the windows-cross job runs ctest under Wine (`CMAKE_CROSSCOMPILING_EMULATOR`), with the null display driver |
 | P0-13 | Golden-output harness | done | `port/tests/golden/run_golden.py` (capture, normalise, compare, check), cases in `golden/cases`; ctest `golden` against `golden/expected`. Linux and Windows linscp agree on all 35 logs |
 | P0-14 | Protocol server containers | done | Not containers: loopback servers per test (`fixtures.py`: OpenSSH, rclone, the suite's FTP and S3 servers), on Linux and Windows alike |
 | P0-15 | Capture golden corpus from real WinSCP | done | WinSCP 6.5.7 on a Windows 11 VM, rclone v1.75.2: 35 logs in `port/tests/golden/expected` |
