@@ -8,12 +8,12 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 27 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 31 | 37 | Golden suite green, six protocols, both platforms |
+| P0 Foundation | 28 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P1 Headless core | 32 | 37 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **58** | **96** | |
+| **Total** | **60** | **96** | |
 
 ## Next three actions
 
@@ -105,12 +105,19 @@ file types were logged as `68`/`45`; and on POSIX `FindFirst` read `*.*`
 literally, so synchronization did not see local directories without a dot
 in their name and `synchronize remote -delete` deleted them on the server.
 
-1. **P0-15**: capture the corpus with real WinSCP on Windows (the user runs
-   `run_golden.py capture`; see `port/tests/golden/README.md`), commit it,
-   and make ctest `golden` pass against it.
-2. **P1-22**: `keepuptodate` (directory watching) in the CLI.
-3. **P1-20**: the stock .NET assembly driving `linscp-cli` (it expects
-   winscp.com's switches and XML log).
+**linscp matches real WinSCP** (P0-15, P1-19 done): the golden corpus was
+captured on a native Windows 11 VM with WinSCP 6.5.7 against rclone v1.75.2
+and the suite's servers (`golden/expected`), and ctest `golden` passes on
+Linux and on the Windows build: all 35 logs identical but the two WebDAV
+`rmdir` cases, where WinSCP 6.5.7 fails with "Invalid access to memory" and
+linscp's patch removes the directory (`known-differences.txt`).
+
+1. Report the upstream bugs found so far: script `rmdir` over WebDAV
+   (reproduced in WinSCP 6.5.7), FileGetSymLinkTargetSafe's handle leak,
+   GetParentProcessId's swapped memset arguments, the AES-NI pragma mismatch.
+2. **P1-20**: the stock .NET assembly driving `linscp-cli` (it expects
+   winscp.com's switches and XML log), on the Windows VM and on Linux.
+3. **P1-22**: `keepuptodate` (directory watching) in the CLI.
 
 ## Decisions taken
 
@@ -255,6 +262,8 @@ in their name and `synchronize remote -delete` deleted them on the server.
 | 2026-10-11 | `SubString` takes an index below 1 as 1 and keeps the count (C++Builder's), not Delphi `Copy`'s dropping of the characters before 1 | Core's one use of it, `TS3FileSystem::ParsePath`'s `SubString(0, P - 1)`, works in WinSCP's S3 transfers only that way; the shim's earlier reading cut every bucket name by one character |
 | 2026-10-11 | Golden runs use servers that exist on both platforms -- rclone (SFTP, WebDAV), the suite's FTP and S3 servers -- with fixed data, fixed permissions, password logins and `*` for host keys and certificates | Real WinSCP captures on Windows and linscp replays on Linux; any difference has to be the client's. SCP is left out: Windows has no SCP server without installing OpenSSH. Normalising removes only the start time and the local working directory |
 | 2026-10-11 | Deliberate departures from WinSCP's output are listed per case in `golden/known-differences.txt` | Printed, not failed; cases are kept small (rmdir has its own) so an entry hides nothing else |
+| 2026-10-12 | The golden corpus is captured on a native Windows VM (192.168.0.33, reached over SSH; tools kept in `C:\temp`) and pins its servers' versions (`expected/SERVERS.txt`, `CLIENT.txt`); `ctest golden` skips, saying why, unless the same rclone is at `LINSCP_RCLONE` (`port/tools/fetch_rclone.py`) | A newer rclone answers WebDAV synchronization differently (seen: 1.60 against 1.75.2), which would read as a client difference |
+| 2026-10-12 | P1-19 closes with SCP outside the golden comparison | No SCP server runs on both platforms (Windows' OpenSSH has no POSIX shell, which SCP needs); SCP is tested against OpenSSH in ctest `protocols` |
 | 2026-10-10 | `Format` keeps malformed input visible | Delphi raises on a missing argument. Core routes user- and server-supplied text through these into logs, so an unknown specifier is echoed and a missing argument renders as `<missing>` rather than throwing from a log path |
 
 ## Correction: census figures before 2026-10-11 used the wrong configuration
@@ -525,7 +534,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P0-12 | Wine smoke tests in CI | wip | wired into CTest via `CMAKE_CROSSCOMPILING_EMULATOR`; GitHub Actions pending |
 | P0-13 | Golden-output harness | done | `port/tests/golden/run_golden.py` (capture, normalise, compare, check), cases in `golden/cases`; ctest `golden` against `golden/expected`. Linux and Windows linscp agree on all 35 logs |
 | P0-14 | Protocol server containers | done | Not containers: loopback servers per test (`fixtures.py`: OpenSSH, rclone, the suite's FTP and S3 servers), on Linux and Windows alike |
-| P0-15 | Capture golden corpus from real WinSCP | todo | Runnable: the user captures on native Windows (`golden/README.md`) |
+| P0-15 | Capture golden corpus from real WinSCP | done | WinSCP 6.5.7 on a Windows 11 VM, rclone v1.75.2: 35 logs in `port/tests/golden/expected` |
 | P0-16 | ADR log | wip | `doc/qt/adr/` started with ADR 0001 |
 | P0-17 | Property compile-check harness | done | `check_properties.py`, 613 declarations, clang exit 0 |
 | P0-18 | HTML render of plan docs | done | `doc/qt/plan.html` via `build-html.sh` |
@@ -580,7 +589,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-16 | Headless `Interface.h` frontend | done | `port/frontend`: all 17 functions plus startup/shutdown; core initialises and finalises under Wine. Linux follows core (P1-07b) |
 | P1-17 | First SFTP session on Linux | done | Core links on Linux, and the four loopback-`sshd` session tests pass there as on Windows (negotiated, AES-CTR, AES-GCM, ChaCha20-Poly1305). Needed the `lp64_long` transform rule and the link-level wide-function check |
 | P1-18 | Windows cross-build + Wine | done | Core and the CLI, cross-built, run real SFTP sessions and scripts under Wine (`sftp_session*`, `cli_session`) |
-| P1-19 | Golden suite green, both platforms | wip | ctest `protocols`: SFTP, SCP, WebDAV(S), FTP, FTPES, FTPS and S3 pass the everyday script on both targets. The golden comparison needs P0-13 (harness) and P0-15 (corpus from real WinSCP, Q-2). **P1 gate** |
+| P1-19 | Golden suite green, both platforms | done | ctest `golden`: Linux and Windows linscp match real WinSCP on SFTP, WebDAV(S), FTP, FTPES, FTPS and S3 (two documented differences); SCP in ctest `protocols` only. **P1 gate** |
 | P1-20 | .NET assembly drives Linux CLI | todo | |
 | P1-21 | `#ifdef` out Windows-only subsystems | todo | |
 | P1-22 | CLI `keepuptodate` (directory watching) | todo | |

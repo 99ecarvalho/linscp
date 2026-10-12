@@ -58,6 +58,13 @@ def make_tree(server_root, work):
     write(os.path.join(base, 'data.bin'), bytes(range(256)) * 4)
     write(os.path.join(base, 'sub', 'a.txt'), b'a\n')
     write(os.path.join(base, 'sub', 'b.txt'), b'bb\n')
+    # rclone's SFTP server reports the files' real modes: Windows has 0666
+    # and 0777, so POSIX is given the same (with a zero umask for what the
+    # client creates; set in capture).
+    for dirpath, dirs, files in os.walk(base):
+        os.chmod(dirpath, 0o777)
+        for f in files:
+            os.chmod(os.path.join(dirpath, f), 0o666)
     for d in (os.path.join(base, 'sub'), base):
         os.utime(d, (FIXED_TIME, FIXED_TIME))
 
@@ -149,6 +156,8 @@ def capture(a):
         cases = [c for c in cases if c in a.cases.split(',')]
     protocols = [p for p in PROTOCOLS if not a.only or p in a.only.split(',')]
     tmp = tempfile.mkdtemp(prefix='linscp-golden-')
+    if os.name != 'nt':
+        os.umask(0)
     servers = Servers(tmp)
     ran, skipped = 0, []
     try:
@@ -198,6 +207,14 @@ def capture(a):
         shutil.rmtree(tmp, ignore_errors=True)
     if skipped:
         print('skipped: ' + ', '.join(skipped))
+    # Which client wrote the logs: the first line of its /help.
+    cmd = ([a.emulator] if a.emulator else []) + [a.client, '/help']
+    help_text = subprocess.run(cmd, capture_output=True, timeout=60).stdout.decode('utf-8', 'replace')
+    with open(os.path.join(a.out, 'CLIENT.txt'), 'w', encoding='utf-8', newline='\n') as f:
+        f.write(help_text.strip().split('\n', 1)[0].strip() + '\n')
+    # The servers' versions: a different rclone may answer differently.
+    with open(os.path.join(a.out, 'SERVERS.txt'), 'w', encoding='utf-8', newline='\n') as f:
+        f.write(f'{fixtures.rclone_version() or "rclone: none"}\n')
     return ran
 
 
@@ -215,6 +232,8 @@ def compare(expected, actual):
     known = known_differences()
     compared, differing, missing = 0, 0, []
     for proto in sorted(os.listdir(expected)):
+        if not os.path.isdir(os.path.join(expected, proto)):
+            continue  # SERVERS.txt, CLIENT.txt
         for name in sorted(os.listdir(os.path.join(expected, proto))):
             if not name.endswith('.xml'):
                 continue
@@ -246,6 +265,7 @@ def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest='command', required=True)
     c = sub.add_parser('capture')
+    c.add_argument('--rclone', help='the rclone to serve with (default: LINSCP_RCLONE, then PATH)')
     c.add_argument('--client', required=True)
     c.add_argument('--emulator')
     c.add_argument('--out', required=True)
@@ -255,10 +275,13 @@ def main():
     d.add_argument('expected')
     d.add_argument('actual')
     k = sub.add_parser('check')
+    k.add_argument('--rclone', help='the rclone to serve with (default: LINSCP_RCLONE, then PATH)')
     k.add_argument('--client', required=True)
     k.add_argument('--emulator')
     k.add_argument('expected')
     a = ap.parse_args()
+    if getattr(a, 'rclone', None):
+        os.environ['LINSCP_RCLONE'] = os.path.abspath(a.rclone)
 
     if a.command == 'capture':
         return 0 if capture(a) > 0 else SKIP
@@ -270,6 +293,14 @@ def main():
     if not os.path.isdir(a.expected) or not os.listdir(a.expected):
         print(f'SKIP: no golden corpus in {a.expected}')
         return SKIP
+    pinned_path = os.path.join(a.expected, 'SERVERS.txt')
+    if os.path.exists(pinned_path):
+        pinned = open(pinned_path, encoding='utf-8').read().split('\n', 1)[0].strip()
+        have = fixtures.rclone_version()
+        if have != pinned:
+            print(f'SKIP: the corpus was captured with {pinned}, this rclone is {have or "missing"} '
+                  f'(port/tools/fetch_rclone.py fetches it; pass --rclone or set LINSCP_RCLONE)')
+            return SKIP
     out = tempfile.mkdtemp(prefix='linscp-golden-out-')
     try:
         a.out, a.only, a.cases = out, None, None

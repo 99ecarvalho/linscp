@@ -1,0 +1,16 @@
+<ns0:session xmlns:ns0="http://winscp.net/schema/session/1.0" name="linscp@127.0.0.1">
+  <ns0:failure>
+    <ns0:message>Can't get attributes of file '/work/missing.txt'.</ns0:message>
+    <ns0:message>Could not retrieve file information</ns0:message>
+    <ns0:message>No such file or directory</ns0:message>
+  </ns0:failure>
+  <ns0:failure>
+    <ns0:message>Can't get attributes of file '/work/missing.txt'.</ns0:message>
+    <ns0:message>Could not retrieve file information</ns0:message>
+    <ns0:message>No such file or directory</ns0:message>
+  </ns0:failure>
+  <ns0:failure>
+    <ns0:message>Error changing directory to '/work/nodir'.</ns0:message>
+    <ns0:message>No such directory</ns0:message>
+  </ns0:failure>
+</ns0:session>

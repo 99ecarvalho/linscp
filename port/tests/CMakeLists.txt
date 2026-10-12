@@ -180,9 +180,15 @@ set_tests_properties(protocols PROPERTIES
 # compared with the logs real WinSCP wrote for them on Windows
 # (golden/expected, captured with run_golden.py capture). Skipped until the
 # corpus exists.
+# The servers must be the corpus' (golden/expected/SERVERS.txt): rclone of
+# that version at LINSCP_RCLONE, which port/tools/fetch_rclone.py fetches;
+# otherwise the test skips and says so.
+set(LINSCP_RCLONE "${CMAKE_BINARY_DIR}/tools/rclone" CACHE FILEPATH
+    "rclone of the golden corpus' version, for ctest golden")
 add_test(NAME golden
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/golden/run_golden.py" check
           --client "$<TARGET_FILE:linscp-cli>" --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}"
+          --rclone "${LINSCP_RCLONE}"
           "${CMAKE_CURRENT_SOURCE_DIR}/golden/expected")
 set_tests_properties(golden PROPERTIES
   DEPENDS cli_session_build SKIP_RETURN_CODE 77 TIMEOUT 1800)

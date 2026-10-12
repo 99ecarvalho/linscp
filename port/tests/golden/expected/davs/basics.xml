@@ -1,0 +1,93 @@
+<ns0:session xmlns:ns0="http://winscp.net/schema/session/1.0" name="linscp@127.0.0.1">
+  <ns0:ls>
+    <ns0:destination value="/work" />
+    <ns0:files>
+      <ns0:file>
+        <ns0:filename value=".." />
+        <ns0:type value="D" />
+        <ns0:modification value="2020-01-02T03:04:05.000Z" />
+      </ns0:file>
+      <ns0:file>
+        <ns0:filename value="data.bin" />
+        <ns0:type value="-" />
+        <ns0:size value="1024" />
+        <ns0:modification value="2020-01-02T03:04:05.000Z" />
+      </ns0:file>
+      <ns0:file>
+        <ns0:filename value="hello.txt" />
+        <ns0:type value="-" />
+        <ns0:size value="14" />
+        <ns0:modification value="2020-01-02T03:04:05.000Z" />
+      </ns0:file>
+      <ns0:file>
+        <ns0:filename value="sub" />
+        <ns0:type value="D" />
+        <ns0:modification value="2020-01-02T03:04:05.000Z" />
+      </ns0:file>
+    </ns0:files>
+    <ns0:result success="true" />
+  </ns0:ls>
+  <ns0:stat>
+    <ns0:filename value="/work/hello.txt" />
+    <ns0:file>
+      <ns0:type value="-" />
+      <ns0:size value="14" />
+      <ns0:modification value="2020-01-02T03:04:05.000Z" />
+    </ns0:file>
+    <ns0:result success="true" />
+  </ns0:stat>
+  <ns0:download>
+    <ns0:filename value="/work/hello.txt" />
+    <ns0:destination value="{LOCAL}/hello.txt" />
+    <ns0:size value="14" />
+    <ns0:result success="true" />
+  </ns0:download>
+  <ns0:download>
+    <ns0:filename value="/work/sub/a.txt" />
+    <ns0:destination value="{LOCAL}/a.txt" />
+    <ns0:size value="2" />
+    <ns0:result success="true" />
+  </ns0:download>
+  <ns0:download>
+    <ns0:filename value="/work/sub/b.txt" />
+    <ns0:destination value="{LOCAL}/b.txt" />
+    <ns0:size value="3" />
+    <ns0:result success="true" />
+  </ns0:download>
+  <ns0:upload>
+    <ns0:filename value="{LOCAL}/upload.txt" />
+    <ns0:destination value="/work/upload.txt" />
+    <ns0:size value="9" />
+    <ns0:result success="true" />
+  </ns0:upload>
+  <ns0:mkdir>
+    <ns0:filename value="/work/newdir" />
+    <ns0:result success="true" />
+  </ns0:mkdir>
+  <ns0:mv>
+    <ns0:filename value="/work/upload.txt" />
+    <ns0:destination value="/work/newdir/upload.txt" />
+    <ns0:result success="true" />
+  </ns0:mv>
+  <ns0:ls>
+    <ns0:destination value="/work/newdir" />
+    <ns0:files>
+      <ns0:file>
+        <ns0:filename value=".." />
+        <ns0:type value="D" />
+        <ns0:modification value="{NOW}" />
+      </ns0:file>
+      <ns0:file>
+        <ns0:filename value="upload.txt" />
+        <ns0:type value="-" />
+        <ns0:size value="9" />
+        <ns0:modification value="{NOW}" />
+      </ns0:file>
+    </ns0:files>
+    <ns0:result success="true" />
+  </ns0:ls>
+  <ns0:rm recursive="true">
+    <ns0:filename value="/work/newdir/upload.txt" />
+    <ns0:result success="true" />
+  </ns0:rm>
+</ns0:session>

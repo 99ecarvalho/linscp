@@ -1,0 +1,105 @@
+<ns0:session xmlns:ns0="http://winscp.net/schema/session/1.0" name="linscp@127.0.0.1">
+  <ns0:difference>
+    <ns0:action value="downloadnew" />
+    <ns0:type value="-" />
+    <ns0:filename value="/work/data.bin" />
+    <ns0:size value="1024" />
+    <ns0:modification value="2020-01-02T03:04:05.000Z" />
+    <ns0:result success="true" />
+  </ns0:difference>
+  <ns0:difference>
+    <ns0:action value="downloadnew" />
+    <ns0:type value="-" />
+    <ns0:filename value="/work/hello.txt" />
+    <ns0:size value="14" />
+    <ns0:modification value="2020-01-02T03:04:05.000Z" />
+    <ns0:result success="true" />
+  </ns0:difference>
+  <ns0:difference>
+    <ns0:action value="downloadnew" />
+    <ns0:type value="D" />
+    <ns0:filename value="/work/sub" />
+    <ns0:modification value="2020-01-02T03:04:05.000Z" />
+    <ns0:result success="true" />
+  </ns0:difference>
+  <ns0:download>
+    <ns0:filename value="/work/data.bin" />
+    <ns0:destination value="{LOCAL}/mirror/data.bin" />
+    <ns0:size value="1024" />
+    <ns0:result success="true" />
+  </ns0:download>
+  <ns0:download>
+    <ns0:filename value="/work/hello.txt" />
+    <ns0:destination value="{LOCAL}/mirror/hello.txt" />
+    <ns0:size value="14" />
+    <ns0:result success="true" />
+  </ns0:download>
+  <ns0:download>
+    <ns0:filename value="/work/sub/a.txt" />
+    <ns0:destination value="{LOCAL}/mirror/sub/a.txt" />
+    <ns0:size value="2" />
+    <ns0:result success="true" />
+  </ns0:download>
+  <ns0:download>
+    <ns0:filename value="/work/sub/b.txt" />
+    <ns0:destination value="{LOCAL}/mirror/sub/b.txt" />
+    <ns0:size value="3" />
+    <ns0:result success="true" />
+  </ns0:download>
+  <ns0:upload>
+    <ns0:filename value="{LOCAL}/mirror/local-only.txt" />
+    <ns0:destination value="/work/local-only.txt" />
+    <ns0:size value="10" />
+    <ns0:result success="true" />
+  </ns0:upload>
+  <ns0:touch>
+    <ns0:filename value="/work/local-only.txt" />
+    <ns0:modification value="2020-01-02T03:04:05.000Z" />
+    <ns0:result success="true" />
+  </ns0:touch>
+  <ns0:ls>
+    <ns0:destination value="/work" />
+    <ns0:files>
+      <ns0:file>
+        <ns0:filename value="data.bin" />
+        <ns0:type value="-" />
+        <ns0:size value="1024" />
+        <ns0:modification value="2020-01-02T03:04:05.000Z" />
+        <ns0:permissions value="rw-rw-rw-" />
+        <ns0:owner value="0" />
+        <ns0:group value="0" />
+      </ns0:file>
+      <ns0:file>
+        <ns0:filename value="hello.txt" />
+        <ns0:type value="-" />
+        <ns0:size value="14" />
+        <ns0:modification value="2020-01-02T03:04:05.000Z" />
+        <ns0:permissions value="rw-rw-rw-" />
+        <ns0:owner value="0" />
+        <ns0:group value="0" />
+      </ns0:file>
+      <ns0:file>
+        <ns0:filename value="local-only.txt" />
+        <ns0:type value="-" />
+        <ns0:size value="10" />
+        <ns0:modification value="2020-01-02T03:04:05.000Z" />
+        <ns0:permissions value="rw-rw-rw-" />
+        <ns0:owner value="0" />
+        <ns0:group value="0" />
+      </ns0:file>
+      <ns0:file>
+        <ns0:filename value="sub" />
+        <ns0:type value="D" />
+        <ns0:modification value="2020-01-02T03:04:05.000Z" />
+        <ns0:permissions value="rwxrwxrwx" />
+        <ns0:owner value="0" />
+        <ns0:group value="0" />
+      </ns0:file>
+      <ns0:file>
+        <ns0:filename value=".." />
+        <ns0:type value="D" />
+      </ns0:file>
+    </ns0:files>
+    <ns0:result success="true" />
+  </ns0:ls>
+</ns0:session>

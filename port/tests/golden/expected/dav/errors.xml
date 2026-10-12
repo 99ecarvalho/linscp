@@ -1,0 +1,18 @@
+<ns0:session xmlns:ns0="http://winscp.net/schema/session/1.0" name="linscp@127.0.0.1">
+  <ns0:failure>
+    <ns0:message>Can't get attributes of file '/work/missing.txt'.</ns0:message>
+    <ns0:message>404 Not Found</ns0:message>
+  </ns0:failure>
+  <ns0:failure>
+    <ns0:message>Can't get attributes of file '/work/missing.txt'.</ns0:message>
+    <ns0:message>404 Not Found</ns0:message>
+  </ns0:failure>
+  <ns0:failure>
+    <ns0:message>Error changing directory to '/work/nodir'.</ns0:message>
+    <ns0:message>404 Not Found</ns0:message>
+  </ns0:failure>
+  <ns0:mkdir>
+    <ns0:filename value="/work/sub" />
+    <ns0:result success="true" />
+  </ns0:mkdir>
+</ns0:session>

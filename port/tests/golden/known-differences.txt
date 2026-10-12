@@ -4,5 +4,5 @@
 # else.
 #
 #   <protocol>/<case>.xml   reason
-dav/rmdir.xml    WinSCP crashes removing a directory by name over WebDAV; linscp patches it (core-script-rmdir-full-path.patch)
+dav/rmdir.xml    WinSCP 6.5.7 fails removing a directory by name over WebDAV ("Invalid access to memory" in TRemoteFileList::GetFullDirectory); linscp patches it (core-script-rmdir-full-path.patch)
 davs/rmdir.xml   as dav/rmdir.xml

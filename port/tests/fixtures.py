@@ -42,6 +42,30 @@ def fingerprint(pub):
     return 'ssh-ed25519 255 ' + out[1].split(':', 1)[1]
 
 
+def rclone_binary():
+    """$LINSCP_RCLONE if set (the golden corpus pins a version), else rclone
+    on PATH."""
+    chosen = os.environ.get('LINSCP_RCLONE')
+    return chosen if chosen and os.path.exists(chosen) else shutil.which('rclone')
+
+
+def rclone_version():
+    binary = rclone_binary()
+    if not binary:
+        return None
+    out = subprocess.run([binary, 'version'], capture_output=True, text=True).stdout
+    return out.split('\n', 1)[0].strip()
+
+
+def empty_config():
+    """An empty rclone configuration file: rclone on Windows rejects "nul"."""
+    import tempfile
+    path = os.path.join(tempfile.gettempdir(), 'linscp-rclone-empty.conf')
+    if not os.path.exists(path):
+        open(path, 'w').close()
+    return path
+
+
 def self_signed(directory, name='server'):
     """A certificate for 127.0.0.1 and its key; returns (cert, key, sha256)."""
     if not shutil.which('openssl'):
@@ -89,12 +113,12 @@ def sshd(tmp, extra=()):
 @contextlib.contextmanager
 def rclone_webdav(root, user, password, cert=None, key=None):
     """rclone serving root over WebDAV (HTTPS with cert and key). Yields the port."""
-    binary = shutil.which('rclone')
+    binary = rclone_binary()
     if not binary:
         raise Missing('rclone')
     port = free_port()
     cmd = [binary, 'serve', 'webdav', root, '--addr', f'127.0.0.1:{port}',
-           '--user', user, '--pass', password, '--config', os.devnull, '-q']
+           '--user', user, '--pass', password, '--config', empty_config(), '-q']
     if cert:
         cmd += ['--cert', cert, '--key', key]
     server = subprocess.Popen(cmd)
@@ -127,12 +151,12 @@ def python_server(script, root, *args):
 def rclone_sftp(root, user, password, host_key_dir):
     """rclone serving root over SFTP to one user with a password; its host
     key is generated into host_key_dir on first use. Yields the port."""
-    binary = shutil.which('rclone')
+    binary = rclone_binary()
     if not binary:
         raise Missing('rclone')
     port = free_port()
     cmd = [binary, 'serve', 'sftp', root, '--addr', f'127.0.0.1:{port}',
-           '--user', user, '--pass', password, '--config', os.devnull, '-q',
+           '--user', user, '--pass', password, '--config', empty_config(), '-q',
            '--cache-dir', host_key_dir]
     server = subprocess.Popen(cmd)
     try:

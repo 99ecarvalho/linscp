@@ -1,0 +1,18 @@
+<ns0:session xmlns:ns0="http://winscp.net/schema/session/1.0" name="LINSCPKEY@127.0.0.1">
+  <ns0:failure>
+    <ns0:message>Can't get attributes of file '/bucket/work/missing.txt'.</ns0:message>
+    <ns0:message>File or folder '/bucket/work/missing.txt' does not exist.</ns0:message>
+  </ns0:failure>
+  <ns0:failure>
+    <ns0:message>Can't get attributes of file '/bucket/work/missing.txt'.</ns0:message>
+    <ns0:message>File or folder '/bucket/work/missing.txt' does not exist.</ns0:message>
+  </ns0:failure>
+  <ns0:failure>
+    <ns0:message>Error changing directory to '/bucket/work/nodir'.</ns0:message>
+    <ns0:message>File or folder '/bucket/work/nodir' does not exist.</ns0:message>
+  </ns0:failure>
+  <ns0:mkdir>
+    <ns0:filename value="/bucket/work/sub" />
+    <ns0:result success="true" />
+  </ns0:mkdir>
+</ns0:session>
