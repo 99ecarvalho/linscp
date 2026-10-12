@@ -2,7 +2,8 @@
 # Windows cross-compiled with the tests run under Wine. Debian trixie, as the
 # toolchain the port is developed with (clang 19, lld, mingw-w64, Wine 10).
 #
-# The tests run as an unprivileged user: sshd and the other fixtures are
+# Both jobs install the mingw-w64 sysroot: the census_ratchet test compiles
+# core for both targets. The tests run as an unprivileged user: sshd and the other fixtures are
 # started unprivileged on loopback, as on a developer's machine.
 name: ci
 
@@ -32,19 +33,19 @@ jobs:
             packages: ''
           - name: windows-cross
             configure: -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-mingw-w64.cmake
-            packages: >-
-              binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64-posix
-              gcc-mingw-w64-x86-64-posix mingw-w64-x86-64-dev libz-mingw-w64
-              wine wine64
+            packages: wine wine64
     steps:
       - name: Install the toolchain and the test servers
         run: |
           apt-get update
           DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
             ca-certificates git clang lld llvm cmake ninja-build make perl python3 \
-            cpio curl unzip libssl-dev zlib1g-dev \
+            cpio curl unzip libssl-dev zlib1g-dev shared-mime-info \
+            binutils-mingw-w64-x86-64 g++-mingw-w64-x86-64-posix \
+            gcc-mingw-w64-x86-64-posix mingw-w64-x86-64-dev libz-mingw-w64 \
             openssh-client openssh-server rclone microsocks tinyproxy \
-            python3-boto3 python3-flask-cors python3-moto python3-pyftpdlib \
+            python3-boto3 python3-flask-cors python3-moto python3-openssl \
+            python3-pyftpdlib \
             ${{ matrix.packages }}
 
       - uses: actions/checkout@v4
@@ -63,6 +64,14 @@ jobs:
         run: >-
           runuser -u ci -- python3 port/tools/fetch_rclone.py
           --corpus port/tests/golden/expected --dest build/tools
+
+      # FileZilla's sockets and timers need windows, which Wine creates
+      # only with a display driver; the null driver needs no display.
+      - name: Prepare Wine
+        if: matrix.name == 'windows-cross'
+        run: >-
+          runuser -u ci -- env WINEDEBUG=-all
+          wine reg add 'HKCU\Software\Wine\Drivers' /v Graphics /d null /f
 
       - name: Build
         run: runuser -u ci -- cmake --build build
