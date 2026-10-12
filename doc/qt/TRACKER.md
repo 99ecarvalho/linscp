@@ -8,12 +8,12 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
 | Phase | Done | Total | Gate |
 |---|---|---|---|
-| P0 Foundation | 25 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
+| P0 Foundation | 27 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 31 | 37 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **56** | **96** | |
+| **Total** | **58** | **96** | |
 
 ## Next three actions
 
@@ -97,9 +97,17 @@ dereferenced a null directory list, upstream too
 (`core-script-rmdir-full-path.patch`); and `SubString(0, n)` returned n-1
 characters, which cut S3 bucket names short.
 
-1. **P0-13**: the golden-output harness (`/xmllog` runner, XML normaliser,
-   differ) over this protocol matrix -- comparable today between the two
-   targets; the reference corpus from real WinSCP (P0-15) waits on Q-2.
+**The golden-output harness runs** (P0-13 done): `port/tests/golden`, five
+cases over seven protocols, servers and data chosen to be identical on Linux
+and Windows. The two linscp targets already agree on all 35 logs -- getting
+there found two bugs: on Windows mingw's `towupper` returns `wint_t`, so
+file types were logged as `68`/`45`; and on POSIX `FindFirst` read `*.*`
+literally, so synchronization did not see local directories without a dot
+in their name and `synchronize remote -delete` deleted them on the server.
+
+1. **P0-15**: capture the corpus with real WinSCP on Windows (the user runs
+   `run_golden.py capture`; see `port/tests/golden/README.md`), commit it,
+   and make ctest `golden` pass against it.
 2. **P1-22**: `keepuptodate` (directory watching) in the CLI.
 3. **P1-20**: the stock .NET assembly driving `linscp-cli` (it expects
    winscp.com's switches and XML log).
@@ -245,6 +253,8 @@ characters, which cut S3 bucket names short.
 | 2026-10-11 | A field-backed property of class type reads as the field itself (a reference) | Borland makes such a property the field: core changes members through it (`Rights.Number = TRights::rfDefault` in `TCopyParamType::Default`). Returning a copy lost every such change silently -- SCP sent mode 0000. Scalars stay by value; a class field of another type than the property's fails to compile rather than copy |
 | 2026-10-11 | Protocol tests use loopback servers: OpenSSH's sshd, rclone for WebDAV, and the suite's own where none is installed | Real servers where the machine has them, so the client is tested against implementations it did not write; a protocol whose server is missing is skipped, not failed |
 | 2026-10-11 | `SubString` takes an index below 1 as 1 and keeps the count (C++Builder's), not Delphi `Copy`'s dropping of the characters before 1 | Core's one use of it, `TS3FileSystem::ParsePath`'s `SubString(0, P - 1)`, works in WinSCP's S3 transfers only that way; the shim's earlier reading cut every bucket name by one character |
+| 2026-10-11 | Golden runs use servers that exist on both platforms -- rclone (SFTP, WebDAV), the suite's FTP and S3 servers -- with fixed data, fixed permissions, password logins and `*` for host keys and certificates | Real WinSCP captures on Windows and linscp replays on Linux; any difference has to be the client's. SCP is left out: Windows has no SCP server without installing OpenSSH. Normalising removes only the start time and the local working directory |
+| 2026-10-11 | Deliberate departures from WinSCP's output are listed per case in `golden/known-differences.txt` | Printed, not failed; cases are kept small (rmdir has its own) so an entry hides nothing else |
 | 2026-10-10 | `Format` keeps malformed input visible | Delphi raises on a missing argument. Core routes user- and server-supplied text through these into logs, so an unknown specifier is echoed and a missing argument renders as `<missing>` rather than throwing from a log path |
 
 ## Correction: census figures before 2026-10-11 used the wrong configuration
@@ -359,7 +369,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | # | Question | Blocks | Owner |
 |---|---|---|---|
 | Q-1 | P3 scope: faithful parity, or a deliberately narrower client? | P3 estimate (swings ~2 years) | — |
-| Q-2 | Access to a C++Builder 11 licence + Windows host? | P0-04, P0-15, R1, R3 | — |
+| Q-2 | Access to a C++Builder 11 licence? (A native Windows host is available: the user runs things there on request, 2026-10-11) | P0-04, R1, R3 | — |
 | Q-3 | Internal editor, or delegate to the system editor? | P3-05 | — |
 | Q-4 | Ship 32-bit Windows, or x86-64 and arm64 only? | P0-10, packaging | — |
 | Q-5 | Approach the maintainer early for feedback, or after P1 lands? | social strategy, not architecture | — |
@@ -513,9 +523,9 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P0-10 | mingw-w64 sysroot + clang toolchain file | done | `cmake/toolchain-mingw-w64.cmake`; clang + lld + Wine emulator |
 | P0-11 | CI matrix Linux + Windows cross | todo | |
 | P0-12 | Wine smoke tests in CI | wip | wired into CTest via `CMAKE_CROSSCOMPILING_EMULATOR`; GitHub Actions pending |
-| P0-13 | Golden-output harness | todo | highest leverage in P0 |
-| P0-14 | Protocol server containers | todo | |
-| P0-15 | Capture golden corpus from real WinSCP | blocked | Q-2: needs Windows host |
+| P0-13 | Golden-output harness | done | `port/tests/golden/run_golden.py` (capture, normalise, compare, check), cases in `golden/cases`; ctest `golden` against `golden/expected`. Linux and Windows linscp agree on all 35 logs |
+| P0-14 | Protocol server containers | done | Not containers: loopback servers per test (`fixtures.py`: OpenSSH, rclone, the suite's FTP and S3 servers), on Linux and Windows alike |
+| P0-15 | Capture golden corpus from real WinSCP | todo | Runnable: the user captures on native Windows (`golden/README.md`) |
 | P0-16 | ADR log | wip | `doc/qt/adr/` started with ADR 0001 |
 | P0-17 | Property compile-check harness | done | `check_properties.py`, 613 declarations, clang exit 0 |
 | P0-18 | HTML render of plan docs | done | `doc/qt/plan.html` via `build-html.sh` |

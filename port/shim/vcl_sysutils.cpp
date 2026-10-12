@@ -214,8 +214,13 @@ int Advance(TSearchRec & F)
     {
       return errno != 0 ? errno : ENOENT;   // ENOENT means "no more entries"
     }
-    // Case-sensitive, matching the host filesystem rather than Windows.
-    if (fnmatch(State->Pattern.c_str(), E->d_name, 0) != 0)
+    // Case-sensitive, matching the host filesystem rather than Windows. But
+    // "*.*" is every name, as Windows has it: core lists directories with it
+    // (synchronization scans <dir>\*.*), and read as fnmatch reads it, a
+    // name without a dot -- a typical directory -- went unseen, so
+    // "synchronize remote -delete" deleted it on the server.
+    if ((State->Pattern != "*") && (State->Pattern != "*.*") &&
+        (fnmatch(State->Pattern.c_str(), E->d_name, 0) != 0))
     {
       continue;
     }

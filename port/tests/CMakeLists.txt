@@ -176,6 +176,16 @@ add_test(NAME protocols
           --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:linscp-cli>")
 set_tests_properties(protocols PROPERTIES
   DEPENDS cli_session_build SKIP_RETURN_CODE 77 TIMEOUT 600)
+# The golden comparison: the cases in golden/cases run by linscp-cli and
+# compared with the logs real WinSCP wrote for them on Windows
+# (golden/expected, captured with run_golden.py capture). Skipped until the
+# corpus exists.
+add_test(NAME golden
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/golden/run_golden.py" check
+          --client "$<TARGET_FILE:linscp-cli>" --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}"
+          "${CMAKE_CURRENT_SOURCE_DIR}/golden/expected")
+set_tests_properties(golden PROPERTIES
+  DEPENDS cli_session_build SKIP_RETURN_CODE 77 TIMEOUT 1800)
 
 # PuTTY's crypto primitives against published vectors, on both targets: the
 # PuTTY libraries alone, with a stub for the one frontend function they need.

@@ -10,3 +10,4 @@ compile_commands.json
 *.so
 __pycache__/
 *.pyc
+port/tests/golden/expected/*/*.out

@@ -14,6 +14,17 @@ confined to the root.
 import argparse, os, socket, ssl, stat, threading, time
 
 
+# Modes as the server reports them: fixed per type, changed only by SITE
+# CHMOD, so listings are the same whatever the host's file system and umask
+# (the golden comparison runs this server on Linux and Windows alike).
+MODES = {}
+
+
+def mode_of(path, st):
+    default = 0o755 if stat.S_ISDIR(st.st_mode) else 0o644
+    return MODES.get(os.path.abspath(path), default)
+
+
 def mlsx_facts(path, name):
     st = os.stat(path)
     kind = 'dir' if stat.S_ISDIR(st.st_mode) else 'file'
@@ -22,12 +33,12 @@ def mlsx_facts(path, name):
     modify = time.strftime('%Y%m%d%H%M%S', time.gmtime(st.st_mtime))
     perm = 'flcdmpe' if stat.S_ISDIR(st.st_mode) else 'adfrw'
     return (f'type={kind};size={st.st_size};modify={modify};perm={perm};'
-            f'UNIX.mode={stat.S_IMODE(st.st_mode):04o}; {name}')
+            f'UNIX.mode={mode_of(path, st):04o}; {name}')
 
 
 def list_line(path, name):
     st = os.stat(path)
-    mode = stat.filemode(st.st_mode)
+    mode = stat.filemode(stat.S_IFMT(st.st_mode) | mode_of(path, st))
     when = time.strftime('%b %d %H:%M', time.gmtime(st.st_mtime))
     return f'{mode} 1 owner group {st.st_size:>10} {when} {name}'
 
@@ -396,8 +407,11 @@ class Session(threading.Thread):
         verb, _, rest = arg.partition(' ')
         if verb.upper() == 'CHMOD':
             mode, _, name = rest.partition(' ')
+            path = self.real(name)[0]
             try:
-                os.chmod(self.real(name)[0], int(mode, 8))
+                if not os.path.exists(path):
+                    raise OSError(path)
+                MODES[os.path.abspath(path)] = int(mode, 8) & 0o7777
                 self.reply('200 Mode changed')
             except (ValueError, OSError):
                 self.reply('550 Cannot change mode')

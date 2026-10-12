@@ -1,0 +1,10 @@
+# Removing a directory given by name, which the script resolves itself:
+# upstream crashes over WebDAV here (the port's
+# core-script-rmdir-full-path.patch).
+option batch continue
+option confirm off
+{OPEN}
+mkdir {R}/gone
+rmdir {R}/gone
+ls {R}
+exit

@@ -1,0 +1,16 @@
+# Everyday operations: list, stat, download (one file, a mask, keeping
+# times), upload, make a directory, move, delete. Removing a directory is
+# rmdir.txt's.
+option batch abort
+option confirm off
+{OPEN}
+ls {R}
+stat {R}/hello.txt
+get {R}/hello.txt {L}{SEP}
+get -preservetime {R}/sub/*.txt {L}{SEP}
+put -preservetime {L}{SEP}upload.txt {R}/
+mkdir {R}/newdir
+mv {R}/upload.txt {R}/newdir/
+ls {R}/newdir
+rm {R}/newdir/upload.txt
+exit

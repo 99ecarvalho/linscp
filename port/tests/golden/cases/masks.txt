@@ -1,0 +1,8 @@
+# File masks on listing and transfer.
+option batch abort
+option confirm off
+{OPEN}
+ls {R}/*.txt
+get -filemask="*.txt" {R}/* {L}{SEP}
+get -filemask="|sub/" {R}/* {L}{SEP}masked{SEP}
+exit

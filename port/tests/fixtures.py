@@ -121,3 +121,23 @@ def python_server(script, root, *args):
     finally:
         server.terminate()
         server.wait(timeout=10)
+
+
+@contextlib.contextmanager
+def rclone_sftp(root, user, password, host_key_dir):
+    """rclone serving root over SFTP to one user with a password; its host
+    key is generated into host_key_dir on first use. Yields the port."""
+    binary = shutil.which('rclone')
+    if not binary:
+        raise Missing('rclone')
+    port = free_port()
+    cmd = [binary, 'serve', 'sftp', root, '--addr', f'127.0.0.1:{port}',
+           '--user', user, '--pass', password, '--config', os.devnull, '-q',
+           '--cache-dir', host_key_dir]
+    server = subprocess.Popen(cmd)
+    try:
+        wait_for_port(port, server)
+        yield port
+    finally:
+        server.terminate()
+        server.wait(timeout=10)

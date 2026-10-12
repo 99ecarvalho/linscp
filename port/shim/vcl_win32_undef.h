@@ -18,6 +18,7 @@
 #define LINSCP_VCL_WIN32_UNDEF_H
 
 #if defined(_WIN32)
+  #include <wctype.h>
   #undef DeleteFile
   #undef CopyFile
   #undef MoveFile
@@ -91,6 +92,19 @@
   inline DWORD FormatMessage(DWORD Flags, LPCVOID Source, DWORD MessageId, DWORD LanguageId,
                              LPWSTR Buffer, DWORD Size, va_list * Arguments)
     { return FormatMessageW(Flags, Source, MessageId, LanguageId, Buffer, Size, Arguments); }
+
+  // C++Builder's towupper and towlower return wchar_t; mingw-w64's return
+  // wint_t (unsigned short). Core turns the result into a string --
+  // SessionInfo.cpp logs a file's type as XmlAttributeEscape(towupper(Type))
+  // -- and from a wint_t that is the number, "68" for 'D'. The names are
+  // redirected to single functions returning wchar_t, as the POSIX layer
+  // does, rather than overloaded, since FileZilla passes towupper to
+  // std::transform. <wctype.h> is included above, so its own declarations
+  // keep their names.
+  inline wchar_t linscp_TowUpper(wchar_t C) { return static_cast<wchar_t>(::towupper(static_cast<wint_t>(C))); } // ADR 0001: Windows CRT
+  inline wchar_t linscp_TowLower(wchar_t C) { return static_cast<wchar_t>(::towlower(static_cast<wint_t>(C))); } // ADR 0001: Windows CRT
+  #define towupper linscp_TowUpper
+  #define towlower linscp_TowLower
 
   // Deliberately not a forwarder: the shim's LoadString, which serves the
   // string table generated from upstream's .rc files. MFC's CString::LoadString

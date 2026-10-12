@@ -52,6 +52,9 @@ def main():
                                               errors='replace'), 1):
                     if line.lstrip().startswith(('//', '*')):
                         continue          # commentary may name them
+                    if '// ADR 0001: Windows CRT' in line:
+                        continue          # Windows-only code, where the CRT's
+                                          # wchar_t is 2 bytes; marked per line
                     for pat, why in BANNED:
                         if pat.search(line):
                             hits.append((p, i, why, line.strip()[:70]))

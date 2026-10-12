@@ -1,0 +1,10 @@
+# Synchronization both ways: a preview, then downloading what the local
+# side lacks, then uploading the local-only file and deleting nothing else.
+option batch abort
+option confirm off
+{OPEN}
+synchronize local -preview {L}{SEP}mirror {R}
+synchronize local {L}{SEP}mirror {R}
+synchronize remote -delete {L}{SEP}mirror {R}
+ls {R}
+exit

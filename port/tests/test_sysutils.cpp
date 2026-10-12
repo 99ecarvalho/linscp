@@ -99,6 +99,12 @@ void TestEnumeration(const fs::path & Root)
   const auto Dat = Enumerate(Base + "/*.dat", faAnyFile);
   CHECK(Dat.size() == 1 && Dat.count("gamma.dat") == 1);
 
+  // "*.*" is every name, dot or not, as on Windows: core scans directories
+  // with it, and missing "subdir" made synchronization delete it remotely.
+  const auto All = Enumerate(Base + "/*.*", faAnyFile);
+  CHECK(All.count("subdir") == 1);
+  CHECK(All.count("alpha.txt") == 1 && All.count("gamma.dat") == 1);
+
   // An exact name is just a pattern with no wildcard.
   const auto One = Enumerate(Base + "/alpha.txt", faAnyFile);
   CHECK(One.size() == 1 && One.count("alpha.txt") == 1);

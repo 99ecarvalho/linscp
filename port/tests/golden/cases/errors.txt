@@ -1,0 +1,10 @@
+# Failures, reported and carried past with batch continue.
+option batch continue
+option confirm off
+{OPEN}
+get {R}/missing.txt {L}{SEP}
+rm {R}/missing.txt
+cd {R}/nodir
+ls {R}/nodir
+mkdir {R}/sub
+exit

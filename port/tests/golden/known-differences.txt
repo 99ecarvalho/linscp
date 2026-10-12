@@ -1,0 +1,8 @@
+# Golden cases where linscp deliberately differs from WinSCP: a difference
+# here is printed but does not fail the comparison. Each entry names one
+# case of one protocol and why; keep cases small so an entry hides nothing
+# else.
+#
+#   <protocol>/<case>.xml   reason
+dav/rmdir.xml    WinSCP crashes removing a directory by name over WebDAV; linscp patches it (core-script-rmdir-full-path.patch)
+davs/rmdir.xml   as dav/rmdir.xml
