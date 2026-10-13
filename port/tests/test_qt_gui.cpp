@@ -1320,8 +1320,14 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       }
       Check(Pages == QStringList({ PreferencesDialog::tr("Window"), PreferencesDialog::tr("Commander"),
         PreferencesDialog::tr("Languages"), PreferencesDialog::tr("Panels"), PreferencesDialog::tr("File colors"),
-        PreferencesDialog::tr("Transfer"), PreferencesDialog::tr("Background"), PreferencesDialog::tr("Endurance") }),
+        PreferencesDialog::tr("Transfer"), PreferencesDialog::tr("Background"), PreferencesDialog::tr("Endurance"),
+        PreferencesDialog::tr("Network"), PreferencesDialog::tr("Security"), PreferencesDialog::tr("Logging"),
+        PreferencesDialog::tr("Storage") }),
         "the dialog's pages, in the order of WinSCP's tree");
+      Check(!Dialog.LoggingCheck()->isChecked() && !Dialog.LogFileEdit()->text().isEmpty() && !Dialog.LogFileEdit()->isEnabled(),
+        "logging off, its default file shown, not editable until on");
+      Check(!Dialog.StorageLabel()->text().isEmpty(), "the storage shown");
+      Check(Dialog.RememberPasswordCheck()->isChecked(), "passwords remembered for the session by default");
       Check(Dialog.PathShortButton()->isChecked() && Dialog.KeepOpenCheck()->isChecked() && Dialog.FileColors().empty(),
         "the Window and File colors pages show WinSCP's defaults");
       Check(!Dialog.ShowHiddenFilesCheck()->isChecked() && (Dialog.SizeFormatCombo()->currentIndex() == 1) &&
@@ -1402,6 +1408,20 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       Dialog.MoveFileColor(-1);
       Check((Dialog.FileColors().size() == 2) && (Dialog.FileColors()[0].Mask == "*.txt"), "file colors add and move");
       Dialog.PathFullButton()->setChecked(true);
+      // Logging, Network, Security.
+      Dialog.LoggingCheck()->setChecked(true);
+      Check(Dialog.LogFileEdit()->isEnabled(), "logging on, its file editable");
+      Dialog.LogLevelCombo()->setCurrentIndex(2);
+      Dialog.LogMaxSizeCheck()->setChecked(true);
+      Dialog.LogMaxSizeCombo()->setEditText(QStringLiteral("10M"));
+      Dialog.CustomIpButton()->setChecked(true);
+      Dialog.CustomIpEdit()->setText(QStringLiteral("192.0.2.1"));
+      Dialog.PortLimitCheck()->setChecked(true);
+      Dialog.PortMinSpin()->setValue(50000);
+      Dialog.PortMaxSpin()->setValue(50100);
+      Dialog.AuthAgentCombo()->setCurrentIndex(1);
+      Dialog.CustomTemporaryButton()->setChecked(true);
+      Dialog.TemporaryEdit()->setText(Directory);
       Dialog.Save();
       Window.ApplyPreferences();
     }
@@ -1479,6 +1499,22 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
     Check(Saved(Interface, QStringLiteral("FileColors")).contains(QStringLiteral("0000FF:*.txt")),
       "kept as WinSCP keeps them (BBGGRR:mask)");
     Check(Saved(Interface, QStringLiteral("PathInCaption")) == QStringLiteral("1"), "the window title's path");
+    const QString Logging = QStringLiteral("Configuration\\Logging");
+    Check((Saved(Logging, QStringLiteral("Logging")) == QStringLiteral("1")) &&
+      (Saved(Logging, QStringLiteral("LogProtocol")) == QStringLiteral("1")) &&
+      (Saved(Logging, QStringLiteral("LogMaxSize")) == QString::number(10 * 1024 * 1024)),
+      "Logging's, under core's Logging keys");
+    Check((Saved(Interface, QStringLiteral("ExternalIpAddress")) == QStringLiteral("192.0.2.1")) &&
+      (Saved(Interface, QStringLiteral("LocalPortNumberMin")) == QStringLiteral("50000")) &&
+      (Saved(Interface, QStringLiteral("AuthAgent")) == QStringLiteral("1")), "Network's and Security's, under core's");
+    Check(QFileInfo(QString::fromStdString(CoreBridge::TemporaryDirectoryBase())) == QFileInfo(Directory),
+      "the temporary directory, where temporary files go now");
+    {
+      CoreBridge::TPreferences Off = CoreBridge::Preferences();
+      Off.Logging = false;
+      Off.TemporaryDirectory.clear();
+      CoreBridge::SetPreferences(Off);
+    }
     Check((CoreBridge::TransferPresets().size() == 5) && (CoreBridge::TransferPresets()[0].Name == "Mine") &&
       (CoreBridge::TransferPresets()[0].Settings.Mode == CoreBridge::TTransferSettings::TMode::Text), "the presets");
     Check(Saved(CopyParam, QStringLiteral("CopyParamList")) == QStringLiteral("5"), "saved as WinSCP's list");

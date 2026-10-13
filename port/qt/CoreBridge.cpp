@@ -263,7 +263,63 @@ TPreferences Preferences()
   Result.SessionReopenAutoInactive = GUIConfiguration->SessionReopenAutoInactive;
   Result.SessionReopenAutoStall = Configuration->SessionReopenAutoStall / MSecsPerSec;
   Result.SessionReopenTimeout = Configuration->SessionReopenTimeout / MSecsPerSec;
+  // Logging, Network, Security, Storage: as TPreferencesDialog::LoadConfiguration.
+  Result.Logging = Configuration->Logging;
+  Result.LogLevel = Configuration->LogProtocol + 1;
+  Result.LogFileName = Utf8(Configuration->LogFileName);
+  Result.DefaultLogFileName = Utf8(Configuration->DefaultLogFileName);
+  Result.LogFileAppend = Configuration->LogFileAppend;
+  Result.LogSensitive = Configuration->LogSensitive;
+  Result.LogMaxSize = Configuration->LogMaxSize;
+  Result.LogMaxCount = Configuration->LogMaxCount;
+  Result.LogActions = Configuration->LogActions;
+  Result.ActionsLogFileName = Utf8(Configuration->ActionsLogFileName);
+  Result.ExternalIpAddress = Utf8(Configuration->ExternalIpAddress);
+  Result.LocalPortNumberMin = Configuration->LocalPortNumberMin;
+  Result.LocalPortNumberMax = Configuration->LocalPortNumberMax;
+  Result.TryFtpWhenSshFails = Configuration->TryFtpWhenSshFails;
+  Result.SessionRememberPassword = GUIConfiguration->SessionRememberPassword;
+  Result.AuthAgent = Configuration->AuthAgent;
+  if (Configuration->Storage == stNul)
+  {
+    Result.Storage = TPreferences::TStorage::None;
+  }
+  else if (!Configuration->ExplicitIniFileStorageName.IsEmpty())
+  {
+    Result.Storage = TPreferences::TStorage::Explicit;
+  }
+  else if (Configuration->Storage == stRegistry)
+  {
+    Result.Storage = TPreferences::TStorage::Registry;
+  }
+  else
+  {
+    Result.Storage = Configuration->CustomIniFileStorageName.IsEmpty() ?
+      TPreferences::TStorage::AutomaticIni : TPreferences::TStorage::CustomIni;
+  }
+  Result.StorageFile = Utf8((Result.Storage == TPreferences::TStorage::Explicit) ? Configuration->ExplicitIniFileStorageName :
+    ExpandEnvironmentVariables(Configuration->GetAutomaticIniFileStorageName(false)));
+  Result.CustomIniFile = Utf8(!Configuration->CustomIniFileStorageName.IsEmpty() ? Configuration->CustomIniFileStorageName :
+    Configuration->GetDefaultIniFileExportPath());
+  Result.RandomSeedFile = Utf8(Configuration->RandomSeedFile);
+  Result.TemporaryDirectory = Utf8(Settings.DDTemporaryDirectory);
   return Result;
+}
+
+std::int64_t SizeOfText(const std::string & Text)
+{
+  __int64 Size = 0;
+  return TryStrToSize(FromUtf8(Text), Size) ? Size : 0;
+}
+
+std::string TextOfSize(std::int64_t Size)
+{
+  return Utf8(SizeToStr(Size));
+}
+
+std::string TemporaryDirectoryBase()
+{
+  return Utf8(Shell()->ExpandedTemporaryDirectory());
 }
 
 void SetPreferences(const TPreferences & Preferences)
@@ -287,6 +343,7 @@ void SetPreferences(const TPreferences & Preferences)
     Colors->Add(IntToHex(static_cast<int>(Bgr), 6) + L":" + FromUtf8(Color.Mask));
   }
   Settings.FileColors = Colors->CommaText;
+  Settings.DDTemporaryDirectory = FromUtf8(Preferences.TemporaryDirectory);
   // The layout is SetLayout's.
   const TShellSettings & Current = Shell()->Settings();
   Settings.WindowParams = Current.WindowParams;
@@ -310,6 +367,45 @@ void SetPreferences(const TPreferences & Preferences)
     GUIConfiguration->SessionReopenAutoInactive = Preferences.SessionReopenAutoInactive;
     Configuration->SessionReopenAutoStall = Preferences.SessionReopenAutoStall * MSecsPerSec;
     Configuration->SessionReopenTimeout = Preferences.SessionReopenTimeout * MSecsPerSec;
+    // As TPreferencesDialog::SaveConfiguration: logging only with a file.
+    Configuration->Logging = Preferences.Logging && !Preferences.LogFileName.empty();
+    Configuration->LogProtocol = Preferences.LogLevel - 1;
+    Configuration->LogFileName = FromUtf8(Preferences.LogFileName);
+    Configuration->LogFileAppend = Preferences.LogFileAppend;
+    Configuration->LogSensitive = Preferences.LogSensitive;
+    Configuration->LogMaxSize = Preferences.LogMaxSize;
+    Configuration->LogMaxCount = Preferences.LogMaxCount;
+    Configuration->LogActions = Preferences.LogActions;
+    Configuration->ActionsLogFileName = FromUtf8(Preferences.ActionsLogFileName);
+    Configuration->ExternalIpAddress = FromUtf8(Preferences.ExternalIpAddress);
+    Configuration->LocalPortNumberMin = Preferences.LocalPortNumberMin;
+    Configuration->LocalPortNumberMax = Preferences.LocalPortNumberMax;
+    Configuration->TryFtpWhenSshFails = Preferences.TryFtpWhenSshFails;
+    GUIConfiguration->SessionRememberPassword = Preferences.SessionRememberPassword;
+    Configuration->AuthAgent = Preferences.AuthAgent;
+    Configuration->RandomSeedFile = FromUtf8(Preferences.RandomSeedFile);
+    // The storage moves as the dialog's OK moves it, when it is one of the
+    // three that can be chosen and another than it was.
+    const TPreferences Before = CoreBridge::Preferences();
+    const bool Movable = (Before.Storage == TPreferences::TStorage::Registry) ||
+      (Before.Storage == TPreferences::TStorage::AutomaticIni) || (Before.Storage == TPreferences::TStorage::CustomIni);
+    if (Movable &&
+        ((Preferences.Storage != Before.Storage) ||
+         ((Preferences.Storage == TPreferences::TStorage::CustomIni) && (Preferences.CustomIniFile != Before.CustomIniFile))))
+    {
+      if (Preferences.Storage == TPreferences::TStorage::Registry)
+      {
+        Configuration->MoveStorage(stRegistry, UnicodeString());
+      }
+      else if (Preferences.Storage == TPreferences::TStorage::AutomaticIni)
+      {
+        Configuration->MoveStorage(stIniFile, UnicodeString());
+      }
+      else if (Preferences.Storage == TPreferences::TStorage::CustomIni)
+      {
+        Configuration->MoveStorage(stIniFile, FromUtf8(Preferences.CustomIniFile));
+      }
+    }
     Configuration->SaveExplicit();
   }
   catch (Exception & E)

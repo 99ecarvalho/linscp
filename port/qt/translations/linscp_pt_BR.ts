@@ -522,6 +522,170 @@ Configuração: %4</translation>
         <source>&amp;Color</source>
         <translation>&amp;Cor</translation>
     </message>
+    <message>
+        <source>Network</source>
+        <translation>Rede</translation>
+    </message>
+    <message>
+        <source>Security</source>
+        <translation>Segurança</translation>
+    </message>
+    <message>
+        <source>Logging</source>
+        <translation>Arquivo de log</translation>
+    </message>
+    <message>
+        <source>Storage</source>
+        <translation>Armazenamento</translation>
+    </message>
+    <message>
+        <source>Incoming FTP connections (active mode)</source>
+        <translation>Conexões FTP de entrada (modo ativo)</translation>
+    </message>
+    <message>
+        <source>Retrieve the external IP address from &amp;operating system</source>
+        <translation>Obter endereço IP extern&amp;o a partir do SO</translation>
+    </message>
+    <message>
+        <source>Use the &amp;following external IP address:</source>
+        <translation>Usar o &amp;seguinte endereço IP externo:</translation>
+    </message>
+    <message>
+        <source>Limit listening &amp;ports to:</source>
+        <translation>Limitar &amp;portas de escuta para:</translation>
+    </message>
+    <message>
+        <source>Connections</source>
+        <translation>Conexões</translation>
+    </message>
+    <message>
+        <source>When SFTP connection is &amp;rejected, knock FTP port</source>
+        <translation>Quando uma conexão SFTP é rejeitada, bater porta FTP</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Autenticação</translation>
+    </message>
+    <message>
+        <source>Remember &amp;password for duration of session</source>
+        <translation>Lembrar &amp;senhas até duração da sessão</translation>
+    </message>
+    <message>
+        <source>PuTTY Pageant</source>
+        <translation>PuTTY Pageant</translation>
+    </message>
+    <message>
+        <source>OpenSSH ssh-agent</source>
+        <translation>OpenSSH ssh-agent</translation>
+    </message>
+    <message>
+        <source>Aut&amp;hentication agent:</source>
+        <translation>Agente de autenticação:</translation>
+    </message>
+    <message>
+        <source>Session log</source>
+        <translation>Log de sessão</translation>
+    </message>
+    <message>
+        <source>Enable &amp;session logging on level:</source>
+        <translation>Habilitar log de &amp;sessão no nível:</translation>
+    </message>
+    <message>
+        <source>Reduced</source>
+        <translation>Reduzido</translation>
+    </message>
+    <message>
+        <source>Normal</source>
+        <translation>Normal</translation>
+    </message>
+    <message>
+        <source>Debug 1</source>
+        <translation>Depuração 1</translation>
+    </message>
+    <message>
+        <source>Debug 2</source>
+        <translation>Depuração 2</translation>
+    </message>
+    <message>
+        <source>&amp;Log path:</source>
+        <translation>Caminho do arquivo de &amp;log:</translation>
+    </message>
+    <message>
+        <source>Appe&amp;nd</source>
+        <translation>Anex&amp;ar</translation>
+    </message>
+    <message>
+        <source>&amp;Overwrite</source>
+        <translation>S&amp;obrescrever</translation>
+    </message>
+    <message>
+        <source>&amp;Rotate log files after reaching</source>
+        <translation>&amp;Rotacionar arquivos de log após alcançar</translation>
+    </message>
+    <message>
+        <source>&amp;Delete old log files, keep</source>
+        <translation>&amp;Deletar arquivos de log antigos, manter</translation>
+    </message>
+    <message>
+        <source> files</source>
+        <translation> arquivos</translation>
+    </message>
+    <message>
+        <source>Log pass&amp;words and other sensitive information</source>
+        <translation>Fazer log de senhas e outras informações sensíveis</translation>
+    </message>
+    <message>
+        <source>XML log</source>
+        <translation>log em XML</translation>
+    </message>
+    <message>
+        <source>Enable &amp;XML logging to file:</source>
+        <translation>Habilitar log em XML para o arquivo:</translation>
+    </message>
+    <message>
+        <source>Configuration storage</source>
+        <translation>Configuração de armazenamento</translation>
+    </message>
+    <message>
+        <source>Not stored.</source>
+        <translation>Não armazenada.</translation>
+    </message>
+    <message>
+        <source>Windows re&amp;gistry</source>
+        <translation>Re&amp;gistro do Windows</translation>
+    </message>
+    <message>
+        <source>&amp;Automatic INI file</source>
+        <translation>&amp;Arquivo INI automático</translation>
+    </message>
+    <message>
+        <source>Custo&amp;m INI file:</source>
+        <translation>Arquivo INI Perso&amp;nalizado:</translation>
+    </message>
+    <message>
+        <source>Temporary directory</source>
+        <translation>Diretório Temporário</translation>
+    </message>
+    <message>
+        <source>Specify where to temporarily store edited and downloaded files.</source>
+        <translation>Especifique onde serão guardados temporariamente os arquivos baixados.</translation>
+    </message>
+    <message>
+        <source>&amp;Use temporary directory of system</source>
+        <translation>&amp;Usar diretório temporário do sistema</translation>
+    </message>
+    <message>
+        <source>Use this &amp;directory:</source>
+        <translation>Usar este &amp;diretório:</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Outro</translation>
+    </message>
+    <message>
+        <source>&amp;Random seed file:</source>
+        <translation>A&amp;rquivo de semente aleatória</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

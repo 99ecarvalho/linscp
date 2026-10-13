@@ -26,6 +26,9 @@ struct TShellSettings
   bool KeepOpenWhenNoSession = true;
   // File colors (TFileColorData::SaveList: "BBGGRR:mask" items, comma text).
   UnicodeString FileColors;
+  // Storage: where temporary files go (empty: the system's temporary
+  // directory), environment variables allowed.
+  UnicodeString DDTemporaryDirectory;
   // Interface\Commander (TScpCommanderConfiguration).
   bool SwappedPanels = false;
   bool ExplorerKeyboardShortcuts = false;
@@ -73,6 +76,8 @@ public:
 
   const TShellSettings & Settings() const { return FSettings; }
   void SetSettings(const TShellSettings & Settings);
+  // As TWinConfiguration::ExpandedTemporaryDirectory.
+  UnicodeString ExpandedTemporaryDirectory() const;
 
 protected:
   virtual void __fastcall SaveData(THierarchicalStorage * Storage, bool All);

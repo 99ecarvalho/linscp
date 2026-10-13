@@ -296,7 +296,50 @@ struct TPreferences
   bool SessionReopenAutoInactive = false;
   int SessionReopenAutoStall = 60;
   int SessionReopenTimeout = 0;
+  // Logging (core's configuration): the session log, at a level (0
+  // reduced, 1 normal, 2 debug 1, 3 debug 2), to a file (patterns as
+  // WinSCP's: !S the session...), appended or overwritten, passwords
+  // included or not, rotated above a size (0: not) keeping so many (0: all);
+  // the XML log.
+  bool Logging = false;
+  int LogLevel = 1;
+  // Empty: none set; the dialog shows DefaultLogFileName, as WinSCP's.
+  std::string LogFileName;
+  std::string DefaultLogFileName;
+  bool LogFileAppend = true;
+  bool LogSensitive = false;
+  std::int64_t LogMaxSize = 0;
+  int LogMaxCount = 0;
+  bool LogActions = false;
+  std::string ActionsLogFileName;
+  // Network: the external IP address for active FTP (empty: the operating
+  // system's), the listening ports (0: any), knocking the FTP port when SFTP
+  // is rejected.
+  std::string ExternalIpAddress;
+  int LocalPortNumberMin = 0;
+  int LocalPortNumberMax = 0;
+  bool TryFtpWhenSshFails = true;
+  // Security: passwords remembered for the session; the agent (0 Pageant,
+  // 1 OpenSSH's ssh-agent).
+  bool SessionRememberPassword = true;
+  int AuthAgent = 0;
+  // Storage: where the configuration is (the registry, the automatic INI
+  // file, a custom one; or a file given on the command line, or none), the
+  // file in use, the custom one; the random seed file; where temporary
+  // files go (empty: the system's temporary directory).
+  enum class TStorage { Registry, AutomaticIni, CustomIni, Explicit, None };
+  TStorage Storage = TStorage::AutomaticIni;
+  std::string StorageFile;
+  std::string CustomIniFile;
+  std::string RandomSeedFile;
+  std::string TemporaryDirectory;
 };
+// What a temporary directory goes under (Storage's, else the system's).
+std::string TemporaryDirectoryBase();
+// Sizes as WinSCP's dialogs type them ("1M", "100K", "10G"; core's
+// TryStrToSize and SizeToStr); 0 for text that is not one.
+std::int64_t SizeOfText(const std::string & Text);
+std::string TextOfSize(std::int64_t Size);
 TPreferences Preferences();
 
 // The window's layout, kept between runs in WinSCP's own formats and keys

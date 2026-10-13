@@ -119,7 +119,10 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   // deletes its after a delay; the program dropped on may still be copying).
   FPanel->MakeDrag = [this](const TFileDrag & Drag) -> QMimeData *
   {
-    FDragDirectories.push_back(std::make_unique<QTemporaryDir>());
+    // Under Storage's temporary directory (else the system's), as WinSCP's
+    // (TWinConfiguration::TemporaryDir: "scp" and a unique part).
+    FDragDirectories.push_back(std::make_unique<QTemporaryDir>(
+      QDir(QString::fromStdString(CoreBridge::TemporaryDirectoryBase())).filePath(QStringLiteral("scpXXXXXX"))));
     const QString Directory = FDragDirectories.back()->path();
     const QStringList Names = Drag.Names;
     return new RemoteFileDrag(Drag, Directory, [this, Names, Directory]()

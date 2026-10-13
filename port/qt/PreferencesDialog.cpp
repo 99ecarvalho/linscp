@@ -57,6 +57,10 @@ PreferencesDialog::PreferencesDialog(QWidget * Parent) :
   AddPage(tr("Transfer"), MakeTransferPage());
   AddPage(tr("Background"), MakeBackgroundPage(Preferences));
   AddPage(tr("Endurance"), MakeEndurancePage(Preferences));
+  AddPage(tr("Network"), MakeNetworkPage(Preferences));
+  AddPage(tr("Security"), MakeSecurityPage(Preferences));
+  AddPage(tr("Logging"), MakeLoggingPage(Preferences));
+  AddPage(tr("Storage"), MakeStoragePage(Preferences));
   connect(FNavigation, &QListWidget::currentRowChanged, FPages, &QStackedWidget::setCurrentIndex);
   FNavigation->setCurrentRow(0);
 
@@ -183,6 +187,22 @@ void PreferencesDialog::UpdateControls()
   FReopenAutoSeconds->setEnabled(FReopenAuto->isChecked());
   FReopenAutoIdleSeconds->setEnabled(FReopenAutoIdle->isChecked());
   FReopenAutoStallSeconds->setEnabled(FReopenAutoStall->isChecked());
+  // As TPreferencesDialog::UpdateControls' logging, network and storage.
+  for (QWidget * Widget : std::initializer_list<QWidget *>{ FLogLevel, FLogFile, FLogAppend, FLogOverwrite, FLogMaxSize, FLogMaxCount })
+  {
+    Widget->setEnabled(FLogging->isChecked());
+  }
+  FLogMaxSizeCombo->setEnabled(FLogging->isChecked() && FLogMaxSize->isChecked());
+  FLogMaxCountSpin->setEnabled(FLogging->isChecked() && FLogMaxCount->isChecked());
+  FActionsLogFile->setEnabled(FLogActions->isChecked());
+  FCustomIpEdit->setEnabled(FCustomIp->isChecked());
+  FPortMin->setEnabled(FPortLimit->isChecked());
+  FPortMax->setEnabled(FPortLimit->isChecked());
+  if (FCustomIniEdit != nullptr)
+  {
+    FCustomIniEdit->setEnabled(FCustomIniStorage->isChecked());
+  }
+  FTemporaryEdit->setEnabled(FCustomTemporary->isChecked());
 }
 
 // As TPreferencesDialog::UpdateCopyParamListView: the default first, then
@@ -367,6 +387,191 @@ void PreferencesDialog::MoveFileColor(int By)
     LoadFileColors();
     FFileColorsList->setCurrentRow(To);
   }
+}
+
+QWidget * PreferencesDialog::MakeNetworkPage(const TPreferences & Preferences)
+{
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  QGroupBox * Incoming = new QGroupBox(tr("Incoming FTP connections (active mode)"), Page);
+  QGridLayout * IncomingLayout = new QGridLayout(Incoming);
+  FRetrieveIp = new QRadioButton(tr("Retrieve the external IP address from &operating system"), Incoming);
+  FCustomIp = new QRadioButton(tr("Use the &following external IP address:"), Incoming);
+  FCustomIpEdit = new QLineEdit(QString::fromStdString(Preferences.ExternalIpAddress), Incoming);
+  FRetrieveIp->setChecked(Preferences.ExternalIpAddress.empty());
+  FCustomIp->setChecked(!Preferences.ExternalIpAddress.empty());
+  FPortLimit = new QCheckBox(tr("Limit listening &ports to:"), Incoming);
+  FPortLimit->setChecked((Preferences.LocalPortNumberMin > 0) && (Preferences.LocalPortNumberMax >= Preferences.LocalPortNumberMin));
+  FPortMin = new QSpinBox(Incoming);
+  FPortMax = new QSpinBox(Incoming);
+  for (QSpinBox * Spin : { FPortMin, FPortMax })
+  {
+    Spin->setRange(1024, 65535);
+  }
+  // As TPreferencesDialog: none set shows the private ports.
+  FPortMin->setValue((Preferences.LocalPortNumberMin > 0) ? Preferences.LocalPortNumberMin : 49152);
+  FPortMax->setValue((Preferences.LocalPortNumberMax >= FPortMin->value()) ? Preferences.LocalPortNumberMax : 65535);
+  IncomingLayout->addWidget(FRetrieveIp, 0, 0, 1, 3);
+  IncomingLayout->addWidget(FCustomIp, 1, 0);
+  IncomingLayout->addWidget(FCustomIpEdit, 1, 1, 1, 2);
+  IncomingLayout->addWidget(FPortLimit, 2, 0);
+  IncomingLayout->addWidget(FPortMin, 2, 1);
+  IncomingLayout->addWidget(FPortMax, 2, 2);
+  Layout->addWidget(Incoming);
+  QGroupBox * Connections = new QGroupBox(tr("Connections"), Page);
+  QVBoxLayout * ConnectionsLayout = new QVBoxLayout(Connections);
+  FTryFtp = new QCheckBox(tr("When SFTP connection is &rejected, knock FTP port"), Connections);
+  FTryFtp->setChecked(Preferences.TryFtpWhenSshFails);
+  ConnectionsLayout->addWidget(FTryFtp);
+  Layout->addWidget(Connections);
+  Layout->addStretch(1);
+  for (QAbstractButton * Button : std::initializer_list<QAbstractButton *>{ FRetrieveIp, FCustomIp, FPortLimit })
+  {
+    connect(Button, &QAbstractButton::toggled, this, &PreferencesDialog::UpdateControls);
+  }
+  return Page;
+}
+
+// The master password and the trusted certification authorities are not
+// here yet (ADR 0014).
+QWidget * PreferencesDialog::MakeSecurityPage(const TPreferences & Preferences)
+{
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  QGroupBox * Authentication = new QGroupBox(tr("Authentication"), Page);
+  QFormLayout * Form = new QFormLayout(Authentication);
+  FRememberPassword = new QCheckBox(tr("Remember &password for duration of session"), Authentication);
+  FRememberPassword->setChecked(Preferences.SessionRememberPassword);
+  Form->addRow(FRememberPassword);
+  FAuthAgent = new QComboBox(Authentication);
+  FAuthAgent->addItems({ tr("PuTTY Pageant"), tr("OpenSSH ssh-agent") });
+  FAuthAgent->setCurrentIndex(qBound(0, Preferences.AuthAgent, 1));
+  Form->addRow(tr("Aut&hentication agent:"), FAuthAgent);
+  Layout->addWidget(Authentication);
+  Layout->addStretch(1);
+  return Page;
+}
+
+QWidget * PreferencesDialog::MakeLoggingPage(const TPreferences & Preferences)
+{
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  QGroupBox * Session = new QGroupBox(tr("Session log"), Page);
+  QGridLayout * SessionLayout = new QGridLayout(Session);
+  FLogging = new QCheckBox(tr("Enable &session logging on level:"), Session);
+  FLogging->setChecked(Preferences.Logging);
+  FLogLevel = new QComboBox(Session);
+  FLogLevel->addItems({ tr("Reduced"), tr("Normal"), tr("Debug 1"), tr("Debug 2") });
+  FLogLevel->setCurrentIndex(qBound(0, Preferences.LogLevel, 3));
+  SessionLayout->addWidget(FLogging, 0, 0);
+  SessionLayout->addWidget(FLogLevel, 0, 1);
+  FLogFile = new QLineEdit(QString::fromStdString(!Preferences.LogFileName.empty() ? Preferences.LogFileName : Preferences.DefaultLogFileName), Session);
+  QLabel * FileLabel = new QLabel(tr("&Log path:"), Session);
+  FileLabel->setBuddy(FLogFile);
+  SessionLayout->addWidget(FileLabel, 1, 0);
+  SessionLayout->addWidget(FLogFile, 1, 1);
+  FLogAppend = new QRadioButton(tr("Appe&nd"), Session);
+  FLogOverwrite = new QRadioButton(tr("&Overwrite"), Session);
+  FLogAppend->setChecked(Preferences.LogFileAppend);
+  FLogOverwrite->setChecked(!Preferences.LogFileAppend);
+  QHBoxLayout * Mode = new QHBoxLayout();
+  Mode->addWidget(FLogAppend);
+  Mode->addWidget(FLogOverwrite);
+  SessionLayout->addLayout(Mode, 2, 1);
+  FLogMaxSize = new QCheckBox(tr("&Rotate log files after reaching"), Session);
+  FLogMaxSize->setChecked(Preferences.LogMaxSize > 0);
+  FLogMaxSizeCombo = new QComboBox(Session);
+  FLogMaxSizeCombo->setEditable(true);
+  FLogMaxSizeCombo->addItems({ QStringLiteral("1M"), QStringLiteral("10M"), QStringLiteral("100M"), QStringLiteral("1G") });
+  FLogMaxSizeCombo->setEditText(QString::fromStdString(CoreBridge::TextOfSize((Preferences.LogMaxSize > 0) ? Preferences.LogMaxSize : 1024 * 1024)));
+  SessionLayout->addWidget(FLogMaxSize, 3, 0);
+  SessionLayout->addWidget(FLogMaxSizeCombo, 3, 1);
+  FLogMaxCount = new QCheckBox(tr("&Delete old log files, keep"), Session);
+  FLogMaxCount->setChecked(Preferences.LogMaxCount > 0);
+  FLogMaxCountSpin = new QSpinBox(Session);
+  FLogMaxCountSpin->setRange(1, 999);
+  FLogMaxCountSpin->setSuffix(tr(" files"));
+  FLogMaxCountSpin->setValue((Preferences.LogMaxCount > 0) ? Preferences.LogMaxCount : 5);
+  SessionLayout->addWidget(FLogMaxCount, 4, 0);
+  SessionLayout->addWidget(FLogMaxCountSpin, 4, 1);
+  FLogSensitive = new QCheckBox(tr("Log pass&words and other sensitive information"), Session);
+  FLogSensitive->setChecked(Preferences.LogSensitive);
+  SessionLayout->addWidget(FLogSensitive, 5, 0, 1, 2);
+  Layout->addWidget(Session);
+  QGroupBox * Xml = new QGroupBox(tr("XML log"), Page);
+  QVBoxLayout * XmlLayout = new QVBoxLayout(Xml);
+  FLogActions = new QCheckBox(tr("Enable &XML logging to file:"), Xml);
+  FLogActions->setChecked(Preferences.LogActions);
+  FActionsLogFile = new QLineEdit(QString::fromStdString(Preferences.ActionsLogFileName), Xml);
+  XmlLayout->addWidget(FLogActions);
+  XmlLayout->addWidget(FActionsLogFile);
+  Layout->addWidget(Xml);
+  Layout->addStretch(1);
+  for (QAbstractButton * Button : std::initializer_list<QAbstractButton *>{ FLogging, FLogMaxSize, FLogMaxCount, FLogActions })
+  {
+    connect(Button, &QAbstractButton::toggled, this, &PreferencesDialog::UpdateControls);
+  }
+  return Page;
+}
+
+QWidget * PreferencesDialog::MakeStoragePage(const TPreferences & Preferences)
+{
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  QGroupBox * Storage = new QGroupBox(tr("Configuration storage"), Page);
+  QGridLayout * StorageLayout = new QGridLayout(Storage);
+  FStorage = Preferences.Storage;
+  if ((Preferences.Storage == TPreferences::TStorage::Explicit) || (Preferences.Storage == TPreferences::TStorage::None))
+  {
+    // A file given on the command line (and on POSIX, always the INI file,
+    // ADR 0009): the configuration is there, nothing to move.
+    FStorageLabel = new QLabel((Preferences.Storage == TPreferences::TStorage::None) ? tr("Not stored.") :
+      QString::fromStdString(Preferences.StorageFile), Storage);
+    FStorageLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    StorageLayout->addWidget(FStorageLabel, 0, 0);
+    Storage->setEnabled(Preferences.Storage != TPreferences::TStorage::None);
+  }
+  else
+  {
+    FRegistryStorage = new QRadioButton(tr("Windows re&gistry"), Storage);
+    FAutomaticIniStorage = new QRadioButton(tr("&Automatic INI file"), Storage);
+    FStorageLabel = new QLabel(QString::fromStdString(Preferences.StorageFile), Storage);
+    FCustomIniStorage = new QRadioButton(tr("Custo&m INI file:"), Storage);
+    FCustomIniEdit = new QLineEdit(QString::fromStdString(Preferences.CustomIniFile), Storage);
+    FRegistryStorage->setChecked(Preferences.Storage == TPreferences::TStorage::Registry);
+    FAutomaticIniStorage->setChecked(Preferences.Storage == TPreferences::TStorage::AutomaticIni);
+    FCustomIniStorage->setChecked(Preferences.Storage == TPreferences::TStorage::CustomIni);
+    StorageLayout->addWidget(FRegistryStorage, 0, 0, 1, 2);
+    StorageLayout->addWidget(FAutomaticIniStorage, 1, 0);
+    StorageLayout->addWidget(FStorageLabel, 1, 1);
+    StorageLayout->addWidget(FCustomIniStorage, 2, 0);
+    StorageLayout->addWidget(FCustomIniEdit, 2, 1);
+    connect(FCustomIniStorage, &QRadioButton::toggled, this, &PreferencesDialog::UpdateControls);
+  }
+  Layout->addWidget(Storage);
+  QGroupBox * Temporary = new QGroupBox(tr("Temporary directory"), Page);
+  QGridLayout * TemporaryLayout = new QGridLayout(Temporary);
+  TemporaryLayout->addWidget(new QLabel(tr("Specify where to temporarily store edited and downloaded files."), Temporary), 0, 0, 1, 2);
+  FSystemTemporary = new QRadioButton(tr("&Use temporary directory of system"), Temporary);
+  FCustomTemporary = new QRadioButton(tr("Use this &directory:"), Temporary);
+  FTemporaryEdit = new QLineEdit(Temporary);
+  // As TPreferencesDialog: none set shows the system's.
+  FSystemTemporary->setChecked(Preferences.TemporaryDirectory.empty());
+  FCustomTemporary->setChecked(!Preferences.TemporaryDirectory.empty());
+  FTemporaryEdit->setText(Preferences.TemporaryDirectory.empty() ? QString::fromStdString(CoreBridge::TemporaryDirectoryBase()) :
+    QString::fromStdString(Preferences.TemporaryDirectory));
+  TemporaryLayout->addWidget(FSystemTemporary, 1, 0, 1, 2);
+  TemporaryLayout->addWidget(FCustomTemporary, 2, 0);
+  TemporaryLayout->addWidget(FTemporaryEdit, 2, 1);
+  connect(FCustomTemporary, &QRadioButton::toggled, this, &PreferencesDialog::UpdateControls);
+  Layout->addWidget(Temporary);
+  QGroupBox * Other = new QGroupBox(tr("Other"), Page);
+  QFormLayout * OtherLayout = new QFormLayout(Other);
+  FRandomSeedEdit = new QLineEdit(QString::fromStdString(Preferences.RandomSeedFile), Other);
+  OtherLayout->addRow(tr("&Random seed file:"), FRandomSeedEdit);
+  Layout->addWidget(Other);
+  Layout->addStretch(1);
+  return Page;
 }
 
 QWidget * PreferencesDialog::MakeTransferPage()
@@ -636,6 +841,38 @@ TPreferences PreferencesDialog::Preferences() const
     (FPathNone->isChecked() ? TPreferences::TPathInCaption::None : TPreferences::TPathInCaption::Short);
   Result.KeepOpenWhenNoSession = FKeepOpen->isChecked();
   Result.FileColors = FFileColors;
+  // As TPreferencesDialog::SaveConfiguration.
+  Result.Logging = FLogging->isChecked();
+  Result.LogLevel = FLogLevel->currentIndex();
+  Result.LogFileName = FLogFile->text().trimmed().toStdString();
+  Result.LogFileAppend = FLogAppend->isChecked();
+  Result.LogSensitive = FLogSensitive->isChecked();
+  Result.LogMaxSize = FLogMaxSize->isChecked() ? CoreBridge::SizeOfText(FLogMaxSizeCombo->currentText().toStdString()) : 0;
+  Result.LogMaxCount = FLogMaxCount->isChecked() ? FLogMaxCountSpin->value() : 0;
+  Result.LogActions = FLogActions->isChecked();
+  Result.ActionsLogFileName = FActionsLogFile->text().trimmed().toStdString();
+  Result.ExternalIpAddress = FCustomIp->isChecked() ? FCustomIpEdit->text().trimmed().toStdString() : std::string();
+  Result.LocalPortNumberMin = FPortLimit->isChecked() ? FPortMin->value() : 0;
+  Result.LocalPortNumberMax = FPortLimit->isChecked() ? FPortMax->value() : 0;
+  Result.TryFtpWhenSshFails = FTryFtp->isChecked();
+  Result.SessionRememberPassword = FRememberPassword->isChecked();
+  Result.AuthAgent = FAuthAgent->currentIndex();
+  Result.Storage = FStorage;
+  if ((FRegistryStorage != nullptr) && FRegistryStorage->isChecked())
+  {
+    Result.Storage = TPreferences::TStorage::Registry;
+  }
+  else if ((FAutomaticIniStorage != nullptr) && FAutomaticIniStorage->isChecked())
+  {
+    Result.Storage = TPreferences::TStorage::AutomaticIni;
+  }
+  else if ((FCustomIniStorage != nullptr) && FCustomIniStorage->isChecked())
+  {
+    Result.Storage = TPreferences::TStorage::CustomIni;
+    Result.CustomIniFile = FCustomIniEdit->text().trimmed().toStdString();
+  }
+  Result.TemporaryDirectory = FCustomTemporary->isChecked() ? FTemporaryEdit->text().trimmed().toStdString() : std::string();
+  Result.RandomSeedFile = FRandomSeedEdit->text().trimmed().toStdString();
   return Result;
 }
 

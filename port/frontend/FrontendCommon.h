@@ -8,7 +8,8 @@ class TConfiguration;
 // The configuration's storage as upstream's CreateConfiguration sets it up:
 // /ini, /rawconfig, and POSIX's INI file. Returns Configuration.
 TConfiguration * SetUpConfigurationStorage(TConfiguration * Configuration);
-// The temporary directory upstream's GUI uses when none is configured.
-UnicodeString DefaultTemporaryDir(bool Mask);
+// A temporary directory as upstream's GUI makes one (UniqTempDir, "scp"),
+// under Base, or the system's temporary directory when none is configured.
+UnicodeString DefaultTemporaryDir(bool Mask, const UnicodeString & Base = UnicodeString());
 
 #endif

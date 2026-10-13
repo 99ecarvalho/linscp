@@ -481,6 +481,59 @@ int main(int argc, char ** argv)
     }
     Check(Cancelled, "comparing cancelled aborts");
     Check(!Sftp || Session.CanSyncTimestamps(), "timestamps can be synchronized over SFTP");
+
+    // Logging (Preferences, core's configuration): a session opened with it
+    // on writes its log and its XML log.
+    {
+      CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+      Check(!Preferences.Logging && !Preferences.DefaultLogFileName.empty(), "logging is off by default, with a default file");
+      Preferences.Logging = true;
+      Preferences.LogLevel = 2;
+      Preferences.LogFileName = (Local / "session.log").string();
+      Preferences.LogActions = true;
+      Preferences.ActionsLogFileName = (Local / "session.xml").string();
+      CoreBridge::SetPreferences(Preferences);
+      Frontend.Passwords = { "secret" };
+      CoreBridge::TSession Logged(Url);
+      Logged.Open();
+      Logged.List();
+      Logged.Close();
+      std::ifstream Log(Local / "session.log");
+      const std::string Text((std::istreambuf_iterator<char>(Log)), std::istreambuf_iterator<char>());
+      Check(Text.find("127.0.0.1") != std::string::npos, "the session log is written");
+      Check(fs::exists(Local / "session.xml") && (fs::file_size(Local / "session.xml") > 0), "and the XML log");
+#if !defined(_WIN32)
+      // WinSCP's default path, %TEMP%\!S.log, works where TEMP is not set:
+      // the session's log in TMPDIR.
+      const fs::path Temporary = Local / "temporary";
+      fs::create_directories(Temporary);
+      unsetenv("TEMP");
+      setenv("TMPDIR", Temporary.c_str(), 1);
+      Preferences.LogFileName = Preferences.DefaultLogFileName;
+      Preferences.LogActions = false;
+      CoreBridge::SetPreferences(Preferences);
+      Frontend.Passwords = { "secret" };
+      {
+        CoreBridge::TSession Default(Url);
+        Default.Open();
+        Default.Close();
+      }
+      bool Found = false;
+      for (const fs::directory_entry & Entry : fs::directory_iterator(Temporary))
+      {
+        Found = Found || (Entry.path().extension() == ".log");
+      }
+      Check(Found, "the default log path is the temporary directory's");
+      unsetenv("TMPDIR");
+#endif
+      Preferences.Logging = false;
+      Preferences.LogActions = false;
+      Preferences.LogFileName.clear();
+      CoreBridge::SetPreferences(Preferences);
+      Check(!CoreBridge::Preferences().Logging, "logging turns off again");
+      Check(CoreBridge::SizeOfText("10M") == 10 * 1024 * 1024 && (CoreBridge::TextOfSize(1024 * 1024) == "1M"),
+        "sizes as WinSCP's dialogs type them");
+    }
     fs::remove_all(Local);
     }
     catch (const CoreBridge::TCoreError & E)

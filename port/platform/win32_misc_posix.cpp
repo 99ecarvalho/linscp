@@ -7,6 +7,7 @@
 #include "secext.h"
 #include "winsock2.h"
 
+#include <cctype>
 #include <pwd.h>
 
 #include <cerrno>
@@ -615,6 +616,43 @@ BOOL GetProductInfo(DWORD, DWORD, DWORD, DWORD, PDWORD ReturnedProductType)
 
 // --- environment, paths, strings ------------------------------------------------------
 
+namespace {
+
+// The variables Windows always defines, which upstream's defaults are
+// written in (the session log's %TEMP%\!S.log, the random seed's
+// %APPDATA%\winscp.rnd): when the environment has none, their POSIX
+// equivalents, as SHGetFolderPath gives the folders.
+std::string WindowsVariable(const std::string & Name)
+{
+  std::string Upper;
+  for (char C : Name)
+  {
+    Upper += static_cast<char>(std::toupper(static_cast<unsigned char>(C)));
+  }
+  if ((Upper == "TEMP") || (Upper == "TMP"))
+  {
+    const std::string TmpDir = Env("TMPDIR");
+    return TmpDir.empty() ? std::string("/tmp") : TmpDir;
+  }
+  if (Upper == "APPDATA")
+  {
+    const std::string Config = Env("XDG_CONFIG_HOME");
+    return Config.empty() ? (Home() + "/.config") : Config;
+  }
+  if (Upper == "LOCALAPPDATA")
+  {
+    const std::string Data = Env("XDG_DATA_HOME");
+    return Data.empty() ? (Home() + "/.local/share") : Data;
+  }
+  if (Upper == "USERPROFILE")
+  {
+    return Home();
+  }
+  return std::string();
+}
+
+}  // namespace
+
 DWORD ExpandEnvironmentStrings(LPCWSTR Src, LPWSTR Dst, DWORD Size)
 {
   const std::u16string In = Wide(Src);
@@ -629,9 +667,15 @@ DWORD ExpandEnvironmentStrings(LPCWSTR Src, LPWSTR Dst, DWORD Size)
     }
     const std::u16string Name = In.substr(I + 1, End - I - 1);
     const char * Value = Name.empty() ? nullptr : getenv(ToUtf8(Name).c_str());
+    const std::string Windows = ((Value == nullptr) && !Name.empty()) ? WindowsVariable(ToUtf8(Name)) : std::string();
     if (Value != nullptr)
     {
       Out += FromUtf8(Value);
+      I = End + 1;
+    }
+    else if (!Windows.empty())
+    {
+      Out += FromUtf8(Windows.c_str());
       I = End + 1;
     }
     else

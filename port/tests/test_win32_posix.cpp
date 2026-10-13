@@ -496,6 +496,28 @@ void TestEnvironmentExpansion()
   // Too small: nothing written, the size needed returned.
   wchar_t Tiny[4];
   CHECK(ExpandEnvironmentStrings(L"%LINSCP_TEST_VAR%", Tiny, 4) == 6);
+#if !defined(_WIN32)
+  // The variables Windows always has, and upstream's defaults are written
+  // in, have their POSIX equivalents when the environment does not set them.
+  unsetenv("TEMP");
+  setenv("TMPDIR", "/var/tmp/linscp", 1);
+  wchar_t Temp[64];
+  ExpandEnvironmentStrings(L"%TEMP%\\!S.log", Temp, 64);
+  CHECK(P16(Temp) == Path16(u"/var/tmp/linscp\\!S.log"));
+  unsetenv("TMPDIR");
+  ExpandEnvironmentStrings(L"%TEMP%", Temp, 64);
+  CHECK(P16(Temp) == Path16(u"/tmp"));
+  unsetenv("APPDATA");
+  setenv("XDG_CONFIG_HOME", "/home/x/.config", 1);
+  ExpandEnvironmentStrings(L"%APPDATA%", Temp, 64);
+  CHECK(P16(Temp) == Path16(u"/home/x/.config"));
+  // What the environment sets wins.
+  setenv("TEMP", "/elsewhere", 1);
+  ExpandEnvironmentStrings(L"%TEMP%", Temp, 64);
+  CHECK(P16(Temp) == Path16(u"/elsewhere"));
+  unsetenv("TEMP");
+  unsetenv("XDG_CONFIG_HOME");
+#endif
 }
 
 void TestModulesAndProcesses()

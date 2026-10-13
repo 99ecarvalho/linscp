@@ -238,3 +238,51 @@ the layout written in WinSCP's formats, the column linscp lacks kept, and
 restored by a new window; the window closing with its session when not
 kept open) and `qt_gui_panel` (the path in the title): Linux, Wine,
 natively on Windows 11.
+
+## Amendment 2026-10-14: core's pages, Network, Security, Logging, Storage (P3-04d)
+
+- **Four of core's pages**, after Endurance in the order of WinSCP's tree,
+  loaded and saved as `TPreferencesDialog` does:
+  - Network: the external IP address for active FTP, the listening ports
+    (none set shows the private range), knocking the FTP port when SFTP is
+    rejected;
+  - Security: passwords remembered for the session, and the
+    authentication agent;
+  - Logging: the session log (level, file, append or overwrite, sensitive
+    information, rotation by size as WinSCP's dialog types sizes, through
+    core's `TryStrToSize`/`SizeToStr`, files kept) and the XML log. The
+    log path shows core's default when none is set, and logging is on
+    only with a file, as upstream's;
+  - Storage: where the configuration is, and the temporary directory and
+    random seed file. On Windows without `/ini` the configuration can be
+    moved between the registry, the automatic INI file and a custom one
+    (`MoveStorage`). A file given on the command line, and on POSIX the
+    INI file always (ADR 0009), is shown, with nothing to move.
+- **The temporary directory** is `TWinConfiguration`'s `DDTemporaryDirectory`,
+  mirrored. The shell's `TemporaryDir`, which core uses, and the drag-out
+  directories go under it as `TWinConfiguration::TemporaryDir` does.
+- **Upstream's defaults now work on POSIX:**
+  - the Win32 layer's `ExpandEnvironmentStrings` gives `TEMP`, `TMP`,
+    `APPDATA`, `LOCALAPPDATA` and `USERPROFILE`, which Windows always
+    defines, their POSIX equivalents when the environment does not set
+    them;
+  - a patch (`core-log-file-name-delimiter.patch`) builds the default
+    log names (`%TEMP%\!S.log`, `!S.xml`) with the platform's delimiter,
+    unchanged on Windows, so the log goes into the temporary directory
+    rather than beside it. It is a candidate to offer upstream
+    (ADR 0006).
+- **Not offered:**
+  - Updates, which checks winscp.net for WinSCP's releases and sends
+    WinSCP anonymous usage statistics, neither of which is for linscp;
+  - for now, the master password (`TWinConfiguration`'s encryption of
+    stored passwords) and the trusted host certification authorities'
+    list, which want their own dialogs;
+  - the temporary directory's cleanup, session and path options, which
+    belong with editing (P3-05).
+
+Verified by `qt_session`/`qt_session_ftp` (logging on writes the session
+and XML logs; the default path in `TMPDIR` where `TEMP` is not set),
+`win32_on_posix` (the variables' fallbacks) and `qt_gui_preferences` (the
+pages, saved under core's `Logging` and `Interface` keys, the temporary
+directory in use): Linux and Wine. Natively on Windows 11 is to be
+checked; the VM was not reachable.

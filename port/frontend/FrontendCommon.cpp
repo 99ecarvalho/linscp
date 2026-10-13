@@ -51,9 +51,9 @@ UnicodeString UniqTempDir(const UnicodeString BaseDir, const UnicodeString Ident
 //---------------------------------------------------------------------------
 // Upstream's (UniqTempDir, "scp" prefix) under the system's temporary
 // directory, as TWinConfiguration's is when no custom one is configured.
-UnicodeString DefaultTemporaryDir(bool Mask)
+UnicodeString DefaultTemporaryDir(bool Mask, const UnicodeString & Base)
 {
-  return UniqTempDir(SystemTemporaryDirectory(), L"scp", Mask);
+  return UniqTempDir(Base.IsEmpty() ? SystemTemporaryDirectory() : Base, L"scp", Mask);
 }
 #if !defined(_WIN32)
 //---------------------------------------------------------------------------

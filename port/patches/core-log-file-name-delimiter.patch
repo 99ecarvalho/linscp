@@ -1,0 +1,18 @@
+Build the default log file names with the platform's path delimiter.
+
+The session log's and the XML log's defaults are written as literals,
+%TEMP%\!S.log and %TEMP%\!S.xml. On POSIX the backslash is not a path
+delimiter, so the log was created beside the temporary directory, named
+"tmp\!S.log", instead of in it. Built with IncludeTrailingBackslash, as the
+random seed file's default already is, the delimiter is the platform's:
+on Windows the same backslash as before, so upstream's behaviour is
+unchanged. Line counts are unchanged.
+
+--- a/source/core/Configuration.cpp
++++ b/source/core/Configuration.cpp
+@@ -264,1 +264,1 @@
+-  FActionsLogFileName = L"%TEMP%\\!S.xml";
++  FActionsLogFileName = IncludeTrailingBackslash(L"%TEMP%") + L"!S.xml";
+@@ -2252,1 +2252,1 @@
+-  return L"%TEMP%\\!S.log";
++  return IncludeTrailingBackslash(L"%TEMP%") + L"!S.log";

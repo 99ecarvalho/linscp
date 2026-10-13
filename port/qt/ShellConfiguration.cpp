@@ -66,9 +66,20 @@ void TShellConfiguration::SetTranslationsDirectory(const UnicodeString & Transla
     IncludeTrailingBackslash(ExtractFilePath(ExcludeTrailingBackslash(Translations))) + L"linscp" + ExtractFileExt(Own);
 }
 
+UnicodeString TShellConfiguration::ExpandedTemporaryDirectory() const
+{
+  UnicodeString Result = ExpandFileName(ExpandEnvironmentVariables(FSettings.DDTemporaryDirectory));
+  if (FSettings.DDTemporaryDirectory.IsEmpty() || Result.IsEmpty())
+  {
+    Result = SystemTemporaryDirectory();
+  }
+  return Result;
+}
+
+// As TWinConfiguration::TemporaryDir.
 UnicodeString TShellConfiguration::TemporaryDir(bool Mask)
 {
-  return DefaultTemporaryDir(Mask);
+  return DefaultTemporaryDir(Mask, ExpandedTemporaryDirectory());
 }
 
 // TWinConfiguration's keys, in its own Interface and Interface\Commander
@@ -89,6 +100,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteInteger(L"PathInCaption", FSettings.PathInCaption);
     Storage->WriteBool(L"KeepOpenWhenNoSession", FSettings.KeepOpenWhenNoSession);
     Storage->WriteString(L"FileColors", FSettings.FileColors);
+    Storage->WriteString(L"DDTemporaryDirectory", FSettings.DDTemporaryDirectory);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander", true))
   {
@@ -138,6 +150,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.PathInCaption = Storage->ReadInteger(L"PathInCaption", FSettings.PathInCaption);
     FSettings.KeepOpenWhenNoSession = Storage->ReadBool(L"KeepOpenWhenNoSession", FSettings.KeepOpenWhenNoSession);
     FSettings.FileColors = Storage->ReadString(L"FileColors", FSettings.FileColors);
+    FSettings.DDTemporaryDirectory = Storage->ReadString(L"DDTemporaryDirectory", FSettings.DDTemporaryDirectory);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander", false))
   {

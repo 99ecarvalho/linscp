@@ -15,6 +15,9 @@
 class QCheckBox;
 class QComboBox;
 class QLabel;
+class QLineEdit;
+class QRadioButton;
+class QSpinBox;
 class QListWidget;
 class QStackedWidget;
 
@@ -77,6 +80,22 @@ public:
   void EditFileColor(const CoreBridge::TPreferences::TFileColor & Color);
   void RemoveFileColor();
   void MoveFileColor(int By);
+  QCheckBox * LoggingCheck() const { return FLogging; }
+  QComboBox * LogLevelCombo() const { return FLogLevel; }
+  QLineEdit * LogFileEdit() const { return FLogFile; }
+  QCheckBox * LogMaxSizeCheck() const { return FLogMaxSize; }
+  QComboBox * LogMaxSizeCombo() const { return FLogMaxSizeCombo; }
+  QCheckBox * LogActionsCheck() const { return FLogActions; }
+  QRadioButton * CustomIpButton() const { return FCustomIp; }
+  QLineEdit * CustomIpEdit() const { return FCustomIpEdit; }
+  QCheckBox * PortLimitCheck() const { return FPortLimit; }
+  QSpinBox * PortMinSpin() const { return FPortMin; }
+  QSpinBox * PortMaxSpin() const { return FPortMax; }
+  QCheckBox * RememberPasswordCheck() const { return FRememberPassword; }
+  QComboBox * AuthAgentCombo() const { return FAuthAgent; }
+  QLabel * StorageLabel() const { return FStorageLabel; }
+  QRadioButton * CustomTemporaryButton() const { return FCustomTemporary; }
+  QLineEdit * TemporaryEdit() const { return FTemporaryEdit; }
 
 private:
   void AddPage(const QString & Name, QWidget * Page);
@@ -88,6 +107,10 @@ private:
   QWidget * MakeEndurancePage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeWindowPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeFileColorsPage();
+  QWidget * MakeNetworkPage(const CoreBridge::TPreferences & Preferences);
+  QWidget * MakeSecurityPage(const CoreBridge::TPreferences & Preferences);
+  QWidget * MakeLoggingPage(const CoreBridge::TPreferences & Preferences);
+  QWidget * MakeStoragePage(const CoreBridge::TPreferences & Preferences);
   void LoadFileColors();
   bool FileColorDialog(CoreBridge::TPreferences::TFileColor & Color);
   void LoadPresets();
@@ -142,6 +165,37 @@ private:
   QPushButton * FRemoveFileColor = nullptr;
   QPushButton * FUpFileColor = nullptr;
   QPushButton * FDownFileColor = nullptr;
+  QCheckBox * FLogging = nullptr;
+  QComboBox * FLogLevel = nullptr;
+  class QLineEdit * FLogFile = nullptr;
+  QRadioButton * FLogAppend = nullptr;
+  QRadioButton * FLogOverwrite = nullptr;
+  QCheckBox * FLogSensitive = nullptr;
+  QCheckBox * FLogMaxSize = nullptr;
+  QComboBox * FLogMaxSizeCombo = nullptr;
+  QCheckBox * FLogMaxCount = nullptr;
+  QSpinBox * FLogMaxCountSpin = nullptr;
+  QCheckBox * FLogActions = nullptr;
+  QLineEdit * FActionsLogFile = nullptr;
+  QRadioButton * FRetrieveIp = nullptr;
+  QRadioButton * FCustomIp = nullptr;
+  QLineEdit * FCustomIpEdit = nullptr;
+  QCheckBox * FPortLimit = nullptr;
+  QSpinBox * FPortMin = nullptr;
+  QSpinBox * FPortMax = nullptr;
+  QCheckBox * FTryFtp = nullptr;
+  QCheckBox * FRememberPassword = nullptr;
+  QComboBox * FAuthAgent = nullptr;
+  CoreBridge::TPreferences::TStorage FStorage = CoreBridge::TPreferences::TStorage::AutomaticIni;
+  QLabel * FStorageLabel = nullptr;
+  QRadioButton * FRegistryStorage = nullptr;
+  QRadioButton * FAutomaticIniStorage = nullptr;
+  QRadioButton * FCustomIniStorage = nullptr;
+  QLineEdit * FCustomIniEdit = nullptr;
+  QRadioButton * FSystemTemporary = nullptr;
+  QRadioButton * FCustomTemporary = nullptr;
+  QLineEdit * FTemporaryEdit = nullptr;
+  QLineEdit * FRandomSeedEdit = nullptr;
   // The pages exist: their controls can be updated.
   bool FBuilt = false;
 };
