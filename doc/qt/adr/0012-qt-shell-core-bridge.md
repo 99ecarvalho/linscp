@@ -154,3 +154,28 @@ and the suite's FTP server) and `qt_gui_panel` (the panel: order, sorting,
 new folder, rename, a two-entry delete with core's confirmation, the path
 box, back, forward, parent, root, home, a directory that cannot be
 entered): Linux, Wine, natively on Windows 11.
+
+## Amendment 2026-10-13: transfers and the queue (P2-07)
+
+- **Foreground transfers** run on the GUI thread, as WinSCP's: core's
+  `CopyToRemote`/`CopyToLocal` with its default copy parameters, its
+  progress reported through `IFrontend::TransferProgress`, whose `false`
+  cancels at core's next report (`SetCancel(csCancel)`), and its questions
+  (a file that exists) through the frontend as all of core's.
+- **The queue** is core's `TTerminalQueue`, with its own connections on its
+  own threads. Those threads never reach Qt: the queue's events only flag a
+  change (an atomic). The GUI polls it from a timer (`TSession::QueueIdle`),
+  which calls the queue's `Idle`, takes a fresh status, and -- as WinSCP's
+  queue auto-popup -- calls `ProcessUserAction` on the first item waiting
+  for an answer, which asks it on the GUI thread through the session's own
+  handlers. Entries are named by their status proxies, which core keeps
+  stable while an item is listed. Core drops done items at once unless told
+  to keep them, so "finished" is counted as added minus still listed, which
+  tells the panels to read their directories again.
+
+Verified by `qt_session`/`qt_session_ftp` (foreground and queued uploads and
+downloads, bytes compared, overwrite, cancel, move; the queue's connection
+reusing the password) and `qt_gui_transfer` (F5/F6 between the panels, the
+progress window's cancel, queued transfers the panels catch up with, a
+queued upload cancelled from the queue panel): Linux, Wine, natively on
+Windows 11.

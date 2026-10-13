@@ -15,7 +15,9 @@
 #include <TextsCore.h>
 #include <CopyParam.h>
 #include <FileOperationProgress.h>
+#include <Queue.h>
 
+#include <atomic>
 #include <memory>
 
 namespace CoreBridge
@@ -25,6 +27,48 @@ struct TSession::TImpl
 {
   std::unique_ptr<TSessionData> Data;
   std::unique_ptr<TTerminal> Terminal;
+  // The background queue, made with its first item; its status as last
+  // taken, and whether its threads said it changed since.
+  std::unique_ptr<TTerminalQueue> Queue;
+  TTerminalQueueStatus * QueueStatus = NULL;
+  std::atomic<bool> QueueChanged{false};
+  // Items added; those no longer listed have finished (done, or removed:
+  // core drops done items at once unless told to keep them).
+  int QueueAdded = 0;
+  int QueueDone = 0;
+
+  // The queue's events come on its threads: they only flag the change.
+  void __fastcall QueueListUpdate(TTerminalQueue * /*Queue*/)
+  {
+    QueueChanged = true;
+  }
+
+  void __fastcall QueueItemUpdate(TTerminalQueue * /*Queue*/, TQueueItem * /*Item*/)
+  {
+    QueueChanged = true;
+  }
+
+  void __fastcall QueueEvent(TTerminalQueue * /*Queue*/, TQueueEvent /*Event*/)
+  {
+    QueueChanged = true;
+  }
+
+  // Made with its first item, as the GUI's: core's queue over this session,
+  // asking its questions through the same handlers as the session's own.
+  TTerminalQueue * EnsureQueue()
+  {
+    if (Queue == NULL)
+    {
+      Queue.reset(new TTerminalQueue(Terminal.get(), Configuration));
+      Queue->OnQueryUser = CLOSURE(QueryUser);
+      Queue->OnPromptUser = CLOSURE(PromptUser);
+      Queue->OnShowExtendedException = CLOSURE(ShowExtendedException);
+      Queue->OnListUpdate = CLOSURE(QueueListUpdate);
+      Queue->OnQueueItemUpdate = CLOSURE(QueueItemUpdate);
+      Queue->OnEvent = CLOSURE(QueueEvent);
+    }
+    return Queue.get();
+  }
 
   void __fastcall QueryUser(TObject * /*Sender*/, const UnicodeString Query, TStrings * MoreMessages,
     unsigned int Answers, const TQueryParams * Params, unsigned int & Answer, ::TQueryType QueryType,
@@ -420,8 +464,191 @@ bool TSession::Download(const std::vector<std::string> & Names, const std::strin
   }
 }
 
+namespace
+{
+
+TStrings * UploadList(const std::vector<std::string> & LocalPaths)
+{
+  TStringList * Files = new TStringList();
+  for (const std::string & Path : LocalPaths)
+  {
+    Files->Add(FromUtf8(Path));
+  }
+  return Files;
+}
+
+TQueueEntry::TState StateOf(TQueueItem::TStatus Status)
+{
+  switch (Status)
+  {
+    case TQueueItem::qsConnecting: return TQueueEntry::TState::Connecting;
+    case TQueueItem::qsProcessing: return TQueueEntry::TState::Processing;
+    case TQueueItem::qsPrompt: return TQueueEntry::TState::Prompt;
+    case TQueueItem::qsQuery: return TQueueEntry::TState::Query;
+    case TQueueItem::qsError: return TQueueEntry::TState::Error;
+    case TQueueItem::qsPaused: return TQueueEntry::TState::Paused;
+    case TQueueItem::qsDone: return TQueueEntry::TState::Done;
+    default: return TQueueEntry::TState::Pending;
+  }
+}
+
+}  // namespace
+
+void TSession::QueueUpload(const std::vector<std::string> & LocalPaths, const std::string & RemoteDirectory, bool Move)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TStrings> Files(UploadList(LocalPaths));
+    const UnicodeString Target = RemoteDirectory.empty() ? F->Terminal->CurrentDirectory : FromUtf8(RemoteDirectory);
+    TCopyParamType CopyParam;
+    F->EnsureQueue()->AddItem(new TUploadQueueItem(F->Terminal.get(), Files.get(),
+      UnixIncludeTrailingBackslash(Target), &CopyParam, FLAGMASK(Move, cpDelete), false));
+    F->QueueAdded++;
+    F->QueueChanged = true;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void TSession::QueueDownload(const std::vector<std::string> & Names, const std::string & LocalDirectory, bool Move)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TStringList> Files(new TStringList());
+    for (const std::string & Name : Names)
+    {
+      TRemoteFile * File = FindFile(F->Terminal.get(), Name);
+      Files->AddObject(File->FileName, File);
+    }
+    TCopyParamType CopyParam;
+    F->EnsureQueue()->AddItem(new TDownloadQueueItem(F->Terminal.get(), Files.get(),
+      IncludeTrailingBackslash(FromUtf8(LocalDirectory)), &CopyParam, FLAGMASK(Move, cpDelete), false));
+    F->QueueAdded++;
+    F->QueueChanged = true;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+bool TSession::QueueIdle()
+{
+  if (F->Queue == NULL)
+  {
+    return false;
+  }
+  try
+  {
+    F->Queue->Idle();
+    const bool Changed = F->QueueChanged.exchange(false) || (F->QueueStatus == NULL);
+    // Progress moves without list events: the running items are read anew
+    // on every call.
+    F->QueueStatus = F->Queue->CreateStatus(F->QueueStatus);
+    F->QueueDone = F->QueueAdded - (F->QueueStatus->Count - F->QueueStatus->DoneCount);
+    // As WinSCP's queue auto-popup: the first question waiting is asked.
+    for (int Index = 0; Index < F->QueueStatus->Count; Index++)
+    {
+      TQueueItemProxy * Item = F->QueueStatus->Items[Index];
+      if (TQueueItem::IsUserActionStatus(Item->Status))
+      {
+        Item->ProcessUserAction();
+        break;
+      }
+    }
+    return Changed || (F->QueueStatus->ActiveCount > 0);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+std::vector<TQueueEntry> TSession::QueueEntries() const
+{
+  std::vector<TQueueEntry> Result;
+  for (int Index = 0; (F->QueueStatus != NULL) && (Index < F->QueueStatus->Count); Index++)
+  {
+    TQueueItemProxy * Item = F->QueueStatus->Items[Index];
+    TQueueEntry Entry;
+    Entry.Id = reinterpret_cast<std::uintptr_t>(Item);
+    Entry.Upload = (Item->Info->Side == osLocal);
+    Entry.Move = (Item->Info->Operation == foMove);
+    Entry.Source = Utf8(Item->Info->Source);
+    Entry.Destination = Utf8(Item->Info->Destination);
+    Entry.State = StateOf(Item->Status);
+    TFileOperationProgressType * Progress = Item->ProgressData;
+    if ((Progress != NULL) && Progress->InProgress)
+    {
+      Entry.FileName = Utf8(Progress->FileName);
+      Entry.Percent = Progress->OverallProgress();
+      Entry.Transferred = Progress->TotalTransferred;
+      Entry.Speed = Progress->CPS();
+    }
+    else if (Entry.State == TQueueEntry::TState::Done)
+    {
+      Entry.Percent = 100;
+    }
+    Result.push_back(Entry);
+  }
+  return Result;
+}
+
+int TSession::QueueDoneCount() const
+{
+  return F->QueueDone;
+}
+
+bool TSession::QueueEmpty() const
+{
+  return (F->Queue == NULL) || F->Queue->IsEmpty;
+}
+
+namespace
+{
+
+TQueueItemProxy * FindItem(TTerminalQueueStatus * Status, std::uintptr_t Id)
+{
+  for (int Index = 0; (Status != NULL) && (Index < Status->Count); Index++)
+  {
+    if (reinterpret_cast<std::uintptr_t>(Status->Items[Index]) == Id)
+    {
+      return Status->Items[Index];
+    }
+  }
+  return NULL;
+}
+
+}  // namespace
+
+bool TSession::QueueCancel(std::uintptr_t Id)
+{
+  TQueueItemProxy * Item = FindItem(F->QueueStatus, Id);
+  return (Item != NULL) && Item->Delete();
+}
+
+bool TSession::QueuePause(std::uintptr_t Id)
+{
+  TQueueItemProxy * Item = FindItem(F->QueueStatus, Id);
+  return (Item != NULL) && Item->Pause();
+}
+
+bool TSession::QueueResume(std::uintptr_t Id)
+{
+  TQueueItemProxy * Item = FindItem(F->QueueStatus, Id);
+  return (Item != NULL) && Item->Resume();
+}
+
 void TSession::Close()
 {
+  // The queue's connections and threads go first: they use the session's.
+  delete F->QueueStatus;
+  F->QueueStatus = NULL;
+  F->Queue.reset();
   if (F->Terminal != NULL)
   {
     try

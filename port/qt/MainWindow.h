@@ -13,6 +13,8 @@
 class QAction;
 class QLineEdit;
 class LocalPanel;
+class QueuePanel;
+class QTimer;
 class RemotePanel;
 
 class MainWindow : public QMainWindow
@@ -35,7 +37,12 @@ public:
   // in full.
   bool Upload(const QStringList & Names, const QString & Target, bool Move);
   bool Download(const QStringList & Names, const QString & Target, bool Move);
-  bool TransferSelected(bool Move, bool Confirm = true);
+  // Background: through the transfer queue, as the Copy dialog's "transfer
+  // in background" (with Confirm, the dialog's checkbox decides).
+  bool TransferSelected(bool Move, bool Confirm = true, bool Background = false);
+  // Polls the session's queue: QueueTimer's, and tests'.
+  void QueueIdle();
+  QueuePanel * Queue() const { return FQueue; }
   // The panel transfers start from: the one the focus last went to.
   void ActivatePanel(bool Local);
   bool LocalActive() const { return FLocalActive; }
@@ -64,6 +71,9 @@ private:
   QAction * FDisconnectAction = nullptr;
   RemotePanel * FPanel = nullptr;
   LocalPanel * FLocal = nullptr;
+  QueuePanel * FQueue = nullptr;
+  QTimer * FQueueTimer = nullptr;
+  int FQueueDone = 0;
 };
 
 #endif

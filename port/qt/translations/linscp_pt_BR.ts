@@ -175,7 +175,10 @@ Configuração: %4</translation>
     </message>
     <message numerus="yes">
         <source>%n file(s)</source>
-        <translation><numerusform>%n arquivo</numerusform><numerusform>%n arquivos</numerusform></translation>
+        <translation>
+            <numerusform>%n arquivo</numerusform>
+            <numerusform>%n arquivos</numerusform>
+        </translation>
     </message>
     <message>
         <source>Move %1 to remote directory:</source>
@@ -200,6 +203,10 @@ Configuração: %4</translation>
     <message>
         <source>Copy</source>
         <translation>Copiar</translation>
+    </message>
+    <message>
+        <source>Transfer in &amp;background (add to transfer queue)</source>
+        <translation>Transferir em &amp;segundo plano (adicionar à fila de transferência)</translation>
     </message>
 </context>
 <context>
@@ -241,6 +248,93 @@ Configuração: %4</translation>
     <message>
         <source>%1 (%2 s)</source>
         <translation>%1 (%2 s)</translation>
+    </message>
+</context>
+<context>
+    <name>QueuePanel</name>
+    <message>
+        <source>Waiting</source>
+        <translation>Aguardando</translation>
+    </message>
+    <message>
+        <source>Connecting</source>
+        <translation>Conectando</translation>
+    </message>
+    <message>
+        <source>In progress</source>
+        <translation>Em andamento</translation>
+    </message>
+    <message>
+        <source>Waiting for an answer</source>
+        <translation>Aguardando resposta</translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation>Erro</translation>
+    </message>
+    <message>
+        <source>Paused</source>
+        <translation>Suspenso</translation>
+    </message>
+    <message>
+        <source>Done</source>
+        <translation>Concluído</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <source>Suspend</source>
+        <translation>Suspender</translation>
+    </message>
+    <message>
+        <source>Resume</source>
+        <translation>Retomar</translation>
+    </message>
+    <message>
+        <source>Operation</source>
+        <translation>Operação</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation>Origem</translation>
+    </message>
+    <message>
+        <source>Destination</source>
+        <translation>Destino</translation>
+    </message>
+    <message>
+        <source>Transferred</source>
+        <translation>Transferido</translation>
+    </message>
+    <message>
+        <source>Speed</source>
+        <translation>Velocidade</translation>
+    </message>
+    <message>
+        <source>Progress</source>
+        <translation>Progresso</translation>
+    </message>
+    <message>
+        <source>Move up</source>
+        <translation>Mover para cima</translation>
+    </message>
+    <message>
+        <source>Upload</source>
+        <translation>Enviar</translation>
+    </message>
+    <message>
+        <source>Move down</source>
+        <translation>Mover para baixo</translation>
+    </message>
+    <message>
+        <source>Download</source>
+        <translation>Baixar</translation>
+    </message>
+    <message>
+        <source>%1/s</source>
+        <translation>%1/s</translation>
     </message>
 </context>
 <context>

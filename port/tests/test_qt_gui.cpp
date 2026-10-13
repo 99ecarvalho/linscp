@@ -47,7 +47,10 @@
 #include "QtFrontend.h"
 #include "LocalPanel.h"
 #include "QueryDialog.h"
+#include "QueuePanel.h"
 #include "TransferDialog.h"
+
+#include <functional>
 #include "RemotePanel.h"
 
 #include <QDir>
@@ -582,6 +585,52 @@ void Transfer(const char * Port, const QString & Directory)
     Responder.CancelTransfers = true;
     Check(!Window.TransferSelected(false, false), "an upload cancelled from the progress window does not complete");
     Check(Responder.TransfersSeen > 0, "the progress window was up while it ran");
+
+    // In the background, through the queue: the panels catch up by themselves.
+    const auto WaitFor = [](const std::function<bool()> & Condition)
+    {
+      QElapsedTimer Timer;
+      Timer.start();
+      while (!Condition() && (Timer.elapsed() < 30000))
+      {
+        QApplication::processEvents(QEventLoop::AllEvents, 50);
+      }
+      return Condition();
+    };
+    {
+      QFile File(Dir.filePath(QStringLiteral("queued.txt")));
+      File.open(QIODevice::WriteOnly);
+      File.write("through the queue\n");
+    }
+    Local->Refresh();
+    Local->Select({ QStringLiteral("queued.txt") });
+    Window.ActivatePanel(true);
+    Check(Window.TransferSelected(false, false, true), "an upload goes to the queue");
+    Check(Window.Queue()->List()->topLevelItemCount() == 1, "the queue panel lists it");
+    Check(WaitFor([Remote]() { return Remote->Names().contains(QStringLiteral("queued.txt")); }),
+      "it completes, and the remote panel shows it by itself");
+    Check(WaitFor([&Window]() { return Window.Queue()->List()->topLevelItemCount() == 0; }), "the queue empties");
+
+    QFile::remove(Dir.filePath(QStringLiteral("queued.txt")));
+    Remote->Select({ QStringLiteral("queued.txt") });
+    Window.ActivatePanel(false);
+    Check(Window.TransferSelected(false, false, true), "a download goes to the queue");
+    Check(WaitFor([Local]() { return Local->Names().contains(QStringLiteral("queued.txt")); }),
+      "and the local panel shows it when done");
+
+    Local->Select({ QStringLiteral("big.bin") });
+    Window.ActivatePanel(true);
+    Check(Window.TransferSelected(false, false, true), "a big upload goes to the queue");
+    Window.Queue()->List()->topLevelItem(0)->setSelected(true);
+    Check(Window.Queue()->CancelSelected(), "and is cancelled from the queue panel");
+    Check(WaitFor([&Window]() { return Window.Queue()->List()->topLevelItemCount() == 0; }), "leaving the queue");
+    Window.Panel()->Refresh();
+    bool Whole = false;
+    for (const CoreBridge::TRemoteEntry & Entry : Window.Session()->List())
+    {
+      Whole = Whole || ((Entry.Name == "big.bin") && (Entry.Size == 40 * 1024 * 1024));
+    }
+    Check(!Whole, "and no whole file behind");
     Responder.CancelTransfers = false;
     Check(Frontend.Transfer() == nullptr, "and the window closes");
     Frontend.SetWindow(nullptr);

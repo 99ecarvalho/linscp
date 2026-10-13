@@ -19,7 +19,9 @@
 #include <deque>
 #include <filesystem>
 #include <fstream>
+#include <chrono>
 #include <iterator>
+#include <thread>
 #include <string>
 
 namespace
@@ -293,6 +295,46 @@ int main(int argc, char ** argv)
     }
     Check(Session.Upload({ (Local / "moved.txt").string() }, "", true), "a file moves up");
     Check(!fs::exists(Local / "moved.txt") && HasEntry(Session.List(), "moved.txt", false), "leaving no local copy");
+
+    // In the background, through core's queue and its own connections.
+    {
+      std::ofstream(Local / "queued.bin", std::ios::binary) << std::string(200000, 'q');
+    }
+    const int PromptsBefore = Frontend.Prompts;
+    Session.QueueUpload({ (Local / "queued.bin").string() }, "");
+    Check(!Session.QueueEmpty(), "an upload is queued");
+    const auto Wait = [&Session]()
+    {
+      for (int Round = 0; (Round < 600) && !Session.QueueEmpty(); Round++)
+      {
+        Session.QueueIdle();
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+      }
+      Session.QueueIdle();
+    };
+    bool SawProcessing = false;
+    Session.QueueIdle();
+    for (const CoreBridge::TQueueEntry & Entry : Session.QueueEntries())
+    {
+      SawProcessing = SawProcessing || (Entry.Upload && (Entry.Source.find("queued.bin") != std::string::npos));
+    }
+    Check(SawProcessing, "and listed, with its source");
+    Wait();
+    Check(Session.QueueEmpty(), "the queue empties");
+    Check(Session.QueueDoneCount() >= 1, "counting it done");
+    Check(Frontend.Prompts == PromptsBefore, "its connection reuses the password, no prompt");
+    Session.Refresh();
+    bool Queued = false;
+    for (const CoreBridge::TRemoteEntry & Entry : Session.List())
+    {
+      Queued = Queued || ((Entry.Name == "queued.bin") && (Entry.Size == 200000));
+    }
+    Check(Queued, "and the file is on the server, whole");
+    fs::remove(Local / "down" / "queued.bin");
+    Session.QueueDownload({ "queued.bin" }, (Local / "down").string());
+    Wait();
+    Check(fs::exists(Local / "down" / "queued.bin") && (fs::file_size(Local / "down" / "queued.bin") == 200000),
+      "a queued download arrives whole");
     fs::remove_all(Local);
     }
     catch (const CoreBridge::TCoreError & E)

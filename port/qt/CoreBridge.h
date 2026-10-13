@@ -326,6 +326,24 @@ void SaveSite(const TSite & Site, const std::string & BaseName = std::string());
 void RenameSite(const std::string & Name, const std::string & NewName);
 void DeleteSite(const std::string & Name);
 
+// A background transfer of the session's queue, as WinSCP's queue panel
+// lists it.
+struct TQueueEntry
+{
+  // Stable while the entry is listed; what the queue's actions take.
+  std::uintptr_t Id = 0;
+  bool Upload = true;
+  bool Move = false;
+  std::string Source;
+  std::string Destination;
+  enum class TState { Pending, Connecting, Processing, Prompt, Query, Error, Paused, Done } State = TState::Pending;
+  // While it runs: the file, how far along the whole item is, its speed.
+  std::string FileName;
+  int Percent = 0;
+  std::int64_t Transferred = 0;
+  unsigned int Speed = 0;
+};
+
 // One connection, as WinSCP's "open" command takes it: a URL
 // (sftp://user@host:port/path, ftp://, ftps://, ftpes://, dav://, davs://,
 // s3://, scp://). Prompts and errors reach the shell through IFrontend while
@@ -376,6 +394,24 @@ public:
   bool Upload(const std::vector<std::string> & LocalPaths, const std::string & RemoteDirectory, bool Move = false);
   // Entries of the current directory to a local directory.
   bool Download(const std::vector<std::string> & Names, const std::string & LocalDirectory, bool Move = false);
+
+  // The same in the background, through core's transfer queue (its own
+  // connections, on its own threads), as WinSCP's "transfer in background".
+  void QueueUpload(const std::vector<std::string> & LocalPaths, const std::string & RemoteDirectory, bool Move = false);
+  void QueueDownload(const std::vector<std::string> & Names, const std::string & LocalDirectory, bool Move = false);
+  // To be called regularly on the GUI thread (a timer): keeps the queue's
+  // connections alive, and asks the questions its transfers wait on -- the
+  // first one pending, through the frontend, as WinSCP pops them up. True
+  // when the entries changed since the last call.
+  bool QueueIdle();
+  std::vector<TQueueEntry> QueueEntries() const;
+  // How many entries finished (or were removed) since the session opened.
+  int QueueDoneCount() const;
+  bool QueueEmpty() const;
+  // Removes an entry: a running transfer is cancelled. False when gone.
+  bool QueueCancel(std::uintptr_t Id);
+  bool QueuePause(std::uintptr_t Id);
+  bool QueueResume(std::uintptr_t Id);
   void Close();
 
 private:

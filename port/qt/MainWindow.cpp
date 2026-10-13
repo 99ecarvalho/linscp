@@ -9,7 +9,11 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QStatusBar>
+#include <QCheckBox>
+#include <QDialogButtonBox>
 #include <QDir>
+#include <QFormLayout>
+#include <QTimer>
 #include <QTreeView>
 #include <QSplitter>
 #include <QStyle>
@@ -20,6 +24,7 @@
 
 #include "QtFrontend.h"
 #include "LocalPanel.h"
+#include "QueuePanel.h"
 #include "RemotePanel.h"
 #include "SiteManager.h"
 
@@ -48,11 +53,19 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   QMenu * HelpMenu = menuBar()->addMenu(tr("&Help"));
   HelpMenu->addAction(tr("&About..."), this, &MainWindow::About);
 
-  QSplitter * Panels = new QSplitter(this);
+  // The panels side by side, the queue below them, as WinSCP's Commander.
+  QSplitter * Vertical = new QSplitter(Qt::Vertical, this);
+  QSplitter * Panels = new QSplitter(Vertical);
   FLocal = new LocalPanel(Panels);
   FPanel = new RemotePanel(Panels);
   Panels->setChildrenCollapsible(false);
-  setCentralWidget(Panels);
+  FQueue = new QueuePanel(Vertical);
+  Vertical->setStretchFactor(0, 4);
+  Vertical->setStretchFactor(1, 1);
+  setCentralWidget(Vertical);
+  FQueueTimer = new QTimer(this);
+  FQueueTimer->setInterval(250);
+  connect(FQueueTimer, &QTimer::timeout, this, &MainWindow::QueueIdle);
 
   // The active panel follows the focus, as in WinSCP's Commander.
   connect(qApp, &QApplication::focusChanged, this, [this](QWidget *, QWidget * Now)
@@ -169,6 +182,16 @@ bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
   FBusy = false;
   statusBar()->showMessage(Result ? tr("Connected") : tr("Not connected"));
   FPanel->SetSession(FSession.get());
+  FQueue->SetSession(FSession.get());
+  FQueueDone = 0;
+  if (FSession)
+  {
+    FQueueTimer->start();
+  }
+  else
+  {
+    FQueueTimer->stop();
+  }
   UpdateActions();
   return Result;
 }
@@ -195,6 +218,16 @@ void MainWindow::Disconnect()
     statusBar()->showMessage(tr("Disconnected"));
   }
   FPanel->SetSession(FSession.get());
+  FQueue->SetSession(FSession.get());
+  FQueueDone = 0;
+  if (FSession)
+  {
+    FQueueTimer->start();
+  }
+  else
+  {
+    FQueueTimer->stop();
+  }
   UpdateActions();
 }
 
@@ -262,7 +295,38 @@ void MainWindow::ActivatePanel(bool Local)
   (Local ? static_cast<QWidget *>(FLocal->View()) : static_cast<QWidget *>(FPanel->View()))->setFocus();
 }
 
-bool MainWindow::TransferSelected(bool Move, bool Confirm)
+void MainWindow::QueueIdle()
+{
+  if (!FSession || !FSession->Active() || FBusy)
+  {
+    return;
+  }
+  bool Changed = false;
+  try
+  {
+    Changed = FSession->QueueIdle();
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  if (Changed)
+  {
+    FQueue->Update();
+  }
+  // Finished transfers change the directories: as WinSCP, the panels read
+  // theirs again.
+  const int Done = FSession ? FSession->QueueDoneCount() : 0;
+  if (Done != FQueueDone)
+  {
+    FQueueDone = Done;
+    FPanel->Refresh();
+    FLocal->Refresh();
+    FQueue->Update();
+  }
+}
+
+bool MainWindow::TransferSelected(bool Move, bool Confirm, bool Background)
 {
   const bool FromLocal = FLocalActive;
   const QStringList Names = FromLocal ? FLocal->Selected() : FPanel->Selected();
@@ -278,12 +342,52 @@ bool MainWindow::TransferSelected(bool Move, bool Confirm)
     const QString Prompt = FromLocal ?
       (Move ? tr("Move %1 to remote directory:") : tr("Upload %1 to remote directory:")).arg(What) :
       (Move ? tr("Move %1 to local directory:") : tr("Download %1 to local directory:")).arg(What);
-    bool OK = false;
-    Target = QInputDialog::getText(this, Move ? tr("Move") : tr("Copy"), Prompt, QLineEdit::Normal, Target, &OK).trimmed();
-    if (!OK || Target.isEmpty())
+    QDialog Dialog(this);
+    Dialog.setWindowTitle(Move ? tr("Move") : tr("Copy"));
+    QFormLayout * Layout = new QFormLayout(&Dialog);
+    QLineEdit * TargetEdit = new QLineEdit(Target, &Dialog);
+    TargetEdit->setMinimumWidth(380);
+    Layout->addRow(new QLabel(Prompt, &Dialog));
+    Layout->addRow(TargetEdit);
+    QCheckBox * InBackground = new QCheckBox(tr("Transfer in &background (add to transfer queue)"), &Dialog);
+    InBackground->setChecked(Background);
+    Layout->addRow(InBackground);
+    QDialogButtonBox * Box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &Dialog);
+    connect(Box, &QDialogButtonBox::accepted, &Dialog, &QDialog::accept);
+    connect(Box, &QDialogButtonBox::rejected, &Dialog, &QDialog::reject);
+    Layout->addRow(Box);
+    if ((Dialog.exec() != QDialog::Accepted) || TargetEdit->text().trimmed().isEmpty())
     {
       return false;
     }
+    Target = TargetEdit->text().trimmed();
+    Background = InBackground->isChecked();
+  }
+  if (Background)
+  {
+    std::vector<std::string> List;
+    for (const QString & Name : Names)
+    {
+      List.push_back(FromLocal ? QDir::toNativeSeparators(QDir(FLocal->Path()).filePath(Name)).toStdString() : Name.toStdString());
+    }
+    try
+    {
+      if (FromLocal)
+      {
+        FSession->QueueUpload(List, Target.toStdString(), Move);
+      }
+      else
+      {
+        FSession->QueueDownload(List, QDir::toNativeSeparators(Target).toStdString(), Move);
+      }
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+      return false;
+    }
+    QueueIdle();
+    return true;
   }
   return FromLocal ? Upload(Names, Target, Move) : Download(Names, Target, Move);
 }
