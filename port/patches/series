@@ -11,3 +11,4 @@ filezilla-tools-unicodestring.patch
 core-storage-key-backslashes.patch
 core-neon-tls-init-closure.patch
 core-script-rmdir-full-path.patch
+putty-random-add-noise-section.patch

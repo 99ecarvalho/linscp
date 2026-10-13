@@ -154,21 +154,26 @@ Checked against the build, not only read from the diff.
 
 - `sshrand.c:40` -- `random_add_noise` returns with `putty_section` held
   when the RNG is inactive; every other thread then deadlocks on it.
+  winscp/winscp#74; carried as `putty-random-add-noise-section.patch`, as
+  the Qt shell runs sessions on several threads.
 - `windows/storage.c:351` -- `retrieve_host_key` compares the converted
   old-style key with its *output* buffer, uninitialised, so old-format RSA
-  host keys are never migrated.
+  host keys are never migrated. winscp/winscp#75.
 - `windows/network.c:1118` -- the connect timeout is set with
   `SO_RCVTIMEO`, which bounds no `connect()` on Windows or Linux:
   `-timeout=5` to an unreachable host gives up after the system's own
   limit -- 24 s for WinSCP 6.5.7 on Windows 11, 136 s for linscp on Linux,
   whose kernel retries SYN longer. A known divergence until fixed upstream
-  (a non-blocking connect bounded by the timeout).
+  (a non-blocking connect bounded by the timeout). Not reported yet: the fix
+  changes how `sk_new` connects, so it goes with a tested patch.
 - `transport2.c:2102` -- the rekey check `now >= next_rekey` is not
   wrap-safe: one early rekey per 49.7-day tick wrap, on both platforms
   (`schedule_timer` adds in 32 bits; harmless).
 - `windows/utils/get_system_dir.c:32` -- `win_misc_cleanup` frees the
   cached directory without clearing the pointer (only at shutdown).
+  winscp/winscp#76.
 - `crypto/ecc-ssh.c` -- `ec_cleanup` misses Ed448 (a leak at shutdown).
+  winscp/winscp#77.
 
 **Security-relevant, by design:**
 
