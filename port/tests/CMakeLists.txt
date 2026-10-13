@@ -250,6 +250,39 @@ endif()
 # where Qt finds its plugins beside its DLLs. Qt's -platform argument, as
 # Wine does not hand QT_QPA_PLATFORM on.
 if(TARGET linscp)
+  # The bridge's VCL side against a real server, a scripted frontend in Qt's
+  # place: questions core asks while a session opens, and the answers.
+  add_executable(test_qt_session EXCLUDE_FROM_ALL test_qt_session.cpp)
+  target_include_directories(test_qt_session PRIVATE "${CMAKE_SOURCE_DIR}/port/qt")
+  target_link_libraries(test_qt_session PRIVATE linscp-qt-core)
+  add_test(NAME qt_session_build
+    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_qt_session)
+  add_test(NAME qt_session
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
+            --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_session>")
+  set_tests_properties(qt_session PROPERTIES DEPENDS qt_session_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+  # Over FTP too: FileZilla's engine, whose sockets run on window messages.
+  add_test(NAME qt_session_ftp
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
+            --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" --protocol ftp "$<TARGET_FILE:test_qt_session>")
+  set_tests_properties(qt_session_ftp PROPERTIES DEPENDS qt_session_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+  # The Qt side: the dialogs alone, then the main window opening a session
+  # with every question answered through them.
+  add_executable(test_qt_gui EXCLUDE_FROM_ALL test_qt_gui.cpp)
+  target_include_directories(test_qt_gui PRIVATE "${CMAKE_SOURCE_DIR}/port/qt")
+  target_link_libraries(test_qt_gui PRIVATE linscp-qt-ui linscp-qt-core)
+  if(NOT WIN32)
+    target_compile_options(test_qt_gui PRIVATE -fno-short-wchar)  # a Qt unit: ADR 0001
+  endif()
+  add_test(NAME qt_gui_build
+    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_qt_gui)
+  add_test(NAME qt_dialogs COMMAND test_qt_gui dialogs -platform offscreen)
+  set_tests_properties(qt_dialogs PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
+  add_test(NAME qt_gui_session
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
+            --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
+            session /ini=nul {port} -platform offscreen)
+  set_tests_properties(qt_gui_session PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
   add_test(NAME gui_build
     COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target linscp)
   add_test(NAME gui_smoke COMMAND linscp /ini=nul --smoke -platform offscreen)

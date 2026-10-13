@@ -39,3 +39,46 @@ ctest `gui_smoke` starts core through the bridge, shows the main window and
 quits from the event loop, on Linux (offscreen) and on Windows under Wine;
 `windows_imports` checks the shell's imports resolve against the DLLs it
 ships with.
+
+## Amendment 2026-10-13: core's questions (P2-03)
+
+How the bridge carries `Interface.h` and the terminal's events:
+
+- **Core runs on the GUI thread, as in WinSCP.** A session opens, lists and
+  changes directory synchronously on it. While it blocks, core calls
+  `ProcessGUI`, which pumps Qt's event loop (`IFrontend::ProcessEvents`) on
+  the GUI thread only, at most every `GUIUpdateInterval` unless forced, as
+  upstream's does. A question is a modal dialog shown from within the
+  operation. Background transfers (P2-07) will marshal their questions onto
+  this thread, as upstream's queue does.
+- **`Interface.h` is split by program.** `port/frontend/FrontendCommon.cpp`
+  holds what every program shares (configuration, registry keys, names,
+  threads); `HeadlessInterface.cpp` (stderr, no event loop, no clipboard)
+  is linked by the CLI and tests through `linscp-runtime`;
+  `port/qt/QtInterface.cpp` is the shell's, linked through
+  `linscp-runtime-base`. Only one of the two is ever in a program.
+- **`IFrontend`** is what the shell implements: `Query`, `Prompt`,
+  `ShowError`, `Banner`, `Information`, busy, event loop, clipboard. It
+  receives plain values built on the VCL side the way upstream's dialogs
+  build theirs:
+  - queries as `MoreMessageDialog` does: one button per answer in
+    upstream's order and captions (`AnswerNameAndCaption`), aliases
+    applied, `CancelAnswer` for Escape. An alias's `OnSubmit` becomes a
+    callback the dialog runs without closing unless it gives an answer, as
+    `TMessageForm::ButtonSubmit` does ("Copy key", "Paste key"). A ticked
+    "Never ask again" on a positive answer is `qaNeverAskAgain`
+    (`WinInterface.cpp`'s rule), and timeouts count down on their answer;
+  - prompts with each field's echo flag and starting value; a URL with no
+    host asks for one, as the script's `open` does;
+  - errors through `ExceptionMessageFormatted`, aborts not shown. A
+    cancelled credentials prompt is not an abort: core fails with its own
+    "Credentials were not specified", which is shown, as in WinSCP.
+- **Not wired yet:** `TQueryParams`' periodic timer events (the reconnect
+  countdown), file-transfer progress (P2-07), and Help buttons (there is no
+  help system).
+
+Verified by `qt_session` and `qt_session_ftp` (the VCL side against rclone's
+SFTP server and the suite's FTP server, a scripted frontend), `qt_dialogs`
+(the dialogs alone), and `qt_gui_session` (the main window opening a
+session, every question answered in its dialogs by a responder): on Linux,
+under Wine, and natively on Windows 11.

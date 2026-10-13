@@ -10,10 +10,10 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 |---|---|---|---|
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
-| P2 Qt shell | 2 | 11 | A user can do a day's work in it |
+| P2 Qt shell | 3 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **71** | **97** | |
+| **Total** | **72** | **97** | |
 
 ## Next three actions
 
@@ -170,11 +170,16 @@ its main window, on Linux and, cross-built, on Windows. ctest `gui_smoke`
 runs it on both (offscreen; under Wine), `windows_imports` checks what Wine
 cannot: every import from a shipped DLL resolves. CI builds it on both jobs.
 
-1. **P2-03**: the Qt implementation of `Interface.h`: prompts, errors,
-   progress and busy states through the bridge, core's threads marshalled
-   onto Qt's.
-2. **P2-09**: the i18n pipeline, early, while there are few strings.
-3. **P2-04**: the site manager over core's INI-backed stored sessions.
+**Core's questions reach Qt** (P2-03 done, ADR 0012 amended): host keys,
+passwords, banners, errors and connection progress arrive as Qt dialogs
+built the way upstream's are -- answers, aliases, OnSubmit buttons,
+never-ask-again, timeouts -- with core on the GUI thread as in WinSCP.
+File > Open URL connects and lists the remote directory. Tested on Linux,
+under Wine and natively on Windows 11, over SFTP and FTP.
+
+1. **P2-09**: the i18n pipeline, early, while there are few strings.
+2. **P2-04**: the site manager over core's stored sessions.
+3. **P2-05**: the login dialog, then the file panels (P2-06, P2-08).
 
 ## Decisions taken
 
@@ -668,7 +673,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 |---|---|---|---|
 | P2-01 | Qt6 for mingw | done | R4 retired without building Qt: MSYS2's clang64 Qt 6.8.2 and its runtime, locked (`port/tools/fetch_msys2_qt.py`), with llvm-mingw 19.1.7 (`cmake/toolchain-llvm-mingw.cmake`); ADR 0011 |
 | P2-02 | Qt app skeleton | done | `port/qt`: `linscp` on Qt 6.8.2 both platforms, core through `CoreBridge` (ADR 0012), Qt units with Qt's `wchar_t` (ADR 0001 amended); ctests `gui_build`, `gui_smoke`, `windows_imports` |
-| P2-03 | Qt `Interface.h` implementation | todo | |
+| P2-03 | Qt `Interface.h` implementation | done | `port/qt`: `IFrontend` (`QtFrontend`, `QueryDialog`, `PromptDialog`), `QtInterface.cpp`, `Session.cpp`; `Interface.h` split into `FrontendCommon.cpp` and per-program halves. ctests `qt_session`, `qt_session_ftp`, `qt_dialogs`, `qt_gui_session`; native on Windows 11 too. Not yet: query timer events, transfer progress (P2-07) |
 | P2-04 | Site manager | todo | |
 | P2-05 | Login/auth dialogs | todo | |
 | P2-06 | Remote file panel | todo | |

@@ -3,6 +3,7 @@
 // quits once the event loop has run: ctest gui_smoke.
 #include <QApplication>
 #include <QMessageBox>
+#include <QStatusBar>
 #include <QTimer>
 
 #include <cstdio>
@@ -11,6 +12,7 @@
 
 #include "CoreBridge.h"
 #include "MainWindow.h"
+#include "QtFrontend.h"
 
 int main(int argc, char ** argv)
 {
@@ -21,9 +23,12 @@ int main(int argc, char ** argv)
   }
 
   QApplication App(argc, argv);
+  // Core's questions while it starts go to dialogs of their own; once the
+  // window exists, they belong to it.
+  QtFrontend Frontend;
   try
   {
-    CoreBridge::Initialize();
+    CoreBridge::Initialize(&Frontend);
   }
   catch (const std::runtime_error & E)
   {
@@ -42,6 +47,8 @@ int main(int argc, char ** argv)
   {
     const CoreBridge::TInfo Info = CoreBridge::Info();
     MainWindow Window(Info);
+    Frontend.SetWindow(&Window);
+    Frontend.SetStatus([&Window](const QString & Text) { Window.statusBar()->showMessage(Text); });
     Window.show();
     if (Smoke)
     {
@@ -54,6 +61,8 @@ int main(int argc, char ** argv)
       });
     }
     Result = App.exec();
+    Frontend.SetWindow(nullptr);
+    Frontend.SetStatus(nullptr);
   }
   CoreBridge::Finalize();
   return Result;
