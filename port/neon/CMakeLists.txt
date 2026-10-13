@@ -31,6 +31,10 @@ target_link_libraries(linscp-neon PRIVATE linscp-openssl linscp-expat)
 target_link_libraries(linscp-neon INTERFACE linscp-openssl-ssl linscp-expat)
 if(WIN32)
   target_link_libraries(linscp-neon INTERFACE ws2_32 secur32 iphlpapi)
+  # NE_LFS has config.h spell stat64 as __stat64 (_stat64): newer mingw-w64
+  # headers declare a struct stat64 of their own, which the macro would turn
+  # into a second _stat64. Declared first, the header's guard keeps it so.
+  target_compile_options(linscp-neon PRIVATE -include sys/stat.h)
 else()
   target_compile_options(linscp-neon PRIVATE
     -include "${CMAKE_CURRENT_SOURCE_DIR}/config-posix.h")
@@ -41,4 +45,6 @@ set_target_properties(linscp-neon PROPERTIES C_STANDARD 11 C_EXTENSIONS ON)
 # mingw-w64's: _ASSERTE, defined to 1, is a macro its malloc.h calls, and
 # NOUSER removes the MSG its iphlpapi.h (through ole2.h) needs. Undefined
 # after the -D flags, which CMake emits first.
-target_compile_options(linscp-neon PRIVATE -w -U_ASSERTE -UNOUSER)
+# clang 20 and later make incompatible pointer types an error even under -w;
+# neon passes int * for Winsock's char * and u_long * (the same size there).
+target_compile_options(linscp-neon PRIVATE -w -U_ASSERTE -UNOUSER -Wno-error=incompatible-pointer-types)

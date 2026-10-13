@@ -27,6 +27,10 @@ property shim at all.
 Rationale: no MSVC licence or `xwin` SDK download needed, a single libc++/libstdc++
 story, and Debian ships the full `mingw-w64` sysroot in apt. Keep the
 `windows-msvc` target as a later option if MSVC ABI interop is ever required.
+*Amended 2026-10-13 (ADR 0011):* the target stands, but the toolchain is
+llvm-mingw (clang, lld, libc++, UCRT) instead of Debian's GCC sysroot, and Qt
+is MSYS2's prebuilt `clang64` build of Debian's Qt version, pinned by a lock
+file -- no Qt build of our own.
 
 **Two real gaps, both solvable:**
 

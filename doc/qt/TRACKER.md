@@ -10,10 +10,10 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 |---|---|---|---|
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
-| P2 Qt shell | 0 | 11 | A user can do a day's work in it |
+| P2 Qt shell | 1 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **69** | **97** | |
+| **Total** | **70** | **97** | |
 
 ## Next three actions
 
@@ -156,11 +156,18 @@ connect timeout bounds no `connect()`; `win_misc_cleanup` leaves a dangling
 pointer), and nothing the Linux build gets wrong. P1-21's subsystems are
 not compiled at all.
 
-1. **P2-01 spike**: the Windows toolchain for Qt -- llvm-mingw (clang, lld,
-   libc++, UCRT) against MSYS2's prebuilt Qt, proposed; re-run the suite under
-   Wine on it first.
-2. **P2-02, P2-03**: the Qt skeleton on both platforms, then `Interface.h`.
-3. Report the PuTTY-delta bugs upstream; **P0-20** when there is a batch.
+**Qt for Windows is settled** (P2-01 done, ADR 0011): the Windows build is
+llvm-mingw (clang, lld, libc++, UCRT; no GCC) against MSYS2's prebuilt Qt
+6.8.2 -- Debian's version, so Debian's moc/uic/rcc are the host tools --
+with its C++ runtime, all pinned (`port/qt/msys2-qt.lock`, llvm-mingw
+20250114 = LLVM 19.1.7, the runtime's). All 56 ctests pass on it under Wine;
+`linscp-cli` and a Qt Widgets program run natively on Windows 11. The PuTTY
+delta bugs are reported (winscp/winscp#74-#77).
+
+1. **P2-02**: the Qt app skeleton in CMake, both platforms, smoke-tested in
+   ctest (offscreen on Linux, under Wine on Windows).
+2. **P2-03**: the Qt implementation of `Interface.h`.
+3. **P2-09**: the i18n pipeline, early, while there are few strings.
 
 ## Decisions taken
 
@@ -168,6 +175,7 @@ not compiled at all.
 |---|---|---|
 | 2026-10-10 | clang everywhere; GCC unsupported | GCC cannot compile `__declspec(property)`; verified locally |
 | 2026-10-10 | mingw-w64 (`*-windows-gnu`) over clang-cl/MSVC | No MSVC licence or SDK download; sysroot is in Debian apt |
+| 2026-10-13 | The Windows toolchain is llvm-mingw against MSYS2's Qt 6.8.2 and its C++ runtime, all pinned; the GCC sysroot is retired (ADR 0011) | Debian has no Qt for mingw. MSYS2's clang64 Qt is that ABI and prebuilt; Debian's own Qt version, so its host tools serve the cross-build. Wine testing from Linux is kept, which clang-cl/MSVC would have weakened |
 | 2026-10-10 | Generated-tree model, not a source fork | Keeps the upstream diff structurally empty |
 | 2026-10-10 | Keep the VCL RTL shim permanently | De-shimming is a second project of similar size with no user benefit |
 | 2026-10-10 | Decouple shim cleanup from 100% UI parity | Coupling them would add ~a year of dual-build burden |
@@ -582,7 +590,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P0-07 | Transform idempotence tests | done | idempotent + line-count parity asserted |
 | P0-08 | CMake skeleton | done | transform+verify wired as a build step; CTest on both targets |
 | P0-09 | Minimal shim for `core/Common.cpp` | done | Overtaken: all 33 core units compile and link on both targets |
-| P0-10 | mingw-w64 sysroot + clang toolchain file | done | `cmake/toolchain-mingw-w64.cmake`; clang + lld + Wine emulator |
+| P0-10 | mingw-w64 sysroot + clang toolchain file | done | `cmake/toolchain-mingw-w64.cmake`; clang + lld + Wine emulator. Replaced 2026-10-13 by `cmake/toolchain-llvm-mingw.cmake` (ADR 0011) |
 | P0-11 | CI matrix Linux + Windows cross | done | `.github/workflows/ci.yml`, on pull requests; both jobs run the full ctest suite |
 | P0-12 | Wine smoke tests in CI | done | the windows-cross job runs ctest under Wine (`CMAKE_CROSSCOMPILING_EMULATOR`), with the null display driver |
 | P0-13 | Golden-output harness | done | `port/tests/golden/run_golden.py` (capture, normalise, compare, check), cases in `golden/cases`; ctest `golden` against `golden/expected`. Linux and Windows linscp agree on all 35 logs |
@@ -651,7 +659,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 ### P2 — Qt shell
 | ID | Task | Status | Note |
 |---|---|---|---|
-| P2-01 | Qt6 for mingw | todo | R4 |
+| P2-01 | Qt6 for mingw | done | R4 retired without building Qt: MSYS2's clang64 Qt 6.8.2 and its runtime, locked (`port/tools/fetch_msys2_qt.py`), with llvm-mingw 19.1.7 (`cmake/toolchain-llvm-mingw.cmake`); ADR 0011 |
 | P2-02 | Qt app skeleton | todo | |
 | P2-03 | Qt `Interface.h` implementation | todo | |
 | P2-04 | Site manager | todo | |

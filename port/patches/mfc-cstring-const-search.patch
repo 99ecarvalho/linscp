@@ -1,0 +1,25 @@
+Take CString's search results as const wchar_t *.
+
+CString::Find, ReverseFind and FindOneOf search the const string c_str()
+returns and keep the result in a wchar_t *. ISO C++ declares wcschr,
+wcsrchr, wcsstr and wcspbrk on a const string as returning const wchar_t *,
+as MSVC's and newer mingw-w64 headers (llvm-mingw's) do, so the
+initialisation does not compile there. The pointers are only compared and
+subtracted: const is all they need. Line counts are unchanged.
+
+--- a/libs/mfc/source/strcore.cpp
++++ b/libs/mfc/source/strcore.cpp
+@@ -138,1 +138,1 @@
+-	wchar_t * lpsz = wcschr(m_Data.c_str() + nStart, ch);
++	const wchar_t * lpsz = wcschr(m_Data.c_str() + nStart, ch);
+@@ -146,1 +146,1 @@
+-	wchar_t * lpsz = wcspbrk(m_Data.c_str(), lpszCharSet);
++	const wchar_t * lpsz = wcspbrk(m_Data.c_str(), lpszCharSet);
+--- a/libs/mfc/source/strex.cpp
++++ b/libs/mfc/source/strex.cpp
+@@ -154,1 +154,1 @@
+-	wchar_t * lpsz = wcsrchr(m_Data.c_str(), ch);
++	const wchar_t * lpsz = wcsrchr(m_Data.c_str(), ch);
+@@ -173,1 +173,1 @@
+-	wchar_t * lpsz = wcsstr(m_Data.c_str() + nStart, lpszSub);
++	const wchar_t * lpsz = wcsstr(m_Data.c_str() + nStart, lpszSub);
