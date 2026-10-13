@@ -178,6 +178,11 @@ std::string TSession::CurrentDirectory() const
   return Active() ? Utf8(F->Terminal->CurrentDirectory) : std::string();
 }
 
+std::string TSession::LocalDirectory() const
+{
+  return Utf8(F->Data->LocalDirectoryExpanded);
+}
+
 std::vector<TRemoteEntry> TSession::List() const
 {
   std::vector<TRemoteEntry> Result;
@@ -203,6 +208,7 @@ std::vector<TRemoteEntry> TSession::List() const
       Entry.Group = Utf8(File->Group.DisplayText);
       Entry.Link = File->IsSymLink;
       Entry.LinkTarget = Utf8(File->LinkTo);
+      Entry.Hidden = (Entry.Name.size() > 1) && (Entry.Name[0] == '.');
       Result.push_back(Entry);
     }
   }

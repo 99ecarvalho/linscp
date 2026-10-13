@@ -14,6 +14,10 @@
 //     the remote panel over a session: order and sorting, new folder,
 //     rename, delete (core's confirmation), the path box, back, forward,
 //     parent, root, home
+//   test_qt_gui local /ini=nul <directory> -platform offscreen
+//     the local panel in an empty directory: order, hidden files, new
+//     folder, rename, a change made outside it, delete (for good: the
+//     trash is the user's), opening a file, navigation, a missing directory
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -27,6 +31,9 @@
 
 #include <cstdio>
 #include <cstring>
+#if defined(_WIN32)
+  #include <windows.h>
+#endif
 #include <deque>
 #include <string>
 
@@ -34,8 +41,13 @@
 #include "MainWindow.h"
 #include "PromptDialog.h"
 #include "QtFrontend.h"
+#include "LocalPanel.h"
 #include "QueryDialog.h"
 #include "RemotePanel.h"
+
+#include <QDir>
+#include <QElapsedTimer>
+#include <QFileInfo>
 #include "SiteAdvanced.h"
 
 #include <QLabel>
@@ -395,9 +407,9 @@ void Panel(const char * Port)
     Check(Panel->Path() == QStringLiteral("/"), "the panel shows the root");
     Check(Panel->Names() == QStringList({ QStringLiteral("sub"), QStringLiteral("hello.txt") }),
       "directories first, no \"..\" at the root");
-    Panel->View()->sortByColumn(RemoteModel::SizeColumn, Qt::DescendingOrder);
+    Panel->View()->sortByColumn(FileListModel::SizeColumn, Qt::DescendingOrder);
     Check(Panel->Names().first() == QStringLiteral("sub"), "directories first sorted the other way too");
-    Panel->View()->sortByColumn(RemoteModel::NameColumn, Qt::AscendingOrder);
+    Panel->View()->sortByColumn(FileListModel::NameColumn, Qt::AscendingOrder);
 
     Check(Panel->NewFolder(QStringLiteral("made")) && Panel->Names().contains(QStringLiteral("made")), "a new folder appears");
     Check(Panel->Selected() == QStringList({ QStringLiteral("made") }), "selected");
@@ -424,6 +436,77 @@ void Panel(const char * Port)
     const bool Changed = Panel->ChangeDirectory(QStringLiteral("/nowhere"));
     Check(!Changed && (Responder.Errors == 1), "a missing directory is core's error");
     Check(Panel->Path() == QStringLiteral("/"), "and the panel stays");
+    Frontend.SetWindow(nullptr);
+  }
+  CoreBridge::Finalize();
+}
+
+void Local(const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    const QDir Dir(Directory);
+    Dir.mkdir(QStringLiteral("sub"));
+    for (const QString & Name : { QStringLiteral("a.txt"), QStringLiteral("b.bin"), QStringLiteral(".hidden") })
+    {
+      QFile File(Dir.filePath(Name));
+      File.open(QIODevice::WriteOnly);
+      File.write(QByteArray(Name == QStringLiteral("b.bin") ? 100 : 1, 'x'));
+    }
+#if defined(Q_OS_WIN)
+    // On Windows a file is hidden by its attribute, not its dot.
+    SetFileAttributesW(reinterpret_cast<const wchar_t *>(QDir::toNativeSeparators(Dir.filePath(QStringLiteral(".hidden"))).utf16()),
+      FILE_ATTRIBUTE_HIDDEN);
+#endif
+    LocalPanel * Panel = Window.Local();
+    Panel->DeleteToTrash = false;
+    QString Opened;
+    Panel->OpenFile = [&Opened](const QString & FileName) { Opened = FileName; };
+    Check(Panel->ChangeDirectory(Directory), "the local panel enters the directory");
+    Check(Panel->Names() == QStringList({ QStringLiteral(".."), QStringLiteral("sub"), QStringLiteral("a.txt"), QStringLiteral("b.bin") }),
+      "\"..\", directories first, hidden files not shown");
+    Panel->SetShowHidden(true);
+    Check(Panel->Names().contains(QStringLiteral(".hidden")), "until asked for");
+    Panel->SetShowHidden(false);
+
+    Check(Panel->NewFolder(QStringLiteral("made")) && Dir.exists(QStringLiteral("made")), "a new folder is made on disk");
+    Check(Panel->Rename(QStringLiteral("made"), QStringLiteral("renamed")) && Dir.exists(QStringLiteral("renamed")) &&
+      !Dir.exists(QStringLiteral("made")), "and renamed");
+    Check(!Panel->Rename(QStringLiteral("a.txt"), QStringLiteral("b.bin")) && (Responder.Errors == 1),
+      "renaming onto an existing file is refused");
+    {
+      QFile File(Dir.filePath(QStringLiteral("external.txt")));
+      File.open(QIODevice::WriteOnly);
+    }
+    QElapsedTimer Timer;
+    Timer.start();
+    while (!Panel->Names().contains(QStringLiteral("external.txt")) && (Timer.elapsed() < 5000))
+    {
+      QApplication::processEvents(QEventLoop::AllEvents, 50);
+    }
+    Check(Panel->Names().contains(QStringLiteral("external.txt")), "a file made outside the panel appears by itself");
+
+    Panel->Select({ QStringLiteral("renamed"), QStringLiteral("a.txt") });
+    Check(Panel->DeleteSelected(true), "two entries delete, confirmed");
+    Check(Responder.LastQuery.contains(QStringLiteral("2")), "with core's confirmation counting them");
+    Check(!Dir.exists(QStringLiteral("renamed")) && !Dir.exists(QStringLiteral("a.txt")), "gone from disk");
+
+    Panel->Open(QStringLiteral("b.bin"));
+    Check(QFileInfo(Opened) == QFileInfo(Dir.filePath(QStringLiteral("b.bin"))), "a file opens with its application");
+    Panel->Open(QStringLiteral("sub"));
+    Check(QFileInfo(Panel->Path()) == QFileInfo(Dir.filePath(QStringLiteral("sub"))), "a directory is entered");
+    Check(Panel->Back() && (QFileInfo(Panel->Path()) == QFileInfo(Directory)), "back");
+    Check(Panel->Forward() && (QFileInfo(Panel->Path()) == QFileInfo(Dir.filePath(QStringLiteral("sub")))), "forward");
+    Check(Panel->Parent() && (QFileInfo(Panel->Path()) == QFileInfo(Directory)), "parent");
+    Check(Panel->Home() && (QFileInfo(Panel->Path()) == QFileInfo(QDir::homePath())), "home");
+    Check(Panel->Root() && QDir(Panel->Path()).isRoot(), "root");
+    Check(!Panel->ChangeDirectory(Dir.filePath(QStringLiteral("nowhere"))) && (Responder.Errors == 2), "a missing directory is an error");
+    Check(QDir(Panel->Path()).isRoot(), "and the panel stays");
     Frontend.SetWindow(nullptr);
   }
   CoreBridge::Finalize();
@@ -475,6 +558,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 4) && (std::strcmp(argv[1], "panel") == 0))
   {
     Panel(argv[3]);
+  }
+  else if ((argc >= 4) && (std::strcmp(argv[1], "local") == 0))
+  {
+    Local(QString::fromLocal8Bit(argv[3]));
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "session") == 0))
   {

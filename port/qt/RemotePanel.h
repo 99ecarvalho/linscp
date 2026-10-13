@@ -15,36 +15,12 @@
 #include <vector>
 
 #include "CoreBridge.h"
+#include "FileList.h"
 
 class QAction;
 class QLineEdit;
 class QSortFilterProxyModel;
 class QTreeView;
-
-// The current directory's entries, with ".." first below the root.
-class RemoteModel : public QAbstractTableModel
-{
-  Q_OBJECT
-
-public:
-  enum { NameColumn, SizeColumn, ModifiedColumn, RightsColumn, OwnerColumn, ColumnCount };
-  // What the sort proxy compares; directories first is the proxy's.
-  enum { SortRole = Qt::UserRole, DirectoryRole, ParentRole };
-
-  using QAbstractTableModel::QAbstractTableModel;
-  void SetEntries(std::vector<CoreBridge::TRemoteEntry> Entries, bool WithParent);
-  const CoreBridge::TRemoteEntry * Entry(int Row) const;
-  bool IsParent(int Row) const { return FWithParent && (Row == 0); }
-
-  int rowCount(const QModelIndex & Parent = QModelIndex()) const override;
-  int columnCount(const QModelIndex & Parent = QModelIndex()) const override;
-  QVariant data(const QModelIndex & Index, int Role = Qt::DisplayRole) const override;
-  QVariant headerData(int Section, Qt::Orientation Orientation, int Role = Qt::DisplayRole) const override;
-
-private:
-  std::vector<CoreBridge::TRemoteEntry> FEntries;
-  bool FWithParent = false;
-};
 
 class RemotePanel : public QWidget
 {
@@ -73,6 +49,7 @@ public:
   // Opens the entry: a directory is entered.
   void Open(const QString & Name);
 
+  void SetShowHidden(bool Show);
   QStringList Selected() const;
   void Select(const QStringList & Names);
   QStringList Names() const;
@@ -93,8 +70,8 @@ private:
   void UpdateActions();
 
   CoreBridge::TSession * FSession = nullptr;
-  RemoteModel * FModel = nullptr;
-  QSortFilterProxyModel * FSort = nullptr;
+  FileListModel * FModel = nullptr;
+  DirectoriesFirst * FSort = nullptr;
   QTreeView * FView = nullptr;
   QLineEdit * FPath = nullptr;
   // The directory shown: the path box may hold what is being typed.

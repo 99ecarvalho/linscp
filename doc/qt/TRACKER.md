@@ -10,10 +10,10 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 |---|---|---|---|
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
-| P2 Qt shell | 7 | 11 | A user can do a day's work in it |
+| P2 Qt shell | 8 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **76** | **97** | |
+| **Total** | **77** | **97** | |
 
 ## Next three actions
 
@@ -201,9 +201,16 @@ an OpenSSH key converted and logging in are tested.
 first, the path box, back/forward/parent/root/home/refresh, new folder,
 rename and delete with core's confirmations, WinSCP's keys.
 
-1. **P2-08**: the local file panel, beside the remote one (commander layout).
-2. **P2-07**: transfers between them and the queue.
-3. **P2-10**: packaging.
+**Both panels are there** (P2-08 done): WinSCP's Commander layout, the
+local panel beside the remote one, sharing their model (`FileList`): the
+same columns and order, hidden files off by default (Ctrl+Alt+H, WinSCP's
+default), kept up to date as the local directory changes, deleting to the
+trash as WinSCP's default, files opened with their applications, core's
+texts for confirmations and errors.
+
+1. **P2-07**: transfers between the panels and the queue.
+2. **P2-10**: packaging.
+3. **P2-11**: the P2 exit gate.
 
 ## Decisions taken
 
@@ -211,6 +218,7 @@ rename and delete with core's confirmations, WinSCP's keys.
 |---|---|---|
 | 2026-10-10 | clang everywhere; GCC unsupported | GCC cannot compile `__declspec(property)`; verified locally |
 | 2026-10-10 | mingw-w64 (`*-windows-gnu`) over clang-cl/MSVC | No MSVC licence or SDK download; sysroot is in Debian apt |
+| 2026-10-13 | The panels follow WinSCP's defaults: hidden files not shown (dot files remotely, hidden files locally), local deletes to the trash; shell texts that core already has (confirmations, errors) come from core | WinSCP's `ShowHiddenFiles = false` and `DeleteToRecycleBin = true`; core's texts reach every language WinSCP's translators cover |
 | 2026-10-13 | Core's texts are translated with WinSCP's own translations, loaded by the shim where upstream loads its translation DLL; the shell's with Qt Linguist; Qt's with Qt's (ADR 0013) | 55 languages by WinSCP's translators at no cost, and core unchanged. The shell's texts are new and get .ts files; `--lang` chooses until preferences exist (P3-04) |
 | 2026-10-13 | The Windows toolchain is llvm-mingw against MSYS2's Qt 6.8.2 and its C++ runtime, all pinned; the GCC sysroot is retired (ADR 0011) | Debian has no Qt for mingw. MSYS2's clang64 Qt is that ABI and prebuilt; Debian's own Qt version, so its host tools serve the cross-build. Wine testing from Linux is kept, which clang-cl/MSVC would have weakened |
 | 2026-10-10 | Generated-tree model, not a source fork | Keeps the upstream diff structurally empty |
@@ -703,7 +711,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P2-05 | Login/auth dialogs | done | `SiteAdvanced` (directories, connection, proxy, SSH authentication), keys checked and converted as upstream (`Keys.cpp`), folders and rename in `SiteManager`; ctests `qt_sites` (proxy, key phases), `qt_gui_sites`; native on Windows 11 too |
 | P2-06 | Remote file panel | done | `port/qt/RemotePanel.cpp` over `TSession`'s new operations; ctests `qt_gui_panel`, `qt_session`/`qt_session_ftp` (operations over SFTP and FTP); native on Windows 11 too |
 | P2-07 | Transfer + queue UI | todo | |
-| P2-08 | Local file panel | todo | |
+| P2-08 | Local file panel | done | `port/qt/LocalPanel.cpp` over the shared `FileList` model; Commander layout; ctest `qt_gui_local`; native on Windows 11 too |
 | P2-09 | i18n pipeline | done | ADR 0013, `doc/qt/translations.md`: core via `gen_translations.py` and shim translation modules (55 languages), the shell via Qt Linguist (`linscp_pt_BR.ts`), Qt's own; ctests `qt_session_pt_BR`, `qt_language`, `translations_current`; native on Windows 11 too |
 | P2-10 | Packaging | todo | |
 | P2-11 | P2 exit gate | todo | |

@@ -264,6 +264,12 @@ std::string Text(TText Text)
     case TText::ConfirmDeleteFile: Ident = CONFIRM_DELETE_FILE; break;
     case TText::ConfirmDeleteFiles: Ident = CONFIRM_DELETE_FILES; break;
     case TText::NewFolderName: Ident = NEW_FOLDER; break;
+    case TText::ConfirmRecycleFile: Ident = CONFIRM_RECYCLE_FILE; break;
+    case TText::ConfirmRecycleFiles: Ident = CONFIRM_RECYCLE_FILES; break;
+    case TText::ChangeDirError: Ident = CHANGE_DIR_ERROR; break;
+    case TText::CreateDirError: Ident = CREATE_DIR_ERROR; break;
+    case TText::RenameFileError: Ident = RENAME_FILE_ERROR; break;
+    case TText::DeleteLocalFileError: Ident = DELETE_LOCAL_FILE_ERROR; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

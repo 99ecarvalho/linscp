@@ -21,157 +21,12 @@
 namespace
 {
 
-const char * const ParentName = "..";
-
 QString CoreText(CoreBridge::TText Text)
 {
   return QString::fromStdString(CoreBridge::Text(Text));
 }
 
-// Directories (and "..") first, as WinSCP's panels sort; then the column.
-class DirectoriesFirst : public QSortFilterProxyModel
-{
-public:
-  using QSortFilterProxyModel::QSortFilterProxyModel;
-
-protected:
-  bool lessThan(const QModelIndex & Left, const QModelIndex & Right) const override
-  {
-    const bool Ascending = (sortOrder() == Qt::AscendingOrder);
-    // ".." stays on top whichever way the column sorts.
-    if (Left.data(RemoteModel::ParentRole).toBool())
-    {
-      return Ascending;
-    }
-    if (Right.data(RemoteModel::ParentRole).toBool())
-    {
-      return !Ascending;
-    }
-    const bool LeftDirectory = Left.data(RemoteModel::DirectoryRole).toBool();
-    const bool RightDirectory = Right.data(RemoteModel::DirectoryRole).toBool();
-    if (LeftDirectory != RightDirectory)
-    {
-      return Ascending ? LeftDirectory : RightDirectory;
-    }
-    const QVariant A = Left.data(RemoteModel::SortRole);
-    const QVariant B = Right.data(RemoteModel::SortRole);
-    if (A.typeId() == QMetaType::QString)
-    {
-      return QString::compare(A.toString(), B.toString(), Qt::CaseInsensitive) < 0;
-    }
-    return A.toDouble() < B.toDouble();
-  }
-};
-
 }  // namespace
-
-void RemoteModel::SetEntries(std::vector<CoreBridge::TRemoteEntry> Entries, bool WithParent)
-{
-  beginResetModel();
-  FEntries = std::move(Entries);
-  FWithParent = WithParent;
-  endResetModel();
-}
-
-const CoreBridge::TRemoteEntry * RemoteModel::Entry(int Row) const
-{
-  const int Index = Row - (FWithParent ? 1 : 0);
-  return ((Index >= 0) && (Index < static_cast<int>(FEntries.size()))) ? &FEntries[Index] : nullptr;
-}
-
-int RemoteModel::rowCount(const QModelIndex & Parent) const
-{
-  return Parent.isValid() ? 0 : static_cast<int>(FEntries.size()) + (FWithParent ? 1 : 0);
-}
-
-int RemoteModel::columnCount(const QModelIndex & Parent) const
-{
-  return Parent.isValid() ? 0 : ColumnCount;
-}
-
-QVariant RemoteModel::data(const QModelIndex & Index, int Role) const
-{
-  if (!Index.isValid())
-  {
-    return QVariant();
-  }
-  if (IsParent(Index.row()))
-  {
-    switch (Role)
-    {
-      case Qt::DisplayRole: return (Index.column() == NameColumn) ? QString::fromLatin1(ParentName) : QVariant();
-      case Qt::DecorationRole:
-        return (Index.column() == NameColumn) ? QApplication::style()->standardIcon(QStyle::SP_FileDialogToParent) : QVariant();
-      case DirectoryRole:
-      case ParentRole: return true;
-      case SortRole: return QString();
-      default: return QVariant();
-    }
-  }
-  const CoreBridge::TRemoteEntry * E = Entry(Index.row());
-  if (E == nullptr)
-  {
-    return QVariant();
-  }
-  switch (Role)
-  {
-    case Qt::DisplayRole:
-      switch (Index.column())
-      {
-        case NameColumn: return QString::fromStdString(E->Name);
-        case SizeColumn: return E->Directory ? QVariant() : QLocale().toString(static_cast<qlonglong>(E->Size));
-        case ModifiedColumn: return QString::fromStdString(E->Modified);
-        case RightsColumn: return QString::fromStdString(E->Rights);
-        case OwnerColumn: return QString::fromStdString(E->Owner);
-      }
-      break;
-    case Qt::ToolTipRole:
-      return E->Link ? QStringLiteral("%1 -> %2").arg(QString::fromStdString(E->Name), QString::fromStdString(E->LinkTarget)) : QVariant();
-    case Qt::DecorationRole:
-      if (Index.column() == NameColumn)
-      {
-        return QApplication::style()->standardIcon(
-          E->Directory ? (E->Link ? QStyle::SP_DirLinkIcon : QStyle::SP_DirIcon) :
-          (E->Link ? QStyle::SP_FileLinkIcon : QStyle::SP_FileIcon));
-      }
-      break;
-    case Qt::TextAlignmentRole:
-      if (Index.column() == SizeColumn)
-      {
-        return static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
-      }
-      break;
-    case DirectoryRole: return E->Directory;
-    case ParentRole: return false;
-    case SortRole:
-      switch (Index.column())
-      {
-        case SizeColumn: return static_cast<double>(E->Size);
-        case ModifiedColumn: return E->ModifiedTime;
-        case RightsColumn: return QString::fromStdString(E->Rights);
-        case OwnerColumn: return QString::fromStdString(E->Owner);
-        default: return QString::fromStdString(E->Name);
-      }
-  }
-  return QVariant();
-}
-
-QVariant RemoteModel::headerData(int Section, Qt::Orientation Orientation, int Role) const
-{
-  if ((Orientation != Qt::Horizontal) || (Role != Qt::DisplayRole))
-  {
-    return QVariant();
-  }
-  switch (Section)
-  {
-    case NameColumn: return tr("Name");
-    case SizeColumn: return tr("Size");
-    case ModifiedColumn: return tr("Changed");
-    case RightsColumn: return tr("Rights");
-    case OwnerColumn: return tr("Owner");
-  }
-  return QVariant();
-}
 
 RemotePanel::RemotePanel(QWidget * Parent) :
   QWidget(Parent)
@@ -228,10 +83,10 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   connect(FPath, &QLineEdit::returnPressed, this, [this]() { ChangeDirectory(FPath->text().trimmed()); });
   Layout->addWidget(FPath);
 
-  FModel = new RemoteModel(this);
+  FModel = new FileListModel(this);
   FSort = new DirectoriesFirst(this);
   FSort->setSourceModel(FModel);
-  FSort->setSortRole(RemoteModel::SortRole);
+  FSort->setSortRole(FileListModel::SortRole);
   FView = new QTreeView(this);
   FView->setModel(FSort);
   FView->setRootIsDecorated(false);
@@ -240,8 +95,8 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   FView->setAllColumnsShowFocus(true);
   FView->setSelectionMode(QAbstractItemView::ExtendedSelection);
   FView->setSortingEnabled(true);
-  FView->sortByColumn(RemoteModel::NameColumn, Qt::AscendingOrder);
-  FView->header()->setSectionResizeMode(RemoteModel::NameColumn, QHeaderView::Stretch);
+  FView->sortByColumn(FileListModel::NameColumn, Qt::AscendingOrder);
+  FView->header()->setSectionResizeMode(FileListModel::NameColumn, QHeaderView::Stretch);
   FView->setContextMenuPolicy(Qt::CustomContextMenu);
   connect(FView, &QTreeView::activated, this, &RemotePanel::Activated);
   connect(FView, &QWidget::customContextMenuRequested, this, &RemotePanel::ContextMenu);
@@ -362,7 +217,7 @@ bool RemotePanel::Forward()
 
 bool RemotePanel::Parent()
 {
-  return (Path() != QStringLiteral("/")) && ChangeDirectory(QString::fromLatin1(ParentName));
+  return (Path() != QStringLiteral("/")) && ChangeDirectory(QString::fromLatin1(ParentEntryName));
 }
 
 bool RemotePanel::Root()
@@ -442,7 +297,7 @@ bool RemotePanel::DeleteSelected(bool Confirm)
 
 void RemotePanel::Open(const QString & Name)
 {
-  if (Name == QString::fromLatin1(ParentName))
+  if (Name == QString::fromLatin1(ParentEntryName))
   {
     Parent();
     return;
@@ -462,7 +317,7 @@ void RemotePanel::Open(const QString & Name)
 void RemotePanel::Activated(const QModelIndex & Index)
 {
   const QModelIndex Source = FSort->mapToSource(Index);
-  Open(FModel->IsParent(Source.row()) ? QString::fromLatin1(ParentName) :
+  Open(FModel->IsParent(Source.row()) ? QString::fromLatin1(ParentEntryName) :
     QString::fromStdString(FModel->Entry(Source.row())->Name));
 }
 
@@ -477,6 +332,11 @@ void RemotePanel::ContextMenu(const QPoint & Pos)
   Menu.exec(FView->viewport()->mapToGlobal(Pos));
 }
 
+void RemotePanel::SetShowHidden(bool Show)
+{
+  FSort->SetShowHidden(Show);
+}
+
 QStringList RemotePanel::Selected() const
 {
   QStringList Result;
@@ -484,7 +344,7 @@ QStringList RemotePanel::Selected() const
   {
     return Result;
   }
-  for (const QModelIndex & Index : FView->selectionModel()->selectedRows(RemoteModel::NameColumn))
+  for (const QModelIndex & Index : FView->selectionModel()->selectedRows(FileListModel::NameColumn))
   {
     const QModelIndex Source = FSort->mapToSource(Index);
     if (!FModel->IsParent(Source.row()) && (FModel->Entry(Source.row()) != nullptr))
@@ -500,8 +360,8 @@ void RemotePanel::Select(const QStringList & Names)
   FView->selectionModel()->clearSelection();
   for (int Row = 0; Row < FSort->rowCount(); Row++)
   {
-    const QModelIndex Index = FSort->index(Row, RemoteModel::NameColumn);
-    if (Names.contains(Index.data(Qt::DisplayRole).toString()) && !Index.data(RemoteModel::ParentRole).toBool())
+    const QModelIndex Index = FSort->index(Row, FileListModel::NameColumn);
+    if (Names.contains(Index.data(Qt::DisplayRole).toString()) && !Index.data(FileListModel::ParentRole).toBool())
     {
       FView->selectionModel()->select(Index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
       // The view's own setCurrentIndex would clear the selection made so far.
@@ -516,7 +376,7 @@ QStringList RemotePanel::Names() const
   QStringList Result;
   for (int Row = 0; Row < FSort->rowCount(); Row++)
   {
-    Result.append(FSort->index(Row, RemoteModel::NameColumn).data(Qt::DisplayRole).toString());
+    Result.append(FSort->index(Row, FileListModel::NameColumn).data(Qt::DisplayRole).toString());
   }
   return Result;
 }

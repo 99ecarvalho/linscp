@@ -2,6 +2,84 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pt_BR">
 <context>
+    <name>FileListModel</name>
+    <message>
+        <source>Name</source>
+        <translation>Nome</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Tamanho</translation>
+    </message>
+    <message>
+        <source>Changed</source>
+        <translation>Data modificada</translation>
+    </message>
+    <message>
+        <source>Attributes</source>
+        <translation>Atributos</translation>
+    </message>
+    <message>
+        <source>Rights</source>
+        <translation>Permissões</translation>
+    </message>
+    <message>
+        <source>Owner</source>
+        <translation>Proprietário</translation>
+    </message>
+</context>
+<context>
+    <name>LocalPanel</name>
+    <message>
+        <source>Back</source>
+        <translation>Voltar</translation>
+    </message>
+    <message>
+        <source>Forward</source>
+        <translation>Avançar</translation>
+    </message>
+    <message>
+        <source>Parent directory</source>
+        <translation>Diretório acima</translation>
+    </message>
+    <message>
+        <source>Root directory</source>
+        <translation>Diretório Raiz</translation>
+    </message>
+    <message>
+        <source>Home directory</source>
+        <translation>Diretório Inicial</translation>
+    </message>
+    <message>
+        <source>Refresh</source>
+        <translation>Atualizar</translation>
+    </message>
+    <message>
+        <source>Create Directory</source>
+        <translation>Criar diretório</translation>
+    </message>
+    <message>
+        <source>Create folder</source>
+        <translation>Criar pasta</translation>
+    </message>
+    <message>
+        <source>New &amp;folder name:</source>
+        <translation>Nome da no&amp;va pasta:</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>Renomear</translation>
+    </message>
+    <message>
+        <source>New &amp;name:</source>
+        <translation>Novo &amp;nome:</translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation>Excluir</translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <source>&amp;File</source>
@@ -75,6 +153,14 @@ Configuração: %4</translation>
         <source>&amp;Site Manager...</source>
         <translation>&amp;Gerenciador de Site...</translation>
     </message>
+    <message>
+        <source>&amp;View</source>
+        <translation>&amp;Exibir</translation>
+    </message>
+    <message>
+        <source>Show &amp;Hidden Files</source>
+        <translation>Exibir arquivos &amp;ocultos</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>
@@ -115,29 +201,6 @@ Configuração: %4</translation>
     <message>
         <source>%1 (%2 s)</source>
         <translation>%1 (%2 s)</translation>
-    </message>
-</context>
-<context>
-    <name>RemoteModel</name>
-    <message>
-        <source>Name</source>
-        <translation>Nome</translation>
-    </message>
-    <message>
-        <source>Size</source>
-        <translation>Tamanho</translation>
-    </message>
-    <message>
-        <source>Changed</source>
-        <translation>Data modificada</translation>
-    </message>
-    <message>
-        <source>Rights</source>
-        <translation>Permissões</translation>
-    </message>
-    <message>
-        <source>Owner</source>
-        <translation>Proprietário</translation>
     </message>
 </context>
 <context>

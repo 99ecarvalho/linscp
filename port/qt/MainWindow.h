@@ -1,6 +1,6 @@
-// The shell's main window: a session, opened from the site manager or a
-// URL, and its remote panel; the local panel and the queue (P2-07, P2-08)
-// join it.
+// The shell's main window, in WinSCP's Commander layout: the local panel
+// and, beside it, the remote panel of the session opened from the site
+// manager or a URL. Transfers between them and the queue are P2-07's.
 #ifndef LINSCP_QT_MAIN_WINDOW_H
 #define LINSCP_QT_MAIN_WINDOW_H
 
@@ -12,6 +12,7 @@
 
 class QAction;
 class QLineEdit;
+class LocalPanel;
 class RemotePanel;
 
 class MainWindow : public QMainWindow
@@ -30,6 +31,7 @@ public:
   bool SiteManagerDialog();
   CoreBridge::TSession * Session() const { return FSession.get(); }
   RemotePanel * Panel() const { return FPanel; }
+  LocalPanel * Local() const { return FLocal; }
 
 private slots:
   void OpenUrlDialog();
@@ -48,6 +50,7 @@ private:
   QAction * FSitesAction = nullptr;
   QAction * FDisconnectAction = nullptr;
   RemotePanel * FPanel = nullptr;
+  LocalPanel * FLocal = nullptr;
 };
 
 #endif

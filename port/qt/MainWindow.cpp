@@ -9,6 +9,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QStatusBar>
+#include <QSplitter>
 #include <QStyle>
 #include <QTreeWidget>
 #include <QVBoxLayout>
@@ -16,6 +17,7 @@
 #include <algorithm>
 
 #include "QtFrontend.h"
+#include "LocalPanel.h"
 #include "RemotePanel.h"
 #include "SiteManager.h"
 
@@ -44,8 +46,21 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   QMenu * HelpMenu = menuBar()->addMenu(tr("&Help"));
   HelpMenu->addAction(tr("&About..."), this, &MainWindow::About);
 
-  FPanel = new RemotePanel(this);
-  setCentralWidget(FPanel);
+  QSplitter * Panels = new QSplitter(this);
+  FLocal = new LocalPanel(Panels);
+  FPanel = new RemotePanel(Panels);
+  Panels->setChildrenCollapsible(false);
+  setCentralWidget(Panels);
+
+  QMenu * ViewMenu = menuBar()->addMenu(tr("&View"));
+  QAction * Hidden = ViewMenu->addAction(tr("Show &Hidden Files"));
+  Hidden->setCheckable(true);
+  Hidden->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_H));
+  connect(Hidden, &QAction::toggled, this, [this](bool Show)
+  {
+    FLocal->SetShowHidden(Show);
+    FPanel->SetShowHidden(Show);
+  });
 
   statusBar()->showMessage(tr("%1 %2").arg(QString::fromStdString(FInfo.AppName), QString::fromStdString(FInfo.Version)));
   UpdateActions();
@@ -118,6 +133,11 @@ bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
     statusBar()->showMessage(tr("Connecting to %1...").arg(QString::fromStdString(Session->Name())));
     Session->Open();
     FSession = std::move(Session);
+    // As WinSCP: the site's local directory, when it has one.
+    if (!FSession->LocalDirectory().empty())
+    {
+      FLocal->ChangeDirectory(QString::fromStdString(FSession->LocalDirectory()));
+    }
     setWindowTitle(tr("%1 - %2").arg(QString::fromStdString(FSession->Name()), QString::fromStdString(FInfo.AppName)));
     Result = true;
   }

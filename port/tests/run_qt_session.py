@@ -28,6 +28,8 @@ def main():
     ap.add_argument('args', nargs=argparse.REMAINDER)
     a = ap.parse_args()
     args = a.args or ['/ini=nul', '{port}', '{protocol}']
+    # A Windows program under Wine is given {tmp} as a Windows path: one
+    # without a drive would resolve on whichever drive it is on.
     tmp = tempfile.mkdtemp(prefix='linscp-qt-session-')
     try:
         root = os.path.join(tmp, 'root')
@@ -38,11 +40,16 @@ def main():
             if not shutil.which('ssh-keygen'):
                 raise fixtures.Missing('ssh-keygen')
             fixtures.keygen(os.path.join(tmp, 'id_ed25519'))
+        os.makedirs(os.path.join(tmp, 'local'))
         server = (fixtures.rclone_sftp(root, 'linscp', 'secret', os.path.join(tmp, 'keys')) if a.protocol == 'sftp'
                   else fixtures.python_server('ftp_server.py', root))
         with server as port:
+            target_tmp = tmp
+            if a.emulator and os.path.basename(a.emulator).startswith('wine'):
+                target_tmp = subprocess.run(['winepath', '-w', tmp], capture_output=True, text=True,
+                                            env=dict(os.environ, WINEDEBUG='-all')).stdout.strip() or tmp
             cmd = ([a.emulator] if a.emulator else []) + [a.test] + [
-                x.replace('{port}', str(port)).replace('{protocol}', a.protocol).replace('{tmp}', tmp)
+                x.replace('{port}', str(port)).replace('{protocol}', a.protocol).replace('{tmp}', target_tmp)
                 .replace('{key}', os.path.join(tmp, 'id_ed25519')) for x in args]
             p = subprocess.run(cmd, capture_output=True, text=True, timeout=240)
             print(p.stdout, end='')

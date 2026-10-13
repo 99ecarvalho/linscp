@@ -172,6 +172,12 @@ enum class TText
   ConfirmDeleteFile,    // "Are you sure you want to delete file '%s'?"
   ConfirmDeleteFiles,   // "Are you sure you want to delete %d selected files?"
   NewFolderName,        // "New folder"
+  ConfirmRecycleFile,   // "Are you sure you want to move file '%s' to recycle bin?"
+  ConfirmRecycleFiles,  // "Are you sure you want to move %d selected files to recycle bin?"
+  ChangeDirError,       // "Error changing directory to '%s'."
+  CreateDirError,       // "Error creating folder '%s'."
+  RenameFileError,      // "Error renaming file '%s' to '%s'."
+  DeleteLocalFileError, // "Error deleting file '%s'."
 };
 std::string Text(TText Text);
 
@@ -200,6 +206,9 @@ struct TRemoteEntry
   // A symbolic link, and where it points.
   bool Link = false;
   std::string LinkTarget;
+  // Hidden as WinSCP's "Show hidden files" means it: a dot file remotely; a
+  // hidden file locally.
+  bool Hidden = false;
 };
 
 // --- Stored sites -------------------------------------------------------------
@@ -314,6 +323,9 @@ public:
   void Open();
   bool Active() const;
   std::string CurrentDirectory() const;
+  // The site's local directory, environment variables expanded; empty when
+  // it has none.
+  std::string LocalDirectory() const;
   // The current directory's entries, without "." and "..".
   std::vector<TRemoteEntry> List() const;
   // These throw TCoreError; what fails along the way is asked about first
