@@ -86,12 +86,37 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"AlwaysSortDirectoriesByName", FSettings.AlwaysSortDirectoriesByName);
     Storage->WriteBool(L"RenameWholeName", FSettings.RenameWholeName);
     Storage->WriteBool(L"DefaultDirIsHome", FSettings.DefaultDirIsHome);
+    Storage->WriteInteger(L"PathInCaption", FSettings.PathInCaption);
+    Storage->WriteBool(L"KeepOpenWhenNoSession", FSettings.KeepOpenWhenNoSession);
+    Storage->WriteString(L"FileColors", FSettings.FileColors);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander", true))
   {
     TCloseSubKeyPath Close(Storage);
     Storage->WriteBool(L"SwappedPanels", FSettings.SwappedPanels);
     Storage->WriteBool(L"ExplorerKeyboardShortcuts", FSettings.ExplorerKeyboardShortcuts);
+    Storage->WriteInteger(L"CurrentPanel", FSettings.CurrentPanel);
+    Storage->WriteFloat(L"LocalPanelWidth", FSettings.LocalPanelWidth);
+    if (!FSettings.WindowParams.IsEmpty())
+    {
+      Storage->WriteString(L"WindowParams", FSettings.WindowParams);
+    }
+  }
+  if (Storage->OpenSubKeyPath(L"Interface\\Commander\\LocalPanel", true))
+  {
+    TCloseSubKeyPath Close(Storage);
+    Storage->WriteString(L"DirViewParams", FSettings.LocalDirViewParams);
+  }
+  if (Storage->OpenSubKeyPath(L"Interface\\Commander\\RemotePanel", true))
+  {
+    TCloseSubKeyPath Close(Storage);
+    Storage->WriteString(L"DirViewParams", FSettings.RemoteDirViewParams);
+  }
+  if (Storage->OpenSubKeyPath(L"Interface\\QueueView", true))
+  {
+    TCloseSubKeyPath Close(Storage);
+    Storage->WriteInteger(L"Height", FSettings.QueueViewHeight);
+    Storage->WriteInteger(L"HeightPixelsPerInch", FSettings.QueueViewHeightPixelsPerInch);
   }
 }
 
@@ -110,6 +135,9 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
       Storage->ReadBool(L"AlwaysSortDirectoriesByName", FSettings.AlwaysSortDirectoriesByName);
     FSettings.RenameWholeName = Storage->ReadBool(L"RenameWholeName", FSettings.RenameWholeName);
     FSettings.DefaultDirIsHome = Storage->ReadBool(L"DefaultDirIsHome", FSettings.DefaultDirIsHome);
+    FSettings.PathInCaption = Storage->ReadInteger(L"PathInCaption", FSettings.PathInCaption);
+    FSettings.KeepOpenWhenNoSession = Storage->ReadBool(L"KeepOpenWhenNoSession", FSettings.KeepOpenWhenNoSession);
+    FSettings.FileColors = Storage->ReadString(L"FileColors", FSettings.FileColors);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander", false))
   {
@@ -117,5 +145,25 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.SwappedPanels = Storage->ReadBool(L"SwappedPanels", FSettings.SwappedPanels);
     FSettings.ExplorerKeyboardShortcuts =
       Storage->ReadBool(L"ExplorerKeyboardShortcuts", FSettings.ExplorerKeyboardShortcuts);
+    FSettings.CurrentPanel = Storage->ReadInteger(L"CurrentPanel", FSettings.CurrentPanel);
+    FSettings.LocalPanelWidth = Storage->ReadFloat(L"LocalPanelWidth", FSettings.LocalPanelWidth);
+    FSettings.WindowParams = Storage->ReadString(L"WindowParams", FSettings.WindowParams);
+  }
+  if (Storage->OpenSubKeyPath(L"Interface\\Commander\\LocalPanel", false))
+  {
+    TCloseSubKeyPath Close(Storage);
+    FSettings.LocalDirViewParams = Storage->ReadString(L"DirViewParams", FSettings.LocalDirViewParams);
+  }
+  if (Storage->OpenSubKeyPath(L"Interface\\Commander\\RemotePanel", false))
+  {
+    TCloseSubKeyPath Close(Storage);
+    FSettings.RemoteDirViewParams = Storage->ReadString(L"DirViewParams", FSettings.RemoteDirViewParams);
+  }
+  if (Storage->OpenSubKeyPath(L"Interface\\QueueView", false))
+  {
+    TCloseSubKeyPath Close(Storage);
+    FSettings.QueueViewHeight = Storage->ReadInteger(L"Height", FSettings.QueueViewHeight);
+    FSettings.QueueViewHeightPixelsPerInch =
+      Storage->ReadInteger(L"HeightPixelsPerInch", FSettings.QueueViewHeightPixelsPerInch);
   }
 }

@@ -263,6 +263,19 @@ struct TPreferences
   // Home is the site's own directories, when the site does not remember
   // the last used ones.
   bool DefaultDirIsHome = true;
+  // Window: the current directory in the title, short (its last part),
+  // full, or none; the window kept when the last session closes.
+  enum class TPathInCaption { Short, Full, None };
+  TPathInCaption PathInCaption = TPathInCaption::Short;
+  bool KeepOpenWhenNoSession = true;
+  // File colors: the first mask a file matches colors it.
+  struct TFileColor
+  {
+    std::string Mask;
+    // 0xRRGGBB.
+    unsigned Color = 0;
+  };
+  std::vector<TFileColor> FileColors;
   // Commander.
   bool SwappedPanels = false;
   // Explorer's keys (F5 refresh, Ctrl+K copy) rather than the Commander's.
@@ -285,6 +298,26 @@ struct TPreferences
   int SessionReopenTimeout = 0;
 };
 TPreferences Preferences();
+
+// The window's layout, kept between runs in WinSCP's own formats and keys
+// (TWinConfiguration's ScpCommander and QueueView): the window's placement
+// ("left;top;right;bottom;state;ppi"; empty, never placed), the local panel's
+// share of the width, the active panel (0 local, 1 remote), each panel's
+// columns (WinSCP's DirViewParams), the queue's height at its pixels per
+// inch.
+struct TLayout
+{
+  std::string WindowParams;
+  double LocalPanelWidth = 0.5;
+  int CurrentPanel = 0;
+  std::string LocalDirViewParams;
+  std::string RemoteDirViewParams;
+  int QueueViewHeight = 140;
+  int QueueViewHeightPixelsPerInch = 96;
+};
+TLayout Layout();
+// Saves it.
+void SetLayout(const TLayout & Layout);
 // Saves them, as the dialog's OK does (SaveExplicit).
 void SetPreferences(const TPreferences & Preferences);
 
@@ -356,6 +389,11 @@ std::string Text(TText Text);
 // implicit matches). ModifiedTime is in seconds since 1970. Throws
 // TCoreError when the mask is not one.
 bool MaskMatches(const std::string & Masks, const std::string & FileName, bool Directory,
+  std::int64_t Size, double ModifiedTime);
+// The same against a full path (local or remote), as the panels' file
+// colors match (TCustomScpExplorerForm::DirViewGetItemColor), so masks with
+// directories work.
+bool MaskMatchesPath(const std::string & Masks, const std::string & Path, bool Local, bool Directory,
   std::int64_t Size, double ModifiedTime);
 
 struct TInfo

@@ -62,6 +62,10 @@ public:
   // sorting, renaming, and Explorer's refresh key (F5) for the Commander's
   // (Ctrl+R).
   void ApplyPreferences(const CoreBridge::TPreferences & Preferences);
+  // The columns' layout in WinSCP's own terms (DirViewParams; this panel's
+  // columns mapped onto WinSCP's local panel's six).
+  void SetColumnsParams(const QString & Params);
+  QString ColumnsParams() const;
   QStringList Selected() const;
   void Select(const QStringList & Names);
   QStringList Names() const;

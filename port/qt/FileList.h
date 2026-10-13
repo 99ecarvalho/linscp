@@ -7,6 +7,7 @@
 
 #include <QAbstractTableModel>
 #include <QCollator>
+#include <QColor>
 #include <QMimeData>
 class QMenu;
 #include <QSortFilterProxyModel>
@@ -38,6 +39,10 @@ public:
   void SetAttributes(bool Attributes) { FAttributes = Attributes; }
   // "Show file sizes in" (Preferences, Panels): kilobytes by default.
   void SetSizeFormat(CoreBridge::TPreferences::TSizeFormat Format);
+  // File colors (Preferences): the first rule an entry's full path (Path
+  // gives it) matches colors it.
+  void SetFileColors(const std::vector<CoreBridge::TPreferences::TFileColor> & Colors, bool Local,
+    std::function<std::string(const CoreBridge::TRemoteEntry &)> Path);
 
   int rowCount(const QModelIndex & Parent = QModelIndex()) const override;
   int columnCount(const QModelIndex & Parent = QModelIndex()) const override;
@@ -56,6 +61,12 @@ private:
   bool FWithParent = false;
   bool FAttributes = false;
   CoreBridge::TPreferences::TSizeFormat FSizeFormat = CoreBridge::TPreferences::TSizeFormat::Kilobytes;
+  void UpdateColors();
+  std::vector<CoreBridge::TPreferences::TFileColor> FFileColorRules;
+  bool FColorsLocal = false;
+  std::function<std::string(const CoreBridge::TRemoteEntry &)> FColorPath;
+  // Each entry's color; invalid: none.
+  std::vector<QColor> FColors;
 };
 
 // Directories (and "..") first, as WinSCP's panels sort; then the column.
@@ -161,6 +172,13 @@ public:
   // name. To call once the model is set.
   void SetupColumns();
   QMenu * ColumnsMenu();
+  // The columns' layout as WinSCP keeps it (TIEListViewColProperties'
+  // params: "sort;ascending|width,visible;...;@ppi|order"), over WinSCP's
+  // columns: Map gives each of the model's columns its WinSCP index (-1:
+  // none), out of Count. What WinSCP has and the view does not (its
+  // extension and type columns) is kept as it was given.
+  void SetColumnsParams(const QString & Params, const std::vector<int> & Map, int Count);
+  QString ColumnsParams(const std::vector<int> & Map, int Count) const;
 
 signals:
   void Dropped(const QMimeData * Data, const QString & OnDirectory, Qt::DropAction Action);
@@ -183,6 +201,9 @@ private:
   // SelectMask and SelectDirectories), for the session.
   static QString FLastMask;
   static bool FLastDirectories;
+  // WinSCP's entries as last given, for the columns the view does not have.
+  QStringList FColumnEntries;
+  QStringList FColumnOrder;
 };
 
 #endif

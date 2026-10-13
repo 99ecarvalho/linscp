@@ -503,5 +503,23 @@ void LocalPanel::ApplyPreferences(const CoreBridge::TPreferences & Preferences)
   FSort->SetSorting(Preferences.NaturalOrderNumericalSorting, Preferences.AlwaysSortDirectoriesByName);
   FView->RenameWholeName = Preferences.RenameWholeName;
   FRefreshAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::Key_F5) : QKeySequence(Qt::CTRL | Qt::Key_R));
+  FModel->SetFileColors(Preferences.FileColors, true,
+    [this](const CoreBridge::TRemoteEntry & Entry)
+    {
+      return QDir::toNativeSeparators(QDir(FCurrent).filePath(QString::fromStdString(Entry.Name))).toStdString();
+    });
   SetShowHidden(Preferences.ShowHiddenFiles);
+}
+
+// WinSCP's columns: name, size, type, changed, attributes, extension (TDirView); owner, group and link target are not among them.
+static const std::vector<int> WinScpColumns = { 0, 1, 3, 4, -1, -1, -1 };
+
+void LocalPanel::SetColumnsParams(const QString & Params)
+{
+  FView->SetColumnsParams(Params, WinScpColumns, 6);
+}
+
+QString LocalPanel::ColumnsParams() const
+{
+  return FView->ColumnsParams(WinScpColumns, 6);
 }

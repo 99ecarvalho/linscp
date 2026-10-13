@@ -451,5 +451,23 @@ void RemotePanel::ApplyPreferences(const CoreBridge::TPreferences & Preferences)
   FView->RenameWholeName = Preferences.RenameWholeName;
   FRefreshAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::Key_F5) : QKeySequence(Qt::CTRL | Qt::Key_R));
   FDefaultDirIsHome = Preferences.DefaultDirIsHome;
+  FModel->SetFileColors(Preferences.FileColors, false,
+    [this](const CoreBridge::TRemoteEntry & Entry)
+    {
+      return (FCurrent.endsWith(QLatin1Char('/')) ? FCurrent : (FCurrent + QLatin1Char('/'))).toStdString() + Entry.Name;
+    });
   SetShowHidden(Preferences.ShowHiddenFiles);
+}
+
+// WinSCP's columns: name, size, changed, rights, owner, group, extension, link target, type (TUnixDirView).
+static const std::vector<int> WinScpColumns = { 0, 1, 2, 3, 4, 5, 7 };
+
+void RemotePanel::SetColumnsParams(const QString & Params)
+{
+  FView->SetColumnsParams(Params, WinScpColumns, 9);
+}
+
+QString RemotePanel::ColumnsParams() const
+{
+  return FView->ColumnsParams(WinScpColumns, 9);
 }

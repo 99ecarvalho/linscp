@@ -1,8 +1,8 @@
 // The Preferences dialog, as WinSCP's (forms/Preferences.cpp): its pages
 // listed on the left, each one's settings on the right. The pages are
-// WinSCP's, with the settings the shell has so far (P3-04a): Panels,
-// Commander, Languages. What they set is upstream's configuration
-// (ADR 0014).
+// WinSCP's, with the settings the shell has so far (P3-04a…c): Window,
+// Commander, Languages, Panels, File colors, Transfer, Background,
+// Endurance. What they set is upstream's configuration (ADR 0014).
 #ifndef LINSCP_QT_PREFERENCES_DIALOG_H
 #define LINSCP_QT_PREFERENCES_DIALOG_H
 
@@ -65,6 +65,18 @@ public:
   QSpinBox * ResumeThresholdSpin() const { return FResumeThreshold; }
   QCheckBox * ReopenAutoCheck() const { return FReopenAuto; }
   QSpinBox * ReopenAutoSpin() const { return FReopenAutoSeconds; }
+  QRadioButton * PathFullButton() const { return FPathFull; }
+  QRadioButton * PathShortButton() const { return FPathShort; }
+  QRadioButton * PathNoneButton() const { return FPathNone; }
+  QCheckBox * KeepOpenCheck() const { return FKeepOpen; }
+  // File colors, and their buttons' actions (what the dialog would edit
+  // given).
+  QListWidget * FileColorsList() const { return FFileColorsList; }
+  const std::vector<CoreBridge::TPreferences::TFileColor> & FileColors() const { return FFileColors; }
+  void AddFileColor(const CoreBridge::TPreferences::TFileColor & Color);
+  void EditFileColor(const CoreBridge::TPreferences::TFileColor & Color);
+  void RemoveFileColor();
+  void MoveFileColor(int By);
 
 private:
   void AddPage(const QString & Name, QWidget * Page);
@@ -74,6 +86,10 @@ private:
   QWidget * MakeTransferPage();
   QWidget * MakeBackgroundPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeEndurancePage(const CoreBridge::TPreferences & Preferences);
+  QWidget * MakeWindowPage(const CoreBridge::TPreferences & Preferences);
+  QWidget * MakeFileColorsPage();
+  void LoadFileColors();
+  bool FileColorDialog(CoreBridge::TPreferences::TFileColor & Color);
   void LoadPresets();
   void EditPresetDialog(bool Add, bool Duplicate);
   void UpdateControls();
@@ -116,6 +132,16 @@ private:
   QCheckBox * FReopenAutoStall = nullptr;
   QSpinBox * FReopenAutoStallSeconds = nullptr;
   QSpinBox * FReopenTimeout = nullptr;
+  QRadioButton * FPathFull = nullptr;
+  QRadioButton * FPathShort = nullptr;
+  QRadioButton * FPathNone = nullptr;
+  QCheckBox * FKeepOpen = nullptr;
+  std::vector<CoreBridge::TPreferences::TFileColor> FFileColors;
+  QListWidget * FFileColorsList = nullptr;
+  QPushButton * FEditFileColor = nullptr;
+  QPushButton * FRemoveFileColor = nullptr;
+  QPushButton * FUpFileColor = nullptr;
+  QPushButton * FDownFileColor = nullptr;
   // The pages exist: their controls can be updated.
   bool FBuilt = false;
 };

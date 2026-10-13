@@ -1,5 +1,6 @@
 #include "FileList.h"
 
+#include <algorithm>
 #include <cmath>
 
 #include <QApplication>
@@ -259,6 +260,53 @@ QString FormatPanelBytes(std::int64_t Bytes, CoreBridge::TPreferences::TSizeForm
   }
 }
 
+void FileListModel::SetFileColors(const std::vector<CoreBridge::TPreferences::TFileColor> & Colors, bool Local,
+  std::function<std::string(const CoreBridge::TRemoteEntry &)> Path)
+{
+  FFileColorRules = Colors;
+  FColorsLocal = Local;
+  FColorPath = std::move(Path);
+  UpdateColors();
+  if (rowCount() > 0)
+  {
+    emit dataChanged(index(0, 0), index(rowCount() - 1, ColumnCount - 1), { Qt::ForegroundRole });
+  }
+}
+
+// As TCustomScpExplorerForm::DirViewGetItemColor: the first rule the full
+// path matches, explicitly.
+void FileListModel::UpdateColors()
+{
+  FColors.assign(FEntries.size(), QColor());
+  if (FFileColorRules.empty() || !FColorPath)
+  {
+    return;
+  }
+  for (std::size_t Index = 0; Index < FEntries.size(); Index++)
+  {
+    const CoreBridge::TRemoteEntry & Entry = FEntries[Index];
+    const std::string Path = FColorPath(Entry);
+    for (const CoreBridge::TPreferences::TFileColor & Rule : FFileColorRules)
+    {
+      bool Matches = false;
+      try
+      {
+        Matches = CoreBridge::MaskMatchesPath(Rule.Mask, Path, FColorsLocal, Entry.Directory, Entry.Size, Entry.ModifiedTime);
+      }
+      catch (const CoreBridge::TCoreError &)
+      {
+        // A mask that is not one colors nothing, as upstream's would not
+        // have been saved.
+      }
+      if (Matches)
+      {
+        FColors[Index] = QColor(static_cast<QRgb>(Rule.Color));
+        break;
+      }
+    }
+  }
+}
+
 void FileListModel::SetSizeFormat(CoreBridge::TPreferences::TSizeFormat Format)
 {
   FSizeFormat = Format;
@@ -323,6 +371,128 @@ void FileView::SetupColumns()
     Menu->exec(header()->mapToGlobal(Pos));
     Menu->deleteLater();
   });
+}
+
+// TIEListViewColProperties::SetParamsStr: the sort, then each WinSCP
+// column's width and visibility at the pixels per inch saved, then their
+// order.
+void FileView::SetColumnsParams(const QString & Params, const std::vector<int> & Map, int Count)
+{
+  const QStringList Parts = Params.split(QLatin1Char('|'));
+  if (Parts.size() < 3)
+  {
+    return;
+  }
+  const QStringList Sort = Parts[0].split(QLatin1Char(';'));
+  QStringList Widths = Parts[1].split(QLatin1Char(';'));
+  int PixelsPerInch = logicalDpiX();
+  QStringList Entries;
+  for (const QString & Width : Widths)
+  {
+    if (Width.startsWith(QLatin1Char('@')))
+    {
+      PixelsPerInch = Width.mid(1).toInt();
+    }
+    else if (!Width.isEmpty() && (Entries.size() < Count))
+    {
+      Entries.append(Width);
+    }
+  }
+  if (PixelsPerInch <= 0)
+  {
+    PixelsPerInch = logicalDpiX();
+  }
+  FColumnEntries = Entries;
+  FColumnOrder = Parts[2].split(QLatin1Char(';'), Qt::SkipEmptyParts);
+  for (int Column = 0; Column < static_cast<int>(Map.size()); Column++)
+  {
+    const int Index = Map[Column];
+    if ((Index < 0) || (Index >= Entries.size()))
+    {
+      continue;
+    }
+    const QStringList Entry = Entries[Index].split(QLatin1Char(','));
+    if (Entry.size() < 2)
+    {
+      continue;
+    }
+    // LoadDimension: to this view's pixels per inch.
+    const int Width = Entry[0].toInt() * logicalDpiX() / PixelsPerInch;
+    const bool Visible = (Entry[1].toInt() != 0) || (Column == FileListModel::NameColumn);
+    setColumnHidden(Column, !Visible);
+    if (Width > 0)
+    {
+      header()->resizeSection(Column, Width);
+    }
+  }
+  // The order: WinSCP's columns, of which the view's in that order.
+  int Visual = 0;
+  for (const QString & Item : FColumnOrder)
+  {
+    const auto Found = std::find(Map.begin(), Map.end(), Item.toInt());
+    if (Found != Map.end())
+    {
+      header()->moveSection(header()->visualIndex(static_cast<int>(Found - Map.begin())), Visual++);
+    }
+  }
+  if (Sort.size() >= 2)
+  {
+    const auto Found = std::find(Map.begin(), Map.end(), Sort[0].toInt());
+    const int Column = (Found != Map.end()) ? static_cast<int>(Found - Map.begin()) : FileListModel::NameColumn;
+    sortByColumn(Column, (Sort[1].toInt() != 0) ? Qt::AscendingOrder : Qt::DescendingOrder);
+  }
+}
+
+// TIEListViewColProperties::GetParamsStr, keeping what the view does not
+// have as it was given.
+QString FileView::ColumnsParams(const std::vector<int> & Map, int Count) const
+{
+  QStringList Entries = FColumnEntries;
+  while (Entries.size() < Count)
+  {
+    Entries.append(QStringLiteral("100,0"));
+  }
+  for (int Column = 0; Column < static_cast<int>(Map.size()); Column++)
+  {
+    const int Index = Map[Column];
+    if ((Index >= 0) && (Index < Count))
+    {
+      const int Width = isColumnHidden(Column) ? Entries[Index].split(QLatin1Char(',')).value(0).toInt() : header()->sectionSize(Column);
+      Entries[Index] = QStringLiteral("%1,%2").arg(Width).arg(isColumnHidden(Column) ? 0 : 1);
+    }
+  }
+  // The order: as given, the view's columns in its visual order in the
+  // places its columns had.
+  QStringList Order = FColumnOrder;
+  for (int Index = 0; Index < Count; Index++)
+  {
+    if (!Order.contains(QString::number(Index)))
+    {
+      Order.append(QString::number(Index));
+    }
+  }
+  std::vector<int> Mine;
+  for (int Visual = 0; Visual < header()->count(); Visual++)
+  {
+    const int Column = header()->logicalIndex(Visual);
+    if ((Column >= 0) && (Column < static_cast<int>(Map.size())) && (Map[Column] >= 0))
+    {
+      Mine.push_back(Map[Column]);
+    }
+  }
+  std::size_t Next = 0;
+  for (QString & Item : Order)
+  {
+    if ((std::find(Map.begin(), Map.end(), Item.toInt()) != Map.end()) && (Next < Mine.size()))
+    {
+      Item = QString::number(Mine[Next++]);
+    }
+  }
+  const int SortColumn = header()->sortIndicatorSection();
+  const int SortIndex = ((SortColumn >= 0) && (SortColumn < static_cast<int>(Map.size())) && (Map[SortColumn] >= 0)) ?
+    Map[SortColumn] : 0;
+  return QStringLiteral("%1;%2|%3;@%4|%5").arg(SortIndex).arg(header()->sortIndicatorOrder() == Qt::AscendingOrder ? 1 : 0)
+    .arg(Entries.join(QLatin1Char(';'))).arg(logicalDpiX()).arg(Order.join(QLatin1Char(';')));
 }
 
 QMenu * FileView::ColumnsMenu()
@@ -620,6 +790,7 @@ void FileListModel::SetEntries(std::vector<CoreBridge::TRemoteEntry> Entries, bo
   beginResetModel();
   FEntries = std::move(Entries);
   FWithParent = WithParent;
+  UpdateColors();
   endResetModel();
 }
 
@@ -704,6 +875,11 @@ QVariant FileListModel::data(const QModelIndex & Index, int Role) const
         case LinkTargetColumn: return QString::fromStdString(E->LinkTarget);
       }
       break;
+    case Qt::ForegroundRole:
+    {
+      const std::size_t Row = static_cast<std::size_t>(Index.row() - (FWithParent ? 1 : 0));
+      return ((Row < FColors.size()) && FColors[Row].isValid()) ? QVariant(FColors[Row]) : QVariant();
+    }
     case Qt::ToolTipRole:
       return E->Link ? QStringLiteral("%1 -> %2").arg(QString::fromStdString(E->Name), QString::fromStdString(E->LinkTarget)) : QVariant();
     case Qt::DecorationRole:

@@ -482,6 +482,46 @@ Configuração: %4</translation>
         <source>&amp;Keep reconnecting for:</source>
         <translation>&amp;Continuar reconectando por:</translation>
     </message>
+    <message>
+        <source>Window</source>
+        <translation>Janela</translation>
+    </message>
+    <message>
+        <source>File colors</source>
+        <translation>Cores do arquivo</translation>
+    </message>
+    <message>
+        <source>Path in window title</source>
+        <translation>Caminho no título da janela</translation>
+    </message>
+    <message>
+        <source>Show &amp;full path</source>
+        <translation>Mostrar caminho com&amp;pleto</translation>
+    </message>
+    <message>
+        <source>Sho&amp;w short path</source>
+        <translation>Mostrar caminho &amp;resumido</translation>
+    </message>
+    <message>
+        <source>Do &amp;not show</source>
+        <translation>&amp;Não mostrar</translation>
+    </message>
+    <message>
+        <source>&amp;Keep main window open when the last session is closed</source>
+        <translation>&amp;Manter janela principal aberta quando a última sessão for fechada</translation>
+    </message>
+    <message>
+        <source>File color</source>
+        <translation>Cor do arquivo</translation>
+    </message>
+    <message>
+        <source>File &amp;mask:</source>
+        <translation>&amp;Máscara de arquivo:</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Cor</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

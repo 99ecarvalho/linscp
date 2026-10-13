@@ -23,6 +23,7 @@
 #include <QTimer>
 #include <QTreeView>
 #include <QSplitter>
+#include <QScreen>
 #include <QStyle>
 #include <QTreeWidget>
 #include <QVBoxLayout>
@@ -50,14 +51,21 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FInfo(Info)
 {
   setWindowTitle(QString::fromStdString(FInfo.AppName));
-  resize(900, 560);
 
   QMenu * FileMenu = menuBar()->addMenu(tr("&File"));
   FSitesAction = FileMenu->addAction(tr("&Site Manager..."), this, &MainWindow::SiteManagerDialog);
   FSitesAction->setShortcut(QKeySequence::New);
   FOpenAction = FileMenu->addAction(tr("&Open URL..."), this, &MainWindow::OpenUrlDialog);
   FOpenAction->setShortcut(QKeySequence::Open);
-  FDisconnectAction = FileMenu->addAction(tr("&Disconnect"), this, &MainWindow::Disconnect);
+  // As WinSCP: the last session closed, the window too unless kept open.
+  FDisconnectAction = FileMenu->addAction(tr("&Disconnect"), this, [this]()
+  {
+    Disconnect();
+    if (!CoreBridge::Preferences().KeepOpenWhenNoSession)
+    {
+      close();
+    }
+  });
   FileMenu->addSeparator();
   QAction * Quit = FileMenu->addAction(tr("E&xit"), this, &QWidget::close);
   // F10 too, as WinSCP's Commander.
@@ -67,6 +75,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
 
   // The panels side by side, the queue below them, as WinSCP's Commander.
   QSplitter * Vertical = new QSplitter(Qt::Vertical, this);
+  FVertical = Vertical;
   QSplitter * Panels = new QSplitter(Vertical);
   FPanels = Panels;
   FLocal = new LocalPanel(Panels);
@@ -192,7 +201,125 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   // From now on a language chosen applies on the next start, as WinSCP's.
   CoreBridge::GuiStarted();
   ApplyPreferences();
+  RestoreLayout();
+  connect(FPanel, &RemotePanel::Changed, this, &MainWindow::UpdateTitle);
   UpdateActions();
+}
+
+// As TTerminalManager::UpdateAppTitle and PathForCaption: the remote
+// directory (short: its last part, full, or none), the session, the
+// program.
+void MainWindow::UpdateTitle()
+{
+  QString Title = QString::fromStdString(FInfo.AppName);
+  if (FSession && FSession->Active())
+  {
+    Title = tr("%1 - %2").arg(QString::fromStdString(FSession->Name()), Title);
+    QString Path = FPanel->Path();
+    switch (CoreBridge::Preferences().PathInCaption)
+    {
+      case CoreBridge::TPreferences::TPathInCaption::Short:
+      {
+        // ExtractShortName: the last part, the root as is.
+        QString Trimmed = Path;
+        while ((Trimmed.size() > 1) && Trimmed.endsWith(QLatin1Char('/')))
+        {
+          Trimmed.chop(1);
+        }
+        const QString Last = Trimmed.mid(Trimmed.lastIndexOf(QLatin1Char('/')) + 1);
+        Path = Last.isEmpty() ? Trimmed : Last;
+        break;
+      }
+      case CoreBridge::TPreferences::TPathInCaption::None:
+        Path.clear();
+        break;
+      default:
+        break;
+    }
+    if (!Path.isEmpty())
+    {
+      Title = tr("%1 - %2").arg(Path, Title);
+    }
+  }
+  setWindowTitle(Title);
+}
+
+// As TScpCommanderForm's RestoreParams: the window's placement, the panels'
+// split and columns, the queue's height, the active panel; WinSCP's
+// formats (TWinConfiguration's ScpCommander, QueueView).
+void MainWindow::RestoreLayout()
+{
+  const CoreBridge::TLayout Layout = CoreBridge::Layout();
+  const int Dpi = logicalDpiX();
+  const QStringList Window = QString::fromStdString(Layout.WindowParams).split(QLatin1Char(';'));
+  QScreen * Screen = this->screen();
+  const QRect Area = (Screen != nullptr) ? Screen->availableGeometry() : QRect(0, 0, 1280, 800);
+  if (Window.size() >= 6)
+  {
+    // left;top;right;bottom;state;ppi, on the window's monitor, at the
+    // pixels per inch saved; -1;-1;width;height when never placed.
+    const int Saved = (Window[5].toInt() > 0) ? Window[5].toInt() : Dpi;
+    const auto Scale = [Dpi, Saved](int Value) { return Value * Dpi / Saved; };
+    if (Window[0].toInt() == -1)
+    {
+      resize(Scale(Window[2].toInt()), Scale(Window[3].toInt()));
+    }
+    else
+    {
+      setGeometry(QRect(QPoint(Area.left() + Scale(Window[0].toInt()), Area.top() + Scale(Window[1].toInt())),
+        QPoint(Area.left() + Scale(Window[2].toInt()) - 1, Area.top() + Scale(Window[3].toInt()) - 1)));
+    }
+    if (Window[4].toInt() == 2)
+    {
+      setWindowState(windowState() | Qt::WindowMaximized);
+    }
+  }
+  else
+  {
+    // TWinConfiguration::Default's: the work area, less a margin, at most
+    // 1090 by 700.
+    resize(std::min(Area.width() - 40, 1090 * Dpi / 96), std::min(Area.height() - 30, 700 * Dpi / 96));
+  }
+  FLocal->SetColumnsParams(QString::fromStdString(Layout.LocalDirViewParams));
+  FPanel->SetColumnsParams(QString::fromStdString(Layout.RemoteDirViewParams));
+  const int Total = std::max(FPanels->width(), width());
+  const int LocalWidth = static_cast<int>(Total * std::clamp(Layout.LocalPanelWidth, 0.1, 0.9));
+  FPanels->setSizes(FPanels->widget(0) == FLocal ? QList<int>{ LocalWidth, Total - LocalWidth } :
+    QList<int>{ Total - LocalWidth, LocalWidth });
+  const int QueueHeight = Layout.QueueViewHeight * Dpi / std::max(1, Layout.QueueViewHeightPixelsPerInch);
+  FVertical->setSizes({ std::max(100, height() - QueueHeight), QueueHeight });
+  ActivatePanel(Layout.CurrentPanel == 0);
+}
+
+void MainWindow::SaveLayout()
+{
+  CoreBridge::TLayout Layout = CoreBridge::Layout();
+  const int Dpi = logicalDpiX();
+  QScreen * Screen = this->screen();
+  const QRect Area = (Screen != nullptr) ? Screen->availableGeometry() : QRect();
+  // StoreForm: relative to the monitor; normal bounds even when maximized.
+  const QRect Bounds = isMaximized() ? normalGeometry() : geometry();
+  Layout.WindowParams = QStringLiteral("%1;%2;%3;%4;%5;%6")
+    .arg(Bounds.left() - Area.left()).arg(Bounds.top() - Area.top())
+    .arg(Bounds.right() + 1 - Area.left()).arg(Bounds.bottom() + 1 - Area.top())
+    .arg(isMaximized() ? 2 : 0).arg(Dpi).toStdString();
+  const QList<int> Sizes = FPanels->sizes();
+  const int Total = std::max(1, Sizes.value(0) + Sizes.value(1));
+  const int LocalWidth = (FPanels->widget(0) == FLocal) ? Sizes.value(0) : Sizes.value(1);
+  Layout.LocalPanelWidth = static_cast<double>(LocalWidth) / Total;
+  Layout.CurrentPanel = FLocalActive ? 0 : 1;
+  Layout.LocalDirViewParams = FLocal->ColumnsParams().toStdString();
+  Layout.RemoteDirViewParams = FPanel->ColumnsParams().toStdString();
+  Layout.QueueViewHeight = FVertical->sizes().value(1);
+  Layout.QueueViewHeightPixelsPerInch = Dpi;
+  try
+  {
+    CoreBridge::SetLayout(Layout);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
 }
 
 bool MainWindow::PreferencesDialog()
@@ -231,12 +358,14 @@ void MainWindow::ApplyPreferences()
   FLocal->HomeDirectory =
     (Preferences.DefaultDirIsHome && FSession && !FSession->UpdateDirectories() && !FSession->LocalDirectory().empty()) ?
     QString::fromStdString(FSession->LocalDirectory()) : QString();
+  UpdateTitle();
 }
 
 MainWindow::~MainWindow() = default;
 
 void MainWindow::closeEvent(QCloseEvent * Event)
 {
+  SaveLayout();
   Disconnect();
   QMainWindow::closeEvent(Event);
 }
@@ -299,6 +428,7 @@ bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
   }
   Disconnect();
   FBusy = true;
+  UpdateTitle();
   UpdateActions();
   bool Result = false;
   try
@@ -330,7 +460,6 @@ bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
         FLocal->ChangeDirectory(Directory);
       }
     }
-    setWindowTitle(tr("%1 - %2").arg(QString::fromStdString(FSession->Name()), QString::fromStdString(FInfo.AppName)));
     Result = true;
   }
   catch (const CoreBridge::TCoreError & E)
@@ -382,7 +511,6 @@ void MainWindow::Disconnect()
     FSession->Close();
     FSession.reset();
     FLocal->HomeDirectory.clear();
-    setWindowTitle(QString::fromStdString(FInfo.AppName));
     statusBar()->showMessage(tr("Disconnected"));
   }
   FPanel->SetSession(FSession.get());
@@ -396,6 +524,7 @@ void MainWindow::Disconnect()
   {
     FQueueTimer->stop();
   }
+  UpdateTitle();
   UpdateActions();
 }
 

@@ -240,6 +240,19 @@ TPreferences Preferences()
   Result.DefaultDirIsHome = Settings.DefaultDirIsHome;
   Result.SwappedPanels = Settings.SwappedPanels;
   Result.ExplorerKeyboardShortcuts = Settings.ExplorerKeyboardShortcuts;
+  Result.PathInCaption = static_cast<TPreferences::TPathInCaption>(Settings.PathInCaption);
+  Result.KeepOpenWhenNoSession = Settings.KeepOpenWhenNoSession;
+  // As TFileColorData::LoadList: comma text of "BBGGRR:mask" (TColor).
+  std::unique_ptr<TStringList> Colors(CommaTextToStringList(Settings.FileColors));
+  for (int Index = 0; Index < Colors->Count; Index++)
+  {
+    UnicodeString Item = Colors->Strings[Index];
+    const unsigned Bgr = static_cast<unsigned>(StrToIntDef(UnicodeString(L"$") + CutToChar(Item, L':', true), 0));
+    TPreferences::TFileColor Color;
+    Color.Mask = Utf8(Item);
+    Color.Color = ((Bgr & 0xff) << 16) | (Bgr & 0xff00) | ((Bgr >> 16) & 0xff);
+    Result.FileColors.push_back(Color);
+  }
   // As TPreferencesDialog::LoadConfiguration.
   Result.QueueTransfersLimit = Configuration->QueueTransfersLimit;
   Result.QueueKeepDoneItemsFor = GUIConfiguration->QueueKeepDoneItems ? GUIConfiguration->QueueKeepDoneItemsFor : 0;
@@ -264,6 +277,25 @@ void SetPreferences(const TPreferences & Preferences)
   Settings.DefaultDirIsHome = Preferences.DefaultDirIsHome;
   Settings.SwappedPanels = Preferences.SwappedPanels;
   Settings.ExplorerKeyboardShortcuts = Preferences.ExplorerKeyboardShortcuts;
+  Settings.PathInCaption = static_cast<int>(Preferences.PathInCaption);
+  Settings.KeepOpenWhenNoSession = Preferences.KeepOpenWhenNoSession;
+  // As TFileColorData::SaveList.
+  std::unique_ptr<TStringList> Colors(new TStringList());
+  for (const TPreferences::TFileColor & Color : Preferences.FileColors)
+  {
+    const unsigned Bgr = ((Color.Color & 0xff) << 16) | (Color.Color & 0xff00) | ((Color.Color >> 16) & 0xff);
+    Colors->Add(IntToHex(static_cast<int>(Bgr), 6) + L":" + FromUtf8(Color.Mask));
+  }
+  Settings.FileColors = Colors->CommaText;
+  // The layout is SetLayout's.
+  const TShellSettings & Current = Shell()->Settings();
+  Settings.WindowParams = Current.WindowParams;
+  Settings.LocalPanelWidth = Current.LocalPanelWidth;
+  Settings.CurrentPanel = Current.CurrentPanel;
+  Settings.LocalDirViewParams = Current.LocalDirViewParams;
+  Settings.RemoteDirViewParams = Current.RemoteDirViewParams;
+  Settings.QueueViewHeight = Current.QueueViewHeight;
+  Settings.QueueViewHeightPixelsPerInch = Current.QueueViewHeightPixelsPerInch;
   try
   {
     Shell()->SetSettings(Settings);
@@ -278,6 +310,41 @@ void SetPreferences(const TPreferences & Preferences)
     GUIConfiguration->SessionReopenAutoInactive = Preferences.SessionReopenAutoInactive;
     Configuration->SessionReopenAutoStall = Preferences.SessionReopenAutoStall * MSecsPerSec;
     Configuration->SessionReopenTimeout = Preferences.SessionReopenTimeout * MSecsPerSec;
+    Configuration->SaveExplicit();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+TLayout Layout()
+{
+  const TShellSettings & Settings = Shell()->Settings();
+  TLayout Result;
+  Result.WindowParams = Utf8(Settings.WindowParams);
+  Result.LocalPanelWidth = Settings.LocalPanelWidth;
+  Result.CurrentPanel = Settings.CurrentPanel;
+  Result.LocalDirViewParams = Utf8(Settings.LocalDirViewParams);
+  Result.RemoteDirViewParams = Utf8(Settings.RemoteDirViewParams);
+  Result.QueueViewHeight = Settings.QueueViewHeight;
+  Result.QueueViewHeightPixelsPerInch = Settings.QueueViewHeightPixelsPerInch;
+  return Result;
+}
+
+void SetLayout(const TLayout & Layout)
+{
+  TShellSettings Settings = Shell()->Settings();
+  Settings.WindowParams = FromUtf8(Layout.WindowParams);
+  Settings.LocalPanelWidth = Layout.LocalPanelWidth;
+  Settings.CurrentPanel = Layout.CurrentPanel;
+  Settings.LocalDirViewParams = FromUtf8(Layout.LocalDirViewParams);
+  Settings.RemoteDirViewParams = FromUtf8(Layout.RemoteDirViewParams);
+  Settings.QueueViewHeight = Layout.QueueViewHeight;
+  Settings.QueueViewHeightPixelsPerInch = Layout.QueueViewHeightPixelsPerInch;
+  try
+  {
+    Shell()->SetSettings(Settings);
     Configuration->SaveExplicit();
   }
   catch (Exception & E)
@@ -366,6 +433,24 @@ bool MaskMatches(const std::string & Masks, const std::string & FileName, bool D
     Params.Modification = TDateTime(ModifiedTime / 86400.0 + 25569.0);
     bool ImplicitMatch = false;
     return Mask.Matches(FromUtf8(FileName), false, Directory, &Params, true, ImplicitMatch) && !ImplicitMatch;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+bool MaskMatchesPath(const std::string & Masks, const std::string & Path, bool Local, bool Directory,
+  std::int64_t Size, double ModifiedTime)
+{
+  try
+  {
+    TFileMasks Mask(FromUtf8(Masks));
+    TFileMasks::TParams Params;
+    Params.Size = Size;
+    Params.Modification = TDateTime(ModifiedTime / 86400.0 + 25569.0);
+    bool ImplicitMatch = false;
+    return Mask.Matches(FromUtf8(Path), Local, Directory, &Params, false, ImplicitMatch) && !ImplicitMatch;
   }
   catch (Exception & E)
   {

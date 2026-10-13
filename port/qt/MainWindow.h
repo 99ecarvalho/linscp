@@ -68,6 +68,13 @@ public:
   bool PreferencesDialog();
   // The preferences applied to the window and its panels.
   void ApplyPreferences();
+  // The layout kept between runs (WinSCP's): restored as the window is
+  // made, saved as it closes.
+  void RestoreLayout();
+  void SaveLayout();
+  // The title, as WinSCP's: the path (Preferences, Window), the session,
+  // the program.
+  void UpdateTitle();
   // Polls the session's queue: QueueTimer's, and tests'.
   void QueueIdle();
   QueuePanel * Queue() const { return FQueue; }
@@ -105,6 +112,7 @@ private:
   QAction * FSynchronizeAction = nullptr;
   QAction * FHiddenAction = nullptr;
   class QSplitter * FPanels = nullptr;
+  QSplitter * FVertical = nullptr;
   // As GUIConfiguration's SynchronizeParams, for the session's lifetime.
   CoreBridge::TSyncParams FSyncParams;
   QAction * FDisconnectAction = nullptr;

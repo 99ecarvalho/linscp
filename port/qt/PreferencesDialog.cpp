@@ -10,6 +10,8 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QListWidget>
+#include <QColorDialog>
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QRadioButton>
@@ -44,12 +46,17 @@ PreferencesDialog::PreferencesDialog(QWidget * Parent) :
   const TPreferences Preferences = CoreBridge::Preferences();
   FDefaultSettings = CoreBridge::DefaultTransferSettings();
   FPresets = CoreBridge::TransferPresets();
-  AddPage(tr("Panels"), MakePanelsPage(Preferences));
+  FFileColors = Preferences.FileColors;
+  // In the order of WinSCP's tree: Environment (Window, Commander,
+  // Languages), Panels (File colors), Transfer (Background, Endurance).
+  AddPage(tr("Window"), MakeWindowPage(Preferences));
   AddPage(tr("Commander"), MakeCommanderPage(Preferences));
+  AddPage(tr("Languages"), MakeLanguagesPage());
+  AddPage(tr("Panels"), MakePanelsPage(Preferences));
+  AddPage(tr("File colors"), MakeFileColorsPage());
   AddPage(tr("Transfer"), MakeTransferPage());
   AddPage(tr("Background"), MakeBackgroundPage(Preferences));
   AddPage(tr("Endurance"), MakeEndurancePage(Preferences));
-  AddPage(tr("Languages"), MakeLanguagesPage());
   connect(FNavigation, &QListWidget::currentRowChanged, FPages, &QStackedWidget::setCurrentIndex);
   FNavigation->setCurrentRow(0);
 
@@ -168,6 +175,11 @@ void PreferencesDialog::UpdateControls()
   FUpPreset->setEnabled(Row > 1);
   FDownPreset->setEnabled((Row >= 1) && (Row < FPresetsList->count() - 1));
   FResumeThreshold->setEnabled(FResumeSmart->isChecked());
+  const int ColorRow = FFileColorsList->currentRow();
+  FEditFileColor->setEnabled(ColorRow >= 0);
+  FRemoveFileColor->setEnabled(ColorRow >= 0);
+  FUpFileColor->setEnabled(ColorRow > 0);
+  FDownFileColor->setEnabled((ColorRow >= 0) && (ColorRow < FFileColorsList->count() - 1));
   FReopenAutoSeconds->setEnabled(FReopenAuto->isChecked());
   FReopenAutoIdleSeconds->setEnabled(FReopenAutoIdle->isChecked());
   FReopenAutoStallSeconds->setEnabled(FReopenAutoStall->isChecked());
@@ -185,6 +197,176 @@ void PreferencesDialog::LoadPresets()
     FPresetsList->addItem(QString::fromStdString(Preset.Name));
   }
   FPresetsList->setCurrentRow(qBound(0, Row, FPresetsList->count() - 1));
+}
+
+QWidget * PreferencesDialog::MakeWindowPage(const TPreferences & Preferences)
+{
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  QGroupBox * Path = new QGroupBox(tr("Path in window title"), Page);
+  QVBoxLayout * PathLayout = new QVBoxLayout(Path);
+  FPathFull = new QRadioButton(tr("Show &full path"), Path);
+  FPathShort = new QRadioButton(tr("Sho&w short path"), Path);
+  FPathNone = new QRadioButton(tr("Do &not show"), Path);
+  FPathFull->setChecked(Preferences.PathInCaption == TPreferences::TPathInCaption::Full);
+  FPathShort->setChecked(Preferences.PathInCaption == TPreferences::TPathInCaption::Short);
+  FPathNone->setChecked(Preferences.PathInCaption == TPreferences::TPathInCaption::None);
+  PathLayout->addWidget(FPathFull);
+  PathLayout->addWidget(FPathShort);
+  PathLayout->addWidget(FPathNone);
+  Layout->addWidget(Path);
+  QGroupBox * Misc = new QGroupBox(tr("Miscellaneous"), Page);
+  QVBoxLayout * MiscLayout = new QVBoxLayout(Misc);
+  FKeepOpen = new QCheckBox(tr("&Keep main window open when the last session is closed"), Misc);
+  FKeepOpen->setChecked(Preferences.KeepOpenWhenNoSession);
+  MiscLayout->addWidget(FKeepOpen);
+  Layout->addWidget(Misc);
+  Layout->addStretch(1);
+  return Page;
+}
+
+// As the File colors page: the rules in order, each its mask shown in its
+// color.
+void PreferencesDialog::LoadFileColors()
+{
+  const int Row = FFileColorsList->currentRow();
+  FFileColorsList->clear();
+  for (const TPreferences::TFileColor & Color : FFileColors)
+  {
+    QListWidgetItem * Item = new QListWidgetItem(QString::fromStdString(Color.Mask), FFileColorsList);
+    Item->setForeground(QColor(static_cast<QRgb>(Color.Color)));
+  }
+  FFileColorsList->setCurrentRow(qBound(-1, Row, FFileColorsList->count() - 1));
+}
+
+QWidget * PreferencesDialog::MakeFileColorsPage()
+{
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  QGroupBox * Group = new QGroupBox(tr("File colors"), Page);
+  QHBoxLayout * GroupLayout = new QHBoxLayout(Group);
+  FFileColorsList = new QListWidget(Group);
+  connect(FFileColorsList, &QListWidget::currentRowChanged, this, &PreferencesDialog::UpdateControls);
+  GroupLayout->addWidget(FFileColorsList, 1);
+  QVBoxLayout * Buttons = new QVBoxLayout();
+  QPushButton * Add = new QPushButton(tr("&Add..."), Group);
+  connect(Add, &QPushButton::clicked, this, [this]()
+  {
+    TPreferences::TFileColor Color;
+    Color.Mask = "*.*";
+    if (FileColorDialog(Color))
+    {
+      AddFileColor(Color);
+    }
+  });
+  FEditFileColor = new QPushButton(tr("&Edit..."), Group);
+  connect(FEditFileColor, &QPushButton::clicked, this, [this]()
+  {
+    const int Row = FFileColorsList->currentRow();
+    if (Row >= 0)
+    {
+      TPreferences::TFileColor Color = FFileColors[Row];
+      if (FileColorDialog(Color))
+      {
+        EditFileColor(Color);
+      }
+    }
+  });
+  FRemoveFileColor = new QPushButton(tr("&Remove"), Group);
+  connect(FRemoveFileColor, &QPushButton::clicked, this, &PreferencesDialog::RemoveFileColor);
+  FUpFileColor = new QPushButton(tr("&Up"), Group);
+  connect(FUpFileColor, &QPushButton::clicked, this, [this]() { MoveFileColor(-1); });
+  FDownFileColor = new QPushButton(tr("&Down"), Group);
+  connect(FDownFileColor, &QPushButton::clicked, this, [this]() { MoveFileColor(1); });
+  for (QPushButton * Button : { Add, FEditFileColor, FRemoveFileColor, FUpFileColor, FDownFileColor })
+  {
+    Buttons->addWidget(Button);
+  }
+  Buttons->addStretch(1);
+  GroupLayout->addLayout(Buttons);
+  Layout->addWidget(Group, 1);
+  LoadFileColors();
+  return Page;
+}
+
+// As WinSCP's file color dialog (the Select dialog with its color): the
+// mask, and the color to show matching files in.
+bool PreferencesDialog::FileColorDialog(TPreferences::TFileColor & Color)
+{
+  QDialog Dialog(this);
+  Dialog.setWindowTitle(tr("File color"));
+  QFormLayout * Form = new QFormLayout(&Dialog);
+  QLineEdit * Mask = new QLineEdit(QString::fromStdString(Color.Mask), &Dialog);
+  Mask->setMinimumWidth(300);
+  Form->addRow(tr("File &mask:"), Mask);
+  QColor Chosen(static_cast<QRgb>(Color.Color));
+  QPushButton * ColorButton = new QPushButton(tr("&Color"), &Dialog);
+  const auto Show = [ColorButton, &Chosen]()
+  {
+    ColorButton->setStyleSheet(QStringLiteral("color: %1").arg(Chosen.name()));
+  };
+  Show();
+  connect(ColorButton, &QPushButton::clicked, &Dialog, [&Dialog, &Chosen, Show]()
+  {
+    const QColor Picked = QColorDialog::getColor(Chosen, &Dialog);
+    if (Picked.isValid())
+    {
+      Chosen = Picked;
+      Show();
+    }
+  });
+  Form->addRow(ColorButton);
+  QDialogButtonBox * Box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &Dialog);
+  connect(Box, &QDialogButtonBox::accepted, &Dialog, &QDialog::accept);
+  connect(Box, &QDialogButtonBox::rejected, &Dialog, &QDialog::reject);
+  Form->addRow(Box);
+  if ((Dialog.exec() != QDialog::Accepted) || Mask->text().trimmed().isEmpty())
+  {
+    return false;
+  }
+  Color.Mask = Mask->text().trimmed().toStdString();
+  Color.Color = Chosen.rgb() & 0xffffff;
+  return true;
+}
+
+void PreferencesDialog::AddFileColor(const TPreferences::TFileColor & Color)
+{
+  const int At = FFileColorsList->currentRow() + 1;
+  FFileColors.insert(FFileColors.begin() + At, Color);
+  LoadFileColors();
+  FFileColorsList->setCurrentRow(At);
+}
+
+void PreferencesDialog::EditFileColor(const TPreferences::TFileColor & Color)
+{
+  const int Row = FFileColorsList->currentRow();
+  if (Row >= 0)
+  {
+    FFileColors[Row] = Color;
+    LoadFileColors();
+  }
+}
+
+void PreferencesDialog::RemoveFileColor()
+{
+  const int Row = FFileColorsList->currentRow();
+  if (Row >= 0)
+  {
+    FFileColors.erase(FFileColors.begin() + Row);
+    LoadFileColors();
+  }
+}
+
+void PreferencesDialog::MoveFileColor(int By)
+{
+  const int Row = FFileColorsList->currentRow();
+  const int To = Row + By;
+  if ((Row >= 0) && (To >= 0) && (To < FFileColorsList->count()))
+  {
+    std::swap(FFileColors[Row], FFileColors[To]);
+    LoadFileColors();
+    FFileColorsList->setCurrentRow(To);
+  }
 }
 
 QWidget * PreferencesDialog::MakeTransferPage()
@@ -450,6 +632,10 @@ TPreferences PreferencesDialog::Preferences() const
   Result.SessionReopenAutoInactive = FReopenAutoInactive->isChecked();
   Result.SessionReopenAutoStall = FReopenAutoStall->isChecked() ? FReopenAutoStallSeconds->value() : 0;
   Result.SessionReopenTimeout = FReopenTimeout->value();
+  Result.PathInCaption = FPathFull->isChecked() ? TPreferences::TPathInCaption::Full :
+    (FPathNone->isChecked() ? TPreferences::TPathInCaption::None : TPreferences::TPathInCaption::Short);
+  Result.KeepOpenWhenNoSession = FKeepOpen->isChecked();
+  Result.FileColors = FFileColors;
   return Result;
 }
 

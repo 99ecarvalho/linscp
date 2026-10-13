@@ -550,6 +550,10 @@ void Panel(const char * Port)
     Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "the session opens");
     RemotePanel * Panel = Window.Panel();
     Check(Panel->Path() == QStringLiteral("/"), "the panel shows the root");
+    Check(Window.windowTitle().startsWith(QStringLiteral("/ - ")), "the title shows the path (short: the root as is)");
+    Check(Panel->ChangeDirectory(QStringLiteral("/sub")) && Window.windowTitle().startsWith(QStringLiteral("sub - ")),
+      "and a directory by its last part");
+    Check(Panel->ChangeDirectory(QStringLiteral("/")), "(back to the root)");
     Check(Panel->Names() == QStringList({ QStringLiteral("sub"), QStringLiteral("hello.txt") }),
       "directories first, no \"..\" at the root");
     Panel->View()->sortByColumn(FileListModel::SizeColumn, Qt::DescendingOrder);
@@ -1314,9 +1318,12 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       {
         Pages.append(Dialog.Navigation()->item(Row)->text());
       }
-      Check(Pages == QStringList({ PreferencesDialog::tr("Panels"), PreferencesDialog::tr("Commander"),
-        PreferencesDialog::tr("Transfer"), PreferencesDialog::tr("Background"), PreferencesDialog::tr("Endurance"),
-        PreferencesDialog::tr("Languages") }), "the dialog's pages");
+      Check(Pages == QStringList({ PreferencesDialog::tr("Window"), PreferencesDialog::tr("Commander"),
+        PreferencesDialog::tr("Languages"), PreferencesDialog::tr("Panels"), PreferencesDialog::tr("File colors"),
+        PreferencesDialog::tr("Transfer"), PreferencesDialog::tr("Background"), PreferencesDialog::tr("Endurance") }),
+        "the dialog's pages, in the order of WinSCP's tree");
+      Check(Dialog.PathShortButton()->isChecked() && Dialog.KeepOpenCheck()->isChecked() && Dialog.FileColors().empty(),
+        "the Window and File colors pages show WinSCP's defaults");
       Check(!Dialog.ShowHiddenFilesCheck()->isChecked() && (Dialog.SizeFormatCombo()->currentIndex() == 1) &&
         Dialog.NaturalSortingCheck()->isChecked(), "showing the settings");
       bool Portuguese = false;
@@ -1327,7 +1334,7 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       Check(Dialog.LanguagesList()->count() > 40, "the languages WinSCP is translated into");
       Check(Portuguese, "Brazilian Portuguese among them");
       Check(Dialog.LanguagesList()->currentItem() != nullptr, "the one in use chosen");
-      Dialog.Navigation()->setCurrentRow(5);
+      Dialog.Navigation()->setCurrentRow(2);
       Check(Dialog.LanguageChangeLabel()->isHidden(), "no change to apply");
       for (int Row = 0; Row < Dialog.LanguagesList()->count(); Row++)
       {
@@ -1382,6 +1389,19 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       Check(!Dialog.ResumeThresholdSpin()->isEnabled(), "a threshold only for \"files above\"");
       Dialog.ReopenAutoCheck()->setChecked(false);
       Check(!Dialog.ReopenAutoSpin()->isEnabled(), "a delay only when reconnecting");
+      // File colors: the first matching rule colors a file.
+      CoreBridge::TPreferences::TFileColor Red;
+      Red.Mask = "*.txt";
+      Red.Color = 0xff0000;
+      CoreBridge::TPreferences::TFileColor Blue;
+      Blue.Mask = "file*";
+      Blue.Color = 0x0000ff;
+      Dialog.AddFileColor(Blue);
+      Dialog.AddFileColor(Red);
+      Dialog.FileColorsList()->setCurrentRow(1);
+      Dialog.MoveFileColor(-1);
+      Check((Dialog.FileColors().size() == 2) && (Dialog.FileColors()[0].Mask == "*.txt"), "file colors add and move");
+      Dialog.PathFullButton()->setChecked(true);
       Dialog.Save();
       Window.ApplyPreferences();
     }
@@ -1449,6 +1469,16 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       (Saved(CopyParam, QStringLiteral("ResumeSupport")) == QStringLiteral("2")) &&
       (Saved(CopyParam, QStringLiteral("FileNameCase")) == QStringLiteral("2")),
       "the default transfer settings, under Interface\\CopyParam");
+    const auto ColorOf = [Local](const QString & Name)
+    {
+      const int Row = Local->Names().indexOf(Name);
+      return Local->View()->model()->index(Row, FileListModel::NameColumn).data(Qt::ForegroundRole).value<QColor>();
+    };
+    Check(ColorOf(QStringLiteral("file2.txt")) == QColor(0xff0000), "a file in its first matching rule's color");
+    Check(ColorOf(QStringLiteral("a.bin")) == QColor(), "one matching none in the panel's");
+    Check(Saved(Interface, QStringLiteral("FileColors")).contains(QStringLiteral("0000FF:*.txt")),
+      "kept as WinSCP keeps them (BBGGRR:mask)");
+    Check(Saved(Interface, QStringLiteral("PathInCaption")) == QStringLiteral("1"), "the window title's path");
     Check((CoreBridge::TransferPresets().size() == 5) && (CoreBridge::TransferPresets()[0].Name == "Mine") &&
       (CoreBridge::TransferPresets()[0].Settings.Mode == CoreBridge::TTransferSettings::TMode::Text), "the presets");
     Check(Saved(CopyParam, QStringLiteral("CopyParamList")) == QStringLiteral("5"), "saved as WinSCP's list");
@@ -1474,6 +1504,50 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
     QTest::keyClick(Window.windowHandle(), Qt::Key_H, Qt::ControlModifier | Qt::AltModifier);
     Check(!CoreBridge::Preferences().ShowHiddenFiles && !Local->Names().contains(QStringLiteral(".hidden")),
       "Ctrl+Alt+H hides them again, and keeps it");
+
+    // The layout, kept as WinSCP keeps it, on closing.
+    Local->View()->setColumnHidden(FileListModel::SizeColumn, true);
+    Local->View()->sortByColumn(FileListModel::ModifiedColumn, Qt::DescendingOrder);
+    Window.close();
+    const QString LocalPanel = QStringLiteral("Configuration\\Interface\\Commander\\LocalPanel");
+    const QString Params = Saved(LocalPanel, QStringLiteral("DirViewParams"));
+    // Changed is WinSCP's column 3 of the local panel's six; size its 1.
+    Check(Params.startsWith(QStringLiteral("3;0|")), "the sort, in WinSCP's columns");
+    Check(Params.section(QLatin1Char('|'), 1, 1).section(QLatin1Char(';'), 1, 1).endsWith(QStringLiteral(",0")),
+      "the hidden column, hidden");
+    Check(Params.section(QLatin1Char('|'), 1, 1).section(QLatin1Char(';'), 5, 5) == QStringLiteral("55,0"),
+      "the extension column linscp has not, kept as WinSCP's");
+    Check(!Saved(QStringLiteral("Configuration\\Interface\\Commander"), QStringLiteral("WindowParams")).isEmpty() &&
+      !Saved(QStringLiteral("Configuration\\Interface\\Commander"), QStringLiteral("LocalPanelWidth")).isEmpty(),
+      "the window's placement and the panels' split");
+    {
+      MainWindow Again(CoreBridge::Info());
+      Check(Again.Local()->View()->isColumnHidden(FileListModel::SizeColumn) &&
+        (Again.Local()->View()->header()->sortIndicatorSection() == FileListModel::ModifiedColumn) &&
+        (Again.Local()->View()->header()->sortIndicatorOrder() == Qt::DescendingOrder), "a new window restores them");
+      Again.Local()->View()->setColumnHidden(FileListModel::SizeColumn, false);
+    }
+
+    // "Keep main window open when the last session is closed", off: closing
+    // it closes the window.
+    {
+      CoreBridge::TPreferences Off = CoreBridge::Preferences();
+      Off.KeepOpenWhenNoSession = false;
+      CoreBridge::SetPreferences(Off);
+      MainWindow Closing(CoreBridge::Info());
+      Closing.show();
+      for (QAction * Action : Closing.findChildren<QAction *>())
+      {
+        if (Action->text() == MainWindow::tr("&Disconnect"))
+        {
+          Action->setEnabled(true);
+          Action->trigger();
+        }
+      }
+      Check(!Closing.isVisible(), "without keeping it open, the window closes with the session");
+      Off.KeepOpenWhenNoSession = true;
+      CoreBridge::SetPreferences(Off);
+    }
     Frontend.SetWindow(nullptr);
   }
   CoreBridge::Finalize();

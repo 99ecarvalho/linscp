@@ -196,3 +196,45 @@ settings followed, a preset in use followed) and `qt_gui_preferences` (the
 pages, presets edited, each setting saved under WinSCP's keys in
 `Interface` and `Interface\CopyParam`, the Copy dialog's group): Linux,
 Wine, natively on Windows 11.
+
+## Amendment 2026-10-13: Window, File colors, the layout kept (P3-04c)
+
+- **Window:**
+  - the path in the title, short (its last part, the root as is), full,
+    or none, as `TTerminalManager::UpdateAppTitle` and `PathForCaption`
+    put it before the session and the program;
+  - "keep main window open when the last session is closed": off, a
+    disconnect closes the window.
+
+  WinSCP's two other settings on this page are not here yet: "minimize to
+  the tray" and "open externally initiated sessions in the existing
+  window", which needs a single instance.
+- **File colors:** `FileColors`, kept as `TFileColorData::SaveList` keeps
+  it (comma text of `BBGGRR:mask`), with colors given to Qt as RGB. As
+  `DirViewGetItemColor`, the first rule whose mask a file's full path
+  matches (explicitly, through `CoreBridge::MaskMatchesPath`) colors it.
+- **The layout is kept between runs in WinSCP's own formats and keys**,
+  restored as the window is made and saved as it closes:
+  - each panel's columns: `Interface\Commander\LocalPanel` and
+    `RemotePanel`'s `DirViewParams`, `TIEListViewColProperties`' params
+    (sort; width and visibility per column at the pixels per inch saved;
+    the order), mapped onto WinSCP's columns. Those are nine remote and
+    six local; the local panel's owner, group and link target are not
+    among them. WinSCP's columns linscp does not have (extension, type)
+    are written back as they were read;
+  - the window's placement (`WindowParams`, as `StoreForm`: on its
+    monitor, maximized kept, `-1;-1;width;height` before it is placed;
+    the default as `TWinConfiguration::Default`'s);
+  - the local panel's share of the width (`LocalPanelWidth`);
+  - the active panel (`CurrentPanel`);
+  - the queue's height (`Interface\QueueView`).
+- **The Explorer page is not offered.** It configures WinSCP's Explorer
+  interface, which the shell does not have.
+- **Pages are in the order of WinSCP's tree:** Window, Commander,
+  Languages, Panels, File colors, Transfer, Background, Endurance.
+
+Verified by `qt_gui_preferences` (the pages; file colors applied and kept;
+the layout written in WinSCP's formats, the column linscp lacks kept, and
+restored by a new window; the window closing with its session when not
+kept open) and `qt_gui_panel` (the path in the title): Linux, Wine,
+natively on Windows 11.

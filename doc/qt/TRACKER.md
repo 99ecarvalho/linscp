@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 6 | 16 | Parity on features users depend on |
+| P3 Qt parity | 7 | 16 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **84** | **103** | |
+| **Total** | **85** | **103** | |
 
 ## Next three actions
 
@@ -221,19 +221,19 @@ Drag and drop (P3-07, done): between the panels, a transfer after the Copy dialo
 through core's `MoveFiles`, as WinSCP); files from other programs, onto the
 remote panel, an upload; remote files dragged out to other programs,
 downloaded at the drop to a temporary directory, as WinSCP's drag without its
-shell extension. Preferences (P3-04a, P3-04b, done): upstream's GUI configuration compiled as
+shell extension. Preferences (P3-04a…c, done): upstream's GUI configuration compiled as
 it is, the language chosen as upstream does, Options > Preferences with
-Panels, Commander, Transfer, Background, Endurance and Languages; transfers
-use the GUI's transfer settings and presets, as WinSCP's. Last used directories (P3-11, done): kept in the site when a session ends,
+Window, Commander, Languages, Panels, File colors, Transfer, Background
+and Endurance; transfers use the GUI's transfer settings and presets, and
+the layout is kept between runs, as WinSCP's (P3-04c). Last used directories (P3-11, done): kept in the site when a session ends,
 as WinSCP. The Commander (P3-02, done): WinSCP's keys, rename in place, status lines,
 columns. Synchronization (P3-03, done): Commands > Synchronize, WinSCP's
 Synchronize dialog and checklist over core's own synchronization, applied
 here or in the queue. P2-10 and P2-11 wait, at the user's request.
 
-1. **P3-04c**: Preferences' Window, Explorer, File colors; the panels'
-   layout kept between runs.
-2. **P3-04d**: core's Storage, Logging, Network, Security, Updates.
-3. **P3-05**: the internal editor (Q-3).
+1. **P3-04d**: core's Storage, Logging, Network, Security, Updates.
+2. **P3-05**: the internal editor (Q-3).
+3. **P3-06**: the remaining dialogs, batched (split first).
 
 ## Decisions taken
 
@@ -751,7 +751,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-04 | Preferences | wip | split into P3-04a…e (below), each counted as its own task; done when they are |
 | P3-04a | Preferences foundation, Languages, Panels, Commander | done | upstream's `GUIConfiguration` compiled as it is (`port/gui`, ADR 0014); `TShellConfiguration` mirroring `TWinConfiguration`'s keys; the language as upstream chooses it; Options > Preferences (Ctrl+Alt+P) with Panels, Commander and Languages, applied to the panels; ctests `qt_gui_preferences`, `qt_gui_sites`, `qt_language`; native on Windows 11 too. Not yet on these pages (ADR 0014): incremental search, panel state, full row, double-click, font, Explorer-style selection, tree, location profiles, compare criteria |
 | P3-04b | Preferences: Transfer, Background, Endurance | done | transfers use the GUI's settings (`TTransferSettings`, `port/qt/TransferSettings.cpp`); the Copy and Synchronize dialogs' Transfer settings group and dialog (`TransferSettingsDialog.cpp`); Preferences' Transfer (presets), Background, Endurance; ctests `qt_session`/`qt_session_ftp`, `qt_gui_preferences`; native on Windows 11 too. Not yet (ADR 0014): autoselection rules, parallel threshold, queue enabling and list visibility |
-| P3-04c | Preferences: Window, Explorer, File colors | todo | the panels' layout kept between runs |
+| P3-04c | Preferences: Window, Explorer, File colors | done | Window (path in title, keep open), File colors (`MaskMatchesPath`), the layout kept in WinSCP's formats (`DirViewParams`, `WindowParams`, `LocalPanelWidth`, `CurrentPanel`, the queue's height); pages in WinSCP's tree order; ctests `qt_gui_preferences`, `qt_gui_panel`; native on Windows 11 too. The Explorer page is not offered (no Explorer interface); not yet: minimize to tray, single instance |
 | P3-04d | Preferences: Storage, Logging, Network, Security, Updates | todo | |
 | P3-04e | Preferences: Editors, Integration, Applications, Commands, Drag & Drop | todo | after P3-05, P3-08 |
 | P3-05 | Internal editor | todo | Q-3 |
