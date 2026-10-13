@@ -134,15 +134,24 @@ add_subdirectory(port/frontend)
 # The Qt shell, when Qt is there: Debian's qt6-base-dev natively; for the
 # Windows cross-build, MSYS2's Qt (port/tools/fetch_msys2_qt.py) with
 # Debian's as the host tools, the same version (ADR 0011).
+# Without the host Qt, Qt's packages fall back to the target's own tools
+# (moc.exe), which do not run here, so its absence stops the shell.
+set(_qt_host_ok TRUE)
 if(CMAKE_CROSSCOMPILING AND NOT QT_HOST_PATH)
-  set(QT_HOST_PATH /usr CACHE PATH "Qt for the build host, whose moc, uic and rcc the cross-build runs")
-  execute_process(COMMAND dpkg-architecture -qDEB_HOST_MULTIARCH OUTPUT_VARIABLE _multiarch
-                  OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-  if(_multiarch)
-    set(QT_HOST_PATH_CMAKE_DIR "/usr/lib/${_multiarch}/cmake" CACHE PATH "The host Qt's CMake packages")
+  file(GLOB _qt_host_info LIST_DIRECTORIES true /usr/lib/*/cmake/Qt6HostInfo /usr/lib/cmake/Qt6HostInfo)
+  if(_qt_host_info)
+    list(GET _qt_host_info 0 _qt_host_info)
+    get_filename_component(_qt_host_cmake "${_qt_host_info}" DIRECTORY)
+    set(QT_HOST_PATH /usr CACHE PATH "Qt for the build host, whose moc, uic and rcc the cross-build runs")
+    set(QT_HOST_PATH_CMAKE_DIR "${_qt_host_cmake}" CACHE PATH "The host Qt's CMake packages")
+  else()
+    set(_qt_host_ok FALSE)
+    message(STATUS "linscp: no host Qt (qt6-base-dev) for the cross-build's moc, uic and rcc")
   endif()
 endif()
-find_package(Qt6 6.8 QUIET COMPONENTS Widgets)
+if(_qt_host_ok)
+  find_package(Qt6 6.8 QUIET COMPONENTS Widgets)
+endif()
 if(Qt6_FOUND)
   add_subdirectory(port/qt)
 else()
