@@ -87,7 +87,7 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   FSort = new DirectoriesFirst(this);
   FSort->setSourceModel(FModel);
   FSort->setSortRole(FileListModel::SortRole);
-  FView = new QTreeView(this);
+  FView = new FileView(this);
   FView->setModel(FSort);
   FView->setRootIsDecorated(false);
   FView->setItemsExpandable(false);
@@ -98,6 +98,11 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   FView->sortByColumn(FileListModel::NameColumn, Qt::AscendingOrder);
   FView->header()->setSectionResizeMode(FileListModel::NameColumn, QHeaderView::Stretch);
   FView->setContextMenuPolicy(Qt::CustomContextMenu);
+  FView->MakeDrag = [this]() -> QMimeData *
+  {
+    const QStringList Names = Selected();
+    return Names.isEmpty() ? nullptr : MakeFileDrag({ false, FCurrent, Names });
+  };
   connect(FView, &QTreeView::activated, this, &RemotePanel::Activated);
   connect(FView, &QWidget::customContextMenuRequested, this, &RemotePanel::ContextMenu);
   connect(FView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &RemotePanel::UpdateActions);
@@ -253,6 +258,33 @@ bool RemotePanel::Rename(const QString & Name, const QString & NewName)
     Select({ NewName });
   }
   return Result;
+}
+
+// As WinSCP's remote panel moves what is dropped on one of its directories.
+bool RemotePanel::MoveInto(const QStringList & Names, const QString & Directory)
+{
+  if (Names.isEmpty() || Directory.isEmpty() || Names.contains(Directory) || (FSession == nullptr))
+  {
+    return false;
+  }
+  QString Target;
+  if (Directory == QLatin1String(ParentEntryName))
+  {
+    const int Slash = FCurrent.lastIndexOf(QLatin1Char('/'));
+    Target = (Slash <= 0) ? QStringLiteral("/") : FCurrent.left(Slash);
+  }
+  else
+  {
+    Target = FCurrent.endsWith(QLatin1Char('/')) ? (FCurrent + Directory) : (FCurrent + QLatin1Char('/') + Directory);
+  }
+  std::vector<std::string> List;
+  for (const QString & Name : Names)
+  {
+    List.push_back(Name.toStdString());
+  }
+  bool Moved = false;
+  const bool Result = Run([this, &List, &Target, &Moved]() { Moved = FSession->Move(List, Target.toStdString()); }, false);
+  return Result && Moved;
 }
 
 // As the explorer deletes: core's confirmation naming the file, or how many.

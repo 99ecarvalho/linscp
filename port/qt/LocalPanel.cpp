@@ -143,7 +143,7 @@ LocalPanel::LocalPanel(QWidget * Parent) :
   FSort = new DirectoriesFirst(this);
   FSort->setSourceModel(FModel);
   FSort->setSortRole(FileListModel::SortRole);
-  FView = new QTreeView(this);
+  FView = new FileView(this);
   FView->setModel(FSort);
   FView->setRootIsDecorated(false);
   FView->setItemsExpandable(false);
@@ -154,6 +154,11 @@ LocalPanel::LocalPanel(QWidget * Parent) :
   FView->sortByColumn(FileListModel::NameColumn, Qt::AscendingOrder);
   FView->header()->setSectionResizeMode(FileListModel::NameColumn, QHeaderView::Stretch);
   FView->setContextMenuPolicy(Qt::CustomContextMenu);
+  FView->MakeDrag = [this]() -> QMimeData *
+  {
+    const QStringList Names = Selected();
+    return Names.isEmpty() ? nullptr : MakeFileDrag({ true, FCurrent, Names });
+  };
   connect(FView, &QTreeView::activated, this, &LocalPanel::Activated);
   connect(FView, &QWidget::customContextMenuRequested, this, &LocalPanel::ContextMenu);
   connect(FView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &LocalPanel::UpdateActions);
@@ -313,6 +318,29 @@ bool LocalPanel::Rename(const QString & Name, const QString & NewName)
   Reload();
   Select({ NewName });
   return true;
+}
+
+bool LocalPanel::MoveInto(const QStringList & Names, const QString & Directory)
+{
+  if (Names.isEmpty() || Directory.isEmpty() || Names.contains(Directory))
+  {
+    return false;
+  }
+  const QDir Current(FCurrent);
+  const QDir Target(Current.filePath(Directory));
+  bool Result = true;
+  for (const QString & Name : Names)
+  {
+    const QString NewName = Target.filePath(Name);
+    if (QFileInfo::exists(NewName) || !QDir().rename(Current.filePath(Name), NewName))
+    {
+      Fail(CoreText(CoreBridge::TText::RenameFileError, { Name, QDir::toNativeSeparators(NewName) }));
+      Result = false;
+      break;
+    }
+  }
+  Reload();
+  return Result;
 }
 
 // As WinSCP's local delete by default: to the recycle bin (the trash), with

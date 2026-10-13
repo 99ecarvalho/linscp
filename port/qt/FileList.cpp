@@ -1,8 +1,110 @@
 #include "FileList.h"
 
 #include <QApplication>
+#include <QDrag>
+#include <QDragEnterEvent>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QLocale>
+#include <QMimeData>
 #include <QStyle>
+#include <QUrl>
+
+const char * const FileDragMimeType = "application/x-linscp-files";
+
+QMimeData * MakeFileDrag(const TFileDrag & Drag)
+{
+  QMimeData * Data = new QMimeData();
+  QJsonObject Object;
+  Object[QStringLiteral("local")] = Drag.Local;
+  Object[QStringLiteral("directory")] = Drag.Directory;
+  Object[QStringLiteral("names")] = QJsonArray::fromStringList(Drag.Names);
+  Data->setData(QString::fromLatin1(FileDragMimeType), QJsonDocument(Object).toJson(QJsonDocument::Compact));
+  if (Drag.Local)
+  {
+    QList<QUrl> Urls;
+    for (const QString & Name : Drag.Names)
+    {
+      Urls.append(QUrl::fromLocalFile(Drag.Directory + QLatin1Char('/') + Name));
+    }
+    Data->setUrls(Urls);
+  }
+  return Data;
+}
+
+bool ReadFileDrag(const QMimeData * Data, TFileDrag & Drag)
+{
+  if ((Data == nullptr) || !Data->hasFormat(QString::fromLatin1(FileDragMimeType)))
+  {
+    return false;
+  }
+  const QJsonObject Object = QJsonDocument::fromJson(Data->data(QString::fromLatin1(FileDragMimeType))).object();
+  Drag.Local = Object[QStringLiteral("local")].toBool();
+  Drag.Directory = Object[QStringLiteral("directory")].toString();
+  Drag.Names.clear();
+  for (const QJsonValue & Name : Object[QStringLiteral("names")].toArray())
+  {
+    Drag.Names.append(Name.toString());
+  }
+  return true;
+}
+
+FileView::FileView(QWidget * Parent) :
+  QTreeView(Parent)
+{
+  setDragEnabled(true);
+  setAcceptDrops(true);
+  setDropIndicatorShown(true);
+  setDragDropMode(QAbstractItemView::DragDrop);
+  setDefaultDropAction(Qt::CopyAction);
+}
+
+void FileView::startDrag(Qt::DropActions /*Actions*/)
+{
+  QMimeData * Data = MakeDrag ? MakeDrag() : nullptr;
+  if (Data == nullptr)
+  {
+    return;
+  }
+  QDrag * Drag = new QDrag(this);
+  Drag->setMimeData(Data);
+  Drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
+}
+
+// A panel's drag, or files from elsewhere: copy, or move with Shift, as
+// WinSCP's.
+void FileView::dragEnterEvent(QDragEnterEvent * Event)
+{
+  if (Event->mimeData()->hasFormat(QString::fromLatin1(FileDragMimeType)) || Event->mimeData()->hasUrls())
+  {
+    Event->acceptProposedAction();
+  }
+}
+
+void FileView::dragMoveEvent(QDragMoveEvent * Event)
+{
+  Event->setDropAction((Event->modifiers() & Qt::ShiftModifier) ? Qt::MoveAction : Qt::CopyAction);
+  Event->accept();
+}
+
+void FileView::dropEvent(QDropEvent * Event)
+{
+  const Qt::DropAction Action = (Event->modifiers() & Qt::ShiftModifier) ? Qt::MoveAction : Qt::CopyAction;
+  emit Dropped(Event->mimeData(), DirectoryAt(Event->position().toPoint()), Action);
+  Event->setDropAction(Action);
+  Event->accept();
+}
+
+QString FileView::DirectoryAt(const QPoint & Pos) const
+{
+  const QModelIndex Index = indexAt(Pos);
+  if (!Index.isValid() || !Index.data(FileListModel::DirectoryRole).toBool())
+  {
+    return QString();
+  }
+  return Index.siblingAtColumn(FileListModel::NameColumn).data(Qt::DisplayRole).toString();
+}
 
 const char * const ParentEntryName = "..";
 

@@ -382,6 +382,9 @@ public:
   void CreateDirectory(const std::string & Name);
   // An entry of the current directory, to a new name (or path).
   void Rename(const std::string & Name, const std::string & NewName);
+  // Entries of the current directory into another remote directory (a full
+  // path), keeping their names. False when not all moved.
+  bool Move(const std::vector<std::string> & Names, const std::string & TargetDirectory);
   // Entries of the current directory. False when core skipped some.
   bool Delete(const std::vector<std::string> & Names);
   // Transfers with core's default transfer settings, as the GUI's Copy

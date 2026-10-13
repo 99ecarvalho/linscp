@@ -47,6 +47,9 @@ public:
   bool Rename(const QString & Name, const QString & NewName);
   // The selected entries, after asking (core's confirmation) unless not.
   bool DeleteSelected(bool Confirm = true);
+  // Entries of the directory into one of its directories ("..": the
+  // parent), as a drop within the panel.
+  bool MoveInto(const QStringList & Names, const QString & Directory);
   // Opens the entry: a directory is entered.
   void Open(const QString & Name);
 
@@ -55,7 +58,7 @@ public:
   void Select(const QStringList & Names);
   QStringList Names() const;
   QString Path() const;
-  QTreeView * View() const { return FView; }
+  FileView * View() const { return FView; }
   QLineEdit * PathEdit() const { return FPath; }
 
 signals:
@@ -73,7 +76,7 @@ private:
   CoreBridge::TSession * FSession = nullptr;
   FileListModel * FModel = nullptr;
   DirectoriesFirst * FSort = nullptr;
-  QTreeView * FView = nullptr;
+  FileView * FView = nullptr;
   QLineEdit * FPath = nullptr;
   // The directory shown: the path box may hold what is being typed.
   QString FCurrent;

@@ -12,6 +12,9 @@
 #include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QDir>
+#include <QFileInfo>
+#include <QMimeData>
+#include <QUrl>
 #include <QFormLayout>
 #include <QTimer>
 #include <QTreeView>
@@ -22,6 +25,7 @@
 
 #include <algorithm>
 
+#include "FileList.h"
 #include "QtFrontend.h"
 #include "LocalPanel.h"
 #include "QueuePanel.h"
@@ -60,6 +64,28 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FPanel = new RemotePanel(Panels);
   Panels->setChildrenCollapsible(false);
   FQueue = new QueuePanel(Vertical);
+  // Dropped: handled once the drag is over (its loop is the source's, and on
+  // Windows the system's), with a copy of what was dropped.
+  for (FileView * View : { FLocal->View(), FPanel->View() })
+  {
+    const bool OnLocal = (View == FLocal->View());
+    connect(View, &FileView::Dropped, this, [this, OnLocal](const QMimeData * Data, const QString & OnDirectory, Qt::DropAction Action)
+    {
+      std::shared_ptr<QMimeData> Copy(new QMimeData());
+      for (const QString & Format : Data->formats())
+      {
+        Copy->setData(Format, Data->data(Format));
+      }
+      if (Data->hasUrls())
+      {
+        Copy->setUrls(Data->urls());
+      }
+      QTimer::singleShot(0, this, [this, OnLocal, Copy, OnDirectory, Action]()
+      {
+        Drop(OnLocal, Copy.get(), OnDirectory, Action == Qt::MoveAction);
+      });
+    });
+  }
   Vertical->setStretchFactor(0, 4);
   Vertical->setStretchFactor(1, 1);
   setCentralWidget(Vertical);
@@ -330,15 +356,93 @@ bool MainWindow::TransferSelected(bool Move, bool Confirm, bool Background)
 {
   const bool FromLocal = FLocalActive;
   const QStringList Names = FromLocal ? FLocal->Selected() : FPanel->Selected();
-  if (Names.isEmpty() || !FSession || !FSession->Active())
+  const QString Target = FromLocal ? FPanel->Path() : QDir::toNativeSeparators(FLocal->Path());
+  return Transfer(FromLocal, Names, Target, Move, Confirm, Background);
+}
+
+// Into a directory of the panel or, with OnDirectory empty, the panel's own.
+static QString DropTarget(const QString & Path, const QString & OnDirectory, bool Remote)
+{
+  if (OnDirectory.isEmpty())
+  {
+    return Path;
+  }
+  if (Remote)
+  {
+    return Path.endsWith(QLatin1Char('/')) ? (Path + OnDirectory) : (Path + QLatin1Char('/') + OnDirectory);
+  }
+  return QDir::cleanPath(QDir(Path).filePath(OnDirectory));
+}
+
+bool MainWindow::Drop(bool OnLocal, const QMimeData * Data, const QString & OnDirectory, bool Move, bool Confirm)
+{
+  if (FBusy)
   {
     return false;
   }
-  QString Target = FromLocal ? FPanel->Path() : QDir::toNativeSeparators(FLocal->Path());
+  TFileDrag Drag;
+  if (ReadFileDrag(Data, Drag))
+  {
+    if (Drag.Local == OnLocal)
+    {
+      // Within the panel: onto one of its directories, moved there, as
+      // WinSCP's panels do; onto the panel itself, nothing.
+      if (OnDirectory.isEmpty())
+      {
+        return false;
+      }
+      if (Confirm)
+      {
+        const QString What = (Drag.Names.size() == 1) ? QStringLiteral("'%1'").arg(Drag.Names.first()) :
+          tr("%n file(s)", nullptr, Drag.Names.size());
+        if (QMessageBox::question(this, tr("Move"), tr("Move %1 to '%2'?").arg(What, OnDirectory)) != QMessageBox::Yes)
+        {
+          return false;
+        }
+      }
+      return OnLocal ? FLocal->MoveInto(Drag.Names, OnDirectory) : FPanel->MoveInto(Drag.Names, OnDirectory);
+    }
+    // From the other panel: its entries, from the directory they were
+    // dragged from.
+    QStringList Sources;
+    for (const QString & Name : Drag.Names)
+    {
+      Sources.append(Drag.Local ? QDir(Drag.Directory).filePath(Name) : Name);
+    }
+    if (!Drag.Local && (Drag.Directory != FPanel->Path()))
+    {
+      return false;
+    }
+    const QString Target = OnLocal ?
+      QDir::toNativeSeparators(DropTarget(FLocal->Path(), OnDirectory, false)) : DropTarget(FPanel->Path(), OnDirectory, true);
+    return Transfer(Drag.Local, Sources, Target, Move, Confirm, false);
+  }
+  // Files from another program: uploaded when dropped on the remote panel.
+  if (OnLocal || (Data == nullptr) || !Data->hasUrls())
+  {
+    return false;
+  }
+  QStringList Sources;
+  for (const QUrl & Url : Data->urls())
+  {
+    if (Url.isLocalFile())
+    {
+      Sources.append(QDir::cleanPath(Url.toLocalFile()));
+    }
+  }
+  return Transfer(true, Sources, DropTarget(FPanel->Path(), OnDirectory, true), Move, Confirm, false);
+}
+
+bool MainWindow::Transfer(bool FromLocal, const QStringList & Names, QString Target, bool Move, bool Confirm, bool Background)
+{
+  if (Names.isEmpty() || !FSession || !FSession->Active() || FBusy)
+  {
+    return false;
+  }
   if (Confirm)
   {
     // As WinSCP's Copy dialog: where to, editable.
-    const QString What = (Names.size() == 1) ? QStringLiteral("'%1'").arg(Names.first()) : tr("%n file(s)", nullptr, Names.size());
+    const QString What = (Names.size() == 1) ? QStringLiteral("'%1'").arg(QFileInfo(Names.first()).fileName()) : tr("%n file(s)", nullptr, Names.size());
     const QString Prompt = FromLocal ?
       (Move ? tr("Move %1 to remote directory:") : tr("Upload %1 to remote directory:")).arg(What) :
       (Move ? tr("Move %1 to local directory:") : tr("Download %1 to local directory:")).arg(What);

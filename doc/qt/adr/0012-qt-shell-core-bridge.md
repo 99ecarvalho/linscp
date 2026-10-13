@@ -179,3 +179,25 @@ reusing the password) and `qt_gui_transfer` (F5/F6 between the panels, the
 progress window's cancel, queued transfers the panels catch up with, a
 queued upload cancelled from the queue panel): Linux, Wine, natively on
 Windows 11.
+
+## Amendment 2026-10-13: drag and drop (P3-07, first part)
+
+- **What a panel drags** is its own MIME type, `application/x-linscp-files`:
+  the side, the directory and the selected names. A local drag also carries
+  the files' URLs, so other programs take it as a file drag.
+- **A drop is handled after the drag ends.** The view reports the drop and
+  the directory row it fell on. The main window copies the data and acts on
+  it from the event loop, because the drag loop belongs to the source (on
+  Windows, to the system's `DoDragDrop`), and a modal dialog or a transfer
+  should not run inside it.
+- **What a drop does follows WinSCP.** From the other panel it transfers,
+  through the Copy dialog, as F5 does; with Shift it moves. Within a panel,
+  a drop onto a directory moves the entries into it after asking. Remotely
+  that goes through core's `MoveFiles`, as WinSCP's remote panel does,
+  which also invalidates the target in core's directory cache. A rename
+  into a subdirectory leaves the target's cached listing stale. Files from
+  other programs upload when dropped on the remote panel.
+
+Verified by `qt_gui_drop` (each kind of drop, and drops delivered as the
+system sends them, through the view, with their questions answered): Linux,
+Wine, natively on Windows 11.

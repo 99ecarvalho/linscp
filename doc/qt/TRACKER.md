@@ -216,9 +216,16 @@ the panels for background ones (core's `TTerminalQueue`, polled on the GUI
 thread, its questions popped up as WinSCP does), with cancel, suspend and
 resume; the panels catch up when transfers finish.
 
-1. **P2-10**: packaging (Linux and Windows).
-2. **P2-11**: the P2 exit gate: a day's work in the shell.
-3. Then P3.
+Drag and drop between the panels (P3-07, under way): from one panel to the
+other, a transfer after the Copy dialog (Shift: move); within a panel, onto a
+directory, a move into it (remotely through core's `MoveFiles`, as WinSCP);
+files from other programs, onto the remote panel, an upload. P2-10 and P2-11
+wait, at the user's request.
+
+1. **P3-07**: drag out of the remote panel to other programs (XDS on Linux,
+   a download-and-drop on Windows).
+2. **P3-03**: synchronization UI, over the transfer and queue machinery.
+3. **P3-02**: the rest of the Commander (status bars, toolbar, keys).
 
 ## Decisions taken
 
@@ -229,6 +236,7 @@ resume; the panels catch up when transfers finish.
 | 2026-10-13 | The panels follow WinSCP's defaults: hidden files not shown (dot files remotely, hidden files locally), local deletes to the trash; shell texts that core already has (confirmations, errors) come from core | WinSCP's `ShowHiddenFiles = false` and `DeleteToRecycleBin = true`; core's texts reach every language WinSCP's translators cover |
 | 2026-10-13 | Core's texts are translated with WinSCP's own translations, loaded by the shim where upstream loads its translation DLL; the shell's with Qt Linguist; Qt's with Qt's (ADR 0013) | 55 languages by WinSCP's translators at no cost, and core unchanged. The shell's texts are new and get .ts files; `--lang` chooses until preferences exist (P3-04) |
 | 2026-10-13 | The Windows toolchain is llvm-mingw against MSYS2's Qt 6.8.2 and its C++ runtime, all pinned; the GCC sysroot is retired (ADR 0011) | Debian has no Qt for mingw. MSYS2's clang64 Qt is that ABI and prebuilt; Debian's own Qt version, so its host tools serve the cross-build. Wine testing from Linux is kept, which clang-cl/MSVC would have weakened |
+| 2026-10-13 | P2-10 (packaging) and P2-11 (the P2 exit gate) wait; P3 goes first | The user's call: parity features before packaging. They stay `todo` |
 | 2026-10-10 | Generated-tree model, not a source fork | Keeps the upstream diff structurally empty |
 | 2026-10-10 | Keep the VCL RTL shim permanently | De-shimming is a second project of similar size with no user benefit |
 | 2026-10-10 | Decouple shim cleanup from 100% UI parity | Coupling them would add ~a year of dual-build burden |
@@ -733,7 +741,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-04 | Preferences | todo | XL — split first |
 | P3-05 | Internal editor | todo | Q-3 |
 | P3-06 | Remaining 48 dialogs, batched | todo | XL — split into P3-06a…f |
-| P3-07 | Drag & drop | todo | |
+| P3-07 | Drag & drop | wip | between the panels, within one (onto a directory), and from other programs onto the remote panel: `FileView` in `port/qt/FileList.cpp`, `MainWindow::Drop`, `TSession::Move`; ctest `qt_gui_drop`; native on Windows 11 too. Left: dragging remote files out to other programs |
 | P3-08 | Shell integration | todo | |
 | P3-09 | Accessibility | todo | |
 | P3-10 | P3 exit gate | todo | |

@@ -1,6 +1,7 @@
 // The shell's main window, in WinSCP's Commander layout: the local panel
 // and, beside it, the remote panel of the session opened from the site
-// manager or a URL. Transfers between them and the queue are P2-07's.
+// manager or a URL; transfers between them by keys, menu, or drag and drop;
+// the transfer queue below.
 #ifndef LINSCP_QT_MAIN_WINDOW_H
 #define LINSCP_QT_MAIN_WINDOW_H
 
@@ -12,6 +13,7 @@
 
 class QAction;
 class QLineEdit;
+class QMimeData;
 class LocalPanel;
 class QueuePanel;
 class QTimer;
@@ -40,6 +42,15 @@ public:
   // Background: through the transfer queue, as the Copy dialog's "transfer
   // in background" (with Confirm, the dialog's checkbox decides).
   bool TransferSelected(bool Move, bool Confirm = true, bool Background = false);
+  // Names (or full paths, from the local side) to Target, as the above.
+  bool Transfer(bool FromLocal, const QStringList & Names, QString Target, bool Move, bool Confirm, bool Background);
+  // What is dropped on a panel (OnLocal: the local one), onto one of its
+  // directories or (OnDirectory empty) the panel itself, as WinSCP's drag
+  // and drop: from the other panel, transferred there after the Copy
+  // dialog; within the panel, onto a directory, moved into it; files from
+  // another program, onto the remote panel, uploaded. Move: dropped with
+  // Shift. False when nothing was done in full.
+  bool Drop(bool OnLocal, const QMimeData * Data, const QString & OnDirectory, bool Move, bool Confirm = true);
   // Polls the session's queue: QueueTimer's, and tests'.
   void QueueIdle();
   QueuePanel * Queue() const { return FQueue; }

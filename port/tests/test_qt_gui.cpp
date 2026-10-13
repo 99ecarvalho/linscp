@@ -32,6 +32,12 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QTimer>
+#include <QDragEnterEvent>
+#include <QMessageBox>
+#include <QMimeData>
+#include <QUrl>
+
+#include <memory>
 
 #include <cstdio>
 #include <cstring>
@@ -241,6 +247,10 @@ public:
   QtFrontend * Frontend = nullptr;
   int TransfersSeen = 0;
   bool CancelTransfers = false;
+  // Other dialogs (a message box's Yes, a plain dialog's OK), with their
+  // titles.
+  bool AcceptDialogs = false;
+  QStringList Accepted;
 
   TResponder()
   {
@@ -301,6 +311,16 @@ private:
         Passwords.pop_front();
         Prompt->accept();
       }
+    }
+    else if (QMessageBox * Box = qobject_cast<QMessageBox *>(Modal); AcceptDialogs && (Box != nullptr))
+    {
+      Accepted.append(Box->windowTitle());
+      Box->button(QMessageBox::Yes)->click();
+    }
+    else if (QDialog * Dialog = qobject_cast<QDialog *>(Modal); AcceptDialogs && (Dialog != nullptr))
+    {
+      Accepted.append(Dialog->windowTitle());
+      Dialog->accept();
     }
   }
 };
@@ -638,6 +658,157 @@ void Transfer(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// Where a row of a panel is, for a drop onto it.
+QPoint RowCenter(FileView * View, const QString & Name)
+{
+  for (int Row = 0; Row < View->model()->rowCount(); Row++)
+  {
+    const QModelIndex Index = View->model()->index(Row, FileListModel::NameColumn);
+    if (Index.data(Qt::DisplayRole).toString() == Name)
+    {
+      return View->visualRect(Index).center();
+    }
+  }
+  return QPoint();
+}
+
+// A drag of Data dropped at Pos of View, as the system delivers it.
+void DragOnto(FileView * View, QMimeData * Data, const QPoint & Pos, Qt::KeyboardModifiers Modifiers)
+{
+  if (Data == nullptr)
+  {
+    return;
+  }
+  const Qt::DropActions Actions = Qt::CopyAction | Qt::MoveAction;
+  QDragEnterEvent Enter(Pos, Actions, Data, Qt::LeftButton, Modifiers);
+  QApplication::sendEvent(View->viewport(), &Enter);
+  QDragMoveEvent Move(Pos, Actions, Data, Qt::LeftButton, Modifiers);
+  QApplication::sendEvent(View->viewport(), &Move);
+  QDropEvent Drop(QPointF(Pos), Actions, Data, Qt::LeftButton, Modifiers);
+  QApplication::sendEvent(View->viewport(), &Drop);
+}
+
+void DragAndDrop(const char * Port, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = { "secret" };
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "the session opens");
+    const QDir Dir(Directory);
+    for (const char * Name : { "dragged.txt", "moveme.txt", "local.txt", "external.txt" })
+    {
+      QFile File(Dir.filePath(QString::fromLatin1(Name)));
+      File.open(QIODevice::WriteOnly);
+      File.write(Name);
+    }
+    Dir.mkpath(QStringLiteral("down"));
+    LocalPanel * Local = Window.Local();
+    RemotePanel * Remote = Window.Panel();
+    Local->ChangeDirectory(Directory);
+    const auto Drag = [](FileView * View) { return std::unique_ptr<QMimeData>(View->MakeDrag()); };
+
+    Local->Select({ QStringLiteral("moveme.txt") });
+    std::unique_ptr<QMimeData> Data = Drag(Local->View());
+    TFileDrag Read;
+    Check(ReadFileDrag(Data.get(), Read) && Read.Local && (Read.Names == QStringList{ QStringLiteral("moveme.txt") }),
+      "a local drag carries the panel's selection");
+    Check((Data->urls().size() == 1) && (QFileInfo(Data->urls().first().toLocalFile()) == QFileInfo(Dir.filePath(QStringLiteral("moveme.txt")))),
+      "and its file URLs, for other programs");
+    Check(Window.Drop(false, Data.get(), QString(), false, false) && Remote->Names().contains(QStringLiteral("moveme.txt")),
+      "dropped on the remote panel, it uploads there");
+    Check(QFileInfo::exists(Dir.filePath(QStringLiteral("moveme.txt"))), "a copy: the local file stays");
+
+    Local->Select({ QStringLiteral("dragged.txt") });
+    Data = Drag(Local->View());
+    Check(Window.Drop(false, Data.get(), QStringLiteral("sub"), true, false), "dropped on a remote directory with Shift");
+    Check(!QFileInfo::exists(Dir.filePath(QStringLiteral("dragged.txt"))) && !Remote->Names().contains(QStringLiteral("dragged.txt")),
+      "it moves: gone locally, not in the remote directory itself");
+    Check(Remote->ChangeDirectory(QStringLiteral("/sub")) && Remote->Names().contains(QStringLiteral("dragged.txt")),
+      "but in the one dropped on");
+    Check(Remote->ChangeDirectory(QStringLiteral("/")), "back to the root");
+
+    Remote->Select({ QStringLiteral("hello.txt") });
+    Data = Drag(Remote->View());
+    Check(ReadFileDrag(Data.get(), Read) && !Read.Local && Data->urls().isEmpty(), "a remote drag carries no file URLs");
+    Check(Window.Drop(true, Data.get(), QStringLiteral("down"), false, false), "dropped on a local directory");
+    QFile Down(Dir.filePath(QStringLiteral("down/hello.txt")));
+    Check(Down.open(QIODevice::ReadOnly) && (Down.readAll() == "Hello, linscp\n"), "it downloads there, whole");
+    Check(Remote->Names().contains(QStringLiteral("hello.txt")), "and stays remotely");
+
+    Remote->Select({ QStringLiteral("moveme.txt") });
+    Data = Drag(Remote->View());
+    Check(Window.Drop(false, Data.get(), QStringLiteral("sub"), false, false), "within the remote panel, onto a directory");
+    Check(!Remote->Names().contains(QStringLiteral("moveme.txt")), "it moves into it");
+    Check(Remote->ChangeDirectory(QStringLiteral("/sub")) && Remote->Names().contains(QStringLiteral("moveme.txt")), "and is there");
+    Remote->Select({ QStringLiteral("moveme.txt") });
+    Data = Drag(Remote->View());
+    Check(Window.Drop(false, Data.get(), QStringLiteral(".."), false, false), "onto \"..\", the parent");
+    Check(Remote->ChangeDirectory(QStringLiteral("/")) && Remote->Names().contains(QStringLiteral("moveme.txt")), "back in the root");
+    Check(!Window.Drop(false, Data.get(), QString(), false, false), "onto the panel itself, nothing");
+
+    QFile::remove(Dir.filePath(QStringLiteral("moveme.txt")));
+    Local->Refresh();
+    Remote->Select({ QStringLiteral("moveme.txt") });
+    Data = Drag(Remote->View());
+    Check(Window.Drop(true, Data.get(), QString(), true, false), "a remote file dropped on the local panel with Shift");
+    Check(QFileInfo::exists(Dir.filePath(QStringLiteral("moveme.txt"))) && !Remote->Names().contains(QStringLiteral("moveme.txt")),
+      "moves down");
+
+    std::unique_ptr<QMimeData> External(new QMimeData());
+    External->setUrls({ QUrl::fromLocalFile(Dir.filePath(QStringLiteral("external.txt"))) });
+    Check(Window.Drop(false, External.get(), QString(), false, false) && Remote->Names().contains(QStringLiteral("external.txt")),
+      "files from another program upload when dropped on the remote panel");
+    Check(!Window.Drop(true, External.get(), QString(), false, false), "and are not taken by the local panel");
+
+    // Through the view, as the system delivers a drop: with the questions.
+    Responder.AcceptDialogs = true;
+    Local->Refresh();
+    Local->Select({ QStringLiteral("local.txt") });
+    Data = Drag(Local->View());
+    Check(Data != nullptr, "the local panel drags its selection");
+    QString DroppedOn;
+    Qt::DropAction DroppedAs = Qt::IgnoreAction;
+    QObject::connect(Local->View(), &FileView::Dropped, Local->View(),
+      [&DroppedOn, &DroppedAs](const QMimeData *, const QString & OnDirectory, Qt::DropAction Action)
+      {
+        DroppedOn = OnDirectory;
+        DroppedAs = Action;
+      });
+    DragOnto(Local->View(), Data.get(), RowCenter(Local->View(), QStringLiteral("down")), Qt::NoModifier);
+    Check((DroppedOn == QStringLiteral("down")) && (DroppedAs == Qt::CopyAction), "a drop on a row names its directory");
+    QElapsedTimer Timer;
+    Timer.start();
+    while (!QFileInfo::exists(Dir.filePath(QStringLiteral("down/local.txt"))) && (Timer.elapsed() < 10000))
+    {
+      QApplication::processEvents(QEventLoop::AllEvents, 50);
+    }
+    Check(QFileInfo::exists(Dir.filePath(QStringLiteral("down/local.txt"))) && !QFileInfo::exists(Dir.filePath(QStringLiteral("local.txt"))),
+      "and, after asking, the file moves into it");
+    Check(Responder.Accepted.contains(QStringLiteral("Move")), "the question was the move's");
+
+    Local->Refresh();
+    Local->Select({ QStringLiteral("moveme.txt") });
+    Data = Drag(Local->View());
+    Check(Data != nullptr, "and drags it again");
+    DragOnto(Remote->View(), Data.get(), QPoint(5, Remote->View()->viewport()->height() - 5), Qt::ShiftModifier);
+    Timer.start();
+    while (!Remote->Names().contains(QStringLiteral("moveme.txt")) && (Timer.elapsed() < 10000))
+    {
+      QApplication::processEvents(QEventLoop::AllEvents, 50);
+    }
+    Check(Remote->Names().contains(QStringLiteral("moveme.txt")) && !QFileInfo::exists(Dir.filePath(QStringLiteral("moveme.txt"))),
+      "a Shift-drop on the remote panel's free space moves up, after the Move dialog");
+    Frontend.SetWindow(nullptr);
+  }
+  CoreBridge::Finalize();
+}
+
 void Session(const char * Port)
 {
   QtFrontend Frontend;
@@ -669,6 +840,7 @@ void Session(const char * Port)
 int main(int argc, char ** argv)
 {
   QApplication App(argc, argv);
+  std::setvbuf(stdout, nullptr, _IONBF, 0);
   if ((argc >= 2) && (std::strcmp(argv[1], "dialogs") == 0))
   {
     Dialogs();
@@ -692,6 +864,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 5) && (std::strcmp(argv[1], "transfer") == 0))
   {
     Transfer(argv[3], QString::fromLocal8Bit(argv[4]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "drop") == 0))
+  {
+    DragAndDrop(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "session") == 0))
   {

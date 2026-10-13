@@ -41,6 +41,8 @@ public:
   // The selected entries, to the trash (or for good where there is no
   // trash), after core's confirmation unless not asked.
   bool DeleteSelected(bool Confirm = true);
+  // As RemotePanel's: entries into one of the directory's directories.
+  bool MoveInto(const QStringList & Names, const QString & Directory);
   // A directory is entered; a file opened with its application.
   void Open(const QString & Name);
   // Where a file is opened: the system's application by default.
@@ -55,7 +57,7 @@ public:
   QStringList Names() const;
   // The directory shown, with '/' separators (Qt's), as the panel works in it.
   QString Path() const { return FCurrent; }
-  QTreeView * View() const { return FView; }
+  FileView * View() const { return FView; }
   QLineEdit * PathEdit() const { return FPath; }
 
 signals:
@@ -71,7 +73,7 @@ private:
 
   FileListModel * FModel = nullptr;
   DirectoriesFirst * FSort = nullptr;
-  QTreeView * FView = nullptr;
+  FileView * FView = nullptr;
   QLineEdit * FPath = nullptr;
   QFileSystemWatcher * FWatcher = nullptr;
   QTimer * FReloadTimer = nullptr;

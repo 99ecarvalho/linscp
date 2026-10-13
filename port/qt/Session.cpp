@@ -384,6 +384,28 @@ void TSession::Rename(const std::string & Name, const std::string & NewName)
   }
 }
 
+// As WinSCP's remote panel moves (TCustomScpExplorerForm's RemoteTransferFiles):
+// the files with their TRemoteFile, through MoveFiles, which also tells the
+// directory cache the target changed.
+bool TSession::Move(const std::vector<std::string> & Names, const std::string & TargetDirectory)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TStringList> Files(new TStringList());
+    for (const std::string & Name : Names)
+    {
+      TRemoteFile * File = FindFile(F->Terminal.get(), Name);
+      Files->AddObject(File->FileName, File);
+    }
+    return F->Terminal->MoveFiles(Files.get(), FromUtf8(TargetDirectory), L"*.*", false);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 // As the GUI deletes: the files' names, each with its TRemoteFile. (A
 // directory's full name ends in a slash, which FileZilla's removedir refuses.)
 bool TSession::Delete(const std::vector<std::string> & Names)

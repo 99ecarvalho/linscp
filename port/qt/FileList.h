@@ -7,7 +7,10 @@
 
 #include <QAbstractTableModel>
 #include <QSortFilterProxyModel>
+#include <QStringList>
+#include <QTreeView>
 
+#include <functional>
 #include <vector>
 
 #include "CoreBridge.h"
@@ -57,6 +60,46 @@ protected:
 
 private:
   bool FShowHidden = false;
+};
+
+// What a panel's drag carries (application/x-linscp-files): which side the
+// entries are on, their directory and names. A local drag carries their file
+// URLs too, for other programs.
+struct TFileDrag
+{
+  bool Local = false;
+  QString Directory;
+  QStringList Names;
+};
+extern const char * const FileDragMimeType;
+class QMimeData;
+QMimeData * MakeFileDrag(const TFileDrag & Drag);
+// false when Data is not a panel's drag.
+bool ReadFileDrag(const QMimeData * Data, TFileDrag & Drag);
+
+// A panel's view: its selection dragged as the panel says, and drops onto it
+// reported with the directory row they fell on ("" for the panel's own
+// directory; ".." for its parent).
+class FileView : public QTreeView
+{
+  Q_OBJECT
+
+public:
+  explicit FileView(QWidget * Parent = nullptr);
+  // The drag of the selection; null for none.
+  std::function<QMimeData *()> MakeDrag;
+
+signals:
+  void Dropped(const QMimeData * Data, const QString & OnDirectory, Qt::DropAction Action);
+
+protected:
+  void startDrag(Qt::DropActions Actions) override;
+  void dragEnterEvent(QDragEnterEvent * Event) override;
+  void dragMoveEvent(QDragMoveEvent * Event) override;
+  void dropEvent(QDropEvent * Event) override;
+
+private:
+  QString DirectoryAt(const QPoint & Pos) const;
 };
 
 #endif

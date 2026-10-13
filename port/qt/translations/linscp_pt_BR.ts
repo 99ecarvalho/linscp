@@ -208,6 +208,10 @@ Configuração: %4</translation>
         <source>Transfer in &amp;background (add to transfer queue)</source>
         <translation>Transferir em &amp;segundo plano (adicionar à fila de transferência)</translation>
     </message>
+    <message>
+        <source>Move %1 to &apos;%2&apos;?</source>
+        <translation>Mover %1 para &apos;%2&apos;?</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>
@@ -467,8 +471,8 @@ Configuração: %4</translation>
         <translation>Tent&amp;ar autenticação usando agente</translation>
     </message>
     <message>
-        <source>Attempt '&amp;keyboard-interactive' authentication</source>
-        <translation>Tentar autenticação com o '&amp;teclado interativo'</translation>
+        <source>Attempt &apos;&amp;keyboard-interactive&apos; authentication</source>
+        <translation>Tentar autenticação com o &apos;&amp;teclado interativo&apos;</translation>
     </message>
     <message>
         <source>Allow agent &amp;forwarding</source>
@@ -574,8 +578,8 @@ Configuração: %4</translation>
         <translation>A&amp;vançado...</translation>
     </message>
     <message>
-        <source>Site '%1' already exists.</source>
-        <translation>O site '%1' já existe.</translation>
+        <source>Site &apos;%1&apos; already exists.</source>
+        <translation>O site &apos;%1&apos; já existe.</translation>
     </message>
 </context>
 <context>
