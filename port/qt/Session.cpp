@@ -201,6 +201,44 @@ std::string TSession::Name() const
   return Utf8(F->Data->SessionName);
 }
 
+bool TSession::UpdateDirectories() const
+{
+  return F->Data->UpdateDirectories;
+}
+
+bool TSession::SaveDirectories(const std::string & LocalDirectory)
+{
+  try
+  {
+    TSessionData * Stored = StoredSessions->FindSame(F->Data.get());
+    if ((Stored == NULL) || !F->Data->UpdateDirectories)
+    {
+      return false;
+    }
+    // As TCustomScpExplorerForm::UpdateSessionData: only peeked, the
+    // connection may be gone.
+    if (F->Terminal != NULL)
+    {
+      const UnicodeString Current = F->Terminal->PeekCurrentDirectory();
+      if (!Current.IsEmpty())
+      {
+        Stored->RemoteDirectory = Current;
+      }
+    }
+    if (!LocalDirectory.empty())
+    {
+      Stored->LocalDirectory = FromUtf8(LocalDirectory);
+    }
+    // Modified only, implicit, as SaveTerminal.
+    StoredSessions->Save(false, false);
+    return true;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 void TSession::Open()
 {
   try

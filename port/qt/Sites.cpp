@@ -111,6 +111,7 @@ TSite SiteOf(const TSessionData * Data)
   Site.Password = Utf8(Data->Password);
   Site.RemoteDirectory = Utf8(Data->RemoteDirectory);
   Site.LocalDirectory = Utf8(Data->LocalDirectory);
+  Site.UpdateDirectories = Data->UpdateDirectories;
   Site.Timeout = Data->Timeout;
   Site.FtpPassive = Data->FtpPasvMode;
   Site.Proxy = ProxyOf(Data->ProxyMethod);
@@ -143,6 +144,7 @@ TSessionData * SessionDataOf(const TSite & Site, const std::string & BaseName)
   Data->Password = FromUtf8(Site.Password);
   Data->RemoteDirectory = FromUtf8(Site.RemoteDirectory);
   Data->LocalDirectory = FromUtf8(Site.LocalDirectory);
+  Data->UpdateDirectories = Site.UpdateDirectories;
   Data->Timeout = Site.Timeout;
   Data->FtpPasvMode = Site.FtpPassive;
   // A method the dialog does not offer (telnet, command, tunnel) stays.

@@ -533,6 +533,10 @@ Configuração: %4</translation>
         <source>SSH Authentication</source>
         <translation>Autenticação SSH</translation>
     </message>
+    <message>
+        <source>Re&amp;member last used directory</source>
+        <translation>Le&amp;mbrar último diretório utilizado</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

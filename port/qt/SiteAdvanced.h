@@ -27,6 +27,7 @@ public:
   QLineEdit * LocalDirectory() const { return FLocalDirectory; }
   QSpinBox * Timeout() const { return FTimeout; }
   QCheckBox * FtpPassive() const { return FFtpPassive; }
+  QCheckBox * UpdateDirectories() const { return FUpdateDirectories; }
   QComboBox * Proxy() const { return FProxy; }
   QLineEdit * ProxyHost() const { return FProxyHost; }
   QSpinBox * ProxyPort() const { return FProxyPort; }
@@ -47,6 +48,7 @@ private:
   QLineEdit * FLocalDirectory = nullptr;
   QSpinBox * FTimeout = nullptr;
   QCheckBox * FFtpPassive = nullptr;
+  QCheckBox * FUpdateDirectories = nullptr;
   QComboBox * FProxy = nullptr;
   QLineEdit * FProxyHost = nullptr;
   QSpinBox * FProxyPort = nullptr;

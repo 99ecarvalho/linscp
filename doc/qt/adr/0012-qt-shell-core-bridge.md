@@ -303,3 +303,26 @@ Verified by `qt_gui_keys` (each key pressed through the window as a user
 presses it, rename in place, the status line and `FormatBytes`, the columns'
 menu) and `qt_gui_panel` (rename in place remotely): Linux, Wine, natively
 on Windows 11.
+
+## Amendment 2026-10-13: remembering the last used directories (P3-11)
+
+- **The site's "Remember last used directory"** (`UpdateDirectories`, on by
+  default) is in `TSite` and on the advanced settings' Directories page.
+- **When a session ends**, by disconnecting, opening another, or closing the
+  window, the main window calls `TSession::SaveDirectories`, which does what
+  `TTerminalManager::SaveTerminal` does. It finds the stored site by the
+  session's name (`FindSame`), and when the site remembers, it takes the
+  current remote directory as last known (`PeekCurrentDirectory`, never
+  asking the server) and the local panel's directory, and saves the
+  modified sites only.
+- **Opening the site next time** starts there. Core changes to the remote
+  directory as it always does. The local directory, as
+  `RestoreSessionLocalDirView` handles it, falls back quietly to the
+  nearest one that exists when the site remembers; otherwise a missing one
+  is an error.
+- **Not here:** WinSCP's "preserve local directory" preference, which keeps
+  the local panel where it is across sessions, belongs to P3-04.
+
+Verified by `qt_gui_sites` (kept on disconnect, reopened there, the quiet
+fallback, nothing kept when off, the advanced settings' checkbox): Linux,
+Wine, natively on Windows 11.

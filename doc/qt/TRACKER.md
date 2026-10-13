@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 3 | 11 | Parity on features users depend on |
+| P3 Qt parity | 4 | 11 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **81** | **98** | |
+| **Total** | **82** | **98** | |
 
 ## Next three actions
 
@@ -221,15 +221,17 @@ Drag and drop (P3-07, done): between the panels, a transfer after the Copy dialo
 through core's `MoveFiles`, as WinSCP); files from other programs, onto the
 remote panel, an upload; remote files dragged out to other programs,
 downloaded at the drop to a temporary directory, as WinSCP's drag without its
-shell extension. The Commander (P3-02, done): WinSCP's keys, rename in place, status lines,
+shell extension. Last used directories (P3-11, done): kept in the site when a session ends,
+as WinSCP. The Commander (P3-02, done): WinSCP's keys, rename in place, status lines,
 columns. Synchronization (P3-03, done): Commands > Synchronize, WinSCP's
 Synchronize dialog and checklist over core's own synchronization, applied
 here or in the queue. P2-10 and P2-11 wait, at the user's request.
 
-1. **P3-11**: remember the last used directories per site, as WinSCP.
-2. **P3-04**: preferences (split first), where synchronization's saved
-   options, transfer settings and the panels' kept layout land too.
-3. **P3-05**: the internal editor (Q-3).
+1. **P3-04**: preferences (split first), where synchronization's saved
+   options, transfer settings, the panels' kept layout and "preserve local
+   directory" land too.
+2. **P3-05**: the internal editor (Q-3).
+3. **P3-06**: the remaining dialogs, batched (split first).
 
 ## Decisions taken
 
@@ -750,7 +752,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-08 | Shell integration | todo | |
 | P3-09 | Accessibility | todo | |
 | P3-10 | P3 exit gate | todo | |
-| P3-11 | Remember last used directories | todo | after P3-03 and P3-02; opening a site's saved directories already works, saving them back does not |
+| P3-11 | Remember last used directories | done | `TSite::UpdateDirectories` (advanced settings' Directories page), `TSession::SaveDirectories` as `TTerminalManager::SaveTerminal` on disconnect, another session, or closing; the local directory's quiet fallback; ctest `qt_gui_sites`; native on Windows 11 too. "Preserve local directory" is P3-04's |
 
 ### P4 — Cleanup
 | ID | Task | Status | Note |

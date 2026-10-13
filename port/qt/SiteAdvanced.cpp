@@ -50,6 +50,9 @@ SiteAdvanced::SiteAdvanced(const CoreBridge::TSite & Site, QWidget * Parent) :
   LocalRow->addWidget(FLocalDirectory, 1);
   LocalRow->addWidget(BrowseLocal);
   DirectoriesForm->addRow(tr("&Local directory:"), LocalRow);
+  FUpdateDirectories = new QCheckBox(tr("Re&member last used directory"), Directories);
+  FUpdateDirectories->setChecked(Site.UpdateDirectories);
+  DirectoriesForm->addRow(FUpdateDirectories);
   FPages->addTab(Directories, tr("Directories"));
 
   // Connection.
@@ -146,6 +149,7 @@ CoreBridge::TSite SiteAdvanced::Site() const
   CoreBridge::TSite Site = FSite;
   Site.RemoteDirectory = FRemoteDirectory->text().trimmed().toStdString();
   Site.LocalDirectory = FLocalDirectory->text().trimmed().toStdString();
+  Site.UpdateDirectories = FUpdateDirectories->isChecked();
   Site.Timeout = FTimeout->value();
   Site.FtpPassive = FFtpPassive->isChecked();
   Site.Proxy = static_cast<TProxy>(FProxy->currentData().toInt());

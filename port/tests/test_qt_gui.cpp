@@ -387,6 +387,42 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
       Check(Responder.HostKeyQueries == 1, "the host key asked about once");
     }
     {
+      // "Remember last used directory", on by default: kept when the
+      // session ends, and where the site opens next.
+      const QString Remembered = QDir(Directory).filePath(QStringLiteral("remembered"));
+      QDir().mkpath(Remembered);
+      Check(CoreBridge::LoadSite("Tests/rclone").UpdateDirectories, "a site remembers its directories by default");
+      Check(Window.Panel()->ChangeDirectory(QStringLiteral("/sub")) && Window.Local()->ChangeDirectory(Remembered),
+        "the panels go elsewhere");
+      QMetaObject::invokeMethod(&Window, "Disconnect");
+      CoreBridge::TSite Site = CoreBridge::LoadSite("Tests/rclone");
+      Check(Site.RemoteDirectory == "/sub", "disconnecting keeps the remote directory in the site");
+      Check(QFileInfo(QString::fromStdString(Site.LocalDirectory)) == QFileInfo(Remembered), "and the local one");
+      Check(Window.OpenSite(Site), "the site opens again");
+      Check((Window.Panel()->Path() == QStringLiteral("/sub")) && (QFileInfo(Window.Local()->Path()) == QFileInfo(Remembered)),
+        "in the directories it was left in");
+      QMetaObject::invokeMethod(&Window, "Disconnect");
+      // Out of it first: on Windows, a directory being watched cannot go.
+      Window.Local()->ChangeDirectory(QDir::homePath());
+      Check(QDir(Remembered).removeRecursively() && !QFileInfo::exists(Remembered), "(the local directory removed)");
+      const int Errors = Responder.Errors;
+      Check(Window.OpenSite(CoreBridge::LoadSite("Tests/rclone")), "with the local one gone");
+      Check((QFileInfo(Window.Local()->Path()) == QFileInfo(Directory)) && (Responder.Errors == Errors),
+        "it opens the nearest that is there, quietly");
+      QMetaObject::invokeMethod(&Window, "Disconnect");
+
+      Site = CoreBridge::LoadSite("Tests/rclone");
+      Site.UpdateDirectories = false;
+      CoreBridge::SaveSite(Site);
+      Check(!CoreBridge::LoadSite("Tests/rclone").UpdateDirectories, "the option turns off and saves");
+      Check(Window.OpenSite(CoreBridge::LoadSite("Tests/rclone")) && Window.Panel()->ChangeDirectory(QStringLiteral("/")),
+        "a session of it goes elsewhere");
+      QMetaObject::invokeMethod(&Window, "Disconnect");
+      Check(CoreBridge::LoadSite("Tests/rclone").RemoteDirectory == "/sub", "and, off, nothing is kept");
+      SiteAdvanced Advanced(CoreBridge::LoadSite("Tests/rclone"), &Window);
+      Check(!Advanced.UpdateDirectories()->isChecked(), "the advanced settings show it");
+    }
+    {
       SiteManager Dialog(&Window);
       Dialog.SelectSite(QStringLiteral("Tests/rclone"));
       Check(Dialog.DeleteSelected(false), "the site deletes");

@@ -275,6 +275,9 @@ struct TSite
 
   // Directories.
   std::string LocalDirectory;
+  // "Remember last used directory" (UpdateDirectories): on by default, as
+  // WinSCP's.
+  bool UpdateDirectories = true;
   // Connection: seconds to wait for the server; FTP's passive mode.
   int Timeout = 15;
   bool FtpPassive = true;
@@ -447,6 +450,14 @@ public:
   // The site's local directory, environment variables expanded; empty when
   // it has none.
   std::string LocalDirectory() const;
+  // The site's "remember last used directory".
+  bool UpdateDirectories() const;
+  // As WinSCP saves a session's directories when it ends
+  // (TTerminalManager::SaveTerminal): into the stored site it was opened
+  // from, when it remembers them, the current remote directory (as last
+  // known, without asking the server) and LocalDirectory. False when
+  // nothing was saved. Throws TCoreError.
+  bool SaveDirectories(const std::string & LocalDirectory);
   // The current directory's entries, without "." and "..".
   std::vector<TRemoteEntry> List() const;
   // These throw TCoreError; what fails along the way is asked about first

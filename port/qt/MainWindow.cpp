@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QClipboard>
+#include <QCloseEvent>
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QLabel>
@@ -176,6 +177,12 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
 
 MainWindow::~MainWindow() = default;
 
+void MainWindow::closeEvent(QCloseEvent * Event)
+{
+  Disconnect();
+  QMainWindow::closeEvent(Event);
+}
+
 void MainWindow::ShowError(const CoreBridge::TCoreError & E)
 {
   if (!E.Aborted)
@@ -241,10 +248,28 @@ bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
     statusBar()->showMessage(tr("Connecting to %1...").arg(QString::fromStdString(Session->Name())));
     Session->Open();
     FSession = std::move(Session);
-    // As WinSCP: the site's local directory, when it has one.
+    // As WinSCP (TScpCommanderForm::RestoreSessionLocalDirView): the site's
+    // local directory, when it has one; when remembered, one that is gone
+    // falls back to the nearest that is not, quietly.
     if (!FSession->LocalDirectory().empty())
     {
-      FLocal->ChangeDirectory(QString::fromStdString(FSession->LocalDirectory()));
+      QString Directory = QDir::cleanPath(QDir::fromNativeSeparators(QString::fromStdString(FSession->LocalDirectory())));
+      if (FSession->UpdateDirectories())
+      {
+        while (!QFileInfo(Directory).isDir() && !QDir(Directory).isRoot() && !Directory.isEmpty())
+        {
+          const QString Parent = QFileInfo(Directory).path();
+          if (Parent == Directory)
+          {
+            break;
+          }
+          Directory = Parent;
+        }
+      }
+      if (QFileInfo(Directory).isDir() || !FSession->UpdateDirectories())
+      {
+        FLocal->ChangeDirectory(Directory);
+      }
     }
     setWindowTitle(tr("%1 - %2").arg(QString::fromStdString(FSession->Name()), QString::fromStdString(FInfo.AppName)));
     Result = true;
@@ -286,6 +311,15 @@ void MainWindow::Disconnect()
 {
   if (FSession)
   {
+    // As WinSCP: the directories kept for next time, when the site does.
+    try
+    {
+      FSession->SaveDirectories(QDir::toNativeSeparators(FLocal->Path()).toStdString());
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+    }
     FSession->Close();
     FSession.reset();
     setWindowTitle(QString::fromStdString(FInfo.AppName));

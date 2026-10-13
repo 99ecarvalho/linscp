@@ -78,6 +78,10 @@ private slots:
   void Disconnect();
   void About();
 
+protected:
+  // Closing ends the session as Disconnect does, its directories kept.
+  void closeEvent(QCloseEvent * Event) override;
+
 private:
   bool Open(std::unique_ptr<CoreBridge::TSession> Session);
   void ShowError(const CoreBridge::TCoreError & E);
