@@ -18,6 +18,10 @@
 //     the local panel in an empty directory: order, hidden files, new
 //     folder, rename, a change made outside it, delete (for good: the
 //     trash is the user's), opening a file, navigation, a missing directory
+//   test_qt_gui transfer /ini=nul <port> <directory> -platform offscreen
+//     transfers between the panels: an upload from the local panel, a
+//     download from the remote one, a remote directory moved down, an upload
+//     cancelled from the progress window
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -43,6 +47,7 @@
 #include "QtFrontend.h"
 #include "LocalPanel.h"
 #include "QueryDialog.h"
+#include "TransferDialog.h"
 #include "RemotePanel.h"
 
 #include <QDir>
@@ -229,6 +234,10 @@ public:
   QString LastQuery;
   // Answer a warning's Ignore rather than its first button.
   bool IgnoreWarnings = false;
+  // Watches the frontend's progress window, and cancels from it if asked.
+  QtFrontend * Frontend = nullptr;
+  int TransfersSeen = 0;
+  bool CancelTransfers = false;
 
   TResponder()
   {
@@ -240,6 +249,15 @@ public:
 private:
   void Act()
   {
+    if ((Frontend != nullptr) && (Frontend->Transfer() != nullptr))
+    {
+      TransfersSeen++;
+      if (CancelTransfers)
+      {
+        Frontend->Transfer()->CancelButton()->click();
+      }
+      return;
+    }
     QWidget * Modal = QApplication::activeModalWidget();
     if (QueryDialog * Query = qobject_cast<QueryDialog *>(Modal))
     {
@@ -512,6 +530,65 @@ void Local(const QString & Directory)
   CoreBridge::Finalize();
 }
 
+void Transfer(const char * Port, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = { "secret" };
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "the session opens");
+    const QDir Dir(Directory);
+    {
+      QFile File(Dir.filePath(QStringLiteral("up.txt")));
+      File.open(QIODevice::WriteOnly);
+      File.write("uploaded through the panels\n");
+    }
+    LocalPanel * Local = Window.Local();
+    RemotePanel * Remote = Window.Panel();
+    Local->ChangeDirectory(Directory);
+
+    Local->Select({ QStringLiteral("up.txt") });
+    Window.ActivatePanel(true);
+    Check(Window.TransferSelected(false, false), "the local panel's selection uploads (F5)");
+    Check(Remote->Names().contains(QStringLiteral("up.txt")), "and shows in the remote panel");
+    Check(Frontend.Transfer() == nullptr, "and gone after");
+
+    Remote->Select({ QStringLiteral("hello.txt") });
+    Window.ActivatePanel(false);
+    Check(Window.TransferSelected(false, false), "the remote panel's selection downloads (F5)");
+    QFile Down(Dir.filePath(QStringLiteral("hello.txt")));
+    Check(Down.open(QIODevice::ReadOnly) && (Down.readAll() == "Hello, linscp\n"), "into the local panel's directory, whole");
+    Check(Local->Names().contains(QStringLiteral("hello.txt")), "which shows it");
+
+    Remote->Select({ QStringLiteral("sub") });
+    Window.ActivatePanel(false);
+    Check(Window.TransferSelected(true, false), "a remote directory moves down (F6)");
+    Check(QFileInfo(Dir.filePath(QStringLiteral("sub"))).isDir() && !Remote->Names().contains(QStringLiteral("sub")),
+      "there locally, gone remotely");
+
+    {
+      QFile File(Dir.filePath(QStringLiteral("big.bin")));
+      File.open(QIODevice::WriteOnly);
+      File.write(QByteArray(40 * 1024 * 1024, 'b'));
+    }
+    Local->Refresh();
+    Local->Select({ QStringLiteral("big.bin") });
+    Window.ActivatePanel(true);
+    Responder.CancelTransfers = true;
+    Check(!Window.TransferSelected(false, false), "an upload cancelled from the progress window does not complete");
+    Check(Responder.TransfersSeen > 0, "the progress window was up while it ran");
+    Responder.CancelTransfers = false;
+    Check(Frontend.Transfer() == nullptr, "and the window closes");
+    Frontend.SetWindow(nullptr);
+  }
+  CoreBridge::Finalize();
+}
+
 void Session(const char * Port)
 {
   QtFrontend Frontend;
@@ -562,6 +639,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 4) && (std::strcmp(argv[1], "local") == 0))
   {
     Local(QString::fromLocal8Bit(argv[3]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "transfer") == 0))
+  {
+    Transfer(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "session") == 0))
   {

@@ -50,6 +50,9 @@ public:
   void ShowError(const CoreBridge::TError & Error) override { std::printf("  error: %s\n", Error.Message.c_str()); }
   void Banner(const std::string &, const std::string &, bool, bool &) override {}
   void Information(const std::string &) override {}
+  void TransferStarted(bool, int) override {}
+  bool TransferProgress(const CoreBridge::TTransferProgress &) override { return true; }
+  void TransferFinished() override {}
   void BusyStart() override {}
   void BusyEnd() override {}
   void ProcessEvents() override {}

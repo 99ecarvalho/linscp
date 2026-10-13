@@ -13,6 +13,8 @@
 #include <SessionData.h>
 #include <Terminal.h>
 #include <TextsCore.h>
+#include <CopyParam.h>
+#include <FileOperationProgress.h>
 
 #include <memory>
 
@@ -80,6 +82,29 @@ struct TSession::TImpl
     if (ErrorOf(E, Error))
     {
       Frontend()->ShowError(Error);
+    }
+  }
+
+  // A transfer's progress, to the frontend; its answer may cancel it.
+  void __fastcall OperationProgress(TFileOperationProgressType & ProgressData)
+  {
+    if (!ProgressData.IsTransfer() || !ProgressData.InProgress)
+    {
+      return;
+    }
+    TTransferProgress Progress;
+    Progress.Upload = (ProgressData.Side == osLocal);
+    Progress.FileName = Utf8(UniversalExcludeTrailingBackslash(ProgressData.Side != osLocal, ProgressData.FileName));
+    Progress.FilePercent = ProgressData.TransferProgress();
+    Progress.OverallPercent = ProgressData.OverallProgress();
+    Progress.Transferred = ProgressData.TotalTransferred;
+    Progress.Total = ProgressData.TotalSizeSet ? ProgressData.TotalSize : -1;
+    Progress.FilesDone = ProgressData.FilesFinishedSuccessfully;
+    Progress.FileCount = ProgressData.Count;
+    Progress.Speed = ProgressData.CPS();
+    if (!Frontend()->TransferProgress(Progress))
+    {
+      ProgressData.SetCancel(csCancel);
     }
   }
 
@@ -159,6 +184,7 @@ void TSession::Open()
     Terminal->OnDisplayBanner = CLOSURE_OF(F.get(), DisplayBanner);
     Terminal->OnShowExtendedException = CLOSURE_OF(F.get(), ShowExtendedException);
     Terminal->OnInformation = CLOSURE_OF(F.get(), Information);
+    Terminal->OnProgress = CLOSURE_OF(F.get(), OperationProgress);
     Terminal->Open();
   }
   catch (Exception & E)
@@ -328,6 +354,65 @@ bool TSession::Delete(const std::vector<std::string> & Names)
       Files->AddObject(File->FileName, File);
     }
     return F->Terminal->DeleteFiles(Files.get());
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+namespace
+{
+
+// Brackets a transfer for the frontend's progress window.
+class TTransferBracket
+{
+public:
+  TTransferBracket(bool Upload, int Count) { Frontend()->TransferStarted(Upload, Count); }
+  ~TTransferBracket() { Frontend()->TransferFinished(); }
+};
+
+}  // namespace
+
+bool TSession::Upload(const std::vector<std::string> & LocalPaths, const std::string & RemoteDirectory, bool Move)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TStringList> Files(new TStringList());
+    for (const std::string & Path : LocalPaths)
+    {
+      Files->Add(FromUtf8(Path));
+    }
+    const UnicodeString Target = RemoteDirectory.empty() ? F->Terminal->CurrentDirectory : FromUtf8(RemoteDirectory);
+    TCopyParamType CopyParam;
+    TTransferBracket Bracket(true, Files->Count);
+    return F->Terminal->CopyToRemote(Files.get(), UnixIncludeTrailingBackslash(Target), &CopyParam,
+      FLAGMASK(Move, cpDelete), NULL);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+// As the GUI downloads: the entries' names with their TRemoteFiles, as for
+// deleting.
+bool TSession::Download(const std::vector<std::string> & Names, const std::string & LocalDirectory, bool Move)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TStringList> Files(new TStringList());
+    for (const std::string & Name : Names)
+    {
+      TRemoteFile * File = FindFile(F->Terminal.get(), Name);
+      Files->AddObject(File->FileName, File);
+    }
+    TCopyParamType CopyParam;
+    TTransferBracket Bracket(false, Files->Count);
+    return F->Terminal->CopyToLocal(Files.get(), IncludeTrailingBackslash(FromUtf8(LocalDirectory)), &CopyParam,
+      FLAGMASK(Move, cpDelete), NULL);
   }
   catch (Exception & E)
   {

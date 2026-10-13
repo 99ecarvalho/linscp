@@ -9,6 +9,8 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QStatusBar>
+#include <QDir>
+#include <QTreeView>
 #include <QSplitter>
 #include <QStyle>
 #include <QTreeWidget>
@@ -51,6 +53,25 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FPanel = new RemotePanel(Panels);
   Panels->setChildrenCollapsible(false);
   setCentralWidget(Panels);
+
+  // The active panel follows the focus, as in WinSCP's Commander.
+  connect(qApp, &QApplication::focusChanged, this, [this](QWidget *, QWidget * Now)
+  {
+    if ((Now != nullptr) && FLocal->isAncestorOf(Now))
+    {
+      FLocalActive = true;
+    }
+    else if ((Now != nullptr) && FPanel->isAncestorOf(Now))
+    {
+      FLocalActive = false;
+    }
+  });
+
+  QMenu * FilesMenu = menuBar()->addMenu(tr("F&iles"));
+  FCopyAction = FilesMenu->addAction(tr("&Copy..."), this, [this]() { TransferSelected(false, true); });
+  FCopyAction->setShortcut(QKeySequence(Qt::Key_F5));
+  FMoveAction = FilesMenu->addAction(tr("&Move..."), this, [this]() { TransferSelected(true, true); });
+  FMoveAction->setShortcut(QKeySequence(Qt::Key_F6));
 
   QMenu * ViewMenu = menuBar()->addMenu(tr("&View"));
   QAction * Hidden = ViewMenu->addAction(tr("Show &Hidden Files"));
@@ -177,10 +198,102 @@ void MainWindow::Disconnect()
   UpdateActions();
 }
 
+bool MainWindow::Upload(const QStringList & Names, const QString & Target, bool Move)
+{
+  if (FBusy || !FSession || Names.isEmpty())
+  {
+    return false;
+  }
+  std::vector<std::string> Paths;
+  for (const QString & Name : Names)
+  {
+    Paths.push_back(QDir::toNativeSeparators(QDir(FLocal->Path()).filePath(Name)).toStdString());
+  }
+  FBusy = true;
+  UpdateActions();
+  bool Result = false;
+  try
+  {
+    Result = FSession->Upload(Paths, Target.toStdString(), Move);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  FPanel->Refresh();
+  FLocal->Refresh();
+  UpdateActions();
+  return Result;
+}
+
+bool MainWindow::Download(const QStringList & Names, const QString & Target, bool Move)
+{
+  if (FBusy || !FSession || Names.isEmpty())
+  {
+    return false;
+  }
+  std::vector<std::string> List;
+  for (const QString & Name : Names)
+  {
+    List.push_back(Name.toStdString());
+  }
+  FBusy = true;
+  UpdateActions();
+  bool Result = false;
+  try
+  {
+    Result = FSession->Download(List, QDir::toNativeSeparators(Target).toStdString(), Move);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  FPanel->Refresh();
+  FLocal->Refresh();
+  UpdateActions();
+  return Result;
+}
+
+void MainWindow::ActivatePanel(bool Local)
+{
+  FLocalActive = Local;
+  (Local ? static_cast<QWidget *>(FLocal->View()) : static_cast<QWidget *>(FPanel->View()))->setFocus();
+}
+
+bool MainWindow::TransferSelected(bool Move, bool Confirm)
+{
+  const bool FromLocal = FLocalActive;
+  const QStringList Names = FromLocal ? FLocal->Selected() : FPanel->Selected();
+  if (Names.isEmpty() || !FSession || !FSession->Active())
+  {
+    return false;
+  }
+  QString Target = FromLocal ? FPanel->Path() : QDir::toNativeSeparators(FLocal->Path());
+  if (Confirm)
+  {
+    // As WinSCP's Copy dialog: where to, editable.
+    const QString What = (Names.size() == 1) ? QStringLiteral("'%1'").arg(Names.first()) : tr("%n file(s)", nullptr, Names.size());
+    const QString Prompt = FromLocal ?
+      (Move ? tr("Move %1 to remote directory:") : tr("Upload %1 to remote directory:")).arg(What) :
+      (Move ? tr("Move %1 to local directory:") : tr("Download %1 to local directory:")).arg(What);
+    bool OK = false;
+    Target = QInputDialog::getText(this, Move ? tr("Move") : tr("Copy"), Prompt, QLineEdit::Normal, Target, &OK).trimmed();
+    if (!OK || Target.isEmpty())
+    {
+      return false;
+    }
+  }
+  return FromLocal ? Upload(Names, Target, Move) : Download(Names, Target, Move);
+}
+
 void MainWindow::UpdateActions()
 {
   FOpenAction->setEnabled(!FBusy);
   FSitesAction->setEnabled(!FBusy);
+  FCopyAction->setEnabled(!FBusy && FSession);
+  FMoveAction->setEnabled(!FBusy && FSession);
   FDisconnectAction->setEnabled(!FBusy && FSession);
 }
 

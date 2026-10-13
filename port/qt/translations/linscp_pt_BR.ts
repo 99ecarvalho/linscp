@@ -161,6 +161,46 @@ Configuração: %4</translation>
         <source>Show &amp;Hidden Files</source>
         <translation>Exibir arquivos &amp;ocultos</translation>
     </message>
+    <message>
+        <source>F&amp;iles</source>
+        <translation>&amp;Arquivos</translation>
+    </message>
+    <message>
+        <source>&amp;Copy...</source>
+        <translation>&amp;Copiar...</translation>
+    </message>
+    <message>
+        <source>&amp;Move...</source>
+        <translation>&amp;Mover...</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n file(s)</source>
+        <translation><numerusform>%n arquivo</numerusform><numerusform>%n arquivos</numerusform></translation>
+    </message>
+    <message>
+        <source>Move %1 to remote directory:</source>
+        <translation>Mover %1 para o diretório remoto:</translation>
+    </message>
+    <message>
+        <source>Upload %1 to remote directory:</source>
+        <translation>Enviar %1 para o diretório remoto:</translation>
+    </message>
+    <message>
+        <source>Move %1 to local directory:</source>
+        <translation>Mover %1 para o diretório local:</translation>
+    </message>
+    <message>
+        <source>Download %1 to local directory:</source>
+        <translation>Baixar %1 para o diretório local:</translation>
+    </message>
+    <message>
+        <source>Move</source>
+        <translation>Mover</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>Copiar</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>
@@ -442,6 +482,53 @@ Configuração: %4</translation>
     <message>
         <source>Site '%1' already exists.</source>
         <translation>O site '%1' já existe.</translation>
+    </message>
+</context>
+<context>
+    <name>TransferDialog</name>
+    <message>
+        <source>Uploading</source>
+        <translation>Enviando</translation>
+    </message>
+    <message>
+        <source>Downloading</source>
+        <translation>Baixando</translation>
+    </message>
+    <message>
+        <source>File:</source>
+        <translation>Arquivo:</translation>
+    </message>
+    <message>
+        <source>File progress:</source>
+        <translation>Progresso do arquivo:</translation>
+    </message>
+    <message>
+        <source>Overall progress:</source>
+        <translation>Progresso total:</translation>
+    </message>
+    <message>
+        <source>Transferred:</source>
+        <translation>Bytes transferidos:</translation>
+    </message>
+    <message>
+        <source>Speed:</source>
+        <translation>Velocidade:</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <source>%p% of %1 file(s)</source>
+        <translation>%p% de %1 arquivo(s)</translation>
+    </message>
+    <message>
+        <source>%1 of %2</source>
+        <translation>%1 de %2</translation>
+    </message>
+    <message>
+        <source>%1/s</source>
+        <translation>%1/s</translation>
     </message>
 </context>
 </TS>

@@ -17,6 +17,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <deque>
+#include <filesystem>
+#include <fstream>
+#include <iterator>
 #include <string>
 
 namespace
@@ -55,6 +58,15 @@ public:
   std::string Clipboard;
   std::string LastPromptName;
   std::string InformationLines;
+  int Transfers = 0;
+  bool LastUpload = false;
+  int LastCount = 0;
+  bool Open = false;
+  int ProgressCalls = 0;
+  CoreBridge::TTransferProgress LastProgress;
+  bool CancelTransfers = false;
+  // Overwrite questions: answered with Yes; counted.
+  int Overwrites = 0;
 
   CoreBridge::TQueryResult Query(const CoreBridge::TQuery & Query) override
   {
@@ -83,6 +95,12 @@ public:
       // Accept: upstream's first button, Yes; or Cancel.
       Result.Answer = AcceptHostKey ? CoreBridge::AnswerYes : CoreBridge::AnswerCancel;
     }
+    else
+    {
+      // Anything else here is core's "file exists": overwrite.
+      Overwrites++;
+      Result.Answer = CoreBridge::AnswerYes;
+    }
     return Result;
   }
 
@@ -108,6 +126,15 @@ public:
 
   void Banner(const std::string &, const std::string &, bool, bool &) override {}
   void Information(const std::string & Text) override { InformationLines += Text + "\n"; }
+  void TransferStarted(bool Upload, int Count) override { Transfers++; LastUpload = Upload; LastCount = Count; Open = true; }
+  bool TransferProgress(const CoreBridge::TTransferProgress & Progress) override
+  {
+    Check(Open, "progress comes between a transfer's start and end");
+    ProgressCalls++;
+    LastProgress = Progress;
+    return !CancelTransfers;
+  }
+  void TransferFinished() override { Open = false; }
   void BusyStart() override {}
   void BusyEnd() override {}
   void ProcessEvents() override {}
@@ -211,6 +238,62 @@ int main(int argc, char ** argv)
     Session.ChangeDirectory("sub");
     Session.HomeDirectory();
     Check(Session.CurrentDirectory() == "/", "home is the server's home");
+
+    // Transfers, on the server and the disk for real.
+    namespace fs = std::filesystem;
+    const fs::path Local = fs::temp_directory_path() / ("linscp-qt-transfer-" + Protocol);
+    fs::remove_all(Local);
+    fs::create_directories(Local / "down");
+    const std::string Content(300000, 'z');
+    {
+      std::ofstream(Local / "up.bin", std::ios::binary) << Content;
+    }
+    const int Calls = Frontend.ProgressCalls;
+    Check(Session.Upload({ (Local / "up.bin").string() }, ""), "a file uploads");
+    Check(Frontend.LastUpload && (Frontend.LastCount == 1) && !Frontend.Open, "as one upload, started and finished");
+    Check(Frontend.ProgressCalls > Calls, "reporting progress");
+    Check((Frontend.LastProgress.FileName.find("up.bin") != std::string::npos) && (Frontend.LastProgress.Transferred > 0),
+      "of that file, in bytes");
+    bool Uploaded = false;
+    for (const CoreBridge::TRemoteEntry & Entry : Session.List())
+    {
+      Uploaded = Uploaded || ((Entry.Name == "up.bin") && (Entry.Size == static_cast<std::int64_t>(Content.size())));
+    }
+    Check(Uploaded, "and is there, whole");
+    Check(Session.Download({ "up.bin" }, (Local / "down").string()), "it downloads");
+    {
+      std::ifstream In(Local / "down" / "up.bin", std::ios::binary);
+      const std::string Back((std::istreambuf_iterator<char>(In)), std::istreambuf_iterator<char>());
+      Check(Back == Content, "byte for byte");
+    }
+    Check(!Frontend.LastUpload, "as a download");
+    const int Overwrites = Frontend.Overwrites;
+    Check(Session.Download({ "up.bin" }, (Local / "down").string()), "downloading it again");
+    Check(Frontend.Overwrites == Overwrites + 1, "asks about overwriting it, through the frontend");
+
+    {
+      std::ofstream(Local / "big.bin", std::ios::binary) << std::string(20 * 1024 * 1024, 'b');
+    }
+    Frontend.CancelTransfers = true;
+    bool Completed = true;
+    try
+    {
+      Completed = Session.Upload({ (Local / "big.bin").string() }, "");
+    }
+    catch (const CoreBridge::TCoreError &)
+    {
+      Completed = false;
+    }
+    Frontend.CancelTransfers = false;
+    Check(!Completed, "a cancelled upload does not complete");
+    Check(!Frontend.Open, "and its progress window closes");
+
+    {
+      std::ofstream(Local / "moved.txt", std::ios::binary) << "move me";
+    }
+    Check(Session.Upload({ (Local / "moved.txt").string() }, "", true), "a file moves up");
+    Check(!fs::exists(Local / "moved.txt") && HasEntry(Session.List(), "moved.txt", false), "leaving no local copy");
+    fs::remove_all(Local);
     }
     catch (const CoreBridge::TCoreError & E)
     {

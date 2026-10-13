@@ -3,7 +3,8 @@
 // toolbars) -- sortable columns with directories first, the path to type
 // into, back and forward, parent, root, home, refresh -- and the remote
 // operations that are not transfers: new folder, rename, delete, with
-// WinSCP's keys (F2, F5, F7, Del, Backspace, Enter).
+// WinSCP's Commander keys (F2, F7, Del, Backspace, Enter, Ctrl+R; F5 and F6
+// are the main window's transfers).
 #ifndef LINSCP_QT_REMOTE_PANEL_H
 #define LINSCP_QT_REMOTE_PANEL_H
 

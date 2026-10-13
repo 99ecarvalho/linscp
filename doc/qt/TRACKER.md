@@ -208,7 +208,14 @@ default), kept up to date as the local directory changes, deleting to the
 trash as WinSCP's default, files opened with their applications, core's
 texts for confirmations and errors.
 
-1. **P2-07**: transfers between the panels and the queue.
+**Files transfer between the panels** (P2-07 wip): F5 copies and F6 moves
+from the active panel to the other's directory, after WinSCP's Copy
+confirmation; a progress window shows the file and the whole operation,
+bytes and speed, and cancels; core's overwrite questions come through the
+frontend. Tested over SFTP and FTP, upload, download, a directory moved, an
+upload cancelled.
+
+1. **P2-07**: the background transfer queue (core's `TTerminalQueue`).
 2. **P2-10**: packaging.
 3. **P2-11**: the P2 exit gate.
 
@@ -710,7 +717,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P2-04 | Site manager | done | `port/qt/SiteManager.cpp` over `Sites.cpp` (core's `StoredSessions`, as upstream's Login dialog uses it); shown at startup; ctests `qt_sites`, `qt_gui_sites`, native on Windows 11 too |
 | P2-05 | Login/auth dialogs | done | `SiteAdvanced` (directories, connection, proxy, SSH authentication), keys checked and converted as upstream (`Keys.cpp`), folders and rename in `SiteManager`; ctests `qt_sites` (proxy, key phases), `qt_gui_sites`; native on Windows 11 too |
 | P2-06 | Remote file panel | done | `port/qt/RemotePanel.cpp` over `TSession`'s new operations; ctests `qt_gui_panel`, `qt_session`/`qt_session_ftp` (operations over SFTP and FTP); native on Windows 11 too |
-| P2-07 | Transfer + queue UI | todo | |
+| P2-07 | Transfer + queue UI | wip | foreground transfers done: `TSession::Upload`/`Download` over `CopyToRemote`/`CopyToLocal`, `TransferDialog`, F5/F6; ctests `qt_gui_transfer`, transfers in `qt_session`/`qt_session_ftp`. The background queue next |
 | P2-08 | Local file panel | done | `port/qt/LocalPanel.cpp` over the shared `FileList` model; Commander layout; ctest `qt_gui_local`; native on Windows 11 too |
 | P2-09 | i18n pipeline | done | ADR 0013, `doc/qt/translations.md`: core via `gen_translations.py` and shim translation modules (55 languages), the shell via Qt Linguist (`linscp_pt_BR.ts`), Qt's own; ctests `qt_session_pt_BR`, `qt_language`, `translations_current`; native on Windows 11 too |
 | P2-10 | Packaging | todo | |

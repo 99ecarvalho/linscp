@@ -50,7 +50,7 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   FParentAction = Add(QStyle::SP_FileDialogToParent, tr("Parent directory"), QKeySequence(Qt::Key_Backspace), [this]() { RemotePanel::Parent(); });
   FRootAction = Add(QStyle::SP_DriveHDIcon, tr("Root directory"), QKeySequence(Qt::CTRL | Qt::Key_Backslash), [this]() { Root(); });
   FHomeAction = Add(QStyle::SP_DirHomeIcon, tr("Home directory"), QKeySequence(Qt::CTRL | Qt::Key_H), [this]() { Home(); });
-  FRefreshAction = Add(QStyle::SP_BrowserReload, tr("Refresh"), QKeySequence(Qt::Key_F5), [this]() { Refresh(); });
+  FRefreshAction = Add(QStyle::SP_BrowserReload, tr("Refresh"), QKeySequence(Qt::CTRL | Qt::Key_R), [this]() { Refresh(); });
   Bar->addSeparator();
   FNewFolderAction = Add(QStyle::SP_FileDialogNewFolder, tr("Create Directory"), QKeySequence(Qt::Key_F7), [this]()
   {

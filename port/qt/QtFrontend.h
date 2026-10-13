@@ -6,14 +6,19 @@
 #include <QPointer>
 
 #include <functional>
+#include <memory>
 
 #include "CoreBridge.h"
 
 class QWidget;
+class TransferDialog;
 
 class QtFrontend : public CoreBridge::IFrontend
 {
 public:
+  QtFrontend();
+  ~QtFrontend() override;
+
   // The window dialogs belong to, once there is one.
   void SetWindow(QWidget * Window) { FWindow = Window; }
   // Where progress lines go (the main window's status bar).
@@ -25,6 +30,11 @@ public:
   void Banner(const std::string & SessionName, const std::string & Banner,
     bool CanNeverShowAgain, bool & NeverShowAgain) override;
   void Information(const std::string & Text) override;
+  void TransferStarted(bool Upload, int FileCount) override;
+  bool TransferProgress(const CoreBridge::TTransferProgress & Progress) override;
+  void TransferFinished() override;
+  // The progress window of the transfer under way, if any: for tests.
+  TransferDialog * Transfer() const { return FTransfer.get(); }
   void BusyStart() override;
   void BusyEnd() override;
   void ProcessEvents() override;
@@ -34,6 +44,7 @@ public:
 private:
   QPointer<QWidget> FWindow;
   std::function<void(const QString &)> FStatus;
+  std::unique_ptr<TransferDialog> FTransfer;
 };
 
 #endif

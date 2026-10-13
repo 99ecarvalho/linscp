@@ -11,6 +11,10 @@
 
 #include "PromptDialog.h"
 #include "QueryDialog.h"
+#include "TransferDialog.h"
+
+QtFrontend::QtFrontend() = default;
+QtFrontend::~QtFrontend() = default;
 
 CoreBridge::TQueryResult QtFrontend::Query(const CoreBridge::TQuery & Query)
 {
@@ -77,6 +81,27 @@ void QtFrontend::Information(const std::string & Text)
   {
     FStatus(QString::fromStdString(Text));
   }
+}
+
+void QtFrontend::TransferStarted(bool Upload, int FileCount)
+{
+  FTransfer.reset(new TransferDialog(Upload, FileCount, FWindow));
+  FTransfer->show();
+}
+
+bool QtFrontend::TransferProgress(const CoreBridge::TTransferProgress & Progress)
+{
+  if (FTransfer)
+  {
+    FTransfer->Update(Progress);
+    return !FTransfer->Cancelled();
+  }
+  return true;
+}
+
+void QtFrontend::TransferFinished()
+{
+  FTransfer.reset();
 }
 
 void QtFrontend::BusyStart()

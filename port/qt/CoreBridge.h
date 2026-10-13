@@ -96,6 +96,24 @@ struct TError
   std::string HelpKeyword;
 };
 
+// A transfer's progress, as core reports it (TFileOperationProgressType).
+struct TTransferProgress
+{
+  bool Upload = true;
+  // The file being transferred, and how far along it is.
+  std::string FileName;
+  int FilePercent = 0;
+  // The whole operation: percent of the files (or of the bytes, once core
+  // knows the total), bytes so far and in all (-1 not known yet).
+  int OverallPercent = 0;
+  std::int64_t Transferred = 0;
+  std::int64_t Total = -1;
+  int FilesDone = 0;
+  int FileCount = 0;
+  // Bytes per second.
+  unsigned int Speed = 0;
+};
+
 // The shell's side, implemented on Qt (port/qt/QtFrontend.cpp). Every call
 // comes on the GUI thread.
 class IFrontend
@@ -112,6 +130,13 @@ public:
     bool CanNeverShowAgain, bool & NeverShowAgain) = 0;
   // A line of progress while connecting ("Authenticating...").
   virtual void Information(const std::string & Text) = 0;
+
+  // A transfer starting and ending (around its progress), for the shell's
+  // progress window.
+  virtual void TransferStarted(bool Upload, int FileCount) = 0;
+  // false to cancel it.
+  virtual bool TransferProgress(const TTransferProgress & Progress) = 0;
+  virtual void TransferFinished() = 0;
 
   virtual void BusyStart() = 0;
   virtual void BusyEnd() = 0;
@@ -341,6 +366,16 @@ public:
   void Rename(const std::string & Name, const std::string & NewName);
   // Entries of the current directory. False when core skipped some.
   bool Delete(const std::vector<std::string> & Names);
+  // Transfers with core's default transfer settings, as the GUI's Copy
+  // without changes; Move deletes the source after. What already exists is
+  // asked about (overwrite, skip, ...) through the frontend, as core does.
+  // False when the transfer was cancelled or core skipped some. Throws
+  // TCoreError.
+  // Local files or directories (full paths) to a remote directory (or the
+  // current one, when empty).
+  bool Upload(const std::vector<std::string> & LocalPaths, const std::string & RemoteDirectory, bool Move = false);
+  // Entries of the current directory to a local directory.
+  bool Download(const std::vector<std::string> & Names, const std::string & LocalDirectory, bool Move = false);
   void Close();
 
 private:
