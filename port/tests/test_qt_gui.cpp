@@ -32,6 +32,10 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QTimer>
+#include <QClipboard>
+#include <QTest>
+#include <QHeaderView>
+#include <QMenu>
 #include <QRadioButton>
 #include <QDragEnterEvent>
 #include <QMessageBox>
@@ -448,6 +452,28 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// F2 pressed in a panel's view, the new name typed into the editor in place,
+// Enter; then waits for the panel to list it.
+bool RenameInPlace(QWidget * Window, FileView * View, const QString & NewName, const std::function<bool()> & Done)
+{
+  QTest::keyClick(Window->windowHandle(), Qt::Key_F2);
+  QLineEdit * Editor = View->viewport()->findChild<QLineEdit *>();
+  if (Editor == nullptr)
+  {
+    return false;
+  }
+  Editor->selectAll();
+  QTest::keyClicks(Editor, NewName);
+  QTest::keyClick(Window->windowHandle(), Qt::Key_Return);
+  QElapsedTimer Timer;
+  Timer.start();
+  while (!Done() && (Timer.elapsed() < 10000))
+  {
+    QApplication::processEvents(QEventLoop::AllEvents, 50);
+  }
+  return Done();
+}
+
 void Panel(const char * Port)
 {
   QtFrontend Frontend;
@@ -471,6 +497,14 @@ void Panel(const char * Port)
     Check(Panel->Selected() == QStringList({ QStringLiteral("made") }), "selected");
     Check(Panel->Rename(QStringLiteral("made"), QStringLiteral("renamed")) && Panel->Names().contains(QStringLiteral("renamed")),
       "a rename shows");
+    QApplication::setActiveWindow(&Window);
+    Check(QTest::qWaitForWindowActive(&Window), "the window is active");
+    Panel->Select({ QStringLiteral("renamed") });
+    Panel->View()->setFocus();
+    Check(RenameInPlace(&Window, Panel->View(), QStringLiteral("inplace"),
+      [Panel]() { return Panel->Names().contains(QStringLiteral("inplace")); }), "F2 renames in place, remotely");
+    Check(!Panel->Names().contains(QStringLiteral("renamed")), "the old name gone");
+    Check(Panel->Rename(QStringLiteral("inplace"), QStringLiteral("renamed")), "(and back)");
     Panel->Select({ QStringLiteral("renamed"), QStringLiteral("hello.txt") });
     Check(Panel->Selected().size() == 2, "two entries select");
     Check(Panel->DeleteSelected(true), "and delete, confirmed");
@@ -971,6 +1005,203 @@ void Synchronization(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// The Commander's keys, pressed as a user presses them.
+void Keys(const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    QApplication::setActiveWindow(&Window);
+    Check(QTest::qWaitForWindowActive(&Window), "the window is active");
+    TResponder Responder;
+    const QDir Dir(Directory);
+    for (const char * Name : { "a.txt", "b.log", "c.txt", "gone.txt", "kept.txt" })
+    {
+      QFile File(Dir.filePath(QString::fromLatin1(Name)));
+      File.open(QIODevice::WriteOnly);
+      File.write(Name);
+    }
+    Dir.mkpath(QStringLiteral("d.txt"));
+    Dir.mkpath(QStringLiteral("sub"));
+#ifndef _WIN32
+    {
+      QFile File(Dir.filePath(QStringLiteral(".hidden")));
+      File.open(QIODevice::WriteOnly);
+    }
+#endif
+    LocalPanel * Local = Window.Local();
+    Local->DeleteToTrash = false;
+    Local->ChangeDirectory(Directory);
+    FileView * View = Local->View();
+
+    // The status line, as WinSCP's, with its sizes as WinSCP formats them.
+    QLocale::setDefault(QLocale::c());
+    Check(FormatBytes(512) == QStringLiteral("512 B"), "bytes below 1 KB");
+    Check(FormatBytes(1536) == QStringLiteral("1.50 KB"), "then KB, to three digits");
+    Check(FormatBytes(12 * 1024 + 128) == QStringLiteral("12.1 KB"), "12 KB + 128 B is 12.1 KB, as WinSCP's table");
+    Check(FormatBytes(1000 * 1024) == QStringLiteral("0.97 MB"), "1000 KB is 0.97 MB");
+    Check(FormatBytes(1024LL * 1024 * 1024 + 12 * 1024 * 1024) == QStringLiteral("1.01 GB"), "1 GB + 12 MB is 1.01 GB");
+    Local->Select({ QStringLiteral("a.txt"), QStringLiteral("b.log") });
+    Check(Local->Status()->text().startsWith(QStringLiteral("10 B of 31 B in 2 of 7")), "the status line counts the selection");
+#ifndef _WIN32
+    Check(Local->Status()->text().contains(QStringLiteral("1 hidden")), "and the hidden");
+    Local->SetShowHidden(true);
+    Check(Local->Status()->text().startsWith(QStringLiteral("10 B of 31 B in 2 of 8")) &&
+      !Local->Status()->text().contains(QStringLiteral("hidden")), "which, shown, count");
+    Local->SetShowHidden(false);
+#endif
+    View->clearSelection();
+    Window.ActivatePanel(true);
+    const auto Sorted = [Local]() { QStringList S = Local->Selected(); S.sort(); return S; };
+    // After a dialog closes, the offscreen platform leaves no window active
+    // (a window manager would give it back).
+    const auto Activate = [&Window]()
+    {
+      QApplication::setActiveWindow(&Window);
+      Check(QTest::qWaitForWindowActive(&Window), "the window is active again");
+      Window.ActivatePanel(true);
+    };
+
+    // Insert: the focused entry toggled, the focus down.
+    View->setCurrentIndex(View->model()->index(0, 0));
+    View->clearSelection();
+    QTest::keyClick(Window.windowHandle(), Qt::Key_Insert);
+    Check(Local->Selected().isEmpty(), "Insert on \"..\" selects nothing");
+    Check(View->currentIndex().row() == 1, "but moves the focus down");
+    QTest::keyClick(Window.windowHandle(), Qt::Key_Insert);
+    QTest::keyClick(Window.windowHandle(), Qt::Key_Insert);
+    Check(Local->Selected().size() == 2, "Insert selects the focused entry and moves on");
+    View->selectionModel()->setCurrentIndex(View->model()->index(1, 0), QItemSelectionModel::NoUpdate);
+    QTest::keyClick(Window.windowHandle(), Qt::Key_Insert);
+    Check(Local->Selected().size() == 1, "and unselects a selected one");
+
+    // The keypad: + and - by mask, * inverts.
+    View->clearSelection();
+    Check(View->SelectByMask(true, QStringLiteral("*.txt"), false), "a mask selects");
+    Check(Sorted() == QStringList({ QStringLiteral("a.txt"), QStringLiteral("c.txt"), QStringLiteral("gone.txt"),
+      QStringLiteral("kept.txt") }), "files matching it, not a directory named so");
+    Check(View->SelectByMask(true, QStringLiteral("*.txt"), true) && Local->Selected().contains(QStringLiteral("d.txt")),
+      "applied to directories, that one too");
+    Check(View->SelectByMask(false, QStringLiteral("a*"), false) && !Local->Selected().contains(QStringLiteral("a.txt")),
+      "a mask unselects");
+    View->clearSelection();
+    Check(View->SelectByMask(true, QStringLiteral("*.txt | gone*"), false) && !Local->Selected().contains(QStringLiteral("gone.txt")) &&
+      Local->Selected().contains(QStringLiteral("a.txt")), "in core's mask syntax, with exclusions");
+    View->clearSelection();
+    View->SelectByMask(true, QStringLiteral("*.log"), false);
+    QTest::keyClick(Window.windowHandle(), Qt::Key_Asterisk, Qt::KeypadModifier);
+    Check(!Local->Selected().contains(QStringLiteral("b.log")) && (Local->Selected().size() == Local->Names().size() - 2),
+      "keypad * inverts the selection, never \"..\"");
+    int MaskDialogs = 0;
+    Responder.Custom = [&MaskDialogs](QWidget * Modal)
+    {
+      QDialog * Dialog = qobject_cast<QDialog *>(Modal);
+      if ((Dialog == nullptr) || (Dialog->windowTitle() != FileView::tr("Deselect")))
+      {
+        return false;
+      }
+      MaskDialogs++;
+      Dialog->findChild<QLineEdit *>()->setText(QStringLiteral("*.txt"));
+      Dialog->accept();
+      return true;
+    };
+    QTest::keyClick(Window.windowHandle(), Qt::Key_Minus, Qt::KeypadModifier);
+    Check((MaskDialogs == 1) && (Sorted() == QStringList({ QStringLiteral("d.txt"), QStringLiteral("sub") })),
+      "keypad - asks for a mask and unselects by it");
+    Responder.Custom = nullptr;
+    Activate();
+    QTest::keyClick(Window.windowHandle(), Qt::Key_L, Qt::ControlModifier | Qt::ShiftModifier);
+    Check(Local->Selected().isEmpty(), "Ctrl+Shift+L clears the selection");
+    QTest::keyClick(Window.windowHandle(), Qt::Key_A, Qt::ControlModifier);
+    Check(Local->Selected().size() == Local->Names().size() - 1, "Ctrl+A selects all");
+    View->clearSelection();
+
+    // Navigation.
+    Local->Open(QStringLiteral("sub"));
+    QTest::keyClick(Window.windowHandle(), Qt::Key_Up, Qt::AltModifier);
+    Check(QFileInfo(Local->Path()) == QFileInfo(Directory), "Alt+Up: the parent");
+    Local->Open(QStringLiteral("sub"));
+    QTest::keyClick(Window.windowHandle(), Qt::Key_PageUp, Qt::ControlModifier);
+    Check(QFileInfo(Local->Path()) == QFileInfo(Directory), "Ctrl+PgUp: the parent");
+    QTest::keyClick(Window.windowHandle(), Qt::Key_Left, Qt::AltModifier);
+    Check(QFileInfo(Local->Path()) == QFileInfo(Dir.filePath(QStringLiteral("sub"))), "Alt+Left: back");
+    QTest::keyClick(Window.windowHandle(), Qt::Key_Right, Qt::AltModifier);
+    Check(QFileInfo(Local->Path()) == QFileInfo(Directory), "Alt+Right: forward");
+
+    // F8 deletes, Shift+Del the other way.
+    Responder.IgnoreWarnings = false;
+    Local->Select({ QStringLiteral("gone.txt") });
+    QTest::keyClick(Window.windowHandle(), Qt::Key_F8);
+    Check(!Dir.exists(QStringLiteral("gone.txt")), "F8 deletes, after core's confirmation");
+    Activate();
+    Local->DeleteToTrash = true;
+    Local->Select({ QStringLiteral("kept.txt") });
+    QTest::keyClick(Window.windowHandle(), Qt::Key_Delete, Qt::ShiftModifier);
+    Check(!Dir.exists(QStringLiteral("kept.txt")) && Responder.LastQuery.contains(QStringLiteral("kept.txt")) &&
+      (Responder.LastQuery == QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ConfirmDeleteFile)).replace(QStringLiteral("%s"), QStringLiteral("kept.txt"))),
+      "Shift+Del: for good, not to the trash, asking so");
+    Activate();
+
+    Local->Select({ QStringLiteral("a.txt") });
+    Check(RenameInPlace(&Window, View, QStringLiteral("z.txt"), [&Dir]() { return Dir.exists(QStringLiteral("z.txt")); }),
+      "F2 renames in place");
+    Check(!Dir.exists(QStringLiteral("a.txt")) && Local->Names().contains(QStringLiteral("z.txt")), "on disk and in the panel");
+    Local->Select({ QStringLiteral("b.log") });
+    QTest::keyClick(Window.windowHandle(), Qt::Key_F2);
+    QTest::keyClick(Window.windowHandle(), Qt::Key_Escape);
+    QApplication::processEvents();
+    Check(Dir.exists(QStringLiteral("b.log")) && (View->viewport()->findChild<QLineEdit *>() == nullptr ||
+      !View->viewport()->findChild<QLineEdit *>()->isVisible()), "Escape leaves the name");
+    Activate();
+    // Ctrl+F6: by size; again, the other way; Ctrl+F3: by name.
+    QTest::keyClick(Window.windowHandle(), Qt::Key_F6, Qt::ControlModifier);
+    Check((View->header()->sortIndicatorSection() == FileListModel::SizeColumn) &&
+      (View->header()->sortIndicatorOrder() == Qt::AscendingOrder), "Ctrl+F6 sorts by size");
+    QTest::keyClick(Window.windowHandle(), Qt::Key_F6, Qt::ControlModifier);
+    Check(View->header()->sortIndicatorOrder() == Qt::DescendingOrder, "again, the other way");
+    QTest::keyClick(Window.windowHandle(), Qt::Key_F3, Qt::ControlModifier);
+    Check((View->header()->sortIndicatorSection() == FileListModel::NameColumn) &&
+      (View->header()->sortIndicatorOrder() == Qt::AscendingOrder), "Ctrl+F3 by name");
+
+    // Columns: group and link target hidden until shown from the header.
+    Check(View->isColumnHidden(FileListModel::GroupColumn) && View->isColumnHidden(FileListModel::LinkTargetColumn) &&
+      !View->isColumnHidden(FileListModel::SizeColumn), "group and link target start hidden");
+    {
+      std::unique_ptr<QMenu> Menu(View->ColumnsMenu());
+      const QList<QAction *> Actions = Menu->actions();
+      Check(Actions.size() == FileListModel::ColumnCount - 1, "the header's menu lists every column but the name");
+      for (QAction * Action : Actions)
+      {
+        if (Action->text() == FileListModel::tr("Group"))
+        {
+          Action->setChecked(true);
+        }
+        else if (Action->text() == FileListModel::tr("Size"))
+        {
+          Action->setChecked(false);
+        }
+      }
+      Check(!View->isColumnHidden(FileListModel::GroupColumn) && View->isColumnHidden(FileListModel::SizeColumn),
+        "and shows and hides them");
+    }
+    View->setColumnHidden(FileListModel::SizeColumn, false);
+
+    // Tab: to the other panel and back; Ctrl+[: the local path copied.
+    Window.ActivatePanel(true);
+    QTest::keyClick(Window.windowHandle(), Qt::Key_Tab);
+    Check(!Window.LocalActive() && Window.Panel()->View()->hasFocus(), "Tab goes to the remote panel");
+    QTest::keyClick(Window.windowHandle(), Qt::Key_Tab);
+    Check(Window.LocalActive() && View->hasFocus(), "and back");
+    QTest::keyClick(Window.windowHandle(), Qt::Key_BracketLeft, Qt::ControlModifier);
+    Check(QApplication::clipboard()->text() == QDir::toNativeSeparators(Local->Path()), "Ctrl+[ copies the local path");
+    Frontend.SetWindow(nullptr);
+  }
+  CoreBridge::Finalize();
+}
+
 void Session(const char * Port)
 {
   QtFrontend Frontend;
@@ -1026,6 +1257,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 5) && (std::strcmp(argv[1], "transfer") == 0))
   {
     Transfer(argv[3], QString::fromLocal8Bit(argv[4]));
+  }
+  else if ((argc >= 4) && (std::strcmp(argv[1], "keys") == 0))
+  {
+    Keys(QString::fromLocal8Bit(argv[3]));
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "sync") == 0))
   {

@@ -203,8 +203,18 @@ enum class TText
   CreateDirError,       // "Error creating folder '%s'."
   RenameFileError,      // "Error renaming file '%s' to '%s'."
   DeleteLocalFileError, // "Error deleting file '%s'."
+  FileInfoFormat,       // "%s of %s in %s of %s"
+  FileInfoHidden,       // "%s hidden"
 };
 std::string Text(TText Text);
+
+// Whether a file matches a file mask (core's TFileMasks syntax: "*.txt;
+// *.log | old/", size and time conditions...), as WinSCP's panels match
+// one when selecting (TCustomScpExplorerForm::DirViewMatchMask, without
+// implicit matches). ModifiedTime is in seconds since 1970. Throws
+// TCoreError when the mask is not one.
+bool MaskMatches(const std::string & Masks, const std::string & FileName, bool Directory,
+  std::int64_t Size, double ModifiedTime);
 
 struct TInfo
 {

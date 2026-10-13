@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 2 | 11 | Parity on features users depend on |
+| P3 Qt parity | 3 | 11 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **80** | **98** | |
+| **Total** | **81** | **98** | |
 
 ## Next three actions
 
@@ -221,14 +221,15 @@ Drag and drop (P3-07, done): between the panels, a transfer after the Copy dialo
 through core's `MoveFiles`, as WinSCP); files from other programs, onto the
 remote panel, an upload; remote files dragged out to other programs,
 downloaded at the drop to a temporary directory, as WinSCP's drag without its
-shell extension. Synchronization (P3-03, done): Commands > Synchronize, WinSCP's
+shell extension. The Commander (P3-02, done): WinSCP's keys, rename in place, status lines,
+columns. Synchronization (P3-03, done): Commands > Synchronize, WinSCP's
 Synchronize dialog and checklist over core's own synchronization, applied
 here or in the queue. P2-10 and P2-11 wait, at the user's request.
 
-1. **P3-02**: the rest of the Commander (status bars, toolbar, keys).
-2. **P3-11**: remember the last used directories per site, as WinSCP.
-3. **P3-04**: preferences (split first), where synchronization's saved
-   options and transfer settings land too.
+1. **P3-11**: remember the last used directories per site, as WinSCP.
+2. **P3-04**: preferences (split first), where synchronization's saved
+   options, transfer settings and the panels' kept layout land too.
+3. **P3-05**: the internal editor (Q-3).
 
 ## Decisions taken
 
@@ -740,7 +741,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | ID | Task | Status | Note |
 |---|---|---|---|
 | P3-01 | `.dfm` → `.ui` converter | todo | |
-| P3-02 | Commander dual-pane | todo | the main draw |
+| P3-02 | Commander dual-pane | done | WinSCP's Commander keys (panels, `FileView`, main window), select by core's masks (`CoreBridge::MaskMatches`), rename in place, status lines, group and link target columns with the header's menu; ctests `qt_gui_keys`, `qt_gui_panel`; native on Windows 11 too. Not yet (ADR 0012): Shift+F5/F6, the extension column, incremental search status, toolbars, kept layout (P3-04) |
 | P3-03 | Synchronization UI | done | `port/qt/SynchronizeDialog.cpp` (Synchronize dialog, comparing progress, checklist) over `TSession::Sync*` (core's `SynchronizeCollect`/`Apply`/`ToQueue`); Commands > Synchronize (Ctrl+S); ctests `qt_gui_sync`, `qt_session`/`qt_session_ftp`; native on Windows 11 too. Not yet (ADR 0012): selected files only, checksum, transfer settings, saved options (P3-04); the checklist's size calculation, move finding, custom commands; keep remote directory up to date |
 | P3-04 | Preferences | todo | XL — split first |
 | P3-05 | Internal editor | todo | Q-3 |

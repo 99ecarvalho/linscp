@@ -7,6 +7,7 @@
 
 #include <QAbstractTableModel>
 #include <QMimeData>
+class QMenu;
 #include <QSortFilterProxyModel>
 #include <QStringList>
 #include <QTreeView>
@@ -24,7 +25,7 @@ class FileListModel : public QAbstractTableModel
   Q_OBJECT
 
 public:
-  enum { NameColumn, SizeColumn, ModifiedColumn, RightsColumn, OwnerColumn, ColumnCount };
+  enum { NameColumn, SizeColumn, ModifiedColumn, RightsColumn, OwnerColumn, GroupColumn, LinkTargetColumn, ColumnCount };
   // What the sort proxy compares; directories first is the proxy's.
   enum { SortRole = Qt::UserRole, DirectoryRole, ParentRole, HiddenRole };
 
@@ -39,6 +40,13 @@ public:
   int columnCount(const QModelIndex & Parent = QModelIndex()) const override;
   QVariant data(const QModelIndex & Index, int Role = Qt::DisplayRole) const override;
   QVariant headerData(int Section, Qt::Orientation Orientation, int Role = Qt::DisplayRole) const override;
+  // A name edited in place (F2) is a rename asked for, not a change of the
+  // list: the panel renames, then lists again.
+  Qt::ItemFlags flags(const QModelIndex & Index) const override;
+  bool setData(const QModelIndex & Index, const QVariant & Value, int Role = Qt::EditRole) override;
+
+signals:
+  void RenameRequested(const QString & Name, const QString & NewName);
 
 private:
   std::vector<CoreBridge::TRemoteEntry> FEntries;
@@ -100,6 +108,10 @@ private:
   mutable bool FDownloaded = false;
 };
 
+// As WinSCP's panels show sizes (BaseUtils.pas' FormatBytes, its default
+// short style): bytes below 1 KB, then KB, MB or GB to three digits.
+QString FormatBytes(std::int64_t Bytes);
+
 // A panel's view: its selection dragged as the panel says, and drops onto it
 // reported with the directory row they fell on ("" for the panel's own
 // directory; ".." for its parent).
@@ -112,10 +124,35 @@ public:
   // The drag of the selection; null for none.
   std::function<QMimeData *()> MakeDrag;
 
+  // WinSCP's selection commands, as its keys do them: Insert, the
+  // focused entry's selection toggled and the focus down; the keypad's *,
+  // the selection inverted; + and -, entries selected or unselected by a
+  // file mask (after asking for it, unless given); Ctrl+Shift+L, none.
+  void ToggleCurrent();
+  void InvertSelection();
+  // False when the mask is not one (the error is shown).
+  bool SelectByMask(bool Select, const QString & Masks, bool Directories);
+  void SelectByMaskDialog(bool Select);
+  // F2, as WinSCP's Commander renames: the focused entry's name edited in
+  // place. False when there is none ("..").
+  bool EditCurrentName();
+  // The panel's status line, as WinSCP's (FileStatusBarText): the selected
+  // entries' size of all, and how many of how many; and how many hidden.
+  QString StatusText() const;
+  // The columns as WinSCP's panels have them: group and link target hidden
+  // until shown; the header's context menu shows and hides each but the
+  // name. To call once the model is set.
+  void SetupColumns();
+  QMenu * ColumnsMenu();
+
 signals:
   void Dropped(const QMimeData * Data, const QString & OnDirectory, Qt::DropAction Action);
+  // Tab: to the other panel, as WinSCP's Commander.
+  void SwitchPanel();
 
 protected:
+  bool event(QEvent * Event) override;
+  void keyPressEvent(QKeyEvent * Event) override;
   void startDrag(Qt::DropActions Actions) override;
   void dragEnterEvent(QDragEnterEvent * Event) override;
   void dragMoveEvent(QDragMoveEvent * Event) override;
@@ -123,6 +160,12 @@ protected:
 
 private:
   QString DirectoryAt(const QPoint & Pos) const;
+  // The listed entry at a row of the view; null for "..".
+  const CoreBridge::TRemoteEntry * EntryAt(int Row) const;
+  // As WinSCP's Select dialog remembers them (WinConfiguration's
+  // SelectMask and SelectDirectories), for the session.
+  static QString FLastMask;
+  static bool FLastDirectories;
 };
 
 #endif

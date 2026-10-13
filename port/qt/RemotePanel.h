@@ -19,6 +19,7 @@
 #include "FileList.h"
 
 class QAction;
+class QLabel;
 class QLineEdit;
 class QSortFilterProxyModel;
 class QTreeView;
@@ -63,6 +64,7 @@ public:
   // (RemoteFileDrag); without it, a drag for the panels only.
   std::function<QMimeData *(const TFileDrag & Drag)> MakeDrag;
   QLineEdit * PathEdit() const { return FPath; }
+  QLabel * Status() const { return FStatus; }
 
 signals:
   // The directory or its contents changed.
@@ -81,6 +83,7 @@ private:
   DirectoriesFirst * FSort = nullptr;
   FileView * FView = nullptr;
   QLineEdit * FPath = nullptr;
+  QLabel * FStatus = nullptr;
   // The directory shown: the path box may hold what is being typed.
   QString FCurrent;
   QStringList FBack;

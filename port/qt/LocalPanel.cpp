@@ -9,6 +9,7 @@
 #include <QFileSystemWatcher>
 #include <QHeaderView>
 #include <QInputDialog>
+#include <QLabel>
 #include <QLineEdit>
 #include <QLocale>
 #include <QMenu>
@@ -101,6 +102,9 @@ LocalPanel::LocalPanel(QWidget * Parent) :
   FForwardAction = Add(QStyle::SP_ArrowForward, tr("Forward"), QKeySequence::Forward, [this]() { Forward(); });
   FParentAction = Add(QStyle::SP_FileDialogToParent, tr("Parent directory"), QKeySequence(Qt::Key_Backspace),
     [this]() { LocalPanel::Parent(); });
+  // As TCustomDirView.KeyDown: Alt+Up and Ctrl+PgUp too.
+  FParentAction->setShortcuts({ QKeySequence(Qt::Key_Backspace), QKeySequence(Qt::ALT | Qt::Key_Up),
+    QKeySequence(Qt::CTRL | Qt::Key_PageUp) });
   FRootAction = Add(QStyle::SP_DriveHDIcon, tr("Root directory"), QKeySequence(Qt::CTRL | Qt::Key_Backslash), [this]() { Root(); });
   FHomeAction = Add(QStyle::SP_DirHomeIcon, tr("Home directory"), QKeySequence(Qt::CTRL | Qt::Key_H), [this]() { Home(); });
   FRefreshAction = Add(QStyle::SP_BrowserReload, tr("Refresh"), QKeySequence(Qt::CTRL | Qt::Key_R), [this]() { Refresh(); });
@@ -117,19 +121,15 @@ LocalPanel::LocalPanel(QWidget * Parent) :
   });
   FRenameAction = Add(QStyle::SP_FileDialogDetailedView, tr("Rename"), QKeySequence(Qt::Key_F2), [this]()
   {
-    const QStringList Names = Selected();
-    if (Names.size() == 1)
-    {
-      bool OK = false;
-      const QString NewName =
-        QInputDialog::getText(this, tr("Rename"), tr("New &name:"), QLineEdit::Normal, Names.first(), &OK).trimmed();
-      if (OK && !NewName.isEmpty() && (NewName != Names.first()))
-      {
-        Rename(Names.first(), NewName);
-      }
-    }
+    FView->EditCurrentName();
   });
   FDeleteAction = Add(QStyle::SP_TrashIcon, tr("Delete"), QKeySequence::Delete, [this]() { DeleteSelected(true); });
+  FDeleteAction->setShortcuts({ QKeySequence::Delete, QKeySequence(Qt::Key_F8) });
+  QAction * DeleteAlternative = new QAction(this);
+  DeleteAlternative->setShortcuts({ QKeySequence(Qt::SHIFT | Qt::Key_Delete), QKeySequence(Qt::SHIFT | Qt::Key_F8) });
+  DeleteAlternative->setShortcutContext(Qt::WidgetWithChildrenShortcut);
+  connect(DeleteAlternative, &QAction::triggered, this, [this]() { DeleteSelected(true, true); });
+  addAction(DeleteAlternative);
   Layout->addWidget(Bar);
 
   FPath = new QLineEdit(this);
@@ -145,6 +145,7 @@ LocalPanel::LocalPanel(QWidget * Parent) :
   FSort->setSortRole(FileListModel::SortRole);
   FView = new FileView(this);
   FView->setModel(FSort);
+  FView->SetupColumns();
   FView->setRootIsDecorated(false);
   FView->setItemsExpandable(false);
   FView->setUniformRowHeights(true);
@@ -159,10 +160,17 @@ LocalPanel::LocalPanel(QWidget * Parent) :
     const QStringList Names = Selected();
     return Names.isEmpty() ? nullptr : MakeFileDrag({ true, FCurrent, Names });
   };
+  // After the editor has closed: renaming lists the directory again.
+  connect(FModel, &FileListModel::RenameRequested, this, [this](const QString & Name, const QString & NewName)
+  {
+    QTimer::singleShot(0, this, [this, Name, NewName]() { Rename(Name, NewName); });
+  });
   connect(FView, &QTreeView::activated, this, &LocalPanel::Activated);
   connect(FView, &QWidget::customContextMenuRequested, this, &LocalPanel::ContextMenu);
   connect(FView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &LocalPanel::UpdateActions);
   Layout->addWidget(FView, 1);
+  FStatus = new QLabel(this);
+  Layout->addWidget(FStatus);
 
   // Kept up to date as the directory changes, as WinSCP's local pane is:
   // changes coalesced, so a burst of them reads the directory once.
@@ -346,8 +354,10 @@ bool LocalPanel::MoveInto(const QStringList & Names, const QString & Directory)
 // As WinSCP's local delete by default: to the recycle bin (the trash), with
 // core's confirmation for that; where the system has no trash, for good,
 // with the plain one.
-bool LocalPanel::DeleteSelected(bool Confirm)
+bool LocalPanel::DeleteSelected(bool Confirm, bool Alternative)
 {
+  // WinSCP's alternative delete (Shift+Del): the other of the two.
+  const bool ToTrash = (DeleteToTrash != Alternative);
   const QStringList Names = Selected();
   if (Names.isEmpty())
   {
@@ -356,7 +366,7 @@ bool LocalPanel::DeleteSelected(bool Confirm)
   if (Confirm)
   {
     const bool One = (Names.size() == 1);
-    QString Message = CoreText(DeleteToTrash ?
+    QString Message = CoreText(ToTrash ?
       (One ? CoreBridge::TText::ConfirmRecycleFile : CoreBridge::TText::ConfirmRecycleFiles) :
       (One ? CoreBridge::TText::ConfirmDeleteFile : CoreBridge::TText::ConfirmDeleteFiles));
     Message = One ? Message.replace(QStringLiteral("%s"), Names.first()) :
@@ -384,7 +394,7 @@ bool LocalPanel::DeleteSelected(bool Confirm)
   {
     const QString Path = QDir(FCurrent).filePath(Name);
     const bool Directory = QFileInfo(Path).isDir() && !QFileInfo(Path).isSymLink();
-    if (!(DeleteToTrash && QFile::moveToTrash(Path)) &&
+    if (!(ToTrash && QFile::moveToTrash(Path)) &&
         !(Directory ? QDir(Path).removeRecursively() : QFile::remove(Path)))
     {
       Fail(CoreText(CoreBridge::TText::DeleteLocalFileError, { Name }));
@@ -435,6 +445,7 @@ void LocalPanel::ContextMenu(const QPoint & Pos)
 void LocalPanel::SetShowHidden(bool Show)
 {
   FSort->SetShowHidden(Show);
+  UpdateActions();
 }
 
 QStringList LocalPanel::Selected() const
@@ -477,6 +488,7 @@ QStringList LocalPanel::Names() const
 
 void LocalPanel::UpdateActions()
 {
+  FStatus->setText(FView->StatusText());
   const int Count = Selected().size();
   FBackAction->setEnabled(!FBack.isEmpty());
   FForwardAction->setEnabled(!FForward.isEmpty());

@@ -22,6 +22,7 @@
 #include <chrono>
 #include <iterator>
 #include <thread>
+#include <random>
 #include <string>
 
 namespace
@@ -243,7 +244,9 @@ int main(int argc, char ** argv)
 
     // Transfers, on the server and the disk for real.
     namespace fs = std::filesystem;
-    const fs::path Local = fs::temp_directory_path() / ("linscp-qt-transfer-" + Protocol);
+    // Its own, as runs of this test (by protocol, language) may run at once.
+    const fs::path Local = fs::temp_directory_path() /
+      ("linscp-qt-transfer-" + Protocol + "-" + std::to_string(std::random_device()()));
     fs::remove_all(Local);
     fs::create_directories(Local / "down");
     const std::string Content(300000, 'z');

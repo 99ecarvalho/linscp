@@ -288,7 +288,8 @@ if(TARGET linscp)
   # with every question answered through them.
   add_executable(test_qt_gui EXCLUDE_FROM_ALL test_qt_gui.cpp)
   target_include_directories(test_qt_gui PRIVATE "${CMAKE_SOURCE_DIR}/port/qt")
-  target_link_libraries(test_qt_gui PRIVATE linscp-qt-ui linscp-qt-core)
+  find_package(Qt6 REQUIRED COMPONENTS Test)
+  target_link_libraries(test_qt_gui PRIVATE linscp-qt-ui linscp-qt-core Qt6::Test)
   if(NOT WIN32)
     target_compile_options(test_qt_gui PRIVATE -fno-short-wchar)  # a Qt unit: ADR 0001
   endif()
@@ -317,6 +318,11 @@ if(TARGET linscp)
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
             local /ini=nul {tmp}/local -platform offscreen)
   set_tests_properties(qt_gui_local PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+  add_test(NAME qt_gui_keys
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
+            --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
+            keys /ini=nul {tmp}/local -platform offscreen)
+  set_tests_properties(qt_gui_keys PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
   add_test(NAME qt_gui_transfer
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"

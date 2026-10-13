@@ -27,6 +27,33 @@
         <source>Owner</source>
         <translation>Proprietário</translation>
     </message>
+    <message>
+        <source>Group</source>
+        <translation>Grupo</translation>
+    </message>
+    <message>
+        <source>Link target</source>
+        <translation>Destino do Link</translation>
+    </message>
+</context>
+<context>
+    <name>FileView</name>
+    <message>
+        <source>Select</source>
+        <translation>Selecionar</translation>
+    </message>
+    <message>
+        <source>Deselect</source>
+        <translation>Desselecionar</translation>
+    </message>
+    <message>
+        <source>File &amp;mask:</source>
+        <translation>&amp;Máscara de arquivo:</translation>
+    </message>
+    <message>
+        <source>Apply to &amp;directories</source>
+        <translation>Aplicar aos &amp;diretórios</translation>
+    </message>
 </context>
 <context>
     <name>LocalPanel</name>
@@ -69,10 +96,6 @@
     <message>
         <source>Rename</source>
         <translation>Renomear</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Novo &amp;nome:</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -398,10 +421,6 @@ Configuração: %4</translation>
     <message>
         <source>Rename</source>
         <translation>Renomear</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Novo &amp;nome:</translation>
     </message>
     <message>
         <source>Delete</source>

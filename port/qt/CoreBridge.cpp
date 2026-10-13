@@ -7,6 +7,7 @@
 #include <Configuration.h>
 #include <CoreMain.h>
 #include <Exceptions.h>
+#include <FileMasks.h>
 #include <HeadlessMain.h>
 #include <TextsCore.h>
 #include <TextsWin.h>
@@ -244,6 +245,25 @@ void Finalize()
   GGuiThread = 0;
 }
 
+bool MaskMatches(const std::string & Masks, const std::string & FileName, bool Directory,
+  std::int64_t Size, double ModifiedTime)
+{
+  try
+  {
+    TFileMasks Mask(FromUtf8(Masks));
+    TFileMasks::TParams Params;
+    Params.Size = Size;
+    // TDateTime counts days from 1899-12-30; 1970 is day 25569.
+    Params.Modification = TDateTime(ModifiedTime / 86400.0 + 25569.0);
+    bool ImplicitMatch = false;
+    return Mask.Matches(FromUtf8(FileName), false, Directory, &Params, true, ImplicitMatch) && !ImplicitMatch;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 std::string Text(TText Text)
 {
   int Ident;
@@ -270,6 +290,8 @@ std::string Text(TText Text)
     case TText::CreateDirError: Ident = CREATE_DIR_ERROR; break;
     case TText::RenameFileError: Ident = RENAME_FILE_ERROR; break;
     case TText::DeleteLocalFileError: Ident = DELETE_LOCAL_FILE_ERROR; break;
+    case TText::FileInfoFormat: Ident = FILE_INFO_FORMAT; break;
+    case TText::FileInfoHidden: Ident = FILE_INFO_HIDDEN2; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

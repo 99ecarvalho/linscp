@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 
 #include <QApplication>
+#include <QClipboard>
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QLabel>
@@ -56,7 +57,8 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FDisconnectAction = FileMenu->addAction(tr("&Disconnect"), this, &MainWindow::Disconnect);
   FileMenu->addSeparator();
   QAction * Quit = FileMenu->addAction(tr("E&xit"), this, &QWidget::close);
-  Quit->setShortcut(QKeySequence::Quit);
+  // F10 too, as WinSCP's Commander.
+  Quit->setShortcuts({ QKeySequence(QKeySequence::Quit), QKeySequence(Qt::Key_F10) });
   QMenu * HelpMenu = menuBar()->addMenu(tr("&Help"));
   HelpMenu->addAction(tr("&About..."), this, &MainWindow::About);
 
@@ -113,6 +115,21 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
       return Download(Names, Directory, false);
     });
   };
+  // Tab: to the other panel.
+  connect(FLocal->View(), &FileView::SwitchPanel, this, [this]() { ActivatePanel(false); });
+  connect(FPanel->View(), &FileView::SwitchPanel, this, [this]() { ActivatePanel(true); });
+  // Ctrl+[ and Ctrl+]: the local and remote paths to the clipboard.
+  QAction * LocalPathAction = new QAction(this);
+  LocalPathAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_BracketLeft));
+  connect(LocalPathAction, &QAction::triggered, this, [this]()
+  {
+    QApplication::clipboard()->setText(QDir::toNativeSeparators(FLocal->Path()));
+  });
+  addAction(LocalPathAction);
+  QAction * RemotePathAction = new QAction(this);
+  RemotePathAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_BracketRight));
+  connect(RemotePathAction, &QAction::triggered, this, [this]() { QApplication::clipboard()->setText(FPanel->Path()); });
+  addAction(RemotePathAction);
   Vertical->setStretchFactor(0, 4);
   Vertical->setStretchFactor(1, 1);
   setCentralWidget(Vertical);

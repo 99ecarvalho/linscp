@@ -16,6 +16,7 @@
 
 class QAction;
 class QFileSystemWatcher;
+class QLabel;
 class QLineEdit;
 class QTimer;
 class QTreeView;
@@ -40,7 +41,9 @@ public:
   bool Rename(const QString & Name, const QString & NewName);
   // The selected entries, to the trash (or for good where there is no
   // trash), after core's confirmation unless not asked.
-  bool DeleteSelected(bool Confirm = true);
+  // Alternative: the other way (for good when deleting to the trash, and
+  // the other way round), as WinSCP's Shift+Del.
+  bool DeleteSelected(bool Confirm = true, bool Alternative = false);
   // As RemotePanel's: entries into one of the directory's directories.
   bool MoveInto(const QStringList & Names, const QString & Directory);
   // A directory is entered; a file opened with its application.
@@ -59,6 +62,7 @@ public:
   QString Path() const { return FCurrent; }
   FileView * View() const { return FView; }
   QLineEdit * PathEdit() const { return FPath; }
+  QLabel * Status() const { return FStatus; }
 
 signals:
   void Changed();
@@ -75,6 +79,7 @@ private:
   DirectoriesFirst * FSort = nullptr;
   FileView * FView = nullptr;
   QLineEdit * FPath = nullptr;
+  QLabel * FStatus = nullptr;
   QFileSystemWatcher * FWatcher = nullptr;
   QTimer * FReloadTimer = nullptr;
   QString FCurrent;

@@ -254,3 +254,52 @@ again, reverse a delete into a download, queue, cancel) and `qt_gui_sync`
 (the dialog's rules, the checklist's checks and reverse and counts,
 Commands > Synchronize through both dialogs, "no differences", "start in
 background"): Linux, Wine, natively on Windows 11.
+
+## Amendment 2026-10-13: the Commander's keys, rename in place, columns (P3-02)
+
+- **The keys are WinSCP's Commander keys**, from `NonVisual.cpp` and
+  `TCustomDirView.KeyDown`. The panels' own actions carry:
+  - F2 rename;
+  - F7 new folder;
+  - F8 and Del delete (Shift+Del and Shift+F8 the other way locally:
+    for good instead of the trash, or the other way round);
+  - Backspace, Alt+Up and Ctrl+PgUp parent;
+  - Ctrl+\ root and Ctrl+H home;
+  - Alt+Left and Alt+Right back and forward;
+  - Ctrl+R refresh.
+- **The view (`FileView`) carries the selection keys and Tab:**
+  - Insert toggles the focused entry and moves down;
+  - keypad + and - select and unselect by mask, keypad * inverts;
+  - Ctrl+A selects all, Ctrl+Shift+L clears;
+  - Ctrl+F3, F5, F6, F7, F8 and F9 sort by name, time, size, rights,
+    owner and group (the same key again reverses);
+  - Tab goes to the other panel.
+- **The main window** adds F10 to quit and Ctrl+[ and Ctrl+] to copy the
+  local and remote paths.
+- **Masks are core's.** `CoreBridge::MaskMatches` is `TFileMasks` as
+  `TCustomScpExplorerForm::DirViewMatchMask` uses it, so selecting by mask
+  takes WinSCP's whole syntax (exclusions, size and time conditions).
+  "Apply to directories" matches a directory by its name alone, as
+  `TUnixDirView::ItemMatchesFilter` does.
+- **Renaming is in place**, as WinSCP's Commander does it. F2 edits the
+  name in the list. The model turns a committed edit into a rename
+  request, which the panel carries out after the editor has closed,
+  because it lists the directory again. A double click still opens.
+- **Each panel has a status line**, as WinSCP's (`FileStatusBarText`):
+  - the selected entries' size of all, and how many of how many;
+  - how many are hidden;
+  - in core's texts (`FILE_INFO_FORMAT`, `FILE_INFO_HIDDEN2`), with sizes
+    formatted as WinSCP's `FormatBytes` does in its default style.
+- **Columns:** group and link target join the others, hidden until shown
+  from the header's menu.
+- **Not yet:**
+  - Shift+F5 and Shift+F6 (copy or move only the focused entry);
+  - the extension column and its sort (Ctrl+F4);
+  - incremental search in the status line;
+  - toolbars to customize;
+  - columns and sorting kept between runs (preferences, P3-04).
+
+Verified by `qt_gui_keys` (each key pressed through the window as a user
+presses it, rename in place, the status line and `FormatBytes`, the columns'
+menu) and `qt_gui_panel` (rename in place remotely): Linux, Wine, natively
+on Windows 11.

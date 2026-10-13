@@ -5,11 +5,13 @@
 #include <QDateTime>
 #include <QHeaderView>
 #include <QInputDialog>
+#include <QLabel>
 #include <QLineEdit>
 #include <QLocale>
 #include <QMenu>
 #include <QSortFilterProxyModel>
 #include <QStyle>
+#include <QTimer>
 #include <QToolBar>
 #include <QTreeView>
 #include <QVBoxLayout>
@@ -48,6 +50,9 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   FBackAction = Add(QStyle::SP_ArrowBack, tr("Back"), QKeySequence::Back, [this]() { Back(); });
   FForwardAction = Add(QStyle::SP_ArrowForward, tr("Forward"), QKeySequence::Forward, [this]() { Forward(); });
   FParentAction = Add(QStyle::SP_FileDialogToParent, tr("Parent directory"), QKeySequence(Qt::Key_Backspace), [this]() { RemotePanel::Parent(); });
+  // As TCustomDirView.KeyDown: Alt+Up and Ctrl+PgUp too.
+  FParentAction->setShortcuts({ QKeySequence(Qt::Key_Backspace), QKeySequence(Qt::ALT | Qt::Key_Up),
+    QKeySequence(Qt::CTRL | Qt::Key_PageUp) });
   FRootAction = Add(QStyle::SP_DriveHDIcon, tr("Root directory"), QKeySequence(Qt::CTRL | Qt::Key_Backslash), [this]() { Root(); });
   FHomeAction = Add(QStyle::SP_DirHomeIcon, tr("Home directory"), QKeySequence(Qt::CTRL | Qt::Key_H), [this]() { Home(); });
   FRefreshAction = Add(QStyle::SP_BrowserReload, tr("Refresh"), QKeySequence(Qt::CTRL | Qt::Key_R), [this]() { Refresh(); });
@@ -64,19 +69,10 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   });
   FRenameAction = Add(QStyle::SP_FileDialogDetailedView, tr("Rename"), QKeySequence(Qt::Key_F2), [this]()
   {
-    const QStringList Names = Selected();
-    if (Names.size() == 1)
-    {
-      bool OK = false;
-      const QString NewName =
-        QInputDialog::getText(this, tr("Rename"), tr("New &name:"), QLineEdit::Normal, Names.first(), &OK).trimmed();
-      if (OK && !NewName.isEmpty() && (NewName != Names.first()))
-      {
-        Rename(Names.first(), NewName);
-      }
-    }
+    FView->EditCurrentName();
   });
   FDeleteAction = Add(QStyle::SP_TrashIcon, tr("Delete"), QKeySequence::Delete, [this]() { DeleteSelected(true); });
+  FDeleteAction->setShortcuts({ QKeySequence::Delete, QKeySequence(Qt::Key_F8) });
   Layout->addWidget(Bar);
 
   FPath = new QLineEdit(this);
@@ -89,6 +85,7 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   FSort->setSortRole(FileListModel::SortRole);
   FView = new FileView(this);
   FView->setModel(FSort);
+  FView->SetupColumns();
   FView->setRootIsDecorated(false);
   FView->setItemsExpandable(false);
   FView->setUniformRowHeights(true);
@@ -108,10 +105,17 @@ RemotePanel::RemotePanel(QWidget * Parent) :
     const TFileDrag Drag{ false, FCurrent, Names };
     return MakeDrag ? MakeDrag(Drag) : MakeFileDrag(Drag);
   };
+  // After the editor has closed: renaming lists the directory again.
+  connect(FModel, &FileListModel::RenameRequested, this, [this](const QString & Name, const QString & NewName)
+  {
+    QTimer::singleShot(0, this, [this, Name, NewName]() { Rename(Name, NewName); });
+  });
   connect(FView, &QTreeView::activated, this, &RemotePanel::Activated);
   connect(FView, &QWidget::customContextMenuRequested, this, &RemotePanel::ContextMenu);
   connect(FView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &RemotePanel::UpdateActions);
   Layout->addWidget(FView, 1);
+  FStatus = new QLabel(this);
+  Layout->addWidget(FStatus);
   UpdateActions();
 }
 
@@ -372,6 +376,7 @@ void RemotePanel::ContextMenu(const QPoint & Pos)
 void RemotePanel::SetShowHidden(bool Show)
 {
   FSort->SetShowHidden(Show);
+  UpdateActions();
 }
 
 QStringList RemotePanel::Selected() const
@@ -425,6 +430,7 @@ QString RemotePanel::Path() const
 
 void RemotePanel::UpdateActions()
 {
+  FStatus->setText(((FSession != nullptr) && FSession->Active()) ? FView->StatusText() : QString());
   const bool Active = (FSession != nullptr) && FSession->Active();
   const int Count = Selected().size();
   FBackAction->setEnabled(Active && !FBack.isEmpty());
