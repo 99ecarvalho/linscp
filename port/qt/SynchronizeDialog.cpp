@@ -20,6 +20,8 @@
 
 #include <map>
 
+#include "TransferSettingsDialog.h"
+
 using TAction = CoreBridge::TSyncItem::TAction;
 using TSyncParams = CoreBridge::TSyncParams;
 
@@ -98,6 +100,8 @@ SynchronizeDialog::SynchronizeDialog(const QString & LocalDirectory, const QStri
   CriteriaLayout->addWidget(FCaseSensitive);
   Groups2->addWidget(Criteria);
   Layout->addLayout(Groups2);
+  FTransferSettings = new TransferSettingsBox(this);
+  Layout->addWidget(FTransferSettings);
 
   QDialogButtonBox * Box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
   FOk = Box->button(QDialogButtonBox::Ok);

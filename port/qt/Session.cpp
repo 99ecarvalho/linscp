@@ -16,6 +16,9 @@
 #include <CopyParam.h>
 #include <FileOperationProgress.h>
 #include <Queue.h>
+#include <GUIConfiguration.h>
+
+#include "TransferSettings.h"
 
 #include <atomic>
 #include <memory>
@@ -60,6 +63,10 @@ struct TSession::TImpl
     if (Queue == NULL)
     {
       Queue.reset(new TTerminalQueue(Terminal.get(), Configuration));
+      // As TTerminalManager::NewQueue.
+      Queue->TransfersLimit = Configuration->QueueTransfersLimit;
+      Queue->KeepDoneItemsFor =
+        (GUIConfiguration->QueueKeepDoneItems ? GUIConfiguration->QueueKeepDoneItemsFor : 0);
       Queue->OnQueryUser = CLOSURE(QueryUser);
       Queue->OnPromptUser = CLOSURE(PromptUser);
       Queue->OnShowExtendedException = CLOSURE(ShowExtendedException);
@@ -507,7 +514,8 @@ public:
 
 }  // namespace
 
-bool TSession::Upload(const std::vector<std::string> & LocalPaths, const std::string & RemoteDirectory, bool Move)
+bool TSession::Upload(const std::vector<std::string> & LocalPaths, const std::string & RemoteDirectory, bool Move,
+  const TTransferSettings * Settings)
 {
   try
   {
@@ -518,7 +526,7 @@ bool TSession::Upload(const std::vector<std::string> & LocalPaths, const std::st
       Files->Add(FromUtf8(Path));
     }
     const UnicodeString Target = RemoteDirectory.empty() ? F->Terminal->CurrentDirectory : FromUtf8(RemoteDirectory);
-    TCopyParamType CopyParam;
+    TGUICopyParamType CopyParam = TransferCopyParam(Settings);
     TTransferBracket Bracket(true, Files->Count);
     return F->Terminal->CopyToRemote(Files.get(), UnixIncludeTrailingBackslash(Target), &CopyParam,
       FLAGMASK(Move, cpDelete), NULL);
@@ -531,7 +539,8 @@ bool TSession::Upload(const std::vector<std::string> & LocalPaths, const std::st
 
 // As the GUI downloads: the entries' names with their TRemoteFiles, as for
 // deleting.
-bool TSession::Download(const std::vector<std::string> & Names, const std::string & LocalDirectory, bool Move)
+bool TSession::Download(const std::vector<std::string> & Names, const std::string & LocalDirectory, bool Move,
+  const TTransferSettings * Settings)
 {
   try
   {
@@ -542,7 +551,7 @@ bool TSession::Download(const std::vector<std::string> & Names, const std::strin
       TRemoteFile * File = FindFile(F->Terminal.get(), Name);
       Files->AddObject(File->FileName, File);
     }
-    TCopyParamType CopyParam;
+    TGUICopyParamType CopyParam = TransferCopyParam(Settings);
     TTransferBracket Bracket(false, Files->Count);
     return F->Terminal->CopyToLocal(Files.get(), IncludeTrailingBackslash(FromUtf8(LocalDirectory)), &CopyParam,
       FLAGMASK(Move, cpDelete), NULL);
@@ -583,16 +592,20 @@ TQueueEntry::TState StateOf(TQueueItem::TStatus Status)
 
 }  // namespace
 
-void TSession::QueueUpload(const std::vector<std::string> & LocalPaths, const std::string & RemoteDirectory, bool Move)
+// As TCustomScpExplorerForm::AddQueueItem: no confirmations when the
+// settings say so, several connections when they allow.
+void TSession::QueueUpload(const std::vector<std::string> & LocalPaths, const std::string & RemoteDirectory, bool Move,
+  const TTransferSettings * Settings)
 {
   try
   {
     CheckActive(*this);
     std::unique_ptr<TStrings> Files(UploadList(LocalPaths));
     const UnicodeString Target = RemoteDirectory.empty() ? F->Terminal->CurrentDirectory : FromUtf8(RemoteDirectory);
-    TCopyParamType CopyParam;
+    TGUICopyParamType CopyParam = TransferCopyParam(Settings);
     F->EnsureQueue()->AddItem(new TUploadQueueItem(F->Terminal.get(), Files.get(),
-      UnixIncludeTrailingBackslash(Target), &CopyParam, FLAGMASK(Move, cpDelete), false));
+      UnixIncludeTrailingBackslash(Target), &CopyParam,
+      FLAGMASK(Move, cpDelete) | FLAGMASK(CopyParam.QueueNoConfirmation, cpNoConfirmation), CopyParam.QueueParallel));
     F->QueueAdded++;
     F->QueueChanged = true;
   }
@@ -602,7 +615,8 @@ void TSession::QueueUpload(const std::vector<std::string> & LocalPaths, const st
   }
 }
 
-void TSession::QueueDownload(const std::vector<std::string> & Names, const std::string & LocalDirectory, bool Move)
+void TSession::QueueDownload(const std::vector<std::string> & Names, const std::string & LocalDirectory, bool Move,
+  const TTransferSettings * Settings)
 {
   try
   {
@@ -613,9 +627,10 @@ void TSession::QueueDownload(const std::vector<std::string> & Names, const std::
       TRemoteFile * File = FindFile(F->Terminal.get(), Name);
       Files->AddObject(File->FileName, File);
     }
-    TCopyParamType CopyParam;
+    TGUICopyParamType CopyParam = TransferCopyParam(Settings);
     F->EnsureQueue()->AddItem(new TDownloadQueueItem(F->Terminal.get(), Files.get(),
-      IncludeTrailingBackslash(FromUtf8(LocalDirectory)), &CopyParam, FLAGMASK(Move, cpDelete), false));
+      IncludeTrailingBackslash(FromUtf8(LocalDirectory)), &CopyParam,
+      FLAGMASK(Move, cpDelete) | FLAGMASK(CopyParam.QueueNoConfirmation, cpNoConfirmation), CopyParam.QueueParallel));
     F->QueueAdded++;
     F->QueueChanged = true;
   }
@@ -639,8 +654,9 @@ bool TSession::QueueIdle()
     // on every call.
     F->QueueStatus = F->Queue->CreateStatus(F->QueueStatus);
     F->QueueDone = F->QueueAdded - (F->QueueStatus->Count - F->QueueStatus->DoneCount);
-    // As WinSCP's queue auto-popup: the first question waiting is asked.
-    for (int Index = 0; Index < F->QueueStatus->Count; Index++)
+    // As WinSCP's queue auto-popup (when on): the first question waiting is
+    // asked.
+    for (int Index = 0; GUIConfiguration->QueueAutoPopup && (Index < F->QueueStatus->Count); Index++)
     {
       TQueueItemProxy * Item = F->QueueStatus->Items[Index];
       if (TQueueItem::IsUserActionStatus(Item->Status))
@@ -890,7 +906,7 @@ bool TSession::CanSyncTimestamps() const
 // default transfer settings, rooted at the two directories.
 std::unique_ptr<TSyncChecklist> TSession::SyncCollect(const std::string & LocalDirectory,
   const std::string & RemoteDirectory, const TSyncParams & Params,
-  const std::function<bool(const std::string &, const std::string &)> & OnDirectory)
+  const std::function<bool(const std::string &, const std::string &)> & OnDirectory, const TTransferSettings * Settings)
 {
   try
   {
@@ -898,6 +914,8 @@ std::unique_ptr<TSyncChecklist> TSession::SyncCollect(const std::string & LocalD
     std::unique_ptr<TSyncChecklist::TImpl> Impl(new TSyncChecklist::TImpl());
     Impl->Mode = SyncModeOf(Params.Direction);
     Impl->Params = SyncParamsOf(Params, CanSyncTimestamps());
+    // As DoFullSynchronizeDirectories: the GUI's current transfer settings.
+    Impl->CopyParam = TransferCopyParam(Settings);
     const UnicodeString Local = FromUtf8(LocalDirectory);
     const UnicodeString Remote = FromUtf8(RemoteDirectory);
     Impl->CopyParam.IncludeFileMask.SetRoots(Local, Remote);

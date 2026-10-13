@@ -240,6 +240,16 @@ TPreferences Preferences()
   Result.DefaultDirIsHome = Settings.DefaultDirIsHome;
   Result.SwappedPanels = Settings.SwappedPanels;
   Result.ExplorerKeyboardShortcuts = Settings.ExplorerKeyboardShortcuts;
+  // As TPreferencesDialog::LoadConfiguration.
+  Result.QueueTransfersLimit = Configuration->QueueTransfersLimit;
+  Result.QueueKeepDoneItemsFor = GUIConfiguration->QueueKeepDoneItems ? GUIConfiguration->QueueKeepDoneItemsFor : 0;
+  Result.QueueAutoPopup = GUIConfiguration->QueueAutoPopup;
+  Result.SessionReopenAuto = Configuration->SessionReopenAuto / MSecsPerSec;
+  Result.SessionReopenAutoIdleOn = GUIConfiguration->SessionReopenAutoIdleOn && (GUIConfiguration->SessionReopenAutoIdle > 0);
+  Result.SessionReopenAutoIdle = GUIConfiguration->SessionReopenAutoIdle / MSecsPerSec;
+  Result.SessionReopenAutoInactive = GUIConfiguration->SessionReopenAutoInactive;
+  Result.SessionReopenAutoStall = Configuration->SessionReopenAutoStall / MSecsPerSec;
+  Result.SessionReopenTimeout = Configuration->SessionReopenTimeout / MSecsPerSec;
   return Result;
 }
 
@@ -257,6 +267,17 @@ void SetPreferences(const TPreferences & Preferences)
   try
   {
     Shell()->SetSettings(Settings);
+    // As TPreferencesDialog::SaveConfiguration.
+    Configuration->QueueTransfersLimit = Preferences.QueueTransfersLimit;
+    GUIConfiguration->QueueKeepDoneItems = (Preferences.QueueKeepDoneItemsFor != 0);
+    GUIConfiguration->QueueKeepDoneItemsFor = Preferences.QueueKeepDoneItemsFor;
+    GUIConfiguration->QueueAutoPopup = Preferences.QueueAutoPopup;
+    Configuration->SessionReopenAuto = Preferences.SessionReopenAuto * MSecsPerSec;
+    GUIConfiguration->SessionReopenAutoIdleOn = Preferences.SessionReopenAutoIdleOn;
+    GUIConfiguration->SessionReopenAutoIdle = Preferences.SessionReopenAutoIdle * MSecsPerSec;
+    GUIConfiguration->SessionReopenAutoInactive = Preferences.SessionReopenAutoInactive;
+    Configuration->SessionReopenAutoStall = Preferences.SessionReopenAutoStall * MSecsPerSec;
+    Configuration->SessionReopenTimeout = Preferences.SessionReopenTimeout * MSecsPerSec;
     Configuration->SaveExplicit();
   }
   catch (Exception & E)
@@ -380,6 +401,8 @@ std::string Text(TText Text)
     case TText::DeleteLocalFileError: Ident = DELETE_LOCAL_FILE_ERROR; break;
     case TText::FileInfoFormat: Ident = FILE_INFO_FORMAT; break;
     case TText::FileInfoHidden: Ident = FILE_INFO_HIDDEN2; break;
+    case TText::CopyParamDefault: Ident = COPY_PARAM_DEFAULT; break;
+    case TText::CopyParamDuplicate: Ident = COPY_PARAM_DUPLICATE; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

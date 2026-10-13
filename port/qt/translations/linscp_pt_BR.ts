@@ -342,6 +342,146 @@ Configuração: %4</translation>
         <source>Changes will apply on the next start.</source>
         <translation>Alterações serão aplicadas no próximo inicio</translation>
     </message>
+    <message>
+        <source>Transfer</source>
+        <translation>Transferir</translation>
+    </message>
+    <message>
+        <source>Background</source>
+        <translation>Segundo plano</translation>
+    </message>
+    <message>
+        <source>Endurance</source>
+        <translation>Tolerância</translation>
+    </message>
+    <message>
+        <source>Transfer settings presets</source>
+        <translation>Esquemas de ajustes de transferência</translation>
+    </message>
+    <message>
+        <source>&amp;Add...</source>
+        <translation>&amp;Adicionar ...</translation>
+    </message>
+    <message>
+        <source>&amp;Edit...</source>
+        <translation>&amp;Editar...</translation>
+    </message>
+    <message>
+        <source>Du&amp;plicate...</source>
+        <translation>Du&amp;plicar ...</translation>
+    </message>
+    <message>
+        <source>&amp;Remove</source>
+        <translation>&amp;Remover</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>A&amp;cima</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>A&amp;baixo</translation>
+    </message>
+    <message>
+        <source>Background transfers</source>
+        <translation>Transferências em segundo plano</translation>
+    </message>
+    <message>
+        <source>&amp;Maximal number of transfers at the same time:</source>
+        <translation>Número &amp;máximo de transferências simultâneas</translation>
+    </message>
+    <message>
+        <source>Never</source>
+        <translation>Nunca</translation>
+    </message>
+    <message>
+        <source>15 seconds</source>
+        <translation>15 segundos</translation>
+    </message>
+    <message>
+        <source>1 minute</source>
+        <translation>1 minuto</translation>
+    </message>
+    <message>
+        <source>15 minutes</source>
+        <translation>15 minutos</translation>
+    </message>
+    <message>
+        <source>1 hour</source>
+        <translation>1 hora</translation>
+    </message>
+    <message>
+        <source>Forever</source>
+        <translation>Sempre</translation>
+    </message>
+    <message>
+        <source>Display &amp;completed transfers in queue for:</source>
+        <translation>Exibir transferências completas na fila por:</translation>
+    </message>
+    <message>
+        <source>Transfer in &amp;background by default</source>
+        <translation>&amp;Transferir em segundo plano por padrão</translation>
+    </message>
+    <message>
+        <source>&amp;No confirmations for background transfers</source>
+        <translation>&amp;Sem confirmações para transferências em segundo plano</translation>
+    </message>
+    <message>
+        <source>&amp;Use multiple connections for single transfer</source>
+        <translation>&amp;Usa múltiplas conexões para uma única transferência</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically popup prompts of background transfers when idle</source>
+        <translation>&amp;Exibir automaticamente caixas de diálogo de transmissões em segundo plano quando ociosas</translation>
+    </message>
+    <message>
+        <source>Enable transfer resume/transfer to temporary filename for</source>
+        <translation>Habilitar resumo/transferência para nome de arquivo temporário para</translation>
+    </message>
+    <message>
+        <source>A&amp;ll files</source>
+        <translation>Todos ar&amp;quivos</translation>
+    </message>
+    <message>
+        <source>Files abo&amp;ve:</source>
+        <translation>Arquivos a&amp;baixo:</translation>
+    </message>
+    <message>
+        <source>Di&amp;sable</source>
+        <translation>De&amp;sabilitar</translation>
+    </message>
+    <message>
+        <source> KB</source>
+        <translation> KB</translation>
+    </message>
+    <message>
+        <source>Automatic reconnect</source>
+        <translation>Reconectar automaticamente</translation>
+    </message>
+    <message>
+        <source> seconds</source>
+        <translation> segundos</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically reconnect session, if it breaks during transfer</source>
+        <translation>Reconectar a sessão &amp;automaticamente caso ela seja interrompida durante a transferência</translation>
+    </message>
+    <message>
+        <source>Automatically reconnect session, if it breaks &amp;while idle</source>
+        <translation>Reconectar a sessão automaticamente caso ela seja interrompida &amp;enquanto está em espera</translation>
+    </message>
+    <message>
+        <source>Automatically reconnect session, if it breaks &amp;while inactive</source>
+        <translation>Reconectar sessão automaticamente, se ela cair en&amp;quanto inativa</translation>
+    </message>
+    <message>
+        <source>Automatically reconnect session, if it &amp;stalls</source>
+        <translation>Reconectar a sessão automaticamente ca&amp;so ela trave</translation>
+    </message>
+    <message>
+        <source>&amp;Keep reconnecting for:</source>
+        <translation>&amp;Continuar reconectando por:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>
@@ -950,6 +1090,163 @@ Configuração: %4</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+</context>
+<context>
+    <name>TransferSettingsBox</name>
+    <message>
+        <source>Transfer settings</source>
+        <translation>Ajustes de transferência</translation>
+    </message>
+    <message>
+        <source>Default transfer settings</source>
+        <translation>Configurações de transferência padrão</translation>
+    </message>
+    <message>
+        <source>Transfer settin&amp;gs...</source>
+        <translation>Ajus&amp;tes de transferência</translation>
+    </message>
+</context>
+<context>
+    <name>TransferSettingsDialog</name>
+    <message>
+        <source>Transfer settings preset</source>
+        <translation>Esquema de ajustes de transferência</translation>
+    </message>
+    <message>
+        <source>Transfer settings</source>
+        <translation>Ajustes de transferência</translation>
+    </message>
+    <message>
+        <source>Preset &amp;description:</source>
+        <translation>&amp;Descrição do esquema</translation>
+    </message>
+</context>
+<context>
+    <name>TransferSettingsFrame</name>
+    <message>
+        <source>Transfer mode</source>
+        <translation>Modo de transferência</translation>
+    </message>
+    <message>
+        <source>&amp;Text (plain text, html, scripts, ...)</source>
+        <translation>&amp;Texto (texto plano, html, scripts, ...)</translation>
+    </message>
+    <message>
+        <source>&amp;Binary (archives, doc, ...)</source>
+        <translation>&amp;Binário (arquivos, doc, ...)</translation>
+    </message>
+    <message>
+        <source>&amp;Automatic</source>
+        <translation>&amp;Automático</translation>
+    </message>
+    <message>
+        <source>Transfer following &amp;files in text mode:</source>
+        <translation>Trans&amp;ferir os seguintes arquivos em modo texto</translation>
+    </message>
+    <message>
+        <source>Filename modification</source>
+        <translation>Modificar nome do arquivo</translation>
+    </message>
+    <message>
+        <source>No chan&amp;ge</source>
+        <translation>&amp;Sem alteração</translation>
+    </message>
+    <message>
+        <source>&amp;Upper case</source>
+        <translation>Caracteres m&amp;aiúsculos</translation>
+    </message>
+    <message>
+        <source>Lo&amp;wer case</source>
+        <translation>Caracteres m&amp;inúsculos</translation>
+    </message>
+    <message>
+        <source>Lower case &amp;8.3</source>
+        <translation>Minúsculas formato &amp;8.3 (MS-DOS)</translation>
+    </message>
+    <message>
+        <source>Rep&amp;lace &apos;\:*?&apos;...</source>
+        <translation>Substituir &apos;\:*?&apos; ...</translation>
+    </message>
+    <message>
+        <source>Upload options</source>
+        <translation>Propriedades de upload</translation>
+    </message>
+    <message>
+        <source>Set pe&amp;rmissions:</source>
+        <translation>Definir permissões</translation>
+    </message>
+    <message>
+        <source>Add &amp;X to directories</source>
+        <translation>Adicionar &amp;X aos diretórios</translation>
+    </message>
+    <message>
+        <source>Ign&amp;ore permission errors</source>
+        <translation>Ign&amp;orar erros de permissão</translation>
+    </message>
+    <message>
+        <source>Clear &apos;Arc&amp;hive&apos; attribute</source>
+        <translation>Limpar atributo do &apos;Depósito&apos;</translation>
+    </message>
+    <message>
+        <source>Remo&amp;ve BOM and EOF marks</source>
+        <translation>Re&amp;mover marcas BOM e EOF</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt new files</source>
+        <translation>&amp;Encriptar novos arquivos</translation>
+    </message>
+    <message>
+        <source>Download options</source>
+        <translation>Propriedades de download</translation>
+    </message>
+    <message>
+        <source>Preserve rea&amp;d-only</source>
+        <translation>Preservar somente &amp;leitura</translation>
+    </message>
+    <message>
+        <source>Common options</source>
+        <translation>Propriedades gerais</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve timestamp</source>
+        <translation>Preservar timesta&amp;mp</translation>
+    </message>
+    <message>
+        <source>Including directories</source>
+        <translation>Incluindo diretórios</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate total size</source>
+        <translation>&amp;Calcular tamanho total</translation>
+    </message>
+    <message>
+        <source>Unlimited</source>
+        <translation>Ilimitado</translation>
+    </message>
+    <message>
+        <source>&amp;Speed (KB/s):</source>
+        <translation>&amp;Speed (KB/s):</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Outro</translation>
+    </message>
+    <message>
+        <source>File &amp;mask:</source>
+        <translation>&amp;Máscara de arquivo:</translation>
+    </message>
+    <message>
+        <source>&amp;New and updated files only</source>
+        <translation>Apenas arquivos novos e atualizados</translation>
+    </message>
+    <message>
+        <source>Exclude h&amp;idden files</source>
+        <translation>Excluir arquivos &amp;ocultos</translation>
+    </message>
+    <message>
+        <source>E&amp;xclude empty directories</source>
+        <translation>E&amp;xcluir diretórios vazios</translation>
     </message>
 </context>
 </TS>

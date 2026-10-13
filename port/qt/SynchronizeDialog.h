@@ -32,6 +32,8 @@ public:
   QString LocalDirectory() const;
   QString RemoteDirectory() const;
   CoreBridge::TSyncParams Params() const;
+  // The transfer settings group (WinSCP's "Transfer settings").
+  class TransferSettingsBox * TransferSettings() const { return FTransferSettings; }
 
   // The controls, for tests.
   QRadioButton * BothButton() const { return FBoth; }
@@ -66,6 +68,7 @@ private:
   QCheckBox * FBySize = nullptr;
   QCheckBox * FCaseSensitive = nullptr;
   QPushButton * FOk = nullptr;
+  class TransferSettingsBox * FTransferSettings = nullptr;
   QString FBySizeCaption;
 };
 

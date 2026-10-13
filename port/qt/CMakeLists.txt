@@ -10,7 +10,7 @@
 add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp QtFrontend.cpp QueryDialog.cpp
   PromptDialog.cpp Language.cpp SiteManager.cpp SiteAdvanced.cpp
   FileList.cpp RemotePanel.cpp LocalPanel.cpp
-  TransferDialog.cpp QueuePanel.cpp SynchronizeDialog.cpp PreferencesDialog.cpp CoreBridge.h)
+  TransferDialog.cpp QueuePanel.cpp SynchronizeDialog.cpp PreferencesDialog.cpp TransferSettingsDialog.cpp CoreBridge.h)
 set_target_properties(linscp-qt-ui PROPERTIES AUTOMOC ON)
 target_link_libraries(linscp-qt-ui PUBLIC Qt6::Widgets)
 if(NOT WIN32)
@@ -20,7 +20,7 @@ endif()
 # The core side: the bridge (CoreBridge.cpp, Session.cpp) and the shell's
 # half of core's Interface.h (QtInterface.cpp), in place of the headless one.
 add_library(linscp-qt-core STATIC EXCLUDE_FROM_ALL CoreBridge.cpp QtInterface.cpp Session.cpp Sites.cpp
-  Keys.cpp ShellConfiguration.cpp)
+  Keys.cpp ShellConfiguration.cpp TransferSettings.cpp)
 target_link_libraries(linscp-qt-core PUBLIC linscp-runtime-base linscp-gui)
 # The generated GUIConfiguration.h before core's include path, which has
 # upstream's own windows/ (ADR 0014).

@@ -175,6 +175,75 @@ void Finalize();
 // the shell's Translations/, when the program is not the shell beside it
 // (tests).
 std::string SetLanguage(const std::string & Locale, const std::string & Directory = std::string());
+// --- Transfer settings (P3-04b, ADR 0014) --------------------------------------
+
+// WinSCP's transfer settings (core's TCopyParamType, with the GUI's own
+// TGUICopyParamType additions), as its Transfer settings dialog edits them.
+struct TTransferSettings
+{
+  enum class TMode { Binary, Text, Automatic };  // tmBinary, tmAscii, tmAutomatic
+  TMode Mode = TMode::Binary;
+  // The files transferred as text in automatic mode, a file mask.
+  std::string TextMask;
+  // ncNoChange, ncUpperCase, ncLowerCase, ncFirstUpperCase, ncLowerCaseShort.
+  enum class TNameCase { NoChange, Upper, Lower, FirstUpper, LowerShort };
+  TNameCase NameCase = TNameCase::NoChange;
+  bool ReplaceInvalidChars = true;
+  bool PreserveTime = true;
+  bool PreserveTimeDirs = false;
+  bool CalculateSize = true;
+  // Bytes a second; 0 unlimited.
+  unsigned long SpeedLimit = 0;
+  // Downloads.
+  bool PreserveReadOnly = false;
+  // Uploads: the permissions to set (octal, "644"), with X added to
+  // directories.
+  bool PreserveRights = false;
+  std::string Rights = "644";
+  bool AddXToDirectories = true;
+  bool IgnorePermErrors = false;
+  bool ClearArchive = false;
+  // "Remove BOM and EOF marks".
+  bool RemoveBomAndEof = false;
+  bool EncryptNewFiles = true;
+  // Other.
+  std::string IncludeFileMask;
+  bool NewerOnly = false;
+  bool ExcludeHiddenFiles = false;
+  bool ExcludeEmptyDirectories = false;
+  // Endurance: resume (and transfer to a temporary name) for all files,
+  // files above the threshold (bytes), or none.
+  enum class TResume { On, Smart, Off };
+  TResume Resume = TResume::Smart;
+  std::int64_t ResumeThreshold = 100 * 1024;
+  // Background: transfer in the background by default, without asking;
+  // several connections for one transfer.
+  bool Queue = false;
+  bool QueueNoConfirmation = true;
+  bool QueueParallel = true;
+};
+// WinSCP's summary of them (TCopyParamType::GetInfoStr), as the Copy
+// dialog shows it; what differs from the defaults.
+std::string TransferSettingsInfo(const TTransferSettings & Settings);
+
+// A transfer settings preset, as the Transfer preferences page lists them.
+struct TTransferPreset
+{
+  std::string Name;
+  TTransferSettings Settings;
+};
+// The default settings, the presets, and the one in use ("": the default).
+TTransferSettings DefaultTransferSettings();
+std::vector<TTransferPreset> TransferPresets();
+std::string CurrentTransferPreset();
+// What transfers use: the preset in use, else the default.
+TTransferSettings CurrentTransferSettings();
+// These save. A preset kept by name keeps its autoselection rule. Throw
+// TCoreError (a preset name that is not one, for instance).
+void SetDefaultTransferSettings(const TTransferSettings & Settings);
+void SetTransferPresets(const std::vector<TTransferPreset> & Presets);
+void SetCurrentTransferPreset(const std::string & Name);
+
 // --- Preferences (P3-04, ADR 0014) --------------------------------------------
 
 // What the Preferences dialog sets, as WinSCP's (TWinConfiguration's
@@ -198,6 +267,22 @@ struct TPreferences
   bool SwappedPanels = false;
   // Explorer's keys (F5 refresh, Ctrl+K copy) rather than the Commander's.
   bool ExplorerKeyboardShortcuts = false;
+  // Background (core's and the GUI's configuration; the transfer settings'
+  // background options are TTransferSettings'): transfers at the same
+  // time; how long completed ones stay listed (seconds; 0 never, -1
+  // forever); questions of background transfers popped up when idle.
+  int QueueTransfersLimit = 2;
+  int QueueKeepDoneItemsFor = 15;
+  bool QueueAutoPopup = true;
+  // Endurance: reconnect a session that breaks during a transfer, while
+  // idle or inactive, or stalls, after so many seconds (0: not), and keep
+  // trying for so many (0: for ever).
+  int SessionReopenAuto = 5;
+  bool SessionReopenAutoIdleOn = true;
+  int SessionReopenAutoIdle = 9;
+  bool SessionReopenAutoInactive = false;
+  int SessionReopenAutoStall = 60;
+  int SessionReopenTimeout = 0;
 };
 TPreferences Preferences();
 // Saves them, as the dialog's OK does (SaveExplicit).
@@ -260,6 +345,8 @@ enum class TText
   DeleteLocalFileError, // "Error deleting file '%s'."
   FileInfoFormat,       // "%s of %s in %s of %s"
   FileInfoHidden,       // "%s hidden"
+  CopyParamDefault,     // "&Default" (the default transfer settings)
+  CopyParamDuplicate,   // "Transfer settings preset with description '%s' already exists."
 };
 std::string Text(TText Text);
 
@@ -540,14 +627,20 @@ public:
   // TCoreError.
   // Local files or directories (full paths) to a remote directory (or the
   // current one, when empty).
-  bool Upload(const std::vector<std::string> & LocalPaths, const std::string & RemoteDirectory, bool Move = false);
+  // Settings: this transfer's (the Copy dialog's); null for the GUI's
+  // current ones, as WinSCP's.
+  bool Upload(const std::vector<std::string> & LocalPaths, const std::string & RemoteDirectory, bool Move = false,
+    const TTransferSettings * Settings = nullptr);
   // Entries of the current directory to a local directory.
-  bool Download(const std::vector<std::string> & Names, const std::string & LocalDirectory, bool Move = false);
+  bool Download(const std::vector<std::string> & Names, const std::string & LocalDirectory, bool Move = false,
+    const TTransferSettings * Settings = nullptr);
 
   // The same in the background, through core's transfer queue (its own
   // connections, on its own threads), as WinSCP's "transfer in background".
-  void QueueUpload(const std::vector<std::string> & LocalPaths, const std::string & RemoteDirectory, bool Move = false);
-  void QueueDownload(const std::vector<std::string> & Names, const std::string & LocalDirectory, bool Move = false);
+  void QueueUpload(const std::vector<std::string> & LocalPaths, const std::string & RemoteDirectory, bool Move = false,
+    const TTransferSettings * Settings = nullptr);
+  void QueueDownload(const std::vector<std::string> & Names, const std::string & LocalDirectory, bool Move = false,
+    const TTransferSettings * Settings = nullptr);
 
   // Synchronization, as WinSCP's Synchronize command: what differs between
   // a local and a remote directory and its subdirectories, collected into a
@@ -556,7 +649,8 @@ public:
   // Throws TCoreError.
   std::unique_ptr<TSyncChecklist> SyncCollect(const std::string & LocalDirectory, const std::string & RemoteDirectory,
     const TSyncParams & Params,
-    const std::function<bool(const std::string & Local, const std::string & Remote)> & OnDirectory = nullptr);
+    const std::function<bool(const std::string & Local, const std::string & Remote)> & OnDirectory = nullptr,
+    const TTransferSettings * Settings = nullptr);
   // The checked entries. False when it was cancelled or core skipped some.
   bool SyncApply(TSyncChecklist & Checklist);
   // Each checked entry as its own queue item (TTerminal::SynchronizeToQueue).

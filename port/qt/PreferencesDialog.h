@@ -8,6 +8,8 @@
 
 #include <QDialog>
 
+#include <vector>
+
 #include "CoreBridge.h"
 
 class QCheckBox;
@@ -41,12 +43,39 @@ public:
   QComboBox * KeyboardShortcutsCombo() const { return FKeyboardShortcuts; }
   QListWidget * LanguagesList() const { return FLanguages; }
   QLabel * LanguageChangeLabel() const { return FLanguageChange; }
+  // Transfer: the default settings (row 0) and the presets.
+  QListWidget * PresetsList() const { return FPresetsList; }
+  CoreBridge::TTransferSettings DefaultSettings() const { return FDefaultSettings; }
+  const std::vector<CoreBridge::TTransferPreset> & Presets() const { return FPresets; }
+  // Its buttons' actions, for tests and them alike: what the dialogs would
+  // edit is given.
+  bool AddPreset(const QString & Name, const CoreBridge::TTransferSettings & Settings);
+  bool EditSelected(const QString & Name, const CoreBridge::TTransferSettings & Settings);
+  void RemoveSelected();
+  void MoveSelected(int By);
+  class QSpinBox * QueueTransfersLimitSpin() const { return FQueueTransfersLimit; }
+  QComboBox * QueueKeepDoneCombo() const { return FQueueKeepDone; }
+  QCheckBox * QueueAutoPopupCheck() const { return FQueueAutoPopup; }
+  QCheckBox * QueueCheck() const { return FQueue; }
+  QCheckBox * QueueNoConfirmationCheck() const { return FQueueNoConfirmation; }
+  QCheckBox * QueueParallelCheck() const { return FQueueParallel; }
+  class QRadioButton * ResumeOnButton() const { return FResumeOn; }
+  QRadioButton * ResumeSmartButton() const { return FResumeSmart; }
+  QRadioButton * ResumeOffButton() const { return FResumeOff; }
+  QSpinBox * ResumeThresholdSpin() const { return FResumeThreshold; }
+  QCheckBox * ReopenAutoCheck() const { return FReopenAuto; }
+  QSpinBox * ReopenAutoSpin() const { return FReopenAutoSeconds; }
 
 private:
   void AddPage(const QString & Name, QWidget * Page);
   QWidget * MakePanelsPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeCommanderPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeLanguagesPage();
+  QWidget * MakeTransferPage();
+  QWidget * MakeBackgroundPage(const CoreBridge::TPreferences & Preferences);
+  QWidget * MakeEndurancePage(const CoreBridge::TPreferences & Preferences);
+  void LoadPresets();
+  void EditPresetDialog(bool Add, bool Duplicate);
   void UpdateControls();
 
   QListWidget * FNavigation = nullptr;
@@ -61,6 +90,34 @@ private:
   QComboBox * FKeyboardShortcuts = nullptr;
   QListWidget * FLanguages = nullptr;
   QLabel * FLanguageChange = nullptr;
+  CoreBridge::TTransferSettings FDefaultSettings;
+  std::vector<CoreBridge::TTransferPreset> FPresets;
+  QListWidget * FPresetsList = nullptr;
+  class QPushButton * FEditPreset = nullptr;
+  QPushButton * FDuplicatePreset = nullptr;
+  QPushButton * FRemovePreset = nullptr;
+  QPushButton * FUpPreset = nullptr;
+  QPushButton * FDownPreset = nullptr;
+  QSpinBox * FQueueTransfersLimit = nullptr;
+  QComboBox * FQueueKeepDone = nullptr;
+  QCheckBox * FQueueAutoPopup = nullptr;
+  QCheckBox * FQueue = nullptr;
+  QCheckBox * FQueueNoConfirmation = nullptr;
+  QCheckBox * FQueueParallel = nullptr;
+  QRadioButton * FResumeOn = nullptr;
+  QRadioButton * FResumeSmart = nullptr;
+  QRadioButton * FResumeOff = nullptr;
+  QSpinBox * FResumeThreshold = nullptr;
+  QCheckBox * FReopenAuto = nullptr;
+  QSpinBox * FReopenAutoSeconds = nullptr;
+  QCheckBox * FReopenAutoIdle = nullptr;
+  QSpinBox * FReopenAutoIdleSeconds = nullptr;
+  QCheckBox * FReopenAutoInactive = nullptr;
+  QCheckBox * FReopenAutoStall = nullptr;
+  QSpinBox * FReopenAutoStallSeconds = nullptr;
+  QSpinBox * FReopenTimeout = nullptr;
+  // The pages exist: their controls can be updated.
+  bool FBuilt = false;
 };
 
 #endif

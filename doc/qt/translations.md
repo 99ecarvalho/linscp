@@ -66,7 +66,12 @@ for both targets: Debian's `qt6-l10n-tools`, which `qt6-tools-dev-tools`
 brings. They compile each `.ts` to a `.qm`, embedded with Qt's resource
 compiler. Brazilian Portuguese (`linscp_pt_BR.ts`) is the first translation.
 It follows the terms of WinSCP's own Brazilian translation, so the shell
-reads like the rest of WinSCP.
+reads like the rest of WinSCP. Most of the shell's strings are WinSCP's
+captions, so `port/tools/winscp_ts_suggest.py <ts> <LANG> --write` fills a
+`.ts` file's unfinished strings from WinSCP's translation of the same
+English text: by the WinSCP form the shell's dialog follows when that form
+has it, else where every occurrence agrees. What it cannot place is left
+for a person.
 
 ## Working with it
 

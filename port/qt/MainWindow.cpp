@@ -37,6 +37,7 @@
 #include "SiteManager.h"
 #include "PreferencesDialog.h"
 #include "SynchronizeDialog.h"
+#include "TransferSettingsDialog.h"
 
 namespace
 {
@@ -398,7 +399,8 @@ void MainWindow::Disconnect()
   UpdateActions();
 }
 
-bool MainWindow::Upload(const QStringList & Names, const QString & Target, bool Move)
+bool MainWindow::Upload(const QStringList & Names, const QString & Target, bool Move,
+  const CoreBridge::TTransferSettings * Settings)
 {
   if (FBusy || !FSession || Names.isEmpty())
   {
@@ -414,7 +416,7 @@ bool MainWindow::Upload(const QStringList & Names, const QString & Target, bool 
   bool Result = false;
   try
   {
-    Result = FSession->Upload(Paths, Target.toStdString(), Move);
+    Result = FSession->Upload(Paths, Target.toStdString(), Move, Settings);
   }
   catch (const CoreBridge::TCoreError & E)
   {
@@ -427,7 +429,8 @@ bool MainWindow::Upload(const QStringList & Names, const QString & Target, bool 
   return Result;
 }
 
-bool MainWindow::Download(const QStringList & Names, const QString & Target, bool Move)
+bool MainWindow::Download(const QStringList & Names, const QString & Target, bool Move,
+  const CoreBridge::TTransferSettings * Settings)
 {
   if (FBusy || !FSession || Names.isEmpty())
   {
@@ -443,7 +446,7 @@ bool MainWindow::Download(const QStringList & Names, const QString & Target, boo
   bool Result = false;
   try
   {
-    Result = FSession->Download(List, QDir::toNativeSeparators(Target).toStdString(), Move);
+    Result = FSession->Download(List, QDir::toNativeSeparators(Target).toStdString(), Move, Settings);
   }
   catch (const CoreBridge::TCoreError & E)
   {
@@ -580,6 +583,7 @@ bool MainWindow::Transfer(bool FromLocal, const QStringList & Names, QString Tar
   {
     return false;
   }
+  CoreBridge::TTransferSettings Settings = CoreBridge::CurrentTransferSettings();
   if (Confirm)
   {
     // As WinSCP's Copy dialog: where to, editable.
@@ -594,8 +598,12 @@ bool MainWindow::Transfer(bool FromLocal, const QStringList & Names, QString Tar
     TargetEdit->setMinimumWidth(380);
     Layout->addRow(new QLabel(Prompt, &Dialog));
     Layout->addRow(TargetEdit);
+    // The transfer settings, as WinSCP's Copy dialog shows them; the
+    // background default is theirs.
+    TransferSettingsBox * SettingsBox = new TransferSettingsBox(&Dialog);
+    Layout->addRow(SettingsBox);
     QCheckBox * InBackground = new QCheckBox(tr("Transfer in &background (add to transfer queue)"), &Dialog);
-    InBackground->setChecked(Background);
+    InBackground->setChecked(Background || SettingsBox->Settings().Queue);
     Layout->addRow(InBackground);
     QDialogButtonBox * Box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &Dialog);
     connect(Box, &QDialogButtonBox::accepted, &Dialog, &QDialog::accept);
@@ -607,6 +615,15 @@ bool MainWindow::Transfer(bool FromLocal, const QStringList & Names, QString Tar
     }
     Target = TargetEdit->text().trimmed();
     Background = InBackground->isChecked();
+    Settings = SettingsBox->Settings();
+    try
+    {
+      SettingsBox->Commit();
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+    }
   }
   if (Background)
   {
@@ -619,11 +636,11 @@ bool MainWindow::Transfer(bool FromLocal, const QStringList & Names, QString Tar
     {
       if (FromLocal)
       {
-        FSession->QueueUpload(List, Target.toStdString(), Move);
+        FSession->QueueUpload(List, Target.toStdString(), Move, &Settings);
       }
       else
       {
-        FSession->QueueDownload(List, QDir::toNativeSeparators(Target).toStdString(), Move);
+        FSession->QueueDownload(List, QDir::toNativeSeparators(Target).toStdString(), Move, &Settings);
       }
     }
     catch (const CoreBridge::TCoreError & E)
@@ -634,7 +651,7 @@ bool MainWindow::Transfer(bool FromLocal, const QStringList & Names, QString Tar
     QueueIdle();
     return true;
   }
-  return FromLocal ? Upload(Names, Target, Move) : Download(Names, Target, Move);
+  return FromLocal ? Upload(Names, Target, Move, &Settings) : Download(Names, Target, Move, &Settings);
 }
 
 // As TScpCommanderForm::FullSynchronizeDirectories: from the local panel, the
@@ -649,6 +666,7 @@ bool MainWindow::Synchronize(bool Confirm)
   QString RemoteDirectory = FPanel->Path();
   CoreBridge::TSyncParams Params = FSyncParams;
   Params.Direction = FLocalActive ? CoreBridge::TSyncParams::TDirection::Remote : CoreBridge::TSyncParams::TDirection::Local;
+  CoreBridge::TTransferSettings Settings = CoreBridge::CurrentTransferSettings();
   if (Confirm)
   {
     SynchronizeDialog Dialog(LocalDirectory, RemoteDirectory, Params, FSession->CanSyncTimestamps(), this);
@@ -660,13 +678,22 @@ bool MainWindow::Synchronize(bool Confirm)
     RemoteDirectory = Dialog.RemoteDirectory();
     Params = Dialog.Params();
     FSyncParams = Params;
+    Settings = Dialog.TransferSettings()->Settings();
+    try
+    {
+      Dialog.TransferSettings()->Commit();
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+    }
   }
-  return SynchronizeDirectories(LocalDirectory, RemoteDirectory, Params);
+  return SynchronizeDirectories(LocalDirectory, RemoteDirectory, Params, &Settings);
 }
 
 // As TCustomScpExplorerForm::DoFullSynchronizeDirectories.
 bool MainWindow::SynchronizeDirectories(const QString & LocalDirectory, const QString & RemoteDirectory,
-  const CoreBridge::TSyncParams & Params)
+  const CoreBridge::TSyncParams & Params, const CoreBridge::TTransferSettings * Settings)
 {
   if (FBusy || !FSession || !FSession->Active())
   {
@@ -684,7 +711,7 @@ bool MainWindow::SynchronizeDirectories(const QString & LocalDirectory, const QS
         [&Progress](const std::string & Local, const std::string & Remote)
         {
           return Progress.Directory(QString::fromStdString(Local), QString::fromStdString(Remote));
-        });
+        }, Settings);
     }
     catch (const CoreBridge::TCoreError & E)
     {

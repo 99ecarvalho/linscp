@@ -148,3 +148,51 @@ Verified by `qt_gui_preferences` (WinSCP's defaults; the pages; each
 setting applied to the panels and saved under WinSCP's keys; the language
 waiting for the next start; Ctrl+Alt+H kept) and `qt_gui_sites` (Home as
 the site's directory): Linux, Wine, natively on Windows 11.
+
+## Amendment 2026-10-13: transfer settings, presets, background, endurance (P3-04b)
+
+- **Transfers use the GUI's transfer settings**, as WinSCP's do. Before,
+  they used core's bare `TCopyParamType`. Uploads, downloads, queued
+  transfers and synchronization now take `GUIConfiguration`'s
+  `CurrentCopyParam` (the preset in use, else the default), or a transfer's
+  own when its dialog changed them. The bridge's `TTransferSettings` is
+  `TCopyParamType` with `TGUICopyParamType`'s background options, mapped
+  field for field and written back over the parameters it came from, so
+  what the shell does not edit stays.
+- **Queued transfers** add `cpNoConfirmation` and use several connections
+  as the settings say (`AddQueueItem`). The queue takes its transfers
+  limit and how long completed items stay listed as
+  `TTerminalManager::NewQueue` does. Questions pop up only when "popup
+  prompts when idle" is on.
+- **The Copy and Synchronize dialogs** show WinSCP's Transfer settings group:
+  - the summary (`GetInfoStr`);
+  - the preset to use, which becomes the current one, as WinSCP's preset
+    menu has it;
+  - "Transfer settings..." for this transfer alone, through the frame
+    WinSCP's dialogs share (`CopyParams.dfm`).
+
+  "Transfer in background" defaults to the settings' "background by
+  default".
+- **Preferences gains three pages:**
+  - Transfer: the default and the presets, starting with upstream's own
+    four (`DefaultLocalized`); add, edit, duplicate, remove, reorder, and
+    `COPY_PARAM_DUPLICATE` for a name taken. A preset kept by name keeps
+    its autoselection rule.
+  - Background: core's `QueueTransfersLimit`; the GUI's
+    `QueueKeepDoneItems`/`For` (WinSCP's combo of durations) and
+    `QueueAutoPopup`; the default settings' `Queue`,
+    `QueueNoConfirmation` and `QueueParallel`.
+  - Endurance: the default settings' resume, and core's and the GUI's
+    reconnect delays, mapped as `TPreferencesDialog` maps them (seconds;
+    a delay that is off shows upstream's default).
+- **Not yet:**
+  - presets' autoselection rules and their announcement;
+  - the parallel transfer threshold;
+  - "enable queue processing by default";
+  - the queue list's visibility.
+
+Verified by `qt_session`/`qt_session_ftp` (the default and a transfer's own
+settings followed, a preset in use followed) and `qt_gui_preferences` (the
+pages, presets edited, each setting saved under WinSCP's keys in
+`Interface` and `Interface\CopyParam`, the Copy dialog's group): Linux,
+Wine, natively on Windows 11.

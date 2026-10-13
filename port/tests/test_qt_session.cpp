@@ -340,6 +340,46 @@ int main(int argc, char ** argv)
     Check(fs::exists(Local / "down" / "queued.bin") && (fs::file_size(Local / "down" / "queued.bin") == 200000),
       "a queued download arrives whole");
 
+    // Transfer settings, as WinSCP's: the GUI's current ones, or the
+    // transfer's own.
+    {
+      const CoreBridge::TTransferSettings Defaults = CoreBridge::DefaultTransferSettings();
+      Check(Defaults.PreserveTime && (Defaults.Mode == CoreBridge::TTransferSettings::TMode::Binary) &&
+        (Defaults.Resume == CoreBridge::TTransferSettings::TResume::Smart), "WinSCP's default transfer settings");
+      CoreBridge::TTransferSettings Upper = Defaults;
+      Upper.NameCase = CoreBridge::TTransferSettings::TNameCase::Upper;
+      CoreBridge::SetDefaultTransferSettings(Upper);
+      std::ofstream(Local / "lower.txt") << "case";
+      Check(Session.Upload({ (Local / "lower.txt").string() }, ""), "an upload with the default settings changed");
+      Check(HasEntry(Session.List(), "LOWER.TXT", false), "follows them: the name upper-cased");
+      CoreBridge::SetDefaultTransferSettings(Defaults);
+      fs::create_directories(Local / "masked");
+      std::ofstream(Local / "masked" / "keep.txt") << "keep";
+      std::ofstream(Local / "masked" / "skip.log") << "skip";
+      CoreBridge::TTransferSettings Masked = Defaults;
+      Masked.IncludeFileMask = "|*.log";
+      Check(Session.Upload({ (Local / "masked").string() }, "", false, &Masked), "an upload with its own settings");
+      Session.ChangeDirectory("/masked");
+      Check(HasEntry(Session.List(), "keep.txt", false) && !HasEntry(Session.List(), "skip.log", false),
+        "follows them: the mask excludes *.log");
+      Session.ChangeDirectory("/");
+      CoreBridge::TTransferPreset Preset;
+      Preset.Name = "Lower case";
+      Preset.Settings = Defaults;
+      Preset.Settings.NameCase = CoreBridge::TTransferSettings::TNameCase::Lower;
+      CoreBridge::SetTransferPresets({ Preset });
+      CoreBridge::SetCurrentTransferPreset("Lower case");
+      Check((CoreBridge::TransferPresets().size() == 1) && (CoreBridge::CurrentTransferPreset() == "Lower case") &&
+        (CoreBridge::CurrentTransferSettings().NameCase == CoreBridge::TTransferSettings::TNameCase::Lower),
+        "a preset in use is what transfers use");
+      Check(!CoreBridge::TransferSettingsInfo(Preset.Settings).empty(), "summarised as WinSCP does");
+      std::ofstream(Local / "UPPER.TXT") << "case";
+      Check(Session.Upload({ (Local / "UPPER.TXT").string() }, "") && HasEntry(Session.List(), "upper.txt", false),
+        "uploaded under it, lower-cased");
+      CoreBridge::SetCurrentTransferPreset("");
+      CoreBridge::SetTransferPresets({});
+    }
+
     // Synchronization, as WinSCP's: collected into a checklist, applied.
     const fs::path SyncLocal = Local / "sync";
     fs::create_directories(SyncLocal / "d");

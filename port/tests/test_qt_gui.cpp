@@ -79,6 +79,7 @@
 #include "SiteManager.h"
 #include "PreferencesDialog.h"
 #include "SynchronizeDialog.h"
+#include "TransferSettingsDialog.h"
 
 #include <QFile>
 
@@ -1314,6 +1315,7 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
         Pages.append(Dialog.Navigation()->item(Row)->text());
       }
       Check(Pages == QStringList({ PreferencesDialog::tr("Panels"), PreferencesDialog::tr("Commander"),
+        PreferencesDialog::tr("Transfer"), PreferencesDialog::tr("Background"), PreferencesDialog::tr("Endurance"),
         PreferencesDialog::tr("Languages") }), "the dialog's pages");
       Check(!Dialog.ShowHiddenFilesCheck()->isChecked() && (Dialog.SizeFormatCombo()->currentIndex() == 1) &&
         Dialog.NaturalSortingCheck()->isChecked(), "showing the settings");
@@ -1325,7 +1327,7 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       Check(Dialog.LanguagesList()->count() > 40, "the languages WinSCP is translated into");
       Check(Portuguese, "Brazilian Portuguese among them");
       Check(Dialog.LanguagesList()->currentItem() != nullptr, "the one in use chosen");
-      Dialog.Navigation()->setCurrentRow(2);
+      Dialog.Navigation()->setCurrentRow(5);
       Check(Dialog.LanguageChangeLabel()->isHidden(), "no change to apply");
       for (int Row = 0; Row < Dialog.LanguagesList()->count(); Row++)
       {
@@ -1342,6 +1344,44 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       Dialog.SwappedPanelsCheck()->setChecked(true);
       Dialog.KeyboardShortcutsCombo()->setCurrentIndex(1);
       Dialog.RenameWholeNameCheck()->setChecked(true);
+
+      // Transfer: the default first, then the presets: WinSCP's own to begin
+      // with (TGUIConfiguration::DefaultLocalized: text, binary, changed
+      // files only, no directories).
+      const int Initial = static_cast<int>(Dialog.Presets().size());
+      Check(Initial == 4, "WinSCP's four presets to begin with");
+      Check((Dialog.PresetsList()->count() == Initial + 1) &&
+        (Dialog.PresetsList()->item(0)->text() == QString::fromStdString(CoreBridge::Text(CoreBridge::TText::CopyParamDefault)).remove(QLatin1Char('&'))),
+        "the presets list has the default");
+      CoreBridge::TTransferSettings Text = Dialog.DefaultSettings();
+      Text.Mode = CoreBridge::TTransferSettings::TMode::Text;
+      Dialog.PresetsList()->setCurrentRow(0);
+      Check(Dialog.AddPreset(QStringLiteral("Mine"), Text) && Dialog.AddPreset(QStringLiteral("Other"), Text),
+        "presets are added");
+      Check((Dialog.Presets()[0].Name == "Mine") && (Dialog.Presets()[1].Name == "Other"),
+        "each after the one selected");
+      Responder.AcceptDialogs = true;
+      Check(!Dialog.AddPreset(QStringLiteral("mine"), Text), "not twice under one name");
+      Responder.AcceptDialogs = false;
+      Dialog.MoveSelected(-1);
+      Check((Dialog.Presets().size() == static_cast<std::size_t>(Initial + 2)) && (Dialog.Presets()[0].Name == "Other"),
+        "and move");
+      Dialog.PresetsList()->setCurrentRow(0);
+      CoreBridge::TTransferSettings Default = Dialog.DefaultSettings();
+      Default.NameCase = CoreBridge::TTransferSettings::TNameCase::Lower;
+      Check(Dialog.EditSelected(QString(), Default), "the default edits");
+      Dialog.PresetsList()->setCurrentRow(1);
+      Dialog.RemoveSelected();
+      Check((Dialog.Presets().size() == static_cast<std::size_t>(Initial + 1)) && (Dialog.Presets()[0].Name == "Mine"),
+        "a preset removes");
+      // Background and Endurance.
+      Dialog.QueueTransfersLimitSpin()->setValue(3);
+      Dialog.QueueKeepDoneCombo()->setCurrentIndex(2);
+      Dialog.QueueCheck()->setChecked(true);
+      Dialog.ResumeOffButton()->setChecked(true);
+      Check(!Dialog.ResumeThresholdSpin()->isEnabled(), "a threshold only for \"files above\"");
+      Dialog.ReopenAutoCheck()->setChecked(false);
+      Check(!Dialog.ReopenAutoSpin()->isEnabled(), "a delay only when reconnecting");
       Dialog.Save();
       Window.ApplyPreferences();
     }
@@ -1400,6 +1440,32 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       "and Interface\\Commander's");
     Check(Saved(Interface, QStringLiteral("LocaleSafe")).toUInt() == CoreBridge::PreferredLocale(),
       "the language chosen too");
+    Check((Saved(Interface, QStringLiteral("QueueTransfersLimit")) == QStringLiteral("3")) &&
+      (Saved(Interface, QStringLiteral("QueueKeepDoneItemsFor")) == QStringLiteral("60")) &&
+      (Saved(Interface, QStringLiteral("SessionReopenAuto")) == QStringLiteral("0")),
+      "Background's and Endurance's, under core's and the GUI's keys");
+    const QString CopyParam = QStringLiteral("Configuration\\Interface\\CopyParam");
+    Check((Saved(CopyParam, QStringLiteral("Queue")) == QStringLiteral("1")) &&
+      (Saved(CopyParam, QStringLiteral("ResumeSupport")) == QStringLiteral("2")) &&
+      (Saved(CopyParam, QStringLiteral("FileNameCase")) == QStringLiteral("2")),
+      "the default transfer settings, under Interface\\CopyParam");
+    Check((CoreBridge::TransferPresets().size() == 5) && (CoreBridge::TransferPresets()[0].Name == "Mine") &&
+      (CoreBridge::TransferPresets()[0].Settings.Mode == CoreBridge::TTransferSettings::TMode::Text), "the presets");
+    Check(Saved(CopyParam, QStringLiteral("CopyParamList")) == QStringLiteral("5"), "saved as WinSCP's list");
+
+    // The Copy dialog's settings: the presets to choose, the summary.
+    {
+      TransferSettingsBox Box;
+      Check(Box.PresetCombo()->count() == 6, "the Copy dialog offers the default and the presets");
+      Check(Box.Settings().Queue, "the background default comes from the settings");
+      Box.PresetCombo()->setCurrentIndex(1);
+      Check(Box.Settings().Mode == CoreBridge::TTransferSettings::TMode::Text, "choosing a preset uses it");
+      Check(!Box.InfoLabel()->text().isEmpty(), "summarised");
+      Box.Commit();
+      Check(CoreBridge::CurrentTransferPreset() == "Mine", "and makes it the one in use, as WinSCP's");
+      Box.PresetCombo()->setCurrentIndex(0);
+      Box.Commit();
+    }
 
     // Ctrl+Alt+H: kept, as WinSCP's.
     QApplication::setActiveWindow(&Window);

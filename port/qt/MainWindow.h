@@ -39,8 +39,11 @@ public:
   // (move) from the active panel to the other's directory, after asking for
   // the target unless Confirm is false. False when nothing was transferred
   // in full.
-  bool Upload(const QStringList & Names, const QString & Target, bool Move);
-  bool Download(const QStringList & Names, const QString & Target, bool Move);
+  // Settings: this transfer's; null for the current ones.
+  bool Upload(const QStringList & Names, const QString & Target, bool Move,
+    const CoreBridge::TTransferSettings * Settings = nullptr);
+  bool Download(const QStringList & Names, const QString & Target, bool Move,
+    const CoreBridge::TTransferSettings * Settings = nullptr);
   // Background: through the transfer queue, as the Copy dialog's "transfer
   // in background" (with Confirm, the dialog's checkbox decides).
   bool TransferSelected(bool Move, bool Confirm = true, bool Background = false);
@@ -60,7 +63,7 @@ public:
   // Compares and, after the checklist when Params asks to preview, applies
   // (or queues). False when cancelled or nothing was applied.
   bool SynchronizeDirectories(const QString & LocalDirectory, const QString & RemoteDirectory,
-    const CoreBridge::TSyncParams & Params);
+    const CoreBridge::TSyncParams & Params, const CoreBridge::TTransferSettings * Settings = nullptr);
   // Options > Preferences: false when cancelled.
   bool PreferencesDialog();
   // The preferences applied to the window and its panels.

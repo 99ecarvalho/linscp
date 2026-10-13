@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 5 | 16 | Parity on features users depend on |
+| P3 Qt parity | 6 | 16 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **83** | **103** | |
+| **Total** | **84** | **103** | |
 
 ## Next three actions
 
@@ -221,18 +221,18 @@ Drag and drop (P3-07, done): between the panels, a transfer after the Copy dialo
 through core's `MoveFiles`, as WinSCP); files from other programs, onto the
 remote panel, an upload; remote files dragged out to other programs,
 downloaded at the drop to a temporary directory, as WinSCP's drag without its
-shell extension. Preferences (P3-04a, done): upstream's GUI configuration compiled as it is,
-the language chosen as upstream does, Options > Preferences with Panels,
-Commander and Languages. Last used directories (P3-11, done): kept in the site when a session ends,
+shell extension. Preferences (P3-04a, P3-04b, done): upstream's GUI configuration compiled as
+it is, the language chosen as upstream does, Options > Preferences with
+Panels, Commander, Transfer, Background, Endurance and Languages; transfers
+use the GUI's transfer settings and presets, as WinSCP's. Last used directories (P3-11, done): kept in the site when a session ends,
 as WinSCP. The Commander (P3-02, done): WinSCP's keys, rename in place, status lines,
 columns. Synchronization (P3-03, done): Commands > Synchronize, WinSCP's
 Synchronize dialog and checklist over core's own synchronization, applied
 here or in the queue. P2-10 and P2-11 wait, at the user's request.
 
-1. **P3-04b**: Preferences' Transfer (presets), Background and Endurance
-   pages, and the Copy and Synchronize dialogs' transfer settings.
-2. **P3-04c**/**P3-04d**: Window, Explorer, File colors, the panels' kept
-   layout; then core's Storage, Logging, Network, Security, Updates.
+1. **P3-04c**: Preferences' Window, Explorer, File colors; the panels'
+   layout kept between runs.
+2. **P3-04d**: core's Storage, Logging, Network, Security, Updates.
 3. **P3-05**: the internal editor (Q-3).
 
 ## Decisions taken
@@ -750,7 +750,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-03 | Synchronization UI | done | `port/qt/SynchronizeDialog.cpp` (Synchronize dialog, comparing progress, checklist) over `TSession::Sync*` (core's `SynchronizeCollect`/`Apply`/`ToQueue`); Commands > Synchronize (Ctrl+S); ctests `qt_gui_sync`, `qt_session`/`qt_session_ftp`; native on Windows 11 too. Not yet (ADR 0012): selected files only, checksum, transfer settings, saved options (P3-04); the checklist's size calculation, move finding, custom commands; keep remote directory up to date |
 | P3-04 | Preferences | wip | split into P3-04a…e (below), each counted as its own task; done when they are |
 | P3-04a | Preferences foundation, Languages, Panels, Commander | done | upstream's `GUIConfiguration` compiled as it is (`port/gui`, ADR 0014); `TShellConfiguration` mirroring `TWinConfiguration`'s keys; the language as upstream chooses it; Options > Preferences (Ctrl+Alt+P) with Panels, Commander and Languages, applied to the panels; ctests `qt_gui_preferences`, `qt_gui_sites`, `qt_language`; native on Windows 11 too. Not yet on these pages (ADR 0014): incremental search, panel state, full row, double-click, font, Explorer-style selection, tree, location profiles, compare criteria |
-| P3-04b | Preferences: Transfer, Background, Endurance | todo | |
+| P3-04b | Preferences: Transfer, Background, Endurance | done | transfers use the GUI's settings (`TTransferSettings`, `port/qt/TransferSettings.cpp`); the Copy and Synchronize dialogs' Transfer settings group and dialog (`TransferSettingsDialog.cpp`); Preferences' Transfer (presets), Background, Endurance; ctests `qt_session`/`qt_session_ftp`, `qt_gui_preferences`; native on Windows 11 too. Not yet (ADR 0014): autoselection rules, parallel threshold, queue enabling and list visibility |
 | P3-04c | Preferences: Window, Explorer, File colors | todo | the panels' layout kept between runs |
 | P3-04d | Preferences: Storage, Logging, Network, Security, Updates | todo | |
 | P3-04e | Preferences: Editors, Integration, Applications, Commands, Drag & Drop | todo | after P3-05, P3-08 |

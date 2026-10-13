@@ -274,11 +274,14 @@ if(TARGET linscp)
   set_tests_properties(qt_sites PROPERTIES DEPENDS qt_sites_build SKIP_RETURN_CODE 77 TIMEOUT 300)
   # In WinSCP's Portuguese translation: core's texts come back translated.
   add_dependencies(test_qt_session core-translations)
+  # The tests that read the shell's translations run after gui_build, which
+  # may write them (the translations' generation is part of building the
+  # shell).
   add_test(NAME qt_session_pt_BR
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_session>"
             /ini=nul {port} sftp pt_BR "${LINSCP_TRANSLATIONS_DIR}")
-  set_tests_properties(qt_session_pt_BR PROPERTIES DEPENDS qt_session_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+  set_tests_properties(qt_session_pt_BR PROPERTIES DEPENDS "qt_session_build;gui_build" SKIP_RETURN_CODE 77 TIMEOUT 300)
   # Over FTP too: FileZilla's engine, whose sockets run on window messages.
   add_test(NAME qt_session_ftp
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
@@ -298,7 +301,7 @@ if(TARGET linscp)
   add_test(NAME qt_dialogs COMMAND test_qt_gui dialogs -platform offscreen)
   set_tests_properties(qt_dialogs PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
   add_test(NAME qt_language COMMAND test_qt_gui language "${LINSCP_TRANSLATIONS_DIR}" -platform offscreen)
-  set_tests_properties(qt_language PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
+  set_tests_properties(qt_language PROPERTIES DEPENDS "qt_gui_build;gui_build" TIMEOUT 120)
   # The shell's .ts files keep up with its texts (port/tools/check_ts_current.py).
   add_test(NAME translations_current
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/check_ts_current.py"
@@ -327,7 +330,7 @@ if(TARGET linscp)
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
             preferences "/ini={tmp}/WinSCP.ini" "${LINSCP_TRANSLATIONS_DIR}" {tmp}/local -platform offscreen)
-  set_tests_properties(qt_gui_preferences PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+  set_tests_properties(qt_gui_preferences PROPERTIES DEPENDS "qt_gui_build;gui_build" SKIP_RETURN_CODE 77 TIMEOUT 300)
   add_test(NAME qt_gui_transfer
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
