@@ -218,3 +218,39 @@ view as the system sends them, with their questions answered; a remote
 drag's URLs downloaded when asked for, once, and not for drops on the
 panels): Linux, Wine, natively on Windows 11. Dragging out was checked by
 hand with Explorer on Windows 11 and with Nautilus.
+
+## Amendment 2026-10-13: synchronization (P3-03)
+
+- **The bridge carries core's synchronization as it is.** It does not
+  re-implement it. `TSession::SyncCollect` is core's `SynchronizeCollect`,
+  with the params WinSCP's Synchronize dialog sets (`TSyncParams`, mapped as
+  `TFullSynchronizeDialog::GetParams`, plus `spNoConfirmation` as the GUI
+  adds) and core's default transfer settings rooted at the two
+  directories. It returns the checklist (`TSyncChecklist` over
+  `TSynchronizeChecklist`, its entries' actions in core's order).
+- **Checking and reversing an entry update core's checklist at once**
+  (`TSynchronizeChecklist::Update`, `Reverse`). WinSCP's dialog keeps them
+  aside and updates on OK. The outcome is the same, because a cancelled
+  checklist is never applied.
+- **Applying** is core's `SynchronizeApply` with the progress window, or each
+  checked entry queued (`SynchronizeToQueue`), as WinSCP's "Start" and
+  "Start in Background". Timestamps are not queued, as in WinSCP.
+- **Collecting runs on the GUI thread.** Core reports each directory pair to
+  a small progress window, whose Cancel makes the callback return false.
+  Core then aborts, which reaches the shell as an aborted `TCoreError`,
+  and nothing is shown.
+- **What core finds is shown as core finds it.** Remote-only files are
+  listed as deletions even without "delete files", unchecked, as WinSCP's
+  checklist shows them.
+- **Not yet:**
+  - in the Synchronize dialog: "selected files only", "checksum", transfer
+    settings, and "use same options next time" (preferences, P3-04);
+  - in the checklist: calculating sizes, finding moves, custom commands,
+    and checking a directory's actions;
+  - "Keep remote directory up to date".
+
+Verified by `qt_session`/`qt_session_ftp` (collect, uncheck, apply, compare
+again, reverse a delete into a download, queue, cancel) and `qt_gui_sync`
+(the dialog's rules, the checklist's checks and reverse and counts,
+Commands > Synchronize through both dialogs, "no differences", "start in
+background"): Linux, Wine, natively on Windows 11.

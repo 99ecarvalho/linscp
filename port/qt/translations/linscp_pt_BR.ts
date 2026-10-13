@@ -212,6 +212,22 @@ Configuração: %4</translation>
         <source>Move %1 to &apos;%2&apos;?</source>
         <translation>Mover %1 para &apos;%2&apos;?</translation>
     </message>
+    <message>
+        <source>&amp;Commands</source>
+        <translation>Co&amp;mandos</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize...</source>
+        <translation>&amp;Sincronizar...</translation>
+    </message>
+    <message>
+        <source>Synchronize</source>
+        <translation>Sincronizar</translation>
+    </message>
+    <message>
+        <source>No differences found.</source>
+        <translation>Nenhuma diferença encontrada.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>
@@ -580,6 +596,199 @@ Configuração: %4</translation>
     <message>
         <source>Site &apos;%1&apos; already exists.</source>
         <translation>O site &apos;%1&apos; já existe.</translation>
+    </message>
+</context>
+<context>
+    <name>SyncChecklistDialog</name>
+    <message>
+        <source>Upload new</source>
+        <translation>Enviar novo</translation>
+    </message>
+    <message>
+        <source>Download new</source>
+        <translation>Baixar novo</translation>
+    </message>
+    <message>
+        <source>Upload update</source>
+        <translation>Enviar atualização</translation>
+    </message>
+    <message>
+        <source>Download update</source>
+        <translation>Baixar atualização</translation>
+    </message>
+    <message>
+        <source>Delete remote</source>
+        <translation>Excluir remoto</translation>
+    </message>
+    <message>
+        <source>Delete local</source>
+        <translation>Excluir local</translation>
+    </message>
+    <message>
+        <source>Synchronization checklist - %1 &lt;=&gt; %2</source>
+        <translation>Lista de sincronização - %1 &lt;=&gt; %2</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Nome</translation>
+    </message>
+    <message>
+        <source>Local directory</source>
+        <translation>Diretório local</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Tamanho</translation>
+    </message>
+    <message>
+        <source>Date modified</source>
+        <translation>Data modificada</translation>
+    </message>
+    <message>
+        <source>Remote directory</source>
+        <translation>Diretório remoto</translation>
+    </message>
+    <message>
+        <source>&amp;Start</source>
+        <translation>Ini&amp;ciar</translation>
+    </message>
+    <message>
+        <source>Start in &amp;Background</source>
+        <translation>Iniciar em &amp;Segundo Plano</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
+    <message>
+        <source>Check &amp;All</source>
+        <translation>Marcar &amp;todos</translation>
+    </message>
+    <message>
+        <source>Uncheck A&amp;ll</source>
+        <translation>Desmarcar t&amp;odos</translation>
+    </message>
+    <message>
+        <source>&amp;Reverse</source>
+        <translation>&amp;Reverso</translation>
+    </message>
+    <message>
+        <source>%1: %2 of %3</source>
+        <translation>%1: %2 de %3</translation>
+    </message>
+</context>
+<context>
+    <name>SynchronizeDialog</name>
+    <message>
+        <source>Synchronize</source>
+        <translation>Sincronizar</translation>
+    </message>
+    <message>
+        <source>Directories</source>
+        <translation>Diretórios</translation>
+    </message>
+    <message>
+        <source>Bro&amp;wse...</source>
+        <translation>Explo&amp;rar...</translation>
+    </message>
+    <message>
+        <source>Select local directory</source>
+        <translation>Selecione o diretório local</translation>
+    </message>
+    <message>
+        <source>Lo&amp;cal directory:</source>
+        <translation>Diretório lo&amp;cal:</translation>
+    </message>
+    <message>
+        <source>R&amp;emote directory:</source>
+        <translation>Diretório Remo&amp;to:</translation>
+    </message>
+    <message>
+        <source>Direction/Target directory</source>
+        <translation>Direção</translation>
+    </message>
+    <message>
+        <source>&amp;Both</source>
+        <translation>Am&amp;bos</translation>
+    </message>
+    <message>
+        <source>&amp;Remote</source>
+        <translation>&amp;Remoto</translation>
+    </message>
+    <message>
+        <source>&amp;Local</source>
+        <translation>&amp;Local</translation>
+    </message>
+    <message>
+        <source>Mode</source>
+        <translation>Modo</translation>
+    </message>
+    <message>
+        <source>Synchronize &amp;files</source>
+        <translation>Sincronizar ar&amp;quivos</translation>
+    </message>
+    <message>
+        <source>&amp;Mirror files</source>
+        <translation>Es&amp;pelhar arquivos</translation>
+    </message>
+    <message>
+        <source>Synchronize &amp;timestamps</source>
+        <translation>Sincronizar &amp;horários</translation>
+    </message>
+    <message>
+        <source>Synchronize options</source>
+        <translation>Opções de sincronização</translation>
+    </message>
+    <message>
+        <source>&amp;Delete files</source>
+        <translation>E&amp;xcluir arquivos</translation>
+    </message>
+    <message>
+        <source>E&amp;xisting files only</source>
+        <translation>Apenas arquivos &amp;existentes</translation>
+    </message>
+    <message>
+        <source>Pre&amp;view changes</source>
+        <translation>&amp;Visualizar alterações</translation>
+    </message>
+    <message>
+        <source>Comparison criteria</source>
+        <translation>Comparar critérios</translation>
+    </message>
+    <message>
+        <source>M&amp;odification time</source>
+        <translation>Horário de m&amp;odificação</translation>
+    </message>
+    <message>
+        <source>File si&amp;ze</source>
+        <translation>&amp;Tamanho do arquivo</translation>
+    </message>
+    <message>
+        <source>C&amp;ase sensitive</source>
+        <translation>Sensível ao c&amp;aso</translation>
+    </message>
+    <message>
+        <source>Same si&amp;ze only</source>
+        <translation>Apenas do &amp;mesmo tamanho</translation>
+    </message>
+</context>
+<context>
+    <name>SynchronizeProgress</name>
+    <message>
+        <source>Comparing</source>
+        <translation>Comparando</translation>
+    </message>
+    <message>
+        <source>Local:</source>
+        <translation>Local:</translation>
+    </message>
+    <message>
+        <source>Remote:</source>
+        <translation>Remoto:</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
     </message>
 </context>
 <context>

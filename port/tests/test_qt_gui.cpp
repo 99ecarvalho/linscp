@@ -32,6 +32,7 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QTimer>
+#include <QRadioButton>
 #include <QDragEnterEvent>
 #include <QMessageBox>
 #include <QMimeData>
@@ -68,6 +69,7 @@
 #include <QLineEdit>
 #include <QTreeView>
 #include "SiteManager.h"
+#include "SynchronizeDialog.h"
 
 #include <QFile>
 
@@ -251,6 +253,8 @@ public:
   // titles.
   bool AcceptDialogs = false;
   QStringList Accepted;
+  // Asked first about any modal dialog: true when it dealt with it.
+  std::function<bool(QWidget *)> Custom;
 
   TResponder()
   {
@@ -272,6 +276,10 @@ private:
       return;
     }
     QWidget * Modal = QApplication::activeModalWidget();
+    if ((Modal != nullptr) && Custom && Custom(Modal))
+    {
+      return;
+    }
     if (QueryDialog * Query = qobject_cast<QueryDialog *>(Modal))
     {
       const QList<QLabel *> Labels = Query->findChildren<QLabel *>();
@@ -315,7 +323,14 @@ private:
     else if (QMessageBox * Box = qobject_cast<QMessageBox *>(Modal); AcceptDialogs && (Box != nullptr))
     {
       Accepted.append(Box->windowTitle());
-      Box->button(QMessageBox::Yes)->click();
+      if (Box->button(QMessageBox::Yes) != nullptr)
+      {
+        Box->button(QMessageBox::Yes)->click();
+      }
+      else
+      {
+        Box->accept();
+      }
     }
     else if (QDialog * Dialog = qobject_cast<QDialog *>(Modal); AcceptDialogs && (Dialog != nullptr))
     {
@@ -834,6 +849,128 @@ void DragAndDrop(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+void Synchronization(const char * Port, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = { "secret" };
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "the session opens");
+    using TSyncParams = CoreBridge::TSyncParams;
+
+    // The dialog's rules, as TFullSynchronizeDialog::UpdateControls.
+    {
+      SynchronizeDialog Dialog(Directory, QStringLiteral("/sub"), TSyncParams(), true);
+      Check(Dialog.RemoteButton()->isChecked() && Dialog.FilesButton()->isChecked() && Dialog.PreviewCheck()->isChecked() &&
+        Dialog.ByTimeCheck()->isChecked() && !Dialog.DeleteCheck()->isChecked(), "the defaults: remote, files, preview, by time");
+      Dialog.MirrorButton()->setChecked(true);
+      Dialog.BothButton()->setChecked(true);
+      Check(Dialog.FilesButton()->isChecked() && !Dialog.MirrorButton()->isEnabled(), "both directions: no mirror");
+      Check(!Dialog.DeleteCheck()->isEnabled() && !Dialog.ByTimeCheck()->isEnabled() && Dialog.ByTimeCheck()->isChecked() &&
+        !Dialog.BySizeCheck()->isEnabled(), "nor delete, and by time only");
+      Dialog.RemoteButton()->setChecked(true);
+      Dialog.DeleteCheck()->setChecked(true);
+      Dialog.TimestampsButton()->setChecked(true);
+      Check(Dialog.ExistingOnlyCheck()->isChecked() && !Dialog.ExistingOnlyCheck()->isEnabled() &&
+        !Dialog.DeleteCheck()->isChecked() && !Dialog.DeleteCheck()->isEnabled(), "timestamps: existing files only, no delete");
+      Check(Dialog.BySizeCheck()->text().contains(QStringLiteral("Same")), "and \"same size only\"");
+      Check(Dialog.Params().Mode == TSyncParams::TMode::Timestamps, "which the params say");
+      Dialog.FilesButton()->setChecked(true);
+      Dialog.LocalButton()->setChecked(true);
+      Check(Dialog.Params().Direction == TSyncParams::TDirection::Local, "the direction too");
+      SynchronizeDialog NoTimes(Directory, QString(), TSyncParams(), false);
+      Check(!NoTimes.TimestampsButton()->isEnabled(), "a server that cannot set times: no timestamps");
+      Check(!NoTimes.OkButton()->isEnabled(), "and no OK without both directories");
+    }
+
+    const QDir Dir(Directory);
+    for (const char * Name : { "s1.txt", "s2.txt" })
+    {
+      QFile File(Dir.filePath(QString::fromLatin1(Name)));
+      File.open(QIODevice::WriteOnly);
+      File.write(Name);
+    }
+    LocalPanel * Local = Window.Local();
+    RemotePanel * Remote = Window.Panel();
+    Local->ChangeDirectory(Directory);
+    Remote->ChangeDirectory(QStringLiteral("/sub"));
+
+    // The checklist, over what the session collects.
+    {
+      std::unique_ptr<CoreBridge::TSyncChecklist> List =
+        Window.Session()->SyncCollect(Directory.toStdString(), "/sub", TSyncParams());
+      Check(List && (List->Items().size() == 2), "two files to upload");
+      SyncChecklistDialog Dialog(*List, Directory, QStringLiteral("/sub"));
+      Check(Dialog.List()->topLevelItemCount() == 2, "the checklist lists them");
+      Check(Dialog.Status()->text().contains(QStringLiteral("2 of 2")), "counting them, checked of all");
+      Dialog.List()->topLevelItem(0)->setCheckState(0, Qt::Unchecked);
+      Check(List->CheckedCount() == 1, "an entry unchecked in the list is unchecked in the checklist");
+      Dialog.CheckAll(false);
+      Check(!Dialog.StartButton()->isEnabled() && (List->CheckedCount() == 0), "none checked: nothing to start");
+      Dialog.CheckAll(true);
+      Check(Dialog.StartButton()->isEnabled() && (List->CheckedCount() == 2), "all checked again");
+      Dialog.List()->topLevelItem(1)->setSelected(true);
+      Dialog.ReverseSelected();
+      Check(List->Items()[1].Action == CoreBridge::TSyncItem::TAction::DeleteLocal, "a new upload reversed is a local delete");
+      Check(Dialog.List()->topLevelItem(1)->toolTip(4) == SyncChecklistDialog::tr("Delete local"), "shown so");
+    }
+
+    // Commands > Synchronize, from the local panel: the remote directory updated.
+    Responder.AcceptDialogs = true;
+    int Checklists = 0;
+    Responder.Custom = [&Checklists](QWidget * Modal)
+    {
+      if (SyncChecklistDialog * Dialog = qobject_cast<SyncChecklistDialog *>(Modal))
+      {
+        Checklists++;
+        Dialog->StartButton()->click();
+        return true;
+      }
+      return false;
+    };
+    Window.ActivatePanel(true);
+    Check(Window.Synchronize(true), "synchronizing applies");
+    Check(Responder.Accepted.contains(SynchronizeDialog::tr("Synchronize")) && (Checklists == 1),
+      "after the Synchronize dialog and the checklist");
+    Check(Remote->Names().contains(QStringLiteral("s1.txt")) && Remote->Names().contains(QStringLiteral("s2.txt")),
+      "and the remote panel shows the files");
+    Responder.Accepted.clear();
+    Check(!Window.Synchronize(true), "again, nothing to do");
+    Check(Responder.Accepted.count(MainWindow::tr("Synchronize")) == 2, "\"no differences\" is told");
+
+    {
+      QFile File(Dir.filePath(QStringLiteral("s3.txt")));
+      File.open(QIODevice::WriteOnly);
+      File.write("queued");
+    }
+    Responder.Custom = [](QWidget * Modal)
+    {
+      if (SyncChecklistDialog * Dialog = qobject_cast<SyncChecklistDialog *>(Modal))
+      {
+        Dialog->QueueButton()->click();
+        return true;
+      }
+      return false;
+    };
+    Check(Window.Synchronize(true), "started in the background");
+    QElapsedTimer Timer;
+    Timer.start();
+    while (!Remote->Names().contains(QStringLiteral("s3.txt")) && (Timer.elapsed() < 30000))
+    {
+      QApplication::processEvents(QEventLoop::AllEvents, 50);
+    }
+    Check(Remote->Names().contains(QStringLiteral("s3.txt")), "the queue uploads it, and the panel shows it");
+    Responder.Custom = nullptr;
+    Frontend.SetWindow(nullptr);
+  }
+  CoreBridge::Finalize();
+}
+
 void Session(const char * Port)
 {
   QtFrontend Frontend;
@@ -889,6 +1026,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 5) && (std::strcmp(argv[1], "transfer") == 0))
   {
     Transfer(argv[3], QString::fromLocal8Bit(argv[4]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "sync") == 0))
+  {
+    Synchronization(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "drop") == 0))
   {

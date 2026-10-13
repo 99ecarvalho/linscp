@@ -8,6 +8,7 @@
 #include <QLocale>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QPushButton>
 #include <QStatusBar>
 #include <QCheckBox>
 #include <QDialogButtonBox>
@@ -32,6 +33,7 @@
 #include "QueuePanel.h"
 #include "RemotePanel.h"
 #include "SiteManager.h"
+#include "SynchronizeDialog.h"
 
 namespace
 {
@@ -136,6 +138,10 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FCopyAction->setShortcut(QKeySequence(Qt::Key_F5));
   FMoveAction = FilesMenu->addAction(tr("&Move..."), this, [this]() { TransferSelected(true, true); });
   FMoveAction->setShortcut(QKeySequence(Qt::Key_F6));
+
+  QMenu * CommandsMenu = menuBar()->addMenu(tr("&Commands"));
+  FSynchronizeAction = CommandsMenu->addAction(tr("&Synchronize..."), this, [this]() { Synchronize(true); });
+  FSynchronizeAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
   QMenu * ViewMenu = menuBar()->addMenu(tr("&View"));
   QAction * Hidden = ViewMenu->addAction(tr("Show &Hidden Files"));
@@ -521,12 +527,120 @@ bool MainWindow::Transfer(bool FromLocal, const QStringList & Names, QString Tar
   return FromLocal ? Upload(Names, Target, Move) : Download(Names, Target, Move);
 }
 
+// As TScpCommanderForm::FullSynchronizeDirectories: from the local panel, the
+// remote directory is updated; from the remote, the local one.
+bool MainWindow::Synchronize(bool Confirm)
+{
+  if (FBusy || !FSession || !FSession->Active())
+  {
+    return false;
+  }
+  QString LocalDirectory = QDir::toNativeSeparators(FLocal->Path());
+  QString RemoteDirectory = FPanel->Path();
+  CoreBridge::TSyncParams Params = FSyncParams;
+  Params.Direction = FLocalActive ? CoreBridge::TSyncParams::TDirection::Remote : CoreBridge::TSyncParams::TDirection::Local;
+  if (Confirm)
+  {
+    SynchronizeDialog Dialog(LocalDirectory, RemoteDirectory, Params, FSession->CanSyncTimestamps(), this);
+    if (Dialog.exec() != QDialog::Accepted)
+    {
+      return false;
+    }
+    LocalDirectory = Dialog.LocalDirectory();
+    RemoteDirectory = Dialog.RemoteDirectory();
+    Params = Dialog.Params();
+    FSyncParams = Params;
+  }
+  return SynchronizeDirectories(LocalDirectory, RemoteDirectory, Params);
+}
+
+// As TCustomScpExplorerForm::DoFullSynchronizeDirectories.
+bool MainWindow::SynchronizeDirectories(const QString & LocalDirectory, const QString & RemoteDirectory,
+  const CoreBridge::TSyncParams & Params)
+{
+  if (FBusy || !FSession || !FSession->Active())
+  {
+    return false;
+  }
+  FBusy = true;
+  UpdateActions();
+  std::unique_ptr<CoreBridge::TSyncChecklist> Checklist;
+  {
+    SynchronizeProgress Progress(this);
+    Progress.show();
+    try
+    {
+      Checklist = FSession->SyncCollect(LocalDirectory.toStdString(), RemoteDirectory.toStdString(), Params,
+        [&Progress](const std::string & Local, const std::string & Remote)
+        {
+          return Progress.Directory(QString::fromStdString(Local), QString::fromStdString(Remote));
+        });
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+    }
+  }
+  FBusy = false;
+  UpdateActions();
+  if (!Checklist)
+  {
+    return false;
+  }
+  if (Checklist->Items().empty())
+  {
+    QMessageBox::information(this, tr("Synchronize"), tr("No differences found."));
+    return false;
+  }
+  bool Queue = false;
+  if (Params.PreviewChanges)
+  {
+    SyncChecklistDialog Dialog(*Checklist, LocalDirectory, RemoteDirectory, this);
+    // As WinSCP: synchronizing timestamps is not queued.
+    Dialog.QueueButton()->setVisible(Params.Mode != CoreBridge::TSyncParams::TMode::Timestamps);
+    if (Dialog.exec() != QDialog::Accepted)
+    {
+      return false;
+    }
+    Queue = (Dialog.Result() == SyncChecklistDialog::Queued);
+  }
+  bool Result = false;
+  FBusy = true;
+  UpdateActions();
+  try
+  {
+    if (Queue)
+    {
+      FSession->SyncQueue(*Checklist);
+      Result = true;
+    }
+    else
+    {
+      Result = FSession->SyncApply(*Checklist);
+    }
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  FPanel->Refresh();
+  FLocal->Refresh();
+  UpdateActions();
+  if (Queue)
+  {
+    QueueIdle();
+  }
+  return Result;
+}
+
 void MainWindow::UpdateActions()
 {
   FOpenAction->setEnabled(!FBusy);
   FSitesAction->setEnabled(!FBusy);
   FCopyAction->setEnabled(!FBusy && FSession);
   FMoveAction->setEnabled(!FBusy && FSession);
+  FSynchronizeAction->setEnabled(!FBusy && FSession);
   FDisconnectAction->setEnabled(!FBusy && FSession);
 }
 

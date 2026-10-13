@@ -53,6 +53,14 @@ public:
   // another program, onto the remote panel, uploaded. Move: dropped with
   // Shift. False when nothing was done in full.
   bool Drop(bool OnLocal, const QMimeData * Data, const QString & OnDirectory, bool Move, bool Confirm = true);
+  // Commands > Synchronize, as WinSCP's Commander: the two panels'
+  // directories, the direction from the active panel, after the Synchronize
+  // dialog unless Confirm is false.
+  bool Synchronize(bool Confirm = true);
+  // Compares and, after the checklist when Params asks to preview, applies
+  // (or queues). False when cancelled or nothing was applied.
+  bool SynchronizeDirectories(const QString & LocalDirectory, const QString & RemoteDirectory,
+    const CoreBridge::TSyncParams & Params);
   // Polls the session's queue: QueueTimer's, and tests'.
   void QueueIdle();
   QueuePanel * Queue() const { return FQueue; }
@@ -83,6 +91,9 @@ private:
   bool FLocalActive = false;
   QAction * FCopyAction = nullptr;
   QAction * FMoveAction = nullptr;
+  QAction * FSynchronizeAction = nullptr;
+  // As GUIConfiguration's SynchronizeParams, for the session's lifetime.
+  CoreBridge::TSyncParams FSyncParams;
   QAction * FDisconnectAction = nullptr;
   RemotePanel * FPanel = nullptr;
   LocalPanel * FLocal = nullptr;

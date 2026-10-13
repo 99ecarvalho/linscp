@@ -348,6 +348,74 @@ struct TQueueEntry
 // (sftp://user@host:port/path, ftp://, ftps://, ftpes://, dav://, davs://,
 // s3://, scp://). Prompts and errors reach the shell through IFrontend while
 // Open runs.
+// --- Synchronization -------------------------------------------------------
+
+// As WinSCP's Synchronize dialog sets it (TFullSynchronizeDialog's params):
+// which side is brought up to date, how, and what tells files apart.
+struct TSyncParams
+{
+  // As TTerminal::TSynchronizeMode: the remote directory updated from the
+  // local one, the local from the remote, or both from each other.
+  enum class TDirection { Remote, Local, Both };
+  enum class TMode { Files, Mirror, Timestamps };
+  TDirection Direction = TDirection::Remote;
+  TMode Mode = TMode::Files;
+  bool Delete = false;
+  bool ExistingOnly = false;
+  bool PreviewChanges = true;
+  bool ByTime = true;
+  bool BySize = false;
+  bool CaseSensitive = false;
+};
+
+// An entry of the synchronization checklist (TSynchronizeChecklist::TItem):
+// what is to be done, and the file on each side.
+struct TSyncItem
+{
+  enum class TAction { None, UploadNew, DownloadNew, UploadUpdate, DownloadUpdate, DeleteRemote, DeleteLocal };
+  TAction Action = TAction::None;
+  bool Checked = true;
+  bool Directory = false;
+  std::string Name;
+  // Each side's directory; its size and time only where the file is.
+  std::string LocalDirectory;
+  std::string RemoteDirectory;
+  bool LocalExists = false;
+  bool RemoteExists = false;
+  std::int64_t LocalSize = 0;
+  std::int64_t RemoteSize = 0;
+  // As core formats it, and as seconds since 1970.
+  std::string LocalModified;
+  std::string RemoteModified;
+  double LocalModifiedTime = 0;
+  double RemoteModifiedTime = 0;
+};
+
+// What synchronizing found, before it is applied: the checklist WinSCP shows
+// for "preview changes", whose entries can be unchecked or reversed.
+class TSyncChecklist
+{
+public:
+  ~TSyncChecklist();
+  TSyncChecklist(const TSyncChecklist &) = delete;
+  TSyncChecklist & operator=(const TSyncChecklist &) = delete;
+
+  const std::vector<TSyncItem> & Items() const { return FItems; }
+  void Check(std::size_t Index, bool Checked);
+  // The opposite action (TSynchronizeChecklist::Reverse): an upload becomes
+  // a download, a delete a transfer back.
+  void Reverse(std::size_t Index);
+  int CheckedCount() const;
+
+private:
+  friend class TSession;
+  struct TImpl;
+  explicit TSyncChecklist(TImpl * Impl);
+  void Load();
+  std::unique_ptr<TImpl> F;
+  std::vector<TSyncItem> FItems;
+};
+
 class TSession
 {
 public:
@@ -402,6 +470,21 @@ public:
   // connections, on its own threads), as WinSCP's "transfer in background".
   void QueueUpload(const std::vector<std::string> & LocalPaths, const std::string & RemoteDirectory, bool Move = false);
   void QueueDownload(const std::vector<std::string> & Names, const std::string & LocalDirectory, bool Move = false);
+
+  // Synchronization, as WinSCP's Synchronize command: what differs between
+  // a local and a remote directory and its subdirectories, collected into a
+  // checklist (OnDirectory is told each pair compared; false from it
+  // cancels, and nothing is returned); then applied, here or in the queue.
+  // Throws TCoreError.
+  std::unique_ptr<TSyncChecklist> SyncCollect(const std::string & LocalDirectory, const std::string & RemoteDirectory,
+    const TSyncParams & Params,
+    const std::function<bool(const std::string & Local, const std::string & Remote)> & OnDirectory = nullptr);
+  // The checked entries. False when it was cancelled or core skipped some.
+  bool SyncApply(TSyncChecklist & Checklist);
+  // Each checked entry as its own queue item (TTerminal::SynchronizeToQueue).
+  void SyncQueue(TSyncChecklist & Checklist);
+  // Whether the server can set times, which "synchronize timestamps" needs.
+  bool CanSyncTimestamps() const;
   // To be called regularly on the GUI thread (a timer): keeps the queue's
   // connections alive, and asks the questions its transfers wait on -- the
   // first one pending, through the frontend, as WinSCP pops them up. True

@@ -688,4 +688,208 @@ void TSession::Close()
   }
 }
 
+// --- Synchronization -----------------------------------------------------------
+
+struct TSyncChecklist::TImpl
+{
+  std::unique_ptr<TSynchronizeChecklist> Checklist;
+  // Each entry's core item, in the order of Items().
+  std::vector<const TSynchronizeChecklist::TItem *> Items;
+  TTerminal::TSynchronizeMode Mode = TTerminal::smRemote;
+  int Params = 0;
+  TCopyParamType CopyParam;
+};
+
+namespace
+{
+
+// As TFullSynchronizeDialog::GetParams, with spNoConfirmation as the GUI
+// adds it.
+int SyncParamsOf(const TSyncParams & Params, bool CanTimestamps)
+{
+  const bool Timestamps = (Params.Mode == TSyncParams::TMode::Timestamps) && CanTimestamps;
+  return TTerminal::spNoConfirmation |
+    FLAGMASK(Params.Delete, TTerminal::spDelete) |
+    FLAGMASK(Params.ExistingOnly, TTerminal::spExistingOnly) |
+    FLAGMASK(Params.PreviewChanges, TTerminal::spPreviewChanges) |
+    FLAGMASK(Timestamps, TTerminal::spTimestamp) |
+    FLAGMASK(Params.Mode == TSyncParams::TMode::Mirror, TTerminal::spMirror) |
+    FLAGMASK(!Params.ByTime, TTerminal::spNotByTime) |
+    FLAGMASK(Params.BySize, TTerminal::spBySize) |
+    FLAGMASK(Params.CaseSensitive, TTerminal::spCaseSensitive);
+}
+
+TTerminal::TSynchronizeMode SyncModeOf(TSyncParams::TDirection Direction)
+{
+  switch (Direction)
+  {
+    case TSyncParams::TDirection::Local: return TTerminal::smLocal;
+    case TSyncParams::TDirection::Both: return TTerminal::smBoth;
+    default: return TTerminal::smRemote;
+  }
+}
+
+// Core's directory callback, to the bridge's.
+class TSyncDirectoryHandler
+{
+public:
+  std::function<bool(const std::string &, const std::string &)> OnDirectory;
+
+  void __fastcall Handle(const UnicodeString & LocalDirectory, const UnicodeString & RemoteDirectory,
+    bool & Continue, bool /*Collect*/, const TSynchronizeOptions * /*Options*/)
+  {
+    if (OnDirectory && !OnDirectory(Utf8(LocalDirectory), Utf8(RemoteDirectory)))
+    {
+      Continue = false;
+    }
+  }
+};
+
+double UnixTime(TDateTime DateTime)
+{
+  // TDateTime counts days from 1899-12-30; 1970 is day 25569.
+  return (static_cast<double>(DateTime) - 25569.0) * 86400.0;
+}
+
+}  // namespace
+
+TSyncChecklist::TSyncChecklist(TImpl * Impl) :
+  F(Impl)
+{
+  Load();
+}
+
+TSyncChecklist::~TSyncChecklist() = default;
+
+void TSyncChecklist::Load()
+{
+  F->Items.clear();
+  FItems.clear();
+  for (int Index = 0; Index < F->Checklist->Count; Index++)
+  {
+    const TSynchronizeChecklist::TItem * Item = F->Checklist->Item[Index];
+    TSyncItem Entry;
+    Entry.Action = static_cast<TSyncItem::TAction>(Item->Action);
+    Entry.Checked = Item->Checked;
+    Entry.Directory = Item->IsDirectory;
+    Entry.Name = Utf8(Item->GetFileName());
+    Entry.LocalDirectory = Utf8(Item->Info1.Directory);
+    Entry.RemoteDirectory = Utf8(Item->Info2.Directory);
+    Entry.LocalExists = !Item->IsRemoteOnly();
+    Entry.RemoteExists = !Item->IsLocalOnly();
+    if (Entry.LocalExists)
+    {
+      Entry.LocalSize = Item->Info1.Size;
+      Entry.LocalModified = Utf8(UserModificationStr(Item->Info1.Modification, Item->Info1.ModificationFmt));
+      Entry.LocalModifiedTime = UnixTime(Item->Info1.Modification);
+    }
+    if (Entry.RemoteExists)
+    {
+      Entry.RemoteSize = Item->Info2.Size;
+      Entry.RemoteModified = Utf8(UserModificationStr(Item->Info2.Modification, Item->Info2.ModificationFmt));
+      Entry.RemoteModifiedTime = UnixTime(Item->Info2.Modification);
+    }
+    F->Items.push_back(Item);
+    FItems.push_back(Entry);
+  }
+}
+
+void TSyncChecklist::Check(std::size_t Index, bool Checked)
+{
+  const TSynchronizeChecklist::TItem * Item = F->Items.at(Index);
+  F->Checklist->Update(Item, Checked, Item->Action);
+  FItems[Index].Checked = Checked;
+}
+
+void TSyncChecklist::Reverse(std::size_t Index)
+{
+  const TSynchronizeChecklist::TItem * Item = F->Items.at(Index);
+  const TSynchronizeChecklist::TAction Action = TSynchronizeChecklist::Reverse(Item->Action);
+  F->Checklist->Update(Item, Item->Checked, Action);
+  FItems[Index].Action = static_cast<TSyncItem::TAction>(Action);
+}
+
+int TSyncChecklist::CheckedCount() const
+{
+  return F->Checklist->CheckedCount;
+}
+
+bool TSession::CanSyncTimestamps() const
+{
+  return Active() && F->Terminal->IsCapable[fcTimestampChanging];
+}
+
+// As TCustomScpExplorerForm::DoFullSynchronizeDirectories collects: core's
+// default transfer settings, rooted at the two directories.
+std::unique_ptr<TSyncChecklist> TSession::SyncCollect(const std::string & LocalDirectory,
+  const std::string & RemoteDirectory, const TSyncParams & Params,
+  const std::function<bool(const std::string &, const std::string &)> & OnDirectory)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TSyncChecklist::TImpl> Impl(new TSyncChecklist::TImpl());
+    Impl->Mode = SyncModeOf(Params.Direction);
+    Impl->Params = SyncParamsOf(Params, CanSyncTimestamps());
+    const UnicodeString Local = FromUtf8(LocalDirectory);
+    const UnicodeString Remote = FromUtf8(RemoteDirectory);
+    Impl->CopyParam.IncludeFileMask.SetRoots(Local, Remote);
+    TSyncDirectoryHandler Handler;
+    Handler.OnDirectory = OnDirectory;
+    TSynchronizeOptions Options;
+    Impl->Checklist.reset(F->Terminal->SynchronizeCollect(Local, Remote, Impl->Mode, &Impl->CopyParam,
+      Impl->Params, CLOSURE_OF(&Handler, Handle), &Options));
+    return std::unique_ptr<TSyncChecklist>(new TSyncChecklist(Impl.release()));
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+// As TCustomScpExplorerForm::FullSynchronize: the checked entries, with the
+// progress window.
+bool TSession::SyncApply(TSyncChecklist & Checklist)
+{
+  try
+  {
+    CheckActive(*this);
+    TSyncChecklist::TImpl & C = *Checklist.F;
+    TTransferBracket Bracket(C.Mode != TTerminal::smLocal, C.Checklist->CheckedCount);
+    TFileOperationStatistics Statistics;
+    F->Terminal->SynchronizeApply(C.Checklist.get(), &C.CopyParam, C.Params | TTerminal::spNoConfirmation,
+      TSynchronizeDirectory(), TProcessedSynchronizationChecklistItem(), TUpdatedSynchronizationChecklistItems(),
+      NULL, &Statistics);
+    return true;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+// As TCustomScpExplorerForm::DoQueueSynchronize.
+void TSession::SyncQueue(TSyncChecklist & Checklist)
+{
+  try
+  {
+    CheckActive(*this);
+    TSyncChecklist::TImpl & C = *Checklist.F;
+    const int CopyParams = TTerminal::GetSynchronizeCopyParams(C.Params);
+    TCopyParamType SyncCopyParam = TTerminal::GetSynchronizeCopyParam(&C.CopyParam, C.Params);
+    int Index = 0;
+    const TSynchronizeChecklist::TItem * Item;
+    while (C.Checklist->GetNextChecked(Index, Item))
+    {
+      F->EnsureQueue()->AddItem(F->Terminal->SynchronizeToQueue(Item, &SyncCopyParam, CopyParams, false));
+      F->QueueAdded++;
+    }
+    F->QueueChanged = true;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 }

@@ -335,6 +335,108 @@ int main(int argc, char ** argv)
     Wait();
     Check(fs::exists(Local / "down" / "queued.bin") && (fs::file_size(Local / "down" / "queued.bin") == 200000),
       "a queued download arrives whole");
+
+    // Synchronization, as WinSCP's: collected into a checklist, applied.
+    const fs::path SyncLocal = Local / "sync";
+    fs::create_directories(SyncLocal / "d");
+    std::ofstream(SyncLocal / "a.txt") << "a";
+    std::ofstream(SyncLocal / "b.txt") << "b";
+    std::ofstream(SyncLocal / "d" / "c.txt") << "c";
+    Session.CreateDirectory("/syncr");
+    {
+      std::ofstream(Local / "remote-only.txt") << "r";
+    }
+    Session.Upload({ (Local / "remote-only.txt").string() }, "/syncr");
+    fs::remove(Local / "remote-only.txt");
+    const auto Find = [](const CoreBridge::TSyncChecklist & List, const std::string & Name) -> int
+    {
+      for (std::size_t Index = 0; Index < List.Items().size(); Index++)
+      {
+        if (List.Items()[Index].Name == Name)
+        {
+          return static_cast<int>(Index);
+        }
+      }
+      return -1;
+    };
+    using TAction = CoreBridge::TSyncItem::TAction;
+    CoreBridge::TSyncParams Params;
+    std::vector<std::string> Compared;
+    std::unique_ptr<CoreBridge::TSyncChecklist> List = Session.SyncCollect(SyncLocal.string(), "/syncr", Params,
+      [&Compared](const std::string & L, const std::string & R) { Compared.push_back(L + "|" + R); return true; });
+    Check(List && (List->Items().size() == 4), "synchronizing the remote directory finds four differences");
+    Check(!Compared.empty(), "telling which directories it compares");
+    const int A = List ? Find(*List, "a.txt") : -1;
+    const int B = List ? Find(*List, "b.txt") : -1;
+    const int D = List ? Find(*List, "d") : -1;
+    const int Only = List ? Find(*List, "remote-only.txt") : -1;
+    Check((A >= 0) && (B >= 0) && (D >= 0) && (Only >= 0), "a.txt, b.txt, d and remote-only.txt");
+    Check((Only >= 0) && (List->Items()[Only].Action == TAction::DeleteRemote) && !List->Items()[Only].Checked,
+      "a remote-only file is listed to delete, unchecked without \"delete files\", as WinSCP's");
+    Check((A >= 0) && (List->Items()[A].Action == TAction::UploadNew) && List->Items()[A].LocalExists &&
+      !List->Items()[A].RemoteExists && (List->Items()[A].LocalSize == 1) && List->Items()[A].Checked,
+      "a new file to upload, checked, with its local size");
+    Check((D >= 0) && List->Items()[D].Directory && (List->Items()[D].Action == TAction::UploadNew), "a new directory");
+    Check((A >= 0) && (List->Items()[A].RemoteDirectory == "/syncr/"), "with the directory it goes to");
+    if (B >= 0)
+    {
+      List->Check(B, false);
+    }
+    Check(List && (List->CheckedCount() == 2), "an entry unchecked");
+    Check(List && Session.SyncApply(*List), "the checked entries apply");
+    Session.ChangeDirectory("/syncr");
+    Check(HasEntry(Session.List(), "a.txt", false) && HasEntry(Session.List(), "d", true) &&
+      !HasEntry(Session.List(), "b.txt", false), "uploaded, but not the unchecked one");
+    Session.ChangeDirectory("/syncr/d");
+    Check(HasEntry(Session.List(), "c.txt", false), "a new directory with its contents");
+    Session.ChangeDirectory("/");
+
+    List = Session.SyncCollect(SyncLocal.string(), "/syncr", Params);
+    Check(List && (List->Items().size() == 2) && (Find(*List, "b.txt") >= 0) && (List->CheckedCount() == 1),
+      "compared again, only what was left differs (times are kept)");
+
+    Params.Delete = true;
+    List = Session.SyncCollect(SyncLocal.string(), "/syncr", Params);
+    const int R = List ? Find(*List, "remote-only.txt") : -1;
+    Check((R >= 0) && (List->Items()[R].Action == TAction::DeleteRemote) && List->Items()[R].RemoteExists &&
+      List->Items()[R].Checked, "with \"delete files\", a remote-only file is to delete, checked");
+    if (R >= 0)
+    {
+      List->Reverse(R);
+    }
+    Check((R >= 0) && (List->Items()[R].Action == TAction::DownloadNew), "reversed, it is to download");
+    Check(List && Session.SyncApply(*List), "and applies");
+    Check(fs::exists(SyncLocal / "remote-only.txt"), "downloaded, not deleted");
+    Session.ChangeDirectory("/syncr");
+    Check(HasEntry(Session.List(), "b.txt", false) && HasEntry(Session.List(), "remote-only.txt", false),
+      "and the rest uploaded");
+    Session.ChangeDirectory("/");
+
+    Params.Delete = false;
+    std::ofstream(SyncLocal / "q.txt") << "queued";
+    List = Session.SyncCollect(SyncLocal.string(), "/syncr", Params);
+    Check(List && (List->Items().size() == 1), "a new file to synchronize");
+    if (List)
+    {
+      Session.SyncQueue(*List);
+    }
+    Check(!Session.QueueEmpty(), "goes to the queue");
+    Wait();
+    Session.ChangeDirectory("/syncr");
+    Check(HasEntry(Session.List(), "q.txt", false), "and is uploaded from there");
+    Session.ChangeDirectory("/");
+
+    bool Cancelled = false;
+    try
+    {
+      Session.SyncCollect(SyncLocal.string(), "/syncr", Params, [](const std::string &, const std::string &) { return false; });
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      Cancelled = E.Aborted;
+    }
+    Check(Cancelled, "comparing cancelled aborts");
+    Check(!Sftp || Session.CanSyncTimestamps(), "timestamps can be synchronized over SFTP");
     fs::remove_all(Local);
     }
     catch (const CoreBridge::TCoreError & E)
