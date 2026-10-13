@@ -295,7 +295,7 @@ bool LocalPanel::Root()
 
 bool LocalPanel::Home()
 {
-  return ChangeDirectory(QDir::homePath());
+  return ChangeDirectory(HomeDirectory.isEmpty() ? QDir::homePath() : HomeDirectory);
 }
 
 bool LocalPanel::Refresh()
@@ -495,4 +495,13 @@ void LocalPanel::UpdateActions()
   FParentAction->setEnabled(!QDir(FCurrent).isRoot());
   FRenameAction->setEnabled(Count == 1);
   FDeleteAction->setEnabled(Count > 0);
+}
+
+void LocalPanel::ApplyPreferences(const CoreBridge::TPreferences & Preferences)
+{
+  FModel->SetSizeFormat(Preferences.SizeFormat);
+  FSort->SetSorting(Preferences.NaturalOrderNumericalSorting, Preferences.AlwaysSortDirectoriesByName);
+  FView->RenameWholeName = Preferences.RenameWholeName;
+  FRefreshAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::Key_F5) : QKeySequence(Qt::CTRL | Qt::Key_R));
+  SetShowHidden(Preferences.ShowHiddenFiles);
 }

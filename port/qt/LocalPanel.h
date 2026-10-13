@@ -53,8 +53,15 @@ public:
   // WinSCP's "delete to recycle bin" (its default): to the trash, else for
   // good.
   bool DeleteToTrash = true;
+  // Where Home goes, when not the user's home: the site's local directory
+  // with "default directory is home", as WinSCP's (TDirView.HomeDirectory).
+  QString HomeDirectory;
 
   void SetShowHidden(bool Show);
+  // What the Preferences set of a panel: hidden files, the sizes' format,
+  // sorting, renaming, and Explorer's refresh key (F5) for the Commander's
+  // (Ctrl+R).
+  void ApplyPreferences(const CoreBridge::TPreferences & Preferences);
   QStringList Selected() const;
   void Select(const QStringList & Names);
   QStringList Names() const;

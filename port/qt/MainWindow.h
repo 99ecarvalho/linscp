@@ -61,6 +61,10 @@ public:
   // (or queues). False when cancelled or nothing was applied.
   bool SynchronizeDirectories(const QString & LocalDirectory, const QString & RemoteDirectory,
     const CoreBridge::TSyncParams & Params);
+  // Options > Preferences: false when cancelled.
+  bool PreferencesDialog();
+  // The preferences applied to the window and its panels.
+  void ApplyPreferences();
   // Polls the session's queue: QueueTimer's, and tests'.
   void QueueIdle();
   QueuePanel * Queue() const { return FQueue; }
@@ -96,6 +100,8 @@ private:
   QAction * FCopyAction = nullptr;
   QAction * FMoveAction = nullptr;
   QAction * FSynchronizeAction = nullptr;
+  QAction * FHiddenAction = nullptr;
+  class QSplitter * FPanels = nullptr;
   // As GUIConfiguration's SynchronizeParams, for the session's lifetime.
   CoreBridge::TSyncParams FSyncParams;
   QAction * FDisconnectAction = nullptr;

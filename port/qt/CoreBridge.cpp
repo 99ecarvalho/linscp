@@ -175,14 +175,14 @@ unsigned int AskFrontend(const UnicodeString & Message, TStrings * MoreMessages,
 // run.
 std::string SetLanguage(const std::string & Locale, const std::string & Directory)
 {
-  if (!Directory.empty())
-  {
-    LinscpSetTranslationsDirectory(FromUtf8(Directory));
-  }
   TShellConfiguration * Shell = dynamic_cast<TShellConfiguration *>(GUIConfiguration);
   if (Shell == NULL)
   {
     return std::string();
+  }
+  if (!Directory.empty())
+  {
+    Shell->SetTranslationsDirectory(FromUtf8(Directory));
   }
   LCID Lcid = Shell->AppliedLocale;
   if (!Locale.empty())
@@ -211,6 +211,105 @@ std::string LanguageCode()
 std::string LanguageLocale()
 {
   return (GUIConfiguration != NULL) ? Utf8(LinscpLocaleName(GUIConfiguration->AppliedLocale)) : std::string();
+}
+
+namespace
+{
+
+TShellConfiguration * Shell()
+{
+  TShellConfiguration * Result = dynamic_cast<TShellConfiguration *>(GUIConfiguration);
+  if (Result == NULL)
+  {
+    throw std::logic_error("the shell's configuration is not there");
+  }
+  return Result;
+}
+
+}  // namespace
+
+TPreferences Preferences()
+{
+  const TShellSettings & Settings = Shell()->Settings();
+  TPreferences Result;
+  Result.ShowHiddenFiles = Settings.ShowHiddenFiles;
+  Result.SizeFormat = static_cast<TPreferences::TSizeFormat>(Settings.FormatSizeBytes);
+  Result.NaturalOrderNumericalSorting = Settings.NaturalOrderNumericalSorting;
+  Result.AlwaysSortDirectoriesByName = Settings.AlwaysSortDirectoriesByName;
+  Result.RenameWholeName = Settings.RenameWholeName;
+  Result.DefaultDirIsHome = Settings.DefaultDirIsHome;
+  Result.SwappedPanels = Settings.SwappedPanels;
+  Result.ExplorerKeyboardShortcuts = Settings.ExplorerKeyboardShortcuts;
+  return Result;
+}
+
+void SetPreferences(const TPreferences & Preferences)
+{
+  TShellSettings Settings;
+  Settings.ShowHiddenFiles = Preferences.ShowHiddenFiles;
+  Settings.FormatSizeBytes = static_cast<int>(Preferences.SizeFormat);
+  Settings.NaturalOrderNumericalSorting = Preferences.NaturalOrderNumericalSorting;
+  Settings.AlwaysSortDirectoriesByName = Preferences.AlwaysSortDirectoriesByName;
+  Settings.RenameWholeName = Preferences.RenameWholeName;
+  Settings.DefaultDirIsHome = Preferences.DefaultDirIsHome;
+  Settings.SwappedPanels = Preferences.SwappedPanels;
+  Settings.ExplorerKeyboardShortcuts = Preferences.ExplorerKeyboardShortcuts;
+  try
+  {
+    Shell()->SetSettings(Settings);
+    Configuration->SaveExplicit();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+std::vector<TLocaleOption> Locales()
+{
+  std::vector<TLocaleOption> Result;
+  TObjectList * List = GUIConfiguration->Locales;
+  for (int Index = 0; Index < List->Count; Index++)
+  {
+    const TLocaleInfo * Info = DebugNotNull(dynamic_cast<TLocaleInfo *>(List->Items[Index]));
+    TLocaleOption Option;
+    Option.Locale = Info->Locale;
+    Option.Name = Utf8(Info->Name);
+    Option.Completeness = Info->Completeness;
+    Result.push_back(Option);
+  }
+  return Result;
+}
+
+// As TPreferencesDialog::LoadLanguages.
+unsigned PreferredLocale()
+{
+  const LCID Locale = GUIConfiguration->Locale;
+  return (Locale != 0) ? Locale : Shell()->DefaultLocale();
+}
+
+// As TPreferencesDialog::SaveConfiguration's languages.
+void SetPreferredLocale(unsigned Locale)
+{
+  try
+  {
+    Shell()->SetPreferredLocale((Locale == Shell()->DefaultLocale()) ? 0 : Locale);
+    Configuration->SaveExplicit();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+unsigned AppliedLocale()
+{
+  return GUIConfiguration->AppliedLocale;
+}
+
+void GuiStarted()
+{
+  Screen->FormCount = 1;
 }
 
 void Initialize(IFrontend * AFrontend)

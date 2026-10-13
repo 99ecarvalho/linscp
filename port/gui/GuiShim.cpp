@@ -50,13 +50,7 @@ TLanguages GLanguages;
 
 TScreen * Screen = &GScreen;
 
-UnicodeString GTranslationsDirectory;
 UnicodeString GLastTranslationFile;
-
-void LinscpSetTranslationsDirectory(const UnicodeString & Directory)
-{
-  GTranslationsDirectory = Directory;
-}
 
 UnicodeString LinscpLastTranslationFile()
 {
@@ -65,11 +59,7 @@ UnicodeString LinscpLastTranslationFile()
 
 void * LinscpLoadDataFile(const wchar_t * AFileName)
 {
-  UnicodeString FileName(AFileName);
-  if (!GTranslationsDirectory.IsEmpty())
-  {
-    FileName = IncludeTrailingBackslash(GTranslationsDirectory) + L"linscp" + ExtractFileExt(FileName);
-  }
+  const UnicodeString FileName(AFileName);
   void * Result = LoadTranslationModule(FileName);
   if (Result != nullptr)
   {

@@ -241,7 +241,7 @@ bool RemotePanel::Root()
 
 bool RemotePanel::Home()
 {
-  return Run([this]() { FSession->HomeDirectory(); }, true);
+  return Run([this]() { FSession->HomeDirectory(FDefaultDirIsHome); }, true);
 }
 
 bool RemotePanel::Refresh()
@@ -442,4 +442,14 @@ void RemotePanel::UpdateActions()
   }
   FRenameAction->setEnabled(Active && (Count == 1));
   FDeleteAction->setEnabled(Active && (Count > 0));
+}
+
+void RemotePanel::ApplyPreferences(const CoreBridge::TPreferences & Preferences)
+{
+  FModel->SetSizeFormat(Preferences.SizeFormat);
+  FSort->SetSorting(Preferences.NaturalOrderNumericalSorting, Preferences.AlwaysSortDirectoriesByName);
+  FView->RenameWholeName = Preferences.RenameWholeName;
+  FRefreshAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::Key_F5) : QKeySequence(Qt::CTRL | Qt::Key_R));
+  FDefaultDirIsHome = Preferences.DefaultDirIsHome;
+  SetShowHidden(Preferences.ShowHiddenFiles);
 }

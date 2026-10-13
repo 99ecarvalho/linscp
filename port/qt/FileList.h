@@ -6,6 +6,7 @@
 #define LINSCP_QT_FILE_LIST_H
 
 #include <QAbstractTableModel>
+#include <QCollator>
 #include <QMimeData>
 class QMenu;
 #include <QSortFilterProxyModel>
@@ -35,6 +36,8 @@ public:
   bool IsParent(int Row) const { return FWithParent && (Row == 0); }
   // The rights column as file attributes (a Windows local panel's).
   void SetAttributes(bool Attributes) { FAttributes = Attributes; }
+  // "Show file sizes in" (Preferences, Panels): kilobytes by default.
+  void SetSizeFormat(CoreBridge::TPreferences::TSizeFormat Format);
 
   int rowCount(const QModelIndex & Parent = QModelIndex()) const override;
   int columnCount(const QModelIndex & Parent = QModelIndex()) const override;
@@ -52,23 +55,32 @@ private:
   std::vector<CoreBridge::TRemoteEntry> FEntries;
   bool FWithParent = false;
   bool FAttributes = false;
+  CoreBridge::TPreferences::TSizeFormat FSizeFormat = CoreBridge::TPreferences::TSizeFormat::Kilobytes;
 };
 
 // Directories (and "..") first, as WinSCP's panels sort; then the column.
 class DirectoriesFirst : public QSortFilterProxyModel
 {
 public:
-  using QSortFilterProxyModel::QSortFilterProxyModel;
+  explicit DirectoriesFirst(QObject * Parent = nullptr);
   // WinSCP's "Show hidden files" (Ctrl+Alt+H); off by default, as WinSCP's.
   void SetShowHidden(bool Show);
   bool ShowHidden() const { return FShowHidden; }
+  // Preferences, Panels: "use natural order numerical sorting" (on by
+  // default) and "always sort directories by name".
+  void SetSorting(bool Natural, bool DirectoriesByName);
 
 protected:
   bool lessThan(const QModelIndex & Left, const QModelIndex & Right) const override;
   bool filterAcceptsRow(int Row, const QModelIndex & Parent) const override;
 
 private:
+  int CompareText(const QString & A, const QString & B) const;
+
   bool FShowHidden = false;
+  bool FNatural = true;
+  bool FDirectoriesByName = false;
+  QCollator FCollator;
 };
 
 // What a panel's drag carries (application/x-linscp-files): which side the
@@ -111,6 +123,8 @@ private:
 // As WinSCP's panels show sizes (BaseUtils.pas' FormatBytes, its default
 // short style): bytes below 1 KB, then KB, MB or GB to three digits.
 QString FormatBytes(std::int64_t Bytes);
+// As FormatPanelBytes: what a panel's size column shows.
+QString FormatPanelBytes(std::int64_t Bytes, CoreBridge::TPreferences::TSizeFormat Format);
 
 // A panel's view: its selection dragged as the panel says, and drops onto it
 // reported with the directory row they fell on ("" for the panel's own
@@ -136,6 +150,9 @@ public:
   // F2, as WinSCP's Commander renames: the focused entry's name edited in
   // place. False when there is none ("..").
   bool EditCurrentName();
+  // Preferences, Panels: the whole name selected for renaming, rather than
+  // the name without its extension (WinSCP's default).
+  bool RenameWholeName = false;
   // The panel's status line, as WinSCP's (FileStatusBarText): the selected
   // entries' size of all, and how many of how many; and how many hidden.
   QString StatusText() const;

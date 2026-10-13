@@ -151,6 +151,18 @@ bool FileView::EditCurrentName()
   const QModelIndex Name = Current.siblingAtColumn(FileListModel::NameColumn);
   setCurrentIndex(Name);
   edit(Name);
+  // As WinSCP's: the name without its extension selected, unless the whole
+  // name is to be (a directory's is always whole).
+  QLineEdit * Editor = viewport()->findChild<QLineEdit *>();
+  if ((Editor != nullptr) && !RenameWholeName && !Name.data(FileListModel::DirectoryRole).toBool())
+  {
+    const QString Text = Editor->text();
+    const int Dot = Text.lastIndexOf(QLatin1Char('.'));
+    if (Dot > 0)
+    {
+      Editor->setSelection(0, Dot);
+    }
+  }
   return true;
 }
 
@@ -229,6 +241,31 @@ QString FormatBytes(std::int64_t Bytes)
     Number = Locale.toString(std::floor(Value * 100) / 100, 'f', 2);
   }
   return QStringLiteral("%1 %2").arg(Number, Unit);
+}
+
+// As BaseUtils.pas' FormatPanelBytes, a panel's size column: bytes without
+// a unit, kilobytes rounded up, or FormatBytes' short form.
+QString FormatPanelBytes(std::int64_t Bytes, CoreBridge::TPreferences::TSizeFormat Format)
+{
+  const QLocale Locale;
+  switch (Format)
+  {
+    case CoreBridge::TPreferences::TSizeFormat::Bytes:
+      return Locale.toString(static_cast<qlonglong>(Bytes));
+    case CoreBridge::TPreferences::TSizeFormat::Kilobytes:
+      return QStringLiteral("%1 KB").arg(Locale.toString(static_cast<qlonglong>((Bytes / 1024) + ((Bytes % 1024) > 0 ? 1 : 0))));
+    default:
+      return FormatBytes(Bytes);
+  }
+}
+
+void FileListModel::SetSizeFormat(CoreBridge::TPreferences::TSizeFormat Format)
+{
+  FSizeFormat = Format;
+  if (rowCount() > 0)
+  {
+    emit dataChanged(index(0, SizeColumn), index(rowCount() - 1, SizeColumn));
+  }
 }
 
 QString FileView::StatusText() const
@@ -516,13 +553,55 @@ bool DirectoriesFirst::lessThan(const QModelIndex & Left, const QModelIndex & Ri
   {
     return Ascending ? LeftDirectory : RightDirectory;
   }
-  const QVariant A = Left.data(FileListModel::SortRole);
-  const QVariant B = Right.data(FileListModel::SortRole);
-  if (A.typeId() == QMetaType::QString)
+  // As TUnixDirView's CompareFile: the column, unless directories always go
+  // by name; then, the same, the name; all of it reversed for descending.
+  int Result = 0;
+  if (!(LeftDirectory && FDirectoriesByName) && (Left.column() != FileListModel::NameColumn))
   {
-    return QString::compare(A.toString(), B.toString(), Qt::CaseInsensitive) < 0;
+    const QVariant A = Left.data(FileListModel::SortRole);
+    const QVariant B = Right.data(FileListModel::SortRole);
+    if (A.typeId() == QMetaType::QString)
+    {
+      Result = CompareText(A.toString(), B.toString());
+    }
+    else
+    {
+      Result = (A.toDouble() < B.toDouble()) ? -1 : ((A.toDouble() > B.toDouble()) ? 1 : 0);
+    }
   }
-  return A.toDouble() < B.toDouble();
+  if (Result == 0)
+  {
+    Result = CompareText(Left.siblingAtColumn(FileListModel::NameColumn).data(FileListModel::SortRole).toString(),
+      Right.siblingAtColumn(FileListModel::NameColumn).data(FileListModel::SortRole).toString());
+  }
+  // The proxy reverses what this says for descending; the reversal of the
+  // fallback is wanted too, as upstream's.
+  return Result < 0;
+}
+
+// CompareLogicalText: case-insensitive, numbers by value when natural order
+// numerical sorting is on (StrCmpLogicalW's "file2" before "file10").
+int DirectoriesFirst::CompareText(const QString & A, const QString & B) const
+{
+  if (FNatural)
+  {
+    return FCollator.compare(A, B);
+  }
+  return QString::compare(A, B, Qt::CaseInsensitive);
+}
+
+DirectoriesFirst::DirectoriesFirst(QObject * Parent) :
+  QSortFilterProxyModel(Parent)
+{
+  FCollator.setNumericMode(true);
+  FCollator.setCaseSensitivity(Qt::CaseInsensitive);
+}
+
+void DirectoriesFirst::SetSorting(bool Natural, bool DirectoriesByName)
+{
+  FNatural = Natural;
+  FDirectoriesByName = DirectoriesByName;
+  invalidate();
 }
 
 
@@ -607,7 +686,7 @@ QVariant FileListModel::data(const QModelIndex & Index, int Role) const
       switch (Index.column())
       {
         case NameColumn: return QString::fromStdString(E->Name);
-        case SizeColumn: return E->Directory ? QVariant() : QLocale().toString(static_cast<qlonglong>(E->Size));
+        case SizeColumn: return E->Directory ? QVariant() : FormatPanelBytes(E->Size, FSizeFormat);
         case ModifiedColumn: return QString::fromStdString(E->Modified);
         case RightsColumn: return QString::fromStdString(E->Rights);
         case OwnerColumn: return QString::fromStdString(E->Owner);

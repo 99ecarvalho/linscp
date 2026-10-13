@@ -251,6 +251,97 @@ Configuração: %4</translation>
         <source>No differences found.</source>
         <translation>Nenhuma diferença encontrada.</translation>
     </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Opções</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Preferências...</translation>
+    </message>
+</context>
+<context>
+    <name>PreferencesDialog</name>
+    <message>
+        <source>Preferences</source>
+        <translation>Preferências</translation>
+    </message>
+    <message>
+        <source>Panels</source>
+        <translation>Painéis</translation>
+    </message>
+    <message>
+        <source>Commander</source>
+        <translation>Comando</translation>
+    </message>
+    <message>
+        <source>Languages</source>
+        <translation>Idiomas</translation>
+    </message>
+    <message>
+        <source>Common</source>
+        <translation>Comum</translation>
+    </message>
+    <message>
+        <source>&amp;Show hidden files (Ctrl+Alt+H)</source>
+        <translation>&amp;Mostrar arquivos ocultos (Ctrl+Alt+H)</translation>
+    </message>
+    <message>
+        <source>Default directory is &amp;home directory</source>
+        <translation>Diretório padrão é o diretório &amp;home</translation>
+    </message>
+    <message>
+        <source>Select &amp;whole name when renaming file</source>
+        <translation>Selecionar &amp;todo o nome ao renomear um arquivo</translation>
+    </message>
+    <message>
+        <source>Use &amp;natural order numerical sorting</source>
+        <translation>Use ordenação numérica por ordem &amp;natural</translation>
+    </message>
+    <message>
+        <source>Always sort &amp;directories by name</source>
+        <translation>Sempre ordenar &amp;diretórios por nome</translation>
+    </message>
+    <message>
+        <source>Bytes</source>
+        <translation>Bytes</translation>
+    </message>
+    <message>
+        <source>Kilobytes</source>
+        <translation>Quilobytes</translation>
+    </message>
+    <message>
+        <source>Short format</source>
+        <translation>Formato curto</translation>
+    </message>
+    <message>
+        <source>Show file si&amp;zes in:</source>
+        <translation>Mostrar tamanho dos arquivos em:</translation>
+    </message>
+    <message>
+        <source>Preferences on this page apply to Commander interface only.</source>
+        <translation>As preferências nesta aba apenas se aplicam a interface Norton Commander</translation>
+    </message>
+    <message>
+        <source>S&amp;wap panels (local on right, remote on left)</source>
+        <translation>Alternar painéis (local à direita, remoto à esquerda)</translation>
+    </message>
+    <message>
+        <source>Miscellaneous</source>
+        <translation>Miscelânea</translation>
+    </message>
+    <message>
+        <source>Explorer</source>
+        <translation>Explorador</translation>
+    </message>
+    <message>
+        <source>&amp;Keyboard shortcuts</source>
+        <translation>Atalhos de &amp;Teclado</translation>
+    </message>
+    <message>
+        <source>Changes will apply on the next start.</source>
+        <translation>Alterações serão aplicadas no próximo inicio</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

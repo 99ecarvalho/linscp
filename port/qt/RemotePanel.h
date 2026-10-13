@@ -55,6 +55,10 @@ public:
   void Open(const QString & Name);
 
   void SetShowHidden(bool Show);
+  // What the Preferences set of a panel: hidden files, the sizes' format,
+  // sorting, renaming, and Explorer's refresh key (F5) for the Commander's
+  // (Ctrl+R).
+  void ApplyPreferences(const CoreBridge::TPreferences & Preferences);
   QStringList Selected() const;
   void Select(const QStringList & Names);
   QStringList Names() const;
@@ -89,6 +93,7 @@ private:
   QStringList FBack;
   QStringList FForward;
   bool FBusy = false;
+  bool FDefaultDirIsHome = true;
   QAction * FBackAction = nullptr;
   QAction * FForwardAction = nullptr;
   QAction * FParentAction = nullptr;

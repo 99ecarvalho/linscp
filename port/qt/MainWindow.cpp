@@ -35,6 +35,7 @@
 #include "QueuePanel.h"
 #include "RemotePanel.h"
 #include "SiteManager.h"
+#include "PreferencesDialog.h"
 #include "SynchronizeDialog.h"
 
 namespace
@@ -66,6 +67,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   // The panels side by side, the queue below them, as WinSCP's Commander.
   QSplitter * Vertical = new QSplitter(Qt::Vertical, this);
   QSplitter * Panels = new QSplitter(Vertical);
+  FPanels = Panels;
   FLocal = new LocalPanel(Panels);
   FPanel = new RemotePanel(Panels);
   Panels->setChildrenCollapsible(false);
@@ -162,17 +164,72 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FSynchronizeAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
   QMenu * ViewMenu = menuBar()->addMenu(tr("&View"));
-  QAction * Hidden = ViewMenu->addAction(tr("Show &Hidden Files"));
-  Hidden->setCheckable(true);
-  Hidden->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_H));
-  connect(Hidden, &QAction::toggled, this, [this](bool Show)
+  FHiddenAction = ViewMenu->addAction(tr("Show &Hidden Files"));
+  FHiddenAction->setCheckable(true);
+  FHiddenAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_H));
+  // As WinSCP's: a setting, kept (WinConfiguration's ShowHiddenFiles).
+  connect(FHiddenAction, &QAction::triggered, this, [this](bool Show)
   {
-    FLocal->SetShowHidden(Show);
-    FPanel->SetShowHidden(Show);
+    CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+    Preferences.ShowHiddenFiles = Show;
+    try
+    {
+      CoreBridge::SetPreferences(Preferences);
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+    }
+    ApplyPreferences();
   });
 
+  QMenu * OptionsMenu = menuBar()->addMenu(tr("&Options"));
+  QAction * PreferencesAction = OptionsMenu->addAction(tr("&Preferences..."), this, [this]() { PreferencesDialog(); });
+  PreferencesAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_P));
+
   statusBar()->showMessage(tr("%1 %2").arg(QString::fromStdString(FInfo.AppName), QString::fromStdString(FInfo.Version)));
+  // From now on a language chosen applies on the next start, as WinSCP's.
+  CoreBridge::GuiStarted();
+  ApplyPreferences();
   UpdateActions();
+}
+
+bool MainWindow::PreferencesDialog()
+{
+  ::PreferencesDialog Dialog(this);
+  if (Dialog.exec() != QDialog::Accepted)
+  {
+    return false;
+  }
+  try
+  {
+    Dialog.Save();
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  ApplyPreferences();
+  return true;
+}
+
+// What the preferences say of the window: the panels', their order, the
+// keys, Home of the local panel.
+void MainWindow::ApplyPreferences()
+{
+  const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+  FLocal->ApplyPreferences(Preferences);
+  FPanel->ApplyPreferences(Preferences);
+  FHiddenAction->setChecked(Preferences.ShowHiddenFiles);
+  // Commander: local left, remote right, unless swapped.
+  FPanels->insertWidget(0, Preferences.SwappedPanels ? static_cast<QWidget *>(FPanel) : static_cast<QWidget *>(FLocal));
+  // NonVisual.cpp's: Explorer's keys copy with Ctrl+K, as F5 refreshes.
+  FCopyAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::CTRL | Qt::Key_K) : QKeySequence(Qt::Key_F5));
+  // As TScpCommanderForm::ConfigurationChanged: the site's local directory is
+  // Home, with "default directory is home", unless it remembers the last.
+  FLocal->HomeDirectory =
+    (Preferences.DefaultDirIsHome && FSession && !FSession->UpdateDirectories() && !FSession->LocalDirectory().empty()) ?
+    QString::fromStdString(FSession->LocalDirectory()) : QString();
 }
 
 MainWindow::~MainWindow() = default;
@@ -248,6 +305,7 @@ bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
     statusBar()->showMessage(tr("Connecting to %1...").arg(QString::fromStdString(Session->Name())));
     Session->Open();
     FSession = std::move(Session);
+    ApplyPreferences();
     // As WinSCP (TScpCommanderForm::RestoreSessionLocalDirView): the site's
     // local directory, when it has one; when remembered, one that is gone
     // falls back to the nearest that is not, quietly.
@@ -322,6 +380,7 @@ void MainWindow::Disconnect()
     }
     FSession->Close();
     FSession.reset();
+    FLocal->HomeDirectory.clear();
     setWindowTitle(QString::fromStdString(FInfo.AppName));
     statusBar()->showMessage(tr("Disconnected"));
   }

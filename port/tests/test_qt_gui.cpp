@@ -34,6 +34,10 @@
 #include <QTimer>
 #include <QClipboard>
 #include <QTest>
+#include <QSettings>
+#include <QSplitter>
+#include <QListWidget>
+#include <QComboBox>
 #include <QHeaderView>
 #include <QMenu>
 #include <QRadioButton>
@@ -73,6 +77,7 @@
 #include <QLineEdit>
 #include <QTreeView>
 #include "SiteManager.h"
+#include "PreferencesDialog.h"
 #include "SynchronizeDialog.h"
 
 #include <QFile>
@@ -427,6 +432,19 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
         "a session of it goes elsewhere");
       QMetaObject::invokeMethod(&Window, "Disconnect");
       Check(CoreBridge::LoadSite("Tests/rclone").RemoteDirectory == "/sub", "and, off, nothing is kept");
+      // "Default directory is home" (on by default): Home is the site's own
+      // directory when it does not remember the last used, as WinSCP's.
+      Check(Window.OpenSite(CoreBridge::LoadSite("Tests/rclone")) && Window.Panel()->ChangeDirectory(QStringLiteral("/")) &&
+        Window.Panel()->Home() && (Window.Panel()->Path() == QStringLiteral("/sub")), "Home is the site's directory");
+      CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+      Preferences.DefaultDirIsHome = false;
+      CoreBridge::SetPreferences(Preferences);
+      Window.ApplyPreferences();
+      Check(Window.Panel()->Home() && (Window.Panel()->Path() == QStringLiteral("/")), "without it, the server's home");
+      Preferences.DefaultDirIsHome = true;
+      CoreBridge::SetPreferences(Preferences);
+      Window.ApplyPreferences();
+      QMetaObject::invokeMethod(&Window, "Disconnect");
       SiteAdvanced Advanced(CoreBridge::LoadSite("Tests/rclone"), &Window);
       Check(!Advanced.UpdateDirectories()->isChecked(), "the advanced settings show it");
     }
@@ -1246,6 +1264,155 @@ void Keys(const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// Options > Preferences, over upstream's configuration (ADR 0014).
+void Preferences(const QString & Ini, const QString & Translations, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  CoreBridge::SetLanguage(std::string(), Translations.toStdString());
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    using TPreferences = CoreBridge::TPreferences;
+    const TPreferences Defaults = CoreBridge::Preferences();
+    Check(!Defaults.ShowHiddenFiles && (Defaults.SizeFormat == TPreferences::TSizeFormat::Kilobytes) &&
+      Defaults.NaturalOrderNumericalSorting && !Defaults.AlwaysSortDirectoriesByName && !Defaults.RenameWholeName &&
+      Defaults.DefaultDirIsHome && !Defaults.SwappedPanels && !Defaults.ExplorerKeyboardShortcuts,
+      "the defaults are WinSCP's");
+
+    const QDir Dir(Directory);
+    for (const char * Name : { "file2.txt", "file10.txt", "a.bin", ".hidden" })
+    {
+      QFile File(Dir.filePath(QString::fromLatin1(Name)));
+      File.open(QIODevice::WriteOnly);
+      File.write(QByteArray(1500, 'x'));
+    }
+    Dir.mkpath(QStringLiteral("zdir"));
+    Dir.mkpath(QStringLiteral("adir"));
+#if defined(Q_OS_WIN)
+    // On Windows a file is hidden by its attribute, not its dot.
+    SetFileAttributesW(reinterpret_cast<const wchar_t *>(QDir::toNativeSeparators(Dir.filePath(QStringLiteral(".hidden"))).utf16()),
+      FILE_ATTRIBUTE_HIDDEN);
+#endif
+    LocalPanel * Local = Window.Local();
+    Local->ChangeDirectory(Directory);
+    QLocale::setDefault(QLocale::c());
+    Check(Local->Names() == QStringList({ QStringLiteral(".."), QStringLiteral("adir"), QStringLiteral("zdir"),
+      QStringLiteral("a.bin"), QStringLiteral("file2.txt"), QStringLiteral("file10.txt") }),
+      "natural order: file2 before file10; hidden files not shown");
+    const QModelIndex First = Local->View()->model()->index(3, FileListModel::SizeColumn);
+    Check(First.data().toString() == QStringLiteral("2 KB"), "sizes in kilobytes, rounded up");
+
+    // The dialog, as WinSCP's pages.
+    {
+      PreferencesDialog Dialog(&Window);
+      QStringList Pages;
+      for (int Row = 0; Row < Dialog.Navigation()->count(); Row++)
+      {
+        Pages.append(Dialog.Navigation()->item(Row)->text());
+      }
+      Check(Pages == QStringList({ PreferencesDialog::tr("Panels"), PreferencesDialog::tr("Commander"),
+        PreferencesDialog::tr("Languages") }), "the dialog's pages");
+      Check(!Dialog.ShowHiddenFilesCheck()->isChecked() && (Dialog.SizeFormatCombo()->currentIndex() == 1) &&
+        Dialog.NaturalSortingCheck()->isChecked(), "showing the settings");
+      bool Portuguese = false;
+      for (int Row = 0; Row < Dialog.LanguagesList()->count(); Row++)
+      {
+        Portuguese = Portuguese || Dialog.LanguagesList()->item(Row)->text().contains(QStringLiteral("Brazil"));
+      }
+      Check(Dialog.LanguagesList()->count() > 40, "the languages WinSCP is translated into");
+      Check(Portuguese, "Brazilian Portuguese among them");
+      Check(Dialog.LanguagesList()->currentItem() != nullptr, "the one in use chosen");
+      Dialog.Navigation()->setCurrentRow(2);
+      Check(Dialog.LanguageChangeLabel()->isHidden(), "no change to apply");
+      for (int Row = 0; Row < Dialog.LanguagesList()->count(); Row++)
+      {
+        if (Dialog.LanguagesList()->item(Row)->text().contains(QStringLiteral("Brazil")))
+        {
+          Dialog.LanguagesList()->setCurrentRow(Row);
+        }
+      }
+      Check(!Dialog.LanguageChangeLabel()->isHidden(), "another language applies on the next start");
+      Dialog.ShowHiddenFilesCheck()->setChecked(true);
+      Dialog.SizeFormatCombo()->setCurrentIndex(0);
+      Dialog.NaturalSortingCheck()->setChecked(false);
+      Dialog.DirectoriesByNameCheck()->setChecked(true);
+      Dialog.SwappedPanelsCheck()->setChecked(true);
+      Dialog.KeyboardShortcutsCombo()->setCurrentIndex(1);
+      Dialog.RenameWholeNameCheck()->setChecked(true);
+      Dialog.Save();
+      Window.ApplyPreferences();
+    }
+    Check(CoreBridge::AppliedLocale() != CoreBridge::PreferredLocale(), "the language waits for the next start");
+    Check(QString::fromStdString(CoreBridge::LanguageCode()).isEmpty(), "core keeps its language until then");
+
+    // Applied to the panels.
+    Check(Local->Names().contains(QStringLiteral(".hidden")), "hidden files shown");
+    bool CopyOnCtrlK = false;
+    for (QAction * Action : Window.findChildren<QAction *>())
+    {
+      CopyOnCtrlK = CopyOnCtrlK || ((Action->text() == MainWindow::tr("&Copy...")) &&
+        (Action->shortcut() == QKeySequence(Qt::CTRL | Qt::Key_K)));
+    }
+    Check(CopyOnCtrlK, "Explorer's keys: Copy is Ctrl+K");
+    Check(Local->Names().indexOf(QStringLiteral("file10.txt")) < Local->Names().indexOf(QStringLiteral("file2.txt")),
+      "plain order: file10 before file2");
+    Check(Local->View()->model()->index(Local->Names().indexOf(QStringLiteral("a.bin")), FileListModel::SizeColumn).data().toString() ==
+      QStringLiteral("1500"), "sizes in bytes");
+    Local->View()->sortByColumn(FileListModel::ModifiedColumn, Qt::DescendingOrder);
+    Check(Local->Names().indexOf(QStringLiteral("zdir")) < Local->Names().indexOf(QStringLiteral("adir")),
+      "directories by name, the way the column sorts, whatever the column");
+    Local->View()->sortByColumn(FileListModel::NameColumn, Qt::AscendingOrder);
+    QSplitter * Panels = qobject_cast<QSplitter *>(Local->parentWidget());
+    Check((Panels != nullptr) && (Panels->widget(0) == Window.Panel()), "the panels swapped");
+
+    // Saved under WinSCP's keys.
+    const auto Saved = [&Ini](const QString & Section, const QString & Key)
+    {
+      // WinSCP's INI: [Configuration\Interface] sections, Key=Value lines.
+      QFile File(Ini);
+      File.open(QIODevice::ReadOnly | QIODevice::Text);
+      QString Current;
+      for (const QString & Line : QString::fromUtf8(File.readAll()).split(QLatin1Char('\n')))
+      {
+        const QString Trimmed = Line.trimmed();
+        if (Trimmed.startsWith(QLatin1Char('[')))
+        {
+          Current = Trimmed.mid(1, Trimmed.size() - 2);
+        }
+        else if ((Current == Section) && Trimmed.startsWith(Key + QLatin1Char('=')))
+        {
+          return Trimmed.mid(Key.size() + 1);
+        }
+      }
+      return QStringLiteral("(none)");
+    };
+    const QString Interface = QStringLiteral("Configuration\\Interface");
+    Check((Saved(Interface, QStringLiteral("ShowHiddenFiles")) == QStringLiteral("1")) &&
+      (Saved(Interface, QStringLiteral("FormatSizeBytes")) == QStringLiteral("0")) &&
+      (Saved(Interface, QStringLiteral("NaturalOrderNumericalSorting")) == QStringLiteral("0")),
+      "saved in WinSCP's Interface keys");
+    const QString Commander = QStringLiteral("Configuration\\Interface\\Commander");
+    Check((Saved(Commander, QStringLiteral("SwappedPanels")) == QStringLiteral("1")) &&
+      (Saved(Commander, QStringLiteral("ExplorerKeyboardShortcuts")) == QStringLiteral("1")),
+      "and Interface\\Commander's");
+    Check(Saved(Interface, QStringLiteral("LocaleSafe")).toUInt() == CoreBridge::PreferredLocale(),
+      "the language chosen too");
+
+    // Ctrl+Alt+H: kept, as WinSCP's.
+    QApplication::setActiveWindow(&Window);
+    QTest::qWaitForWindowActive(&Window);
+    Window.ActivatePanel(true);
+    QTest::keyClick(Window.windowHandle(), Qt::Key_H, Qt::ControlModifier | Qt::AltModifier);
+    Check(!CoreBridge::Preferences().ShowHiddenFiles && !Local->Names().contains(QStringLiteral(".hidden")),
+      "Ctrl+Alt+H hides them again, and keeps it");
+    Frontend.SetWindow(nullptr);
+  }
+  CoreBridge::Finalize();
+}
+
 void Session(const char * Port)
 {
   QtFrontend Frontend;
@@ -1301,6 +1468,11 @@ int main(int argc, char ** argv)
   else if ((argc >= 5) && (std::strcmp(argv[1], "transfer") == 0))
   {
     Transfer(argv[3], QString::fromLocal8Bit(argv[4]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "preferences") == 0))
+  {
+    // argv[2] is /ini=<file>.
+    Preferences(QString::fromLocal8Bit(argv[2] + 5), QString::fromLocal8Bit(argv[3]), QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "keys") == 0))
   {

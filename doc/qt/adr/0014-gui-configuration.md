@@ -90,3 +90,61 @@ property subscript.
   - a saved `LocaleSafe` over it;
   - `--lang` for one run, leaving `LocaleSafe` as saved;
   - the INI written with upstream's `Interface` keys.
+
+## Amendment 2026-10-13: the Preferences dialog's first pages (P3-04a)
+
+- **The dialog is WinSCP's.** Options > Preferences (Ctrl+Alt+P) lists its
+  pages on the left. The first ones are WinSCP's Panels, Commander and
+  Languages, with WinSCP's captions (so its pt_BR translation's wording),
+  showing only the settings the shell honours. OK saves, as upstream's,
+  with `Configuration->SaveExplicit`.
+- **Panels:**
+  - show hidden files, which Ctrl+Alt+H also toggles and keeps;
+  - "default directory is home": Home is the site's own directories when
+    the site does not remember the last used ones, as
+    `TUnixDirView::ExecuteHomeDirectory` and `TScpCommanderForm` do;
+  - select the whole name when renaming (otherwise the name without its
+    extension is selected);
+  - natural order numerical sorting;
+  - always sort directories by name;
+  - the sizes' format: bytes, kilobytes (the default), or short, as
+    `FormatPanelBytes`.
+- **Commander:** swap panels, and Explorer's keyboard shortcuts (Ctrl+K
+  copies and F5 refreshes, as `NonVisual.cpp` assigns them).
+- **Languages:** `TGUIConfiguration::Locales`, the one chosen focused. As
+  `TPreferencesDialog`, choosing the default (the user interface's) saves
+  "none", so a translation of it found later is taken. The language applies
+  on the next start: once the shell's window exists, the GUI shim's
+  `Screen` has a form, so upstream's `CanApplyLocaleImmediately` is false,
+  and the page says so as upstream's does.
+- **Settings are mirrored from `TWinConfiguration`'s `REGCONFIG`**:
+  `Interface`'s `ShowHiddenFiles`, `FormatSizeBytes`,
+  `NaturalOrderNumericalSorting`, `AlwaysSortDirectoriesByName`,
+  `RenameWholeName` and `DefaultDirIsHome`; `Interface\Commander`'s
+  `SwappedPanels` and `ExplorerKeyboardShortcuts`. Each has upstream's
+  default.
+- **Sorting is `TUnixDirView`'s `CompareFile`:** the column (directories
+  by name when asked), then the name, all of it reversed for descending.
+  Natural order compares as `CompareLogicalText` does, through Qt's
+  numeric collation rather than a call into core per comparison.
+- **A test program uses the shell's translations** by naming the shell's
+  executable beside them (`TShellConfiguration::ModuleFileName`), so
+  upstream's own lookup lists and loads them.
+- **Not yet, on these pages:**
+  - incremental search;
+  - "remember panels' state when switching sessions";
+  - full row select;
+  - the double-click action;
+  - the panel font;
+  - Explorer-style selection;
+  - the directory tree;
+  - location profiles;
+  - compare criteria.
+
+  They depend on features the shell does not have yet, and are not shown
+  until it does.
+
+Verified by `qt_gui_preferences` (WinSCP's defaults; the pages; each
+setting applied to the panels and saved under WinSCP's keys; the language
+waiting for the next start; Ctrl+Alt+H kept) and `qt_gui_sites` (Home as
+the site's directory): Linux, Wine, natively on Windows 11.

@@ -367,12 +367,41 @@ TRemoteFile * FindFile(TTerminal * Terminal, const std::string & Name)
 
 }  // namespace
 
-void TSession::HomeDirectory()
+// As TUnixDirView::ExecuteHomeDirectory: with "default directory is home",
+// the site's own directory, when it has one and does not remember the last
+// used; a relative one from the server's home.
+void TSession::HomeDirectory(bool DefaultDirIsHome)
 {
   try
   {
     CheckActive(*this);
-    F->Terminal->HomeDirectory();
+    const UnicodeString Path = F->Terminal->SessionData->RemoteDirectory;
+    if (DefaultDirIsHome && !Path.IsEmpty() && !F->Terminal->SessionData->UpdateDirectories)
+    {
+      if (Path[1] != L'/')
+      {
+        F->Terminal->BeginTransaction();
+        try
+        {
+          F->Terminal->HomeDirectory();
+          F->Terminal->ChangeDirectory(Path);
+        }
+        catch (...)
+        {
+          F->Terminal->EndTransaction();
+          throw;
+        }
+        F->Terminal->EndTransaction();
+      }
+      else
+      {
+        F->Terminal->ChangeDirectory(Path);
+      }
+    }
+    else
+    {
+      F->Terminal->HomeDirectory();
+    }
   }
   catch (Exception & E)
   {

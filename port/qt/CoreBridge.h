@@ -172,8 +172,60 @@ void Finalize();
 // --lang): a POSIX or BCP 47 name ("pt_BR", "pt-BR", "de"), as Windows
 // numbers it. Returns WinSCP's code of the translation in use ("PT"), or ""
 // for English: asked for, or none found. Call after Initialize. Directory:
-// where the translations are, when not where upstream looks (tests).
+// the shell's Translations/, when the program is not the shell beside it
+// (tests).
 std::string SetLanguage(const std::string & Locale, const std::string & Directory = std::string());
+// --- Preferences (P3-04, ADR 0014) --------------------------------------------
+
+// What the Preferences dialog sets, as WinSCP's (TWinConfiguration's
+// settings, under its keys and with its defaults).
+struct TPreferences
+{
+  // Panels.
+  bool ShowHiddenFiles = false;
+  // "Show file sizes in": bytes, kilobytes, or short (KB, MB, GB).
+  enum class TSizeFormat { Bytes, Kilobytes, Short };
+  TSizeFormat SizeFormat = TSizeFormat::Kilobytes;
+  bool NaturalOrderNumericalSorting = true;
+  bool AlwaysSortDirectoriesByName = false;
+  // Rename in place selects the whole name, not the name without its
+  // extension.
+  bool RenameWholeName = false;
+  // Home is the site's own directories, when the site does not remember
+  // the last used ones.
+  bool DefaultDirIsHome = true;
+  // Commander.
+  bool SwappedPanels = false;
+  // Explorer's keys (F5 refresh, Ctrl+K copy) rather than the Commander's.
+  bool ExplorerKeyboardShortcuts = false;
+};
+TPreferences Preferences();
+// Saves them, as the dialog's OK does (SaveExplicit).
+void SetPreferences(const TPreferences & Preferences);
+
+// A language there is a translation for, as the Languages page lists them
+// (TGUIConfiguration::Locales). Completeness is a percentage; negative
+// when the translation does not load.
+struct TLocaleOption
+{
+  unsigned Locale = 0;
+  std::string Name;
+  int Completeness = 100;
+};
+std::vector<TLocaleOption> Locales();
+// The language chosen: the one set, else the default one (the user
+// interface's), as the page focuses it.
+unsigned PreferredLocale();
+// As the page's OK: the default one is saved as "none set" (0), so that a
+// translation of the user interface's language found later is taken. Saves.
+void SetPreferredLocale(unsigned Locale);
+// The language in use now, which a change differs from until the next
+// start.
+unsigned AppliedLocale();
+// The shell's window exists: from now on a language chosen applies on the
+// next start, as upstream's (CanApplyLocaleImmediately).
+void GuiStarted();
+
 // The code of the translation in use, as SetLanguage returns it.
 std::string LanguageCode();
 // The locale core's texts are in, as BCP 47 names it ("pt-BR"; "en-US" for
@@ -466,8 +518,10 @@ public:
   // These throw TCoreError; what fails along the way is asked about first
   // (retry, skip, abort) through the frontend, as core does.
   void ChangeDirectory(const std::string & Directory);
-  // The user's home directory, as the server reports it.
-  void HomeDirectory();
+  // The user's home directory, as the server reports it; with
+  // DefaultDirIsHome (Preferences), the site's own directory when it has
+  // one and does not remember the last used, as WinSCP's Home.
+  void HomeDirectory(bool DefaultDirIsHome = false);
   // Reads the current directory again.
   void Refresh();
   // In the current directory, or at a full path.

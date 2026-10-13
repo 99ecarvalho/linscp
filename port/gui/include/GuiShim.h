@@ -15,10 +15,6 @@ typedef std::uintptr_t HINST;
 // module (port/shim/vcl_resources.h, doc/qt/translations.md).
 void * LinscpLoadDataFile(const wchar_t * FileName);
 void LinscpFreeModule(void * Module);
-// Where the translations are when not where upstream looks (beside the
-// executable, in Translations/, named after it): Directory/linscp.<LANG>,
-// whatever the program is called (tests). Empty: upstream's place.
-void LinscpSetTranslationsDirectory(const UnicodeString & Directory);
 // The file the last translation that loaded came from.
 UnicodeString LinscpLastTranslationFile();
 // A locale as POSIX or BCP 47 names it ("pt_BR.UTF-8", "pt-BR", "de"), as
