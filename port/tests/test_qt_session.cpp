@@ -170,14 +170,15 @@ int main(int argc, char ** argv)
   const bool Sftp = (Protocol == "sftp");
   const std::string Url = Protocol + "://linscp@127.0.0.1:" + argv[2] + "/";
   const bool Portuguese = (argc > 5);
+
+  TScriptedFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
   if (Portuguese)
   {
     const std::string Code = CoreBridge::SetLanguage(argv[4], argv[5]);
     Check(Code == "PT", "pt_BR is WinSCP's PT translation");
+    Check(CoreBridge::LanguageLocale() == "pt-BR", "and core's texts are in pt-BR");
   }
-
-  TScriptedFrontend Frontend;
-  CoreBridge::Initialize(&Frontend);
   {
     // A wrong password first: core says so and asks again.
     Frontend.Passwords = { "wrong", "secret" };

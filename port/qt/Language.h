@@ -8,7 +8,7 @@
 
 struct TLanguage
 {
-  // The locale asked for, as Qt names it ("pt_BR").
+  // The locale the texts are in, as Qt names it ("pt_BR"): core's.
   QString Locale;
   // WinSCP's code for core's translation in use ("PT"); empty for English.
   QString CoreCode;
@@ -16,10 +16,14 @@ struct TLanguage
   bool Shell = false;
 };
 
-// The locale to use: `--lang=<locale>` on the command line, else the system's.
+// `--lang=<locale>` from the command line, for this run only; empty without
+// one (the configuration's language, else the system's: core decides, as
+// upstream's GUI does).
 QString RequestedLocale(int argc, char ** argv);
-// Loads and installs the three translations for Locale; call after the
-// QApplication exists and before CoreBridge::Initialize.
-TLanguage SetUpLanguage(const QString & Locale);
+// Applies Requested to core, if any, then loads and installs the shell's and
+// Qt's translations for the locale core's texts are in; call after
+// CoreBridge::Initialize. The number formats follow the system's, unless a
+// locale was asked for.
+TLanguage SetUpLanguage(const QString & Requested);
 
 #endif

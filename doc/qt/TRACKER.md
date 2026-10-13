@@ -227,9 +227,9 @@ columns. Synchronization (P3-03, done): Commands > Synchronize, WinSCP's
 Synchronize dialog and checklist over core's own synchronization, applied
 here or in the queue. P2-10 and P2-11 wait, at the user's request.
 
-1. **P3-04**: preferences (split first), where synchronization's saved
-   options, transfer settings, the panels' kept layout and "preserve local
-   directory" land too.
+1. **P3-04a**: the Preferences dialog on the new foundation: Languages,
+   Panels, Commander (then P3-04b…e: transfer settings, layout, core's
+   options, editors).
 2. **P3-05**: the internal editor (Q-3).
 3. **P3-06**: the remaining dialogs, batched (split first).
 
@@ -244,6 +244,7 @@ here or in the queue. P2-10 and P2-11 wait, at the user's request.
 | 2026-10-13 | The Windows toolchain is llvm-mingw against MSYS2's Qt 6.8.2 and its C++ runtime, all pinned; the GCC sysroot is retired (ADR 0011) | Debian has no Qt for mingw. MSYS2's clang64 Qt is that ABI and prebuilt; Debian's own Qt version, so its host tools serve the cross-build. Wine testing from Linux is kept, which clang-cl/MSVC would have weakened |
 | 2026-10-13 | P2-10 (packaging) and P2-11 (the P2 exit gate) wait; P3 goes first | The user's call: parity features before packaging. They stay `todo` |
 | 2026-10-13 | Remote files dragged out to other programs are downloaded on demand to a temporary directory (WinSCP's drag without its shell extension); no XDS | XDS exists only on X11 and GNOME Files dropped it; on-demand URLs work on X11, Wayland and Windows (ADR 0012) |
+| 2026-10-13 | The shell's settings are upstream's `TGUIConfiguration`, compiled as it is from the transformed tree, with `TWinConfiguration`'s keys mirrored by the shell's `TShellConfiguration` (ADR 0014) | Upstream's code keeps presets, synchronize and queue options and the language exactly as WinSCP does, and `WinSCP.ini` carries over both ways; a spike showed 23/11 errors (Linux/Windows), all shim-sized. `TWinConfiguration` is bound to the VCL GUI, so it is mirrored instead |
 | 2026-10-10 | Generated-tree model, not a source fork | Keeps the upstream diff structurally empty |
 | 2026-10-10 | Keep the VCL RTL shim permanently | De-shimming is a second project of similar size with no user benefit |
 | 2026-10-10 | Decouple shim cleanup from 100% UI parity | Coupling them would add ~a year of dual-build burden |
@@ -745,7 +746,12 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-01 | `.dfm` → `.ui` converter | todo | |
 | P3-02 | Commander dual-pane | done | WinSCP's Commander keys (panels, `FileView`, main window), select by core's masks (`CoreBridge::MaskMatches`), rename in place, status lines, group and link target columns with the header's menu; ctests `qt_gui_keys`, `qt_gui_panel`; native on Windows 11 too. Not yet (ADR 0012): Shift+F5/F6, the extension column, incremental search status, toolbars, kept layout (P3-04) |
 | P3-03 | Synchronization UI | done | `port/qt/SynchronizeDialog.cpp` (Synchronize dialog, comparing progress, checklist) over `TSession::Sync*` (core's `SynchronizeCollect`/`Apply`/`ToQueue`); Commands > Synchronize (Ctrl+S); ctests `qt_gui_sync`, `qt_session`/`qt_session_ftp`; native on Windows 11 too. Not yet (ADR 0012): selected files only, checksum, transfer settings, saved options (P3-04); the checklist's size calculation, move finding, custom commands; keep remote directory up to date |
-| P3-04 | Preferences | todo | XL — split first |
+| P3-04 | Preferences | wip | split into P3-04a…e (below); done when they are. The progress table counts P3-04 only |
+| P3-04a | Preferences foundation, Languages, Panels, Commander | wip | foundation in: upstream's `GUIConfiguration` compiled as it is (`port/gui`, ADR 0014), `TShellConfiguration` with `Interface\LocaleSafe`, the language chosen as upstream does (`Translations/`, `--lang` for one run); next: the dialog and its first pages |
+| P3-04b | Preferences: Transfer, Background, Endurance | todo | |
+| P3-04c | Preferences: Window, Explorer, File colors | todo | the panels' layout kept between runs |
+| P3-04d | Preferences: Storage, Logging, Network, Security, Updates | todo | |
+| P3-04e | Preferences: Editors, Integration, Applications, Commands, Drag & Drop | todo | after P3-05, P3-08 |
 | P3-05 | Internal editor | todo | Q-3 |
 | P3-06 | Remaining 48 dialogs, batched | todo | XL — split into P3-06a…f |
 | P3-07 | Drag & drop | done | between the panels, within one (onto a directory), and from other programs onto the remote panel: `FileView` in `port/qt/FileList.cpp`, `MainWindow::Drop`, `TSession::Move`; `RemoteFileDrag` (remote files out to other programs, downloaded at the drop); ctest `qt_gui_drop`; native on Windows 11 too; dragging out checked by hand with Explorer (Windows 11) and Nautilus, foreground and background |

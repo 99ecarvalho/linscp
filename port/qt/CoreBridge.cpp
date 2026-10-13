@@ -2,11 +2,14 @@
 #pragma hdrstop
 
 #include "BridgeVcl.h"
+#include "ShellConfiguration.h"
+#include "GuiShim.h"
 
 #include <Common.h>
 #include <Configuration.h>
 #include <CoreMain.h>
 #include <Exceptions.h>
+#include <GUIConfiguration.h>
 #include <FileMasks.h>
 #include <HeadlessMain.h>
 #include <TextsCore.h>
@@ -167,61 +170,47 @@ unsigned int AskFrontend(const UnicodeString & Message, TStrings * MoreMessages,
   return Result.Answer;
 }
 
-namespace
+// As upstream: the GUI's configuration chooses and loads the translation
+// (TGUIConfiguration::LoadNewResourceModule, ADR 0014); here only for this
+// run.
+std::string SetLanguage(const std::string & Locale, const std::string & Directory)
 {
-
-void * GTranslation = NULL;
-
-// WinSCP's code for a locale, where it is not the language's own two
-// letters upper-cased: upstream names its translations by Windows'
-// LOCALE_SABBREVLANGNAME (PTB, PTG, CHT, ...), cut to two letters where one
-// translation serves the whole language.
-UnicodeString LanguageCode(const UnicodeString & Language, const UnicodeString & Region)
-{
-  if (Language == L"pt") return (Region == L"PT") ? L"PTG" : L"PT";
-  if (Language == L"zh") return ((Region == L"TW") || (Region == L"HK") || (Region == L"MO") || (Region == L"HANT")) ? L"CH" : L"CHS";
-  if (Language == L"sr") return L"SRL";
-  if (Language == L"id") return L"IN";
-  if (Language == L"ja") return L"JP";
-  if ((Language == L"fil") || (Language == L"tl")) return L"FP";
-  if (Language == L"my") return L"MYA";
-  if ((Language == L"nb") || (Language == L"nn")) return L"NO";
-  if (Language == L"eo") return L"XXE";
-  if (Language == L"kab") return L"XXK";
-  return UpperCase(Language);
+  if (!Directory.empty())
+  {
+    LinscpSetTranslationsDirectory(FromUtf8(Directory));
+  }
+  TShellConfiguration * Shell = dynamic_cast<TShellConfiguration *>(GUIConfiguration);
+  if (Shell == NULL)
+  {
+    return std::string();
+  }
+  LCID Lcid = Shell->AppliedLocale;
+  if (!Locale.empty())
+  {
+    const UnicodeString Name = FromUtf8(Locale);
+    const bool English = SameText(CopyToChar(ReplaceStr(Name, L"_", L"-"), L'-', false), L"en") ||
+      SameText(Name, L"C") || SameText(Name, L"POSIX");
+    Lcid = English ? MAKELANGID(0x09, SUBLANG_DEFAULT) : LinscpLocaleOfName(Name);
+  }
+  if (Lcid != 0)
+  {
+    Shell->OverrideLocale(Lcid);
+  }
+  return LanguageCode();
 }
 
-}  // namespace
-
-std::string SetLanguage(const std::string & Locale, const std::string & ADirectory)
+std::string LanguageCode()
 {
-  // "pt_BR.UTF-8", "pt-BR", "zh-Hant-TW": the language, and the last part.
-  UnicodeString Name = FromUtf8(Locale);
-  Name = CutToChar(Name, L'.', false);
-  Name = ReplaceStr(Name, L"_", L"-");
-  const UnicodeString Language = LowerCase(CutToChar(Name, L'-', false));
-  UnicodeString Region;
-  while (!Name.IsEmpty())
+  if ((GUIConfiguration == NULL) || GUIConfiguration->UsingInternalTranslation())
   {
-    Region = UpperCase(CutToChar(Name, L'-', false));
+    return std::string();
   }
+  return Utf8(UpperCase(ExtractFileExt(LinscpLastTranslationFile()).SubString(2, 3)));
+}
 
-  void * Translation = NULL;
-  UnicodeString Code;
-  if (!Language.IsEmpty() && (Language != L"en") && (Language != L"c") && (Language != L"posix"))
-  {
-    Code = LanguageCode(Language, Region);
-    const UnicodeString Directory = !ADirectory.empty() ? FromUtf8(ADirectory) :
-      (IncludeTrailingBackslash(ExtractFilePath(ParamStr(0))) + L"translations");
-    Translation = LoadTranslationModule(IncludeTrailingBackslash(Directory) + L"linscp." + Code);
-  }
-  ChangeResourceModule(Translation);
-  if (GTranslation != NULL)
-  {
-    FreeTranslationModule(GTranslation);
-  }
-  GTranslation = Translation;
-  return (Translation != NULL) ? Utf8(Code) : std::string();
+std::string LanguageLocale()
+{
+  return (GUIConfiguration != NULL) ? Utf8(LinscpLocaleName(GUIConfiguration->AppliedLocale)) : std::string();
 }
 
 void Initialize(IFrontend * AFrontend)

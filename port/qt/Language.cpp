@@ -19,22 +19,33 @@ QString RequestedLocale(int argc, char ** argv)
       return QString::fromLocal8Bit(argv[Index] + 7);
     }
   }
-  return QLocale::system().name();
+  return QString();
 }
 
-TLanguage SetUpLanguage(const QString & Locale)
+TLanguage SetUpLanguage(const QString & Requested)
 {
   TLanguage Result;
-  Result.Locale = Locale;
-  const QLocale QLocaleValue(Locale);
-  QLocale::setDefault(QLocaleValue);
-
-  Result.CoreCode = QString::fromStdString(CoreBridge::SetLanguage(Locale.toStdString()));
+  if (!Requested.isEmpty())
+  {
+    QLocale::setDefault(QLocale(Requested));
+    Result.CoreCode = QString::fromStdString(CoreBridge::SetLanguage(Requested.toStdString()));
+  }
+  else
+  {
+    Result.CoreCode = QString::fromStdString(CoreBridge::LanguageCode());
+  }
+  // The shell and Qt speak core's language: English when core's is.
+  Result.Locale = QString::fromStdString(CoreBridge::LanguageLocale()).replace(QLatin1Char('-'), QLatin1Char('_'));
+  if (Result.Locale.isEmpty())
+  {
+    Result.Locale = QStringLiteral("en_US");
+  }
+  const QLocale QLocaleValue(Result.Locale);
 
   // Qt's own texts: from Qt's installation (Linux), else beside the
   // executable (a Windows deploy folder).
   static QTranslator QtTranslator;
-  const QString AppTranslations = QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("translations"));
+  const QString AppTranslations = QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("Translations"));
   Result.Qt =
     QtTranslator.load(QLocaleValue, QStringLiteral("qtbase"), QStringLiteral("_"),
       QLibraryInfo::path(QLibraryInfo::TranslationsPath)) ||

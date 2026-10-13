@@ -10,7 +10,7 @@ by following their imports, so nothing the programs do not use comes along.
 PREFIX is MSYS2's clang64 tree (port/tools/fetch_msys2_qt.py); its bin holds
 Qt, its dependencies and the C++ runtime (ADR 0011). Qt finds the plugins in
 the folders beside the executable. DLLs not in PREFIX are the system's.
-translations/ gets core's translations (--translations: gen_translations.py's
+Translations/ gets core's translations (--translations: gen_translations.py's
 output) and Qt's own (qtbase_*.qm from PREFIX), where the shell looks for both.
 """
 import argparse, glob, os, shutil, sys
@@ -49,7 +49,8 @@ def main():
         shutil.copy2(source, target)
         todo.append(source)
 
-    translations = os.path.join(a.dest, 'translations')
+    # Upstream's name: TGUIConfiguration looks there (TranslationsSubFolder).
+    translations = os.path.join(a.dest, 'Translations')
     os.makedirs(translations)
     sources = glob.glob(os.path.join(a.qt_prefix, 'share', 'qt6', 'translations', 'qtbase_*.qm'))
     if a.translations:

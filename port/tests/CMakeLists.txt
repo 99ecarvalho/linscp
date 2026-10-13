@@ -297,7 +297,7 @@ if(TARGET linscp)
     COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_qt_gui)
   add_test(NAME qt_dialogs COMMAND test_qt_gui dialogs -platform offscreen)
   set_tests_properties(qt_dialogs PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
-  add_test(NAME qt_language COMMAND test_qt_gui language -platform offscreen)
+  add_test(NAME qt_language COMMAND test_qt_gui language "${LINSCP_TRANSLATIONS_DIR}" -platform offscreen)
   set_tests_properties(qt_language PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
   # The shell's .ts files keep up with its texts (port/tools/check_ts_current.py).
   add_test(NAME translations_current

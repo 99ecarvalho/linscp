@@ -10,6 +10,9 @@
 #include <Common.h>
 #include <Exceptions.h>
 #include <Interface.h>
+#include <Configuration.h>
+
+#include "FrontendCommon.h"
 //---------------------------------------------------------------------------
 // The message and its details go to stderr, where a console client reports.
 void __fastcall ShowExtendedException(Exception * E)
@@ -56,3 +59,31 @@ bool __fastcall TextFromClipboard(UnicodeString & /*Text*/, bool /*Trim*/)
   return false;
 }
 //---------------------------------------------------------------------------
+//---------------------------------------------------------------------------
+namespace
+{
+// TConfiguration leaves only TemporaryDir abstract; upstream's
+// TWinConfiguration adds the GUI's settings on top, which a program without
+// a GUI has none of.
+class THeadlessConfiguration : public TConfiguration
+{
+public:
+  // TConfiguration's constructor leaves the settings to Default(), which
+  // TWinConfiguration's constructor calls; so does this one. Without it
+  // every setting is zero.
+  THeadlessConfiguration()
+  {
+    Default();
+  }
+
+  virtual UnicodeString TemporaryDir(bool Mask)
+  {
+    return DefaultTemporaryDir(Mask);
+  }
+};
+}
+//---------------------------------------------------------------------------
+TConfiguration * __fastcall CreateConfiguration()
+{
+  return SetUpConfigurationStorage(new THeadlessConfiguration());
+}

@@ -20,8 +20,11 @@ endif()
 # The core side: the bridge (CoreBridge.cpp, Session.cpp) and the shell's
 # half of core's Interface.h (QtInterface.cpp), in place of the headless one.
 add_library(linscp-qt-core STATIC EXCLUDE_FROM_ALL CoreBridge.cpp QtInterface.cpp Session.cpp Sites.cpp
-  Keys.cpp)
-target_link_libraries(linscp-qt-core PUBLIC linscp-runtime-base)
+  Keys.cpp ShellConfiguration.cpp)
+target_link_libraries(linscp-qt-core PUBLIC linscp-runtime-base linscp-gui)
+# The generated GUIConfiguration.h before core's include path, which has
+# upstream's own windows/ (ADR 0014).
+target_include_directories(linscp-qt-core BEFORE PUBLIC "${LINSCP_GEN}/source/windows")
 
 add_executable(linscp WIN32 EXCLUDE_FROM_ALL main.cpp)
 set_target_properties(linscp PROPERTIES AUTOMOC ON)
@@ -33,10 +36,11 @@ target_link_libraries(linscp PRIVATE linscp-qt-ui linscp-qt-core)
 # Translations (P2-09, doc/qt/translations.md).
 #
 # Core's texts: WinSCP's own translations, one file per language generated
-# into translations/ beside the executable (port/tools/gen_translations.py),
+# into Translations/ beside the executable, where upstream's GUI looks for its
+# own (port/tools/gen_translations.py),
 # which CoreBridge::SetLanguage loads into the shim.
 file(GLOB _winscp_translations CONFIGURE_DEPENDS "${LINSCP_UPSTREAM}/translations/*.ini")
-set(_translations_dir "${CMAKE_CURRENT_BINARY_DIR}/translations")
+set(_translations_dir "${CMAKE_CURRENT_BINARY_DIR}/Translations")
 set(_translations_stamp "${CMAKE_CURRENT_BINARY_DIR}/translations.stamp")
 add_custom_command(
   OUTPUT "${_translations_stamp}"

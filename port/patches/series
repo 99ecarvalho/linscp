@@ -13,3 +13,4 @@ core-neon-tls-init-closure.patch
 core-script-rmdir-full-path.patch
 putty-random-add-noise-section.patch
 mfc-cstring-const-search.patch
+gui-configuration-property-subscript.patch

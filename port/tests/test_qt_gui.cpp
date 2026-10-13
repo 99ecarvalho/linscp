@@ -221,9 +221,13 @@ void Dialogs()
   }
 }
 
-void Language()
+void Language(const QString & Translations)
 {
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  CoreBridge::SetLanguage(std::string(), Translations.toStdString());
   const TLanguage Language = SetUpLanguage(QStringLiteral("pt_BR"));
+  Check(Language.Locale == QStringLiteral("pt_BR"), "the shell follows core's locale");
   Check(Language.Shell, "the shell's pt_BR translation loads");
   Check(Language.Qt, "and Qt's own");
   QueryDialog Query(YesNoCancel());
@@ -236,6 +240,10 @@ void Language()
   Prompt.Fields.resize(1);
   PromptDialog Dialog(Prompt);
   Check(Dialog.windowTitle() == QStringLiteral("Autenticação"), "and the prompt's title the shell's");
+  Check(Language.CoreCode == QStringLiteral("PT"), "core's texts are WinSCP's PT translation");
+  Check(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::NewSiteNode)) != QStringLiteral("New Site"),
+    "which core's own strings come from");
+  CoreBridge::Finalize();
 }
 
 // Acts on whatever modal dialog is in front, as a user would.
@@ -1274,9 +1282,9 @@ int main(int argc, char ** argv)
   {
     Dialogs();
   }
-  else if ((argc >= 2) && (std::strcmp(argv[1], "language") == 0))
+  else if ((argc >= 3) && (std::strcmp(argv[1], "language") == 0))
   {
-    Language();
+    Language(QString::fromLocal8Bit(argv[2]));
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "sites") == 0))
   {

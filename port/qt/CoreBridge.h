@@ -166,16 +166,19 @@ void Initialize(IFrontend * Frontend);
 // Saves the configuration and stops core.
 void Finalize();
 
-// Core's texts in a language: WinSCP's own translation (its translators'
-// work, translations/<LANG>.ini upstream, generated into
-// translations/linscp.<LANG> beside the executable by gen_translations.py).
-// Locale is a BCP 47 name ("pt-BR", "de", "zh-TW"; "_" also accepted), mapped
-// to WinSCP's language codes as upstream maps a Windows locale: the
-// language-and-country code first, then the language's. Returns the code in
-// use ("PT"), or "" for English: asked for, or no translation found. Call
-// before Initialize, so that core starts in it. Directory: where the
-// translations are, when not beside the executable (tests).
+// Core's language (WinSCP's translations, as upstream's GUI chooses and
+// loads them: the configuration's, else the user interface's; ADR 0014).
+// SetLanguage applies Locale for this run only, not saved (linscp's
+// --lang): a POSIX or BCP 47 name ("pt_BR", "pt-BR", "de"), as Windows
+// numbers it. Returns WinSCP's code of the translation in use ("PT"), or ""
+// for English: asked for, or none found. Call after Initialize. Directory:
+// where the translations are, when not where upstream looks (tests).
 std::string SetLanguage(const std::string & Locale, const std::string & Directory = std::string());
+// The code of the translation in use, as SetLanguage returns it.
+std::string LanguageCode();
+// The locale core's texts are in, as BCP 47 names it ("pt-BR"; "en-US" for
+// English): what the shell's and Qt's own texts follow.
+std::string LanguageLocale();
 
 // Texts of WinSCP's own string tables that the shell's WinSCP-like dialogs
 // show, in core's language: WinSCP's translations serve them, in WinSCP's

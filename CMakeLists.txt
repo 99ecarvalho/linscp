@@ -130,6 +130,7 @@ add_subdirectory(port/neon)
 add_subdirectory(port/libs3)
 add_subdirectory(port/core)
 add_subdirectory(port/frontend)
+add_subdirectory(port/gui)
 
 # The Qt shell, when Qt is there: Debian's qt6-base-dev natively; for the
 # Windows cross-build, MSYS2's Qt (port/tools/fetch_msys2_qt.py) with

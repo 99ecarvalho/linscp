@@ -741,15 +741,34 @@ def _load_patchset():
     return module
 
 
+def _scope_dirs(root):
+    """(directory, names) to transform under a scope entry: a directory's
+    tree, or a single file."""
+    if os.path.isfile(root):
+        yield os.path.dirname(root), [os.path.basename(root)]
+        return
+    for dirpath, _, names in os.walk(root):
+        yield dirpath, names
+
+
+def _scope_files(root):
+    for dirpath, names in _scope_dirs(root):
+        for n in sorted(names):
+            yield dirpath, n
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--src', default='3rd-party/winscp')
     ap.add_argument('--out', default='build/gen')
     # PuTTY, FileZilla, WinSCP's MFC subset, neon and libs3 are compiled from
     # the generated tree too: they need the include rule or the patch series.
+    # A single file is an entry too: of WinSCP's GUI, the shell compiles only
+    # the units it uses (ADR 0014).
     ap.add_argument('--subdirs', nargs='*',
                     default=['source/core', 'source/putty', 'source/filezilla', 'libs/mfc',
-                             'libs/neon', 'libs/libs3'])
+                             'libs/neon', 'libs/libs3',
+                             'source/windows/GUIConfiguration.cpp', 'source/windows/GUIConfiguration.h'])
     ap.add_argument('--check', action='store_true',
                     help='report only; do not write the output tree')
     ap.add_argument('--report')
@@ -762,11 +781,10 @@ def main():
     if a.list_outputs:
         # For the build: CMake declares these as the transform's byproducts.
         for sub_ in a.subdirs:
-            for dirpath, _, names in os.walk(os.path.join(a.src, sub_)):
-                for n in sorted(names):
-                    if os.path.splitext(n)[1].lower() in EXTS:
-                        print(os.path.relpath(os.path.join(dirpath, n), a.src)
-                              .replace(os.sep, '/'))
+            for dirpath, n in _scope_files(os.path.join(a.src, sub_)):
+                if os.path.splitext(n)[1].lower() in EXTS:
+                    print(os.path.relpath(os.path.join(dirpath, n), a.src)
+                          .replace(os.sep, '/'))
         return 0
 
     t = Transformer(bind_sites=not a.no_closure_sites, src_root=a.src)
@@ -777,9 +795,9 @@ def main():
     produced = set()
     for sub in a.subdirs:
         root = os.path.join(a.src, sub)
-        if not os.path.isdir(root):
+        if not os.path.exists(root):
             sys.exit(f'missing source dir: {root}')
-        for dirpath, _, names in os.walk(root):
+        for dirpath, names in _scope_dirs(root):
             for n in names:
                 src = os.path.join(dirpath, n)
                 rel = os.path.relpath(src, a.src)
@@ -813,6 +831,8 @@ def main():
     pruned = 0
     if not a.check:
         for sub in a.subdirs:
+            if not os.path.isdir(os.path.join(a.src, sub)):
+                continue
             for dirpath, _, names in os.walk(os.path.join(a.out, sub)):
                 for n in names:
                     p = os.path.normpath(os.path.join(dirpath, n))
@@ -825,7 +845,7 @@ def main():
     # A hunk for a file in scope that never applied means the file is gone or
     # renamed upstream; the patch needs attention either way.
     in_scope = {h for h in patchset.all_hunks(series)
-                if any(h[1].startswith(sub.rstrip('/') + '/') for sub in a.subdirs)}
+                if any((h[1] == sub) or h[1].startswith(sub.rstrip('/') + '/') for sub in a.subdirs)}
     unused = sorted(in_scope - used)
     if unused:
         sys.exit('patch hunks that applied nowhere: ' +

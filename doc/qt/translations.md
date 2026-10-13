@@ -8,14 +8,19 @@ decision is [ADR 0013](adr/0013-translations.md).
 
 | Texts | Source | Built into | Loaded by |
 |---|---|---|---|
-| **Core's**: errors, prompts, the host key question, progress lines, button captions core names (about 1,250 strings) | WinSCP's own translations, `3rd-party/winscp/translations/<LANG>.ini`, by WinSCP's translators | `translations/linscp.<LANG>` beside the executable, one per language (55), by `port/tools/gen_translations.py` | `CoreBridge::SetLanguage`, into the shim |
+| **Core's**: errors, prompts, the host key question, progress lines, button captions core names (about 1,250 strings) | WinSCP's own translations, `3rd-party/winscp/translations/<LANG>.ini`, by WinSCP's translators | `Translations/linscp.<LANG>` beside the executable, one per language (55), by `port/tools/gen_translations.py` | upstream's `TGUIConfiguration` (ADR 0014), into the shim |
 | **Qt's**: standard dialogs and buttons | Qt's translations: Debian's `qt6-translations-l10n`; MSYS2's `qt6-translations` (locked with Qt) | `qtbase_<locale>.qm`, from Qt's installation; in a Windows deploy folder, `translations/` | a `QTranslator` |
 | **The shell's**: menus, columns, dialog titles and labels of `port/qt` | `port/qt/translations/linscp_<locale>.ts`, Qt Linguist files in this repository | `.qm` resources inside the shell (`:/i18n`), by the build machine's `lrelease` | a `QTranslator` |
 
-All three follow one locale: `--lang=<locale>` on the shell's command line
-(`--lang=pt_BR`, `--lang=de`), else the system's. Set once at startup, before
-core starts (`port/qt/Language.cpp`). Choosing it in the shell's
-preferences comes with P3-04.
+All three follow one locale, chosen as upstream's GUI chooses it (ADR 0014):
+the configuration's (`Interface\LocaleSafe`, WinSCP's key), else the user
+interface's (Windows' UI language; on Linux `LC_ALL`, `LC_MESSAGES` or
+`LANG`). Upstream's `TGUIConfiguration`, compiled as it is, loads the
+translation. `--lang=<locale>` on the shell's command line (`--lang=pt_BR`,
+`--lang=de`) applies one for that run without saving it. The shell's and
+Qt's texts follow the locale core's are in (`port/qt/Language.cpp`), and
+number formats stay the system's unless `--lang` is given. Choosing it in
+the shell's preferences comes with P3-04.
 
 ### Core's: WinSCP's translations, through the same hook as upstream
 
@@ -35,14 +40,19 @@ linscp does the same at the same point, so core is unchanged:
   (`LoadTranslationModule`) and makes it `ResInstance`
   (`ChangeResourceModule`). Its `LoadString` serves a translation module's
   string, falling back to English for an id the translation lacks.
+- The files are in `Translations/` beside the executable, named after it
+  (`linscp.<LANG>`), where upstream's GUI looks. Upstream's
+  `TGUIConfiguration` picks one as it picks a DLL: by the locale's Windows
+  abbreviation (`PTB`), then by its first two letters (`PT`).
 - The language codes are upstream's. They are Windows' language
   abbreviations, cut to the language where one translation serves it:
   `PT` (Brazilian Portuguese) and `PTG` (Portugal), `CHS` and `CH`
   (Simplified and Traditional Chinese), `JP`, `IN` (Indonesian), `NO`,
   `SRL` (Serbian, Latin script), `FP` (Filipino), `MYA` (Burmese), `XXE`
   (Esperanto), `XXK` (Kabyle); elsewhere the language's two letters (`DE`,
-  `FR`). `CoreBridge::SetLanguage` maps a locale to them as upstream maps a
-  Windows locale: the language-and-country code first, then the language's.
+  `FR`). Esperanto and Kabyle are not listed yet: upstream finds them
+  through a translation DLL's version information, which linscp's files do
+  not have.
 
 The translations follow the WinSCP pin: a bump brings its translators'
 latest work, and new strings appear in English until they are translated

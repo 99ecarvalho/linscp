@@ -1,0 +1,15 @@
+Index the string a string-list property returns, not the property.
+
+GetLocales takes a character of Exts->Strings[Index]. Under clang the
+__declspec(property) the transform makes of TStrings::Strings reads a
+second subscript as the property's own second index, so the expression is
+a two-argument call to the getter and does not compile (parentheses do not
+change that). Read into a UnicodeString first, the second subscript indexes
+the string the property returns, as under C++Builder. Line counts are
+unchanged.
+
+--- a/source/windows/GUIConfiguration.cpp
++++ b/source/windows/GUIConfiguration.cpp
+@@ -1246,1 +1246,1 @@
+-          AddLocale(AdditionalLanguageMask + Exts->Strings[Index][3], LangName);
++          AddLocale(AdditionalLanguageMask + UnicodeString(Exts->Strings[Index])[3], LangName);

@@ -124,6 +124,11 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P3-09 | Accessibility pass | M | P3-06 | |
 | P3-10 | **P3 exit gate:** parity on features users depend on | S | P3-02, P3-03, P3-04, P3-11 | Explicitly *not* 100% of 48 dialogs |
 | P3-11 | Remember last used directories: the site's "Remember last used directory" (`UpdateDirectories`, on by default) in the Advanced dialog; on disconnect and on closing, the remote and local directories saved back to the stored site as `TTerminalManager::SaveTerminal` does; a saved directory that is gone falls back quietly | S | P2-04, P2-08 | Raised 2026-10-13 by the user; "preserve local directory" belongs to P3-04 |
+| P3-04a | Preferences foundation and first pages: upstream's `GUIConfiguration` compiled as it is (ADR 0014), the shell's `TShellConfiguration` with `TWinConfiguration`'s keys, the language chosen as upstream does; the Preferences dialog with Languages, Panels and Commander | L | P3-02 | Split from P3-04 |
+| P3-04b | Preferences: Transfer (presets, `GUIConfiguration`'s copy parameters list), Background (queue), Endurance; the Copy and Synchronize dialogs' transfer settings | M | P3-04a | Split from P3-04 |
+| P3-04c | Preferences: Window, Explorer, File colors; the panels' layout kept between runs | M | P3-04a | Split from P3-04 |
+| P3-04d | Preferences: Storage, Logging, Network, Security, Updates (core's `Configuration`) | M | P3-04a | Split from P3-04 |
+| P3-04e | Preferences: Editors, Integration, Applications, Commands, Drag & Drop | M | P3-04a, P3-05, P3-08 | Split from P3-04 |
 
 ## P4 — Cleanup
 

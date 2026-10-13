@@ -25,7 +25,6 @@ int main(int argc, char ** argv)
   }
 
   QApplication App(argc, argv);
-  const TLanguage Language = SetUpLanguage(RequestedLocale(argc, argv));
   // Core's questions while it starts go to dialogs of their own; once the
   // window exists, they belong to it.
   QtFrontend Frontend;
@@ -45,6 +44,8 @@ int main(int argc, char ** argv)
     }
     return 1;
   }
+  // As upstream: core's configuration chose the language as it started.
+  const TLanguage Language = SetUpLanguage(RequestedLocale(argc, argv));
 
   int Result;
   {

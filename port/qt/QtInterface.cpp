@@ -6,6 +6,8 @@
 #pragma hdrstop
 
 #include "BridgeVcl.h"
+#include "FrontendCommon.h"
+#include "ShellConfiguration.h"
 
 #include <Common.h>
 #include <Exceptions.h>
@@ -95,4 +97,13 @@ bool __fastcall TextFromClipboard(UnicodeString & Text, bool Trim)
     Text = Text.Trim();
   }
   return !Text.IsEmpty();
+}
+//---------------------------------------------------------------------------
+// As upstream's (windows/UserInterface.cpp): the GUI's configuration, which
+// GUIConfiguration names.
+TConfiguration * __fastcall CreateConfiguration()
+{
+  TShellConfiguration * Result = new TShellConfiguration();
+  GUIConfiguration = Result;
+  return SetUpConfigurationStorage(Result);
 }

@@ -17,6 +17,7 @@
 #include <Exceptions.h>
 #include <Interface.h>
 #include <TextsWin.h>
+#include "FrontendCommon.h"
 #include "ProgParams.h"
 //---------------------------------------------------------------------------
 namespace
@@ -46,27 +47,13 @@ UnicodeString UniqTempDir(const UnicodeString BaseDir, const UnicodeString Ident
 
   return TempDir;
 }
+}
 //---------------------------------------------------------------------------
-// TConfiguration leaves only TemporaryDir abstract; upstream's
-// TWinConfiguration adds the GUI's settings on top. The directory is
-// upstream's (UniqTempDir, "scp" prefix) under the system's temporary
+// Upstream's (UniqTempDir, "scp" prefix) under the system's temporary
 // directory, as TWinConfiguration's is when no custom one is configured.
-class THeadlessConfiguration : public TConfiguration
+UnicodeString DefaultTemporaryDir(bool Mask)
 {
-public:
-  // TConfiguration's constructor leaves the settings to Default(), which
-  // TWinConfiguration's constructor calls; so does this one. Without it
-  // every setting is zero.
-  THeadlessConfiguration()
-  {
-    Default();
-  }
-
-  virtual UnicodeString TemporaryDir(bool Mask)
-  {
-    return UniqTempDir(SystemTemporaryDirectory(), L"scp", Mask);
-  }
-};
+  return UniqTempDir(SystemTemporaryDirectory(), L"scp", Mask);
 }
 #if !defined(_WIN32)
 //---------------------------------------------------------------------------
@@ -94,10 +81,10 @@ UnicodeString PosixIniFileName()
 // The /ini and /rawconfig switches, as UserInterface.cpp handles them; the
 // raw configuration only without /unsafe, as its CheckSafe has it. Without
 // /ini, Windows detects the storage as upstream does (an INI file if one
-// exists, else the registry); POSIX uses its INI file.
-TConfiguration * __fastcall CreateConfiguration()
+// exists, else the registry); POSIX uses its INI file. Each program's
+// CreateConfiguration makes its own configuration and hands it here.
+TConfiguration * SetUpConfigurationStorage(TConfiguration * Result)
 {
-  TConfiguration * Result = new THeadlessConfiguration();
   TProgramParams * Params = TProgramParams::Instance();
   UnicodeString IniFileName = Params->SwitchValue(IniSwitch);
   if (!IniFileName.IsEmpty())
