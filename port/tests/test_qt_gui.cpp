@@ -5,10 +5,11 @@
 //     keeps the dialog open, never-ask-again, the timeout, hidden echo
 //   test_qt_gui language -platform offscreen
 //     the shell's and Qt's own texts in Brazilian Portuguese
-//   test_qt_gui sites /ini=<file> <port> -platform offscreen
+//   test_qt_gui sites /ini=<file> <port> <OpenSSH key> <directory> -platform offscreen
 //     the site manager: a site filled in, saved with its password, read
 //     back, its port following the protocol, opened from the dialog with no
-//     prompt, deleted
+//     prompt, deleted; folders made, saved into, renamed and deleted; the
+//     advanced settings; an OpenSSH key converted on the way
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -29,7 +30,10 @@
 #include "PromptDialog.h"
 #include "QtFrontend.h"
 #include "QueryDialog.h"
+#include "SiteAdvanced.h"
 #include "SiteManager.h"
+
+#include <QFile>
 
 #include <QComboBox>
 #include <QSpinBox>
@@ -200,6 +204,8 @@ public:
   int HostKeyQueries = 0;
   int PasswordPrompts = 0;
   int Errors = 0;
+  // Answer a warning's Ignore rather than its first button.
+  bool IgnoreWarnings = false;
 
   TResponder()
   {
@@ -217,6 +223,11 @@ private:
       if (Query->windowTitle() == QueryDialog::tr("Error"))
       {
         Errors++;
+      }
+      else if (IgnoreWarnings && (Query->windowTitle() == QueryDialog::tr("Warning")) && (Query->Buttons().size() > 1))
+      {
+        Query->Buttons()[1]->click();
+        return;
       }
       else
       {
@@ -242,7 +253,7 @@ private:
   }
 };
 
-void Sites(const char * Port)
+void Sites(const char * Port, const QString & Key, const QString & Directory)
 {
   QtFrontend Frontend;
   CoreBridge::Initialize(&Frontend);
@@ -290,6 +301,61 @@ void Sites(const char * Port)
       Check(Dialog.DeleteSelected(false), "the site deletes");
       Check(Dialog.Tree()->topLevelItemCount() == 1, "and the tree is back to \"New Site\" alone");
     }
+    {
+      SiteManager Dialog(&Window);
+      Dialog.NewFolder(QStringLiteral("Work"));
+      Check(Dialog.SelectFolder(QStringLiteral("Work")), "a new folder is in the tree");
+      for (const QString & Name : { QStringLiteral("Work/a"), QStringLiteral("Work/b") })
+      {
+        Dialog.SelectNewSite();
+        Dialog.HostName()->setText(QStringLiteral("example.com"));
+        Dialog.SaveAs(Name, false);
+      }
+      Check(CoreBridge::SiteExists("Work/a") && CoreBridge::SiteExists("Work/b"), "sites save into it");
+      Dialog.SelectFolder(QStringLiteral("Work"));
+      Check(Dialog.RenameSelected(QStringLiteral("Office")), "the folder renames");
+      Check(CoreBridge::SiteExists("Office/a") && CoreBridge::SiteExists("Office/b") && !CoreBridge::SiteExists("Work/a"),
+        "and its sites with it");
+      Dialog.SelectSite(QStringLiteral("Office/a"));
+      Check(Dialog.RenameSelected(QStringLiteral("Office/c")) && CoreBridge::SiteExists("Office/c"), "a site renames");
+      Dialog.SelectFolder(QStringLiteral("Office"));
+      Check(Dialog.DeleteSelected(false) && !CoreBridge::SiteExists("Office/b") && !CoreBridge::SiteExists("Office/c"),
+        "a deleted folder takes its sites");
+    }
+    {
+      SiteManager Dialog(&Window);
+      Dialog.SelectNewSite();
+      Dialog.HostName()->setText(QStringLiteral("example.com"));
+      SiteAdvanced Advanced(Dialog.Edited(), &Dialog);
+      Advanced.Timeout()->setValue(45);
+      Advanced.Proxy()->setCurrentIndex(Advanced.Proxy()->findText(QStringLiteral("HTTP")));
+      Check(Advanced.ProxyHost()->isEnabled(), "a proxy's fields open with one");
+      Advanced.ProxyHost()->setText(QStringLiteral("proxy.example.com"));
+      Advanced.ProxyPort()->setValue(3128);
+      Advanced.PrivateKeyFile()->setText(Directory + QStringLiteral("/none.ppk"));
+      Dialog.SetEdited(Advanced.Site());
+      // The key does not exist: upstream warns, and Ignore saves anyway.
+      Responder.IgnoreWarnings = true;
+      Check(Dialog.SaveAs(QStringLiteral("Advanced"), false), "a site with advanced settings saves");
+      Responder.IgnoreWarnings = false;
+      const CoreBridge::TSite Saved = CoreBridge::LoadSite("Advanced");
+      Check((Saved.Timeout == 45) && (Saved.Proxy == CoreBridge::TSite::TProxy::Http) && (Saved.ProxyPort == 3128) &&
+        (Saved.ProxyHost == "proxy.example.com"), "and they persist");
+      CoreBridge::DeleteSite("Advanced");
+    }
+    {
+      SiteManager Dialog(&Window);
+      Dialog.SelectNewSite();
+      Dialog.HostName()->setText(QStringLiteral("example.com"));
+      CoreBridge::TSite Site = Dialog.Edited();
+      Site.PrivateKeyFile = Key.toStdString();
+      Dialog.SetEdited(Site);
+      const QString Converted = Directory + QStringLiteral("/converted.ppk");
+      Dialog.ChooseConvertedKeyFile = [Converted](const QString &) { return Converted; };
+      Check(Dialog.VerifyKey(), "an OpenSSH key is converted when asked to");
+      Check(QFile::exists(Converted), "to the file chosen");
+      Check(Dialog.Edited().PrivateKeyFile == Converted.toStdString(), "and the site uses it from then on");
+    }
     Frontend.SetWindow(nullptr);
   }
   CoreBridge::Finalize();
@@ -336,7 +402,7 @@ int main(int argc, char ** argv)
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "sites") == 0))
   {
-    Sites(argv[3]);
+    Sites(argv[3], (argc > 4) ? QString::fromLocal8Bit(argv[4]) : QString(), (argc > 5) ? QString::fromLocal8Bit(argv[5]) : QString());
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "session") == 0))
   {

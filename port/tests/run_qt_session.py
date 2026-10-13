@@ -9,7 +9,8 @@ session (the main window, its dialogs answered by a responder).
 The server is rclone's SFTP, or the suite's own FTP server (ftp_server.py);
 user linscp, password secret either way. The arguments default to
 /ini=nul {port} {protocol}, with the server's port and protocol filled in,
-and {tmp} with a temporary directory of the test's own.
+{tmp} with a temporary directory of the test's own, and {key} with an
+OpenSSH private key made there (ssh-keygen).
 
 Exits 77 without rclone.
 """
@@ -33,11 +34,16 @@ def main():
         os.makedirs(os.path.join(root, 'sub'))
         with open(os.path.join(root, 'hello.txt'), 'wb') as f:
             f.write(b'Hello, linscp\n')
+        if any('{key}' in x for x in args):
+            if not shutil.which('ssh-keygen'):
+                raise fixtures.Missing('ssh-keygen')
+            fixtures.keygen(os.path.join(tmp, 'id_ed25519'))
         server = (fixtures.rclone_sftp(root, 'linscp', 'secret', os.path.join(tmp, 'keys')) if a.protocol == 'sftp'
                   else fixtures.python_server('ftp_server.py', root))
         with server as port:
             cmd = ([a.emulator] if a.emulator else []) + [a.test] + [
-                x.replace('{port}', str(port)).replace('{protocol}', a.protocol).replace('{tmp}', tmp) for x in args]
+                x.replace('{port}', str(port)).replace('{protocol}', a.protocol).replace('{tmp}', tmp)
+                .replace('{key}', os.path.join(tmp, 'id_ed25519')) for x in args]
             p = subprocess.run(cmd, capture_output=True, text=True, timeout=240)
             print(p.stdout, end='')
             print(p.stderr[-2000:], end='', file=sys.stderr)

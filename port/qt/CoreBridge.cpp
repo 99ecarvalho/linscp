@@ -258,6 +258,9 @@ std::string Text(TText Text)
     case TText::ConfirmDeleteSite: Ident = CONFIRM_DELETE_SESSION; break;
     case TText::FtpsImplicit: Ident = FTPS_IMPLICIT; break;
     case TText::FtpsExplicit: Ident = FTPS_EXPLICIT; break;
+    case TText::NewFolderCaption: Ident = LOGIN_NEW_SESSION_FOLDER_CAPTION; break;
+    case TText::NewFolderPrompt: Ident = LOGIN_NEW_SESSION_FOLDER_PROMPT; break;
+    case TText::ConfirmDeleteFolder: Ident = LOGIN_DELETE_SESSION_FOLDER; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

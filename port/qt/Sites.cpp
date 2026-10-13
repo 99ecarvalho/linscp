@@ -70,6 +70,30 @@ TFtps FtpsOf(TSite::TProtocol Protocol, TSite::TEncryption Encryption)
   }
 }
 
+TSite::TProxy ProxyOf(TProxyMethod Method)
+{
+  switch (Method)
+  {
+    case pmSocks4: return TSite::TProxy::Socks4;
+    case pmSocks5: return TSite::TProxy::Socks5;
+    case pmHTTP: return TSite::TProxy::Http;
+    // Telnet, local command and SSH tunnel proxies are not offered; such a
+    // site's method is kept (SessionDataOf leaves it alone).
+    default: return TSite::TProxy::None;
+  }
+}
+
+TProxyMethod ProxyMethodOf(TSite::TProxy Proxy)
+{
+  switch (Proxy)
+  {
+    case TSite::TProxy::Socks4: return pmSocks4;
+    case TSite::TProxy::Socks5: return pmSocks5;
+    case TSite::TProxy::Http: return pmHTTP;
+    default: return pmNone;
+  }
+}
+
 TSessionData * StoredSite(const std::string & Name)
 {
   return dynamic_cast<TSessionData *>(StoredSessions->FindByName(FromUtf8(Name)));
@@ -86,6 +110,19 @@ TSite SiteOf(const TSessionData * Data)
   Site.UserName = Utf8(Data->UserName);
   Site.Password = Utf8(Data->Password);
   Site.RemoteDirectory = Utf8(Data->RemoteDirectory);
+  Site.LocalDirectory = Utf8(Data->LocalDirectory);
+  Site.Timeout = Data->Timeout;
+  Site.FtpPassive = Data->FtpPasvMode;
+  Site.Proxy = ProxyOf(Data->ProxyMethod);
+  Site.ProxyHost = Utf8(Data->ProxyHost);
+  Site.ProxyPort = Data->ProxyPort;
+  Site.ProxyUserName = Utf8(Data->ProxyUsername);
+  Site.ProxyPassword = Utf8(Data->ProxyPassword);
+  Site.ProxyLocalhost = Data->ProxyLocalhost;
+  Site.PrivateKeyFile = Utf8(Data->PublicKeyFile);
+  Site.TryAgent = Data->TryAgent;
+  Site.KeyboardInteractive = Data->AuthKI;
+  Site.AgentForwarding = Data->AgentFwd;
   return Site;
 }
 
@@ -105,6 +142,23 @@ TSessionData * SessionDataOf(const TSite & Site, const std::string & BaseName)
   Data->UserName = FromUtf8(Site.UserName);
   Data->Password = FromUtf8(Site.Password);
   Data->RemoteDirectory = FromUtf8(Site.RemoteDirectory);
+  Data->LocalDirectory = FromUtf8(Site.LocalDirectory);
+  Data->Timeout = Site.Timeout;
+  Data->FtpPasvMode = Site.FtpPassive;
+  // A method the dialog does not offer (telnet, command, tunnel) stays.
+  if ((Site.Proxy != TSite::TProxy::None) || (ProxyOf(Data->ProxyMethod) != TSite::TProxy::None))
+  {
+    Data->ProxyMethod = ProxyMethodOf(Site.Proxy);
+  }
+  Data->ProxyHost = FromUtf8(Site.ProxyHost);
+  Data->ProxyPort = Site.ProxyPort;
+  Data->ProxyUsername = FromUtf8(Site.ProxyUserName);
+  Data->ProxyPassword = FromUtf8(Site.ProxyPassword);
+  Data->ProxyLocalhost = Site.ProxyLocalhost;
+  Data->PublicKeyFile = FromUtf8(Site.PrivateKeyFile);
+  Data->TryAgent = Site.TryAgent;
+  Data->AuthKI = Site.KeyboardInteractive;
+  Data->AgentFwd = Site.AgentForwarding;
   if (!Site.Name.empty())
   {
     Data->Name = FromUtf8(Site.Name);

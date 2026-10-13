@@ -166,6 +166,9 @@ enum class TText
   ConfirmDeleteSite,    // "Are you sure you want to delete site '%s'?"
   FtpsImplicit,         // "TLS/SSL Implicit encryption"
   FtpsExplicit,         // "TLS/SSL Explicit encryption"
+  NewFolderCaption,     // "Create site folder"
+  NewFolderPrompt,      // "New &folder name:"
+  ConfirmDeleteFolder,  // "Are you sure you want to delete site folder '%s' with %d site(s)?"
 };
 std::string Text(TText Text);
 
@@ -193,14 +196,18 @@ struct TRemoteEntry
 // --- Stored sites -------------------------------------------------------------
 
 // A site as WinSCP's Login dialog edits it: its protocol and encryption, the
-// server, the credentials, the directory to start in. Everything else a
-// stored site holds is kept as it was when the site is saved again.
+// server, the credentials, the directory to start in, and the advanced
+// settings the shell offers (upstream's Site Advanced dialog: directories,
+// connection, proxy, SSH authentication). Everything else a stored site
+// holds is kept as it was when the site is saved again.
 struct TSite
 {
   enum class TProtocol { Sftp, Scp, Ftp, WebDav, S3 };
   // FTP: implicit TLS (ftps://) or explicit (ftpes://); WebDAV and S3: TLS
   // or not (Implicit = TLS).
   enum class TEncryption { None, Implicit, Explicit };
+  // core's TProxyMethod, those the dialog offers.
+  enum class TProxy { None, Socks4, Socks5, Http };
 
   // The site's path in the tree: "Folder/Subfolder/Site".
   std::string Name;
@@ -212,7 +219,48 @@ struct TSite
   std::string UserName;
   std::string Password;
   std::string RemoteDirectory;
+
+  // Directories.
+  std::string LocalDirectory;
+  // Connection: seconds to wait for the server; FTP's passive mode.
+  int Timeout = 15;
+  bool FtpPassive = true;
+  // Proxy.
+  TProxy Proxy = TProxy::None;
+  std::string ProxyHost;
+  int ProxyPort = 0;
+  std::string ProxyUserName;
+  std::string ProxyPassword;
+  // "Consult proxy for local addresses" (core's ProxyLocalhost).
+  bool ProxyLocalhost = false;
+  // SSH authentication.
+  std::string PrivateKeyFile;
+  bool TryAgent = true;
+  bool KeyboardInteractive = true;
+  bool AgentForwarding = false;
 };
+
+// --- Private keys -----------------------------------------------------------
+
+// A private key file as upstream's Login dialog checks it (windows/Tools.cpp's
+// DoVerifyKey): usable; convertible, an OpenSSH or ssh.com key PuTTY's code
+// cannot use as it is; or not usable, why in core's words.
+struct TKeyCheck
+{
+  enum class TStatus { Usable, Convertible, Unusable } Status = TStatus::Usable;
+  // For Convertible, core's question (KEY_TYPE_CONVERT4); for Unusable, its
+  // message.
+  std::string Message;
+  // For Convertible: where upstream suggests saving it (the .ppk beside it).
+  std::string ConvertedFileName;
+};
+TKeyCheck CheckKey(const std::string & FileName);
+// Converts it to PuTTY's format as upstream's ConvertKey does: its
+// passphrase asked for through the frontend when it has one, a matching
+// certificate added, saved to Target with the same passphrase. Returns core's
+// message saying so. Throws TCoreError (Aborted when the passphrase prompt is
+// cancelled).
+std::string ConvertKey(const std::string & FileName, const std::string & Target);
 
 // The protocol's usual port, as core's default for it.
 int DefaultPort(TSite::TProtocol Protocol, TSite::TEncryption Encryption);

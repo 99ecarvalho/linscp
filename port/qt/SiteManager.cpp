@@ -3,12 +3,13 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QDialogButtonBox>
+#include <QFileDialog>
 #include <QFormLayout>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
-#include <QMessageBox>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QSplitter>
@@ -16,7 +17,10 @@
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
+#include <algorithm>
+
 #include "QtFrontend.h"
+#include "SiteAdvanced.h"
 
 namespace
 {
@@ -24,7 +28,8 @@ namespace
 using TProtocol = CoreBridge::TSite::TProtocol;
 using TEncryption = CoreBridge::TSite::TEncryption;
 
-// Tree items: a site carries its full name; "New Site" and folders do not.
+// Tree items: a site carries its full name, a folder its path; "New Site"
+// neither.
 enum { NameRole = Qt::UserRole, KindRole };
 enum TKind { NewSiteKind, FolderKind, SiteKind };
 
@@ -33,10 +38,10 @@ QString CoreText(CoreBridge::TText Text)
   return QString::fromStdString(CoreBridge::Text(Text));
 }
 
-// Core's texts with their "%s" filled in.
-QString CoreText(CoreBridge::TText Text, const QString & Arg)
+// Core's texts with their "%s" (and "%d") filled in.
+QString CoreText(CoreBridge::TText Text, const QString & Arg, int Number = 0)
 {
-  return CoreText(Text).replace(QStringLiteral("%s"), Arg);
+  return CoreText(Text).replace(QStringLiteral("%s"), Arg).replace(QStringLiteral("%d"), QString::number(Number));
 }
 
 }  // namespace
@@ -45,12 +50,21 @@ SiteManager::SiteManager(QWidget * Parent) :
   QDialog(Parent)
 {
   setWindowTitle(tr("Login"));
-  resize(760, 440);
+  resize(780, 460);
+  ChooseConvertedKeyFile = [this](const QString & Suggested)
+  {
+    return QFileDialog::getSaveFileName(this, tr("Save converted private key"), Suggested,
+      tr("PuTTY Private Key Files (*.ppk)"));
+  };
+
   QVBoxLayout * Layout = new QVBoxLayout(this);
   QSplitter * Splitter = new QSplitter(this);
   Layout->addWidget(Splitter, 1);
 
-  FTree = new QTreeWidget(Splitter);
+  QWidget * TreePanel = new QWidget(Splitter);
+  QVBoxLayout * TreeLayout = new QVBoxLayout(TreePanel);
+  TreeLayout->setContentsMargins(0, 0, 0, 0);
+  FTree = new QTreeWidget(TreePanel);
   FTree->setHeaderHidden(true);
   connect(FTree, &QTreeWidget::currentItemChanged, this, &SiteManager::CurrentChanged);
   connect(FTree, &QTreeWidget::itemActivated, this, [this](QTreeWidgetItem * Item)
@@ -60,9 +74,40 @@ SiteManager::SiteManager(QWidget * Parent) :
       accept();
     }
   });
+  TreeLayout->addWidget(FTree, 1);
+  QHBoxLayout * TreeButtons = new QHBoxLayout();
+  FNewFolder = new QPushButton(tr("New &Folder..."), TreePanel);
+  FRename = new QPushButton(tr("Re&name..."), TreePanel);
+  FDelete = new QPushButton(tr("&Delete"), TreePanel);
+  TreeButtons->addWidget(FNewFolder);
+  TreeButtons->addWidget(FRename);
+  TreeButtons->addWidget(FDelete);
+  TreeLayout->addLayout(TreeButtons);
+  connect(FNewFolder, &QPushButton::clicked, this, [this]()
+  {
+    bool OK = false;
+    const QString Name = QInputDialog::getText(this, CoreText(CoreBridge::TText::NewFolderCaption),
+      CoreText(CoreBridge::TText::NewFolderPrompt), QLineEdit::Normal, QString(), &OK).trimmed();
+    if (OK && !Name.isEmpty())
+    {
+      NewFolder(Name);
+    }
+  });
+  connect(FRename, &QPushButton::clicked, this, [this]()
+  {
+    const QString Current = !SelectedName().isEmpty() ? SelectedName() : SelectedFolder();
+    bool OK = false;
+    const QString Name = QInputDialog::getText(this, tr("Rename"), tr("New &name:"), QLineEdit::Normal, Current, &OK).trimmed();
+    if (OK && !Name.isEmpty() && (Name != Current))
+    {
+      RenameSelected(Name);
+    }
+  });
+  connect(FDelete, &QPushButton::clicked, this, [this]() { DeleteSelected(true); });
 
   QWidget * FormPanel = new QWidget(Splitter);
-  QFormLayout * Form = new QFormLayout(FormPanel);
+  QVBoxLayout * FormLayout = new QVBoxLayout(FormPanel);
+  QFormLayout * Form = new QFormLayout();
   FProtocol = new QComboBox(FormPanel);
   FProtocol->addItem(QStringLiteral("SFTP"), static_cast<int>(TProtocol::Sftp));
   FProtocol->addItem(QStringLiteral("SCP"), static_cast<int>(TProtocol::Scp));
@@ -84,8 +129,14 @@ SiteManager::SiteManager(QWidget * Parent) :
   FPassword = new QLineEdit(FormPanel);
   FPassword->setEchoMode(QLineEdit::Password);
   Form->addRow(tr("&Password:"), FPassword);
-  FRemoteDirectory = new QLineEdit(FormPanel);
-  Form->addRow(tr("Remote &directory:"), FRemoteDirectory);
+  FormLayout->addLayout(Form);
+  FAdvanced = new QPushButton(tr("Ad&vanced..."), FormPanel);
+  connect(FAdvanced, &QPushButton::clicked, this, &SiteManager::Advanced);
+  QHBoxLayout * AdvancedRow = new QHBoxLayout();
+  AdvancedRow->addStretch(1);
+  AdvancedRow->addWidget(FAdvanced);
+  FormLayout->addLayout(AdvancedRow);
+  FormLayout->addStretch(1);
   connect(FProtocol, &QComboBox::currentIndexChanged, this, &SiteManager::ProtocolChanged);
   connect(FEncryption, &QComboBox::currentIndexChanged, this, &SiteManager::ProtocolChanged);
   Splitter->setStretchFactor(0, 2);
@@ -95,19 +146,18 @@ SiteManager::SiteManager(QWidget * Parent) :
   FLogin = Box->addButton(tr("&Login"), QDialogButtonBox::AcceptRole);
   FLogin->setDefault(true);
   FSave = Box->addButton(tr("&Save"), QDialogButtonBox::ActionRole);
-  FDelete = Box->addButton(tr("&Delete"), QDialogButtonBox::ActionRole);
   QPushButton * Close = Box->addButton(tr("Close"), QDialogButtonBox::RejectRole);
-  connect(FLogin, &QPushButton::clicked, this, &QDialog::accept);
+  connect(FLogin, &QPushButton::clicked, this, &SiteManager::accept);
   connect(FSave, &QPushButton::clicked, this, &SiteManager::Save);
-  connect(FDelete, &QPushButton::clicked, this, [this]() { DeleteSelected(true); });
   connect(Close, &QPushButton::clicked, this, &QDialog::reject);
   Layout->addWidget(Box);
 
   Fill(QString());
 }
 
-void SiteManager::Fill(const QString & Select)
+void SiteManager::Fill(const QString & Select, const QStringList & ExtraFolders)
 {
+  const QSignalBlocker Blocker(FTree);
   FTree->clear();
   QTreeWidgetItem * NewSite = new QTreeWidgetItem(FTree, { CoreText(CoreBridge::TText::NewSiteNode) });
   NewSite->setData(0, KindRole, NewSiteKind);
@@ -115,36 +165,55 @@ void SiteManager::Fill(const QString & Select)
   const QIcon FolderIcon = style()->standardIcon(QStyle::SP_DirIcon);
   const QIcon SiteIcon = style()->standardIcon(QStyle::SP_DriveNetIcon);
   QTreeWidgetItem * Selected = NewSite;
+
+  // The folder of Path, made as needed.
+  auto Folder = [this, &FolderIcon](const QString & Path) -> QTreeWidgetItem *
+  {
+    QTreeWidgetItem * Parent = nullptr;
+    QString SoFar;
+    for (const QString & Part : Path.split(QLatin1Char('/'), Qt::SkipEmptyParts))
+    {
+      SoFar = SoFar.isEmpty() ? Part : (SoFar + QLatin1Char('/') + Part);
+      QTreeWidgetItem * Found = nullptr;
+      const int Count = (Parent != nullptr) ? Parent->childCount() : FTree->topLevelItemCount();
+      for (int Child = 0; (Child < Count) && (Found == nullptr); Child++)
+      {
+        QTreeWidgetItem * Item = (Parent != nullptr) ? Parent->child(Child) : FTree->topLevelItem(Child);
+        if ((Item->data(0, KindRole).toInt() == FolderKind) && (Item->text(0) == Part))
+        {
+          Found = Item;
+        }
+      }
+      if (Found == nullptr)
+      {
+        Found = (Parent != nullptr) ? new QTreeWidgetItem(Parent, { Part }) : new QTreeWidgetItem(FTree, { Part });
+        Found->setData(0, KindRole, FolderKind);
+        Found->setData(0, NameRole, SoFar);
+        Found->setIcon(0, FolderIcon);
+      }
+      Parent = Found;
+    }
+    return Parent;
+  };
+
   for (const std::string & Name : CoreBridge::SiteNames())
   {
     const QString Path = QString::fromStdString(Name);
-    const QStringList Parts = Path.split(QLatin1Char('/'));
-    QTreeWidgetItem * Parent = nullptr;
-    for (int Index = 0; Index < Parts.size() - 1; Index++)
-    {
-      QTreeWidgetItem * Folder = nullptr;
-      const int Count = (Parent != nullptr) ? Parent->childCount() : FTree->topLevelItemCount();
-      for (int Child = 0; (Child < Count) && (Folder == nullptr); Child++)
-      {
-        QTreeWidgetItem * Item = (Parent != nullptr) ? Parent->child(Child) : FTree->topLevelItem(Child);
-        if ((Item->data(0, KindRole).toInt() == FolderKind) && (Item->text(0) == Parts[Index]))
-        {
-          Folder = Item;
-        }
-      }
-      if (Folder == nullptr)
-      {
-        Folder = (Parent != nullptr) ? new QTreeWidgetItem(Parent, { Parts[Index] }) : new QTreeWidgetItem(FTree, { Parts[Index] });
-        Folder->setData(0, KindRole, FolderKind);
-        Folder->setIcon(0, FolderIcon);
-      }
-      Parent = Folder;
-    }
-    QTreeWidgetItem * Item =
-      (Parent != nullptr) ? new QTreeWidgetItem(Parent, { Parts.last() }) : new QTreeWidgetItem(FTree, { Parts.last() });
+    const int Slash = Path.lastIndexOf(QLatin1Char('/'));
+    QTreeWidgetItem * Parent = (Slash > 0) ? Folder(Path.left(Slash)) : nullptr;
+    const QString Leaf = Path.mid(Slash + 1);
+    QTreeWidgetItem * Item = (Parent != nullptr) ? new QTreeWidgetItem(Parent, { Leaf }) : new QTreeWidgetItem(FTree, { Leaf });
     Item->setData(0, KindRole, SiteKind);
     Item->setData(0, NameRole, Path);
     Item->setIcon(0, SiteIcon);
+    if (Path == Select)
+    {
+      Selected = Item;
+    }
+  }
+  for (const QString & Path : FNewFolders + ExtraFolders)
+  {
+    QTreeWidgetItem * Item = Folder(Path);
     if (Path == Select)
     {
       Selected = Item;
@@ -161,11 +230,60 @@ QString SiteManager::SelectedName() const
   return ((Item != nullptr) && (Item->data(0, KindRole).toInt() == SiteKind)) ? Item->data(0, NameRole).toString() : QString();
 }
 
+// The folder under the cursor, or the selected site's.
+QString SiteManager::SelectedFolder() const
+{
+  const QTreeWidgetItem * Item = FTree->currentItem();
+  if (Item == nullptr)
+  {
+    return QString();
+  }
+  const int Kind = Item->data(0, KindRole).toInt();
+  if (Kind == FolderKind)
+  {
+    return Item->data(0, NameRole).toString();
+  }
+  if (Kind == SiteKind)
+  {
+    const QString Name = Item->data(0, NameRole).toString();
+    const int Slash = Name.lastIndexOf(QLatin1Char('/'));
+    return (Slash > 0) ? Name.left(Slash) : QString();
+  }
+  return QString();
+}
+
+QStringList SiteManager::SitesIn(const QString & Folder) const
+{
+  QStringList Result;
+  for (const std::string & Name : CoreBridge::SiteNames())
+  {
+    const QString Path = QString::fromStdString(Name);
+    if (Path.startsWith(Folder + QLatin1Char('/')))
+    {
+      Result.append(Path);
+    }
+  }
+  return Result;
+}
+
 bool SiteManager::SelectSite(const QString & Name)
 {
   for (QTreeWidgetItemIterator It(FTree); *It != nullptr; ++It)
   {
     if (((*It)->data(0, KindRole).toInt() == SiteKind) && ((*It)->data(0, NameRole).toString() == Name))
+    {
+      FTree->setCurrentItem(*It);
+      return true;
+    }
+  }
+  return false;
+}
+
+bool SiteManager::SelectFolder(const QString & Path)
+{
+  for (QTreeWidgetItemIterator It(FTree); *It != nullptr; ++It)
+  {
+    if (((*It)->data(0, KindRole).toInt() == FolderKind) && ((*It)->data(0, NameRole).toString() == Path))
     {
       FTree->setCurrentItem(*It);
       return true;
@@ -187,6 +305,21 @@ void SiteManager::ShowError(const CoreBridge::TCoreError & E)
     Frontend.SetWindow(this);
     Frontend.ShowError(E.Error);
   }
+}
+
+void SiteManager::ShowMessage(CoreBridge::TQueryType Type, const QString & Message)
+{
+  CoreBridge::TQuery Query;
+  Query.Type = Type;
+  Query.Message = Message.toStdString();
+  CoreBridge::TQueryButton OK;
+  OK.Answer = CoreBridge::AnswerOK;
+  OK.Caption = "OK";
+  Query.Buttons.push_back(OK);
+  Query.CancelAnswer = CoreBridge::AnswerOK;
+  QtFrontend Frontend;
+  Frontend.SetWindow(this);
+  Frontend.Query(Query);
 }
 
 void SiteManager::CurrentChanged()
@@ -214,6 +347,7 @@ void SiteManager::CurrentChanged()
 void SiteManager::Load(const CoreBridge::TSite & Site)
 {
   FLoading = true;
+  FSite = Site;
   FProtocol->setCurrentIndex(FProtocol->findData(static_cast<int>(Site.Protocol)));
   ProtocolChanged();
   const int Encryption = FEncryption->findData(static_cast<int>(Site.Encryption));
@@ -223,7 +357,6 @@ void SiteManager::Load(const CoreBridge::TSite & Site)
   FHostName->setText(QString::fromStdString(Site.HostName));
   FUserName->setText(QString::fromStdString(Site.UserName));
   FPassword->setText(QString::fromStdString(Site.Password));
-  FRemoteDirectory->setText(QString::fromStdString(Site.RemoteDirectory));
   FLoading = false;
 }
 
@@ -232,7 +365,7 @@ void SiteManager::Load(const CoreBridge::TSite & Site)
 void SiteManager::ProtocolChanged()
 {
   const TProtocol Protocol = static_cast<TProtocol>(FProtocol->currentData().toInt());
-  if (sender() == FProtocol || FLoading)
+  if ((sender() == FProtocol) || FLoading)
   {
     const int Previous = FEncryption->currentData().isValid() ? FEncryption->currentData().toInt() : 0;
     const QSignalBlocker Blocker(FEncryption);
@@ -250,8 +383,7 @@ void SiteManager::ProtocolChanged()
       FEncryption->setCurrentIndex((Index >= 0) ? Index : ((Protocol == TProtocol::S3) ? 1 : 0));
     }
   }
-  const bool HasEncryption = (FEncryption->count() > 0) &&
-    ((Protocol == TProtocol::Ftp) || (Protocol == TProtocol::WebDav) || (Protocol == TProtocol::S3));
+  const bool HasEncryption = (FEncryption->count() > 0);
   FEncryptionLabel->setVisible(HasEncryption);
   FEncryption->setVisible(HasEncryption);
   if (!FLoading)
@@ -267,36 +399,145 @@ void SiteManager::ProtocolChanged()
   }
 }
 
-CoreBridge::TSite SiteManager::FromForm() const
+CoreBridge::TSite SiteManager::Edited() const
 {
-  CoreBridge::TSite Site;
+  CoreBridge::TSite Site = FSite;
   Site.Name = SelectedName().toStdString();
   Site.Protocol = static_cast<TProtocol>(FProtocol->currentData().toInt());
   // SFTP and SCP have no encryption choice: SSH is always encrypted.
-  Site.Encryption = ((Site.Protocol == TProtocol::Sftp) || (Site.Protocol == TProtocol::Scp) || (FEncryption->count() == 0)) ?
-    TEncryption::None : static_cast<TEncryption>(FEncryption->currentData().toInt());
+  Site.Encryption = (FEncryption->count() == 0) ? TEncryption::None : static_cast<TEncryption>(FEncryption->currentData().toInt());
   Site.HostName = FHostName->text().trimmed().toStdString();
   Site.Port = (FPort->value() == CoreBridge::DefaultPort(Site.Protocol, Site.Encryption)) ? 0 : FPort->value();
   Site.UserName = FUserName->text().toStdString();
   Site.Password = FPassword->text().toStdString();
-  Site.RemoteDirectory = FRemoteDirectory->text().trimmed().toStdString();
   return Site;
+}
+
+void SiteManager::SetEdited(const CoreBridge::TSite & Site)
+{
+  const QString Name = SelectedName();
+  Load(Site);
+  FSite.Name = Name.toStdString();
 }
 
 CoreBridge::TSite SiteManager::Site() const
 {
-  return FromForm();
+  return Edited();
+}
+
+void SiteManager::Advanced()
+{
+  SiteAdvanced Dialog(Edited(), this);
+  if (Dialog.exec() == QDialog::Accepted)
+  {
+    FSite = Dialog.Site();
+  }
+}
+
+// As upstream's VerifyAndConvertKey on login and save: an OpenSSH key is
+// offered for conversion, one that cannot be used is warned of.
+bool SiteManager::VerifyKey()
+{
+  const CoreBridge::TSite Site = Edited();
+  if (Site.PrivateKeyFile.empty() || ((Site.Protocol != TProtocol::Sftp) && (Site.Protocol != TProtocol::Scp)))
+  {
+    return true;
+  }
+  const CoreBridge::TKeyCheck Check = CoreBridge::CheckKey(Site.PrivateKeyFile);
+  QtFrontend Frontend;
+  Frontend.SetWindow(this);
+  if (Check.Status == CoreBridge::TKeyCheck::TStatus::Convertible)
+  {
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Confirmation;
+    Query.Message = Check.Message;
+    CoreBridge::TQueryButton OK;
+    OK.Answer = CoreBridge::AnswerOK;
+    OK.Caption = "OK";
+    CoreBridge::TQueryButton Cancel;
+    Cancel.Answer = CoreBridge::AnswerCancel;
+    Cancel.Caption = "Cancel";
+    Query.Buttons = { OK, Cancel };
+    Query.CancelAnswer = CoreBridge::AnswerCancel;
+    if (Frontend.Query(Query).Answer != CoreBridge::AnswerOK)
+    {
+      return false;
+    }
+    const QString Target = ChooseConvertedKeyFile(QString::fromStdString(Check.ConvertedFileName));
+    if (Target.isEmpty())
+    {
+      return false;
+    }
+    try
+    {
+      ShowMessage(CoreBridge::TQueryType::Information,
+        QString::fromStdString(CoreBridge::ConvertKey(Site.PrivateKeyFile, Target.toStdString())));
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+      return false;
+    }
+    CoreBridge::TSite Converted = Site;
+    Converted.PrivateKeyFile = Target.toStdString();
+    FSite = Converted;
+    return true;
+  }
+  if (Check.Status == CoreBridge::TKeyCheck::TStatus::Unusable)
+  {
+    // Upstream's: Ignore to go on anyway, Abort to stop.
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Warning;
+    Query.Message = Check.Message;
+    CoreBridge::TQueryButton Abort;
+    Abort.Answer = CoreBridge::AnswerAbort;
+    Abort.Caption = "&Abort";
+    CoreBridge::TQueryButton Ignore;
+    Ignore.Answer = CoreBridge::AnswerIgnore;
+    Ignore.Caption = "&Ignore";
+    Query.Buttons = { Abort, Ignore };
+    Query.CancelAnswer = CoreBridge::AnswerAbort;
+    return Frontend.Query(Query).Answer == CoreBridge::AnswerIgnore;
+  }
+  return true;
+}
+
+void SiteManager::accept()
+{
+  if (VerifyKey())
+  {
+    QDialog::accept();
+  }
 }
 
 bool SiteManager::SaveAs(const QString & Name, bool SavePassword)
 {
   const QString Original = SelectedName();
-  if (CoreBridge::SiteExists(Name.toStdString()) && (Name != Original) &&
-      (QMessageBox::question(this, windowTitle(), CoreText(CoreBridge::TText::ConfirmOverwriteSite, Name)) != QMessageBox::Yes))
+  if (CoreBridge::SiteExists(Name.toStdString()) && (Name != Original))
+  {
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Confirmation;
+    Query.Message = CoreText(CoreBridge::TText::ConfirmOverwriteSite, Name).toStdString();
+    CoreBridge::TQueryButton Yes;
+    Yes.Answer = CoreBridge::AnswerYes;
+    Yes.Caption = "&Yes";
+    CoreBridge::TQueryButton No;
+    No.Answer = CoreBridge::AnswerNo;
+    No.Caption = "&No";
+    Query.Buttons = { Yes, No };
+    Query.CancelAnswer = CoreBridge::AnswerNo;
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    if (Frontend.Query(Query).Answer != CoreBridge::AnswerYes)
+    {
+      return false;
+    }
+  }
+  if (!VerifyKey())
   {
     return false;
   }
-  CoreBridge::TSite Site = FromForm();
+  CoreBridge::TSite Site = Edited();
   Site.Name = Name.toStdString();
   if (!SavePassword)
   {
@@ -312,21 +553,28 @@ bool SiteManager::SaveAs(const QString & Name, bool SavePassword)
     ShowError(E);
     return false;
   }
+  // A folder made here holds a site now: the tree has it without help.
+  const int Slash = Name.lastIndexOf(QLatin1Char('/'));
+  FNewFolders.removeAll((Slash > 0) ? Name.left(Slash) : QString());
   Fill(Name);
   return true;
 }
 
 // Upstream's "Save": a site in place; a new site through its save dialog
-// (forms/SaveSession.cpp): the name, the folder in it, and whether to keep
-// the password.
+// (forms/SaveSession.cpp): the name, with the folder under the cursor, and
+// whether to keep the password.
 void SiteManager::Save()
 {
   const QString Name = SelectedName();
   if (!Name.isEmpty())
   {
+    if (!VerifyKey())
+    {
+      return;
+    }
     try
     {
-      CoreBridge::SaveSite(FromForm(), Name.toStdString());
+      CoreBridge::SaveSite(Edited(), Name.toStdString());
     }
     catch (const CoreBridge::TCoreError & E)
     {
@@ -339,8 +587,11 @@ void SiteManager::Save()
   Dialog.setWindowTitle(CoreText(CoreBridge::TText::SaveSiteCaption));
   QFormLayout * Layout = new QFormLayout(&Dialog);
   QLineEdit * NameEdit = new QLineEdit(&Dialog);
-  const CoreBridge::TSite Site = FromForm();
-  NameEdit->setText(QString::fromStdString(Site.UserName.empty() ? Site.HostName : Site.UserName + "@" + Site.HostName));
+  const CoreBridge::TSite Site = Edited();
+  const QString Folder = SelectedFolder();
+  const QString Suggested =
+    QString::fromStdString(Site.UserName.empty() ? Site.HostName : Site.UserName + "@" + Site.HostName);
+  NameEdit->setText(Folder.isEmpty() ? Suggested : (Folder + QLatin1Char('/') + Suggested));
   Layout->addRow(CoreText(CoreBridge::TText::SaveSitePrompt), NameEdit);
   QCheckBox * SavePassword = new QCheckBox(CoreText(CoreBridge::TText::SaveSitePassword), &Dialog);
   SavePassword->setEnabled(!FPassword->text().isEmpty());
@@ -355,21 +606,108 @@ void SiteManager::Save()
   }
 }
 
-bool SiteManager::DeleteSelected(bool Confirm)
+// As the Login dialog renames in its tree: a site, or a folder with every
+// site in it.
+bool SiteManager::RenameSelected(const QString & NewName)
 {
-  const QString Name = SelectedName();
-  if (Name.isEmpty() ||
-      (Confirm && (QMessageBox::question(this, windowTitle(), CoreText(CoreBridge::TText::ConfirmDeleteSite, Name)) != QMessageBox::Yes)))
-  {
-    return false;
-  }
+  const QString Site = SelectedName();
+  const QString Folder = Site.isEmpty() ? SelectedFolder() : QString();
   try
   {
-    CoreBridge::DeleteSite(Name.toStdString());
+    if (!Site.isEmpty())
+    {
+      if (CoreBridge::SiteExists(NewName.toStdString()))
+      {
+        ShowMessage(CoreBridge::TQueryType::Error, tr("Site '%1' already exists.").arg(NewName));
+        return false;
+      }
+      CoreBridge::RenameSite(Site.toStdString(), NewName.toStdString());
+      Fill(NewName);
+      return true;
+    }
+    if (!Folder.isEmpty())
+    {
+      for (const QString & Name : SitesIn(Folder))
+      {
+        CoreBridge::RenameSite(Name.toStdString(), (NewName + Name.mid(Folder.length())).toStdString());
+      }
+      for (QString & Path : FNewFolders)
+      {
+        if ((Path == Folder) || Path.startsWith(Folder + QLatin1Char('/')))
+        {
+          Path = NewName + Path.mid(Folder.length());
+        }
+      }
+      Fill(NewName);
+      return true;
+    }
   }
   catch (const CoreBridge::TCoreError & E)
   {
     ShowError(E);
+    Fill(QString());
+  }
+  return false;
+}
+
+void SiteManager::NewFolder(const QString & Name)
+{
+  const QString Parent = SelectedFolder();
+  const QString Path = Parent.isEmpty() ? Name : (Parent + QLatin1Char('/') + Name);
+  if (!FNewFolders.contains(Path))
+  {
+    FNewFolders.append(Path);
+  }
+  Fill(Path);
+}
+
+bool SiteManager::DeleteSelected(bool Confirm)
+{
+  const QString Name = SelectedName();
+  const QString Folder = Name.isEmpty() ? SelectedFolder() : QString();
+  if (Name.isEmpty() && Folder.isEmpty())
+  {
+    return false;
+  }
+  const QStringList Sites = Name.isEmpty() ? SitesIn(Folder) : QStringList{ Name };
+  if (Confirm)
+  {
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Confirmation;
+    Query.Message = (Name.isEmpty() ? CoreText(CoreBridge::TText::ConfirmDeleteFolder, Folder, Sites.size())
+      : CoreText(CoreBridge::TText::ConfirmDeleteSite, Name)).toStdString();
+    CoreBridge::TQueryButton OK;
+    OK.Answer = CoreBridge::AnswerOK;
+    OK.Caption = "OK";
+    CoreBridge::TQueryButton Cancel;
+    Cancel.Answer = CoreBridge::AnswerCancel;
+    Cancel.Caption = "Cancel";
+    Query.Buttons = { OK, Cancel };
+    Query.CancelAnswer = CoreBridge::AnswerCancel;
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    if (Frontend.Query(Query).Answer != CoreBridge::AnswerOK)
+    {
+      return false;
+    }
+  }
+  try
+  {
+    for (const QString & Site : Sites)
+    {
+      CoreBridge::DeleteSite(Site.toStdString());
+    }
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  if (!Folder.isEmpty())
+  {
+    FNewFolders.erase(std::remove_if(FNewFolders.begin(), FNewFolders.end(), [&Folder](const QString & Path)
+    {
+      return (Path == Folder) || Path.startsWith(Folder + QLatin1Char('/'));
+    }), FNewFolders.end());
   }
   Fill(QString());
   return true;
@@ -381,8 +719,10 @@ void SiteManager::UpdateButtons()
   const int Kind = (Item != nullptr) ? Item->data(0, KindRole).toInt() : FolderKind;
   FLogin->setEnabled(Kind != FolderKind);
   FSave->setEnabled(Kind != FolderKind);
-  FDelete->setEnabled(Kind == SiteKind);
-  for (QWidget * Field : std::initializer_list<QWidget *>{ FProtocol, FEncryption, FHostName, FPort, FUserName, FPassword, FRemoteDirectory })
+  FAdvanced->setEnabled(Kind != FolderKind);
+  FRename->setEnabled(Kind != NewSiteKind);
+  FDelete->setEnabled(Kind != NewSiteKind);
+  for (QWidget * Field : std::initializer_list<QWidget *>{ FProtocol, FEncryption, FHostName, FPort, FUserName, FPassword })
   {
     Field->setEnabled(Kind != FolderKind);
   }

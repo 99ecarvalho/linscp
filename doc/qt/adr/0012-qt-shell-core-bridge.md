@@ -105,3 +105,31 @@ stored site opened with its saved password, save-as, rename, delete over an
 INI file) and `qt_gui_sites` (the site manager: filled in, saved, read back,
 its port following protocol and encryption, logged in from, deleted): on
 Linux, under Wine and natively on Windows 11.
+
+## Amendment 2026-10-13: advanced settings and keys (P2-05)
+
+- `TSite` carries the advanced settings the shell offers -- directories,
+  timeout, FTP passive mode, a SOCKS4/SOCKS5/HTTP proxy (with "consult
+  proxy for local addresses"), private key file, agent, keyboard-interactive,
+  agent forwarding -- in the dialog `SiteAdvanced`, after upstream's Site
+  Advanced pages. A proxy method the dialog does not offer (telnet, local
+  command, SSH tunnel) is kept as stored. The proxy's port stays as set when
+  its type changes, as upstream's.
+- **Keys** are checked and converted as upstream's `DoVerifyKey` and
+  `ConvertKey` do, over core's `PuttyTools` (`port/qt/Keys.cpp`): on login
+  and save, an OpenSSH or ssh.com key is offered for conversion to a `.ppk`
+  (its passphrase asked through the frontend, a matching certificate added),
+  and one that cannot be used is warned of, with Ignore and Abort. The two
+  helpers upstream keeps in GUI code (`GetConvertedKeyFileName`,
+  `AddMatchingKeyCertificate`) are carried over.
+- **Folders** are the sites' paths, as in core: a new folder lives in the
+  dialog until a site is saved into it; renaming one renames each of its
+  sites; deleting one deletes them, after core's confirmation naming how
+  many.
+
+Verified by `qt_sites` (advanced settings persist; a site through
+microsocks requiring a password, which logs the connection; an OpenSSH key
+converted and logging in to sshd) and `qt_gui_sites` (folders made, saved
+into, renamed, deleted; the advanced dialog's settings persisting; a key
+converted through the site manager): on Linux, under Wine and natively on
+Windows 11, where the key phase runs against Windows' own OpenSSH server.

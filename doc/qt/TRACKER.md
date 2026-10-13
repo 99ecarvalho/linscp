@@ -10,10 +10,10 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 |---|---|---|---|
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
-| P2 Qt shell | 5 | 11 | A user can do a day's work in it |
+| P2 Qt shell | 6 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **74** | **97** | |
+| **Total** | **75** | **97** | |
 
 ## Next three actions
 
@@ -191,10 +191,15 @@ port following the protocol. Sites are core's, in core's storage (the INI
 file on Linux; WinSCP's registry key on Windows, so WinSCP's own sites
 appear).
 
-1. **P2-05**: the login and authentication dialogs' remaining parts --
-   advanced site settings, key files, rename, folders.
-2. **P2-06**: the remote file panel.
-3. **P2-08**: the local file panel.
+**Sites have their advanced settings** (P2-05 done, ADR 0012 amended):
+directories, timeout, FTP passive mode, proxies, private keys with
+upstream's OpenSSH-key conversion, agent options; folders made, renamed and
+deleted; sites renamed. A site through an authenticating SOCKS5 proxy and
+an OpenSSH key converted and logging in are tested.
+
+1. **P2-06**: the remote file panel.
+2. **P2-08**: the local file panel.
+3. **P2-07**: transfers and the queue between them.
 
 ## Decisions taken
 
@@ -691,7 +696,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P2-02 | Qt app skeleton | done | `port/qt`: `linscp` on Qt 6.8.2 both platforms, core through `CoreBridge` (ADR 0012), Qt units with Qt's `wchar_t` (ADR 0001 amended); ctests `gui_build`, `gui_smoke`, `windows_imports` |
 | P2-03 | Qt `Interface.h` implementation | done | `port/qt`: `IFrontend` (`QtFrontend`, `QueryDialog`, `PromptDialog`), `QtInterface.cpp`, `Session.cpp`; `Interface.h` split into `FrontendCommon.cpp` and per-program halves. ctests `qt_session`, `qt_session_ftp`, `qt_dialogs`, `qt_gui_session`; native on Windows 11 too. Not yet: query timer events, transfer progress (P2-07) |
 | P2-04 | Site manager | done | `port/qt/SiteManager.cpp` over `Sites.cpp` (core's `StoredSessions`, as upstream's Login dialog uses it); shown at startup; ctests `qt_sites`, `qt_gui_sites`, native on Windows 11 too |
-| P2-05 | Login/auth dialogs | todo | |
+| P2-05 | Login/auth dialogs | done | `SiteAdvanced` (directories, connection, proxy, SSH authentication), keys checked and converted as upstream (`Keys.cpp`), folders and rename in `SiteManager`; ctests `qt_sites` (proxy, key phases), `qt_gui_sites`; native on Windows 11 too |
 | P2-06 | Remote file panel | todo | |
 | P2-07 | Transfer + queue UI | todo | |
 | P2-08 | Local file panel | todo | |
