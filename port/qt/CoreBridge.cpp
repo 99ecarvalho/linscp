@@ -164,6 +164,63 @@ unsigned int AskFrontend(const UnicodeString & Message, TStrings * MoreMessages,
   return Result.Answer;
 }
 
+namespace
+{
+
+void * GTranslation = NULL;
+
+// WinSCP's code for a locale, where it is not the language's own two
+// letters upper-cased: upstream names its translations by Windows'
+// LOCALE_SABBREVLANGNAME (PTB, PTG, CHT, ...), cut to two letters where one
+// translation serves the whole language.
+UnicodeString LanguageCode(const UnicodeString & Language, const UnicodeString & Region)
+{
+  if (Language == L"pt") return (Region == L"PT") ? L"PTG" : L"PT";
+  if (Language == L"zh") return ((Region == L"TW") || (Region == L"HK") || (Region == L"MO") || (Region == L"HANT")) ? L"CH" : L"CHS";
+  if (Language == L"sr") return L"SRL";
+  if (Language == L"id") return L"IN";
+  if (Language == L"ja") return L"JP";
+  if ((Language == L"fil") || (Language == L"tl")) return L"FP";
+  if (Language == L"my") return L"MYA";
+  if ((Language == L"nb") || (Language == L"nn")) return L"NO";
+  if (Language == L"eo") return L"XXE";
+  if (Language == L"kab") return L"XXK";
+  return UpperCase(Language);
+}
+
+}  // namespace
+
+std::string SetLanguage(const std::string & Locale, const std::string & ADirectory)
+{
+  // "pt_BR.UTF-8", "pt-BR", "zh-Hant-TW": the language, and the last part.
+  UnicodeString Name = FromUtf8(Locale);
+  Name = CutToChar(Name, L'.', false);
+  Name = ReplaceStr(Name, L"_", L"-");
+  const UnicodeString Language = LowerCase(CutToChar(Name, L'-', false));
+  UnicodeString Region;
+  while (!Name.IsEmpty())
+  {
+    Region = UpperCase(CutToChar(Name, L'-', false));
+  }
+
+  void * Translation = NULL;
+  UnicodeString Code;
+  if (!Language.IsEmpty() && (Language != L"en") && (Language != L"c") && (Language != L"posix"))
+  {
+    Code = LanguageCode(Language, Region);
+    const UnicodeString Directory = !ADirectory.empty() ? FromUtf8(ADirectory) :
+      (IncludeTrailingBackslash(ExtractFilePath(ParamStr(0))) + L"translations");
+    Translation = LoadTranslationModule(IncludeTrailingBackslash(Directory) + L"linscp." + Code);
+  }
+  ChangeResourceModule(Translation);
+  if (GTranslation != NULL)
+  {
+    FreeTranslationModule(GTranslation);
+  }
+  GTranslation = Translation;
+  return (Translation != NULL) ? Utf8(Code) : std::string();
+}
+
 void Initialize(IFrontend * AFrontend)
 {
   GFrontend = AFrontend;

@@ -4,13 +4,16 @@ Assemble a folder that runs on Windows as it is: the programs, the Qt
 plugins the shell needs, and every DLL they load from the Qt prefix -- found
 by following their imports, so nothing the programs do not use comes along.
 
-  deploy_windows.py --objdump llvm-objdump --qt-prefix PREFIX --dest DIR program.exe ...
+  deploy_windows.py --objdump llvm-objdump --qt-prefix PREFIX --dest DIR
+                    [--translations DIR] program.exe ...
 
 PREFIX is MSYS2's clang64 tree (port/tools/fetch_msys2_qt.py); its bin holds
 Qt, its dependencies and the C++ runtime (ADR 0011). Qt finds the plugins in
 the folders beside the executable. DLLs not in PREFIX are the system's.
+translations/ gets core's translations (--translations: gen_translations.py's
+output) and Qt's own (qtbase_*.qm from PREFIX), where the shell looks for both.
 """
-import argparse, os, shutil, sys
+import argparse, glob, os, shutil, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from check_dll_imports import table  # noqa: E402
@@ -27,6 +30,7 @@ def main():
     ap.add_argument('--objdump', required=True)
     ap.add_argument('--qt-prefix', required=True)
     ap.add_argument('--dest', required=True)
+    ap.add_argument('--translations')
     ap.add_argument('programs', nargs='+')
     a = ap.parse_args()
     bin_dir = os.path.join(a.qt_prefix, 'bin')
@@ -45,6 +49,14 @@ def main():
         shutil.copy2(source, target)
         todo.append(source)
 
+    translations = os.path.join(a.dest, 'translations')
+    os.makedirs(translations)
+    sources = glob.glob(os.path.join(a.qt_prefix, 'share', 'qt6', 'translations', 'qtbase_*.qm'))
+    if a.translations:
+        sources += glob.glob(os.path.join(a.translations, 'linscp.*'))
+    for source in sources:
+        shutil.copy2(source, translations)
+
     copied, seen = set(), set()
     while todo:
         path = todo.pop()
@@ -57,7 +69,8 @@ def main():
                 copied.add(dll)
                 shutil.copy2(available[dll], a.dest)
                 todo.append(available[dll])
-    print(f'{a.dest}: {len(a.programs)} programs, {len(PLUGINS)} plugins, {len(copied)} DLLs')
+    print(f'{a.dest}: {len(a.programs)} programs, {len(PLUGINS)} plugins, {len(copied)} DLLs, '
+          f'{len(sources)} translations')
     return 0
 
 

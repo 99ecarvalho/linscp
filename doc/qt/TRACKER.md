@@ -10,10 +10,10 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 |---|---|---|---|
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
-| P2 Qt shell | 3 | 11 | A user can do a day's work in it |
+| P2 Qt shell | 4 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **72** | **97** | |
+| **Total** | **73** | **97** | |
 
 ## Next three actions
 
@@ -177,9 +177,15 @@ never-ask-again, timeouts -- with core on the GUI thread as in WinSCP.
 File > Open URL connects and lists the remote directory. Tested on Linux,
 under Wine and natively on Windows 11, over SFTP and FTP.
 
-1. **P2-09**: the i18n pipeline, early, while there are few strings.
-2. **P2-04**: the site manager over core's stored sessions.
-3. **P2-05**: the login dialog, then the file panels (P2-06, P2-08).
+**linscp speaks WinSCP's 55 languages** (P2-09 done, ADR 0013): core's
+texts come from WinSCP's own translations, loaded where upstream loads its
+translation DLL (the main module's `ResInstance`), so core is unchanged;
+the shell's texts are Qt Linguist files (Brazilian Portuguese first), Qt's
+its own; one locale for all three (`--lang`, else the system's).
+
+1. **P2-04**: the site manager over core's stored sessions.
+2. **P2-05**: the login dialog.
+3. **P2-06, P2-08**: the remote and local file panels.
 
 ## Decisions taken
 
@@ -187,6 +193,7 @@ under Wine and natively on Windows 11, over SFTP and FTP.
 |---|---|---|
 | 2026-10-10 | clang everywhere; GCC unsupported | GCC cannot compile `__declspec(property)`; verified locally |
 | 2026-10-10 | mingw-w64 (`*-windows-gnu`) over clang-cl/MSVC | No MSVC licence or SDK download; sysroot is in Debian apt |
+| 2026-10-13 | Core's texts are translated with WinSCP's own translations, loaded by the shim where upstream loads its translation DLL; the shell's with Qt Linguist; Qt's with Qt's (ADR 0013) | 55 languages by WinSCP's translators at no cost, and core unchanged. The shell's texts are new and get .ts files; `--lang` chooses until preferences exist (P3-04) |
 | 2026-10-13 | The Windows toolchain is llvm-mingw against MSYS2's Qt 6.8.2 and its C++ runtime, all pinned; the GCC sysroot is retired (ADR 0011) | Debian has no Qt for mingw. MSYS2's clang64 Qt is that ABI and prebuilt; Debian's own Qt version, so its host tools serve the cross-build. Wine testing from Linux is kept, which clang-cl/MSVC would have weakened |
 | 2026-10-10 | Generated-tree model, not a source fork | Keeps the upstream diff structurally empty |
 | 2026-10-10 | Keep the VCL RTL shim permanently | De-shimming is a second project of similar size with no user benefit |
@@ -679,7 +686,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P2-06 | Remote file panel | todo | |
 | P2-07 | Transfer + queue UI | todo | |
 | P2-08 | Local file panel | todo | |
-| P2-09 | i18n pipeline | todo | do early |
+| P2-09 | i18n pipeline | done | ADR 0013, `doc/qt/translations.md`: core via `gen_translations.py` and shim translation modules (55 languages), the shell via Qt Linguist (`linscp_pt_BR.ts`), Qt's own; ctests `qt_session_pt_BR`, `qt_language`, `translations_current`; native on Windows 11 too |
 | P2-10 | Packaging | todo | |
 | P2-11 | P2 exit gate | todo | |
 

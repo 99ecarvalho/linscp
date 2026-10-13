@@ -66,6 +66,20 @@ extern void * LibModuleList;
 // DoLoadStrFrom uses to trim the result.
 int LoadString(void * Module, unsigned Ident, wchar_t * Buffer, int BufferMax);
 
+// Translations. Upstream's GUI loads a translation DLL (WinSCP.<LANG>) and
+// makes it the main module's ResInstance, which core's LoadStr reads from.
+// Here a translation is a table read from a generated file
+// (port/tools/gen_translations.py: linscp.<LANG>); its handle is a module
+// LoadString serves, falling back to the English table for an id the
+// translation lacks.
+//
+// The file's handle, or NULL when it cannot be read.
+void * LoadTranslationModule(const UnicodeString & FileName);
+void FreeTranslationModule(void * Module);
+// Makes Module (NULL: the English table) the main module's ResInstance, as
+// upstream's TGUIConfiguration::ChangeResourceModule; returns the previous.
+void * ChangeResourceModule(void * Module);
+
 // Delphi's SysUtils.LoadStr, the one-argument form core calls ~290 times.
 // Core's own Common.h declares only LoadStr(Ident, MaxLength); this one comes
 // from the RTL. It reads the main module through a 1024-character buffer,

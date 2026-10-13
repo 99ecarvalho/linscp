@@ -261,6 +261,13 @@ if(TARGET linscp)
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_session>")
   set_tests_properties(qt_session PROPERTIES DEPENDS qt_session_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+  # In WinSCP's Portuguese translation: core's texts come back translated.
+  add_dependencies(test_qt_session core-translations)
+  add_test(NAME qt_session_pt_BR
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
+            --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_session>"
+            /ini=nul {port} sftp pt_BR "${LINSCP_TRANSLATIONS_DIR}")
+  set_tests_properties(qt_session_pt_BR PROPERTIES DEPENDS qt_session_build SKIP_RETURN_CODE 77 TIMEOUT 300)
   # Over FTP too: FileZilla's engine, whose sockets run on window messages.
   add_test(NAME qt_session_ftp
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
@@ -278,6 +285,12 @@ if(TARGET linscp)
     COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_qt_gui)
   add_test(NAME qt_dialogs COMMAND test_qt_gui dialogs -platform offscreen)
   set_tests_properties(qt_dialogs PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
+  add_test(NAME qt_language COMMAND test_qt_gui language -platform offscreen)
+  set_tests_properties(qt_language PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
+  # The shell's .ts files keep up with its texts (port/tools/check_ts_current.py).
+  add_test(NAME translations_current
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/check_ts_current.py"
+            --lupdate "${LINSCP_LUPDATE}" --ts ${LINSCP_SHELL_TS} --sources ${LINSCP_SHELL_SOURCES})
   add_test(NAME qt_gui_session
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"

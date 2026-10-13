@@ -3,6 +3,8 @@
 //   test_qt_gui dialogs -platform offscreen
 //     the query and prompt dialogs alone: buttons, cancel, OnSubmit that
 //     keeps the dialog open, never-ask-again, the timeout, hidden echo
+//   test_qt_gui language -platform offscreen
+//     the shell's and Qt's own texts in Brazilian Portuguese
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -18,6 +20,7 @@
 #include <deque>
 #include <string>
 
+#include "Language.h"
 #include "MainWindow.h"
 #include "PromptDialog.h"
 #include "QtFrontend.h"
@@ -163,6 +166,23 @@ void Dialogs()
   }
 }
 
+void Language()
+{
+  const TLanguage Language = SetUpLanguage(QStringLiteral("pt_BR"));
+  Check(Language.Shell, "the shell's pt_BR translation loads");
+  Check(Language.Qt, "and Qt's own");
+  QueryDialog Query(YesNoCancel());
+  Check(Query.windowTitle() == QStringLiteral("Confirmar"), "a query's title is the shell's translation");
+  // Qt's own texts. (A standard button's label itself comes from the
+  // platform theme: on a GTK desktop GTK's, in the desktop's language.)
+  Check(QCoreApplication::translate("QPlatformTheme", "Cancel") == QStringLiteral("Cancelar"),
+    "Qt's own texts are its pt_BR translation");
+  CoreBridge::TPrompt Prompt;
+  Prompt.Fields.resize(1);
+  PromptDialog Dialog(Prompt);
+  Check(Dialog.windowTitle() == QStringLiteral("Autenticação"), "and the prompt's title the shell's");
+}
+
 // Acts on whatever modal dialog is in front, as a user would.
 class TResponder : public QObject
 {
@@ -247,6 +267,10 @@ int main(int argc, char ** argv)
   if ((argc >= 2) && (std::strcmp(argv[1], "dialogs") == 0))
   {
     Dialogs();
+  }
+  else if ((argc >= 2) && (std::strcmp(argv[1], "language") == 0))
+  {
+    Language();
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "session") == 0))
   {

@@ -193,6 +193,10 @@ void TSession::ChangeDirectory(const std::string & Directory)
 {
   try
   {
+    if (!Active())
+    {
+      throw Exception(LoadStr(NOT_CONNECTED));
+    }
     F->Terminal->ChangeDirectory(FromUtf8(Directory));
   }
   catch (Exception & E)

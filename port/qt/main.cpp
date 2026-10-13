@@ -1,6 +1,7 @@
 // linscp, the Qt shell: core started as WinSCP.exe starts it, under a Qt
-// event loop. `--smoke` shows the main window, reports what it runs on and
-// quits once the event loop has run: ctest gui_smoke.
+// event loop, in the system's language or --lang=<locale>'s. `--smoke` shows
+// the main window, reports what it runs on and quits once the event loop has
+// run: ctest gui_smoke.
 #include <QApplication>
 #include <QMessageBox>
 #include <QStatusBar>
@@ -11,6 +12,7 @@
 #include <stdexcept>
 
 #include "CoreBridge.h"
+#include "Language.h"
 #include "MainWindow.h"
 #include "QtFrontend.h"
 
@@ -23,6 +25,7 @@ int main(int argc, char ** argv)
   }
 
   QApplication App(argc, argv);
+  const TLanguage Language = SetUpLanguage(RequestedLocale(argc, argv));
   // Core's questions while it starts go to dialogs of their own; once the
   // window exists, they belong to it.
   QtFrontend Frontend;
@@ -52,10 +55,11 @@ int main(int argc, char ** argv)
     Window.show();
     if (Smoke)
     {
-      QTimer::singleShot(0, &Window, [&Window, &Info]()
+      QTimer::singleShot(0, &Window, [&Window, &Info, &Language]()
       {
-        std::printf("%s %s, Qt %s, %s: ok\n", Info.AppName.c_str(), Info.Version.c_str(), qVersion(),
-          QGuiApplication::platformName().toUtf8().constData());
+        std::printf("%s %s, Qt %s, %s: ok (%s; core %s)\n", Info.AppName.c_str(), Info.Version.c_str(), qVersion(),
+          QGuiApplication::platformName().toUtf8().constData(), Language.Locale.toUtf8().constData(),
+          Language.CoreCode.isEmpty() ? "English" : Language.CoreCode.toUtf8().constData());
         std::fflush(stdout);
         Window.close();
       });

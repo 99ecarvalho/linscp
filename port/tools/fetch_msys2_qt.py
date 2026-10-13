@@ -25,7 +25,9 @@ WINDOW = datetime.timedelta(days=1)
 # libc++.dll exports the unwinder (_Unwind_Resume) that llvm-mingw's keeps in
 # libunwind.dll, so Qt does not load with llvm-mingw's. linscp is compiled by
 # the llvm-mingw of the same LLVM release (cmake/toolchain-llvm-mingw.cmake).
-ROOTS = ['qt6-base', 'libc++', 'libunwind', 'libwinpthread']
+# qt6-translations: Qt's own texts (standard buttons and dialogs), as
+# Debian's qt6-translations-l10n gives them on Linux.
+ROOTS = ['qt6-base', 'qt6-translations', 'libc++', 'libunwind', 'libwinpthread']
 # Not fetched: gcc-libs is a virtual package for that runtime; the Vulkan
 # headers are a build-time dependency only, and so is Python with what it
 # brings (glib2's code generators): Qt links none of them.
@@ -73,6 +75,9 @@ def resolve(qt):
         versions = [p for p in packages.get(name, []) + packages.get(name + '-git', []) if p[1] <= snapshot]
         if name == 'qt6-base':
             versions = qt_files
+        elif name.startswith('qt6-'):
+            # Qt's other modules at Qt's own version, whenever uploaded.
+            versions = [p for p in packages.get(name, []) if p[0] == qt]
         if not versions:
             sys.exit(f'{name}: no version uploaded by {snapshot}')
         version, _, filename = max(versions, key=lambda p: p[1])

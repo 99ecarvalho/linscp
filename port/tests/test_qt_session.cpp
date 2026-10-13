@@ -3,7 +3,10 @@
 // question core asks while a session opens reaches the frontend as the shell
 // would show it, and the frontend's answers reach core.
 //
-//   test_qt_session /ini=nul <port> [sftp|ftp]
+//   test_qt_session /ini=nul <port> [sftp|ftp [<locale> <translations directory>]]
+//
+// With a locale (pt_BR), core runs in WinSCP's translation for it, and its
+// error comes back in that language.
 //
 // The server is run_qt_session.py's, serving a directory holding hello.txt
 // and sub/ to user linscp, password secret: rclone over SFTP, its host key
@@ -30,13 +33,19 @@ void Check(bool Condition, const char * What)
   }
 }
 
+// "Copy key" is the host key query's qaRetry, "Paste key" its qaIgnore
+// (SecureShell.cpp's aliases).
+const unsigned int CopyKeyAnswer = CoreBridge::AnswerRetry;
+
 // Answers from a script, and records what it was asked.
 class TScriptedFrontend : public CoreBridge::IFrontend
 {
 public:
   std::deque<std::string> Passwords;
-  // Whether to press "Copy key" before accepting the host key.
+  // Whether to press "Copy key" before accepting the host key, and whether to
+  // accept it at all.
   bool CopyHostKey = true;
+  bool AcceptHostKey = true;
 
   int Queries = 0;
   int HostKeyQueries = 0;
@@ -52,9 +61,13 @@ public:
     Queries++;
     CoreBridge::TQueryResult Result;
     Result.Answer = Query.CancelAnswer;
-    const bool HostKey = (Query.Message.find("host key") != std::string::npos) ||
-      (Query.Message.find("server's key") != std::string::npos) ||
-      (Query.Message.find("fingerprint") != std::string::npos);
+    // The host key query, in any language: the one with "Copy key" and
+    // "Paste key", buttons that act before they answer.
+    bool HostKey = false;
+    for (const CoreBridge::TQueryButton & Button : Query.Buttons)
+    {
+      HostKey = HostKey || static_cast<bool>(Button.OnSubmit);
+    }
     if (HostKey)
     {
       HostKeyQueries++;
@@ -62,13 +75,13 @@ public:
       {
         // "Copy key" acts and keeps the dialog open. (Its sibling, "Paste
         // key", compares the clipboard with the key, and asks about that.)
-        if (CopyHostKey && Button.OnSubmit && (Button.Caption.find("Copy") != std::string::npos))
+        if (CopyHostKey && Button.OnSubmit && (Button.Answer == CopyKeyAnswer))
         {
           StayedOpenAfterCopy = (Button.OnSubmit() == 0);
         }
       }
-      // Accept: upstream's first button, Yes.
-      Result.Answer = CoreBridge::AnswerYes;
+      // Accept: upstream's first button, Yes; or Cancel.
+      Result.Answer = AcceptHostKey ? CoreBridge::AnswerYes : CoreBridge::AnswerCancel;
     }
     return Result;
   }
@@ -126,6 +139,12 @@ int main(int argc, char ** argv)
   const std::string Protocol = (argc > 3) ? argv[3] : "sftp";
   const bool Sftp = (Protocol == "sftp");
   const std::string Url = Protocol + "://linscp@127.0.0.1:" + argv[2] + "/";
+  const bool Portuguese = (argc > 5);
+  if (Portuguese)
+  {
+    const std::string Code = CoreBridge::SetLanguage(argv[4], argv[5]);
+    Check(Code == "PT", "pt_BR is WinSCP's PT translation");
+  }
 
   TScriptedFrontend Frontend;
   CoreBridge::Initialize(&Frontend);
@@ -147,7 +166,8 @@ int main(int argc, char ** argv)
       Check(Frontend.HostKeyQueries == 1, "the unknown host key is asked about once");
       Check(Frontend.StayedOpenAfterCopy, "\"Copy key\" acts without answering");
       Check(!Frontend.Clipboard.empty(), "and puts the key on the clipboard");
-      Check(Frontend.InformationLines.find("Authenticat") != std::string::npos, "progress lines arrive while connecting");
+      Check(Frontend.InformationLines.find(Portuguese ? "Autentica" : "Authenticat") != std::string::npos,
+        "progress lines arrive while connecting, in core's language");
     }
     Check(Frontend.Prompts == 2, "the password is asked for again after a wrong one");
     Check(Frontend.Passwords.empty(), "both passwords were used");
@@ -180,8 +200,37 @@ int main(int argc, char ** argv)
       Message = E.what();
     }
     Check(Failed && !Session.Active(), "a cancelled password prompt does not connect");
-    Check(Shown && (Message.find("Credentials were not specified") != std::string::npos),
-      "and core's error says so, to be shown");
+    Check(Shown && (Message.find(Portuguese ? "Não foram apresentadas credenciais" : "Credentials were not specified") !=
+      std::string::npos), "and core's error says so, to be shown, in core's language");
+  }
+  if (Sftp)
+  {
+    // Declining the unknown host key does not connect, and core says why.
+    Frontend.AcceptHostKey = false;
+    Frontend.Passwords = { "secret" };
+    CoreBridge::TSession Session(Url);
+    bool Shown = false;
+    try
+    {
+      Session.Open();
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      Shown = !E.Aborted && !E.Error.Message.empty();
+    }
+    Check(!Session.Active() && Shown, "a declined host key does not connect, with core's error");
+    Check(Frontend.Passwords.size() == 1, "and no password is asked for");
+    bool Refused = false;
+    try
+    {
+      Session.ChangeDirectory("sub");
+    }
+    catch (const CoreBridge::TCoreError &)
+    {
+      Refused = true;
+    }
+    Check(Refused, "a session that did not open refuses to change directory");
+    Frontend.AcceptHostKey = true;
   }
   {
     // A URL with no host asks for one; giving none gives up.
