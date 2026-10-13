@@ -82,3 +82,26 @@ SFTP server and the suite's FTP server, a scripted frontend), `qt_dialogs`
 (the dialogs alone), and `qt_gui_session` (the main window opening a
 session, every question answered in its dialogs by a responder): on Linux,
 under Wine, and natively on Windows 11.
+
+## Amendment 2026-10-13: stored sites (P2-04)
+
+- **`TSite`** is the site as WinSCP's Login dialog edits it: protocol and
+  encryption, server, credentials, remote directory. Everything else a
+  stored site holds survives a save, because `SessionDataOf` starts from the
+  stored site (or core's defaults) and applies only those fields.
+- **Storage is core's**, used as upstream uses it: `NewSession` plus
+  `Save(false, true)` (modified only, explicit) to save; `Remove` then
+  `NewSession` to rename; `TSessionData::Remove` plus the list's `Remove` to
+  delete. Saving under another name copies, as "save as" does. A special
+  site is not overwritten (`SessionNameValidate`); the dialog asks before
+  overwriting another.
+- **`TText`** hands the shell a curated set of core's own strings, the
+  ones its WinSCP-like dialogs show ("New Site", the save and delete
+  confirmations, the TLS choices). They reach the user in WinSCP's wording
+  and WinSCP's translations, rather than being retyped as the shell's own.
+
+Verified by `qt_sites` (saved in one process, read back in the next, the
+stored site opened with its saved password, save-as, rename, delete over an
+INI file) and `qt_gui_sites` (the site manager: filled in, saved, read back,
+its port following protocol and encryption, logged in from, deleted): on
+Linux, under Wine and natively on Windows 11.

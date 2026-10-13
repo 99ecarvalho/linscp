@@ -10,10 +10,10 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 |---|---|---|---|
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
-| P2 Qt shell | 4 | 11 | A user can do a day's work in it |
+| P2 Qt shell | 5 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **73** | **97** | |
+| **Total** | **74** | **97** | |
 
 ## Next three actions
 
@@ -183,9 +183,18 @@ translation DLL (the main module's `ResInstance`), so core is unchanged;
 the shell's texts are Qt Linguist files (Brazilian Portuguese first), Qt's
 its own; one locale for all three (`--lang`, else the system's).
 
-1. **P2-04**: the site manager over core's stored sessions.
-2. **P2-05**: the login dialog.
-3. **P2-06, P2-08**: the remote and local file panels.
+**The site manager works** (P2-04 done, ADR 0012 amended): the shell starts
+with it, as WinSCP starts with its Login dialog -- core's stored sites in a
+tree with their folders, a site's protocol, encryption, server, credentials
+and remote directory in a form, new / save / save as / delete / login, the
+port following the protocol. Sites are core's, in core's storage (the INI
+file on Linux; WinSCP's registry key on Windows, so WinSCP's own sites
+appear).
+
+1. **P2-05**: the login and authentication dialogs' remaining parts --
+   advanced site settings, key files, rename, folders.
+2. **P2-06**: the remote file panel.
+3. **P2-08**: the local file panel.
 
 ## Decisions taken
 
@@ -681,7 +690,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P2-01 | Qt6 for mingw | done | R4 retired without building Qt: MSYS2's clang64 Qt 6.8.2 and its runtime, locked (`port/tools/fetch_msys2_qt.py`), with llvm-mingw 19.1.7 (`cmake/toolchain-llvm-mingw.cmake`); ADR 0011 |
 | P2-02 | Qt app skeleton | done | `port/qt`: `linscp` on Qt 6.8.2 both platforms, core through `CoreBridge` (ADR 0012), Qt units with Qt's `wchar_t` (ADR 0001 amended); ctests `gui_build`, `gui_smoke`, `windows_imports` |
 | P2-03 | Qt `Interface.h` implementation | done | `port/qt`: `IFrontend` (`QtFrontend`, `QueryDialog`, `PromptDialog`), `QtInterface.cpp`, `Session.cpp`; `Interface.h` split into `FrontendCommon.cpp` and per-program halves. ctests `qt_session`, `qt_session_ftp`, `qt_dialogs`, `qt_gui_session`; native on Windows 11 too. Not yet: query timer events, transfer progress (P2-07) |
-| P2-04 | Site manager | todo | |
+| P2-04 | Site manager | done | `port/qt/SiteManager.cpp` over `Sites.cpp` (core's `StoredSessions`, as upstream's Login dialog uses it); shown at startup; ctests `qt_sites`, `qt_gui_sites`, native on Windows 11 too |
 | P2-05 | Login/auth dialogs | todo | |
 | P2-06 | Remote file panel | todo | |
 | P2-07 | Transfer + queue UI | todo | |

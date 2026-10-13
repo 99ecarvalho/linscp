@@ -91,6 +91,10 @@ Configuration: %4</source>
 Qt %3
 Configuração: %4</translation>
     </message>
+    <message>
+        <source>&amp;Site Manager...</source>
+        <translation>&amp;Gerenciador de Site...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>
@@ -131,6 +135,61 @@ Configuração: %4</translation>
     <message>
         <source>%1 (%2 s)</source>
         <translation>%1 (%2 s)</translation>
+    </message>
+</context>
+<context>
+    <name>SiteManager</name>
+    <message>
+        <source>Login</source>
+        <translation>Login</translation>
+    </message>
+    <message>
+        <source>&amp;File protocol:</source>
+        <translation>Protocolo de ar&amp;quivo:</translation>
+    </message>
+    <message>
+        <source>&amp;Encryption:</source>
+        <translation>&amp;Criptografia:</translation>
+    </message>
+    <message>
+        <source>&amp;Host name:</source>
+        <translation>Nome do &amp;host:</translation>
+    </message>
+    <message>
+        <source>Po&amp;rt number:</source>
+        <translation>Número da po&amp;rta:</translation>
+    </message>
+    <message>
+        <source>&amp;User name:</source>
+        <translation>&amp;Usuário:</translation>
+    </message>
+    <message>
+        <source>&amp;Password:</source>
+        <translation>&amp;Senha:</translation>
+    </message>
+    <message>
+        <source>Remote &amp;directory:</source>
+        <translation>Diretório Remo&amp;to:</translation>
+    </message>
+    <message>
+        <source>&amp;Login</source>
+        <translation>&amp;Login</translation>
+    </message>
+    <message>
+        <source>&amp;Save</source>
+        <translation>&amp;Salvar</translation>
+    </message>
+    <message>
+        <source>&amp;Delete</source>
+        <translation>E&amp;xcluir</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fechar</translation>
+    </message>
+    <message>
+        <source>No encryption</source>
+        <translation>Sem criptografia</translation>
     </message>
 </context>
 </TS>

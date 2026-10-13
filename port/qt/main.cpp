@@ -53,6 +53,11 @@ int main(int argc, char ** argv)
     Frontend.SetWindow(&Window);
     Frontend.SetStatus([&Window](const QString & Text) { Window.statusBar()->showMessage(Text); });
     Window.show();
+    if (!Smoke)
+    {
+      // As WinSCP starts: with its Login dialog, the site manager.
+      QTimer::singleShot(0, &Window, [&Window]() { Window.SiteManagerDialog(); });
+    }
     if (Smoke)
     {
       QTimer::singleShot(0, &Window, [&Window, &Info, &Language]()

@@ -8,6 +8,8 @@
 #include <CoreMain.h>
 #include <Exceptions.h>
 #include <HeadlessMain.h>
+#include <TextsCore.h>
+#include <TextsWin.h>
 
 namespace
 {
@@ -240,6 +242,25 @@ void Finalize()
   HeadlessFinalize();
   GFrontend = NULL;
   GGuiThread = 0;
+}
+
+std::string Text(TText Text)
+{
+  int Ident;
+  switch (Text)
+  {
+    case TText::NewSiteNode: Ident = LOGIN_NEW_SITE_NODE; break;
+    case TText::SaveSiteCaption: Ident = SAVE_SESSION_CAPTION; break;
+    case TText::SaveSitePrompt: Ident = SAVE_SESSION_PROMPT; break;
+    case TText::SaveSiteFolder: Ident = SAVE_SESSION_FOLDER; break;
+    case TText::SaveSitePassword: Ident = SAVE_SESSION_PASSWORD; break;
+    case TText::ConfirmOverwriteSite: Ident = CONFIRM_OVERWRITE_SESSION; break;
+    case TText::ConfirmDeleteSite: Ident = CONFIRM_DELETE_SESSION; break;
+    case TText::FtpsImplicit: Ident = FTPS_IMPLICIT; break;
+    case TText::FtpsExplicit: Ident = FTPS_EXPLICIT; break;
+    default: return std::string();
+  }
+  return Utf8(LoadStr(Ident));
 }
 
 TInfo Info()

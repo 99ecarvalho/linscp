@@ -261,6 +261,17 @@ if(TARGET linscp)
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_session>")
   set_tests_properties(qt_session PROPERTIES DEPENDS qt_session_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+  # Stored sites over core's INI storage, saved in one process and checked in
+  # the next, the stored one opened.
+  add_executable(test_qt_sites EXCLUDE_FROM_ALL test_qt_sites.cpp)
+  target_include_directories(test_qt_sites PRIVATE "${CMAKE_SOURCE_DIR}/port/qt")
+  target_link_libraries(test_qt_sites PRIVATE linscp-qt-core)
+  add_test(NAME qt_sites_build
+    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_qt_sites)
+  add_test(NAME qt_sites
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_sites.py"
+            --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_sites>")
+  set_tests_properties(qt_sites PROPERTIES DEPENDS qt_sites_build SKIP_RETURN_CODE 77 TIMEOUT 300)
   # In WinSCP's Portuguese translation: core's texts come back translated.
   add_dependencies(test_qt_session core-translations)
   add_test(NAME qt_session_pt_BR
@@ -291,6 +302,11 @@ if(TARGET linscp)
   add_test(NAME translations_current
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/check_ts_current.py"
             --lupdate "${LINSCP_LUPDATE}" --ts ${LINSCP_SHELL_TS} --sources ${LINSCP_SHELL_SOURCES})
+  add_test(NAME qt_gui_sites
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
+            --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
+            sites "/ini={tmp}/WinSCP.ini" {port} -platform offscreen)
+  set_tests_properties(qt_gui_sites PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
   add_test(NAME qt_gui_session
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"

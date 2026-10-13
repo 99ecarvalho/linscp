@@ -16,6 +16,7 @@
 #include <algorithm>
 
 #include "QtFrontend.h"
+#include "SiteManager.h"
 
 namespace
 {
@@ -33,6 +34,8 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   resize(900, 560);
 
   QMenu * FileMenu = menuBar()->addMenu(tr("&File"));
+  FSitesAction = FileMenu->addAction(tr("&Site Manager..."), this, &MainWindow::SiteManagerDialog);
+  FSitesAction->setShortcut(QKeySequence::New);
   FOpenAction = FileMenu->addAction(tr("&Open URL..."), this, &MainWindow::OpenUrlDialog);
   FOpenAction->setShortcut(QKeySequence::Open);
   FDisconnectAction = FileMenu->addAction(tr("&Disconnect"), this, &MainWindow::Disconnect);
@@ -75,6 +78,46 @@ void MainWindow::ShowError(const CoreBridge::TCoreError & E)
 
 bool MainWindow::OpenUrl(const QString & Url)
 {
+  try
+  {
+    return Open(std::unique_ptr<CoreBridge::TSession>(new CoreBridge::TSession(Url.toStdString())));
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+}
+
+bool MainWindow::OpenSite(const CoreBridge::TSite & Site)
+{
+  try
+  {
+    return Open(std::unique_ptr<CoreBridge::TSession>(new CoreBridge::TSession(Site)));
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+}
+
+bool MainWindow::SiteManagerDialog()
+{
+  if (FBusy)
+  {
+    return false;
+  }
+  SiteManager Dialog(this);
+  if (Dialog.exec() != QDialog::Accepted)
+  {
+    return false;
+  }
+  return OpenSite(Dialog.Site());
+}
+
+bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
+{
   if (FBusy)
   {
     return false;
@@ -85,7 +128,6 @@ bool MainWindow::OpenUrl(const QString & Url)
   bool Result = false;
   try
   {
-    std::unique_ptr<CoreBridge::TSession> Session(new CoreBridge::TSession(Url.toStdString()));
     statusBar()->showMessage(tr("Connecting to %1...").arg(QString::fromStdString(Session->Name())));
     Session->Open();
     FSession = std::move(Session);
@@ -191,6 +233,7 @@ void MainWindow::ItemActivated(QTreeWidgetItem * Item, int /*Column*/)
 void MainWindow::UpdateActions()
 {
   FOpenAction->setEnabled(!FBusy);
+  FSitesAction->setEnabled(!FBusy);
   FDisconnectAction->setEnabled(!FBusy && FSession);
 }
 

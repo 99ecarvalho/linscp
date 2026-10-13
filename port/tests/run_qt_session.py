@@ -8,7 +8,8 @@ session (the main window, its dialogs answered by a responder).
 
 The server is rclone's SFTP, or the suite's own FTP server (ftp_server.py);
 user linscp, password secret either way. The arguments default to
-/ini=nul {port} {protocol}, with the server's port and protocol filled in.
+/ini=nul {port} {protocol}, with the server's port and protocol filled in,
+and {tmp} with a temporary directory of the test's own.
 
 Exits 77 without rclone.
 """
@@ -36,7 +37,7 @@ def main():
                   else fixtures.python_server('ftp_server.py', root))
         with server as port:
             cmd = ([a.emulator] if a.emulator else []) + [a.test] + [
-                x.replace('{port}', str(port)).replace('{protocol}', a.protocol) for x in args]
+                x.replace('{port}', str(port)).replace('{protocol}', a.protocol).replace('{tmp}', tmp) for x in args]
             p = subprocess.run(cmd, capture_output=True, text=True, timeout=240)
             print(p.stdout, end='')
             print(p.stderr[-2000:], end='', file=sys.stderr)

@@ -108,6 +108,20 @@ TSession::TSession(const std::string & Url) :
   }
 }
 
+TSession::TSession(const TSite & Site) :
+  F(new TImpl())
+{
+  try
+  {
+    // The site as edited, over the settings stored for it.
+    F->Data.reset(SessionDataOf(Site, Site.Name));
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 TSession::~TSession()
 {
   Close();

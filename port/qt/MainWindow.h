@@ -25,6 +25,10 @@ public:
 
   // Connects to Url, as File > Open URL does. False when it did not.
   bool OpenUrl(const QString & Url);
+  // Connects to a site, saved or as edited in the site manager.
+  bool OpenSite(const CoreBridge::TSite & Site);
+  // File > Site Manager: false when it was closed without logging in.
+  bool SiteManagerDialog();
   CoreBridge::TSession * Session() const { return FSession.get(); }
 
 private slots:
@@ -34,6 +38,7 @@ private slots:
   void ItemActivated(QTreeWidgetItem * Item, int Column);
 
 private:
+  bool Open(std::unique_ptr<CoreBridge::TSession> Session);
   void ShowError(const CoreBridge::TCoreError & E);
   void Refresh();
   void UpdateActions();
@@ -42,6 +47,7 @@ private:
   std::unique_ptr<CoreBridge::TSession> FSession;
   bool FBusy = false;
   QAction * FOpenAction = nullptr;
+  QAction * FSitesAction = nullptr;
   QAction * FDisconnectAction = nullptr;
   QLineEdit * FPath = nullptr;
   QTreeWidget * FFiles = nullptr;

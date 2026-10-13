@@ -5,6 +5,10 @@
 //     keeps the dialog open, never-ask-again, the timeout, hidden echo
 //   test_qt_gui language -platform offscreen
 //     the shell's and Qt's own texts in Brazilian Portuguese
+//   test_qt_gui sites /ini=<file> <port> -platform offscreen
+//     the site manager: a site filled in, saved with its password, read
+//     back, its port following the protocol, opened from the dialog with no
+//     prompt, deleted
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -25,6 +29,11 @@
 #include "PromptDialog.h"
 #include "QtFrontend.h"
 #include "QueryDialog.h"
+#include "SiteManager.h"
+
+#include <QComboBox>
+#include <QSpinBox>
+#include <QTreeWidget>
 
 namespace
 {
@@ -233,6 +242,59 @@ private:
   }
 };
 
+void Sites(const char * Port)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    {
+      SiteManager Dialog(&Window);
+      Check(Dialog.Tree()->topLevelItemCount() == 1, "an empty site manager has only \"New Site\"");
+      Dialog.SelectNewSite();
+      Check(Dialog.Port()->value() == 22, "a new site is SFTP on port 22");
+      Dialog.Protocol()->setCurrentIndex(Dialog.Protocol()->findText(QStringLiteral("FTP")));
+      Check(Dialog.Port()->value() == 21, "the port follows the protocol");
+      Check(Dialog.Encryption()->count() == 3, "FTP offers no encryption, implicit and explicit TLS");
+      Dialog.Encryption()->setCurrentIndex(1);
+      Check(Dialog.Port()->value() == 990, "and the encryption: implicit TLS on 990");
+      Dialog.Protocol()->setCurrentIndex(Dialog.Protocol()->findText(QStringLiteral("SFTP")));
+      Check(Dialog.Port()->value() == 22, "back to SFTP, back to 22");
+      Dialog.HostName()->setText(QStringLiteral("127.0.0.1"));
+      Dialog.Port()->setValue(QString::fromLatin1(Port).toInt());
+      Dialog.UserName()->setText(QStringLiteral("linscp"));
+      Dialog.Password()->setText(QStringLiteral("secret"));
+      Check(Dialog.SaveAs(QStringLiteral("Tests/rclone"), true), "the site saves as Tests/rclone");
+      const QTreeWidgetItem * Folder = Dialog.Tree()->topLevelItem(1);
+      Check((Folder != nullptr) && (Folder->text(0) == QStringLiteral("Tests")) && (Folder->childCount() == 1),
+        "under its folder in the tree");
+    }
+    {
+      SiteManager Dialog(&Window);
+      Check(Dialog.SelectSite(QStringLiteral("Tests/rclone")), "a new site manager has it");
+      Check((Dialog.HostName()->text() == QStringLiteral("127.0.0.1")) && (Dialog.UserName()->text() == QStringLiteral("linscp")) &&
+        (Dialog.Password()->text() == QStringLiteral("secret")) && (Dialog.Port()->value() == QString::fromLatin1(Port).toInt()),
+        "with its fields as saved");
+      QTimer::singleShot(0, &Dialog, [&Dialog]() { Dialog.accept(); });
+      Check(Dialog.exec() == QDialog::Accepted, "Login closes the dialog");
+      Check(Window.OpenSite(Dialog.Site()), "and the main window opens the site");
+      Check(Responder.PasswordPrompts == 0, "with its saved password, no prompt");
+      Check(Responder.HostKeyQueries == 1, "the host key asked about once");
+    }
+    {
+      SiteManager Dialog(&Window);
+      Dialog.SelectSite(QStringLiteral("Tests/rclone"));
+      Check(Dialog.DeleteSelected(false), "the site deletes");
+      Check(Dialog.Tree()->topLevelItemCount() == 1, "and the tree is back to \"New Site\" alone");
+    }
+    Frontend.SetWindow(nullptr);
+  }
+  CoreBridge::Finalize();
+}
+
 void Session(const char * Port)
 {
   QtFrontend Frontend;
@@ -271,6 +333,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 2) && (std::strcmp(argv[1], "language") == 0))
   {
     Language();
+  }
+  else if ((argc >= 4) && (std::strcmp(argv[1], "sites") == 0))
+  {
+    Sites(argv[3]);
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "session") == 0))
   {

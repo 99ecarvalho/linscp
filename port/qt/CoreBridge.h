@@ -152,6 +152,23 @@ void Finalize();
 // translations are, when not beside the executable (tests).
 std::string SetLanguage(const std::string & Locale, const std::string & Directory = std::string());
 
+// Texts of WinSCP's own string tables that the shell's WinSCP-like dialogs
+// show, in core's language: WinSCP's translations serve them, in WinSCP's
+// wording. "%s" and "%d" are core's placeholders.
+enum class TText
+{
+  NewSiteNode,          // "New Site"
+  SaveSiteCaption,      // "Save session as site"
+  SaveSitePrompt,       // "&Site name:"
+  SaveSiteFolder,       // "&Folder:"
+  SaveSitePassword,     // "Save &password (not recommended)"
+  ConfirmOverwriteSite, // "Site with name '%s' already exists. Overwrite?"
+  ConfirmDeleteSite,    // "Are you sure you want to delete site '%s'?"
+  FtpsImplicit,         // "TLS/SSL Implicit encryption"
+  FtpsExplicit,         // "TLS/SSL Explicit encryption"
+};
+std::string Text(TText Text);
+
 struct TInfo
 {
   std::string AppName;
@@ -173,6 +190,51 @@ struct TRemoteEntry
   std::string Rights;
 };
 
+// --- Stored sites -------------------------------------------------------------
+
+// A site as WinSCP's Login dialog edits it: its protocol and encryption, the
+// server, the credentials, the directory to start in. Everything else a
+// stored site holds is kept as it was when the site is saved again.
+struct TSite
+{
+  enum class TProtocol { Sftp, Scp, Ftp, WebDav, S3 };
+  // FTP: implicit TLS (ftps://) or explicit (ftpes://); WebDAV and S3: TLS
+  // or not (Implicit = TLS).
+  enum class TEncryption { None, Implicit, Explicit };
+
+  // The site's path in the tree: "Folder/Subfolder/Site".
+  std::string Name;
+  TProtocol Protocol = TProtocol::Sftp;
+  TEncryption Encryption = TEncryption::None;
+  std::string HostName;
+  // 0: the protocol's default port.
+  int Port = 0;
+  std::string UserName;
+  std::string Password;
+  std::string RemoteDirectory;
+};
+
+// The protocol's usual port, as core's default for it.
+int DefaultPort(TSite::TProtocol Protocol, TSite::TEncryption Encryption);
+// The stored sites' names, sorted as core keeps them; workspaces left out.
+std::vector<std::string> SiteNames();
+// A new site, from core's default settings. Throws TCoreError.
+TSite NewSite();
+// Throws TCoreError when there is no such site.
+TSite LoadSite(const std::string & Name);
+bool SiteExists(const std::string & Name);
+// Saves Site under Site.Name, as upstream's Login dialog does: its other
+// settings taken from the site BaseName (empty: a new site, from the default
+// settings), which stays as it is -- saving under another name is "save as".
+// As upstream's SessionNameValidate, a special site is not overwritten;
+// asking before overwriting another is the dialog's (SiteExists). Throws
+// TCoreError: no name, a special site, a storage error.
+void SaveSite(const TSite & Site, const std::string & BaseName = std::string());
+// As the Login dialog renames a site in its tree: saved under the new name,
+// the old one removed. Throws TCoreError.
+void RenameSite(const std::string & Name, const std::string & NewName);
+void DeleteSite(const std::string & Name);
+
 // One connection, as WinSCP's "open" command takes it: a URL
 // (sftp://user@host:port/path, ftp://, ftps://, ftpes://, dav://, davs://,
 // s3://, scp://). Prompts and errors reach the shell through IFrontend while
@@ -180,8 +242,11 @@ struct TRemoteEntry
 class TSession
 {
 public:
-  // Throws TCoreError when the URL is not one.
+  // Throws TCoreError when the URL is not one. A stored site's name is one,
+  // as for the script's open.
   explicit TSession(const std::string & Url);
+  // A site as edited, saved or not.
+  explicit TSession(const TSite & Site);
   ~TSession();
   TSession(const TSession &) = delete;
   TSession & operator=(const TSession &) = delete;

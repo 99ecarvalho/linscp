@@ -12,6 +12,8 @@
 
 #include "CoreBridge.h"
 
+class TSessionData;
+
 namespace CoreBridge
 {
 
@@ -34,6 +36,11 @@ TCoreError CoreErrorOf(Exception & E);
 // never-ask-again rule of WinInterface.cpp's MessageDialog.
 unsigned int AskFrontend(const UnicodeString & Message, TStrings * MoreMessages, ::TQueryType Type,
   unsigned int Answers, const TQueryParams * Params);
+
+// The session data of Site, as Sites.cpp builds it for saving: the settings of
+// the stored site BaseName (empty: core's defaults) with Site's applied. The
+// caller owns it.
+::TSessionData * SessionDataOf(const TSite & Site, const std::string & BaseName);
 
 }
 
