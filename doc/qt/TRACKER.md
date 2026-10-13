@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 1 | 10 | Parity on features users depend on |
+| P3 Qt parity | 1 | 11 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **79** | **97** | |
+| **Total** | **79** | **98** | |
 
 ## Next three actions
 
@@ -225,7 +225,7 @@ shell extension. P2-10 and P2-11 wait, at the user's request.
 
 1. **P3-03**: synchronization UI, over the transfer and queue machinery.
 2. **P3-02**: the rest of the Commander (status bars, toolbar, keys).
-3. **P3-04**: preferences (split first).
+3. **P3-11**: remember the last used directories per site, as WinSCP.
 
 ## Decisions taken
 
@@ -746,6 +746,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-08 | Shell integration | todo | |
 | P3-09 | Accessibility | todo | |
 | P3-10 | P3 exit gate | todo | |
+| P3-11 | Remember last used directories | todo | after P3-03 and P3-02; opening a site's saved directories already works, saving them back does not |
 
 ### P4 — Cleanup
 | ID | Task | Status | Note |

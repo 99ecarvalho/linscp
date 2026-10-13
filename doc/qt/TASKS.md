@@ -122,7 +122,8 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P3-07 | Drag & drop: Qt native + XDS on Linux | M | P3-02 | |
 | P3-08 | Shell integration: "open in terminal", file associations | M | P3-02 | Per-platform |
 | P3-09 | Accessibility pass | M | P3-06 | |
-| P3-10 | **P3 exit gate:** parity on features users depend on | S | P3-02, P3-03, P3-04 | Explicitly *not* 100% of 48 dialogs |
+| P3-10 | **P3 exit gate:** parity on features users depend on | S | P3-02, P3-03, P3-04, P3-11 | Explicitly *not* 100% of 48 dialogs |
+| P3-11 | Remember last used directories: the site's "Remember last used directory" (`UpdateDirectories`, on by default) in the Advanced dialog; on disconnect and on closing, the remote and local directories saved back to the stored site as `TTerminalManager::SaveTerminal` does; a saved directory that is gone falls back quietly | S | P2-04, P2-08 | Raised 2026-10-13 by the user; "preserve local directory" belongs to P3-04 |
 
 ## P4 — Cleanup
 
