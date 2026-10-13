@@ -4,6 +4,9 @@
 GCC sysroot; the `*-windows-gnu` target stands)
 **Date:** 2026-10-13
 
+The working detail -- pinning, the runtime constraint, upgrading, results
+-- is in [windows-toolchain.md](../windows-toolchain.md).
+
 ## Context
 
 The Windows build was clang driving Debian's GCC mingw-w64 sysroot:

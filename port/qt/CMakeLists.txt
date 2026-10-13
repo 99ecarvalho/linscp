@@ -24,3 +24,15 @@ if(NOT WIN32)
   target_compile_options(linscp PRIVATE -fno-short-wchar)
 endif()
 target_link_libraries(linscp PRIVATE linscp-qt-ui linscp-qt-core linscp-runtime)
+
+# A folder that runs on Windows as it is (port/tools/deploy_windows.py):
+#   cmake --build <build> --target deploy   ->   <build>/deploy
+if(WIN32 AND LINSCP_QT_PREFIX)
+  add_custom_target(deploy
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/deploy_windows.py"
+            --objdump "${LINSCP_TARGET_OBJDUMP}" --qt-prefix "${LINSCP_QT_PREFIX}"
+            --dest "${CMAKE_BINARY_DIR}/deploy" "$<TARGET_FILE:linscp>" "$<TARGET_FILE:linscp-cli>"
+    DEPENDS linscp linscp-cli
+    COMMENT "Assembling a runnable Windows folder in ${CMAKE_BINARY_DIR}/deploy"
+    VERBATIM)
+endif()
