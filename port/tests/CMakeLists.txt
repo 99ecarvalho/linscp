@@ -283,6 +283,12 @@ add_test(NAME patch_series
 # WinSCP's OpenSSL changes are all reviewed: adopted or knowingly skipped.
 add_test(NAME openssl_tree
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_openssl_tree.py")
+# WinSCP's PuTTY changes are all reviewed (doc/qt/putty-deltas.md): a bump of
+# WinSCP or of the stock PuTTY that changes any of them fails here.
+add_test(NAME putty_deltas
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/putty_deltas.py"
+          --winscp "${LINSCP_UPSTREAM}/source/putty" --stock "${CMAKE_SOURCE_DIR}/3rd-party/putty"
+          --check "${CMAKE_SOURCE_DIR}/port/putty/deltas.txt")
 add_test(NAME upstream_units
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test_upstream_units.py")
 if(TARGET linscp-putty)

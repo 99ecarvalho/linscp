@@ -9,11 +9,11 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | Phase | Done | Total | Gate |
 |---|---|---|---|
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
-| P1 Headless core | 36 | 38 | Golden suite green, six protocols, both platforms |
+| P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 0 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **68** | **97** | |
+| **Total** | **69** | **97** | |
 
 ## Next three actions
 
@@ -147,9 +147,20 @@ WebDAV and S3 (ctest `dotnet`, in CI), and natively on Windows through
 `/consoleinstance`. Offered upstream as winscp/winscp#73; work does not wait
 on the answer.
 
-1. **P1-10, P1-21**: the remaining P1 tasks.
-2. **P0-20**: the last open P0 task not blocked.
-3. **P2**: the Qt shell, once P1's gate is met.
+**P1 is closed** (P1-10 done, P1-21 dropped). WinSCP's PuTTY is reconciled
+against stock 0.85 (`doc/qt/putty-deltas.md`): 65 files modified, 7 added,
+each delta classified, held in place by ctest `putty_deltas`. Its findings:
+four upstream bugs worth reporting (`random_add_noise` leaves the PuTTY
+lock held; `retrieve_host_key` compares against its output buffer; the
+connect timeout bounds no `connect()`; `win_misc_cleanup` leaves a dangling
+pointer), and nothing the Linux build gets wrong. P1-21's subsystems are
+not compiled at all.
+
+1. **P2-01 spike**: the Windows toolchain for Qt -- llvm-mingw (clang, lld,
+   libc++, UCRT) against MSYS2's prebuilt Qt, proposed; re-run the suite under
+   Wine on it first.
+2. **P2-02, P2-03**: the Qt skeleton on both platforms, then `Interface.h`.
+3. Report the PuTTY-delta bugs upstream; **P0-20** when there is a batch.
 
 ## Decisions taken
 
@@ -351,6 +362,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 
 | Area | Divergence | Why |
 |---|---|---|
+| Connect timeout (PuTTY's `windows/network.c`) | `-timeout` does not bound connecting: an unreachable host fails after the kernel's SYN retries, 136 s on Linux, where WinSCP 6.5.7 on Windows 11 takes 24 s | Upstream's bug on both platforms: the timeout is set with `SO_RCVTIMEO`, which no `connect()` honours. To be fixed upstream (a non-blocking connect bounded by the timeout), not papered over in the emulation |
 | `UnicodeString::LowerCase` / `CompareIC`, `AnsiLowerCase` / `AnsiUpperCase` | ASCII-only case folding | Delphi's is locale-aware. Core uses these on protocol tokens and switch names. Must not be relied on for user-facing text |
 | `FindFirst` pattern matching | Case-sensitive on Linux, case-insensitive on Windows | Each matches its host filesystem. A pattern that matches on Windows may not on Linux |
 | `faHidden` on Linux | Set from a leading dot in the name | POSIX has no hidden attribute; the dot convention is what users expect |
@@ -621,7 +633,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-07b | `port/platform` Win32 file/handle functions | done | every Win32 call core makes: files, time zones (real transition rules), modules, processes (/proc), paths, string order, environment, XDG folders, MIME and type names, reparse points, trash, registry entry points, memory regions, version resources, user name, certificate chains (OpenSSL, system trust store); tested against real Win32 under Wine where observable. Core compiles on Linux |
 | P1-08 | Socket-event emulation | done | `ws2_32` module and `WSAEventSelect`/`WSAEnumNetworkEvents`; one test passes against real Winsock (Wine) and the emulation. `WSAAsyncSelect` (FileZilla) is P1-12's |
 | P1-09 | PuTTY unix backend re-import | done | As decided 2026-10-11: WinSCP's PuTTY with its Windows layer over the emulation, Linux services replaced per unit (`port/putty/linux`); SFTP/SCP sessions pass on Linux, proxied ones included |
-| P1-10 | PuTTY delta reconciliation | todo | |
+| P1-10 | PuTTY delta reconciliation | done | `doc/qt/putty-deltas.md`: every delta of WinSCP's PuTTY against stock 0.85 classified, Linux-relevant flags checked against the build; ctest `putty_deltas` fails when a bump changes any |
 | P1-11 | FileZilla MFC subset replacement | done | Not replaced: WinSCP's subset (`CString`/`CFile`/`CTime` over the shim) builds as is on both targets |
 | P1-12 | FileZilla epoll rewrite | done | Not rewritten: FileZilla builds unmodified on Linux over an emulated user32 subset (windows, message queues, timers, `WSAAsyncSelect`, `WSAAsyncGetHostByName`); ctest `messages` passes against user32/ws2_32 (Wine) and the emulation. One patch (`in_addr`'s `s_addr`) |
 | P1-13 | System libs | done | PuTTY, puttyvs, neon, libs3 from the WinSCP submodule, OpenSSL 3.5.9 from its own, expat from its make file, on both targets; FileZilla + MFC on Windows (Linux is P1-12). neon on POSIX: `config-posix.h` from its `configure` |
@@ -632,7 +644,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-18 | Windows cross-build + Wine | done | Core and the CLI, cross-built, run real SFTP sessions and scripts under Wine (`sftp_session*`, `cli_session`) |
 | P1-19 | Golden suite green, both platforms | done | ctest `golden`: Linux and Windows linscp match real WinSCP on SFTP, WebDAV(S), FTP, FTPES, FTPS and S3 (two documented differences); SCP in ctest `protocols` only. **P1 gate** |
 | P1-20 | .NET assembly drives Linux CLI | done | On Windows: the assembly built from the pinned source runs sessions through linscp-cli over SFTP, FTP, FTPES, WebDAV and S3 (`port/tests/dotnet`); Linux needs another transport (P1-23) |
-| P1-21 | `#ifdef` out Windows-only subsystems | todo | |
+| P1-21 | `#ifdef` out Windows-only subsystems | dropped | nothing to `#ifdef`: `dragext`, `Setup.cpp`, jump lists and file associations live in `windows/`, `forms/` and `dragext/`, none compiled by linscp, and core references none of them (`core_link_build` links with nothing undefined). Their user-facing parts are P3-08's |
 | P1-22 | CLI `keepuptodate` (directory watching) | done | `port/frontend/DirectoryWatcher.cpp` (inotify; ReadDirectoryChangesW), the controller's logic in CliMain.cpp; tested on Linux (ctest) and natively on Windows |
 | P1-23 | .NET assembly on Linux (new transport) | done | ADR 0010: `/consolepipes` in `linscp-cli` (ctest `console_pipes`); the assembly built with `port/patches/dotnet/console-pipes.patch` drives linscp on Linux (ctests `winscpnet_build`, `dotnet`, in CI); offered upstream as winscp/winscp#73 (draft), not waited on |
 
