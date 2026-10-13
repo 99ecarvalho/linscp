@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 0 | 10 | Parity on features users depend on |
+| P3 Qt parity | 1 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **78** | **97** | |
+| **Total** | **79** | **97** | |
 
 ## Next three actions
 
@@ -216,17 +216,16 @@ the panels for background ones (core's `TTerminalQueue`, polled on the GUI
 thread, its questions popped up as WinSCP does), with cancel, suspend and
 resume; the panels catch up when transfers finish.
 
-Drag and drop (P3-07): between the panels, a transfer after the Copy dialog
+Drag and drop (P3-07, done): between the panels, a transfer after the Copy dialog
 (Shift: move); within a panel, onto a directory, a move into it (remotely
 through core's `MoveFiles`, as WinSCP); files from other programs, onto the
 remote panel, an upload; remote files dragged out to other programs,
 downloaded at the drop to a temporary directory, as WinSCP's drag without its
 shell extension. P2-10 and P2-11 wait, at the user's request.
 
-1. **P3-07**: a manual check of dragging out to Explorer and to Linux file
-   managers, then done.
-2. **P3-03**: synchronization UI, over the transfer and queue machinery.
-3. **P3-02**: the rest of the Commander (status bars, toolbar, keys).
+1. **P3-03**: synchronization UI, over the transfer and queue machinery.
+2. **P3-02**: the rest of the Commander (status bars, toolbar, keys).
+3. **P3-04**: preferences (split first).
 
 ## Decisions taken
 
@@ -743,7 +742,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-04 | Preferences | todo | XL — split first |
 | P3-05 | Internal editor | todo | Q-3 |
 | P3-06 | Remaining 48 dialogs, batched | todo | XL — split into P3-06a…f |
-| P3-07 | Drag & drop | wip | between the panels, within one (onto a directory), and from other programs onto the remote panel: `FileView` in `port/qt/FileList.cpp`, `MainWindow::Drop`, `TSession::Move`; `RemoteFileDrag` (remote files out to other programs, downloaded at the drop); ctest `qt_gui_drop`; native on Windows 11 too. Left: a manual check of dragging out to Explorer and Linux file managers |
+| P3-07 | Drag & drop | done | between the panels, within one (onto a directory), and from other programs onto the remote panel: `FileView` in `port/qt/FileList.cpp`, `MainWindow::Drop`, `TSession::Move`; `RemoteFileDrag` (remote files out to other programs, downloaded at the drop); ctest `qt_gui_drop`; native on Windows 11 too; dragging out checked by hand with Explorer (Windows 11) and Nautilus, foreground and background |
 | P3-08 | Shell integration | todo | |
 | P3-09 | Accessibility | todo | |
 | P3-10 | P3 exit gate | todo | |

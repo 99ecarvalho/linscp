@@ -216,5 +216,5 @@ Windows 11.
 Verified by `qt_gui_drop` (each kind of drop; drops delivered through the
 view as the system sends them, with their questions answered; a remote
 drag's URLs downloaded when asked for, once, and not for drops on the
-panels): Linux, Wine, natively on Windows 11. Dragging out to Explorer
-and to Linux file managers is a manual check.
+panels): Linux, Wine, natively on Windows 11. Dragging out was checked by
+hand with Explorer on Windows 11 and with Nautilus.
