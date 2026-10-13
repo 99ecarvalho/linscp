@@ -590,8 +590,18 @@ int DirectoriesFirst::CompareText(const QString & A, const QString & B) const
   return QString::compare(A, B, Qt::CaseInsensitive);
 }
 
+// The system's collation, except C's: Qt's C collator compares plainly,
+// numbers by their digits, where StrCmpLogicalW compares them by value in
+// any locale.
+static QLocale CollationLocale()
+{
+  const QLocale System = QLocale::system();
+  return (System.language() == QLocale::C) ? QLocale(QLocale::English, QLocale::UnitedStates) : System;
+}
+
 DirectoriesFirst::DirectoriesFirst(QObject * Parent) :
-  QSortFilterProxyModel(Parent)
+  QSortFilterProxyModel(Parent),
+  FCollator(CollationLocale())
 {
   FCollator.setNumericMode(true);
   FCollator.setCaseSensitivity(Qt::CaseInsensitive);
