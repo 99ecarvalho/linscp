@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 4 | 11 | Parity on features users depend on |
+| P3 Qt parity | 4 | 16 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **82** | **98** | |
+| **Total** | **82** | **103** | |
 
 ## Next three actions
 
@@ -746,7 +746,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-01 | `.dfm` → `.ui` converter | todo | |
 | P3-02 | Commander dual-pane | done | WinSCP's Commander keys (panels, `FileView`, main window), select by core's masks (`CoreBridge::MaskMatches`), rename in place, status lines, group and link target columns with the header's menu; ctests `qt_gui_keys`, `qt_gui_panel`; native on Windows 11 too. Not yet (ADR 0012): Shift+F5/F6, the extension column, incremental search status, toolbars, kept layout (P3-04) |
 | P3-03 | Synchronization UI | done | `port/qt/SynchronizeDialog.cpp` (Synchronize dialog, comparing progress, checklist) over `TSession::Sync*` (core's `SynchronizeCollect`/`Apply`/`ToQueue`); Commands > Synchronize (Ctrl+S); ctests `qt_gui_sync`, `qt_session`/`qt_session_ftp`; native on Windows 11 too. Not yet (ADR 0012): selected files only, checksum, transfer settings, saved options (P3-04); the checklist's size calculation, move finding, custom commands; keep remote directory up to date |
-| P3-04 | Preferences | wip | split into P3-04a…e (below); done when they are. The progress table counts P3-04 only |
+| P3-04 | Preferences | wip | split into P3-04a…e (below), each counted as its own task; done when they are |
 | P3-04a | Preferences foundation, Languages, Panels, Commander | wip | foundation in: upstream's `GUIConfiguration` compiled as it is (`port/gui`, ADR 0014), `TShellConfiguration` with `Interface\LocaleSafe`, the language chosen as upstream does (`Translations/`, `--lang` for one run); next: the dialog and its first pages |
 | P3-04b | Preferences: Transfer, Background, Endurance | todo | |
 | P3-04c | Preferences: Window, Explorer, File colors | todo | the panels' layout kept between runs |
