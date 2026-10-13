@@ -12,7 +12,7 @@ rather than a platform one.
 
   compile_census.py [--tu source/core/Common.cpp] [--target TRIPLE] [--show N]
 """
-import argparse, collections, os, re, subprocess, sys
+import argparse, collections, glob, os, re, subprocess, sys
 
 
 def _upstream_defines():
@@ -42,6 +42,20 @@ PATTERNS = [
     ('no viable',          re.compile(r"no matching (?:function|constructor) for call to '([^']+)'")),
 ]
 
+def _compiler(target):
+    """The Windows build's own compiler for its target -- llvm-mingw's clang++,
+    with its sysroot and libc++ (ADR 0011) -- when it is there; else the host
+    clang for the target, which needs a mingw-w64 sysroot with C++ headers."""
+    if 'mingw' in target:
+        roots = [os.environ.get('LINSCP_LLVM_MINGW', '')] + sorted(
+            d for d in glob.glob('build/tools/llvm-mingw-*-ucrt-*') if os.path.isdir(d))[::-1]
+        for root in roots:
+            exe = os.path.join(root, 'bin', f'{target}-clang++') if root else ''
+            if exe and os.path.exists(exe):
+                return [exe]
+    return ['clang++', f'--target={target}']
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--tu', default='source/core/Common.cpp')
@@ -61,7 +75,7 @@ def main():
 
     up = '3rd-party/winscp/source'
     cmd = [
-        'clang++', f'--target={a.target}', '-std=c++17', '-fsyntax-only',
+        *_compiler(a.target), '-std=c++17', '-fsyntax-only',
         '-fms-extensions', '-fshort-wchar', f'-ferror-limit={a.max_errors}',
         '-I', 'port/shim',
 

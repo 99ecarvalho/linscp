@@ -17,6 +17,7 @@ the decisions table in [TRACKER.md](../TRACKER.md).
 | [0009](0009-posix-configuration.md) | Configuration on POSIX is `WinSCP.ini`, in the XDG directory by default |
 | [0010](0010-console-pipes.md) | winscp.com's console protocol over inherited pipes on POSIX, for the .NET assembly |
 | [0011](0011-windows-toolchain-llvm-mingw.md) | Windows builds with llvm-mingw against MSYS2's Qt, pinned to Debian's Qt version |
+| [0012](0012-qt-shell-core-bridge.md) | The Qt shell reaches core through `CoreBridge`; Qt and the VCL shim never share a unit |
 
 Write one when a decision constrains later work or would be costly to undo;
 number in order, never renumber, and amend rather than rewrite an accepted

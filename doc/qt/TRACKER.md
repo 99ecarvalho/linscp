@@ -10,10 +10,10 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 |---|---|---|---|
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
-| P2 Qt shell | 1 | 11 | A user can do a day's work in it |
+| P2 Qt shell | 2 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 0 | 10 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **70** | **97** | |
+| **Total** | **71** | **97** | |
 
 ## Next three actions
 
@@ -164,10 +164,17 @@ with its C++ runtime, all pinned (`port/qt/msys2-qt.lock`, llvm-mingw
 `linscp-cli` and a Qt Widgets program run natively on Windows 11. The PuTTY
 delta bugs are reported (winscp/winscp#74-#77).
 
-1. **P2-02**: the Qt app skeleton in CMake, both platforms, smoke-tested in
-   ctest (offscreen on Linux, under Wine on Windows).
-2. **P2-03**: the Qt implementation of `Interface.h`.
-3. **P2-09**: the i18n pipeline, early, while there are few strings.
+**The Qt shell exists** (P2-02 done, ADR 0012): `linscp` (`port/qt`) starts
+core through `CoreBridge` -- the only file where the two meet -- and shows
+its main window, on Linux and, cross-built, on Windows. ctest `gui_smoke`
+runs it on both (offscreen; under Wine), `windows_imports` checks what Wine
+cannot: every import from a shipped DLL resolves. CI builds it on both jobs.
+
+1. **P2-03**: the Qt implementation of `Interface.h`: prompts, errors,
+   progress and busy states through the bridge, core's threads marshalled
+   onto Qt's.
+2. **P2-09**: the i18n pipeline, early, while there are few strings.
+3. **P2-04**: the site manager over core's INI-backed stored sessions.
 
 ## Decisions taken
 
@@ -660,7 +667,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | ID | Task | Status | Note |
 |---|---|---|---|
 | P2-01 | Qt6 for mingw | done | R4 retired without building Qt: MSYS2's clang64 Qt 6.8.2 and its runtime, locked (`port/tools/fetch_msys2_qt.py`), with llvm-mingw 19.1.7 (`cmake/toolchain-llvm-mingw.cmake`); ADR 0011 |
-| P2-02 | Qt app skeleton | todo | |
+| P2-02 | Qt app skeleton | done | `port/qt`: `linscp` on Qt 6.8.2 both platforms, core through `CoreBridge` (ADR 0012), Qt units with Qt's `wchar_t` (ADR 0001 amended); ctests `gui_build`, `gui_smoke`, `windows_imports` |
 | P2-03 | Qt `Interface.h` implementation | todo | |
 | P2-04 | Site manager | todo | |
 | P2-05 | Login/auth dialogs | todo | |

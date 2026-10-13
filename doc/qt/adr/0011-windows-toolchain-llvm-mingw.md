@@ -41,8 +41,9 @@ llvm-mingw, against MSYS2's Qt:
   the same release: linscp's objects need nothing that runtime lacks.
   Moving Qt means moving all three together.
 - binutils' `objcopy` stays (`binutils-mingw-w64-x86-64`): llvm-objcopy
-  cannot weaken COFF symbols, which `port/putty` needs. The census keeps
-  compiling against Debian's mingw-w64 headers with the host clang.
+  cannot weaken COFF symbols, which `port/putty` needs. The census compiles
+  core for Windows with llvm-mingw's clang++ too (falling back to the host
+  clang and a mingw-w64 sysroot without it), so it sees the build's headers.
 
 ## Consequences
 

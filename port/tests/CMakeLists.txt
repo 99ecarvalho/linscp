@@ -245,6 +245,18 @@ if(TARGET linscp-putty)
 endif()
 
 # Executable tests go above this line.
+# The Qt shell starts core, shows its main window and quits from the event
+# loop (port/qt/main.cpp --smoke), offscreen on Linux; under Wine on Windows,
+# where Qt finds its plugins beside its DLLs. Qt's -platform argument, as
+# Wine does not hand QT_QPA_PLATFORM on.
+if(TARGET linscp)
+  add_test(NAME gui_build
+    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target linscp)
+  add_test(NAME gui_smoke COMMAND linscp /ini=nul --smoke -platform offscreen)
+  set_tests_properties(gui_smoke PROPERTIES DEPENDS gui_build TIMEOUT 120
+    PASS_REGULAR_EXPRESSION ", Qt 6[.0-9]+, offscreen: ok")
+endif()
+
 # When cross-compiling, the toolchain points CMAKE_CROSSCOMPILING_EMULATOR at
 # wine; these tell wine where the mingw runtime DLLs live and keep its output
 # off the test log.
@@ -257,6 +269,21 @@ if(LINSCP_WINE_DLLDIR_GCC)
   # WINEPATH value; the unescaped ';' separates the two environment entries.
   set_tests_properties(${_wine_tests} PROPERTIES ENVIRONMENT
     "WINEPATH=${LINSCP_WINE_DLLDIR_GCC}\;${LINSCP_WINE_DLLDIR_SYSROOT};WINEDEBUG=-all")
+endif()
+
+# What Windows checks at load time and Wine does not: every import from a DLL
+# the programs ship with resolves in it (port/tools/check_dll_imports.py).
+if(WIN32 AND LINSCP_WINE_DLLDIR_GCC)
+  set(_programs "$<TARGET_FILE:linscp-cli>")
+  set(_deps cli_session_build)
+  if(TARGET linscp)
+    list(APPEND _programs "$<TARGET_FILE:linscp>")
+    list(APPEND _deps gui_build)
+  endif()
+  add_test(NAME windows_imports
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/check_dll_imports.py"
+            --objdump "${LINSCP_TARGET_OBJDUMP}" --dlls "${LINSCP_WINE_DLLDIR_GCC}" ${_programs})
+  set_tests_properties(windows_imports PROPERTIES DEPENDS "${_deps}")
 endif()
 
 # The transform and its invariants are verified by the same scripts CI runs.

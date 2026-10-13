@@ -97,3 +97,22 @@ three ways: PuTTY utilities that include no platform header (`dupwcs.c`),
   implementation for the numeric conversions upstream uses.
 - Windows-only lines calling the CRT's wide functions, where `wchar_t` is
   2 bytes, are marked `// ADR 0001: Windows CRT` and exempted line by line.
+
+## Amendment 2026-10-13: the Qt shell's own units
+
+On Linux, Qt is built with the platform's 4-byte `wchar_t`, and its headers
+inline wide conversions (`QString::fromWCharArray`, `std::wstring`). Compiled
+with `-fshort-wchar`, a Qt translation unit would disagree with Qt's own
+libraries -- the landmine this ADR exists to avoid, from the other side.
+
+So the uniformity rule is per side of one boundary:
+
+- Every unit that includes the VCL shim or upstream code: `-fshort-wchar`,
+  as before.
+- The Qt shell's units (`port/qt`, target `linscp-qt-ui` and `main.cpp`,
+  moc's output included): Qt's `wchar_t`, `-fno-short-wchar` on Linux.
+  They may use the C library's wide functions, which agree with them.
+- The two never share a translation unit, and nothing wide crosses between
+  them: `port/qt/CoreBridge.h` carries UTF-8 `std::string` (ADR 0012).
+
+On Windows `wchar_t` is 2 bytes for both, so nothing differs there.

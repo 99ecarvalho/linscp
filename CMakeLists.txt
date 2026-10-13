@@ -131,6 +131,24 @@ add_subdirectory(port/libs3)
 add_subdirectory(port/core)
 add_subdirectory(port/frontend)
 
+# The Qt shell, when Qt is there: Debian's qt6-base-dev natively; for the
+# Windows cross-build, MSYS2's Qt (port/tools/fetch_msys2_qt.py) with
+# Debian's as the host tools, the same version (ADR 0011).
+if(CMAKE_CROSSCOMPILING AND NOT QT_HOST_PATH)
+  set(QT_HOST_PATH /usr CACHE PATH "Qt for the build host, whose moc, uic and rcc the cross-build runs")
+  execute_process(COMMAND dpkg-architecture -qDEB_HOST_MULTIARCH OUTPUT_VARIABLE _multiarch
+                  OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+  if(_multiarch)
+    set(QT_HOST_PATH_CMAKE_DIR "/usr/lib/${_multiarch}/cmake" CACHE PATH "The host Qt's CMake packages")
+  endif()
+endif()
+find_package(Qt6 6.8 QUIET COMPONENTS Widgets)
+if(Qt6_FOUND)
+  add_subdirectory(port/qt)
+else()
+  message(STATUS "linscp: no Qt 6.8 Widgets found, the Qt shell is not built")
+endif()
+
 include(CTest)
 if(BUILD_TESTING)
   add_subdirectory(port/tests)
