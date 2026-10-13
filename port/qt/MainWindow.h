@@ -1,6 +1,6 @@
-// The shell's main window: a session opened from a URL and its current
-// remote directory -- what P2-03 needs to exercise core's questions -- in the
-// frame the site manager, file panels and queue (P2-04 to P2-08) fill in.
+// The shell's main window: a session, opened from the site manager or a
+// URL, and its remote panel; the local panel and the queue (P2-07, P2-08)
+// join it.
 #ifndef LINSCP_QT_MAIN_WINDOW_H
 #define LINSCP_QT_MAIN_WINDOW_H
 
@@ -12,8 +12,7 @@
 
 class QAction;
 class QLineEdit;
-class QTreeWidget;
-class QTreeWidgetItem;
+class RemotePanel;
 
 class MainWindow : public QMainWindow
 {
@@ -30,17 +29,16 @@ public:
   // File > Site Manager: false when it was closed without logging in.
   bool SiteManagerDialog();
   CoreBridge::TSession * Session() const { return FSession.get(); }
+  RemotePanel * Panel() const { return FPanel; }
 
 private slots:
   void OpenUrlDialog();
   void Disconnect();
   void About();
-  void ItemActivated(QTreeWidgetItem * Item, int Column);
 
 private:
   bool Open(std::unique_ptr<CoreBridge::TSession> Session);
   void ShowError(const CoreBridge::TCoreError & E);
-  void Refresh();
   void UpdateActions();
 
   CoreBridge::TInfo FInfo;
@@ -49,8 +47,7 @@ private:
   QAction * FOpenAction = nullptr;
   QAction * FSitesAction = nullptr;
   QAction * FDisconnectAction = nullptr;
-  QLineEdit * FPath = nullptr;
-  QTreeWidget * FFiles = nullptr;
+  RemotePanel * FPanel = nullptr;
 };
 
 #endif

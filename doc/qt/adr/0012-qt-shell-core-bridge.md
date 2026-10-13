@@ -133,3 +133,24 @@ converted and logging in to sshd) and `qt_gui_sites` (folders made, saved
 into, renamed, deleted; the advanced dialog's settings persisting; a key
 converted through the site manager): on Linux, under Wine and natively on
 Windows 11, where the key phase runs against Windows' own OpenSSH server.
+
+## Amendment 2026-10-13: the remote panel (P2-06)
+
+- `TSession` gains the remote operations that are not transfers --
+  `HomeDirectory`, `Refresh`, `CreateDirectory`, `Rename`, `Delete` -- used
+  as upstream's explorer uses `TTerminal`: `DeleteFiles` gets the entries'
+  names with their `TRemoteFile`s, as the remote view's `CreateFileList`
+  gives them (full paths are the local side's; a directory's full name ends
+  in a slash, which FileZilla's `removedir` refuses), and `CreateDirectory`
+  an empty `TRemoteProperties` (core reads it unconditionally).
+- Core reports some failures itself rather than throwing -- a directory it
+  cannot enter is shown and the terminal stays -- so the panel judges a
+  directory change by the directory it shows afterwards.
+- `TRemoteEntry` carries owner, group, link target and the modification
+  time as a number, for the panel's columns and sorting.
+
+Verified by `qt_session`/`qt_session_ftp` (the operations on rclone's SFTP
+and the suite's FTP server) and `qt_gui_panel` (the panel: order, sorting,
+new folder, rename, a two-entry delete with core's confirmation, the path
+box, back, forward, parent, root, home, a directory that cannot be
+entered): Linux, Wine, natively on Windows 11.

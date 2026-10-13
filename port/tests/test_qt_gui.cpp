@@ -10,12 +10,17 @@
 //     back, its port following the protocol, opened from the dialog with no
 //     prompt, deleted; folders made, saved into, renamed and deleted; the
 //     advanced settings; an OpenSSH key converted on the way
+//   test_qt_gui panel /ini=nul <port> -platform offscreen
+//     the remote panel over a session: order and sorting, new folder,
+//     rename, delete (core's confirmation), the path box, back, forward,
+//     parent, root, home
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
 //     answered by a responder that acts on the modal dialog in front
 #include <QApplication>
 #include <QCheckBox>
+#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QTimer>
@@ -30,7 +35,12 @@
 #include "PromptDialog.h"
 #include "QtFrontend.h"
 #include "QueryDialog.h"
+#include "RemotePanel.h"
 #include "SiteAdvanced.h"
+
+#include <QLabel>
+#include <QLineEdit>
+#include <QTreeView>
 #include "SiteManager.h"
 
 #include <QFile>
@@ -204,6 +214,7 @@ public:
   int HostKeyQueries = 0;
   int PasswordPrompts = 0;
   int Errors = 0;
+  QString LastQuery;
   // Answer a warning's Ignore rather than its first button.
   bool IgnoreWarnings = false;
 
@@ -220,6 +231,14 @@ private:
     QWidget * Modal = QApplication::activeModalWidget();
     if (QueryDialog * Query = qobject_cast<QueryDialog *>(Modal))
     {
+      const QList<QLabel *> Labels = Query->findChildren<QLabel *>();
+      for (const QLabel * Label : Labels)
+      {
+        if (!Label->text().isEmpty())
+        {
+          LastQuery = Label->text();
+        }
+      }
       if (Query->windowTitle() == QueryDialog::tr("Error"))
       {
         Errors++;
@@ -361,6 +380,55 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+void Panel(const char * Port)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Passwords = { "secret" };
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "the session opens");
+    RemotePanel * Panel = Window.Panel();
+    Check(Panel->Path() == QStringLiteral("/"), "the panel shows the root");
+    Check(Panel->Names() == QStringList({ QStringLiteral("sub"), QStringLiteral("hello.txt") }),
+      "directories first, no \"..\" at the root");
+    Panel->View()->sortByColumn(RemoteModel::SizeColumn, Qt::DescendingOrder);
+    Check(Panel->Names().first() == QStringLiteral("sub"), "directories first sorted the other way too");
+    Panel->View()->sortByColumn(RemoteModel::NameColumn, Qt::AscendingOrder);
+
+    Check(Panel->NewFolder(QStringLiteral("made")) && Panel->Names().contains(QStringLiteral("made")), "a new folder appears");
+    Check(Panel->Selected() == QStringList({ QStringLiteral("made") }), "selected");
+    Check(Panel->Rename(QStringLiteral("made"), QStringLiteral("renamed")) && Panel->Names().contains(QStringLiteral("renamed")),
+      "a rename shows");
+    Panel->Select({ QStringLiteral("renamed"), QStringLiteral("hello.txt") });
+    Check(Panel->Selected().size() == 2, "two entries select");
+    Check(Panel->DeleteSelected(true), "and delete, confirmed");
+    Check(Responder.LastQuery.contains(QStringLiteral("2")), "with core's confirmation counting them");
+    Check(Panel->Names() == QStringList({ QStringLiteral("sub") }), "leaving the rest");
+
+    Panel->PathEdit()->setText(QStringLiteral("/sub"));
+    emit Panel->PathEdit()->returnPressed();
+    Check(Panel->Path() == QStringLiteral("/sub"), "the path box changes directory");
+    Check(Panel->Names().first() == QStringLiteral(".."), "with \"..\" first below the root");
+    Check(Panel->Back() && (Panel->Path() == QStringLiteral("/")), "back");
+    Check(Panel->Forward() && (Panel->Path() == QStringLiteral("/sub")), "forward");
+    Check(Panel->Parent() && (Panel->Path() == QStringLiteral("/")), "parent");
+    Panel->Open(QStringLiteral("sub"));
+    Check(Panel->Path() == QStringLiteral("/sub"), "opening a directory enters it");
+    Check(Panel->Root() && (Panel->Path() == QStringLiteral("/")), "root");
+    Panel->ChangeDirectory(QStringLiteral("sub"));
+    Check(Panel->Home() && (Panel->Path() == QStringLiteral("/")), "home");
+    const bool Changed = Panel->ChangeDirectory(QStringLiteral("/nowhere"));
+    Check(!Changed && (Responder.Errors == 1), "a missing directory is core's error");
+    Check(Panel->Path() == QStringLiteral("/"), "and the panel stays");
+    Frontend.SetWindow(nullptr);
+  }
+  CoreBridge::Finalize();
+}
+
 void Session(const char * Port)
 {
   QtFrontend Frontend;
@@ -403,6 +471,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 4) && (std::strcmp(argv[1], "sites") == 0))
   {
     Sites(argv[3], (argc > 4) ? QString::fromLocal8Bit(argv[4]) : QString(), (argc > 5) ? QString::fromLocal8Bit(argv[5]) : QString());
+  }
+  else if ((argc >= 4) && (std::strcmp(argv[1], "panel") == 0))
+  {
+    Panel(argv[3]);
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "session") == 0))
   {

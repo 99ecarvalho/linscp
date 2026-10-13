@@ -16,13 +16,12 @@
 #include <algorithm>
 
 #include "QtFrontend.h"
+#include "RemotePanel.h"
 #include "SiteManager.h"
 
 namespace
 {
 
-enum { NameColumn, SizeColumn, ModifiedColumn, RightsColumn };
-const char * const ParentEntry = "..";
 
 }  // namespace
 
@@ -45,20 +44,8 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   QMenu * HelpMenu = menuBar()->addMenu(tr("&Help"));
   HelpMenu->addAction(tr("&About..."), this, &MainWindow::About);
 
-  QWidget * Central = new QWidget(this);
-  QVBoxLayout * Layout = new QVBoxLayout(Central);
-  FPath = new QLineEdit(Central);
-  FPath->setReadOnly(true);
-  FPath->setPlaceholderText(tr("Not connected: File > Open URL..."));
-  Layout->addWidget(FPath);
-  FFiles = new QTreeWidget(Central);
-  FFiles->setHeaderLabels({ tr("Name"), tr("Size"), tr("Changed"), tr("Rights") });
-  FFiles->setRootIsDecorated(false);
-  FFiles->setSortingEnabled(false);
-  FFiles->header()->setSectionResizeMode(NameColumn, QHeaderView::Stretch);
-  connect(FFiles, &QTreeWidget::itemActivated, this, &MainWindow::ItemActivated);
-  Layout->addWidget(FFiles);
-  setCentralWidget(Central);
+  FPanel = new RemotePanel(this);
+  setCentralWidget(FPanel);
 
   statusBar()->showMessage(tr("%1 %2").arg(QString::fromStdString(FInfo.AppName), QString::fromStdString(FInfo.Version)));
   UpdateActions();
@@ -140,7 +127,7 @@ bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
   }
   FBusy = false;
   statusBar()->showMessage(Result ? tr("Connected") : tr("Not connected"));
-  Refresh();
+  FPanel->SetSession(FSession.get());
   UpdateActions();
   return Result;
 }
@@ -166,68 +153,8 @@ void MainWindow::Disconnect()
     setWindowTitle(QString::fromStdString(FInfo.AppName));
     statusBar()->showMessage(tr("Disconnected"));
   }
-  Refresh();
+  FPanel->SetSession(FSession.get());
   UpdateActions();
-}
-
-void MainWindow::Refresh()
-{
-  FFiles->clear();
-  if (!FSession || !FSession->Active())
-  {
-    FPath->clear();
-    return;
-  }
-  FPath->setText(QString::fromStdString(FSession->CurrentDirectory()));
-  const QIcon FolderIcon = style()->standardIcon(QStyle::SP_DirIcon);
-  const QIcon FileIcon = style()->standardIcon(QStyle::SP_FileIcon);
-  if (FSession->CurrentDirectory() != "/")
-  {
-    QTreeWidgetItem * Up = new QTreeWidgetItem(FFiles, { QString::fromLatin1(ParentEntry) });
-    Up->setIcon(NameColumn, style()->standardIcon(QStyle::SP_FileDialogToParent));
-    Up->setData(NameColumn, Qt::UserRole, true);
-  }
-  // Directories first, then files, each by name.
-  std::vector<CoreBridge::TRemoteEntry> Entries = FSession->List();
-  std::stable_sort(Entries.begin(), Entries.end(), [](const CoreBridge::TRemoteEntry & A, const CoreBridge::TRemoteEntry & B)
-  {
-    return (A.Directory != B.Directory) ? A.Directory :
-      (QString::fromStdString(A.Name).compare(QString::fromStdString(B.Name), Qt::CaseInsensitive) < 0);
-  });
-  const QLocale Locale;
-  for (const CoreBridge::TRemoteEntry & Entry : Entries)
-  {
-    QTreeWidgetItem * Item = new QTreeWidgetItem(FFiles);
-    Item->setText(NameColumn, QString::fromStdString(Entry.Name));
-    Item->setIcon(NameColumn, Entry.Directory ? FolderIcon : FileIcon);
-    Item->setData(NameColumn, Qt::UserRole, Entry.Directory);
-    if (!Entry.Directory)
-    {
-      Item->setText(SizeColumn, Locale.toString(static_cast<qlonglong>(Entry.Size)));
-      Item->setTextAlignment(SizeColumn, Qt::AlignRight | Qt::AlignVCenter);
-    }
-    Item->setText(ModifiedColumn, QString::fromStdString(Entry.Modified));
-    Item->setText(RightsColumn, QString::fromStdString(Entry.Rights));
-  }
-}
-
-void MainWindow::ItemActivated(QTreeWidgetItem * Item, int /*Column*/)
-{
-  if (!FSession || FBusy || !Item->data(NameColumn, Qt::UserRole).toBool())
-  {
-    return;
-  }
-  FBusy = true;
-  try
-  {
-    FSession->ChangeDirectory(Item->text(NameColumn).toStdString());
-  }
-  catch (const CoreBridge::TCoreError & E)
-  {
-    ShowError(E);
-  }
-  FBusy = false;
-  Refresh();
 }
 
 void MainWindow::UpdateActions()

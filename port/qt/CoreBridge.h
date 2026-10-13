@@ -169,6 +169,9 @@ enum class TText
   NewFolderCaption,     // "Create site folder"
   NewFolderPrompt,      // "New &folder name:"
   ConfirmDeleteFolder,  // "Are you sure you want to delete site folder '%s' with %d site(s)?"
+  ConfirmDeleteFile,    // "Are you sure you want to delete file '%s'?"
+  ConfirmDeleteFiles,   // "Are you sure you want to delete %d selected files?"
+  NewFolderName,        // "New folder"
 };
 std::string Text(TText Text);
 
@@ -188,9 +191,15 @@ struct TRemoteEntry
   std::string Name;
   bool Directory = false;
   std::int64_t Size = 0;
-  // As core formats it for display.
+  // As core formats it for display, and as seconds since 1970 for sorting.
   std::string Modified;
+  double ModifiedTime = 0;
   std::string Rights;
+  std::string Owner;
+  std::string Group;
+  // A symbolic link, and where it points.
+  bool Link = false;
+  std::string LinkTarget;
 };
 
 // --- Stored sites -------------------------------------------------------------
@@ -307,8 +316,19 @@ public:
   std::string CurrentDirectory() const;
   // The current directory's entries, without "." and "..".
   std::vector<TRemoteEntry> List() const;
-  // Throws TCoreError.
+  // These throw TCoreError; what fails along the way is asked about first
+  // (retry, skip, abort) through the frontend, as core does.
   void ChangeDirectory(const std::string & Directory);
+  // The user's home directory, as the server reports it.
+  void HomeDirectory();
+  // Reads the current directory again.
+  void Refresh();
+  // In the current directory, or at a full path.
+  void CreateDirectory(const std::string & Name);
+  // An entry of the current directory, to a new name (or path).
+  void Rename(const std::string & Name, const std::string & NewName);
+  // Entries of the current directory. False when core skipped some.
+  bool Delete(const std::vector<std::string> & Names);
   void Close();
 
 private:

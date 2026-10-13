@@ -261,6 +261,9 @@ std::string Text(TText Text)
     case TText::NewFolderCaption: Ident = LOGIN_NEW_SESSION_FOLDER_CAPTION; break;
     case TText::NewFolderPrompt: Ident = LOGIN_NEW_SESSION_FOLDER_PROMPT; break;
     case TText::ConfirmDeleteFolder: Ident = LOGIN_DELETE_SESSION_FOLDER; break;
+    case TText::ConfirmDeleteFile: Ident = CONFIRM_DELETE_FILE; break;
+    case TText::ConfirmDeleteFiles: Ident = CONFIRM_DELETE_FILES; break;
+    case TText::NewFolderName: Ident = NEW_FOLDER; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

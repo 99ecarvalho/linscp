@@ -177,6 +177,46 @@ int main(int argc, char ** argv)
     Check(HasEntry(Root, "sub", true), "and the sub directory");
     Session.ChangeDirectory("sub");
     Check(Session.CurrentDirectory() == "/sub", "the session changes directory");
+    Session.ChangeDirectory("..");
+    Check(Session.CurrentDirectory() == "/", "and back up");
+
+    // The remote panel's operations, on the server for real.
+    try
+    {
+    Session.CreateDirectory("made");
+    Check(HasEntry(Session.List(), "made", true), "a directory is made");
+    Session.Rename("made", "renamed");
+    Check(HasEntry(Session.List(), "renamed", true) && !HasEntry(Session.List(), "made", true), "and renamed");
+    bool Bad = false;
+    for (const CoreBridge::TRemoteEntry & Entry : Session.List())
+    {
+      Bad = Bad || ((Entry.Name == "hello.txt") && ((Entry.Size != 14) || (Entry.ModifiedTime < 1e9)));
+    }
+    Check(!Bad, "entries carry their size and time");
+    Check(Session.Delete({ "renamed", "hello.txt" }), "a directory and a file delete together");
+    Check(!HasEntry(Session.List(), "renamed", true) && !HasEntry(Session.List(), "hello.txt", false), "and are gone");
+    Check(HasEntry(Session.List(), "sub", true), "leaving the rest");
+    bool Refused = false;
+    try
+    {
+      Session.Rename("nothing", "else");
+    }
+    catch (const CoreBridge::TCoreError &)
+    {
+      Refused = true;
+    }
+    Check(Refused, "renaming an entry that is not there fails");
+    Session.Refresh();
+    Check(HasEntry(Session.List(), "sub", true), "a refresh reads the directory again");
+    Session.ChangeDirectory("sub");
+    Session.HomeDirectory();
+    Check(Session.CurrentDirectory() == "/", "home is the server's home");
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      Check(false, "the remote operations succeed");
+      std::printf("  %s\n  %s\n", E.what(), E.Error.MoreMessages.c_str());
+    }
     Session.Close();
     Check(!Session.Active(), "and closes");
   }

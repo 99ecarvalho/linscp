@@ -8,7 +8,8 @@
 # every core unit has. Nothing wide crosses CoreBridge.h. Windows' wchar_t is
 # 2 bytes either way. See ADR 0001.
 add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp QtFrontend.cpp QueryDialog.cpp
-  PromptDialog.cpp Language.cpp SiteManager.cpp SiteAdvanced.cpp CoreBridge.h)
+  PromptDialog.cpp Language.cpp SiteManager.cpp SiteAdvanced.cpp
+  RemotePanel.cpp CoreBridge.h)
 set_target_properties(linscp-qt-ui PROPERTIES AUTOMOC ON)
 target_link_libraries(linscp-qt-ui PUBLIC Qt6::Widgets)
 if(NOT WIN32)

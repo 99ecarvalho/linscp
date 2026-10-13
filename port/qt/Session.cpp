@@ -196,7 +196,13 @@ std::vector<TRemoteEntry> TSession::List() const
       Entry.Directory = File->IsDirectory;
       Entry.Size = File->Size;
       Entry.Modified = Utf8(File->UserModificationStr);
+      // TDateTime counts days from 1899-12-30; 1970 is day 25569.
+      Entry.ModifiedTime = (static_cast<double>(File->Modification) - 25569.0) * 86400.0;
       Entry.Rights = Utf8(File->RightsStr);
+      Entry.Owner = Utf8(File->Owner.DisplayText);
+      Entry.Group = Utf8(File->Group.DisplayText);
+      Entry.Link = File->IsSymLink;
+      Entry.LinkTarget = Utf8(File->LinkTo);
       Result.push_back(Entry);
     }
   }
@@ -212,6 +218,110 @@ void TSession::ChangeDirectory(const std::string & Directory)
       throw Exception(LoadStr(NOT_CONNECTED));
     }
     F->Terminal->ChangeDirectory(FromUtf8(Directory));
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+namespace
+{
+
+void CheckActive(const TSession & Session)
+{
+  if (!Session.Active())
+  {
+    throw Exception(LoadStr(NOT_CONNECTED));
+  }
+}
+
+// The current directory's entry Name, as core lists it.
+TRemoteFile * FindFile(TTerminal * Terminal, const std::string & Name)
+{
+  TRemoteDirectory * Files = Terminal->Files;
+  const UnicodeString FileName = FromUtf8(Name);
+  for (int Index = 0; (Files != NULL) && (Index < Files->Count); Index++)
+  {
+    if (Files->Files[Index]->FileName == FileName)
+    {
+      return Files->Files[Index];
+    }
+  }
+  throw Exception(FMTLOAD(FILE_NOT_EXISTS, (FileName)));
+}
+
+}  // namespace
+
+void TSession::HomeDirectory()
+{
+  try
+  {
+    CheckActive(*this);
+    F->Terminal->HomeDirectory();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void TSession::Refresh()
+{
+  try
+  {
+    CheckActive(*this);
+    F->Terminal->ReloadDirectory();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void TSession::CreateDirectory(const std::string & Name)
+{
+  try
+  {
+    CheckActive(*this);
+    // Core reads the properties whatever is set in them: none here, the
+    // server's defaults (as the GUI's Create folder with nothing ticked).
+    TRemoteProperties Properties;
+    F->Terminal->CreateDirectory(FromUtf8(Name), &Properties);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void TSession::Rename(const std::string & Name, const std::string & NewName)
+{
+  try
+  {
+    CheckActive(*this);
+    F->Terminal->RenameFile(FindFile(F->Terminal.get(), Name), FromUtf8(NewName));
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+// As the GUI deletes: the files' names, each with its TRemoteFile. (A
+// directory's full name ends in a slash, which FileZilla's removedir refuses.)
+bool TSession::Delete(const std::vector<std::string> & Names)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TStringList> Files(new TStringList());
+    for (const std::string & Name : Names)
+    {
+      TRemoteFile * File = FindFile(F->Terminal.get(), Name);
+      Files->AddObject(File->FileName, File);
+    }
+    return F->Terminal->DeleteFiles(Files.get());
   }
   catch (Exception & E)
   {
