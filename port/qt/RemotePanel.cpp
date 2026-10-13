@@ -101,7 +101,12 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   FView->MakeDrag = [this]() -> QMimeData *
   {
     const QStringList Names = Selected();
-    return Names.isEmpty() ? nullptr : MakeFileDrag({ false, FCurrent, Names });
+    if (Names.isEmpty())
+    {
+      return nullptr;
+    }
+    const TFileDrag Drag{ false, FCurrent, Names };
+    return MakeDrag ? MakeDrag(Drag) : MakeFileDrag(Drag);
   };
   connect(FView, &QTreeView::activated, this, &RemotePanel::Activated);
   connect(FView, &QWidget::customContextMenuRequested, this, &RemotePanel::ContextMenu);

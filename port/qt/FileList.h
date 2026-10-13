@@ -6,6 +6,7 @@
 #define LINSCP_QT_FILE_LIST_H
 
 #include <QAbstractTableModel>
+#include <QMimeData>
 #include <QSortFilterProxyModel>
 #include <QStringList>
 #include <QTreeView>
@@ -72,10 +73,32 @@ struct TFileDrag
   QStringList Names;
 };
 extern const char * const FileDragMimeType;
-class QMimeData;
 QMimeData * MakeFileDrag(const TFileDrag & Drag);
 // false when Data is not a panel's drag.
 bool ReadFileDrag(const QMimeData * Data, TFileDrag & Drag);
+
+// A remote panel's drag, for other programs too, as WinSCP's drag to a
+// temporary directory: the files' URLs in Directory, downloaded there by
+// Download when a program asks for them, at its drop. (On Windows, Explorer
+// asks while the drag hovers too; with a mouse button still down the URLs
+// are given without downloading, as WinSCP gives the names up front.)
+class RemoteFileDrag : public QMimeData
+{
+public:
+  RemoteFileDrag(const TFileDrag & Drag, const QString & Directory, std::function<bool()> Download);
+  QStringList formats() const override;
+  bool hasFormat(const QString & MimeType) const override;
+
+protected:
+  QVariant retrieveData(const QString & MimeType, QMetaType Type) const override;
+
+private:
+  QStringList FNames;
+  QString FDirectory;
+  std::function<bool()> FDownload;
+  mutable bool FDownloading = false;
+  mutable bool FDownloaded = false;
+};
 
 // A panel's view: its selection dragged as the panel says, and drops onto it
 // reported with the directory row they fell on ("" for the panel's own

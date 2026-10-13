@@ -197,7 +197,24 @@ Windows 11.
   which also invalidates the target in core's directory cache. A rename
   into a subdirectory leaves the target's cached listing stale. Files from
   other programs upload when dropped on the remote panel.
+- **Remote files dragged out to other programs** work as WinSCP's drag
+  without its shell extension does. The drag offers the files' URLs in a
+  temporary directory of its own (`RemoteFileDrag`), and downloads into it
+  when the program dropped on asks for them. WinSCP downloads when the
+  button is released (`QueryContinueDrag`); Qt has no such hook, but the
+  data is produced on demand, and programs ask for it at the drop. Explorer
+  reads the paths while the drag hovers, too. With a mouse button still
+  down the paths are given without downloading, as WinSCP gives them up
+  front. The panels never read a panel drag's URLs, so drops on them
+  download nothing extra. The directories are kept while the window is
+  open, because the program dropped on may copy from them after the drop.
+  WinSCP deletes its after a delay.
+- **No XDS** (X Direct Save), which TASKS had planned for Linux. It exists
+  only on X11 (Wayland has none), and GNOME Files has dropped it. The
+  on-demand URLs work on X11, Wayland and Windows alike.
 
-Verified by `qt_gui_drop` (each kind of drop, and drops delivered as the
-system sends them, through the view, with their questions answered): Linux,
-Wine, natively on Windows 11.
+Verified by `qt_gui_drop` (each kind of drop; drops delivered through the
+view as the system sends them, with their questions answered; a remote
+drag's URLs downloaded when asked for, once, and not for drops on the
+panels): Linux, Wine, natively on Windows 11. Dragging out to Explorer
+and to Linux file managers is a manual check.

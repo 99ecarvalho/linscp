@@ -735,11 +735,22 @@ void DragAndDrop(const char * Port, const QString & Directory)
 
     Remote->Select({ QStringLiteral("hello.txt") });
     Data = Drag(Remote->View());
-    Check(ReadFileDrag(Data.get(), Read) && !Read.Local && Data->urls().isEmpty(), "a remote drag carries no file URLs");
+    Check(ReadFileDrag(Data.get(), Read) && !Read.Local && Data->hasUrls(), "a remote drag offers file URLs too");
     Check(Window.Drop(true, Data.get(), QStringLiteral("down"), false, false), "dropped on a local directory");
     QFile Down(Dir.filePath(QStringLiteral("down/hello.txt")));
     Check(Down.open(QIODevice::ReadOnly) && (Down.readAll() == "Hello, linscp\n"), "it downloads there, whole");
+    Down.close();
     Check(Remote->Names().contains(QStringLiteral("hello.txt")), "and stays remotely");
+    Check(Window.DragOuts() == 0, "a drop on a panel downloads nothing for other programs");
+
+    // To another program: the URLs it asks for, downloaded then.
+    const QList<QUrl> Urls = Data->urls();
+    Check(Window.DragOuts() == 1, "another program asking for the URLs downloads them");
+    QFile Out((Urls.size() == 1) ? Urls.first().toLocalFile() : QString());
+    Check(Out.open(QIODevice::ReadOnly) && (Out.readAll() == "Hello, linscp\n"), "into a temporary directory, whole");
+    Out.close();
+    Check(QFileInfo(Out.fileName()).fileName() == QStringLiteral("hello.txt"), "under the file's name");
+    Check((Data->urls() == Urls) && (Window.DragOuts() == 1), "asked again, the same URLs, not downloaded again");
 
     Remote->Select({ QStringLiteral("moveme.txt") });
     Data = Drag(Remote->View());
@@ -791,6 +802,20 @@ void DragAndDrop(const char * Port, const QString & Directory)
     Check(QFileInfo::exists(Dir.filePath(QStringLiteral("down/local.txt"))) && !QFileInfo::exists(Dir.filePath(QStringLiteral("local.txt"))),
       "and, after asking, the file moves into it");
     Check(Responder.Accepted.contains(QStringLiteral("Move")), "the question was the move's");
+
+    Check(QFile::remove(Dir.filePath(QStringLiteral("down/hello.txt"))), "(the earlier download removed)");
+    Remote->Refresh();
+    Remote->Select({ QStringLiteral("hello.txt") });
+    Data = Drag(Remote->View());
+    DragOnto(Local->View(), Data.get(), RowCenter(Local->View(), QStringLiteral("down")), Qt::NoModifier);
+    Timer.start();
+    while (!QFileInfo::exists(Dir.filePath(QStringLiteral("down/hello.txt"))) && (Timer.elapsed() < 10000))
+    {
+      QApplication::processEvents(QEventLoop::AllEvents, 50);
+    }
+    Check(QFileInfo::exists(Dir.filePath(QStringLiteral("down/hello.txt"))) && Responder.Accepted.contains(QStringLiteral("Copy")),
+      "a remote drag dropped through the view downloads there, after the Copy dialog");
+    Check(Window.DragOuts() == 1, "and not to a temporary directory");
 
     Local->Refresh();
     Local->Select({ QStringLiteral("moveme.txt") });

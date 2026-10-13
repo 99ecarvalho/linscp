@@ -16,6 +16,7 @@
 #include <QMimeData>
 #include <QUrl>
 #include <QFormLayout>
+#include <QTemporaryDir>
 #include <QTimer>
 #include <QTreeView>
 #include <QSplitter>
@@ -71,14 +72,24 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
     const bool OnLocal = (View == FLocal->View());
     connect(View, &FileView::Dropped, this, [this, OnLocal](const QMimeData * Data, const QString & OnDirectory, Qt::DropAction Action)
     {
+      // A panel's drag is taken by what it says: its URLs, a remote one's
+      // download for other programs, are not read.
       std::shared_ptr<QMimeData> Copy(new QMimeData());
-      for (const QString & Format : Data->formats())
+      const QString PanelFormat = QString::fromLatin1(FileDragMimeType);
+      if (Data->hasFormat(PanelFormat))
       {
-        Copy->setData(Format, Data->data(Format));
+        Copy->setData(PanelFormat, Data->data(PanelFormat));
       }
-      if (Data->hasUrls())
+      else
       {
-        Copy->setUrls(Data->urls());
+        for (const QString & Format : Data->formats())
+        {
+          Copy->setData(Format, Data->data(Format));
+        }
+        if (Data->hasUrls())
+        {
+          Copy->setUrls(Data->urls());
+        }
       }
       QTimer::singleShot(0, this, [this, OnLocal, Copy, OnDirectory, Action]()
       {
@@ -86,6 +97,20 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
       });
     });
   }
+  // Remote files dragged to other programs: downloaded, at the drop, to a
+  // temporary directory of their own, kept while the window is (WinSCP
+  // deletes its after a delay; the program dropped on may still be copying).
+  FPanel->MakeDrag = [this](const TFileDrag & Drag) -> QMimeData *
+  {
+    FDragDirectories.push_back(std::make_unique<QTemporaryDir>());
+    const QString Directory = FDragDirectories.back()->path();
+    const QStringList Names = Drag.Names;
+    return new RemoteFileDrag(Drag, Directory, [this, Names, Directory]()
+    {
+      FDragOuts++;
+      return Download(Names, Directory, false);
+    });
+  };
   Vertical->setStretchFactor(0, 4);
   Vertical->setStretchFactor(1, 1);
   setCentralWidget(Vertical);

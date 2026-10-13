@@ -8,6 +8,7 @@
 #include <QMainWindow>
 
 #include <memory>
+#include <vector>
 
 #include "CoreBridge.h"
 
@@ -16,6 +17,7 @@ class QLineEdit;
 class QMimeData;
 class LocalPanel;
 class QueuePanel;
+class QTemporaryDir;
 class QTimer;
 class RemotePanel;
 
@@ -54,6 +56,8 @@ public:
   // Polls the session's queue: QueueTimer's, and tests'.
   void QueueIdle();
   QueuePanel * Queue() const { return FQueue; }
+  // Remote drags downloaded for other programs: for tests.
+  int DragOuts() const { return FDragOuts; }
   // The panel transfers start from: the one the focus last went to.
   void ActivatePanel(bool Local);
   bool LocalActive() const { return FLocalActive; }
@@ -84,6 +88,8 @@ private:
   LocalPanel * FLocal = nullptr;
   QueuePanel * FQueue = nullptr;
   QTimer * FQueueTimer = nullptr;
+  std::vector<std::unique_ptr<QTemporaryDir>> FDragDirectories;
+  int FDragOuts = 0;
   int FQueueDone = 0;
 };
 

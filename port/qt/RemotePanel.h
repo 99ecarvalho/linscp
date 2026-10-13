@@ -59,6 +59,9 @@ public:
   QStringList Names() const;
   QString Path() const;
   FileView * View() const { return FView; }
+  // The drag of the selection, for other programs too: the main window's
+  // (RemoteFileDrag); without it, a drag for the panels only.
+  std::function<QMimeData *(const TFileDrag & Drag)> MakeDrag;
   QLineEdit * PathEdit() const { return FPath; }
 
 signals:

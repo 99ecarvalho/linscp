@@ -1,6 +1,7 @@
 #include "FileList.h"
 
 #include <QApplication>
+#include <QDir>
 #include <QDrag>
 #include <QDragEnterEvent>
 #include <QJsonArray>
@@ -11,16 +12,27 @@
 #include <QStyle>
 #include <QUrl>
 
+#ifdef Q_OS_WIN
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+#endif
+
 const char * const FileDragMimeType = "application/x-linscp-files";
 
-QMimeData * MakeFileDrag(const TFileDrag & Drag)
+static QByteArray EncodeFileDrag(const TFileDrag & Drag)
 {
-  QMimeData * Data = new QMimeData();
   QJsonObject Object;
   Object[QStringLiteral("local")] = Drag.Local;
   Object[QStringLiteral("directory")] = Drag.Directory;
   Object[QStringLiteral("names")] = QJsonArray::fromStringList(Drag.Names);
-  Data->setData(QString::fromLatin1(FileDragMimeType), QJsonDocument(Object).toJson(QJsonDocument::Compact));
+  return QJsonDocument(Object).toJson(QJsonDocument::Compact);
+}
+
+QMimeData * MakeFileDrag(const TFileDrag & Drag)
+{
+  QMimeData * Data = new QMimeData();
+  Data->setData(QString::fromLatin1(FileDragMimeType), EncodeFileDrag(Drag));
   if (Drag.Local)
   {
     QList<QUrl> Urls;
@@ -48,6 +60,62 @@ bool ReadFileDrag(const QMimeData * Data, TFileDrag & Drag)
     Drag.Names.append(Name.toString());
   }
   return true;
+}
+
+static const QString UriListMimeType = QStringLiteral("text/uri-list");
+
+// Whether the drag is still held (Windows asks for the data while hovering).
+static bool MouseButtonDown()
+{
+#ifdef Q_OS_WIN
+  return ((GetAsyncKeyState(VK_LBUTTON) | GetAsyncKeyState(VK_RBUTTON)) & 0x8000) != 0;
+#else
+  return false;
+#endif
+}
+
+RemoteFileDrag::RemoteFileDrag(const TFileDrag & Drag, const QString & Directory, std::function<bool()> Download) :
+  FNames(Drag.Names),
+  FDirectory(Directory),
+  FDownload(std::move(Download))
+{
+  setData(QString::fromLatin1(FileDragMimeType), EncodeFileDrag(Drag));
+}
+
+QStringList RemoteFileDrag::formats() const
+{
+  QStringList Result = QMimeData::formats();
+  Result.append(UriListMimeType);
+  return Result;
+}
+
+bool RemoteFileDrag::hasFormat(const QString & MimeType) const
+{
+  return (MimeType == UriListMimeType) || QMimeData::hasFormat(MimeType);
+}
+
+QVariant RemoteFileDrag::retrieveData(const QString & MimeType, QMetaType Type) const
+{
+  if (MimeType != UriListMimeType)
+  {
+    return QMimeData::retrieveData(MimeType, Type);
+  }
+  if (!FDownloaded && !FDownloading && !MouseButtonDown())
+  {
+    FDownloading = true;
+    FDownloaded = FDownload && FDownload();
+    FDownloading = false;
+    if (!FDownloaded)
+    {
+      return QVariant();
+    }
+  }
+  QVariantList Urls;
+  for (const QString & Name : FNames)
+  {
+    Urls.append(QUrl::fromLocalFile(QDir(FDirectory).filePath(Name)));
+  }
+  return Urls;
 }
 
 FileView::FileView(QWidget * Parent) :
