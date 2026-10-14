@@ -1409,6 +1409,30 @@ Local: %2</translation>
         <source>Synchronize &amp;Browsing</source>
         <translation>Sincronizar &amp;Localização</translation>
     </message>
+    <message>
+        <source>&amp;Paste from Clipboard</source>
+        <translation>Colar da área de &amp;transferência</translation>
+    </message>
+    <message>
+        <source>Status &amp;Bar</source>
+        <translation>&amp;Barra de Status</translation>
+    </message>
+    <message>
+        <source>&amp;Queue</source>
+        <translation>&amp;Fila</translation>
+    </message>
+    <message>
+        <source>&amp;Show</source>
+        <translation>&amp;Mostrar</translation>
+    </message>
+    <message>
+        <source>Hide when &amp;Empty</source>
+        <translation>Ocultar se &amp;Vazia</translation>
+    </message>
+    <message>
+        <source>&amp;Hide</source>
+        <translation>&amp;Ocultar</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

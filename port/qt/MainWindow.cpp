@@ -18,6 +18,7 @@
 #include <QFileInfo>
 #include <QMimeData>
 #include <QUrl>
+#include <QActionGroup>
 #include <QDateTime>
 #include <QDirIterator>
 #include <QFileDialog>
@@ -548,6 +549,12 @@ void MainWindow::ApplyPreferences()
 
 MainWindow::~MainWindow()
 {
+  // As WinSCP's ClipboardClear: remote files on the clipboard download
+  // through this window; they go with it.
+  if ((FClipboardData != nullptr) && (QApplication::clipboard()->mimeData() == FClipboardData))
+  {
+    QApplication::clipboard()->clear();
+  }
   // Editors are windows of their own (not children): they go with it.
   for (EditorWindow * Editor : Editors())
   {
@@ -963,6 +970,7 @@ void MainWindow::QueueIdle()
     FLocal->Refresh();
     FQueue->Update();
   }
+  UpdateQueueView();
   CleanUpEdited();
 }
 
@@ -1424,6 +1432,9 @@ void MainWindow::UpdateActions()
     FSyncBrowseAction->setEnabled(!FBusy && Active);
     FDirectorySizesAction->setEnabled(!FBusy && (Active || SideLocal(FLocalActive)));
     FNewFileAction->setEnabled(!FBusy && (Active || SideLocal(FLocalActive)));
+    FCopyClipboardAction->setEnabled(!FBusy && (Active || SideLocal(FLocalActive)));
+    FPasteAction->setEnabled(!FBusy);
+    UpdateQueueView();
   }
   FSaveWorkspaceAction->setEnabled(!FBusy && (TabCount() > 0));
   FCloseTabAction->setEnabled(!FBusy && FSession);
@@ -3232,6 +3243,11 @@ void MainWindow::BuildMenus()
   Files->addAction(tr("&Delete"), this, OnActive(&LocalPanel::DeleteAction, &RemotePanel::DeleteAction));
   Files->addAction(tr("&Rename"), this, OnActive(&LocalPanel::RenameAction, &RemotePanel::RenameAction));
   Files->addSeparator();
+  FCopyClipboardAction = Files->addAction(tr("&Copy to Clipboard"), this, [this]() { CopyToClipboard(); });
+  FCopyClipboardAction->setShortcut(QKeySequence::Copy);
+  FPasteAction = Files->addAction(tr("&Paste from Clipboard"), this, [this]() { PasteFromClipboard(); });
+  FPasteAction->setShortcut(QKeySequence::Paste);
+  Files->addSeparator();
   Files->addMenu(FFileCommandsMenu);
   QMenu * Names = Files->addMenu(tr("&File Names"));
   Names->addAction(tr("Copy to &Clipboard"), this, [this]() { CopyFileNames(FLocalActive, false); });
@@ -3331,7 +3347,33 @@ void MainWindow::BuildMenus()
   });
 
   QMenu * Options = menuBar()->addMenu(tr("&Options"));
+  FStatusBarAction = Options->addAction(tr("Status &Bar"));
+  FStatusBarAction->setCheckable(true);
+  connect(FStatusBarAction, &QAction::triggered, this, [this](bool Shown) { SetStatusBarShown(Shown); });
+  // As WinSCP's Queue submenu: where the queue's list shows.
+  QMenu * QueueMenu = Options->addMenu(tr("&Queue"));
+  QActionGroup * QueueGroup = new QActionGroup(QueueMenu);
+  const std::pair<CoreBridge::TLayout::TQueueShow, QString> QueueShows[] = {
+    { CoreBridge::TLayout::TQueueShow::Show, tr("&Show") },
+    { CoreBridge::TLayout::TQueueShow::HideWhenEmpty, tr("Hide when &Empty") },
+    { CoreBridge::TLayout::TQueueShow::Hide, tr("&Hide") } };
+  for (const auto & QueueShow : QueueShows)
+  {
+    QAction * Action = QueueMenu->addAction(QueueShow.second);
+    Action->setCheckable(true);
+    QueueGroup->addAction(Action);
+    const CoreBridge::TLayout::TQueueShow Show = QueueShow.first;
+    connect(Action, &QAction::triggered, this, [this, Show]() { SetQueueShow(Show); });
+    FQueueShowActions[static_cast<int>(Show)] = Action;
+  }
+  Options->addSeparator();
   Options->addAction(FPreferencesAction);
+  {
+    const CoreBridge::TLayout Layout = CoreBridge::Layout();
+    FStatusBarAction->setChecked(Layout.StatusBar);
+    statusBar()->setVisible(Layout.StatusBar);
+    FQueueShowActions[static_cast<int>(Layout.QueueShow)]->setChecked(true);
+  }
 
   FRemoteMenu = PanelMenu(false);
 
@@ -3466,7 +3508,8 @@ bool LocalCopyEntry(QWidget * Window, const QString & Source, const QString & De
 bool MainWindow::LocalLocalCopy(bool Move, bool Confirm, const QStringList * Sources, const QString * Target,
   const QString & Mask)
 {
-  if (FBusy || !LocalBrowser())
+  // (Given the files and where to: also to paste into a local panel.)
+  if (FBusy || (!LocalBrowser() && ((Sources == nullptr) || (Target == nullptr))))
   {
     return false;
   }
@@ -3517,7 +3560,10 @@ bool MainWindow::LocalLocalCopy(bool Move, bool Confirm, const QStringList * Sou
     }
   }
   FBusy = false;
-  Source->View()->clearSelection();
+  if (Source != nullptr)
+  {
+    Source->View()->clearSelection();
+  }
   // As ReloadLocalDirectory: both panels, as either may show either.
   FLocal->Refresh();
   FOtherLocal->Refresh();
@@ -4194,4 +4240,228 @@ EditorWindow * MainWindow::NewFile(const QString * Name)
     }
   }
   return Result;
+}
+
+// --- Clipboard, status bar, queue (P3-14) --------------------------------------------
+
+bool MainWindow::CopyToClipboard()
+{
+  if (FBusy)
+  {
+    return false;
+  }
+  LocalPanel * Panel = SideLocal(FLocalActive);
+  TFileDrag Drag;
+  Drag.Local = (Panel != nullptr);
+  Drag.Directory = (Panel != nullptr) ? Panel->Path() : FPanel->Path();
+  Drag.Names = (Panel != nullptr) ? Panel->Selected() : FPanel->Selected();
+  if (Drag.Names.isEmpty() || ((Panel == nullptr) && !(FSession && FSession->Active())))
+  {
+    return false;
+  }
+  if (Panel != nullptr)
+  {
+    QApplication::clipboard()->setMimeData(MakeFileDrag(Drag));
+    FClipboardData = nullptr;
+    FClipboardSession = nullptr;
+    return true;
+  }
+  // As CopyFilesToClipboard: the full paths, as the panel may move on;
+  // another program's paste downloads them, as a drag out does.
+  FDragDirectories.push_back(std::make_unique<QTemporaryDir>(
+    QDir(QString::fromStdString(CoreBridge::TemporaryDirectoryBase())).filePath(QStringLiteral("scpXXXXXX"))));
+  const QString Directory = FDragDirectories.back()->path();
+  std::vector<std::string> Paths;
+  for (const QString & Name : Drag.Names)
+  {
+    Paths.push_back((Drag.Directory + (Drag.Directory.endsWith(QLatin1Char('/')) ? QString() : QStringLiteral("/")) + Name).toStdString());
+  }
+  CoreBridge::TSession * Session = FSession.get();
+  RemoteFileDrag * Data = new RemoteFileDrag(Drag, Directory, [this, Session, Paths, Directory]()
+  {
+    if (!SessionOpen(Session) || !Session->Active())
+    {
+      return false;
+    }
+    try
+    {
+      return Session->DownloadPaths(Paths, QDir::toNativeSeparators(Directory).toStdString());
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+      return false;
+    }
+  });
+  QApplication::clipboard()->setMimeData(Data);
+  FClipboardData = Data;
+  FClipboardSession = Session;
+  return true;
+}
+
+bool MainWindow::PasteFromClipboard()
+{
+  if (FBusy)
+  {
+    return false;
+  }
+  const QMimeData * Data = QApplication::clipboard()->mimeData();
+  if (Data == nullptr)
+  {
+    return false;
+  }
+  LocalPanel * Panel = SideLocal(FLocalActive);
+  const bool RemoteTarget = (Panel == nullptr);
+  if (RemoteTarget && !(FSession && FSession->Active()))
+  {
+    return false;
+  }
+  TFileDrag Drag;
+  QStringList LocalSources;
+  if (ReadFileDrag(Data, Drag))
+  {
+    if (!Drag.Local)
+    {
+      // Our remote files: downloaded into a local panel, from the session
+      // they were copied from (ClipboardDownload).
+      if (RemoteTarget || !SessionOpen(FClipboardSession) || !FClipboardSession->Active())
+      {
+        return false;
+      }
+      std::vector<std::string> Paths;
+      QStringList Names;
+      for (const QString & Name : Drag.Names)
+      {
+        Paths.push_back((Drag.Directory + (Drag.Directory.endsWith(QLatin1Char('/')) ? QString() : QStringLiteral("/")) + Name).toStdString());
+        Names.append(Name);
+      }
+      QString Target = QDir::toNativeSeparators(Panel->Path());
+      CoreBridge::TTransferSettings Settings = CoreBridge::CurrentTransferSettings();
+      if (!CopyDialog(false, Names, Target, false, nullptr, Settings))
+      {
+        return false;
+      }
+      FBusy = true;
+      UpdateActions();
+      bool Result = false;
+      try
+      {
+        Result = FClipboardSession->DownloadPaths(Paths, Target.toStdString(), &Settings);
+      }
+      catch (const CoreBridge::TCoreError & E)
+      {
+        ShowError(E);
+      }
+      FBusy = false;
+      Panel->Refresh();
+      UpdateActions();
+      return Result;
+    }
+    for (const QString & Name : Drag.Names)
+    {
+      LocalSources.append(QDir(Drag.Directory).filePath(Name));
+    }
+  }
+  else if (Data->hasUrls())
+  {
+    // Files another program copied.
+    for (const QUrl & Url : Data->urls())
+    {
+      if (Url.isLocalFile())
+      {
+        LocalSources.append(QDir::cleanPath(Url.toLocalFile()));
+      }
+    }
+  }
+  if (!LocalSources.isEmpty())
+  {
+    if (RemoteTarget)
+    {
+      return Transfer(true, LocalSources, FPanel->Path(), false, true, false);
+    }
+    const QString Target = QDir::toNativeSeparators(Panel->Path());
+    return LocalLocalCopy(false, true, &LocalSources, &Target);
+  }
+  // A line of text: a session URL opened (unsafe settings asked about),
+  // else a path to go to.
+  const QString Text = Data->text().trimmed();
+  if (Text.isEmpty() || Text.contains(QLatin1Char('\n')))
+  {
+    return false;
+  }
+  const CoreBridge::TUrlInfo Url = CoreBridge::UrlInfo(Text.toStdString());
+  if (Url.ProtocolDefined)
+  {
+    if (Url.UnsafeSettings)
+    {
+      CoreBridge::TQuery Query;
+      Query.Type = CoreBridge::TQueryType::Confirmation;
+      Query.Message = CoreBridge::Text(CoreBridge::TText::UnsafeSession);
+      CoreBridge::TQueryButton OK;
+      OK.Answer = CoreBridge::AnswerOK;
+      OK.Caption = "OK";
+      CoreBridge::TQueryButton Cancel;
+      Cancel.Answer = CoreBridge::AnswerCancel;
+      Cancel.Caption = "Cancel";
+      Query.Buttons = { OK, Cancel };
+      Query.CancelAnswer = CoreBridge::AnswerCancel;
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      if (Frontend.Query(Query).Answer != CoreBridge::AnswerOK)
+      {
+        return false;
+      }
+    }
+    return OpenUrl(Text);
+  }
+  return RemoteTarget ? FPanel->ChangeDirectory(Text) : Panel->ChangeDirectory(Text);
+}
+
+void MainWindow::SetStatusBarShown(bool Shown)
+{
+  FStatusBarAction->setChecked(Shown);
+  statusBar()->setVisible(Shown);
+  CoreBridge::TLayout Layout = CoreBridge::Layout();
+  Layout.StatusBar = Shown;
+  try
+  {
+    CoreBridge::SetLayout(Layout);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+}
+
+void MainWindow::SetQueueShow(CoreBridge::TLayout::TQueueShow Show)
+{
+  FQueueShowActions[static_cast<int>(Show)]->setChecked(true);
+  CoreBridge::TLayout Layout = CoreBridge::Layout();
+  Layout.QueueShow = Show;
+  try
+  {
+    CoreBridge::SetLayout(Layout);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  UpdateQueueView();
+}
+
+// As TCustomScpExplorerForm::UpdateQueueView: shown, hidden, or shown while
+// the queue has items.
+void MainWindow::UpdateQueueView()
+{
+  if (FQueueShowActions[0] == nullptr)
+  {
+    return;
+  }
+  const bool Show = FQueueShowActions[static_cast<int>(CoreBridge::TLayout::TQueueShow::Show)]->isChecked() ||
+    (FQueueShowActions[static_cast<int>(CoreBridge::TLayout::TQueueShow::HideWhenEmpty)]->isChecked() &&
+     (FQueue->List()->topLevelItemCount() > 0));
+  if (FQueue->isVisibleTo(this) != Show)
+  {
+    FQueue->setVisible(Show);
+  }
 }

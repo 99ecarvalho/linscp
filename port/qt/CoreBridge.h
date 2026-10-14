@@ -493,6 +493,11 @@ struct TLayout
   std::string RemoteDirViewParams;
   int QueueViewHeight = 140;
   int QueueViewHeightPixelsPerInch = 96;
+  // Options > Queue (QueueView.Show, TQueueViewShow's order) and Options >
+  // Status Bar (ScpCommander.StatusBar).
+  enum class TQueueShow { Show, HideWhenEmpty, Hide };
+  TQueueShow QueueShow = TQueueShow::HideWhenEmpty;
+  bool StatusBar = true;
 };
 TLayout Layout();
 // Saves it.
@@ -647,6 +652,7 @@ enum class TText
   EditFileCaption, // "Edit file"
   EditFilePrompt, // "&Enter file name:"
   CreateFileError, // "Can't create file '%s'."
+  UnsafeSession, // "**Use potentially unsafe session settings?**..."
   NotSupported, // "Operation not supported."
   LicenseCaption, // "%s license"
   TagAdd,         // "Add tag"
@@ -1138,6 +1144,14 @@ TSite NewSite();
 // Throws TCoreError when there is no such site.
 TSite LoadSite(const std::string & Name);
 bool SiteExists(const std::string & Name);
+// What a text says as a session URL (TStoredSessionList::GetUrlInfo): a
+// protocol given (it is one); settings that are potentially unsafe.
+struct TUrlInfo
+{
+  bool ProtocolDefined = false;
+  bool UnsafeSettings = false;
+};
+TUrlInfo UrlInfo(const std::string & Text);
 // Saves Site under Site.Name, as upstream's Login dialog does: its other
 // settings taken from the site BaseName (empty: a new site, from the default
 // settings), which stays as it is -- saving under another name is "save as".
@@ -1493,6 +1507,10 @@ public:
   bool Upload(const std::vector<std::string> & LocalPaths, const std::string & RemoteDirectory, bool Move = false,
     const TTransferSettings * Settings = nullptr);
   // Entries of the current directory to a local directory.
+  // Files by their full paths, wherever the panel is now (the clipboard's,
+  // as WinSCP's ClipboardDownload). Throws TCoreError.
+  bool DownloadPaths(const std::vector<std::string> & Paths, const std::string & LocalDirectory,
+    const TTransferSettings * Settings = nullptr);
   bool Download(const std::vector<std::string> & Names, const std::string & LocalDirectory, bool Move = false,
     const TTransferSettings * Settings = nullptr);
 

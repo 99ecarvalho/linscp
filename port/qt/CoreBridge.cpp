@@ -639,6 +639,8 @@ TLayout Layout()
   Result.RemoteDirViewParams = Utf8(Settings.RemoteDirViewParams);
   Result.QueueViewHeight = Settings.QueueViewHeight;
   Result.QueueViewHeightPixelsPerInch = Settings.QueueViewHeightPixelsPerInch;
+  Result.QueueShow = static_cast<TLayout::TQueueShow>(std::clamp(Settings.QueueViewShow, 0, 2));
+  Result.StatusBar = Settings.CommanderStatusBar;
   return Result;
 }
 
@@ -652,6 +654,8 @@ void SetLayout(const TLayout & Layout)
   Settings.RemoteDirViewParams = FromUtf8(Layout.RemoteDirViewParams);
   Settings.QueueViewHeight = Layout.QueueViewHeight;
   Settings.QueueViewHeightPixelsPerInch = Layout.QueueViewHeightPixelsPerInch;
+  Settings.QueueViewShow = static_cast<int>(Layout.QueueShow);
+  Settings.CommanderStatusBar = Layout.StatusBar;
   try
   {
     Shell()->SetSettings(Settings);
@@ -975,6 +979,7 @@ std::string Text(TText Text)
     case TText::EditFileCaption: Ident = EDIT_FILE_CAPTION; break;
     case TText::EditFilePrompt: Ident = EDIT_FILE_PROMPT; break;
     case TText::CreateFileError: Ident = CREATE_FILE_ERROR; break;
+    case TText::UnsafeSession: Ident = UNSAFE_SESSION; break;
     case TText::NotSupported: Ident = NOTSUPPORTED; break;
     case TText::LicenseCaption: Ident = LICENSE_CAPTION; break;
     case TText::TagAdd: Ident = TAG_ADD; break;

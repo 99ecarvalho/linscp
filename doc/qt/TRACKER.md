@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 22 | 26 | Parity on features users depend on |
+| P3 Qt parity | 24 | 26 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **97** | **113** | |
+| **Total** | **99** | **113** | |
 
 ## Next three actions
 
@@ -243,12 +243,15 @@ Integration, Applications, Commands. Session tabs and workspaces (P3-13,
 done): several sessions at once, saved together and opened again. The
 local browser (P3-12, done): local tabs, copying and moving between two
 local panels. Accessibility (P3-09, done): every window the GUI tests show
-is audited for screen-reader names, label mnemonics and clashes.
-P2-10 and P2-11 wait, at the user's request.
+is audited for screen-reader names, label mnemonics and clashes. The
+Commander commands users reach daily (P3-14, done): session commands,
+Compare Directories, Synchronize Browsing, New File, the clipboard,
+directory sizes, the status bar and queue. **The P3 exit gate is passed**
+(P3-10, 2026-10-14); the rest of WinSCP's menus are backlog (P3-15).
+P2-10 and P2-11 waited, at the user's request, for P3.
 
-1. **P3-14**: the Commander commands users reach daily (Reconnect, Save
-   Session as Site, Clear Caches, Compare Directories, clipboard, ...).
-2. The P3 exit gate (**P3-10**) once P3-14 is done; P3-15 stays backlog.
+1. **P2-10**: packaging, then the P2 exit gate (**P2-11**); both waited for P3.
+2. **P4-01**: retire the VCL frontend (its gate, P3-10, is passed).
 3. Offer `core-log-file-name-delimiter.patch` and
    `core-local-eol-platform.patch` upstream (ADR 0006).
 
@@ -792,11 +795,11 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-07 | Drag & drop | done | between the panels, within one (onto a directory), and from other programs onto the remote panel: `FileView` in `port/qt/FileList.cpp`, `MainWindow::Drop`, `TSession::Move`; `RemoteFileDrag` (remote files out to other programs, downloaded at the drop); ctest `qt_gui_drop`; native on Windows 11 too; dragging out checked by hand with Explorer (Windows 11) and Nautilus, foreground and background |
 | P3-08 | Shell integration | done | Commands > Open in PuTTY (Ctrl+P): upstream's `OpenSessionInPutty` compiled from a slice of `GUITools.cpp` (ADR 0014 amendment), the program started through the frontend; on POSIX the session on PuTTY's command line, and by default PuTTY if installed, else `ssh` in the desktop's terminal ("open in terminal"). `linscp <site or URL>` opens it at start, as WinSCP.exe (`TSession::FromCommandLine`; ctest `qt_gui_startup`). Go To > Explore Directory (Ctrl+Alt+E). Local files open with their associated application, as before. Not yet: a remote file opened with its associated application and registering as the URL handler (with Preferences > Integration, P3-04e); folders of sites on the command line (P3-13) |
 | P3-09 | Accessibility | done | An audit (`port/tests/AccessibilityAudit.cpp`) of every window the GUI tests show, the first time each appears, and of each page of the dialogs with pages (ctest `qt_gui_accessibility` shows those the other tests only drive): every control that takes the focus has a name for screen readers (its text, its label's, or one given); every label's mnemonic reaches a control (a buddy); no two visible controls of a window, nor items of a menu, share a mnemonic, except where WinSCP's own forms do (listed). Fixed: labels with no buddy (their `&` shown as is), unnamed lists, views and paths (the panels' named Local/Remote files and path), WinSCP's `&patterns` hints reachable by keyboard, linscp's own clashing captions (New Folder, keyboard-interactive, Copy). Platform standard buttons (OK, Cancel) keep the platform's mnemonics |
-| P3-10 | P3 exit gate | todo | reviewed 2026-10-14: waits for P3-14 |
+| P3-10 | P3 exit gate | done | passed 2026-10-14 (decision): every WinSCP dialog has its counterpart (the Explorer interface aside), menus in WinSCP's order (ctest `qt_gui_menus`), the daily Commander commands (P3-14); the rest of the menus are P3-15's backlog |
 | P3-11 | Remember last used directories | done | `TSite::UpdateDirectories` (advanced settings' Directories page), `TSession::SaveDirectories` as `TTerminalManager::SaveTerminal` on disconnect, another session, or closing; the local directory's quiet fallback; ctest `qt_gui_sites`; native on Windows 11 too. "Preserve local directory" is P3-04's |
 | P3-12 | Local-to-local browsing | done | Tabs > New Tab > Local Tab, as WinSCP's local browser: a tab with no session and a second local panel in the remote one's place (the right side, swapped with it), titled by its two directories; Copy and Move (F5, F6) and drags between its panels copy and move local files (`LocalLocalCopy`), after the Copy dialog (`TCopyLocalDialog`: target path and file mask, Browse, the directory created after asking, several files to one name confirmed), an existing file overwritten after asking, a directory merged; the popups, Mark, Files and the Right menu act on the panel focused. Not yet: local tabs in saved workspaces. ctest `qt_gui_localtab` |
 | P3-13 | Session tabs and workspaces | done | Tabs: a session opened goes to a tab of its own, each tab with its own remote and local directories, its editors uploading to it whichever tab is active, every tab's session kept alive (`TTerminal::Idle`, which the shell had not called); the Tabs menu (New, Duplicate, Close Ctrl+Shift+D, Next and Previous Ctrl+Tab). Workspaces: Tabs > Save Workspace (`TSaveWorkspaceDialog`'s name, passwords and automatic saving) stores the tabs as core's workspace sessions; the site manager lists workspaces, logs in to one (a tab per session) and deletes it; saved on closing when automatic and opened at the next start; a workspace or folder of sites named on the command line opens in tabs. ctest `qt_gui_tabs` |
-| P3-14 | Daily Commander commands | wip | the gate waits for it (decision 2026-10-14). Done: Tabs > Rename Tab, Reconnect Session (a lost connection reopened where it was, `TTerminal::Reopen`), Save Session as Site (`TSaveSessionDialog`: name, folder, password), Change Password (a secondary session, as WinSCP), Install Public Key into Server (the key checked and converted as on login, non-OpenSSH servers asked about); Commands > Clear Caches; ctest `qt_gui_sessioncommands`. Commands > Compare Directories (Shift+F2: newer or missing files selected in each panel, times at the coarser listing's precision, by time and size as Preferences > Commander's new criteria say) and Synchronize Browsing (Ctrl+Alt+B: the other panel follows, a missing directory created after asking, per tab); Files > New > File (local made, remote edited empty and uploaded once saved), Calculate Directory Sizes (Shift+Alt+Enter); Go To > Path from Other Panel (Ctrl+., local tabs); ctest `qt_gui_panelcommands`. Next: the clipboard, Status Bar and Queue |
+| P3-14 | Daily Commander commands | done | the gate waited for it (decision 2026-10-14). Tabs > Rename Tab, Reconnect Session (a lost connection reopened where it was, `TTerminal::Reopen`), Save Session as Site (`TSaveSessionDialog`: name, folder, password), Change Password (a secondary session, as WinSCP), Install Public Key into Server (the key checked and converted as on login, non-OpenSSH servers asked about); Commands > Clear Caches; ctest `qt_gui_sessioncommands`. Commands > Compare Directories (Shift+F2: newer or missing files selected in each panel, times at the coarser listing's precision, by time and size as Preferences > Commander's new criteria say) and Synchronize Browsing (Ctrl+Alt+B: the other panel follows, a missing directory created after asking, per tab); Files > New > File (local made, remote edited empty and uploaded once saved), Calculate Directory Sizes (Shift+Alt+Enter); Go To > Path from Other Panel (Ctrl+., local tabs); ctest `qt_gui_panelcommands`. Files > Copy to Clipboard and Paste from Clipboard (Ctrl+C, Ctrl+V: the panel's drag data, remote files by their full paths and downloaded as another program pastes them; pasted, uploaded, copied locally or downloaded; a line of text opened as a session URL or gone to as a path); Options > Status Bar and Queue (show, hide when empty -- WinSCP's default, now linscp's -- or hide), kept under WinSCP's keys; ctest `qt_gui_clipboard`. Not done: pasting remote files into the remote panel (WinSCP's duplicate) |
 | P3-15 | The rest of the Commander's commands | todo | backlog, not gating P3 |
 
 ### P4 — Cleanup

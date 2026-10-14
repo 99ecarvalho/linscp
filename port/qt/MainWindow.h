@@ -268,6 +268,19 @@ public:
   // focused file's, else "New file"; given: no prompt), edited -- an
   // existing one as it is, a new one empty, uploaded when saved.
   EditorWindow * NewFile(const QString * Name = nullptr);
+  // Files > Copy to Clipboard (Ctrl+C), Paste from Clipboard (Ctrl+V), as
+  // WinSCP's: the active panel's selection, as its drag has it (remote
+  // files by their full paths, downloaded as another program pastes them);
+  // pasted, files are uploaded to the remote panel, copied to a local one,
+  // or downloaded from the session they were copied from; a line of text is
+  // a session URL to open, else a path to go to. Pasting remote files into
+  // the remote panel (WinSCP's duplicate) is not done.
+  bool CopyToClipboard();
+  bool PasteFromClipboard();
+  // Options > Status Bar and Options > Queue (show, hide when empty, hide),
+  // kept as WinSCP keeps them.
+  void SetStatusBarShown(bool Shown);
+  void SetQueueShow(CoreBridge::TLayout::TQueueShow Show);
   bool LocalBrowser() const;
   // The panel on a side as a local one: the left (Local) panel, or the
   // right one in a local tab; null for the remote panel.
@@ -347,6 +360,15 @@ private:
   QAction * FSyncBrowseAction = nullptr;
   QAction * FDirectorySizesAction = nullptr;
   QAction * FNewFileAction = nullptr;
+  QAction * FCopyClipboardAction = nullptr;
+  QAction * FPasteAction = nullptr;
+  QAction * FStatusBarAction = nullptr;
+  QAction * FQueueShowActions[3] = {};
+  // The session remote files were copied to the clipboard from.
+  CoreBridge::TSession * FClipboardSession = nullptr;
+  // What this window put on the clipboard for remote files.
+  const QMimeData * FClipboardData = nullptr;
+  void UpdateQueueView();
   // Synchronized browsing: each side's directory as last loaded (local:
   // [1]), and while following the other.
   QString FPrevPath[2];

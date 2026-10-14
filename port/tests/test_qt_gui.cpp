@@ -70,6 +70,7 @@
 #include <QPushButton>
 #include <QTimer>
 #include <QClipboard>
+#include <QStatusBar>
 #include <QTest>
 #include <QSettings>
 #include <QSplitter>
@@ -4050,6 +4051,95 @@ void PanelCommandsTest(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// P3-14's clipboard, status bar and queue: files copied and pasted between
+// the panels, a path and a URL pasted; the status bar and the queue's
+// visibility kept.
+void ClipboardTest(const char * Port, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = std::deque<QString>(4, QStringLiteral("secret"));
+    Responder.AcceptDialogs = true;
+    // The Copy dialogs, accepted as they are.
+    Responder.Custom = [](QWidget * Modal)
+    {
+      QDialog * Dialog = qobject_cast<QDialog *>(Modal);
+      if ((Dialog == nullptr) || ((Dialog->windowTitle() != MainWindow::tr("Copy")) &&
+          (qobject_cast<CopyLocalDialog *>(Modal) == nullptr)))
+      {
+        return false;
+      }
+      Dialog->accept();
+      return true;
+    };
+    const QDir Local(Directory);
+    const QDir Root(Local.filePath(QStringLiteral("../root")));
+    QDir().mkpath(Local.filePath(QStringLiteral("into")));
+    QFile Up(Local.filePath(QStringLiteral("up.txt")));
+    Up.open(QIODevice::WriteOnly);
+    Up.write("up");
+    Up.close();
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "(connected)");
+    Window.Local()->ChangeDirectory(Local.path());
+
+    // Local files copied, pasted on the remote panel: uploaded.
+    Window.ActivatePanel(true);
+    Window.Local()->Select({ QStringLiteral("up.txt") });
+    Check(Window.CopyToClipboard(), "Copy to Clipboard (local)");
+    Check(QApplication::clipboard()->mimeData()->hasUrls(), "as files other programs take");
+    Window.ActivatePanel(false);
+    Check(Window.PasteFromClipboard() && WaitUntil([&Root]() { return QFileInfo::exists(Root.filePath(QStringLiteral("up.txt"))); }),
+      "pasted on the remote panel: uploaded");
+    // ... and on a local panel's other directory: copied.
+    Window.ActivatePanel(true);
+    Window.Local()->ChangeDirectory(Local.filePath(QStringLiteral("into")));
+    Check(Window.PasteFromClipboard() && QFileInfo::exists(Local.filePath(QStringLiteral("into/up.txt"))),
+      "pasted on a local panel: copied");
+
+    // Remote files copied, the remote panel moved on, pasted locally:
+    // downloaded by their paths.
+    Window.ActivatePanel(false);
+    Window.Panel()->Refresh();
+    Window.Panel()->Select({ QStringLiteral("hello.txt") });
+    Check(Window.CopyToClipboard(), "Copy to Clipboard (remote)");
+    Window.Panel()->ChangeDirectory(QStringLiteral("/sub"));
+    Window.ActivatePanel(true);
+    Check(Window.PasteFromClipboard() && QFileInfo::exists(Local.filePath(QStringLiteral("into/hello.txt"))),
+      "pasted on the local panel: downloaded from where it was copied");
+
+    // Text: a path to go to.
+    QApplication::clipboard()->setText(QDir::toNativeSeparators(Local.path()));
+    Check(Window.PasteFromClipboard() && (QDir(Window.Local()->Path()) == Local), "a pasted path is gone to");
+    Window.ActivatePanel(false);
+    QApplication::clipboard()->setText(QStringLiteral("/"));
+    Check(Window.PasteFromClipboard() && (Window.Panel()->Path() == QStringLiteral("/")), "remotely too");
+    // ... a session URL: opened in a tab.
+    QApplication::clipboard()->setText(QStringLiteral("sftp://linscp@127.0.0.1:%1/sub/").arg(QString::fromLatin1(Port)));
+    Check(Window.PasteFromClipboard() && (Window.TabCount() == 2) && (Window.Panel()->Path() == QStringLiteral("/sub")),
+      "a pasted URL is opened");
+
+    // Status Bar and Queue, kept.
+    Check(Window.statusBar()->isVisible(), "the status bar shown by default");
+    Window.SetStatusBarShown(false);
+    Check(!Window.statusBar()->isVisible() && !CoreBridge::Layout().StatusBar, "Status Bar off, kept");
+    Window.SetStatusBarShown(true);
+    Check(!Window.Queue()->isVisible(), "the queue hidden while empty (WinSCP's default)");
+    Window.SetQueueShow(CoreBridge::TLayout::TQueueShow::Show);
+    Check(Window.Queue()->isVisible() && (CoreBridge::Layout().QueueShow == CoreBridge::TLayout::TQueueShow::Show),
+      "Queue > Show, kept");
+    Window.SetQueueShow(CoreBridge::TLayout::TQueueShow::Hide);
+    Check(!Window.Queue()->isVisible(), "Queue > Hide");
+    Window.SetQueueShow(CoreBridge::TLayout::TQueueShow::HideWhenEmpty);
+  }
+  CoreBridge::Finalize();
+}
+
 // The menu bar as text, a menu's items indented under it, separators as
 // "----": for comparing with WinSCP's (forms/ScpCommander.dfm).
 void DumpMenu(QMenu * Menu, int Depth, QString & Out)
@@ -4114,6 +4204,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 5) && (std::strcmp(argv[1], "panelcommands") == 0))
   {
     PanelCommandsTest(argv[3], QString::fromLocal8Bit(argv[4]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "clipboard") == 0))
+  {
+    ClipboardTest(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 3) && (std::strcmp(argv[1], "menus") == 0))
   {

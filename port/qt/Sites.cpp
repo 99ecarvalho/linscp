@@ -396,6 +396,15 @@ bool SiteExists(const std::string & Name)
   return StoredSite(Name) != NULL;
 }
 
+TUrlInfo UrlInfo(const std::string & Text)
+{
+  const int Info = StoredSessions->GetUrlInfo(FromUtf8(Text));
+  TUrlInfo Result;
+  Result.ProtocolDefined = FLAGSET(Info, piProtocolDefined);
+  Result.UnsafeSettings = FLAGSET(Info, piUnsafeSettings);
+  return Result;
+}
+
 std::vector<std::string> WorkspaceNames()
 {
   std::unique_ptr<TStrings> Names(StoredSessions->GetWorkspaces());

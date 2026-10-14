@@ -97,6 +97,9 @@ bool WinScpClash(const QString & One, const QString & Other)
     { QStringLiteral("Server/Protocol &Information"), QStringLiteral("&Install Public Key into Server...") },
     // NonVisual.dfm, Files and Commands.
     { QStringLiteral("File &Custom Commands"), QStringLiteral("&Calculate Directory Sizes") },
+    { QStringLiteral("Du&plicate..."), QStringLiteral("&Paste from Clipboard") },
+    { QStringLiteral("&Copy to Clipboard"), QStringLiteral("File &Custom Commands") },
+    { QStringLiteral("&Copy to Clipboard"), QStringLiteral("&Calculate Directory Sizes") },
     { QStringLiteral("&Compare Directories"), QStringLiteral("Static &Custom Commands") },
     // A default custom command's name and the Enter... item.
     { QStringLiteral("&Execute"), QStringLiteral("&Enter...") },

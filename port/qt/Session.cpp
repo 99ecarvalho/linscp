@@ -655,6 +655,32 @@ bool TSession::Upload(const std::vector<std::string> & LocalPaths, const std::st
 
 // As the GUI downloads: the entries' names with their TRemoteFiles, as for
 // deleting.
+bool TSession::DownloadPaths(const std::vector<std::string> & Paths, const std::string & LocalDirectory,
+  const TTransferSettings * Settings)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TStringList> Files(new TStringList());
+    std::vector<std::unique_ptr<TRemoteFile>> Owned;
+    for (const std::string & Path : Paths)
+    {
+      const UnicodeString APath = FromUtf8(Path);
+      Owned.emplace_back(F->Terminal->ReadFile(APath));
+      // Read alone, it has no directory listing to take its path from.
+      Owned.back()->FullFileName = APath;
+      Files->AddObject(APath, Owned.back().get());
+    }
+    TGUICopyParamType CopyParam = TransferCopyParam(Settings);
+    TTransferBracket Bracket(false, Files->Count);
+    return F->Terminal->CopyToLocal(Files.get(), IncludeTrailingBackslash(FromUtf8(LocalDirectory)), &CopyParam, 0, NULL);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 bool TSession::Download(const std::vector<std::string> & Names, const std::string & LocalDirectory, bool Move,
   const TTransferSettings * Settings)
 {

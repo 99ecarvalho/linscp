@@ -251,6 +251,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"ExplorerKeyboardShortcuts", FSettings.ExplorerKeyboardShortcuts);
     Storage->WriteBool(L"CompareByTime", FSettings.CompareByTime);
     Storage->WriteBool(L"CompareBySize", FSettings.CompareBySize);
+    Storage->WriteBool(L"StatusBar", FSettings.CommanderStatusBar);
     Storage->WriteInteger(L"CurrentPanel", FSettings.CurrentPanel);
     Storage->WriteFloat(L"LocalPanelWidth", FSettings.LocalPanelWidth);
     if (!FSettings.WindowParams.IsEmpty())
@@ -297,6 +298,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     TCloseSubKeyPath Close(Storage);
     Storage->WriteInteger(L"Height", FSettings.QueueViewHeight);
     Storage->WriteInteger(L"HeightPixelsPerInch", FSettings.QueueViewHeightPixelsPerInch);
+    Storage->WriteInteger(L"Show", FSettings.QueueViewShow);
   }
 }
 
@@ -467,6 +469,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
       Storage->ReadBool(L"ExplorerKeyboardShortcuts", FSettings.ExplorerKeyboardShortcuts);
     FSettings.CompareByTime = Storage->ReadBool(L"CompareByTime", FSettings.CompareByTime);
     FSettings.CompareBySize = Storage->ReadBool(L"CompareBySize", FSettings.CompareBySize);
+    FSettings.CommanderStatusBar = Storage->ReadBool(L"StatusBar", FSettings.CommanderStatusBar);
     FSettings.CurrentPanel = Storage->ReadInteger(L"CurrentPanel", FSettings.CurrentPanel);
     FSettings.LocalPanelWidth = Storage->ReadFloat(L"LocalPanelWidth", FSettings.LocalPanelWidth);
     FSettings.WindowParams = Storage->ReadString(L"WindowParams", FSettings.WindowParams);
@@ -515,5 +518,6 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.QueueViewHeight = Storage->ReadInteger(L"Height", FSettings.QueueViewHeight);
     FSettings.QueueViewHeightPixelsPerInch =
       Storage->ReadInteger(L"HeightPixelsPerInch", FSettings.QueueViewHeightPixelsPerInch);
+    FSettings.QueueViewShow = Storage->ReadInteger(L"Show", FSettings.QueueViewShow);
   }
 }

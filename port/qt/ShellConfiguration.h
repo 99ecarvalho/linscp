@@ -101,6 +101,9 @@ struct TShellSettings
   int GenerateUrlAssemblyLanguage = 0;
   int QueueViewHeight = 140;
   int QueueViewHeightPixelsPerInch = 96;
+  // QueueView.Show (qvShow, qvHideWhenEmpty, qvHide) and ScpCommander.StatusBar.
+  int QueueViewShow = 1;
+  bool CommanderStatusBar = true;
 };
 
 class TCustomCommandList;
