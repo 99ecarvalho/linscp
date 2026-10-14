@@ -41,7 +41,9 @@
 //     Open directory and bookmarks (Ctrl+O, Ctrl+B): the site's and the
 //     shared bookmarks added, ordered, removed and kept; a bookmark
 //     opened; a directory that cannot be opened asked for again; the
-//     local panel's too
+//     local panel's too; Location Profiles (the Commander's preference):
+//     profiles added, foldered, renamed, ordered, removed, opened into
+//     both panels, and the switch between the two dialogs
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -109,6 +111,7 @@
 #include "LinkDialog.h"
 #include "RemoteTransferDialog.h"
 #include "OpenDirectoryDialog.h"
+#include "LocationProfilesDialog.h"
 #include <QTemporaryDir>
 #include "EditorWindow.h"
 
@@ -2159,6 +2162,100 @@ void BookmarksTest(const char * Port, const QString & Directory)
       return true;
     };
     Check(Window.OpenDirectory() && (QDir(Window.Local()->Path()) == QDir(Directory)), "Ctrl+O on the local panel");
+    Responder.Custom = nullptr;
+
+    // Location Profiles.
+    {
+      LocationProfilesDialog Dialog(QDir::toNativeSeparators(Directory), QStringLiteral("/sub"), QStringList(), QStringList(),
+        true, Key, false);
+      Dialog.Pages()->setCurrentIndex(0);
+      Check(!Dialog.AddProfile(0, QStringLiteral("12")), "a number is no profile name");
+      Check(Dialog.AddProfile(0, QStringLiteral("work")), "a profile added");
+      Check(Dialog.MoveSelectedTo(0, QStringLiteral("projects")) && (Dialog.Tree(0)->topLevelItem(0)->text(0) == QStringLiteral("projects")) &&
+        (Dialog.Tree(0)->topLevelItem(0)->child(0)->text(0) == QStringLiteral("work")), "moved into a folder, listed first");
+      Dialog.RemoteCombo()->setEditText(QStringLiteral("/"));
+      Check(Dialog.Tree(0)->currentItem() == nullptr, "other directories: no profile selected, as upstream's");
+      Dialog.Tree(0)->setCurrentItem(Dialog.Tree(0)->topLevelItem(0));
+      Check(Dialog.AddProfile(0, QStringLiteral("root")), "another, into the folder selected");
+      Check(Dialog.Tree(0)->topLevelItem(0)->childCount() == 2, "the folder has both");
+      Check(Dialog.Select(0, QStringLiteral("projects/work")) && (Dialog.RemoteCombo()->currentText() == QStringLiteral("/sub")),
+        "choosing one fills both directories in");
+      Dialog.MoveSelected(0, 1);
+      Check(Dialog.Tree(0)->topLevelItem(0)->child(1)->text(0) == QStringLiteral("work"), "moved down within its folder");
+      Dialog.MoveSelected(0, 1);
+      Check(Dialog.Tree(0)->topLevelItem(0)->child(1)->text(0) == QStringLiteral("work"), "last already: stays");
+      Dialog.MoveSelected(0, -1);
+      Check(Dialog.Tree(0)->topLevelItem(0)->child(0)->text(0) == QStringLiteral("work"), "and up again");
+      Dialog.Tree(0)->setCurrentItem(Dialog.Tree(0)->topLevelItem(0));
+      Check(!Dialog.RenameSelected(0, QStringLiteral("a\\b")) && Dialog.RenameSelected(0, QStringLiteral("clients")),
+        "a folder renamed, a backslash refused");
+      Check(Dialog.Select(0, QStringLiteral("clients/root")), "its profiles go with it");
+      Check(Dialog.RenameSelected(0, QStringLiteral("top")) && Dialog.Select(0, QStringLiteral("clients/top")), "a profile renamed");
+      Dialog.reject();
+    }
+    std::vector<CoreBridge::TBookmarkEntry> Profiles = CoreBridge::Bookmarks(Key);
+    const auto FindProfile = [&Profiles](const std::string & Name) -> const CoreBridge::TBookmarkEntry *
+    {
+      for (const CoreBridge::TBookmarkEntry & Entry : Profiles)
+      {
+        if (Entry.Name == Name)
+        {
+          return &Entry;
+        }
+      }
+      return nullptr;
+    };
+    Check((FindProfile("work") != nullptr) && (FindProfile("work")->Node == "clients") &&
+      (FindProfile("work")->Remote == "/sub") && !FindProfile("work")->Local.empty(), "kept with both directories and the folder");
+    CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+    Preferences.UseLocationProfiles = true;
+    CoreBridge::SetPreferences(Preferences);
+    Remote->ChangeDirectory(QStringLiteral("/"));
+    Window.ActivatePanel(false);
+    Responder.Custom = [](QWidget * Modal)
+    {
+      LocationProfilesDialog * Dialog = qobject_cast<LocationProfilesDialog *>(Modal);
+      if (Dialog == nullptr)
+      {
+        return false;
+      }
+      const bool Found = Dialog->Select(0, QStringLiteral("clients/work"));
+      Check(Found, "the profile is there");
+      Dialog->OkButton()->click();
+      return true;
+    };
+    const bool OpenedProfile = Window.OpenDirectory();
+    Check(OpenedProfile && (Remote->Path() == QStringLiteral("/sub")) && (QDir(Window.Local()->Path()) == QDir(Directory)),
+      "Ctrl+O opens a profile into both panels");
+    // Bookmarks... and back.
+    int Profile = 0;
+    int Bookmark = 0;
+    Responder.Custom = [&Profile, &Bookmark](QWidget * Modal)
+    {
+      if (LocationProfilesDialog * Dialog = qobject_cast<LocationProfilesDialog *>(Modal))
+      {
+        Profile++;
+        for (QPushButton * Button : Dialog->findChildren<QPushButton *>())
+        {
+          if (Button->text() == LocationProfilesDialog::tr("&Bookmarks..."))
+          {
+            Button->click();
+            return true;
+          }
+        }
+        Dialog->reject();
+        return true;
+      }
+      if (OpenDirectoryDialog * Dialog = qobject_cast<OpenDirectoryDialog *>(Modal))
+      {
+        Bookmark++;
+        Dialog->reject();
+        return true;
+      }
+      return false;
+    };
+    Check(!Window.OpenDirectory() && (Profile == 1) && (Bookmark == 1) && !CoreBridge::Preferences().UseLocationProfiles,
+      "Bookmarks... switches to the Open directory dialog, from now on");
     Responder.Custom = nullptr;
     Frontend.SetWindow(nullptr);
   }

@@ -26,9 +26,12 @@ public:
   // WinSCP's "Manage bookmarks", the directory added to the page Shared
   // says.
   OpenDirectoryDialog(bool Remote, const QString & Directory, const QStringList & History, const std::string & SessionKey,
-    bool AddBookmark, bool Shared, QWidget * Parent = nullptr);
+    bool AddBookmark, bool Shared, QWidget * Parent = nullptr, bool AllowSwitch = false);
 
   QString Directory() const;
+  // Location Profiles... (AllowSwitch: with a session): the profiles
+  // instead, from now on.
+  bool Switched() const { return FSwitched; }
 
   // The pages' buttons, for tests and them alike: 0 the site's, 1 the
   // shared bookmarks.
@@ -70,6 +73,7 @@ private:
   std::vector<CoreBridge::TBookmarkEntry> FBookmarks[2];
   std::vector<int> FRows[2];
   bool FUpdating = false;
+  bool FSwitched = false;
 };
 
 // The VCL's TShortCut as text ("Ctrl+Shift+F5"), as ShortCutToText.

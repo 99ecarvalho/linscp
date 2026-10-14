@@ -44,6 +44,7 @@ public:
   QComboBox * SizeFormatCombo() const { return FSizeFormat; }
   QCheckBox * SwappedPanelsCheck() const { return FSwappedPanels; }
   QComboBox * KeyboardShortcutsCombo() const { return FKeyboardShortcuts; }
+  QCheckBox * UseLocationProfilesCheck() const { return FUseLocationProfiles; }
   QListWidget * LanguagesList() const { return FLanguages; }
   QLabel * LanguageChangeLabel() const { return FLanguageChange; }
   // Transfer: the default settings (row 0) and the presets.
@@ -127,6 +128,7 @@ private:
   QComboBox * FSizeFormat = nullptr;
   QCheckBox * FSwappedPanels = nullptr;
   QComboBox * FKeyboardShortcuts = nullptr;
+  QCheckBox * FUseLocationProfiles = nullptr;
   QListWidget * FLanguages = nullptr;
   QLabel * FLanguageChange = nullptr;
   CoreBridge::TTransferSettings FDefaultSettings;

@@ -334,6 +334,9 @@ struct TPreferences
   bool SwappedPanels = false;
   // Explorer's keys (F5 refresh, Ctrl+K copy) rather than the Commander's.
   bool ExplorerKeyboardShortcuts = false;
+  // Open Directory as Location Profiles (a local and a remote directory
+  // each) rather than the side's bookmarks.
+  bool UseLocationProfiles = false;
   // Background (core's and the GUI's configuration; the transfer settings'
   // background options are TTransferSettings'): transfers at the same
   // time; how long completed ones stay listed (seconds; 0 never, -1
@@ -498,6 +501,15 @@ enum class TText
   ManageBookmarksCaption, // "Manage bookmarks"
   AddBookmarkConfirm,   // "Add directory '%s' to bookmarks?"
   AddBookmarkShared,    // "Add to &shared bookmarks"
+  BookmarkInvalidName, // "'%s' is not valid Location Profile name."
+  BookmarkFolderInvalidName, // "'%s' is not valid Location Profile folder name."
+  DuplicateBookmarkFolder, // "Location Profile folder with name '%s' already exists."
+  DeleteBookmarkFolder, // "Delete selected Location Profile folder?"
+  AddBookmarkCaption, // "Add Location Profile"
+  AddBookmarkPrompt, // "Location Profile name:"
+  MoveBookmarkCaption, // "Move Location Profile"
+  MoveBookmarkPrompt, // "New folder name:"
+  BookmarkInfoTip, // "Local: %s\nRemote: %s"
 };
 std::string Text(TText Text);
 

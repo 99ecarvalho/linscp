@@ -40,7 +40,7 @@ QString ShortCutText(unsigned ShortCut)
 }
 
 OpenDirectoryDialog::OpenDirectoryDialog(bool Remote, const QString & Directory, const QStringList & History,
-    const std::string & SessionKey, bool AddBookmark, bool Shared, QWidget * Parent) :
+    const std::string & SessionKey, bool AddBookmark, bool Shared, QWidget * Parent, bool AllowSwitch) :
   QDialog(Parent),
   FRemote(Remote),
   FSessionKey(SessionKey)
@@ -87,6 +87,14 @@ OpenDirectoryDialog::OpenDirectoryDialog(bool Remote, const QString & Directory,
   Layout->addWidget(FPages, 1);
   QDialogButtonBox * Buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
   FOk = Buttons->button(QDialogButtonBox::Ok);
+  if (AllowSwitch)
+  {
+    connect(Buttons->addButton(tr("&Location Profiles..."), QDialogButtonBox::ResetRole), &QPushButton::clicked, this, [this]()
+    {
+      FSwitched = true;
+      reject();
+    });
+  }
   connect(Buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
   connect(Buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
   Layout->addWidget(Buttons);
@@ -331,6 +339,12 @@ void OpenDirectoryDialog::done(int Result)
     {
       CoreBridge::SetBookmarks(FSessionKey, FBookmarks[0]);
       CoreBridge::SetUseSharedBookmarks(FPages->currentWidget() == FPageWidgets[1]);
+    }
+    if (FSwitched)
+    {
+      CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+      Preferences.UseLocationProfiles = true;
+      CoreBridge::SetPreferences(Preferences);
     }
   }
   catch (const CoreBridge::TCoreError & E)

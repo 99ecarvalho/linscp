@@ -135,6 +135,11 @@ private:
   // Loads it and shows it; null (and gone) when it could not be read.
   EditorWindow * ShowEditor(EditorWindow * Editor);
   bool EditUpload(CoreBridge::TEditedFile & File);
+  // OpenDirectory's two dialogs; Switched: the other one asked for.
+  bool OpenBookmark(bool AddBookmark, bool & Switched);
+  bool OpenLocationProfile(bool AddBookmark, bool & Switched);
+  bool GoLocal(const QString & Directory);
+  bool GoRemote(const QString & Directory);
   // Removes the closed editors' temporary directories, once the queue has
   // no uploads left for them (or there is no session).
   void CleanUpEdited();

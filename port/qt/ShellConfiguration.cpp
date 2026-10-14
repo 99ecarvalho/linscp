@@ -109,6 +109,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"ConfirmTemporaryDirectoryCleanup", FSettings.ConfirmTemporaryDirectoryCleanup);
     Storage->WriteBool(L"EditorCheckNotModified", FSettings.EditorCheckNotModified);
     Storage->WriteBool(L"UseSharedBookmarks", FSettings.UseSharedBookmarks);
+    Storage->WriteBool(L"UseLocationProfiles", FSettings.UseLocationProfiles);
   }
   if (Storage->OpenSubKey(L"Bookmarks", true))
   {
@@ -192,6 +193,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
       Storage->ReadBool(L"ConfirmTemporaryDirectoryCleanup", FSettings.ConfirmTemporaryDirectoryCleanup);
     FSettings.EditorCheckNotModified = Storage->ReadBool(L"EditorCheckNotModified", FSettings.EditorCheckNotModified);
     FSettings.UseSharedBookmarks = Storage->ReadBool(L"UseSharedBookmarks", FSettings.UseSharedBookmarks);
+    FSettings.UseLocationProfiles = Storage->ReadBool(L"UseLocationProfiles", FSettings.UseLocationProfiles);
   }
   if (Storage->OpenSubKey(L"Bookmarks", false))
   {

@@ -375,6 +375,61 @@
     </message>
 </context>
 <context>
+    <name>LocationProfilesDialog</name>
+    <message>
+        <source>Location profiles</source>
+        <translation>Perfis de Localização</translation>
+    </message>
+    <message>
+        <source>B&amp;rowse...</source>
+        <translation>P&amp;rocurar...</translation>
+    </message>
+    <message>
+        <source>&amp;Local directory:</source>
+        <translation>Diretório &amp;Local:</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;Diretório Remoto:</translation>
+    </message>
+    <message>
+        <source>Site Location profiles</source>
+        <translation>Perfis de Localização da Sessão</translation>
+    </message>
+    <message>
+        <source>Shared Location profiles</source>
+        <translation>Perfis de Localização Compartilhados</translation>
+    </message>
+    <message>
+        <source>&amp;Bookmarks...</source>
+        <translation>Fa&amp;voritos...</translation>
+    </message>
+    <message>
+        <source>&amp;Add...</source>
+        <translation>&amp;Adicionar...</translation>
+    </message>
+    <message>
+        <source>Remo&amp;ve</source>
+        <translation>&amp;Remover</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Re&amp;nomear</translation>
+    </message>
+    <message>
+        <source>&amp;Move To...</source>
+        <translation>&amp;Mover para ...</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>A&amp;cima</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>A&amp;baixo</translation>
+    </message>
+</context>
+<context>
     <name>MainWindow</name>
     <message>
         <source>&amp;File</source>
@@ -585,6 +640,10 @@
     <message>
         <source>&amp;Down</source>
         <translation>A&amp;baixo</translation>
+    </message>
+    <message>
+        <source>&amp;Location Profiles...</source>
+        <translation>Padrões de &amp;Localização...</translation>
     </message>
 </context>
 <context>
@@ -1012,6 +1071,10 @@
     <message>
         <source>&amp;Random seed file:</source>
         <translation>A&amp;rquivo de semente aleatória</translation>
+    </message>
+    <message>
+        <source>&amp;Use Location Profiles instead of Directory Bookmarks</source>
+        <translation>Usar padrões de localização contidos no diretório de Favoritos</translation>
     </message>
 </context>
 <context>

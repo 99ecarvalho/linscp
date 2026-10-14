@@ -70,6 +70,7 @@ struct TShellSettings
   UnicodeString RemoteDirViewParams = L"0;1;0|150,1;70,1;150,1;79,1;62,1;55,0;20,0;150,0;125,0;@96|6;7;8;0;1;2;3;4;5";
   // Open directory's page: the shared bookmarks rather than the site's.
   bool UseSharedBookmarks = false;
+  bool UseLocationProfiles = false;
   int QueueViewHeight = 140;
   int QueueViewHeightPixelsPerInch = 96;
 };

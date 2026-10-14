@@ -114,6 +114,7 @@ CONTEXT_FORMS = {
     'LinkDialog': ['Symlink.dfm'],
     'RemoteTransferDialog': ['RemoteTransfer.dfm'],
     'OpenDirectoryDialog': ['OpenDirectory.dfm'],
+    'LocationProfilesDialog': ['LocationProfiles.dfm'],
 }
 
 

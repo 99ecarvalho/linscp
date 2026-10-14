@@ -240,6 +240,7 @@ TPreferences Preferences()
   Result.DefaultDirIsHome = Settings.DefaultDirIsHome;
   Result.SwappedPanels = Settings.SwappedPanels;
   Result.ExplorerKeyboardShortcuts = Settings.ExplorerKeyboardShortcuts;
+  Result.UseLocationProfiles = Settings.UseLocationProfiles;
   Result.PathInCaption = static_cast<TPreferences::TPathInCaption>(Settings.PathInCaption);
   Result.KeepOpenWhenNoSession = Settings.KeepOpenWhenNoSession;
   // As TFileColorData::LoadList: comma text of "BBGGRR:mask" (TColor).
@@ -457,6 +458,7 @@ void SetPreferences(const TPreferences & Preferences)
   Settings.DefaultDirIsHome = Preferences.DefaultDirIsHome;
   Settings.SwappedPanels = Preferences.SwappedPanels;
   Settings.ExplorerKeyboardShortcuts = Preferences.ExplorerKeyboardShortcuts;
+  Settings.UseLocationProfiles = Preferences.UseLocationProfiles;
   Settings.PathInCaption = static_cast<int>(Preferences.PathInCaption);
   Settings.KeepOpenWhenNoSession = Preferences.KeepOpenWhenNoSession;
   // As TFileColorData::SaveList.
@@ -729,6 +731,15 @@ std::string Text(TText Text)
     case TText::ManageBookmarksCaption: Ident = OPEN_DIRECTORY_ADD_BOOMARK_ACTION; break;
     case TText::AddBookmarkConfirm: Ident = ADD_BOOKMARK_CONFIRM; break;
     case TText::AddBookmarkShared: Ident = ADD_BOOKMARK_SHARED; break;
+    case TText::BookmarkInvalidName: Ident = BOOKMARK_INVALID_NAME; break;
+    case TText::BookmarkFolderInvalidName: Ident = BOOKMARK_FOLDER_INVALID_NAME; break;
+    case TText::DuplicateBookmarkFolder: Ident = DUPLICATE_BOOKMARK_FOLDER; break;
+    case TText::DeleteBookmarkFolder: Ident = DELETE_BOOKMARK_FOLDER; break;
+    case TText::AddBookmarkCaption: Ident = ADD_BOOKMARK_CAPTION; break;
+    case TText::AddBookmarkPrompt: Ident = ADD_BOOKMARK_PROMPT; break;
+    case TText::MoveBookmarkCaption: Ident = MOVE_BOOKMARK_CAPTION; break;
+    case TText::MoveBookmarkPrompt: Ident = MOVE_BOOKMARK_PROMPT; break;
+    case TText::BookmarkInfoTip: Ident = BOOKMARK_INFO_TIP; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

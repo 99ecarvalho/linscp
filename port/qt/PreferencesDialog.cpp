@@ -127,6 +127,9 @@ QWidget * PreferencesDialog::MakeCommanderPage(const TPreferences & Preferences)
   FKeyboardShortcuts->addItems({ tr("Commander"), tr("Explorer") });
   FKeyboardShortcuts->setCurrentIndex(Preferences.ExplorerKeyboardShortcuts ? 1 : 0);
   MiscLayout->addRow(tr("&Keyboard shortcuts"), FKeyboardShortcuts);
+  FUseLocationProfiles = new QCheckBox(tr("&Use Location Profiles instead of Directory Bookmarks"), Misc);
+  FUseLocationProfiles->setChecked(Preferences.UseLocationProfiles);
+  MiscLayout->addRow(FUseLocationProfiles);
   Layout->addWidget(Misc);
   Layout->addStretch(1);
   return Page;
@@ -828,6 +831,7 @@ TPreferences PreferencesDialog::Preferences() const
   Result.SizeFormat = static_cast<TPreferences::TSizeFormat>(FSizeFormat->currentIndex());
   Result.SwappedPanels = FSwappedPanels->isChecked();
   Result.ExplorerKeyboardShortcuts = (FKeyboardShortcuts->currentIndex() == 1);
+  Result.UseLocationProfiles = FUseLocationProfiles->isChecked();
   Result.QueueTransfersLimit = FQueueTransfersLimit->value();
   Result.QueueKeepDoneItemsFor = FQueueKeepDone->currentData().toInt();
   Result.QueueAutoPopup = FQueueAutoPopup->isChecked();

@@ -43,6 +43,7 @@
 #include "LinkDialog.h"
 #include "RemoteTransferDialog.h"
 #include "OpenDirectoryDialog.h"
+#include "LocationProfilesDialog.h"
 #include "QueryDialog.h"
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
@@ -1314,13 +1315,52 @@ bool MainWindow::RemoteTransfer(bool Move)
   return Result;
 }
 
+// A panel to a directory, already there counting (the panels' own
+// ChangeDirectory is false then).
+bool MainWindow::GoLocal(const QString & Directory)
+{
+  return FLocal->ChangeDirectory(Directory) ||
+    (QDir::cleanPath(QDir::fromNativeSeparators(Directory)) == QDir::cleanPath(FLocal->Path()));
+}
+
+bool MainWindow::GoRemote(const QString & Directory)
+{
+  const auto Clean = [](QString Path)
+  {
+    while ((Path.size() > 1) && Path.endsWith(QLatin1Char('/')))
+    {
+      Path.chop(1);
+    }
+    return Path;
+  };
+  return FPanel->ChangeDirectory(Directory) || (Clean(Directory) == Clean(FPanel->Path()));
+}
+
+// As TScpCommanderForm::DoOpenDirectoryDialog: bookmarks or Location
+// Profiles, as the preference says, the other when the dialog switches.
 bool MainWindow::OpenDirectory(bool AddBookmark)
 {
-  const bool Local = FLocalActive || !FSession;
   if (FBusy)
   {
     return false;
   }
+  while (true)
+  {
+    // Profiles want a session, as upstream's.
+    const bool Profiles = CoreBridge::Preferences().UseLocationProfiles && FSession;
+    bool Switched = false;
+    const bool Result = Profiles ? OpenLocationProfile(AddBookmark, Switched) : OpenBookmark(AddBookmark, Switched);
+    if (!Switched)
+    {
+      return Result;
+    }
+    AddBookmark = false;
+  }
+}
+
+bool MainWindow::OpenBookmark(bool AddBookmark, bool & Switched)
+{
+  const bool Local = FLocalActive || !FSession;
   bool Shared = CoreBridge::UseSharedBookmarks();
   const QString Directory = Local ? QDir::toNativeSeparators(FLocal->Path()) : FPanel->Path();
   if (AddBookmark)
@@ -1363,17 +1403,41 @@ bool MainWindow::OpenDirectory(bool AddBookmark)
   {
     // Site bookmarks are the site's: with a session, on either side.
     OpenDirectoryDialog Dialog(!Local, Name, Local ? FLocal->History() : FPanel->History(),
-      FSession ? FSession->SessionKey() : std::string(), AddBookmark, Shared, this);
+      FSession ? FSession->SessionKey() : std::string(), AddBookmark, Shared, this, FSession != nullptr);
     if (Dialog.exec() != QDialog::Accepted)
     {
+      Switched = Dialog.Switched();
       return false;
     }
     Name = Dialog.Directory();
-    if (Local ? FLocal->ChangeDirectory(Name) : FPanel->ChangeDirectory(Name))
+    if (Local ? GoLocal(Name) : GoRemote(Name))
     {
       return true;
     }
     AddBookmark = false;
     Shared = CoreBridge::UseSharedBookmarks();
   }
+}
+
+// The Location Profiles dialog, then DoOpenBookmark: the local directory,
+// then the remote one, each reporting its own error.
+bool MainWindow::OpenLocationProfile(bool AddBookmark, bool & Switched)
+{
+  LocationProfilesDialog Dialog(QDir::toNativeSeparators(FLocal->Path()), FPanel->Path(), FLocal->History(), FPanel->History(),
+    !FLocalActive, FSession->SessionKey(), AddBookmark, this);
+  if (Dialog.exec() != QDialog::Accepted)
+  {
+    Switched = Dialog.Switched();
+    return false;
+  }
+  bool Result = true;
+  if (!Dialog.LocalDirectory().isEmpty())
+  {
+    Result = GoLocal(Dialog.LocalDirectory()) && Result;
+  }
+  if (!Dialog.RemoteDirectory().isEmpty())
+  {
+    Result = GoRemote(Dialog.RemoteDirectory()) && Result;
+  }
+  return Result;
 }
