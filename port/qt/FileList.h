@@ -159,6 +159,9 @@ public:
   explicit FileView(QWidget * Parent = nullptr);
   // The drag of the selection; null for none.
   std::function<QMimeData *()> MakeDrag;
+  // A drag started is given here instead of to the system (tests), which
+  // owns the data.
+  std::function<void(QMimeData *)> OnDragStarted;
 
   // WinSCP's selection commands, as its keys do them: Insert, the
   // focused entry's selection toggled and the focus down; the keypad's *,

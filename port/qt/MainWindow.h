@@ -110,6 +110,14 @@ public:
   // application (efShell). False when nothing was opened.
   bool EditCurrentWith(int Editor);
   bool OpenCurrent();
+  // A panel's right click, as WinSCP's popups (NonVisual.dfm's
+  // RemoteFilePopup, LocalFilePopup, RemoteDirViewPopup, LocalDirViewPopup):
+  // over a file, what can be done to the selection; elsewhere, the
+  // directory's. The menu is returned unshown when Show is false (tests).
+  QMenu * ContextMenu(bool Local, bool OnItem, const QPoint & Global, bool Show = true);
+  // File Names > Copy to Clipboard: the selected names, one per line, with
+  // their full paths if asked (FileListToClipboard, FullFileListToClipboard).
+  void CopyFileNames(bool Local, bool Paths);
   // As CustomExecuteFile's efExternalEditor and efShell, on a file of the
   // active panel.
   bool EditExternally(const CoreBridge::TEditorDefinition & Editor, bool Local, const QString & Name);

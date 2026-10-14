@@ -976,6 +976,17 @@ void DragOnto(FileView * View, QMimeData * Data, const QPoint & Pos, Qt::Keyboar
   QApplication::sendEvent(View->viewport(), &Drop);
 }
 
+bool WaitUntil(const std::function<bool()> & Condition)
+{
+  QElapsedTimer Timer;
+  Timer.start();
+  while (!Condition() && (Timer.elapsed() < 30000))
+  {
+    QApplication::processEvents(QEventLoop::AllEvents, 50);
+  }
+  return Condition();
+}
+
 void DragAndDrop(const char * Port, const QString & Directory)
 {
   QtFrontend Frontend;
@@ -1000,6 +1011,83 @@ void DragAndDrop(const char * Port, const QString & Directory)
     RemotePanel * Remote = Window.Panel();
     Local->ChangeDirectory(Directory);
     const auto Drag = [](FileView * View) { return std::unique_ptr<QMimeData>(View->MakeDrag()); };
+
+    // With the mouse, as a user drags: the press and move start the panel's
+    // drag (its items draggable), and its drop on the other panel copies,
+    // after the Copy dialog.
+    {
+      QFile(Dir.filePath(QStringLiteral("realdrag.txt"))).open(QIODevice::WriteOnly);
+      Local->Refresh();
+      FileView * View = Local->View();
+      QModelIndex Index;
+      for (int Row = 0; Row < View->model()->rowCount(); Row++)
+      {
+        const QModelIndex Candidate = View->model()->index(Row, 0);
+        if (Candidate.data().toString() == QStringLiteral("realdrag.txt"))
+        {
+          Index = Candidate;
+        }
+      }
+      Check(Index.isValid() && (View->model()->flags(Index) & Qt::ItemIsDragEnabled), "a file's row is draggable");
+      std::unique_ptr<QMimeData> Started;
+      View->OnDragStarted = [&Started](QMimeData * Data) { Started.reset(Data); };
+      View->scrollTo(Index);
+      const QPoint Pos = View->visualRect(Index).center();
+      QTest::mousePress(View->viewport(), Qt::LeftButton, Qt::NoModifier, Pos);
+      QTest::mouseMove(View->viewport(), Pos + QPoint(QApplication::startDragDistance() * 3, 4));
+      QTest::mouseMove(View->viewport(), Pos + QPoint(QApplication::startDragDistance() * 6, 8));
+      QTest::mouseRelease(View->viewport(), Qt::LeftButton, Qt::NoModifier, Pos + QPoint(QApplication::startDragDistance() * 6, 8));
+      View->OnDragStarted = nullptr;
+      TFileDrag Dragged;
+      Check(Started && ReadFileDrag(Started.get(), Dragged) && Dragged.Local &&
+        (Dragged.Names == QStringList{ QStringLiteral("realdrag.txt") }), "pressing and moving the mouse starts its drag");
+      if (Started)
+      {
+        QWidget * Target = Remote->View()->viewport();
+        const QPoint At(Target->width() / 2, Target->height() - 4);
+        QDragEnterEvent Enter(At, Qt::CopyAction | Qt::MoveAction, Started.get(), Qt::LeftButton, Qt::NoModifier);
+        QApplication::sendEvent(Target, &Enter);
+        Check(Enter.isAccepted(), "the other panel takes it");
+        QDragMoveEvent Move(At, Qt::CopyAction | Qt::MoveAction, Started.get(), Qt::LeftButton, Qt::NoModifier);
+        QApplication::sendEvent(Target, &Move);
+        QDropEvent DropEvent(At, Qt::CopyAction | Qt::MoveAction, Started.get(), Qt::LeftButton, Qt::NoModifier);
+        QApplication::sendEvent(Target, &DropEvent);
+        Responder.AcceptDialogs = true;
+        Check(WaitUntil([Remote]() { return Remote->Names().contains(QStringLiteral("realdrag.txt")); }),
+          "dropped there, the file is copied (the Copy dialog's OK)");
+        Responder.AcceptDialogs = false;
+        Check(QFileInfo::exists(Dir.filePath(QStringLiteral("realdrag.txt"))), "a copy: the local file stays");
+      }
+    }
+
+    // The right click: WinSCP's popups, over a file and elsewhere.
+    {
+      const auto Texts = [](QMenu * Menu)
+      {
+        QStringList Result;
+        for (QAction * Action : Menu->actions())
+        {
+          Result.append(Action->text().remove(QLatin1Char('&')));
+        }
+        delete Menu;
+        return Result;
+      };
+      Remote->Select({ QStringLiteral("realdrag.txt") });
+      const QStringList File = Texts(Window.ContextMenu(false, true, QPoint(), false));
+      for (const char * Item : { "Open", "Edit", "Edit With", "Copy...", "Move...", "Duplicate...", "Move To...", "Delete",
+             "Rename", "File Custom Commands", "File Names", "Properties" })
+      {
+        Check(File.contains(QString::fromLatin1(Item)), Item);
+      }
+      Check(!Window.LocalActive(), "the panel clicked is the active one");
+      const QStringList Directory = Texts(Window.ContextMenu(true, false, QPoint(), false));
+      Check(Directory.contains(QStringLiteral("Go To")) && Directory.contains(QStringLiteral("Refresh")) &&
+        Directory.contains(QStringLiteral("New")) && Window.LocalActive(), "and the directory's, on the local panel");
+      Local->Select({ QStringLiteral("realdrag.txt") });
+      Window.CopyFileNames(true, true);
+      Check(QDir::fromNativeSeparators(QApplication::clipboard()->text()) == Dir.filePath(QStringLiteral("realdrag.txt")),
+        "File Names: the full path to the clipboard");
+    }
 
     Local->Select({ QStringLiteral("moveme.txt") });
     std::unique_ptr<QMimeData> Data = Drag(Local->View());
@@ -1944,16 +2032,6 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
 }
 
 
-bool WaitUntil(const std::function<bool()> & Condition)
-{
-  QElapsedTimer Timer;
-  Timer.start();
-  while (!Condition() && (Timer.elapsed() < 30000))
-  {
-    QApplication::processEvents(QEventLoop::AllEvents, 50);
-  }
-  return Condition();
-}
 
 void Editing(const char * Port, const QString & Directory)
 {

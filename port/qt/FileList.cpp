@@ -183,6 +183,11 @@ void FileView::startDrag(Qt::DropActions /*Actions*/)
   {
     return;
   }
+  if (OnDragStarted)
+  {
+    OnDragStarted(Data);
+    return;
+  }
   QDrag * Drag = new QDrag(this);
   Drag->setMimeData(Data);
   Drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
@@ -895,9 +900,14 @@ int FileListModel::columnCount(const QModelIndex & Parent) const
 Qt::ItemFlags FileListModel::flags(const QModelIndex & Index) const
 {
   Qt::ItemFlags Result = QAbstractTableModel::flags(Index);
-  if (Index.isValid() && (Index.column() == NameColumn) && !IsParent(Index.row()))
+  if (Index.isValid() && !IsParent(Index.row()))
   {
-    Result |= Qt::ItemIsEditable;
+    // The view starts a drag only from draggable items (FileView::startDrag).
+    Result |= Qt::ItemIsDragEnabled;
+    if (Index.column() == NameColumn)
+    {
+      Result |= Qt::ItemIsEditable;
+    }
   }
   return Result;
 }

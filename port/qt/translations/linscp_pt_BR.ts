@@ -1130,6 +1130,26 @@ Local: %2</translation>
         <source>&amp;Open</source>
         <translation>A&amp;brir</translation>
     </message>
+    <message>
+        <source>&amp;File Names</source>
+        <translation>Nomes de ar&amp;quivo</translation>
+    </message>
+    <message>
+        <source>&amp;Copy to Clipboard</source>
+        <translation>&amp;Copiar para a área de transferência</translation>
+    </message>
+    <message>
+        <source>Copy to Clipboard (Include &amp;Paths)</source>
+        <translation>Copiar nome (com &amp;endereço)</translation>
+    </message>
+    <message>
+        <source>&amp;Copy Path to Clipboard</source>
+        <translation>&amp;Copiar caminho para a área de transferência</translation>
+    </message>
+    <message>
+        <source>&amp;New</source>
+        <translation>&amp;Novo</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

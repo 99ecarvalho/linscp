@@ -434,6 +434,14 @@ void LocalPanel::Activated(const QModelIndex & Index)
 
 void LocalPanel::ContextMenu(const QPoint & Pos)
 {
+  if (OnContextMenu)
+  {
+    const QModelIndex Index = FView->indexAt(Pos);
+    const QModelIndex Source = Index.isValid() ? FSort->mapToSource(Index) : QModelIndex();
+    const bool OnItem = Source.isValid() && !FModel->IsParent(Source.row()) && (FModel->Entry(Source.row()) != nullptr);
+    OnContextMenu(FView->viewport()->mapToGlobal(Pos), OnItem);
+    return;
+  }
   QMenu Menu(this);
   Menu.addAction(FNewFolderAction);
   Menu.addAction(FRenameAction);

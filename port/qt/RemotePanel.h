@@ -84,6 +84,20 @@ public:
   QLineEdit * PathEdit() const { return FPath; }
   QLabel * Status() const { return FStatus; }
 
+  // Its own actions, which the window's context menus offer too.
+  QAction * BackAction() const { return FBackAction; }
+  QAction * ForwardAction() const { return FForwardAction; }
+  QAction * ParentAction() const { return FParentAction; }
+  QAction * RootAction() const { return FRootAction; }
+  QAction * HomeAction() const { return FHomeAction; }
+  QAction * RefreshAction() const { return FRefreshAction; }
+  QAction * NewFolderAction() const { return FNewFolderAction; }
+  QAction * RenameAction() const { return FRenameAction; }
+  QAction * DeleteAction() const { return FDeleteAction; }
+  // The right click, given to the window when set (WinSCP's file and
+  // directory popups): OnItem when over a file, not the parent entry.
+  std::function<void(const QPoint & Global, bool OnItem)> OnContextMenu;
+
 signals:
   // The directory or its contents changed.
   void Changed();

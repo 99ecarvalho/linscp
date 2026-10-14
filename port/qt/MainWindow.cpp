@@ -152,6 +152,9 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
       return Download(Names, Directory, false);
     });
   };
+  // Right clicks: WinSCP's popups.
+  FLocal->OnContextMenu = [this](const QPoint & Global, bool OnItem) { ContextMenu(true, OnItem, Global); };
+  FPanel->OnContextMenu = [this](const QPoint & Global, bool OnItem) { ContextMenu(false, OnItem, Global); };
   // Tab: to the other panel.
   connect(FLocal->View(), &FileView::SwitchPanel, this, [this]() { ActivatePanel(false); });
   connect(FPanel->View(), &FileView::SwitchPanel, this, [this]() { ActivatePanel(true); });
@@ -1294,6 +1297,116 @@ bool MainWindow::OpenCurrent()
   CoreBridge::TEditorDefinition Editor;
   Editor.Kind = CoreBridge::TEditorDefinition::TKind::Open;
   return EditExternally(Editor, Local, Name);
+}
+
+QMenu * MainWindow::ContextMenu(bool Local, bool OnItem, const QPoint & Global, bool Show)
+{
+  // The panel clicked is the one acted on.
+  ActivatePanel(Local);
+  UpdateActions();
+  QMenu * Menu = new QMenu(this);
+  Menu->setAttribute(Qt::WA_DeleteOnClose, Show);
+  if (OnItem)
+  {
+    const FileView * View = Local ? FLocal->View() : FPanel->View();
+    const CoreBridge::TRemoteEntry * Entry = View->CurrentEntry();
+    // CurrentAddEditLinkContextAction: a link's own.
+    if (!Local && (Entry != nullptr) && Entry->Link)
+    {
+      Menu->addAction(FLinkAction);
+    }
+    Menu->addAction(tr("&Open"), this, [this]() { OpenCurrent(); });
+    Menu->addAction(FEditAction);
+    Menu->addMenu(FEditWithMenu);
+    Menu->addSeparator();
+    Menu->addAction(FCopyAction);
+    Menu->addAction(FMoveAction);
+    if (!Local)
+    {
+      Menu->addAction(FDuplicateAction);
+      Menu->addAction(FMoveToAction);
+    }
+    Menu->addAction(Local ? FLocal->DeleteAction() : FPanel->DeleteAction());
+    Menu->addAction(Local ? FLocal->RenameAction() : FPanel->RenameAction());
+    Menu->addSeparator();
+    if (!Local)
+    {
+      Menu->addMenu(FFileCommandsMenu);
+    }
+    QMenu * Names = Menu->addMenu(tr("&File Names"));
+    Names->addAction(tr("&Copy to Clipboard"), this, [this, Local]() { CopyFileNames(Local, false); });
+    Names->addAction(tr("Copy to Clipboard (Include &Paths)"), this, [this, Local]() { CopyFileNames(Local, true); });
+    if (!Local)
+    {
+      Names->addAction(FGenerateFileUrlAction);
+    }
+    if (!Local)
+    {
+      Menu->addSeparator();
+      Menu->addAction(FPropertiesAction);
+    }
+  }
+  else
+  {
+    QMenu * GoTo = Menu->addMenu(tr("&Go To"));
+    GoTo->addAction(FOpenDirectoryAction);
+    if (Local)
+    {
+      GoTo->addAction(tr("&Explore Directory"), this, [this]() { ExploreLocalDirectory(); });
+    }
+    GoTo->addSeparator();
+    for (QAction * Action : Local ?
+           std::initializer_list<QAction *>{ FLocal->ParentAction(), FLocal->RootAction(), FLocal->HomeAction() } :
+           std::initializer_list<QAction *>{ FPanel->ParentAction(), FPanel->RootAction(), FPanel->HomeAction() })
+    {
+      GoTo->addAction(Action);
+    }
+    GoTo->addSeparator();
+    GoTo->addAction(Local ? FLocal->BackAction() : FPanel->BackAction());
+    GoTo->addAction(Local ? FLocal->ForwardAction() : FPanel->ForwardAction());
+    Menu->addAction(Local ? FLocal->RefreshAction() : FPanel->RefreshAction());
+    Menu->addAction(FAddBookmarkAction);
+    Menu->addAction(FFilterAction);
+    Menu->addAction(tr("&Copy Path to Clipboard"), this, [this, Local]()
+    {
+      QApplication::clipboard()->setText(Local ? QDir::toNativeSeparators(FLocal->Path()) : FPanel->Path());
+    });
+    Menu->addSeparator();
+    QMenu * New = Menu->addMenu(tr("&New"));
+    New->addAction(Local ? FLocal->NewFolderAction() : FPanel->NewFolderAction());
+    if (!Local)
+    {
+      Menu->addMenu(FStaticCommandsMenu);
+    }
+  }
+  if (Show)
+  {
+    Menu->popup(Global);
+  }
+  return Menu;
+}
+
+void MainWindow::CopyFileNames(bool Local, bool Paths)
+{
+  const QStringList Names = Local ? FLocal->Selected() : FPanel->Selected();
+  QStringList Lines;
+  for (const QString & Name : Names)
+  {
+    if (!Paths)
+    {
+      Lines.append(Name);
+    }
+    else if (Local)
+    {
+      Lines.append(QDir::toNativeSeparators(QDir(FLocal->Path()).filePath(Name)));
+    }
+    else
+    {
+      const QString Directory = FPanel->Path();
+      Lines.append(Directory + (Directory.endsWith(QLatin1Char('/')) ? QString() : QStringLiteral("/")) + Name);
+    }
+  }
+  QApplication::clipboard()->setText(Lines.join(QStringLiteral("\n")));
 }
 
 bool MainWindow::EditExternally(const CoreBridge::TEditorDefinition & Editor, bool Local, const QString & Name)
