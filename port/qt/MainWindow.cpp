@@ -20,6 +20,7 @@
 #include <QUrl>
 #include <QFormLayout>
 #include <QTemporaryDir>
+#include <QTabBar>
 #include <QTimer>
 #include <QTreeView>
 #include <QSplitter>
@@ -77,12 +78,11 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   // As WinSCP: the last session closed, the window too unless kept open.
   FDisconnectAction = FileMenu->addAction(tr("&Disconnect"), this, [this]()
   {
-    if (!CloseEditors(true))
+    if ((FActiveTab >= 0) && !CloseTab(FActiveTab))
     {
       return;
     }
-    Disconnect();
-    if (!CoreBridge::Preferences().KeepOpenWhenNoSession)
+    if (FTabs.empty() && !CoreBridge::Preferences().KeepOpenWhenNoSession)
     {
       close();
     }
@@ -172,7 +172,37 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   addAction(RemotePathAction);
   Vertical->setStretchFactor(0, 4);
   Vertical->setStretchFactor(1, 1);
-  setCentralWidget(Vertical);
+  // The session tabs above the panels, as WinSCP's.
+  QWidget * Central = new QWidget(this);
+  QVBoxLayout * CentralLayout = new QVBoxLayout(Central);
+  CentralLayout->setContentsMargins(0, 0, 0, 0);
+  CentralLayout->setSpacing(0);
+  FTabBar = new QTabBar(Central);
+  FTabBar->setTabsClosable(true);
+  FTabBar->setDocumentMode(true);
+  FTabBar->setExpanding(false);
+  FTabBar->setVisible(false);
+  connect(FTabBar, &QTabBar::currentChanged, this, [this](int Index)
+  {
+    if (!FUpdatingTabs && (Index >= 0) && !SwitchTab(Index))
+    {
+      // Busy: back to the tab that is.
+      UpdateTabs();
+    }
+  });
+  connect(FTabBar, &QTabBar::tabCloseRequested, this, [this](int Index)
+  {
+    QTimer::singleShot(0, this, [this, Index]()
+    {
+      if (CloseTab(Index) && FTabs.empty() && !CoreBridge::Preferences().KeepOpenWhenNoSession)
+      {
+        close();
+      }
+    });
+  });
+  CentralLayout->addWidget(FTabBar);
+  CentralLayout->addWidget(Vertical, 1);
+  setCentralWidget(Central);
   FQueueTimer = new QTimer(this);
   FQueueTimer->setInterval(250);
   connect(FQueueTimer, &QTimer::timeout, this, &MainWindow::QueueIdle);
@@ -249,6 +279,24 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FKeepUpToDateAction = CommandsMenu->addAction(tr("&Keep Remote Directory up to Date..."), this,
     [this]() { KeepUpToDate(); });
   FKeepUpToDateAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_U));
+
+  // As WinSCP's Tabs menu.
+  QMenu * TabsMenu = menuBar()->addMenu(tr("&Tabs"));
+  TabsMenu->addAction(tr("&New Tab..."), this, &MainWindow::SiteManagerDialog);
+  FDuplicateTabAction = TabsMenu->addAction(tr("Du&plicate Tab"), this, [this]() { DuplicateTab(); });
+  FCloseTabAction = TabsMenu->addAction(tr("&Close Tab"), this, [this]()
+  {
+    if ((FActiveTab >= 0) && CloseTab(FActiveTab) && FTabs.empty() && !CoreBridge::Preferences().KeepOpenWhenNoSession)
+    {
+      close();
+    }
+  });
+  FCloseTabAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_D));
+  TabsMenu->addSeparator();
+  FNextTabAction = TabsMenu->addAction(tr("&Next Tab"), this, [this]() { CycleTabs(true); });
+  FNextTabAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Tab));
+  FPreviousTabAction = TabsMenu->addAction(tr("&Previous Tab"), this, [this]() { CycleTabs(false); });
+  FPreviousTabAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Backtab));
 
   QMenu * ViewMenu = menuBar()->addMenu(tr("&View"));
   FHiddenAction = ViewMenu->addAction(tr("Show &Hidden Files"));
@@ -467,6 +515,15 @@ void MainWindow::closeEvent(QCloseEvent * Event)
     return;
   }
   SaveLayout();
+  // Every tab's session closed, each keeping its directories.
+  while (!FTabs.empty())
+  {
+    if (FActiveTab < 0)
+    {
+      UnparkTab(0);
+    }
+    Disconnect();
+  }
   Disconnect();
   QMainWindow::closeEvent(Event);
 }
@@ -549,11 +606,13 @@ bool MainWindow::SiteManagerDialog()
 
 bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
 {
-  if (FBusy || !CloseEditors(true))
+  if (FBusy)
   {
     return false;
   }
-  Disconnect();
+  // As WinSCP: a new tab; the one active until now kept.
+  const int Previous = FActiveTab;
+  ParkActiveTab();
   FBusy = true;
   UpdateTitle();
   UpdateActions();
@@ -594,6 +653,21 @@ bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
     ShowError(E);
   }
   FBusy = false;
+  if (Result)
+  {
+    FTabs.push_back(TTab());
+    FActiveTab = static_cast<int>(FTabs.size()) - 1;
+  }
+  else if (Previous >= 0)
+  {
+    // Not connected: the tab active before is again.
+    UnparkTab(Previous);
+    UpdateTabs();
+    UpdateTitle();
+    UpdateActions();
+    return false;
+  }
+  UpdateTabs();
   statusBar()->showMessage(Result ? tr("Connected") : tr("Not connected"));
   FPanel->SetSession(FSession.get());
   FQueue->SetSession(FSession.get());
@@ -634,6 +708,7 @@ void MainWindow::OpenUrlDialog()
 
 void MainWindow::Disconnect()
 {
+  const int Closed = FActiveTab;
   if (FSession)
   {
     // As WinSCP: the directories kept for next time, when the site does.
@@ -651,6 +726,17 @@ void MainWindow::Disconnect()
     FLocal->HomeDirectory.clear();
     statusBar()->showMessage(tr("Disconnected"));
   }
+  // Its tab gone, the next one (else the previous) active, as WinSCP's.
+  if ((Closed >= 0) && (Closed < static_cast<int>(FTabs.size())))
+  {
+    FTabs.erase(FTabs.begin() + Closed);
+    FActiveTab = -1;
+    if (!FTabs.empty())
+    {
+      UnparkTab(std::min(Closed, static_cast<int>(FTabs.size()) - 1));
+    }
+  }
+  UpdateTabs();
   FPanel->SetSession(FSession.get());
   FQueue->SetSession(FSession.get());
   FQueueDone = 0;
@@ -734,13 +820,35 @@ void MainWindow::ActivatePanel(bool Local)
 
 void MainWindow::QueueIdle()
 {
-  if (!FSession || !FSession->Active() || FBusy)
+  if (FBusy)
+  {
+    return;
+  }
+  // The other tabs' sessions and queues keep going, as WinSCP's
+  // TTerminalManager::Idle has them.
+  for (TTab & Tab : FTabs)
+  {
+    if (Tab.Session && Tab.Session->Active())
+    {
+      try
+      {
+        Tab.Session->Idle();
+        Tab.Session->QueueIdle();
+      }
+      catch (const CoreBridge::TCoreError &)
+      {
+        // Seen once the tab is active again.
+      }
+    }
+  }
+  if (!FSession || !FSession->Active())
   {
     return;
   }
   bool Changed = false;
   try
   {
+    FSession->Idle();
     Changed = FSession->QueueIdle();
   }
   catch (const CoreBridge::TCoreError & E)
@@ -1168,6 +1276,10 @@ void MainWindow::UpdateActions()
   FSynchronizeAction->setEnabled(!FBusy && FSession);
   FKeepUpToDateAction->setEnabled(!FBusy && FSession);
   FDisconnectAction->setEnabled(!FBusy && FSession);
+  FDuplicateTabAction->setEnabled(!FBusy && FSession);
+  FCloseTabAction->setEnabled(!FBusy && FSession);
+  FNextTabAction->setEnabled(!FBusy && (TabCount() > 1));
+  FPreviousTabAction->setEnabled(!FBusy && (TabCount() > 1));
 }
 
 void MainWindow::About()
@@ -1488,7 +1600,7 @@ bool MainWindow::EditExternally(const CoreBridge::TEditorDefinition & Editor, bo
   {
     if (Started)
     {
-      FExternalEdited.push_back({ File, QFileInfo(LocalFile).lastModified() });
+      FExternalEdited.push_back({ File, QFileInfo(LocalFile).lastModified(), FSession.get() });
       FExternalTimer->start();
     }
     else if (!File->RootDirectory.empty())
@@ -1505,7 +1617,7 @@ void MainWindow::CheckExternalEdited()
 {
   for (std::size_t Index = 0; Index < FExternalEdited.size(); Index++)
   {
-    if (FBusy || !FSession)
+    if (FBusy)
     {
       return;
     }
@@ -1515,7 +1627,7 @@ void MainWindow::CheckExternalEdited()
     {
       Edited.Modified = Modified;
       std::shared_ptr<CoreBridge::TEditedFile> File = Edited.File;
-      EditUpload(*File);
+      EditUpload(Edited.Session, *File);
     }
   }
 }
@@ -1588,7 +1700,8 @@ EditorWindow * MainWindow::EditRemote(const QString & Name)
     return nullptr;
   }
   EditorWindow * Editor = new EditorWindow(QString::fromStdString(File->LocalFile), RemotePath, QString::fromStdString(FInfo.AppName));
-  Editor->OnFileChanged = [this, File]() { return EditUpload(*File); };
+  CoreBridge::TSession * Session = FSession.get();
+  Editor->OnFileChanged = [this, File, Session]() { return EditUpload(Session, *File); };
   // Its temporary directory goes once it is closed and uploaded.
   connect(Editor, &QObject::destroyed, this, [this, File]()
   {
@@ -1598,13 +1711,14 @@ EditorWindow * MainWindow::EditRemote(const QString & Name)
     }
     CleanUpEdited();
   });
-  FEdited.push_back({ Editor, File });
+  FEdited.push_back({ Editor, File, Session });
   return ShowEditor(Editor);
 }
 
-bool MainWindow::EditUpload(CoreBridge::TEditedFile & File)
+// The file goes back to the session it came from, whichever tab is active.
+bool MainWindow::EditUpload(CoreBridge::TSession * Session, CoreBridge::TEditedFile & File)
 {
-  if (FBusy || !FSession)
+  if (FBusy || !SessionOpen(Session) || !Session->Active())
   {
     return false;
   }
@@ -1613,7 +1727,7 @@ bool MainWindow::EditUpload(CoreBridge::TEditedFile & File)
   bool Result = false;
   try
   {
-    Result = FSession->EditUpload(File, !FClosingEditors);
+    Result = Session->EditUpload(File, !FClosingEditors);
   }
   catch (const CoreBridge::TCoreError & E)
   {
@@ -1622,7 +1736,7 @@ bool MainWindow::EditUpload(CoreBridge::TEditedFile & File)
   FBusy = false;
   UpdateActions();
   // Uploaded here (not queued): the panel shows it now.
-  if (Result && FSession->QueueEmpty())
+  if (Result && (Session == FSession.get()) && Session->QueueEmpty())
   {
     FPanel->Refresh();
   }
@@ -1642,7 +1756,7 @@ std::vector<EditorWindow *> MainWindow::Editors(bool RemoteOnly) const
   return Result;
 }
 
-bool MainWindow::CloseEditors(bool RemoteOnly)
+bool MainWindow::CloseEditors(bool RemoteOnly, const CoreBridge::TSession * Session)
 {
   FClosingEditors = true;
   // As CloseExternalFilesWithoutProcess: their last changes uploaded, then
@@ -1650,15 +1764,28 @@ bool MainWindow::CloseEditors(bool RemoteOnly)
   CheckExternalEdited();
   for (const TExternalEdited & Edited : FExternalEdited)
   {
-    if (!Edited.File->RootDirectory.empty())
+    if (((Session == nullptr) || (Edited.Session == Session)) && !Edited.File->RootDirectory.empty())
     {
       FEditedCleanUp.push_back(Edited.File->RootDirectory);
     }
   }
-  FExternalEdited.clear();
-  FExternalTimer->stop();
+  FExternalEdited.erase(std::remove_if(FExternalEdited.begin(), FExternalEdited.end(),
+    [Session](const TExternalEdited & Edited) { return (Session == nullptr) || (Edited.Session == Session); }),
+    FExternalEdited.end());
+  if (FExternalEdited.empty())
+  {
+    FExternalTimer->stop();
+  }
+  std::vector<EditorWindow *> Closing;
+  for (const TEdited & Edited : FEdited)
+  {
+    if (Edited.Editor && (!RemoteOnly || Edited.File) && ((Session == nullptr) || (Edited.Session == Session)))
+    {
+      Closing.push_back(Edited.Editor);
+    }
+  }
   bool Result = true;
-  for (EditorWindow * Editor : Editors(RemoteOnly))
+  for (EditorWindow * Editor : Closing)
   {
     if (!Editor->close())
     {
@@ -1678,9 +1805,17 @@ void MainWindow::CleanUpEdited()
 {
   FEdited.erase(std::remove_if(FEdited.begin(), FEdited.end(), [](const TEdited & Edited) { return Edited.Editor.isNull(); }),
     FEdited.end());
-  if (FEditedCleanUp.empty() || (FSession && !FSession->QueueEmpty()))
+  if (FEditedCleanUp.empty())
   {
     return;
+  }
+  // Their uploads may still be queued, in any tab.
+  for (int Index = 0; Index < TabCount(); Index++)
+  {
+    if ((TabSession(Index) != nullptr) && !TabSession(Index)->QueueEmpty())
+    {
+      return;
+    }
   }
   for (const std::string & Directory : FEditedCleanUp)
   {
@@ -2462,4 +2597,149 @@ bool MainWindow::EnterCustomCommand(bool Files)
   FHasLastCustomCommand = true;
   UpdateCustomCommands();
   return RunCustomCommand(FLastCustomCommand);
+}
+
+// --- Session tabs ----------------------------------------------------------------
+
+CoreBridge::TSession * MainWindow::TabSession(int Index) const
+{
+  if ((Index < 0) || (Index >= static_cast<int>(FTabs.size())))
+  {
+    return nullptr;
+  }
+  return (Index == FActiveTab) ? FSession.get() : FTabs[Index].Session.get();
+}
+
+bool MainWindow::SessionOpen(const CoreBridge::TSession * Session) const
+{
+  for (int Index = 0; (Session != nullptr) && (Index < TabCount()); Index++)
+  {
+    if (TabSession(Index) == Session)
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+void MainWindow::ParkActiveTab()
+{
+  if ((FActiveTab < 0) || (FActiveTab >= static_cast<int>(FTabs.size())))
+  {
+    return;
+  }
+  TTab & Tab = FTabs[FActiveTab];
+  Tab.Session = std::move(FSession);
+  Tab.LocalPath = FLocal->Path();
+  Tab.QueueDone = FQueueDone;
+  FActiveTab = -1;
+}
+
+// As TTerminalManager::SetActiveTerminal: the panels on the tab's session,
+// the local one on its directory.
+void MainWindow::UnparkTab(int Index)
+{
+  TTab & Tab = FTabs[Index];
+  FSession = std::move(Tab.Session);
+  FActiveTab = Index;
+  FQueueDone = Tab.QueueDone;
+  FPanel->SetSession(FSession.get());
+  FQueue->SetSession(FSession.get());
+  if (!Tab.LocalPath.isEmpty())
+  {
+    FLocal->ChangeDirectory(Tab.LocalPath);
+  }
+  if (FSession)
+  {
+    ApplyPreferences();
+    FQueueTimer->start();
+  }
+}
+
+bool MainWindow::SwitchTab(int Index)
+{
+  if (FBusy || (Index < 0) || (Index >= TabCount()))
+  {
+    return false;
+  }
+  if (Index == FActiveTab)
+  {
+    return true;
+  }
+  ParkActiveTab();
+  UnparkTab(Index);
+  UpdateTabs();
+  UpdateTitle();
+  UpdateActions();
+  return true;
+}
+
+bool MainWindow::CloseTab(int Index)
+{
+  if (FBusy || !SwitchTab(Index))
+  {
+    return false;
+  }
+  if (!CloseEditors(true, FSession.get()))
+  {
+    return false;
+  }
+  Disconnect();
+  return true;
+}
+
+void MainWindow::CycleTabs(bool Forward)
+{
+  if (TabCount() > 1)
+  {
+    SwitchTab((FActiveTab + (Forward ? 1 : TabCount() - 1)) % TabCount());
+  }
+}
+
+bool MainWindow::DuplicateTab()
+{
+  if (FBusy || !FSession)
+  {
+    return false;
+  }
+  std::unique_ptr<CoreBridge::TSession> Copy;
+  try
+  {
+    Copy = FSession->Duplicate();
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+  return Open(std::move(Copy));
+}
+
+// The tab bar as the tabs are: each session's name, the active one current.
+void MainWindow::UpdateTabs()
+{
+  FUpdatingTabs = true;
+  while (FTabBar->count() > TabCount())
+  {
+    FTabBar->removeTab(FTabBar->count() - 1);
+  }
+  for (int Index = 0; Index < TabCount(); Index++)
+  {
+    CoreBridge::TSession * Session = TabSession(Index);
+    const QString Name = (Session != nullptr) ? QString::fromStdString(Session->Name()) : QString();
+    if (Index >= FTabBar->count())
+    {
+      FTabBar->addTab(Name);
+    }
+    else
+    {
+      FTabBar->setTabText(Index, Name);
+    }
+  }
+  if (FActiveTab >= 0)
+  {
+    FTabBar->setCurrentIndex(FActiveTab);
+  }
+  FTabBar->setVisible(TabCount() > 0);
+  FUpdatingTabs = false;
 }

@@ -148,6 +148,7 @@
 #include <QPlainTextEdit>
 #include <QTemporaryDir>
 #include "EditorWindow.h"
+#include <QTabBar>
 #include "KeepUpToDateDialog.h"
 #include <QThread>
 
@@ -3507,6 +3508,67 @@ void StartUpTest(const char * Port)
   CoreBridge::Finalize();
 }
 
+// Session tabs: sessions side by side, each with its directories; an editor
+// saving to its own session whichever tab is active.
+void TabsTest(const char * Port, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = { "secret", "secret", "secret" };
+    Responder.AcceptDialogs = true;
+    const QString Url = QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port));
+    const QDir Root(QDir(Directory).filePath(QStringLiteral("../root")));
+    QDir().mkpath(QDir(Directory).filePath(QStringLiteral("first")));
+    QDir().mkpath(QDir(Directory).filePath(QStringLiteral("second")));
+    Check(Window.OpenUrl(Url) && (Window.TabCount() == 1) && Window.TabBar()->isVisible(), "a session, a tab");
+    CoreBridge::TSession * First = Window.Session();
+    Window.Local()->ChangeDirectory(QDir(Directory).filePath(QStringLiteral("first")));
+    Check(Window.Panel()->ChangeDirectory(QStringLiteral("/sub")), "the first tab in /sub");
+    Check(Window.OpenUrl(Url) && (Window.TabCount() == 2) && (Window.ActiveTab() == 1) && (Window.Session() != First),
+      "another session opens in a tab of its own");
+    CoreBridge::TSession * Second = Window.Session();
+    Check(Window.TabSession(0) == First, "the first one kept");
+    Window.Local()->ChangeDirectory(QDir(Directory).filePath(QStringLiteral("second")));
+    Check(Window.Panel()->Path() == QStringLiteral("/"), "the second at its start");
+
+    Check(Window.SwitchTab(0) && (Window.Session() == First) && (Window.Panel()->Path() == QStringLiteral("/sub")) &&
+      (QDir(Window.Local()->Path()) == QDir(QDir(Directory).filePath(QStringLiteral("first")))),
+      "back on the first tab: its remote and local directories");
+    Check(Window.TabBar()->currentIndex() == 0, "the tab bar says so");
+
+    // An editor of the first tab's, saved while the second is active.
+    Check(Window.Panel()->ChangeDirectory(QStringLiteral("/")), "(the root)");
+    Window.Panel()->Select({ QStringLiteral("hello.txt") });
+    Window.ActivatePanel(false);
+    EditorWindow * Editor = Window.EditCurrent();
+    Check(Editor != nullptr, "a remote file edited in the first tab");
+    Window.CycleTabs(true);
+    Check(Window.Session() == Second, "Ctrl+Tab: the next tab");
+    if (Editor != nullptr)
+    {
+      Editor->Editor()->moveCursor(QTextCursor::End);
+      Editor->Editor()->insertPlainText(QStringLiteral("from a tab\n"));
+      Check(Editor->Save(), "saved with the other tab active");
+      Check(WaitUntil([First]() { return First->QueueEmpty(); }) &&
+        WaitUntil([&Root]() { return QFile(Root.filePath(QStringLiteral("hello.txt"))).size() > 14; }),
+        "uploaded through its own session");
+    }
+
+    // Duplicate, close.
+    Check(Window.DuplicateTab() && (Window.TabCount() == 3) && (Window.ActiveTab() == 2), "Duplicate Tab: a third tab");
+    Check(Window.CloseTab(1) && (Window.TabCount() == 2) && (Window.TabSession(0) == First), "closing one keeps the rest");
+    Check(Window.CloseTab(0) && (Window.TabCount() == 1) && !Window.Editors(true).size(), "closing the first closes its editors");
+    Check(Window.Session() != nullptr, "the last tab active");
+  }
+  CoreBridge::Finalize();
+}
+
 int main(int argc, char ** argv)
 {
   QApplication App(argc, argv);
@@ -3556,6 +3618,10 @@ int main(int argc, char ** argv)
   {
     Commands(argv[3], QString::fromLocal8Bit(argv[4]), QString::fromLocal8Bit(argv[5]), QString::fromLocal8Bit(argv[6]),
       QString::fromLocal8Bit((argc >= 8) ? argv[7] : argv[6]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "tabs") == 0))
+  {
+    TabsTest(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "startup") == 0))
   {

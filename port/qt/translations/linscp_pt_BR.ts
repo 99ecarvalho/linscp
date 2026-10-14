@@ -1150,6 +1150,30 @@ Local: %2</translation>
         <source>&amp;New</source>
         <translation>&amp;Novo</translation>
     </message>
+    <message>
+        <source>&amp;Tabs</source>
+        <translation>&amp;Abas</translation>
+    </message>
+    <message>
+        <source>&amp;New Tab...</source>
+        <translation>&amp;Nova aba...</translation>
+    </message>
+    <message>
+        <source>Du&amp;plicate Tab</source>
+        <translation>Du&amp;plicar Aba</translation>
+    </message>
+    <message>
+        <source>&amp;Close Tab</source>
+        <translation>&amp;Fechar aba</translation>
+    </message>
+    <message>
+        <source>&amp;Next Tab</source>
+        <translation>&amp;Próxima aba</translation>
+    </message>
+    <message>
+        <source>&amp;Previous Tab</source>
+        <translation>Aba a&amp;nterior</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

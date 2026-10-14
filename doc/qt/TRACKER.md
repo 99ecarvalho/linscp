@@ -786,7 +786,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-10 | P3 exit gate | todo | |
 | P3-11 | Remember last used directories | done | `TSite::UpdateDirectories` (advanced settings' Directories page), `TSession::SaveDirectories` as `TTerminalManager::SaveTerminal` on disconnect, another session, or closing; the local directory's quiet fallback; ctest `qt_gui_sites`; native on Windows 11 too. "Preserve local directory" is P3-04's |
 | P3-12 | Local-to-local browsing | todo | WinSCP's local browser and CopyLocal; after P3-06 |
-| P3-13 | Session tabs and workspaces | todo | several sessions at once, and workspaces (Save Workspace, from P3-06f) |
+| P3-13 | Session tabs and workspaces | wip | Tabs done: a session opened goes to a tab of its own, each tab with its own remote and local directories, its editors uploading to it whichever tab is active, every tab's session kept alive (`TTerminal::Idle`, which the shell had not called); the Tabs menu (New, Duplicate, Close Ctrl+Shift+D, Next and Previous Ctrl+Tab); ctest `qt_gui_tabs`. Next: workspaces |
 
 ### P4 — Cleanup
 | ID | Task | Status | Note |

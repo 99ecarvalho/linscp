@@ -2745,4 +2745,35 @@ void TSession::OpenInPutty(const TCustomCommandPrompts & Prompts)
   }
 }
 
+std::unique_ptr<TSession> TSession::Duplicate() const
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TSession> Result(new TSession());
+    Result->F->Data.reset(CloneCurrentSessionData(F->Terminal.get()));
+    return Result;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void TSession::Idle()
+{
+  if (F->Terminal == NULL)
+  {
+    return;
+  }
+  try
+  {
+    F->Terminal->Idle();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 }

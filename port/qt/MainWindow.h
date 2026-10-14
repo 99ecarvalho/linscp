@@ -131,7 +131,8 @@ public:
   std::vector<EditorWindow *> Editors(bool RemoteOnly = false) const;
   // Closes them, each asking to save a modified file, the remote ones'
   // uploads done here. False when one stayed open.
-  bool CloseEditors(bool RemoteOnly);
+  // Session: only that session's.
+  bool CloseEditors(bool RemoteOnly, const CoreBridge::TSession * Session = nullptr);
   // Files > Properties (F9), as WinSCP's: the remote panel's selection (or
   // its focused entry) in the Properties dialog, its changes applied. False
   // when nothing was changed. Local files' properties are the system's.
@@ -212,6 +213,23 @@ public:
   void ActivatePanel(bool Local);
   bool LocalActive() const { return FLocalActive; }
   CoreBridge::TSession * Session() const { return FSession.get(); }
+  // Session tabs, as WinSCP's (TTerminalManager's sessions, its
+  // SessionsPageControl): opening a session adds one, Disconnect closes the
+  // active one. The active tab's session is Session().
+  int TabCount() const { return static_cast<int>(FTabs.size()); }
+  int ActiveTab() const { return FActiveTab; }
+  CoreBridge::TSession * TabSession(int Index) const;
+  // False when busy, or no such tab.
+  bool SwitchTab(int Index);
+  // The tab's remote editors closed (each asking to save), its session
+  // disconnected, the next tab then active. False when an editor stayed.
+  bool CloseTab(int Index);
+  // Ctrl+Tab and Ctrl+Shift+Tab.
+  void CycleTabs(bool Forward);
+  // Tabs > Duplicate Tab: the active session's site, as it is now, in a new
+  // tab (TCustomScpExplorerForm::DuplicateTab).
+  bool DuplicateTab();
+  class QTabBar * TabBar() const { return FTabBar; }
   RemotePanel * Panel() const { return FPanel; }
   LocalPanel * Local() const { return FLocal; }
 
@@ -228,7 +246,7 @@ private:
   bool Open(std::unique_ptr<CoreBridge::TSession> Session);
   // Loads it and shows it; null (and gone) when it could not be read.
   EditorWindow * ShowEditor(EditorWindow * Editor);
-  bool EditUpload(CoreBridge::TEditedFile & File);
+  bool EditUpload(CoreBridge::TSession * Session, CoreBridge::TEditedFile & File);
   // OpenDirectory's two dialogs; Switched: the other one asked for.
   bool OpenBookmark(bool AddBookmark, bool & Switched);
   bool OpenLocationProfile(bool AddBookmark, bool & Switched);
@@ -254,6 +272,10 @@ private:
   QAction * FSynchronizeAction = nullptr;
   QAction * FKeepUpToDateAction = nullptr;
   QAction * FPuttyAction = nullptr;
+  QAction * FDuplicateTabAction = nullptr;
+  QAction * FCloseTabAction = nullptr;
+  QAction * FNextTabAction = nullptr;
+  QAction * FPreviousTabAction = nullptr;
   std::function<bool(const QUrl &)> FUrlOpener;
   std::vector<QAction *> FBookmarkActions;
   class KeepUpToDateDialog * FKeepUpToDate = nullptr;
@@ -280,6 +302,8 @@ private:
   {
     QPointer<EditorWindow> Editor;
     std::shared_ptr<CoreBridge::TEditedFile> File;
+    // The session a remote file is of.
+    CoreBridge::TSession * Session = nullptr;
   };
   std::vector<TEdited> FEdited;
   // Remote files open in an external editor or their application, and their
@@ -288,7 +312,26 @@ private:
   {
     std::shared_ptr<CoreBridge::TEditedFile> File;
     QDateTime Modified;
+    CoreBridge::TSession * Session = nullptr;
   };
+  // The tabs: the active one's session is FSession, the others' their own,
+  // with each one's local directory and finished queue count.
+  struct TTab
+  {
+    std::unique_ptr<CoreBridge::TSession> Session;
+    QString LocalPath;
+    int QueueDone = 0;
+  };
+  std::vector<TTab> FTabs;
+  int FActiveTab = -1;
+  QTabBar * FTabBar = nullptr;
+  bool FUpdatingTabs = false;
+  // The session parked into its tab, and the tab's back again.
+  void ParkActiveTab();
+  void UnparkTab(int Index);
+  void UpdateTabs();
+  // Whether Session is one of the tabs'.
+  bool SessionOpen(const CoreBridge::TSession * Session) const;
   std::vector<TExternalEdited> FExternalEdited;
   QTimer * FExternalTimer = nullptr;
   QMenu * FEditWithMenu = nullptr;

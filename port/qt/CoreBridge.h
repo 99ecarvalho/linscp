@@ -1268,6 +1268,14 @@ public:
   // dialog with it. A folder of sites (several sessions, P3-13) is none
   // yet. Throws TCoreError.
   static std::unique_ptr<TSession> FromCommandLine(bool & CanOpen);
+  // A session on the same site, as it is now (TCustomScpExplorerForm's
+  // DuplicateTab: CloneCurrentSessionData), not opened yet. Throws
+  // TCoreError.
+  std::unique_ptr<TSession> Duplicate() const;
+  // To be called regularly on the GUI thread, for every open session: its
+  // keepalives and dropped-connection checks (TTerminal::Idle, as
+  // TTerminalManager::Idle calls it).
+  void Idle();
   ~TSession();
   TSession(const TSession &) = delete;
   TSession & operator=(const TSession &) = delete;
