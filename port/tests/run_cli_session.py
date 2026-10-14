@@ -13,6 +13,7 @@ import argparse, getpass, os, shutil, socket, subprocess, sys, tempfile, time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from run_sftp_session import SKIP, fingerprint, free_port, keygen  # noqa: E402
+import fixtures  # noqa: E402
 
 failures = 0
 
@@ -87,28 +88,24 @@ def main():
         local = os.path.join(tmp, 'local')
         os.makedirs(local)
 
-        port = free_port()
         config = os.path.join(tmp, 'sshd_config')
-        with open(config, 'w') as f:
-            f.write('\n'.join([
-                f'Port {port}', 'ListenAddress 127.0.0.1',
-                f'HostKey {tmp}/host', f'PidFile {tmp}/sshd.pid',
-                f'AuthorizedKeysFile {tmp}/authorized_keys',
-                'StrictModes no', 'UsePAM no',
-                'PasswordAuthentication no', 'KbdInteractiveAuthentication no',
-                'PubkeyAuthentication yes', 'Subsystem sftp internal-sftp',
-                'LogLevel ERROR', '']))
-        server = subprocess.Popen([sshd, '-D', '-e', '-f', config])
-        deadline = time.monotonic() + 10
-        while True:
-            try:
-                socket.create_connection(('127.0.0.1', port), timeout=1).close()
-                break
-            except OSError:
-                if server.poll() is not None or time.monotonic() > deadline:
-                    print('FAIL: sshd did not start')
-                    return 1
-                time.sleep(0.1)
+
+        def launch(port):
+            with open(config, 'w') as f:
+                f.write('\n'.join([
+                    f'Port {port}', 'ListenAddress 127.0.0.1',
+                    f'HostKey {tmp}/host', f'PidFile {tmp}/sshd.pid',
+                    f'AuthorizedKeysFile {tmp}/authorized_keys',
+                    'StrictModes no', 'UsePAM no',
+                    'PasswordAuthentication no', 'KbdInteractiveAuthentication no',
+                    'PubkeyAuthentication yes', 'Subsystem sftp internal-sftp',
+                    'LogLevel ERROR', '']))
+            return subprocess.Popen([sshd, '-D', '-e', '-f', config])
+        try:
+            port, server = fixtures.start_server(launch)
+        except RuntimeError:
+            print('FAIL: sshd did not start')
+            return 1
 
         # /keygen: the OpenSSH key to PuTTY's format, as core needs it.
         ppk = os.path.join(tmp, 'client.ppk')

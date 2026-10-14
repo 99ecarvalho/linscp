@@ -19,6 +19,28 @@ def free_port():
         return s.getsockname()[1]
 
 
+def start_server(launch, attempts=5):
+    """(port, process): launch(port) run on a free port. A free port is free
+    only when it is checked: a test starting at the same time may take it
+    first, and then this server exits, unable to bind, while the other's
+    answers in its place. So the server must still be running once its port
+    answers; if not, another port is tried."""
+    for _ in range(attempts):
+        port = free_port()
+        server = launch(port)
+        try:
+            wait_for_port(port, server)
+            time.sleep(0.3)
+            if server.poll() is None:
+                return port, server
+        except RuntimeError:
+            pass
+        if server.poll() is None:
+            server.terminate()
+        server.wait(timeout=10)
+    raise RuntimeError('the server did not start on a free port')
+
+
 def wait_for_port(port, process, timeout=10):
     deadline = time.monotonic() + timeout
     while True:
@@ -90,20 +112,21 @@ def sshd(tmp, extra=()):
     keygen(os.path.join(tmp, 'host'))
     keygen(os.path.join(tmp, 'client'))
     shutil.copy(os.path.join(tmp, 'client.pub'), os.path.join(tmp, 'authorized_keys'))
-    port = free_port()
     config = os.path.join(tmp, 'sshd_config')
-    with open(config, 'w') as f:
-        f.write('\n'.join([
-            f'Port {port}', 'ListenAddress 127.0.0.1',
-            f'HostKey {tmp}/host', f'PidFile {tmp}/sshd.pid',
-            f'AuthorizedKeysFile {tmp}/authorized_keys',
-            'StrictModes no', 'UsePAM no',
-            'PasswordAuthentication no', 'KbdInteractiveAuthentication no',
-            'PubkeyAuthentication yes', 'Subsystem sftp internal-sftp',
-            'LogLevel ERROR'] + list(extra) + ['']))
-    server = subprocess.Popen([binary, '-D', '-e', '-f', config])
+
+    def launch(port):
+        with open(config, 'w') as f:
+            f.write('\n'.join([
+                f'Port {port}', 'ListenAddress 127.0.0.1',
+                f'HostKey {tmp}/host', f'PidFile {tmp}/sshd.pid',
+                f'AuthorizedKeysFile {tmp}/authorized_keys',
+                'StrictModes no', 'UsePAM no',
+                'PasswordAuthentication no', 'KbdInteractiveAuthentication no',
+                'PubkeyAuthentication yes', 'Subsystem sftp internal-sftp',
+                'LogLevel ERROR'] + list(extra) + ['']))
+        return subprocess.Popen([binary, '-D', '-e', '-f', config])
+    port, server = start_server(launch)
     try:
-        wait_for_port(port, server)
         yield port, os.path.join(tmp, 'client'), fingerprint(os.path.join(tmp, 'host.pub'))
     finally:
         server.terminate()
@@ -116,14 +139,14 @@ def rclone_webdav(root, user, password, cert=None, key=None):
     binary = rclone_binary()
     if not binary:
         raise Missing('rclone')
-    port = free_port()
-    cmd = [binary, 'serve', 'webdav', root, '--addr', f'127.0.0.1:{port}',
-           '--user', user, '--pass', password, '--config', empty_config(), '-q']
-    if cert:
-        cmd += ['--cert', cert, '--key', key]
-    server = subprocess.Popen(cmd)
+    def launch(port):
+        cmd = [binary, 'serve', 'webdav', root, '--addr', f'127.0.0.1:{port}',
+               '--user', user, '--pass', password, '--config', empty_config(), '-q']
+        if cert:
+            cmd += ['--cert', cert, '--key', key]
+        return subprocess.Popen(cmd)
+    port, server = start_server(launch)
     try:
-        wait_for_port(port, server)
         yield port
     finally:
         server.terminate()
@@ -135,12 +158,10 @@ def python_server(script, root, *args):
     """One of the test servers written for this suite, run as a process.
     Yields the port."""
     import sys
-    port = free_port()
     here = os.path.dirname(os.path.abspath(__file__))
-    server = subprocess.Popen([sys.executable, '-I', os.path.join(here, script),
-                               '--port', str(port), '--root', root] + list(args))
+    port, server = start_server(lambda port: subprocess.Popen(
+        [sys.executable, '-I', os.path.join(here, script), '--port', str(port), '--root', root] + list(args)))
     try:
-        wait_for_port(port, server)
         yield port
     finally:
         server.terminate()
@@ -154,13 +175,11 @@ def rclone_sftp(root, user, password, host_key_dir):
     binary = rclone_binary()
     if not binary:
         raise Missing('rclone')
-    port = free_port()
-    cmd = [binary, 'serve', 'sftp', root, '--addr', f'127.0.0.1:{port}',
-           '--user', user, '--pass', password, '--config', empty_config(), '-q',
-           '--cache-dir', host_key_dir]
-    server = subprocess.Popen(cmd)
+    port, server = start_server(lambda port: subprocess.Popen(
+        [binary, 'serve', 'sftp', root, '--addr', f'127.0.0.1:{port}',
+         '--user', user, '--pass', password, '--config', empty_config(), '-q',
+         '--cache-dir', host_key_dir]))
     try:
-        wait_for_port(port, server)
         yield port
     finally:
         server.terminate()
@@ -178,11 +197,9 @@ def moto_s3():
     binary = shutil.which('moto_server')
     if not binary or not have_module('boto3') or not have_module('flask_cors'):
         raise Missing('moto_server, boto3 and flask_cors (python3-flask-cors)')
-    port = free_port()
-    server = subprocess.Popen([binary, '-H', '127.0.0.1', '-p', str(port)],
-                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    port, server = start_server(lambda port: subprocess.Popen(
+        [binary, '-H', '127.0.0.1', '-p', str(port)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))
     try:
-        wait_for_port(port, server)
         yield port
     finally:
         server.terminate()
@@ -196,12 +213,10 @@ def socks5_proxy(user, password, log_path):
     binary = shutil.which('microsocks')
     if not binary:
         raise Missing('microsocks')
-    port = free_port()
     log = open(log_path, 'wb')
-    server = subprocess.Popen([binary, '-i', '127.0.0.1', '-p', str(port), '-u', user, '-P', password],
-                              stdout=log, stderr=subprocess.STDOUT)
+    port, server = start_server(lambda port: subprocess.Popen(
+        [binary, '-i', '127.0.0.1', '-p', str(port), '-u', user, '-P', password], stdout=log, stderr=subprocess.STDOUT))
     try:
-        wait_for_port(port, server)
         yield port
     finally:
         server.terminate()
@@ -216,17 +231,17 @@ def http_proxy(tmp, user, password):
     binary = shutil.which('tinyproxy')
     if not binary:
         raise Missing('tinyproxy')
-    port = free_port()
     log_path = os.path.join(tmp, 'tinyproxy.log')
     config = os.path.join(tmp, 'tinyproxy.conf')
-    with open(config, 'w') as f:
-        f.write('\n'.join([f'Port {port}', 'Listen 127.0.0.1', 'Timeout 60', f'LogFile "{log_path}"',
-                           'LogLevel Connect', 'MaxClients 20', 'Allow 127.0.0.1',
-                           f'BasicAuth {user} {password}', '']))
-    server = subprocess.Popen([binary, '-d', '-c', config],
-                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    def launch(port):
+        with open(config, 'w') as f:
+            f.write('\n'.join([f'Port {port}', 'Listen 127.0.0.1', 'Timeout 60', f'LogFile "{log_path}"',
+                               'LogLevel Connect', 'MaxClients 20', 'Allow 127.0.0.1',
+                               f'BasicAuth {user} {password}', '']))
+        return subprocess.Popen([binary, '-d', '-c', config], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    port, server = start_server(launch)
     try:
-        wait_for_port(port, server)
         yield port, log_path
     finally:
         server.terminate()
