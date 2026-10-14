@@ -285,3 +285,60 @@ and XML logs; the default path in `TMPDIR` where `TEMP` is not set),
 `win32_on_posix` (the variables' fallbacks) and `qt_gui_preferences` (the
 pages, saved under core's `Logging` and `Interface` keys, the temporary
 directory in use): Linux, Wine, natively on Windows 11.
+
+## Amendment 2026-10-14: slices of the VCL-bound units (P3-06d)
+
+WinSCP's custom commands (`TCustomCommandType`, `TCustomCommandList`)
+live in `windows/WinConfiguration.cpp`, and `TLocalCustomCommand` in
+`GUITools.cpp`, among code bound to the VCL GUI. About 930 lines of them
+use core only. Mirroring them by hand, as the settings are, would copy
+their logic, including the extensions' parsing, and let it drift. The user
+chose to compile them as they are.
+
+- **The transform cuts slices** (`port/tools/slices.json`):
+  - each slice is a range of an upstream file, from the one line its
+    `from` anchor matches up to its `until` anchor, or the end;
+  - each anchor must match exactly once, so a pin bump that moves or
+    changes the code fails the transform rather than cutting the wrong
+    lines;
+  - a slice is taken from the transformed file, which must be in the
+    transform's scope, or from the pristine one where the code needs no
+    rewriting.
+  - Each is written after a linscp prologue, with `#line` naming
+    upstream's file and line, so diagnostics point at upstream's code.
+- **The slices live outside the mirror** (`build/…/gen-slices`).
+  `verify_transform.py`'s check is unchanged: the generated tree stays a
+  file-for-file mirror. `WinConfiguration.cpp` and `.h` join the
+  transform's scope only to be sliced; they are not compiled.
+- **Today's slices:**
+  - `TCustomCommandType` and `TCustomCommandList`, with their header
+    part and `ExtractExtensionBaseName`;
+  - `TLocalCustomCommand`;
+  - `UserInterface.cpp`'s `NormalizeCustomShortCut`, `IsCustomShortCut`
+    and their constants.
+- **What surrounds them is linscp's:**
+  - `port/qt/CustomCommandsSlice.h`: the headers they need, and
+    `WinConfiguration`, which is the shell's `TShellConfiguration`. It
+    gains `ExtensionStringTranslation`, which does not translate yet.
+  - Stand-ins for `Setup.cpp`'s .NET and PowerShell version probes. They
+    find none, so an extension requiring one is not offered.
+- **The shim gains what they ask of the VCL:**
+  - `Vcl.Menus`' `ShortCut`, `ShortCutToText` and `TextToShortCut`, in
+    Delphi's text form;
+  - `TList::SortList` with `TListSortCompareFunc`;
+  - `AnsiCompareStr`.
+- **The commands are kept as `TWinConfiguration` keeps them.**
+  `TShellConfiguration` holds the list, with WinSCP's defaults
+  (`DefaultLocalized`) until changed. It stores them in `CustomCommands`
+  (or `CustomCommandsNone`) and `CustomCommandOptions`, so a `WinSCP.ini`
+  carries over both ways.
+
+Running them follows `TCustomScpExplorerForm::CustomCommand` and
+`RemoteCustomCommand`, over core's `TRemoteCustomCommand`,
+`TInteractiveCustomCommand` (the prompts, the frontend's) and
+`CustomCommandOnFiles`, in the protocol's shell or a separate shell
+session. Local commands, extensions and their options are not ported yet.
+
+Verified by `qt_gui_commands`, against OpenSSH's sshd over SCP, which has
+a real shell, on Linux. Windows builds the slices; the test skips there
+for want of an sshd.

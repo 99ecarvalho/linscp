@@ -48,6 +48,8 @@
 #include "ServerInfoDialog.h"
 #include "GenerateUrlDialog.h"
 #include "ConsoleDialog.h"
+#include "CustomCommandDialog.h"
+#include <QProcess>
 #include "QueryDialog.h"
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
@@ -189,6 +191,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FLinkAction = FilesMenu->addAction(tr("Edit &Link..."), this, [this]() { AddEditLink(); });
   FPropertiesAction = FilesMenu->addAction(tr("&Properties"), this, [this]() { Properties(); });
   FGenerateFileUrlAction = FilesMenu->addAction(tr("Generate File &URL..."), this, [this]() { GenerateUrl(true); });
+  FFileCommandsMenu = FilesMenu->addMenu(tr("File &Custom Commands"));
   FilesMenu->addSeparator();
   FCopyAction = FilesMenu->addAction(tr("&Copy..."), this, [this]() { TransferSelected(false, true); });
   FCopyAction->setShortcut(QKeySequence(Qt::Key_F5));
@@ -206,6 +209,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
 
   QMenu * CommandsMenu = menuBar()->addMenu(tr("&Commands"));
   FFindFilesAction = CommandsMenu->addAction(tr("&Find Files..."), this, [this]() { FindFilesDialog(); });
+  FStaticCommandsMenu = CommandsMenu->addMenu(tr("Static &Custom Commands"));
   FConsoleAction = CommandsMenu->addAction(tr("Open &Terminal"), this, [this]() { OpenConsole(); });
   FConsoleAction->setShortcut(QKeySequence(Qt::SHIFT | Qt::CTRL | Qt::Key_T));
   CommandsMenu->addSeparator();
@@ -247,6 +251,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   ApplyPreferences();
   RestoreLayout();
   connect(FPanel, &RemotePanel::Changed, this, &MainWindow::UpdateTitle);
+  UpdateCustomCommands();
   UpdateActions();
 }
 
@@ -1679,75 +1684,79 @@ void MainWindow::GenerateUrl(bool Files)
   Dialog.exec();
 }
 
-// As TCustomScpExplorerForm::EnsureCommandSessionFallback, then the console.
-bool MainWindow::OpenConsole()
+// As TCustomScpExplorerForm::EnsureCommandSessionFallback: true when the
+// session runs commands (Shell: a shell's, as custom commands need), after
+// opening a separate shell session, asked first, where it must.
+bool MainWindow::EnsureShellSession(bool Shell)
 {
-  if (FBusy || !FSession)
+  if (Shell ? FSession->CanRunShellCommands() : FSession->CanRunCommands())
   {
+    return true;
+  }
+  if (!FSession->CanOpenShellSession())
+  {
+    CoreBridge::TError Error;
+    Error.Message = CoreBridge::Text(CoreBridge::TText::NotSupported);
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    Frontend.ShowError(Error);
     return false;
   }
-  if (!FSession->CanRunCommands())
+  if (CoreBridge::ConfirmCommandSession())
   {
-    if (!FSession->CanOpenShellSession())
-    {
-      CoreBridge::TError Error;
-      Error.Message = CoreBridge::Text(CoreBridge::TText::NotSupported);
-      QtFrontend Frontend;
-      Frontend.SetWindow(this);
-      Frontend.ShowError(Error);
-      return false;
-    }
-    if (CoreBridge::ConfirmCommandSession())
-    {
-      CoreBridge::TQuery Query;
-      Query.Type = CoreBridge::TQueryType::Confirmation;
-      Query.Message = FSession->CommandSessionQuestion();
-      CoreBridge::TQueryButton OK;
-      OK.Answer = CoreBridge::AnswerOK;
-      OK.Caption = "OK";
-      CoreBridge::TQueryButton Cancel;
-      Cancel.Answer = CoreBridge::AnswerCancel;
-      Cancel.Caption = "Cancel";
-      Query.Buttons = { OK, Cancel };
-      Query.CancelAnswer = CoreBridge::AnswerCancel;
-      Query.NeverAskAgainCheck = true;
-      QtFrontend Frontend;
-      Frontend.SetWindow(this);
-      const CoreBridge::TQueryResult Answer = Frontend.Query(Query);
-      if (Answer.Answer != CoreBridge::AnswerOK)
-      {
-        return false;
-      }
-      if (Answer.NeverAskAgain)
-      {
-        try
-        {
-          CoreBridge::SetConfirmCommandSession(false);
-        }
-        catch (const CoreBridge::TCoreError & E)
-        {
-          ShowError(E);
-        }
-      }
-    }
-    FBusy = true;
-    UpdateActions();
-    bool Opened = false;
-    try
-    {
-      FSession->OpenShellSession();
-      Opened = true;
-    }
-    catch (const CoreBridge::TCoreError & E)
-    {
-      ShowError(E);
-    }
-    FBusy = false;
-    UpdateActions();
-    if (!Opened)
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Confirmation;
+    Query.Message = FSession->CommandSessionQuestion();
+    CoreBridge::TQueryButton OK;
+    OK.Answer = CoreBridge::AnswerOK;
+    OK.Caption = "OK";
+    CoreBridge::TQueryButton Cancel;
+    Cancel.Answer = CoreBridge::AnswerCancel;
+    Cancel.Caption = "Cancel";
+    Query.Buttons = { OK, Cancel };
+    Query.CancelAnswer = CoreBridge::AnswerCancel;
+    Query.NeverAskAgainCheck = true;
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    const CoreBridge::TQueryResult Answer = Frontend.Query(Query);
+    if (Answer.Answer != CoreBridge::AnswerOK)
     {
       return false;
     }
+    if (Answer.NeverAskAgain)
+    {
+      try
+      {
+        CoreBridge::SetConfirmCommandSession(false);
+      }
+      catch (const CoreBridge::TCoreError & E)
+      {
+        ShowError(E);
+      }
+    }
+  }
+  FBusy = true;
+  UpdateActions();
+  bool Opened = false;
+  try
+  {
+    FSession->OpenShellSession();
+    Opened = true;
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  UpdateActions();
+  return Opened;
+}
+
+bool MainWindow::OpenConsole()
+{
+  if (FBusy || !FSession || !EnsureShellSession(false))
+  {
+    return false;
   }
   ConsoleDialog Dialog(FSession.get(), this);
   Dialog.exec();
@@ -1755,4 +1764,157 @@ bool MainWindow::OpenConsole()
   FPanel->Refresh();
   UpdateTitle();
   return true;
+}
+
+// As TNonVisualDataModule::CreateCustomCommandsMenu: the file commands under
+// Files, the others under Commands, each with its key; then Enter... and
+// Last.
+void MainWindow::UpdateCustomCommands()
+{
+  for (QMenu * Menu : { FFileCommandsMenu, FStaticCommandsMenu })
+  {
+    Menu->clear();
+  }
+  for (const CoreBridge::TCustomCommandDefinition & Command : CoreBridge::CustomCommands())
+  {
+    const bool FileCommand = CoreBridge::CheckCustomCommand(Command.Command, !Command.Local).FileCommand;
+    QAction * Action = (FileCommand ? FFileCommandsMenu : FStaticCommandsMenu)->addAction(QString::fromStdString(Command.Name));
+    const QString ShortCut = ShortCutText(Command.ShortCut);
+    if (!ShortCut.isEmpty())
+    {
+      Action->setShortcut(QKeySequence::fromString(ShortCut, QKeySequence::NativeText));
+    }
+    // Local commands (on downloaded files) are not ported yet.
+    Action->setEnabled(!Command.Local);
+    connect(Action, &QAction::triggered, this, [this, Command]() { RunCustomCommand(Command); });
+  }
+  for (QMenu * Menu : { FFileCommandsMenu, FStaticCommandsMenu })
+  {
+    const bool Files = (Menu == FFileCommandsMenu);
+    if (!Menu->isEmpty())
+    {
+      Menu->addSeparator();
+    }
+    Menu->addAction(tr("&Enter..."), this, [this, Files]() { EnterCustomCommand(Files); });
+    if (FHasLastCustomCommand)
+    {
+      const CoreBridge::TCustomCommandDefinition Last = FLastCustomCommand;
+      Menu->addAction(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::CustomCommandLast))
+        .replace(QStringLiteral("%s"), QString::fromStdString(Last.Command).replace(QLatin1Char('&'), QStringLiteral("&&"))),
+        this, [this, Last]() { RunCustomCommand(Last); });
+    }
+  }
+}
+
+bool MainWindow::RunCustomCommand(const CoreBridge::TCustomCommandDefinition & Command)
+{
+  if (FBusy || !FSession)
+  {
+    return false;
+  }
+  QStringList Names = FPanel->Selected();
+  if (Names.isEmpty() && (FPanel->View()->CurrentEntry() != nullptr))
+  {
+    Names.append(QString::fromStdString(FPanel->View()->CurrentEntry()->Name));
+  }
+  const CoreBridge::TCustomCommandCheck Check = CoreBridge::CheckCustomCommand(Command.Command, !Command.Local);
+  if (Check.FileCommand && Names.isEmpty())
+  {
+    return false;
+  }
+  if (!Command.Local && !EnsureShellSession(true))
+  {
+    return false;
+  }
+  std::vector<std::string> List;
+  for (const QString & Name : Names)
+  {
+    List.push_back(Name.toStdString());
+  }
+  CoreBridge::TCustomCommandPrompts Prompts;
+  Prompts.Prompt = [this](const std::string & Name, const std::vector<std::pair<std::string, std::string>> & Asked,
+    std::vector<std::string> & Values)
+  {
+    return CustomCommandPrompts(this, Name, Asked, Values);
+  };
+  // !`command`: run here, its output taken.
+  Prompts.Execute = [](const std::string & Line)
+  {
+    QProcess Process;
+#if defined(_WIN32)
+    Process.start(QStringLiteral("cmd.exe"), { QStringLiteral("/c"), QString::fromStdString(Line) });
+#else
+    Process.start(QStringLiteral("/bin/sh"), { QStringLiteral("-c"), QString::fromStdString(Line) });
+#endif
+    Process.waitForFinished(-1);
+    return QString::fromLocal8Bit(Process.readAllStandardOutput()).toStdString();
+  };
+  FBusy = true;
+  UpdateActions();
+  bool Result = false;
+  std::vector<std::string> Output;
+  try
+  {
+    Output = FSession->RunCustomCommand(Command, List, Prompts);
+    Result = true;
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  FPanel->Refresh();
+  UpdateActions();
+  if (Result && !Output.empty())
+  {
+    QStringList Lines;
+    for (const std::string & Line : Output)
+    {
+      Lines.append(QString::fromStdString(Line));
+    }
+    if (Command.CopyResults)
+    {
+      QApplication::clipboard()->setText(Lines.join(QLatin1Char('\n')));
+    }
+    if (Command.ShowResults)
+    {
+      ConsoleDialog Dialog(FSession.get(), this);
+      Dialog.AddOutput(Lines);
+      Dialog.exec();
+    }
+    else if (Command.ShowResultsInMessageBox)
+    {
+      CoreBridge::TQuery Query;
+      Query.Type = CoreBridge::TQueryType::Information;
+      Query.Message = Lines.join(QLatin1Char('\n')).toStdString();
+      CoreBridge::TQueryButton OK;
+      OK.Answer = CoreBridge::AnswerOK;
+      OK.Caption = "OK";
+      Query.Buttons = { OK };
+      Query.CancelAnswer = CoreBridge::AnswerOK;
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      Frontend.Query(Query);
+    }
+  }
+  return Result;
+}
+
+bool MainWindow::EnterCustomCommand(bool Files)
+{
+  Q_UNUSED(Files);
+  if (FBusy || !FSession)
+  {
+    return false;
+  }
+  CoreBridge::TCustomCommandDefinition Command = FHasLastCustomCommand ? FLastCustomCommand : CoreBridge::TCustomCommandDefinition();
+  CustomCommandDialog Dialog(CustomCommandDialog::TMode::AdHoc, Command, CoreBridge::CustomCommands(), this);
+  if (Dialog.exec() != QDialog::Accepted)
+  {
+    return false;
+  }
+  FLastCustomCommand = Dialog.Command();
+  FHasLastCustomCommand = true;
+  UpdateCustomCommands();
+  return RunCustomCommand(FLastCustomCommand);
 }

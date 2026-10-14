@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 12 | 23 | Parity on features users depend on |
+| P3 Qt parity | 13 | 23 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **90** | **110** | |
+| **Total** | **91** | **110** | |
 
 ## Next three actions
 
@@ -235,8 +235,7 @@ internal editor, remote files downloaded to a temporary directory and
 uploaded back on save, as WinSCP (ADR 0015). P2-10 and P2-11 wait, at the
 user's request.
 
-1. **P3-06d**: custom commands, then P3-06e (keep remote directory up
-   to date) and P3-06f.
+1. **P3-06e**: keep remote directory up to date, then P3-06f.
 2. **P3-08**, then **P3-04e**: shell integration, then Preferences'
    Editors page with external editors (ADR 0015).
 3. Offer `core-log-file-name-delimiter.patch` and
@@ -253,6 +252,7 @@ user's request.
 | 2026-10-13 | The Windows toolchain is llvm-mingw against MSYS2's Qt 6.8.2 and its C++ runtime, all pinned; the GCC sysroot is retired (ADR 0011) | Debian has no Qt for mingw. MSYS2's clang64 Qt is that ABI and prebuilt; Debian's own Qt version, so its host tools serve the cross-build. Wine testing from Linux is kept, which clang-cl/MSVC would have weakened |
 | 2026-10-13 | P2-10 (packaging) and P2-11 (the P2 exit gate) wait; P3 goes first | The user's call: parity features before packaging. They stay `todo` |
 | 2026-10-13 | Remote files dragged out to other programs are downloaded on demand to a temporary directory (WinSCP's drag without its shell extension); no XDS | XDS exists only on X11 and GNOME Files dropped it; on-demand URLs work on X11, Wayland and Windows (ADR 0012) |
+| 2026-10-14 | Upstream code bound up with the VCL GUI in one file is compiled from slices the transform cuts by anchored line ranges, outside the mirror: first WinSCP's custom commands (ADR 0014) | The user's choice over mirroring ~930 lines by hand: upstream's own logic, extensions' parsing included, with no drift; anchors that must match exactly once fail a pin bump loudly |
 | 2026-10-13 | Files are edited as WinSCP edits them: its internal editor now, external editors with Preferences > Editors; core's local end of line is the platform's (ADR 0015, Q-3) | WinSCP has both and defaults to the internal one; its temporary directories, transfer settings and queue upload are followed, so editing behaves the same. Core assumed CRLF locally, wrong on POSIX |
 | 2026-10-13 | The shell's settings are upstream's `TGUIConfiguration`, compiled as it is from the transformed tree, with `TWinConfiguration`'s keys mirrored by the shell's `TShellConfiguration` (ADR 0014) | Upstream's code keeps presets, synchronize and queue options and the language exactly as WinSCP does, and `WinSCP.ini` carries over both ways; a spike showed 23/11 errors (Linux/Windows), all shim-sized. `TWinConfiguration` is bound to the VCL GUI, so it is mirrored instead |
 | 2026-10-10 | Generated-tree model, not a source fork | Keeps the upstream diff structurally empty |
@@ -767,7 +767,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-06a | Dialogs: file operations | done | Properties (F9: `PropertiesDialog`, `RightsFrame` with mixed bits, owner and group, recursion, size, checksums) over core's `TRemoteProperties`; Create folder (F7) with permissions kept in `NewDirectoryProperties`; links (Alt+F6, local ones the system's); Duplicate and Move To (Shift+F5/F6) within the server, through a temporary copy where it cannot copy; ctest `qt_gui_properties` (FTP); native on Windows 11 too. WinSCP's CopyLocal belongs to its local-to-local browsing, which the shell does not have. Not yet: local files' properties, S3 ACLs and tags, the secondary shell for checksums and copies |
 | P3-06b | Dialogs: navigation | done | Open directory and bookmarks (Ctrl+O, Ctrl+B) over core's `TBookmarks`, kept by `TShellConfiguration` under `TWinConfiguration`'s keys; Location Profiles (the Commander's preference), with folders; Find Files (Alt+F7) over core's `FilesFind`; Edit file mask; the panels' filter (Ctrl+Alt+F) and the Select dialogs' Edit...; ctests `qt_gui_bookmarks`, `qt_gui_keys`; native on Windows 11 too. Not yet: bookmarks' shortcuts (shown, not editable or bound), the Go To menu's bookmark list, opened folders kept, mask hints |
 | P3-06c | Dialogs: session tools | done | Server/Protocol Information (`TSession::ServerInfo`, space available); Generate Session URL/Code and File URL (TGenerateUrlDialog's generation ported to `GenerateCode.cpp`, its RTF shown by `RtfText.cpp`, scripts for linscp's command-line client); Open Terminal (core's `AnyCommand`, a separate shell session after WinSCP's question); Edit Raw Settings (the site manager's Advanced dropdown); Tools > Import Sites (PuTTY, KiTTY, FileZilla, OpenSSH, INI, known_hosts); ctests `qt_gui_tools`, `qt_gui_properties`, `qt_gui_sites`; native on Windows 11 too. Not yet: the transfer code from the Copy dialog, the console's window size kept, OpenSSH key conversion on import |
-| P3-06d | Dialogs: custom commands | todo | |
+| P3-06d | Dialogs: custom commands | done | WinSCP's `TCustomCommandType`/`TCustomCommandList` and `TLocalCustomCommand` compiled as they are from transform slices (`port/tools/slices.json`, ADR 0014 amendment); the list kept as `TWinConfiguration` keeps it, WinSCP's defaults; Files > File Custom Commands and Commands > Static Custom Commands with their keys, Enter... and Last; the Custom command dialog and the parameters' prompts; remote commands run over core (`CustomCommandOnFiles`, `AnyCommand`), in a shell session where needed; ctest `qt_gui_commands` against OpenSSH's sshd (Linux; skipped on Windows). Not yet: local commands (on downloaded files), extensions and their options dialog, the commands' list edited (Preferences > Commands, P3-04e) |
 | P3-06e | Dialogs: keep remote directory up to date | todo | |
 | P3-06f | Dialogs: the rest | todo | workspace, shortcut, cleanup, license, S3 tags; usage statistics not ported |
 | P3-07 | Drag & drop | done | between the panels, within one (onto a directory), and from other programs onto the remote panel: `FileView` in `port/qt/FileList.cpp`, `MainWindow::Drop`, `TSession::Move`; `RemoteFileDrag` (remote files out to other programs, downloaded at the drop); ctest `qt_gui_drop`; native on Windows 11 too; dragging out checked by hand with Explorer (Windows 11) and Nautilus, foreground and background |

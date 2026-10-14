@@ -31,7 +31,7 @@ add_library(linscp-shim STATIC
   vcl_strutils.cpp
   vcl_format.cpp
   vcl_streams.cpp
-  vcl_containers.cpp
+  vcl_containers.cpp vcl_menus.cpp
   vcl_resources.cpp
   vcl_comobj.cpp
   vcl_inifiles.cpp

@@ -54,6 +54,11 @@
 //     clipboard text); Generate URL/code: the session's URL with its
 //     parts, a script, .NET code, files' URLs, links to WinSCP's
 //     documentation, the choices kept
+//   test_qt_gui commands /ini=nul <port> <key> <user> <directory> -platform offscreen
+//     custom commands over OpenSSH's sshd (SCP: a shell): WinSCP's
+//     defaults in the menus, the Custom command dialog's checks, commands
+//     run on files and not, their parameters asked, a local !`command`,
+//     their results copied, an ad hoc one kept as Last
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -128,6 +133,8 @@
 #include "GenerateUrlDialog.h"
 #include "ConsoleDialog.h"
 #include "SiteRawDialog.h"
+#include "CustomCommandDialog.h"
+#include <QMenu>
 #include "ImportSitesDialog.h"
 #include "RtfText.h"
 #include <QTextBrowser>
@@ -2560,6 +2567,139 @@ void Tools(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+void Commands(const char * Port, const QString & Key, const QString & User, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    // WinSCP's defaults, before anything is opened.
+    const std::vector<CoreBridge::TCustomCommandDefinition> Defaults = CoreBridge::CustomCommands();
+    Check(Defaults.size() == 6, "WinSCP's six commands by default");
+    bool Local = false;
+    for (const auto & Command : Defaults)
+    {
+      Local = Local || Command.Local;
+    }
+    Check(Local, "one of them local");
+    Check(!Window.FileCommandsMenu()->actions().isEmpty() && !Window.StaticCommandsMenu()->actions().isEmpty(),
+      "the file and static commands' menus");
+    // The dialog's checks.
+    {
+      CustomCommandDialog Dialog(CustomCommandDialog::TMode::Add, CoreBridge::TCustomCommandDefinition(), Defaults);
+      Dialog.DescriptionEdit()->setText(QString::fromStdString(Defaults[0].Name));
+      Dialog.CommandCombo()->setEditText(QStringLiteral("echo !"));
+      Responder.Errors = 0;
+      Check(!Dialog.Validate() && (Responder.Errors == 1), "a description already used refused");
+      Dialog.DescriptionEdit()->setText(QStringLiteral("a=b"));
+      Check(!Dialog.Validate(), "and one with =");
+      Dialog.DescriptionEdit()->setText(QStringLiteral("Mine"));
+      Dialog.CommandCombo()->setEditText(QStringLiteral("echo !?unterminated"));
+      Check(!Dialog.Validate(), "an unterminated pattern refused");
+      Dialog.CommandCombo()->setEditText(QStringLiteral("echo !&"));
+      Check(Dialog.Validate() && !Dialog.RecursiveCheck()->isEnabled() && Dialog.ApplyToDirectoriesCheck()->isEnabled(),
+        "a file list: no recursion");
+      Dialog.CommandCombo()->setEditText(QStringLiteral("uptime"));
+      Check(!Dialog.ApplyToDirectoriesCheck()->isEnabled(), "not a file command: not for directories");
+    }
+
+    CoreBridge::TSite Site = CoreBridge::NewSite();
+    Site.Protocol = CoreBridge::TSite::TProtocol::Scp;
+    Site.HostName = "127.0.0.1";
+    Site.Port = QString::fromLatin1(Port).toInt();
+    Site.UserName = User.toStdString();
+    // The fixture's OpenSSH key, converted as the site manager would.
+    const std::string Ppk = QDir(Directory).filePath(QStringLiteral("client.ppk")).toStdString();
+    try
+    {
+      CoreBridge::ConvertKey(Key.toStdString(), Ppk);
+    }
+    catch (const CoreBridge::TCoreError &)
+    {
+      Check(false, "the key converts");
+    }
+    Site.PrivateKeyFile = Ppk;
+    Check(Window.OpenSite(Site), "an SCP session over sshd");
+    RemotePanel * Remote = Window.Panel();
+    // Only the test's directory: commands run there.
+    const QString Work = QDir(Directory).filePath(QStringLiteral("commands"));
+    QDir().mkpath(Work);
+    {
+      QFile File(QDir(Work).filePath(QStringLiteral("data.txt")));
+      File.open(QIODevice::WriteOnly);
+      File.write("12345");
+    }
+    Check(Remote->ChangeDirectory(Work), "in the test's directory");
+    Check(Window.Session()->CanRunShellCommands(), "SCP runs commands in its shell");
+
+    CoreBridge::TCustomCommandDefinition Static;
+    Static.Name = "Static";
+    Static.Command = "echo static";
+    Static.CopyResults = true;
+    Check(Window.RunCustomCommand(Static) && (QApplication::clipboard()->text() == QStringLiteral("static")),
+      "a static command run, its output copied");
+    CoreBridge::TCustomCommandDefinition Count;
+    Count.Name = "Count";
+    Count.Command = "wc -c \"!\"";
+    Count.CopyResults = true;
+    Remote->Select({ QStringLiteral("data.txt") });
+    Check(Window.RunCustomCommand(Count) && QApplication::clipboard()->text().startsWith(QStringLiteral("5")),
+      "a file command on the selected file");
+    Responder.Custom = [](QWidget * Modal)
+    {
+      QDialog * Dialog = qobject_cast<QDialog *>(Modal);
+      if ((Dialog == nullptr) || !Dialog->windowTitle().contains(QStringLiteral("Prompted")))
+      {
+        return false;
+      }
+      Dialog->findChild<QLineEdit *>()->setText(QStringLiteral("typed"));
+      Dialog->accept();
+      return true;
+    };
+    CoreBridge::TCustomCommandDefinition Prompted;
+    Prompted.Name = "Prompted";
+    Prompted.Command = "echo \"!?&Say:?default!\"";
+    Prompted.CopyResults = true;
+    Check(Window.RunCustomCommand(Prompted) && (QApplication::clipboard()->text() == QStringLiteral("typed")),
+      "its parameter asked first");
+    Responder.Custom = nullptr;
+    CoreBridge::TCustomCommandDefinition Executed;
+    Executed.Name = "Executed";
+    Executed.Command = "echo !`echo here`";
+    Executed.CopyResults = true;
+    Check(Window.RunCustomCommand(Executed) && (QApplication::clipboard()->text() == QStringLiteral("here")),
+      "a local command's output in it");
+    // Enter...: ad hoc, then Last.
+    Responder.Custom = [](QWidget * Modal)
+    {
+      CustomCommandDialog * Dialog = qobject_cast<CustomCommandDialog *>(Modal);
+      if (Dialog == nullptr)
+      {
+        return false;
+      }
+      Check(Dialog->DescriptionEdit()->isHidden() && Dialog->ShortCutCombo()->isHidden(), "ad hoc: no description, no key");
+      Dialog->CommandCombo()->setEditText(QStringLiteral("touch adhoc.txt"));
+      Dialog->OkButton()->click();
+      return true;
+    };
+    Check(Window.EnterCustomCommand(false) && QFileInfo::exists(QDir(Work).filePath(QStringLiteral("adhoc.txt"))),
+      "an ad hoc command run");
+    Responder.Custom = nullptr;
+    bool Last = false;
+    for (QAction * Action : Window.StaticCommandsMenu()->actions())
+    {
+      Last = Last || Action->text().contains(QStringLiteral("touch adhoc.txt"));
+    }
+    Check(Last, "and kept as Last");
+    Frontend.SetWindow(nullptr);
+  }
+  CoreBridge::Finalize();
+}
+
 void Session(const char * Port)
 {
   QtFrontend Frontend;
@@ -2645,6 +2785,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 5) && (std::strcmp(argv[1], "drop") == 0))
   {
     DragAndDrop(argv[3], QString::fromLocal8Bit(argv[4]));
+  }
+  else if ((argc >= 7) && (std::strcmp(argv[1], "commands") == 0))
+  {
+    Commands(argv[3], QString::fromLocal8Bit(argv[4]), QString::fromLocal8Bit(argv[5]), QString::fromLocal8Bit(argv[6]));
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "tools") == 0))
   {

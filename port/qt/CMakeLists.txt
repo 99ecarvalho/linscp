@@ -11,7 +11,7 @@ add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp AboutDialog.cpp 
   PromptDialog.cpp Language.cpp SiteManager.cpp SiteAdvanced.cpp
   FileList.cpp RemotePanel.cpp LocalPanel.cpp
   TransferDialog.cpp QueuePanel.cpp SynchronizeDialog.cpp PreferencesDialog.cpp TransferSettingsDialog.cpp
-  RightsFrame.cpp PropertiesDialog.cpp CreateDirectoryDialog.cpp LinkDialog.cpp RemoteTransferDialog.cpp OpenDirectoryDialog.cpp LocationProfilesDialog.cpp FindFilesDialog.cpp EditMaskDialog.cpp ServerInfoDialog.cpp RtfText.cpp GenerateUrlDialog.cpp ConsoleDialog.cpp SiteRawDialog.cpp ImportSitesDialog.cpp CoreBridge.h)
+  RightsFrame.cpp PropertiesDialog.cpp CreateDirectoryDialog.cpp LinkDialog.cpp RemoteTransferDialog.cpp OpenDirectoryDialog.cpp LocationProfilesDialog.cpp FindFilesDialog.cpp EditMaskDialog.cpp ServerInfoDialog.cpp RtfText.cpp GenerateUrlDialog.cpp ConsoleDialog.cpp SiteRawDialog.cpp ImportSitesDialog.cpp CustomCommandDialog.cpp CoreBridge.h)
 set_target_properties(linscp-qt-ui PROPERTIES AUTOMOC ON)
 target_link_libraries(linscp-qt-ui PUBLIC Qt6::Widgets)
 if(NOT WIN32)
@@ -20,12 +20,19 @@ endif()
 
 # The core side: the bridge (CoreBridge.cpp, Session.cpp) and the shell's
 # half of core's Interface.h (QtInterface.cpp), in place of the headless one.
+# WinSCP's custom commands, compiled as they are from slices of
+# windows/WinConfiguration.cpp and GUITools.cpp (ADR 0014).
+set(LINSCP_SLICE_SOURCES "${LINSCP_GEN_SLICES}/windows/CustomCommandType.cpp"
+  "${LINSCP_GEN_SLICES}/windows/LocalCustomCommand.cpp" "${LINSCP_GEN_SLICES}/windows/CustomShortCuts.cpp")
+set_source_files_properties(${LINSCP_SLICE_SOURCES} PROPERTIES GENERATED TRUE)
 add_library(linscp-qt-core STATIC EXCLUDE_FROM_ALL CoreBridge.cpp QtInterface.cpp Session.cpp Sites.cpp
-  Keys.cpp ShellConfiguration.cpp TransferSettings.cpp GenerateCode.cpp)
+  Keys.cpp ShellConfiguration.cpp TransferSettings.cpp GenerateCode.cpp CustomCommandsSlice.cpp CustomCommands.cpp ${LINSCP_SLICE_SOURCES})
+add_dependencies(linscp-qt-core transform)
 target_link_libraries(linscp-qt-core PUBLIC linscp-runtime-base linscp-gui)
 # The generated GUIConfiguration.h before core's include path, which has
 # upstream's own windows/ (ADR 0014).
 target_include_directories(linscp-qt-core BEFORE PUBLIC "${LINSCP_GEN}/source/windows")
+target_include_directories(linscp-qt-core PUBLIC "${LINSCP_GEN_SLICES}/windows" "${CMAKE_CURRENT_SOURCE_DIR}")
 # linscp's own version (the project's); core keeps WinSCP's.
 target_compile_definitions(linscp-qt-core PRIVATE LINSCP_VERSION="${PROJECT_VERSION}")
 

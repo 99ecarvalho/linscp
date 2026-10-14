@@ -23,6 +23,8 @@
 #include "ShellConfiguration.h"
 #include "TransferSettings.h"
 #include "GenerateCode.h"
+#include "CustomCommandsSlice.h"
+#include "CustomCommandType.h"
 
 #include <TextsWin.h>
 
@@ -1386,6 +1388,160 @@ void TSession::RunCommand(const std::string & Command, const std::function<void(
     {
       Terminal->ReadCurrentDirectory();
     }
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+namespace
+{
+
+// TCustomScpExplorerForm::SessionDataForCode: the session's data as it is
+// now, its host key known. The caller owns it.
+TSessionData * SessionDataForCode(TTerminal * Terminal)
+{
+  std::unique_ptr<TSessionData> Data(new TSessionData(L""));
+  Data->Assign(Terminal->SessionData);
+  Data->RemoteDirectory = Terminal->CurrentDirectory;
+  Terminal->UpdateSessionCredentials(Data.get());
+  if (!Terminal->SessionData->HasSessionName())
+  {
+    Data->Name = UnicodeString();
+  }
+  Data->IsWorkspace = false;
+  Terminal->FillSessionDataForCode(Data.get());
+  return Data.release();
+}
+
+// TWinInteractiveCustomCommand, its questions the frontend's.
+class TBridgeInteractiveCustomCommand : public TInteractiveCustomCommand
+{
+public:
+  TBridgeInteractiveCustomCommand(TCustomCommand * ChildCustomCommand, const UnicodeString & Name,
+      const TCustomCommandPrompts & Prompts) :
+    TInteractiveCustomCommand(ChildCustomCommand),
+    FName(StripEllipsis(StripHotkey(Name))),
+    FPrompts(Prompts)
+  {
+  }
+
+protected:
+  virtual void __fastcall PatternHint(int Index, const UnicodeString & Pattern)
+  {
+    if (IsPromptPattern(Pattern))
+    {
+      UnicodeString Prompt;
+      UnicodeString Default;
+      bool Delimit = false;
+      ParsePromptPattern(Pattern, Prompt, Default, Delimit);
+      FIndexes.insert(std::make_pair(Index, FAsked.size()));
+      FAsked.emplace_back(Utf8(Prompt), Utf8(Default));
+    }
+  }
+
+  virtual void __fastcall Prompt(int Index, const UnicodeString & /*Prompt*/, UnicodeString & Value)
+  {
+    auto I = FIndexes.find(Index);
+    if (I == FIndexes.end())
+    {
+      return;
+    }
+    if (FValues.empty())
+    {
+      if (!FPrompts.Prompt || !FPrompts.Prompt(Utf8(FName), FAsked, FValues) || (FValues.size() != FAsked.size()))
+      {
+        Abort();
+      }
+    }
+    Value = FromUtf8(FValues[I->second]);
+  }
+
+  virtual void __fastcall Execute(const UnicodeString & Command, UnicodeString & Value)
+  {
+    Value = FPrompts.Execute ? TrimRight(FromUtf8(FPrompts.Execute(Utf8(Command)))) : UnicodeString();
+  }
+
+private:
+  UnicodeString FName;
+  TCustomCommandPrompts FPrompts;
+  std::map<int, size_t> FIndexes;
+  std::vector<std::pair<std::string, std::string>> FAsked;
+  std::vector<std::string> FValues;
+};
+
+class TCommandOutput
+{
+public:
+  std::vector<std::string> Lines;
+
+  void __fastcall Captured(const UnicodeString & Str, TCaptureOutputType OutputType)
+  {
+    if ((OutputType == cotOutput) || (OutputType == cotError))
+    {
+      Lines.push_back(Utf8(Str));
+    }
+  }
+};
+
+}  // namespace
+
+int ParamsOf(const TCustomCommandDefinition & Command);
+
+bool TSession::CanRunShellCommands() const
+{
+  return Active() && (F->Terminal->IsCapable[fcShellAnyCommand] || F->Terminal->CommandSessionOpened);
+}
+
+// TCustomScpExplorerForm::CustomCommand and RemoteCustomCommand.
+std::vector<std::string> TSession::RunCustomCommand(const TCustomCommandDefinition & Definition,
+  const std::vector<std::string> & Names, const TCustomCommandPrompts & Prompts)
+{
+  try
+  {
+    CheckActive(*this);
+    TTerminal * Terminal = F->Terminal.get();
+    if (Definition.Local)
+    {
+      // Local commands (downloading the files to run them on) are not
+      // ported yet.
+      NotSupported();
+    }
+    if (!Terminal->IsCapable[fcShellAnyCommand] && !Terminal->CommandSessionOpened)
+    {
+      NotSupported();
+    }
+    std::unique_ptr<TSessionData> SessionData(SessionDataForCode(Terminal));
+    TCustomCommandData Data(SessionData.get());
+    const UnicodeString Site = Terminal->SessionData->SessionKey;
+    // An extension's options in it, as GetCommandWithExpandedOptions.
+    UnicodeString CommandCommand = FromUtf8(Definition.Command);
+    const TCustomCommandType * Listed = WinConfiguration->CustomCommandList()->Find(FromUtf8(Definition.Name));
+    if ((Listed != NULL) && (Listed->Command == CommandCommand))
+    {
+      CommandCommand = Listed->GetCommandWithExpandedOptions(WinConfiguration->CustomCommandOptions(), Site);
+    }
+    TRemoteCustomCommand RemoteCustomCommand(Data, Terminal->CurrentDirectory);
+    TBridgeInteractiveCustomCommand InteractiveCustomCommand(&RemoteCustomCommand, FromUtf8(Definition.Name), Prompts);
+    UnicodeString Command = InteractiveCustomCommand.Complete(CommandCommand, false);
+    const bool Capture = Definition.ShowResults || Definition.CopyResults || Definition.ShowResultsInMessageBox;
+    TCommandOutput Output;
+    TCaptureOutputEvent OutputEvent = NULL;
+    if (Capture)
+    {
+      OutputEvent = CLOSURE_OF(&Output, Captured);
+    }
+    if (!RemoteCustomCommand.IsFileCommand(Command))
+    {
+      Terminal->AnyCommand(RemoteCustomCommand.Complete(Command, true), OutputEvent);
+    }
+    else
+    {
+      std::unique_ptr<TStringList> Files = FileListOf(Terminal, Names);
+      Terminal->CustomCommandOnFiles(Command, ParamsOf(Definition), Files.get(), OutputEvent);
+    }
+    return Output.Lines;
   }
   catch (Exception & E)
   {

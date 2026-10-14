@@ -80,6 +80,8 @@ struct TShellSettings
   int QueueViewHeightPixelsPerInch = 96;
 };
 
+class TCustomCommandList;
+
 class TShellConfiguration : public TGUIConfiguration
 {
 public:
@@ -114,11 +116,22 @@ public:
   // The bookmarks, kept as TWinConfiguration keeps them (its Bookmarks
   // key): per site, by session key, and shared.
   TBookmarks * Bookmarks() const { return FBookmarks.get(); }
+  // The custom commands, as TWinConfiguration keeps them (CustomCommands;
+  // its defaults until changed), and their options' values
+  // (CustomCommandOptions).
+  const TCustomCommandList * CustomCommandList() const { return FCustomCommandList.get(); }
+  void SetCustomCommandList(const TCustomCommandList * List);
+  TStrings * CustomCommandOptions() const { return FCustomCommandOptions.get(); }
+  void SetCustomCommandOptions(TStrings * Options);
+  // TWinConfiguration's, for the custom commands' slice (extensions'
+  // strings: not translated yet).
+  UnicodeString __fastcall ExtensionStringTranslation(const UnicodeString & ExtensionId, const UnicodeString & S);
 
 protected:
   virtual void __fastcall SaveData(THierarchicalStorage * Storage, bool All);
   virtual void __fastcall LoadData(THierarchicalStorage * Storage);
   virtual void __fastcall Saved();
+  virtual void __fastcall DefaultLocalized();
 
 private:
   bool FOverridden = false;
@@ -127,6 +140,10 @@ private:
   UnicodeString FModuleFileName;
   TShellSettings FSettings;
   std::unique_ptr<TBookmarks> FBookmarks;
+  std::unique_ptr<TCustomCommandList> FCustomCommandList;
+  bool FCustomCommandsDefaults = true;
+  std::unique_ptr<TStringList> FCustomCommandOptions;
+  bool FCustomCommandOptionsModified = false;
 };
 
 #endif

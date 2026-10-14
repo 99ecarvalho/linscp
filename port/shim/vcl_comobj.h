@@ -69,6 +69,11 @@ public:
 private:
   std::atomic<ULONG> FRefCount{0};
 };
+#else
+// No COM here: the template exists for the interfaces the shim gives it a
+// specialization of (TListSortCompareFunc's, in vcl_containers.h).
+template <typename INTF>
+class TCppInterfacedObject;
 #endif
 
 #endif // LINSCP_VCL_COMOBJ_H

@@ -87,6 +87,53 @@
     </message>
 </context>
 <context>
+    <name>CustomCommandDialog</name>
+    <message>
+        <source>&amp;Description:</source>
+        <translation>&amp;Descrição:</translation>
+    </message>
+    <message>
+        <source>&amp;Custom command:</source>
+        <translation>&amp;Comando personalizado:</translation>
+    </message>
+    <message>
+        <source>&amp;Remote command</source>
+        <translation>Comando &amp;Remoto</translation>
+    </message>
+    <message>
+        <source>&amp;Local command</source>
+        <translation>Comando &amp;Local</translation>
+    </message>
+    <message>
+        <source>&amp;Apply to directories</source>
+        <translation>&amp;Aplicar aos diretórios</translation>
+    </message>
+    <message>
+        <source>&amp;Execute recursively</source>
+        <translation>&amp;Executar recursivamente</translation>
+    </message>
+    <message>
+        <source>&amp;Show results in terminal</source>
+        <translation>E&amp;xibir resultados no terminal</translation>
+    </message>
+    <message>
+        <source>Copy results to clip&amp;board</source>
+        <translation>Copiar resultados para área de trans&amp;ferência</translation>
+    </message>
+    <message>
+        <source>&amp;Use remote files</source>
+        <translation>Usar arquivos remotos</translation>
+    </message>
+    <message>
+        <source>&amp;patterns</source>
+        <translation>&amp;padrões</translation>
+    </message>
+    <message>
+        <source>&amp;Keyboard shortcut:</source>
+        <translation>&amp;Tecla de atalho:</translation>
+    </message>
+</context>
+<context>
     <name>EditMaskDialog</name>
     <message>
         <source>Edit file mask</source>
@@ -860,6 +907,18 @@
     <message>
         <source>Open &amp;Terminal</source>
         <translation>Abrir &amp;Terminal</translation>
+    </message>
+    <message>
+        <source>File &amp;Custom Commands</source>
+        <translation>Arquivo de comandos &amp;personalizados</translation>
+    </message>
+    <message>
+        <source>Static &amp;Custom Commands</source>
+        <translation>Comandos estáticos personalizados</translation>
+    </message>
+    <message>
+        <source>&amp;Enter...</source>
+        <translation>&amp;Entrar...</translation>
     </message>
 </context>
 <context>

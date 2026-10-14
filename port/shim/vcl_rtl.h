@@ -64,6 +64,7 @@
 #include "vcl_dynamicarray.h"
 #include "vcl_set.h"
 #include "vcl_containers.h"
+#include "vcl_menus.h"
 #include "vcl_resources.h"
 #include "vcl_inifiles.h"
 #include "vcl_registry.h"

@@ -7,6 +7,8 @@
 #include <HierarchicalStorage.h>
 
 #include "FrontendCommon.h"
+#include "CustomCommandType.h"
+#include <TextsWin.h>
 
 namespace
 {
@@ -24,9 +26,14 @@ private:
 
 }  // namespace
 
+TShellConfiguration * WinConfiguration = NULL;
+
 TShellConfiguration::TShellConfiguration() :
-  FBookmarks(new TBookmarks())
+  FBookmarks(new TBookmarks()),
+  FCustomCommandList(new TCustomCommandList()),
+  FCustomCommandOptions(new TStringList())
 {
+  WinConfiguration = this;
   Default();
   // Load complete locale according to the UI language.
   SetLocaleInternal(NULL, true, true);
@@ -120,6 +127,28 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     FBookmarks->Save(Storage, All);
     Storage->CloseSubKey();
   }
+  // As TWinConfiguration::SaveData.
+  if ((All && !FCustomCommandsDefaults) || FCustomCommandList->Modified)
+  {
+    FCustomCommandList->Save(Storage);
+
+    if (FCustomCommandList->Count == 0)
+    {
+      Storage->WriteBool(L"CustomCommandsNone", true);
+    }
+    else
+    {
+      Storage->DeleteValue(L"CustomCommandsNone");
+    }
+  }
+  if ((All || FCustomCommandOptionsModified) &&
+      Storage->OpenSubKey(L"CustomCommandOptions", true))
+  {
+    Storage->ClearValues();
+    Storage->WriteValues(FCustomCommandOptions.get(), true);
+    Storage->CloseSubKey();
+    FCustomCommandOptionsModified = false;
+  }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander", true))
   {
     TCloseSubKeyPath Close(Storage);
@@ -166,6 +195,59 @@ void __fastcall TShellConfiguration::Saved()
 {
   TGUIConfiguration::Saved();
   FBookmarks->ModifyAll(false);
+  FCustomCommandList->Reset();
+}
+
+// As TWinConfiguration::DefaultLocalized: WinSCP's own commands, until the
+// user's are loaded.
+void __fastcall TShellConfiguration::DefaultLocalized()
+{
+  TGUIConfiguration::DefaultLocalized();
+
+  if (FCustomCommandsDefaults)
+  {
+    FCustomCommandList->Clear();
+    FCustomCommandList->Add(LoadStr(CUSTOM_COMMAND_EXECUTE), L"\"./!\"", 0);
+    FCustomCommandList->Add(LoadStr(CUSTOM_COMMAND_TOUCH), L"touch \"!\"", ccApplyToDirectories | ccRecursive);
+    FCustomCommandList->Add(LoadStr(CUSTOM_COMMAND_TAR),
+      FORMAT(L"tar -cz  -f \"!?%s?archive.tgz!\" !&",
+        (LoadStr(CUSTOM_COMMAND_TAR_ARCHIVE))), ccApplyToDirectories);
+    FCustomCommandList->Add(LoadStr(CUSTOM_COMMAND_UNTAR),
+      FORMAT(L"tar -xz --directory=\"!?%s?.!\" -f \"!\"",
+        (LoadStr(CUSTOM_COMMAND_UNTAR_DIRECTORY))), 0);
+    FCustomCommandList->Add(LoadStr(CUSTOM_COMMAND_GREP),
+      FORMAT(L"grep \"!?%s?!\" !&", (LoadStr(CUSTOM_COMMAND_GREP_PATTERN))),
+      ccShowResults);
+    FCustomCommandList->Add(LoadStr(CUSTOM_COMMAND_PRINT), L"notepad.exe /p \"!\"", ccLocal);
+    FCustomCommandList->Reset();
+    FCustomCommandsDefaults = true;
+  }
+}
+
+void TShellConfiguration::SetCustomCommandList(const TCustomCommandList * List)
+{
+  if (!FCustomCommandList->Equals(List))
+  {
+    FCustomCommandList->Assign(List);
+    FCustomCommandsDefaults = false;
+    Changed();
+  }
+}
+
+void TShellConfiguration::SetCustomCommandOptions(TStrings * Options)
+{
+  if (!FCustomCommandOptions->Equals(Options))
+  {
+    FCustomCommandOptions->Assign(Options);
+    FCustomCommandOptionsModified = true;
+    Changed();
+  }
+}
+
+UnicodeString __fastcall TShellConfiguration::ExtensionStringTranslation(const UnicodeString & /*ExtensionId*/,
+  const UnicodeString & S)
+{
+  return S;
 }
 
 void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
@@ -208,6 +290,19 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
   {
     FBookmarks->Load(Storage);
     Storage->CloseSubKey();
+  }
+  // As TWinConfiguration::LoadData.
+  if (Storage->KeyExists(L"CustomCommands") ||
+      Storage->ReadBool(L"CustomCommandsNone", false))
+  {
+    FCustomCommandList->Load(Storage);
+    FCustomCommandsDefaults = false;
+  }
+  if (Storage->OpenSubKey(L"CustomCommandOptions", false))
+  {
+    Storage->ReadValues(FCustomCommandOptions.get(), true);
+    Storage->CloseSubKey();
+    FCustomCommandOptionsModified = false;
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander", false))
   {

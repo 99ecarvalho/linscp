@@ -115,3 +115,11 @@ void ConsoleDialog::reject()
     QDialog::reject();
   }
 }
+
+void ConsoleDialog::AddOutput(const QStringList & Lines)
+{
+  for (const QString & Line : Lines)
+  {
+    FOutput->appendPlainText(Line);
+  }
+}

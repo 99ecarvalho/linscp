@@ -125,6 +125,18 @@ public:
   // where the protocol runs no commands, a separate shell session opened
   // first, after asking. False when the console did not open.
   bool OpenConsole();
+  // A custom command run on the remote panel's selection (or its focused
+  // entry), as TCustomScpExplorerForm::CustomCommand: its parameters asked,
+  // its output shown in the console, copied, or in a message as it says.
+  // False when it did not run.
+  bool RunCustomCommand(const CoreBridge::TCustomCommandDefinition & Command);
+  // Enter...: an ad hoc command, from the Custom command dialog (Files: a
+  // file command's), then run; kept as Last.
+  bool EnterCustomCommand(bool Files);
+  // The custom commands' menus and keys, from the list as it is now.
+  void UpdateCustomCommands();
+  class QMenu * FileCommandsMenu() const { return FFileCommandsMenu; }
+  QMenu * StaticCommandsMenu() const { return FStaticCommandsMenu; }
   // Options > Preferences: false when cancelled.
   bool PreferencesDialog();
   // The preferences applied to the window and its panels.
@@ -166,6 +178,7 @@ private:
   bool OpenBookmark(bool AddBookmark, bool & Switched);
   bool OpenLocationProfile(bool AddBookmark, bool & Switched);
   bool GoLocal(const QString & Directory);
+  bool EnsureShellSession(bool Shell);
   bool CopyDialog(bool FromLocal, const QStringList & Names, QString & Target, bool Move, bool * Background,
     CoreBridge::TTransferSettings & Settings);
   bool GoRemote(const QString & Directory);
@@ -193,6 +206,11 @@ private:
   QAction * FFilterAction = nullptr;
   QAction * FServerInfoAction = nullptr;
   QAction * FConsoleAction = nullptr;
+  class QMenu * FFileCommandsMenu = nullptr;
+  QMenu * FStaticCommandsMenu = nullptr;
+  // Enter...'s last command, for Last.
+  bool FHasLastCustomCommand = false;
+  CoreBridge::TCustomCommandDefinition FLastCustomCommand;
   QAction * FGenerateSessionUrlAction = nullptr;
   QAction * FGenerateFileUrlAction = nullptr;
   QAction * FAddBookmarkAction = nullptr;

@@ -103,6 +103,9 @@ bool IsDelimiter(const UnicodeString & Delimiters, const UnicodeString & S, int 
 int FindDelimiter(const UnicodeString & Delimiters, const UnicodeString & S, int StartIdx = 1);
 // Case-insensitive, as Delphi's -- ASCII folding, as everywhere in the shim.
 int AnsiCompareText(const UnicodeString & S1, const UnicodeString & S2);
+// Case-sensitive, as the ordinal CompareStr is here (AnsiCompareText's
+// counterpart).
+int AnsiCompareStr(const UnicodeString & S1, const UnicodeString & S2);
 int StrLIComp(const wchar_t * Str1, const wchar_t * Str2, unsigned MaxLen);
 // Raises EConvertError, as Delphi's does.
 double StrToFloat(const UnicodeString & S);

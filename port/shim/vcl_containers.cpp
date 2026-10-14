@@ -105,6 +105,18 @@ void * TList::Extract(void * Item)
   return Item;
 }
 
+void TList::SortList(TListSortCompareFunc * Compare)
+{
+  if (Compare == nullptr)
+  {
+    return;
+  }
+  Compare->AddRef();
+  std::stable_sort(FItems.begin(), FItems.end(),
+    [Compare](void * A, void * B) { return Compare->Invoke(A, B) < 0; });
+  Compare->Release();
+}
+
 void TList::Sort(TListSortCompare Compare)
 {
   if (Compare == nullptr)

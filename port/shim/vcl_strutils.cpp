@@ -914,6 +914,11 @@ int AnsiCompareText(const UnicodeString & S1, const UnicodeString & S2)
   return CompareText(S1, S2);
 }
 
+int AnsiCompareStr(const UnicodeString & S1, const UnicodeString & S2)
+{
+  return CompareStr(S1, S2);
+}
+
 int StrLIComp(const wchar_t * Str1, const wchar_t * Str2, unsigned MaxLen)
 {
   for (unsigned I = 0; I < MaxLen; ++I)

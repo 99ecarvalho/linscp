@@ -757,6 +757,38 @@ def _scope_files(root):
             yield dirpath, n
 
 
+def _slice(slice_, src_root, transformed):
+    """A slice's text (slices.json): the prologue, then the source's lines
+    from the one 'from' matches to the one 'until' matches (or the end), with
+    #line naming upstream's file and line."""
+    source = slice_['source']
+    if slice_.get('transformed', True):
+        if source not in transformed:
+            raise ValueError(f'slice {slice_["output"]}: {source} is not in the transform\'s scope')
+        text = transformed[source]
+    else:
+        text = open(os.path.join(src_root, source), encoding='utf-8', errors='surrogateescape', newline='').read()
+    eol = '\r\n' if '\r\n' in text else '\n'
+    lines = text.split('\n')
+
+    def only(pattern, what):
+        found = [i for i, l in enumerate(lines) if re.search(pattern, l.rstrip('\r'))]
+        if len(found) != 1:
+            raise ValueError(f'slice {slice_["output"]}: {what} {pattern!r} matches {len(found)} lines of {source}, not one')
+        return found[0]
+
+    # One range, or several ("ranges"), each its own #line.
+    out = list(slice_.get('prologue', []))
+    for range_ in slice_.get('ranges', [slice_]):
+        first = only(range_['from'], 'from')
+        end = only(range_['until'], 'until') if range_.get('until') else len(lines)
+        if end <= first:
+            raise ValueError(f'slice {slice_["output"]}: until comes before from in {source}')
+        out.append(f'#line {first + 1} "{source}"')
+        out += [l.rstrip('\r') for l in lines[first:end]]
+    return eol.join(out) + eol
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--src', default='3rd-party/winscp')
@@ -768,7 +800,15 @@ def main():
     ap.add_argument('--subdirs', nargs='*',
                     default=['source/core', 'source/putty', 'source/filezilla', 'libs/mfc',
                              'libs/neon', 'libs/libs3',
-                             'source/windows/GUIConfiguration.cpp', 'source/windows/GUIConfiguration.h'])
+                             'source/windows/GUIConfiguration.cpp', 'source/windows/GUIConfiguration.h',
+                             # Their slices only (slices.json): the rest is the VCL GUI's.
+                             'source/windows/WinConfiguration.cpp', 'source/windows/WinConfiguration.h'])
+    ap.add_argument('--slices', default=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'slices.json'),
+                    help="part-file units (ADR 0014): their manifest")
+    ap.add_argument('--slice-out',
+                    help='where the slices go (default: --out with "-slices" appended), outside the mirror')
+    ap.add_argument('--list-slices', action='store_true',
+                    help='print the slices, relative to --slice-out, and exit')
     ap.add_argument('--check', action='store_true',
                     help='report only; do not write the output tree')
     ap.add_argument('--report')
@@ -777,6 +817,12 @@ def main():
     ap.add_argument('--no-closure-sites', action='store_true',
                     help='skip binding recorded closure sites (for discovery)')
     a = ap.parse_args()
+
+    slices = json.load(open(a.slices, encoding='utf-8'))['slices'] if a.slices else []
+    if a.list_slices:
+        for slice_ in slices:
+            print(slice_['output'])
+        return 0
 
     if a.list_outputs:
         # For the build: CMake declares these as the transform's byproducts.
@@ -788,6 +834,7 @@ def main():
         return 0
 
     t = Transformer(bind_sites=not a.no_closure_sites, src_root=a.src)
+    transformed = {}
     patchset = _load_patchset()
     series = patchset.load_series()
     used = set()
@@ -810,6 +857,7 @@ def main():
                 except patchset.PatchError as e:
                     sys.exit(str(e))
                 new = t.transform_file(rel, patched)
+                transformed[rel.replace(os.sep, '/')] = new
                 nlines_ok = len(text.split('\n')) == len(new.split('\n'))
                 if not nlines_ok:
                     sys.exit(f'LINE COUNT CHANGED in {rel} — transform is not 1:1')
@@ -852,6 +900,19 @@ def main():
                  ', '.join(f'{n} ({r} #{i + 1})' for n, r, i in unused))
     if series:
         t.stats['patch_hunks'] = len(used)
+
+    slice_out = a.slice_out or (a.out.rstrip('/\\') + '-slices')
+    for slice_ in slices:
+        try:
+            text = _slice(slice_, a.src, transformed)
+        except ValueError as e:
+            sys.exit(str(e))
+        t.stats['slices'] = t.stats.get('slices', 0) + 1
+        if not a.check:
+            dst = os.path.join(slice_out, slice_['output'])
+            if not (os.path.exists(dst) and open(dst, encoding='utf-8', errors='surrogateescape', newline='').read() == text):
+                os.makedirs(os.path.dirname(dst), exist_ok=True)
+                open(dst, 'w', encoding='utf-8', errors='surrogateescape', newline='').write(text)
 
     print(f'files processed: {nfiles}')
     for k, v in sorted(t.stats.items()):

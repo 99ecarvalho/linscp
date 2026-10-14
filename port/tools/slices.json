@@ -1,0 +1,74 @@
+{
+  "comment": "Upstream code compiled as it is from part of a file whose rest is bound to the VCL GUI (ADR 0014, amendment P3-06d). Each slice is the lines from the one line matching 'from' up to the one matching 'until' (or the file's end), taken from the transformed file ('transformed': true; the file must be in the transform's scope) or the pristine one, after a linscp prologue, with #line so diagnostics name upstream's lines. Anchors must each match exactly once: a pin bump that moves or changes them fails the transform instead of cutting the wrong code.",
+  "slices": [
+    {
+      "output": "windows/CustomCommandType.h",
+      "source": "source/windows/WinConfiguration.h",
+      "transformed": true,
+      "prologue": [
+        "#pragma once",
+        "#include \"CustomCommandsSlice.h\""
+      ],
+      "from": "^class TCustomCommandType\\s*$",
+      "until": "^extern TWinConfiguration \\* WinConfiguration;"
+    },
+    {
+      "output": "windows/CustomCommandType.cpp",
+      "source": "source/windows/WinConfiguration.cpp",
+      "transformed": true,
+      "prologue": [
+        "#include \"CustomCommandsSlice.h\"",
+        "#include \"CustomCommandType.h\""
+      ],
+      "ranges": [
+        {
+          "from": "^static UnicodeString __fastcall ExtractExtensionBaseName\\(const UnicodeString & FileName\\)\\s*$",
+          "until": "^UnicodeString __fastcall TWinConfiguration::GetProvisionaryExtensionId\\("
+        },
+        {
+          "from": "^__fastcall TCustomCommandType::TCustomCommandType\\(\\) :\\s*$"
+        }
+      ]
+    },
+    {
+      "output": "windows/LocalCustomCommand.h",
+      "source": "source/windows/GUITools.h",
+      "transformed": false,
+      "prologue": [
+        "#pragma once",
+        "#include \"CustomCommandsSlice.h\""
+      ],
+      "from": "^class TLocalCustomCommand : public TFileCustomCommand\\s*$",
+      "until": "^namespace Pngimagelist\\s*$"
+    },
+    {
+      "output": "windows/LocalCustomCommand.cpp",
+      "source": "source/windows/GUITools.cpp",
+      "transformed": false,
+      "prologue": [
+        "#include \"CustomCommandsSlice.h\"",
+        "#include \"LocalCustomCommand.h\""
+      ],
+      "from": "^TLocalCustomCommand::TLocalCustomCommand\\(\\)\\s*$",
+      "until": "^typedef std::set<TDataModule \\*> TImagesModules;"
+    },
+    {
+      "output": "windows/CustomShortCuts.cpp",
+      "source": "source/windows/UserInterface.cpp",
+      "transformed": false,
+      "prologue": [
+        "#include \"CustomCommandsSlice.h\""
+      ],
+      "ranges": [
+        {
+          "from": "^static TShortCut FirstCtrlNumberShortCut = ",
+          "until": "^void __fastcall InitializeShortCutCombo\\("
+        },
+        {
+          "from": "^TShortCut __fastcall NormalizeCustomShortCut\\(TShortCut ShortCut\\)\\s*$",
+          "until": "^class TMasterPasswordDialog : public TCustomDialog\\s*$"
+        }
+      ]
+    }
+  ]
+}

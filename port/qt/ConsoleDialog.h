@@ -25,6 +25,8 @@ public:
   // error shown).
   bool Execute(const QString & Command);
   bool Executing() const { return FExecuting; }
+  // A command's output shown, as DoConsoleDialog's Log.
+  void AddOutput(const QStringList & Lines);
 
   QComboBox * CommandCombo() const { return FCommand; }
   QPlainTextEdit * Output() const { return FOutput; }

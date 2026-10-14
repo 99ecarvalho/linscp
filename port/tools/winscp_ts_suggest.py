@@ -122,6 +122,7 @@ CONTEXT_FORMS = {
     'GenerateUrlDialog': ['GenerateUrl.dfm'],
     'ConsoleDialog': ['Console.dfm'],
     'ImportSitesDialog': ['ImportSessions.dfm'],
+    'CustomCommandDialog': ['CustomCommand.dfm'],
 }
 
 

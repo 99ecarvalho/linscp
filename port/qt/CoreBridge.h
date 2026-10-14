@@ -516,6 +516,20 @@ enum class TText
   SiteRawAddLabel, // "&Site Setting:"
   ImportCaption, // "Import sites"
   ImportIniTitle, // "Select file to import sites from"
+  CustomCommandAdHoc, // "Custom Command"
+  CustomCommandAdd, // "Add Custom Command"
+  CustomCommandEdit, // "Edit Custom Command"
+  CustomCommandInvalid, // "Custom command description cannot contain '%s'."
+  CustomCommandDuplicate, // "Custom command with description '%s' already exists."
+  CustomCommandAdHocName, // "Ad Hoc"
+  CustomCommandLast, // "&Last: %s"
+  CustomCommandPatternsHint, // "Patterns: ..."
+  CustomCommandPatternsHint6, // "!E ..."
+  PatternsHintK, // "!K ..."
+  PatternsHintBackslash, // "!\\ ..."
+  ShortCutNone, // "None"
+  CustomCommandsParamsTitle, // "'%s' command parameters"
+  CustomCommandsParamPrompt, // "&Parameter value:"
   FindFileTitle, // "Find"
   FindFileFinding, // "Finding ..."
   FindFileInDirectory, // "Searching in %s"
@@ -595,6 +609,53 @@ struct TServerInfo
 struct TSpaceInfo
 {
   std::vector<std::pair<std::string, std::int64_t>> Items;
+};
+
+// --- Custom commands (P3-06d) --------------------------------------------------
+
+// A custom command, as core's TCustomCommandType has it (its Params as
+// flags; the others it has kept as they are).
+struct TCustomCommandDefinition
+{
+  std::string Name;
+  std::string Command;
+  bool ApplyToDirectories = false;
+  bool Recursive = false;
+  bool Local = false;
+  bool ShowResults = false;
+  bool CopyResults = false;
+  bool RemoteFiles = false;
+  bool ShowResultsInMessageBox = false;
+  int OtherParams = 0;
+  // The VCL's TShortCut (0 none).
+  unsigned ShortCut = 0;
+  // From an extension (its options, if any, are not offered yet).
+  std::string Id;
+};
+// Commands > Custom Commands: the list, as WinConfiguration keeps it (its
+// defaults until changed); SetCustomCommands replaces and saves it.
+std::vector<TCustomCommandDefinition> CustomCommands();
+void SetCustomCommands(const std::vector<TCustomCommandDefinition> & Commands);
+// What the Custom command dialog checks of a command, as
+// TCustomCommandDialog's UpdateControls and FormCloseQuery: whether it works
+// on files, which choices apply, and core's error when it is not a command.
+struct TCustomCommandCheck
+{
+  bool FileCommand = false;
+  bool AllowRecursive = true;
+  bool AllowApplyToDirectories = true;
+  bool AllowRemoteFiles = false;
+  std::string Error;
+};
+TCustomCommandCheck CheckCustomCommand(const std::string & Command, bool Remote);
+// The questions a command asks as it runs (TWinInteractiveCustomCommand):
+// its !?prompt?default! patterns, all at once, false when cancelled; and
+// what a !`command` pattern's command prints, run locally.
+struct TCustomCommandPrompts
+{
+  std::function<bool(const std::string & Name, const std::vector<std::pair<std::string, std::string>> & Prompts,
+    std::vector<std::string> & Values)> Prompt;
+  std::function<std::string(const std::string & Command)> Execute;
 };
 
 // --- Generate URL and code (P3-06c) -------------------------------------------
@@ -1116,6 +1177,17 @@ public:
   // FileSystemInfo), and the space available below Path. Throw TCoreError.
   TServerInfo ServerInfo();
   TSpaceInfo SpaceAvailable(const std::string & Path);
+  // A remote custom command run on entries of the current directory, as
+  // TCustomScpExplorerForm::RemoteCustomCommand: its patterns completed
+  // (asking through Prompts), on each file or the list, in the protocol's
+  // or the shell session's shell (which OpenConsole's checks open first).
+  // Its output, when the command shows or copies it. Throws TCoreError
+  // (Aborted when the prompts were cancelled).
+  std::vector<std::string> RunCustomCommand(const TCustomCommandDefinition & Command,
+    const std::vector<std::string> & Names, const TCustomCommandPrompts & Prompts);
+  // Whether custom commands can run here: the protocol's shell, or a shell
+  // session's already open (fcShellAnyCommand).
+  bool CanRunShellCommands() const;
   // The console (Commands > Open Terminal), as TCustomScpExplorerForm's
   // OpenConsole: whether commands can run here (the protocol's, or a
   // shell session's already open), or in a separate shell session

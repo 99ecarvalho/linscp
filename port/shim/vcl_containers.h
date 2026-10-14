@@ -22,6 +22,42 @@ enum TListNotification { lnAdded, lnExtracted, lnDeleted };
 // Delphi's comparison callback: negative, zero or positive, like strcmp.
 using TListSortCompare = int (*)(void * Item1, void * Item2);
 
+// Delphi's TListSortCompareFunc ("reference to function"), as C++Builder
+// sees it: an interface whose Invoke compares, reference-counted, so the
+// sort releases the one it is given.
+class TListSortCompareFunc
+{
+public:
+  virtual ~TListSortCompareFunc() {}
+  virtual int __fastcall Invoke(void * Item1, void * Item2) = 0;
+  virtual unsigned long AddRef() = 0;
+  virtual unsigned long Release() = 0;
+};
+
+// TInterfacedObject's counting for it: zero once made, deleted by its last
+// Release. (The template is vcl_comobj.h's.)
+template <typename INTF>
+class TCppInterfacedObject;
+
+template <>
+class TCppInterfacedObject<TListSortCompareFunc> : public TListSortCompareFunc
+{
+public:
+  unsigned long AddRef() override { return ++FRefCount; }
+  unsigned long Release() override
+  {
+    const unsigned long Result = --FRefCount;
+    if (Result == 0)
+    {
+      delete this;
+    }
+    return Result;
+  }
+
+private:
+  unsigned long FRefCount = 0;
+};
+
 class TList : public TObject
 {
 public:
@@ -46,6 +82,8 @@ public:
   int IndexOf(void * Item) const;
   void * Extract(void * Item);
   void Sort(TListSortCompare Compare);
+  // The interface's comparison; it is released once sorted.
+  void SortList(TListSortCompareFunc * Compare);
   void Move(int CurIndex, int NewIndex);
   void Exchange(int Index1, int Index2);
   void * First() const;
