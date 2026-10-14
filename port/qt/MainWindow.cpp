@@ -46,6 +46,7 @@
 #include "LocationProfilesDialog.h"
 #include "FindFilesDialog.h"
 #include "ServerInfoDialog.h"
+#include "GenerateUrlDialog.h"
 #include "QueryDialog.h"
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
@@ -186,6 +187,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FilesMenu->addSeparator();
   FLinkAction = FilesMenu->addAction(tr("Edit &Link..."), this, [this]() { AddEditLink(); });
   FPropertiesAction = FilesMenu->addAction(tr("&Properties"), this, [this]() { Properties(); });
+  FGenerateFileUrlAction = FilesMenu->addAction(tr("Generate File &URL..."), this, [this]() { GenerateUrl(true); });
   FilesMenu->addSeparator();
   FCopyAction = FilesMenu->addAction(tr("&Copy..."), this, [this]() { TransferSelected(false, true); });
   FCopyAction->setShortcut(QKeySequence(Qt::Key_F5));
@@ -205,6 +207,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FFindFilesAction = CommandsMenu->addAction(tr("&Find Files..."), this, [this]() { FindFilesDialog(); });
   CommandsMenu->addSeparator();
   FServerInfoAction = CommandsMenu->addAction(tr("Server/Protocol &Information"), this, [this]() { ServerInfo(); });
+  FGenerateSessionUrlAction = CommandsMenu->addAction(tr("Generate Session &URL/Code..."), this, [this]() { GenerateUrl(false); });
   FSynchronizeAction = CommandsMenu->addAction(tr("&Synchronize..."), this, [this]() { Synchronize(true); });
   FSynchronizeAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
@@ -985,6 +988,8 @@ void MainWindow::UpdateActions()
   FOpenDirectoryAction->setEnabled(!FBusy);
   FFindFilesAction->setEnabled(!FBusy && FSession);
   FServerInfoAction->setEnabled(!FBusy && FSession);
+  FGenerateSessionUrlAction->setEnabled(!FBusy && FSession);
+  FGenerateFileUrlAction->setEnabled(!FBusy && FSession);
   FAddBookmarkAction->setEnabled(!FBusy);
   FMoveToAction->setEnabled(!FBusy && FSession);
   FCopyAction->setEnabled(!FBusy && FSession);
@@ -1640,4 +1645,32 @@ void MainWindow::ServerInfo()
   {
     ShowError(E);
   }
+}
+
+void MainWindow::GenerateUrl(bool Files)
+{
+  if (FBusy || !FSession)
+  {
+    return;
+  }
+  std::vector<std::string> Paths;
+  if (Files)
+  {
+    QStringList Names = FPanel->Selected();
+    if (Names.isEmpty() && (FPanel->View()->CurrentEntry() != nullptr))
+    {
+      Names.append(QString::fromStdString(FPanel->View()->CurrentEntry()->Name));
+    }
+    if (Names.isEmpty())
+    {
+      return;
+    }
+    const QString Directory = FPanel->Path();
+    for (const QString & Name : Names)
+    {
+      Paths.push_back((Directory + (Directory.endsWith(QLatin1Char('/')) ? QString() : QStringLiteral("/")) + Name).toStdString());
+    }
+  }
+  GenerateUrlDialog Dialog(FSession.get(), Paths, this);
+  Dialog.exec();
 }

@@ -423,6 +423,89 @@
     </message>
 </context>
 <context>
+    <name>GenerateUrlDialog</name>
+    <message>
+        <source>&amp;Username</source>
+        <translation>Nome de Usuário</translation>
+    </message>
+    <message>
+        <source>&amp;Password</source>
+        <translation>&amp;Senha</translation>
+    </message>
+    <message>
+        <source>SSH &amp;host key</source>
+        <translation>Chave SSH &amp;host</translation>
+    </message>
+    <message>
+        <source>Initial &amp;directory</source>
+        <translation>Diretório Inicial</translation>
+    </message>
+    <message>
+        <source>&amp;WinSCP-specific</source>
+        <translation>&amp;WinSCP-específico</translation>
+    </message>
+    <message>
+        <source>&amp;Save extension</source>
+        <translation>&amp;Salvar extensão</translation>
+    </message>
+    <message>
+        <source>&amp;Advanced settings</source>
+        <translation>&amp;Configurações avançadas</translation>
+    </message>
+    <message>
+        <source>URL</source>
+        <translation>URL</translation>
+    </message>
+    <message>
+        <source>Script file</source>
+        <translation>Arquivo de Script</translation>
+    </message>
+    <message>
+        <source>Batch file</source>
+        <translation>Arquivo Batch</translation>
+    </message>
+    <message>
+        <source>Command-line</source>
+        <translation>Linha de comando</translation>
+    </message>
+    <message>
+        <source>PowerShell script</source>
+        <translation>Script PowerShell</translation>
+    </message>
+    <message>
+        <source>&amp;Format:</source>
+        <translation>&amp;Formato</translation>
+    </message>
+    <message>
+        <source>Script</source>
+        <translation>Script</translation>
+    </message>
+    <message>
+        <source>C#</source>
+        <translation>C#</translation>
+    </message>
+    <message>
+        <source>VB.NET</source>
+        <translation>VB.NET</translation>
+    </message>
+    <message>
+        <source>PowerShell</source>
+        <translation>PowerShell</translation>
+    </message>
+    <message>
+        <source>&amp;Language:</source>
+        <translation>&amp;Idioma</translation>
+    </message>
+    <message>
+        <source>.NET assembly code</source>
+        <translation>Código de assembly .NET</translation>
+    </message>
+    <message>
+        <source>&amp;Copy to Clipboard</source>
+        <translation>&amp;Copiar para a área de transferência</translation>
+    </message>
+</context>
+<context>
     <name>LinkDialog</name>
     <message>
         <source>&amp;Link/shortcut file:</source>
@@ -719,6 +802,14 @@
     <message>
         <source>Server/Protocol &amp;Information</source>
         <translation>&amp;Informações sobre o Servidor/protocolo</translation>
+    </message>
+    <message>
+        <source>Generate File &amp;URL...</source>
+        <translation>Gerar &amp;URL do arquivo...</translation>
+    </message>
+    <message>
+        <source>Generate Session &amp;URL/Code...</source>
+        <translation>Gerar &amp;URL/Código da Sessão...</translation>
     </message>
 </context>
 <context>

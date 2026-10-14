@@ -50,7 +50,9 @@
 //   test_qt_gui tools /ini=nul <port> <directory> -platform offscreen
 //     the session tools: server and protocol information (its rows, the
 //     host key, the space available where the server tells it, the
-//     clipboard text)
+//     clipboard text); Generate URL/code: the session's URL with its
+//     parts, a script, .NET code, files' URLs, links to WinSCP's
+//     documentation, the choices kept
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -122,6 +124,9 @@
 #include "FindFilesDialog.h"
 #include "EditMaskDialog.h"
 #include "ServerInfoDialog.h"
+#include "GenerateUrlDialog.h"
+#include "RtfText.h"
+#include <QTextBrowser>
 #include <QPlainTextEdit>
 #include <QTemporaryDir>
 #include "EditorWindow.h"
@@ -2402,6 +2407,40 @@ void Tools(const char * Port, const QString & Directory)
         Check(!Dialog.Pages()->isTabEnabled(2), "no space to check: its page off");
       }
     }
+
+    // Generate URL and code.
+    const QString Url = QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port));
+    {
+      GenerateUrlDialog Dialog(Session, {});
+      Dialog.Pages()->setCurrentIndex(0);
+      Check(Dialog.windowTitle() == QStringLiteral("Generate session URL/code"), "WinSCP's title");
+      Check(Dialog.Text().startsWith(QStringLiteral("sftp://linscp@127.0.0.1:")), "the session's URL, with the user");
+      Dialog.Check(1)->setChecked(false);
+      Check(Dialog.Text().startsWith(QStringLiteral("sftp://127.0.0.1:")) && !Dialog.Check(2)->isEnabled(), "without: no password either");
+      Dialog.Check(1)->setChecked(true);
+      Dialog.Check(4)->setChecked(true);
+      Check(Dialog.Text().contains(QStringLiteral("fingerprint=")), "the host key, WinSCP's URL parameter");
+      Dialog.Pages()->setCurrentIndex(1);
+      Dialog.ScriptFormatCombo()->setCurrentIndex(0);
+      Check(Dialog.Text().startsWith(QStringLiteral("open sftp://")) && Dialog.Text().contains(QStringLiteral("\nexit\n")) &&
+        Dialog.Text().contains(QStringLiteral("linscp-cli")), "a script for the command-line client");
+      Check(Dialog.Result()->toHtml().contains(QStringLiteral("https://winscp.net/eng/docs/scriptcommand_open")),
+        "its commands linked to WinSCP's documentation");
+      Dialog.ScriptFormatCombo()->setCurrentIndex(2);
+      Check(Dialog.Text().contains(QStringLiteral("/command")), "command-line arguments");
+      Dialog.Pages()->setCurrentIndex(2);
+      Dialog.LanguageCombo()->setCurrentIndex(0);
+      Check(Dialog.Text().contains(QStringLiteral("SessionOptions")), ".NET code");
+      Dialog.reject();
+    }
+    Check((CoreBridge::GenerateCodeSettings().Target == CoreBridge::TGenerateCodeOptions::TTarget::Assembly) &&
+      (CoreBridge::GenerateCodeSettings().ScriptFormat == 2), "the choices kept");
+    {
+      GenerateUrlDialog Dialog(Session, { "/hello.txt" });
+      Check((Dialog.Pages()->count() == 1) && (Dialog.windowTitle() == QStringLiteral("Generate file URL")), "a file's URL only");
+      Check(Dialog.Text().endsWith(QStringLiteral("/hello.txt")), "the file's URL");
+    }
+    Check(RtfToText(QStringLiteral("a\\\\b\\{c\\}\\par\nd\\u228?e")) == QStringLiteral("a\\b{c}\nd\u00e4e"), "RTF escapes as text");
     Frontend.SetWindow(nullptr);
   }
   CoreBridge::Finalize();

@@ -118,6 +118,9 @@ public:
   bool Filter();
   // Commands > Server/Protocol Information, as WinSCP's.
   void ServerInfo();
+  // Commands > Generate Session URL/Code, Files > Generate File URL (the
+  // remote panel's selection), as WinSCP's.
+  void GenerateUrl(bool Files);
   // Options > Preferences: false when cancelled.
   bool PreferencesDialog();
   // The preferences applied to the window and its panels.
@@ -185,6 +188,8 @@ private:
   QAction * FFindFilesAction = nullptr;
   QAction * FFilterAction = nullptr;
   QAction * FServerInfoAction = nullptr;
+  QAction * FGenerateSessionUrlAction = nullptr;
+  QAction * FGenerateFileUrlAction = nullptr;
   QAction * FAddBookmarkAction = nullptr;
   QAction * FMoveToAction = nullptr;
   // The editors, and for a remote file what it was downloaded as.

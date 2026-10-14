@@ -71,6 +71,11 @@ struct TShellSettings
   // Open directory's page: the shared bookmarks rather than the site's.
   bool UseSharedBookmarks = false;
   bool UseLocationProfiles = false;
+  // The Generate URL dialog's choices: -1 components (its default).
+  int GenerateUrlComponents = -1;
+  int GenerateUrlCodeTarget = 0;
+  int GenerateUrlScriptFormat = 0;
+  int GenerateUrlAssemblyLanguage = 0;
   int QueueViewHeight = 140;
   int QueueViewHeightPixelsPerInch = 96;
 };

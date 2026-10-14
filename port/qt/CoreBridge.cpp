@@ -381,6 +381,37 @@ void SetBookmarks(const std::string & SessionKey, const std::vector<TBookmarkEnt
   }
 }
 
+TGenerateCodeOptions GenerateCodeSettings()
+{
+  const TShellSettings & Settings = Shell()->Settings();
+  TGenerateCodeOptions Result;
+  // As TGenerateUrlDialog::Execute: never chosen, the user name and the
+  // directory.
+  Result.Components = (Settings.GenerateUrlComponents < 0) ? (1 | 8) : Settings.GenerateUrlComponents;
+  Result.Target = static_cast<TGenerateCodeOptions::TTarget>(std::min(std::max(Settings.GenerateUrlCodeTarget, 0), 2));
+  Result.ScriptFormat = Settings.GenerateUrlScriptFormat;
+  Result.AssemblyLanguage = Settings.GenerateUrlAssemblyLanguage;
+  return Result;
+}
+
+void SetGenerateCodeSettings(const TGenerateCodeOptions & Options)
+{
+  TShellSettings Settings = Shell()->Settings();
+  Settings.GenerateUrlComponents = Options.Components;
+  Settings.GenerateUrlCodeTarget = static_cast<int>(Options.Target);
+  Settings.GenerateUrlScriptFormat = Options.ScriptFormat;
+  Settings.GenerateUrlAssemblyLanguage = Options.AssemblyLanguage;
+  try
+  {
+    Shell()->SetSettings(Settings);
+    Configuration->SaveExplicit();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 bool UseSharedBookmarks()
 {
   return Shell()->Settings().UseSharedBookmarks;

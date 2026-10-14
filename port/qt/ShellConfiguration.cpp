@@ -110,6 +110,10 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"EditorCheckNotModified", FSettings.EditorCheckNotModified);
     Storage->WriteBool(L"UseSharedBookmarks", FSettings.UseSharedBookmarks);
     Storage->WriteBool(L"UseLocationProfiles", FSettings.UseLocationProfiles);
+    Storage->WriteInteger(L"GenerateUrlComponents", FSettings.GenerateUrlComponents);
+    Storage->WriteInteger(L"GenerateUrlCodeTarget", FSettings.GenerateUrlCodeTarget);
+    Storage->WriteInteger(L"GenerateUrlScriptFormat", FSettings.GenerateUrlScriptFormat);
+    Storage->WriteInteger(L"GenerateUrlAssemblyLanguage", FSettings.GenerateUrlAssemblyLanguage);
   }
   if (Storage->OpenSubKey(L"Bookmarks", true))
   {
@@ -194,6 +198,11 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.EditorCheckNotModified = Storage->ReadBool(L"EditorCheckNotModified", FSettings.EditorCheckNotModified);
     FSettings.UseSharedBookmarks = Storage->ReadBool(L"UseSharedBookmarks", FSettings.UseSharedBookmarks);
     FSettings.UseLocationProfiles = Storage->ReadBool(L"UseLocationProfiles", FSettings.UseLocationProfiles);
+    FSettings.GenerateUrlComponents = Storage->ReadInteger(L"GenerateUrlComponents", FSettings.GenerateUrlComponents);
+    FSettings.GenerateUrlCodeTarget = Storage->ReadInteger(L"GenerateUrlCodeTarget", FSettings.GenerateUrlCodeTarget);
+    FSettings.GenerateUrlScriptFormat = Storage->ReadInteger(L"GenerateUrlScriptFormat", FSettings.GenerateUrlScriptFormat);
+    FSettings.GenerateUrlAssemblyLanguage =
+      Storage->ReadInteger(L"GenerateUrlAssemblyLanguage", FSettings.GenerateUrlAssemblyLanguage);
   }
   if (Storage->OpenSubKey(L"Bookmarks", false))
   {

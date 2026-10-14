@@ -118,6 +118,7 @@ CONTEXT_FORMS = {
     'FindFilesDialog': ['FileFind.dfm'],
     'EditMaskDialog': ['EditMask.dfm'],
     'ServerInfoDialog': ['FileSystemInfo.dfm'],
+    'GenerateUrlDialog': ['GenerateUrl.dfm'],
 }
 
 

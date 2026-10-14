@@ -22,6 +22,7 @@
 
 #include "ShellConfiguration.h"
 #include "TransferSettings.h"
+#include "GenerateCode.h"
 
 #include <TextsWin.h>
 
@@ -1300,6 +1301,40 @@ TSpaceInfo TSession::SpaceAvailable(const std::string & Path)
     Result.Items.emplace_back(Utf8(LoadStr(FSINFO_UNUSED_BYTES_AVAILABLE_TO_USER)), Space.UnusedBytesAvailableToUser);
     Result.Items.emplace_back(Utf8(LoadStr(FSINFO_BYTES_PER_ALLOCATION_UNIT)), static_cast<std::int64_t>(Space.BytesPerAllocationUnit));
     return Result;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+// TCustomScpExplorerForm::SessionDataForCode, then the dialog's
+// generation.
+TGeneratedCode TSession::GenerateCode(const TGenerateCodeOptions & Options)
+{
+  try
+  {
+    CheckActive(*this);
+    TTerminal * Terminal = F->Terminal.get();
+    std::unique_ptr<TSessionData> Data(new TSessionData(L""));
+    Data->Assign(Terminal->SessionData);
+    Data->RemoteDirectory = Terminal->CurrentDirectory;
+    Terminal->UpdateSessionCredentials(Data.get());
+    if (!Terminal->SessionData->HasSessionName())
+    {
+      Data->Name = UnicodeString();
+    }
+    Data->IsWorkspace = false;
+    Terminal->FillSessionDataForCode(Data.get());
+    // The command-line client beside the shell, upstream's WinSCP.com.
+    TShellConfiguration * Shell = dynamic_cast<TShellConfiguration *>(GUIConfiguration);
+    UnicodeString Cli = IncludeTrailingBackslash(ExtractFilePath(Shell->ModuleFileName())) +
+#if defined(_WIN32)
+      L"linscp-cli.exe";
+#else
+      L"linscp-cli";
+#endif
+    return GenerateSessionCode(Data.get(), Options, Cli);
   }
   catch (Exception & E)
   {

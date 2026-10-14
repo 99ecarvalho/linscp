@@ -590,6 +590,46 @@ struct TSpaceInfo
   std::vector<std::pair<std::string, std::int64_t>> Items;
 };
 
+// --- Generate URL and code (P3-06c) -------------------------------------------
+
+// What the Generate URL dialog asks for (TGenerateUrlDialog): the session's
+// URL (Components: its checkboxes' flags, WinSCP's tags), script or .NET
+// code, or with Paths (full remote paths) each file's URL. As WinSCP's
+// GenerateUrl* settings, kept between runs.
+struct TGenerateCodeOptions
+{
+  enum class TTarget { Url, Script, Assembly };
+  TTarget Target = TTarget::Url;
+  // 1 user name, 2 password, 4 host key, 8 initial directory, 16
+  // WinSCP-specific, 32 save extension, 64 advanced settings.
+  int Components = 1 | 8;
+  // sfScriptFile, sfBatchFile, sfCommandLine, sfPowerShell.
+  int ScriptFormat = 0;
+  // alCSharp, alVBNET, alPowerShell.
+  int AssemblyLanguage = 0;
+  std::vector<std::string> Paths;
+};
+TGenerateCodeOptions GenerateCodeSettings();
+void SetGenerateCodeSettings(const TGenerateCodeOptions & Options);
+// What it generated: RTF, as upstream's rich edit shows it (colours, links
+// to WinSCP's documentation), with the dialog's captions and which
+// components can be had.
+struct TGeneratedCode
+{
+  std::string Rtf;
+  std::string Description;
+  std::string Title;
+  std::string ResultCaption;
+  bool WordWrap = true;
+  bool FixedWidth = false;
+  bool CanUserName = false;
+  bool CanPassword = false;
+  bool CanHostKey = false;
+  bool CanRemoteDirectory = false;
+  bool CanSaveExtension = false;
+  bool CanRawSettings = false;
+};
+
 // --- Bookmarks (P3-06b) -------------------------------------------------------
 
 // A bookmark, as core's TBookmark: its name, local and remote directories,
@@ -1019,6 +1059,10 @@ public:
   // FileSystemInfo), and the space available below Path. Throw TCoreError.
   TServerInfo ServerInfo();
   TSpaceInfo SpaceAvailable(const std::string & Path);
+  // Commands > Generate Session URL/Code and Files > Generate File URL, as
+  // TCustomScpExplorerForm's GenerateUrl over this session's data
+  // (SessionDataForCode). Throws TCoreError.
+  TGeneratedCode GenerateCode(const TGenerateCodeOptions & Options);
   // The site's key for what is kept per site (SessionData's SessionKey):
   // its bookmarks.
   std::string SessionKey() const;
