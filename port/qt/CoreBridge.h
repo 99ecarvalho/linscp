@@ -563,6 +563,33 @@ struct TInfo
 };
 TInfo Info();
 
+// --- Server and protocol information (P3-06c) ---------------------------------
+
+// What TFileSystemInfoDialog::Feed shows, its labels WinSCP's: the server's
+// rows and the capabilities' (label, value), the host key's algorithm and
+// fingerprints, the certificate's, and the protocol's additional
+// information. Values empty are not shown.
+struct TServerInfo
+{
+  std::vector<std::pair<std::string, std::string>> Server;
+  std::vector<std::pair<std::string, std::string>> Capabilities;
+  std::string HostKeyAlgorithm;
+  std::string HostKeySha256;
+  std::string HostKeyMd5;
+  std::string CertificateSha256;
+  std::string CertificateSha1;
+  std::string Certificate;
+  std::string AdditionalInfo;
+  // The space available can be checked (fcCheckingSpaceAvailable).
+  bool CanCheckSpace = false;
+};
+// Space available on the server (TSpaceAvailable): each with its label; 0
+// unknown.
+struct TSpaceInfo
+{
+  std::vector<std::pair<std::string, std::int64_t>> Items;
+};
+
 // --- Bookmarks (P3-06b) -------------------------------------------------------
 
 // A bookmark, as core's TBookmark: its name, local and remote directories,
@@ -988,6 +1015,10 @@ public:
   void SyncQueue(TSyncChecklist & Checklist);
   // Whether the server can set times, which "synchronize timestamps" needs.
   bool CanSyncTimestamps() const;
+  // Commands > Server/Protocol Information (TCustomScpExplorerForm's
+  // FileSystemInfo), and the space available below Path. Throw TCoreError.
+  TServerInfo ServerInfo();
+  TSpaceInfo SpaceAvailable(const std::string & Path);
   // The site's key for what is kept per site (SessionData's SessionKey):
   // its bookmarks.
   std::string SessionKey() const;

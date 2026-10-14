@@ -716,6 +716,10 @@
         <source>&amp;Filter...</source>
         <translation>&amp;Filtrar...</translation>
     </message>
+    <message>
+        <source>Server/Protocol &amp;Information</source>
+        <translation>&amp;Informações sobre o Servidor/protocolo</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>
@@ -1493,6 +1497,81 @@
     <message>
         <source>&amp;Paste</source>
         <translation>Co&amp;lar</translation>
+    </message>
+</context>
+<context>
+    <name>ServerInfoDialog</name>
+    <message>
+        <source>Item</source>
+        <translation>Item</translation>
+    </message>
+    <message>
+        <source>Value</source>
+        <translation>Valor</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>Desconhecido</translation>
+    </message>
+    <message>
+        <source>Server and protocol information</source>
+        <translation>Informação de servidor e protocolo</translation>
+    </message>
+    <message>
+        <source>Server host key fingerprints</source>
+        <translation>Impressão digital da chave de host do servidor</translation>
+    </message>
+    <message>
+        <source>Algorithm:</source>
+        <translation>Algoritmo:</translation>
+    </message>
+    <message>
+        <source>SHA-256:</source>
+        <translation>SHA-256:</translation>
+    </message>
+    <message>
+        <source>MD5:</source>
+        <translation>MD5:</translation>
+    </message>
+    <message>
+        <source>Certificate fingerprint</source>
+        <translation>Impressão digital do certificado</translation>
+    </message>
+    <message>
+        <source>&amp;Full certificate</source>
+        <translation>&amp;Certificado completo</translation>
+    </message>
+    <message>
+        <source>SHA-1:</source>
+        <translation>SHA-1:</translation>
+    </message>
+    <message>
+        <source>Protocol</source>
+        <translation>Protocolo</translation>
+    </message>
+    <message>
+        <source>Additional information</source>
+        <translation>Informação adicional</translation>
+    </message>
+    <message>
+        <source>Capabilities</source>
+        <translation>Capacidades</translation>
+    </message>
+    <message>
+        <source>&amp;Path:</source>
+        <translation>Ca&amp;minho</translation>
+    </message>
+    <message>
+        <source>Check &amp;space</source>
+        <translation>Checar e&amp;spaço</translation>
+    </message>
+    <message>
+        <source>Space available</source>
+        <translation>Espaço disponível</translation>
+    </message>
+    <message>
+        <source>&amp;Copy to Clipboard</source>
+        <translation>&amp;Copiar para a área de transferência</translation>
     </message>
 </context>
 <context>

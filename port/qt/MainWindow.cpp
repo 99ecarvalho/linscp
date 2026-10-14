@@ -45,6 +45,7 @@
 #include "OpenDirectoryDialog.h"
 #include "LocationProfilesDialog.h"
 #include "FindFilesDialog.h"
+#include "ServerInfoDialog.h"
 #include "QueryDialog.h"
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
@@ -202,6 +203,8 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
 
   QMenu * CommandsMenu = menuBar()->addMenu(tr("&Commands"));
   FFindFilesAction = CommandsMenu->addAction(tr("&Find Files..."), this, [this]() { FindFilesDialog(); });
+  CommandsMenu->addSeparator();
+  FServerInfoAction = CommandsMenu->addAction(tr("Server/Protocol &Information"), this, [this]() { ServerInfo(); });
   FSynchronizeAction = CommandsMenu->addAction(tr("&Synchronize..."), this, [this]() { Synchronize(true); });
   FSynchronizeAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
@@ -981,6 +984,7 @@ void MainWindow::UpdateActions()
   FDuplicateAction->setEnabled(!FBusy && FSession);
   FOpenDirectoryAction->setEnabled(!FBusy);
   FFindFilesAction->setEnabled(!FBusy && FSession);
+  FServerInfoAction->setEnabled(!FBusy && FSession);
   FAddBookmarkAction->setEnabled(!FBusy);
   FMoveToAction->setEnabled(!FBusy && FSession);
   FCopyAction->setEnabled(!FBusy && FSession);
@@ -1618,4 +1622,22 @@ bool MainWindow::Filter()
     FPanel->SetFilter(Normalized);
   }
   return true;
+}
+
+void MainWindow::ServerInfo()
+{
+  if (FBusy || !FSession)
+  {
+    return;
+  }
+  try
+  {
+    const CoreBridge::TServerInfo Info = FSession->ServerInfo();
+    ServerInfoDialog Dialog(FSession.get(), Info, FPanel->Path(), this);
+    Dialog.exec();
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
 }

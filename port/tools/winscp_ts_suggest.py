@@ -117,6 +117,7 @@ CONTEXT_FORMS = {
     'LocationProfilesDialog': ['LocationProfiles.dfm'],
     'FindFilesDialog': ['FileFind.dfm'],
     'EditMaskDialog': ['EditMask.dfm'],
+    'ServerInfoDialog': ['FileSystemInfo.dfm'],
 }
 
 

@@ -1204,6 +1204,109 @@ std::string MultiFilesToOneConfirmation(const std::string & Target, bool Unix)
   return Utf8(UnformatMessage(FormatMultiFilesToOneConfirmation(FromUtf8(Target), Unix)));
 }
 
+namespace
+{
+
+std::pair<std::string, std::string> Row(int Label, const UnicodeString & Value)
+{
+  return { Utf8(LoadStr(Label)), Utf8(Value) };
+}
+
+}  // namespace
+
+// TFileSystemInfoDialog::Feed's items.
+TServerInfo TSession::ServerInfo()
+{
+  try
+  {
+    CheckActive(*this);
+    TTerminal * Terminal = F->Terminal.get();
+    const TSessionInfo & Session = Terminal->GetSessionInfo();
+    const TFileSystemInfo & FileSystem = Terminal->GetFileSystemInfo(true);
+    TServerInfo Result;
+    const auto Capability = [&FileSystem](TFSCapability Capability)
+    {
+      return BooleanToStr(FileSystem.IsCapable[Capability]);
+    };
+    const auto Pair = [&Capability](TFSCapability One, TFSCapability Two)
+    {
+      return FORMAT(L"%s/%s", (Capability(One), Capability(Two)));
+    };
+    Result.Server.push_back(Row(FSINFO_REMOTE_SYSTEM, FileSystem.RemoteSystem));
+    Result.Server.push_back(Row(FSINFO_FS_PROTOCOL, FileSystem.ProtocolName));
+    Result.Server.push_back(Row(FSINFO_CRYPTOGRAPHIC_PROTOCOL, Session.SecurityProtocolName));
+    Result.Server.push_back(Row(FSINFO_SSH_IMPLEMENTATION, Session.SshImplementation));
+    UnicodeString Str = Session.CSCipher;
+    if (Session.CSCipher != Session.SCCipher)
+    {
+      Str += FORMAT(L"/%s", (Session.SCCipher));
+    }
+    Result.Server.push_back(Row(FSINFO_CIPHER, Str));
+    Str = DefaultStr(Session.CSCompression, LoadStr(NO_STR));
+    if (Session.CSCompression != Session.SCCompression)
+    {
+      Str += FORMAT(L"/%s", (DefaultStr(Session.SCCompression, LoadStr(NO_STR))));
+    }
+    Result.Server.push_back(Row(FSINFO_COMPRESSION, Str));
+    // ControlsAddItem: the fingerprint's first two words are the algorithm.
+    UnicodeString HostKey = Session.HostKeyFingerprintSHA256;
+    if (!HostKey.IsEmpty())
+    {
+      UnicodeString Alg1 = CutToChar(HostKey, L' ', true);
+      UnicodeString Alg2 = CutToChar(HostKey, L' ', true);
+      Result.HostKeyAlgorithm = Utf8(FORMAT(L"%s %s", (Alg1, Alg2)));
+      Result.HostKeySha256 = Utf8(HostKey);
+      UnicodeString Md5 = Session.HostKeyFingerprintMD5;
+      CutToChar(Md5, L' ', true);
+      CutToChar(Md5, L' ', true);
+      Result.HostKeyMd5 = Utf8(Md5);
+    }
+    Result.CertificateSha256 = Utf8(Session.CertificateFingerprintSHA256);
+    Result.CertificateSha1 = Utf8(Session.CertificateFingerprintSHA1);
+    Result.Certificate = Utf8(Session.Certificate);
+    Result.Capabilities.push_back(Row(FSINFO_MODE_CHANGING, Capability(fcModeChanging)));
+    Result.Capabilities.push_back(Row(FSINFO_ACL_CHANGING, Capability(fcAclChangingFiles)));
+    Result.Capabilities.push_back(Row(FSINFO_OWNER_GROUP_CHANGING, Capability(fcGroupChanging)));
+    Result.Capabilities.push_back(Row(FSINFO_ANY_COMMAND,
+      (!FileSystem.IsCapable[fcShellAnyCommand] && FileSystem.IsCapable[fcAnyCommand]) ?
+        LoadStr(FSINFO_PROTOCOL_ANY_COMMAND) : Capability(fcAnyCommand)));
+    Result.Capabilities.push_back(Row(FSINFO_SYMBOLIC_HARD_LINK, Pair(fcSymbolicLink, fcHardLink)));
+    Result.Capabilities.push_back(Row(FSINFO_USER_GROUP_LISTING, Capability(fcUserGroupListing)));
+    Result.Capabilities.push_back(Row(FSINFO_REMOTE_COPY, Capability(fcRemoteCopy)));
+    Result.Capabilities.push_back(Row(FSINFO_CHECKING_SPACE_AVAILABLE, Capability(fcCheckingSpaceAvailable)));
+    Result.Capabilities.push_back(Row(FSINFO_CALCULATING_CHECKSUM, Capability(fcCalculatingChecksum)));
+    Result.Capabilities.push_back(Row(FSINFO_NATIVE_TEXT_MODE, Capability(fcNativeTextMode)));
+    Result.AdditionalInfo = Utf8(FileSystem.AdditionalInfo);
+    Result.CanCheckSpace = Terminal->IsCapable[fcCheckingSpaceAvailable];
+    return Result;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+TSpaceInfo TSession::SpaceAvailable(const std::string & Path)
+{
+  try
+  {
+    CheckActive(*this);
+    TSpaceAvailable Space;
+    F->Terminal->SpaceAvailable(FromUtf8(Path), Space);
+    TSpaceInfo Result;
+    Result.Items.emplace_back(Utf8(LoadStr(FSINFO_BYTES_ON_DEVICE)), Space.BytesOnDevice);
+    Result.Items.emplace_back(Utf8(LoadStr(FSINFO_UNUSED_BYTES_ON_DEVICE)), Space.UnusedBytesOnDevice);
+    Result.Items.emplace_back(Utf8(LoadStr(FSINFO_BYTES_AVAILABLE_TO_USER)), Space.BytesAvailableToUser);
+    Result.Items.emplace_back(Utf8(LoadStr(FSINFO_UNUSED_BYTES_AVAILABLE_TO_USER)), Space.UnusedBytesAvailableToUser);
+    Result.Items.emplace_back(Utf8(LoadStr(FSINFO_BYTES_PER_ALLOCATION_UNIT)), static_cast<std::int64_t>(Space.BytesPerAllocationUnit));
+    return Result;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 std::string TSession::SessionKey() const
 {
   return Active() ? Utf8(F->Terminal->SessionData->SessionKey) : std::string();

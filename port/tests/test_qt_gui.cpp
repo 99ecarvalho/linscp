@@ -47,6 +47,10 @@
 //     (Alt+F7): found below a directory, focused, copied, downloaded,
 //     deleted, a mask that is not one; Edit file mask; the panels' filter
 //     (Ctrl+Alt+F)
+//   test_qt_gui tools /ini=nul <port> <directory> -platform offscreen
+//     the session tools: server and protocol information (its rows, the
+//     host key, the space available where the server tells it, the
+//     clipboard text)
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -117,6 +121,7 @@
 #include "LocationProfilesDialog.h"
 #include "FindFilesDialog.h"
 #include "EditMaskDialog.h"
+#include "ServerInfoDialog.h"
 #include <QPlainTextEdit>
 #include <QTemporaryDir>
 #include "EditorWindow.h"
@@ -2356,6 +2361,52 @@ void BookmarksTest(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+void Tools(const char * Port, const QString & Directory)
+{
+  Q_UNUSED(Directory);
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = { "secret" };
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "the session opens");
+    CoreBridge::TSession * Session = Window.Session();
+
+    // Server and protocol information.
+    const CoreBridge::TServerInfo Info = Session->ServerInfo();
+    bool Protocol = false;
+    for (const auto & Row : Info.Server)
+    {
+      Protocol = Protocol || (Row.second.find("SFTP") != std::string::npos);
+    }
+    Check(Protocol, "the protocol, as core names it");
+    Check(!Info.HostKeySha256.empty() && !Info.HostKeyMd5.empty() && !Info.HostKeyAlgorithm.empty() &&
+      (Info.HostKeySha256.find(Info.HostKeyAlgorithm) == std::string::npos), "the host key's algorithm apart from its fingerprints");
+    Check(Info.Capabilities.size() == 10, "WinSCP's capabilities");
+    {
+      ServerInfoDialog Dialog(Session, Info, QStringLiteral("/"));
+      Check(Dialog.ServerView()->topLevelItemCount() >= 3, "the server's rows shown");
+      Check(Dialog.HostKeySha256Edit()->text() == QString::fromStdString(Info.HostKeySha256), "the fingerprint");
+      const QString Text = Dialog.ClipboardText();
+      Check(Text.contains(QStringLiteral("SHA-256 = ")) && Text.contains(QString(60, QLatin1Char('-'))), "the clipboard's text, WinSCP's");
+      if (Info.CanCheckSpace)
+      {
+        Check(Dialog.CheckSpace() && (Dialog.SpaceView()->topLevelItemCount() == 5), "the space available");
+      }
+      else
+      {
+        Check(!Dialog.Pages()->isTabEnabled(2), "no space to check: its page off");
+      }
+    }
+    Frontend.SetWindow(nullptr);
+  }
+  CoreBridge::Finalize();
+}
+
 void Session(const char * Port)
 {
   QtFrontend Frontend;
@@ -2441,6 +2492,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 5) && (std::strcmp(argv[1], "drop") == 0))
   {
     DragAndDrop(argv[3], QString::fromLocal8Bit(argv[4]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "tools") == 0))
+  {
+    Tools(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "bookmarks") == 0))
   {

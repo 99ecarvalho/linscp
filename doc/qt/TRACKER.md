@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 11 | 22 | Parity on features users depend on |
+| P3 Qt parity | 11 | 23 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **89** | **109** | |
+| **Total** | **89** | **110** | |
 
 ## Next three actions
 
@@ -775,6 +775,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-09 | Accessibility | todo | |
 | P3-10 | P3 exit gate | todo | |
 | P3-11 | Remember last used directories | done | `TSite::UpdateDirectories` (advanced settings' Directories page), `TSession::SaveDirectories` as `TTerminalManager::SaveTerminal` on disconnect, another session, or closing; the local directory's quiet fallback; ctest `qt_gui_sites`; native on Windows 11 too. "Preserve local directory" is P3-04's |
+| P3-12 | Local-to-local browsing | todo | WinSCP's local browser and CopyLocal; after P3-06 |
 
 ### P4 — Cleanup
 | ID | Task | Status | Note |

@@ -135,6 +135,7 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P3-06d | Dialogs, custom commands: `CustomCommand`, `TCustomCommandOptionsDialog`, the commands menu running them (core's `TRemoteCustomCommand`, local commands) | M | P3-02 | Split from P3-06; Preferences > Commands is P3-04e |
 | P3-06e | Dialogs, keep remote directory up to date (`Synchronize`): core's `TSynchronizeController` over the local panel's watcher | M | P3-03 | Split from P3-06 |
 | P3-06f | Dialogs, the rest: Save workspace, Shortcut, Cleanup application data, License, S3 tags (`TTagDialog`) | M | P3-04a | Split from P3-06; WinSCP's usage statistics dialog is its telemetry's, not ported |
+| P3-12 | Local-to-local browsing: WinSCP's local browser (a tab with local directories in both panels, no session) and its CopyLocal dialog (local copy and move, Shift+F5/F6) | M | P3-02 | Raised 2026-10-14 by the user; WinSCP has local-to-local copy only in this mode |
 
 ## P4 — Cleanup
 

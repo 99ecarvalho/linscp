@@ -116,6 +116,8 @@ public:
   // what matches the mask asked for (normalized: "*.*" is none). False
   // when cancelled.
   bool Filter();
+  // Commands > Server/Protocol Information, as WinSCP's.
+  void ServerInfo();
   // Options > Preferences: false when cancelled.
   bool PreferencesDialog();
   // The preferences applied to the window and its panels.
@@ -182,6 +184,7 @@ private:
   QAction * FOpenDirectoryAction = nullptr;
   QAction * FFindFilesAction = nullptr;
   QAction * FFilterAction = nullptr;
+  QAction * FServerInfoAction = nullptr;
   QAction * FAddBookmarkAction = nullptr;
   QAction * FMoveToAction = nullptr;
   // The editors, and for a remote file what it was downloaded as.
