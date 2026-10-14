@@ -34,7 +34,9 @@
 //     mixed bits for several files), permissions changed, a directory's
 //     size calculated, recursion offered for directories; Create folder
 //     (F7) with permissions, kept for next time; links (Alt+F6): the
-//     dialog, local links made and edited (FTP makes none)
+//     dialog, local links made and edited (FTP makes none); Duplicate
+//     and Move To (Shift+F5, Shift+F6) within the server, through a
+//     temporary copy where the server copies nothing itself
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -100,6 +102,7 @@
 #include "RightsFrame.h"
 #include "CreateDirectoryDialog.h"
 #include "LinkDialog.h"
+#include "RemoteTransferDialog.h"
 #include <QTemporaryDir>
 #include "EditorWindow.h"
 
@@ -1969,6 +1972,56 @@ void Properties(const char * Port)
     Check(QFileInfo(QDir(LocalDirectory.path()).filePath(LinkName)).isSymLink() &&
       QFileInfo(QDir(LocalDirectory.path()).filePath(LinkName)).symLinkTarget().endsWith(QStringLiteral("target.txt")),
       "pointing to the file");
+    Responder.Custom = nullptr;
+
+    // Duplicate and Move To.
+    {
+      RemoteTransferDialog Dialog(Session, false, false, QStringLiteral("/"), QStringLiteral("hello.txt"));
+      Check(Dialog.windowTitle() == QString::fromStdString(CoreBridge::Text(CoreBridge::TText::RemoteCopyTitle)), "Duplicate's title");
+      Check(Dialog.PathCombo()->currentText() == QStringLiteral("/hello.txt"), "the file's own path to start with");
+      Check(!Session->CanRemoteCopy() && Dialog.NotDirectCopyCheck()->isChecked() && !Dialog.NotDirectCopyCheck()->isEnabled(),
+        "FTP copies nothing itself: through a temporary copy");
+      Dialog.PathCombo()->setEditText(QStringLiteral("/sub"));
+      Check(Dialog.Validate() && (Dialog.PathCombo()->currentText() == QStringLiteral("/sub/*.*")) &&
+        (Dialog.Target() == QStringLiteral("/sub/")) && (Dialog.FileMask() == QStringLiteral("*.*")),
+        "an existing directory takes the file in");
+      RemoteTransferDialog Several(Session, true, true, QStringLiteral("/"), QStringLiteral("*.*"));
+      Several.PathCombo()->setEditText(QStringLiteral("/one.txt"));
+      Responder.LastQuery.clear();
+      Responder.AcceptDialogs = false;
+      Check(Several.Validate() && !Responder.LastQuery.isEmpty(), "several files to one name: asked first");
+    }
+    Remote->Select({ QStringLiteral("hello.txt") });
+    Window.ActivatePanel(false);
+    Responder.Custom = [](QWidget * Modal)
+    {
+      RemoteTransferDialog * Dialog = qobject_cast<RemoteTransferDialog *>(Modal);
+      if (Dialog == nullptr)
+      {
+        return false;
+      }
+      Dialog->PathCombo()->setEditText(QStringLiteral("/copy.txt"));
+      Dialog->OkButton()->click();
+      return true;
+    };
+    Check(Window.RemoteTransfer(false) && Remote->Names().contains(QStringLiteral("copy.txt")) &&
+      Remote->Names().contains(QStringLiteral("hello.txt")), "Shift+F5 duplicates under a new name");
+    Remote->Select({ QStringLiteral("copy.txt") });
+    Responder.Custom = [](QWidget * Modal)
+    {
+      RemoteTransferDialog * Dialog = qobject_cast<RemoteTransferDialog *>(Modal);
+      if (Dialog == nullptr)
+      {
+        return false;
+      }
+      Dialog->PathCombo()->setEditText(QStringLiteral("/sub"));
+      Dialog->OkButton()->click();
+      return true;
+    };
+    Check(Window.RemoteTransfer(true) && !Remote->Names().contains(QStringLiteral("copy.txt")), "Shift+F6 moves it away");
+    Check(Window.Session()->DirectoryExists("/sub") && Remote->ChangeDirectory(QStringLiteral("/sub")) &&
+      Remote->Names().contains(QStringLiteral("copy.txt")), "into the directory, under its name");
+    Remote->ChangeDirectory(QStringLiteral("/"));
     Responder.Custom = nullptr;
     Frontend.SetWindow(nullptr);
   }

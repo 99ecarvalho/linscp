@@ -640,6 +640,9 @@ std::string Text(TText Text)
     case TText::LinkAddCaption: Ident = LINK_ADD_CAPTION; break;
     case TText::LinkEditCaption: Ident = LINK_EDIT_CAPTION; break;
     case TText::CreateLinkError: Ident = CREATE_LINK_ERROR; break;
+    case TText::RemoteCopyTitle: Ident = REMOTE_COPY_TITLE; break;
+    case TText::RemoteMoveTitle: Ident = REMOTE_MOVE_TITLE; break;
+    case TText::RemoteTransferPrompt: Ident = REMOTE_TRANSFER_PROMPT2; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

@@ -90,6 +90,10 @@ public:
   // when it is a link. Locally, the system's (a symbolic link, a shortcut
   // on Windows). False when none was made.
   bool AddEditLink();
+  // Files > Duplicate and Move To (Shift+F5, Shift+F6), as WinSCP's: the
+  // remote panel's selection within the server, after its dialog. False
+  // when nothing was done in full.
+  bool RemoteTransfer(bool Move);
   // Options > Preferences: false when cancelled.
   bool PreferencesDialog();
   // The preferences applied to the window and its panels.
@@ -145,6 +149,8 @@ private:
   QAction * FEditAction = nullptr;
   QAction * FPropertiesAction = nullptr;
   QAction * FLinkAction = nullptr;
+  QAction * FDuplicateAction = nullptr;
+  QAction * FMoveToAction = nullptr;
   // The editors, and for a remote file what it was downloaded as.
   struct TEdited
   {

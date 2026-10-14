@@ -41,6 +41,7 @@
 #include "PreferencesDialog.h"
 #include "PropertiesDialog.h"
 #include "LinkDialog.h"
+#include "RemoteTransferDialog.h"
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
 
@@ -185,6 +186,9 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FCopyAction->setShortcut(QKeySequence(Qt::Key_F5));
   FMoveAction = FilesMenu->addAction(tr("&Move..."), this, [this]() { TransferSelected(true, true); });
   FMoveAction->setShortcut(QKeySequence(Qt::Key_F6));
+  FDuplicateAction = FilesMenu->addAction(tr("Du&plicate..."), this, [this]() { RemoteTransfer(false); });
+  FDuplicateAction->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F5));
+  FMoveToAction = FilesMenu->addAction(tr("Mo&ve To..."), this, [this]() { RemoteTransfer(true); });
 
   QMenu * CommandsMenu = menuBar()->addMenu(tr("&Commands"));
   FSynchronizeAction = CommandsMenu->addAction(tr("&Synchronize..."), this, [this]() { Synchronize(true); });
@@ -372,6 +376,7 @@ void MainWindow::ApplyPreferences()
   FCopyAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::CTRL | Qt::Key_K) : QKeySequence(Qt::Key_F5));
   FPropertiesAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::ALT | Qt::Key_Return) : QKeySequence(Qt::Key_F9));
   FLinkAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_L) : QKeySequence(Qt::ALT | Qt::Key_F6));
+  FMoveToAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_M) : QKeySequence(Qt::SHIFT | Qt::Key_F6));
   // As TScpCommanderForm::ConfigurationChanged: the site's local directory is
   // Home, with "default directory is home", unless it remembers the last.
   FLocal->HomeDirectory =
@@ -943,6 +948,8 @@ void MainWindow::UpdateActions()
   FEditAction->setEnabled(!FBusy);
   FPropertiesAction->setEnabled(!FBusy && FSession);
   FLinkAction->setEnabled(!FBusy);
+  FDuplicateAction->setEnabled(!FBusy && FSession);
+  FMoveToAction->setEnabled(!FBusy && FSession);
   FCopyAction->setEnabled(!FBusy && FSession);
   FMoveAction->setEnabled(!FBusy && FSession);
   FSynchronizeAction->setEnabled(!FBusy && FSession);
@@ -1232,6 +1239,60 @@ bool MainWindow::AddEditLink()
   {
     FSession->CreateLink(Dialog.FileName().toStdString(), Dialog.PointTo().toStdString(), Dialog.SymbolicLink(), Edit);
     Result = true;
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  FPanel->Refresh();
+  UpdateActions();
+  return Result;
+}
+
+bool MainWindow::RemoteTransfer(bool Move)
+{
+  // As WinSCP's Commander: the remote panel's (local files are copied
+  // within the disk only in its local-to-local browsing, which the shell
+  // does not have).
+  if (FBusy || FLocalActive || !FSession)
+  {
+    return false;
+  }
+  QStringList Names = FPanel->Selected();
+  if (Names.isEmpty())
+  {
+    const CoreBridge::TRemoteEntry * Entry = FPanel->View()->CurrentEntry();
+    if (Entry != nullptr)
+    {
+      Names.append(QString::fromStdString(Entry->Name));
+    }
+  }
+  if (Names.isEmpty())
+  {
+    return false;
+  }
+  // As TCustomScpExplorerForm::RemoteTransferDialog: here, under the one
+  // file's name or all.
+  const QString FileMask = (Names.size() == 1) ? Names.first() : QStringLiteral("*.*");
+  RemoteTransferDialog Dialog(FSession.get(), Move, Names.size() > 1, FPanel->Path(), FileMask, this);
+  if (Dialog.exec() != QDialog::Accepted)
+  {
+    return false;
+  }
+  std::vector<std::string> List;
+  for (const QString & Name : Names)
+  {
+    List.push_back(Name.toStdString());
+  }
+  FBusy = true;
+  UpdateActions();
+  bool Result = false;
+  try
+  {
+    Result = Move ?
+      FSession->RemoteMove(List, Dialog.Target().toStdString(), Dialog.FileMask().toStdString()) :
+      FSession->RemoteCopy(List, Dialog.Target().toStdString(), Dialog.FileMask().toStdString(), Dialog.DirectCopy());
   }
   catch (const CoreBridge::TCoreError & E)
   {

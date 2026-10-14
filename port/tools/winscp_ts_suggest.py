@@ -112,6 +112,7 @@ CONTEXT_FORMS = {
     'RightsFrame': ['Rights.dfm'],
     'CreateDirectoryDialog': ['CreateDirectory.dfm'],
     'LinkDialog': ['Symlink.dfm'],
+    'RemoteTransferDialog': ['RemoteTransfer.dfm'],
 }
 
 

@@ -486,6 +486,9 @@ enum class TText
   LinkAddCaption,       // "Add link/shortcut"
   LinkEditCaption,      // "Edit link/shortcut"
   CreateLinkError,      // "Cannot create link '%s'."
+  RemoteCopyTitle,      // "Duplicate"
+  RemoteMoveTitle,      // "Move"
+  RemoteTransferPrompt, // "Target remote &path:"
 };
 std::string Text(TText Text);
 
@@ -543,6 +546,13 @@ struct TFileProperties
   std::string Group;
   bool Recursive = false;
 };
+
+// Core's file masks: whether a target's name part is a mask ("*.*", "*.bak")
+// rather than a file name (IsFileNameMask).
+bool IsFileNameMask(const std::string & Mask);
+// WinSCP's question before several files go to one file Target
+// (FormatMultiFilesToOneConfirmation), as a query's message.
+std::string MultiFilesToOneConfirmation(const std::string & Target, bool Unix);
 
 // The Create folder dialog's permissions, and as kept for next time
 // (GUIConfiguration's NewDirectoryProperties).
@@ -836,6 +846,17 @@ public:
   bool CanLink() const;
   bool CanHardLink() const;
   bool CanEditLinks() const;
+  // Duplicate and Move to (Shift+F5, Shift+F6), as WinSCP's
+  // RemoteTransferFiles: entries of the current directory to Target
+  // (a directory) under FileMask ("*.*", or a new name). A direct copy is
+  // the server's (fcRemoteCopy); otherwise the files go through a local
+  // temporary copy. Throw TCoreError; false when not done in full.
+  bool CanRemoteCopy() const;
+  bool RemoteMove(const std::vector<std::string> & Names, const std::string & Target, const std::string & FileMask);
+  bool RemoteCopy(const std::vector<std::string> & Names, const std::string & Target, const std::string & FileMask,
+    bool Direct);
+  // Whether Path is a directory on the server.
+  bool DirectoryExists(const std::string & Path);
   // A link FileName to PointTo in the current directory; Replace: the
   // existing link FileName is deleted first (an edit). Throws TCoreError.
   void CreateLink(const std::string & FileName, const std::string & PointTo, bool Symbolic, bool Replace);

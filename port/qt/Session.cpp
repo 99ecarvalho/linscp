@@ -379,6 +379,8 @@ TRemoteFile * FindFile(TTerminal * Terminal, const std::string & Name)
 
 // Core's TRights of the bridge's (Properties, below).
 TRights RightsOf(const TRightsState & State);
+// The temporary files' transfer settings (Editing, below).
+TCopyParamType TemporaryFileCopyParam(bool ForceText);
 
 }  // namespace
 
@@ -1172,6 +1174,121 @@ void TSession::CreateLink(const std::string & FileName, const std::string & Poin
       Terminal->ExceptionOnFail = false;
     }
     Terminal->CreateLink(FromUtf8(FileName), FromUtf8(PointTo), Symbolic);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+bool IsFileNameMask(const std::string & Mask)
+{
+  return ::IsFileNameMask(FromUtf8(Mask));
+}
+
+std::string MultiFilesToOneConfirmation(const std::string & Target, bool Unix)
+{
+  return Utf8(UnformatMessage(FormatMultiFilesToOneConfirmation(FromUtf8(Target), Unix)));
+}
+
+bool TSession::CanRemoteCopy() const
+{
+  return Active() && F->Terminal->IsCapable[fcRemoteCopy];
+}
+
+bool TSession::DirectoryExists(const std::string & Path)
+{
+  try
+  {
+    return Active() && F->Terminal->DirectoryExists(FromUtf8(Path));
+  }
+  catch (Exception &)
+  {
+    return false;
+  }
+}
+
+bool TSession::RemoteMove(const std::vector<std::string> & Names, const std::string & Target, const std::string & FileMask)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TStringList> Files = FileListOf(F->Terminal.get(), Names);
+    return F->Terminal->MoveFiles(Files.get(), FromUtf8(Target), FromUtf8(FileMask), false);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+// TCustomScpExplorerForm::RemoteTransferFiles' copy: the server's, or down
+// to a temporary directory (TemporarilyDownloadFiles) and up again.
+bool TSession::RemoteCopy(const std::vector<std::string> & Names, const std::string & Target, const std::string & FileMask,
+  bool Direct)
+{
+  try
+  {
+    CheckActive(*this);
+    TTerminal * Terminal = F->Terminal.get();
+    std::unique_ptr<TStringList> Files = FileListOf(Terminal, Names);
+    if (Direct)
+    {
+      return Terminal->CopyFiles(Files.get(), FromUtf8(Target), FromUtf8(FileMask), false);
+    }
+    const UnicodeString Root = IncludeTrailingBackslash(Configuration->TemporaryDir());
+    if (!ForceDirectories(ApiPath(Root)))
+    {
+      throw EOSExtException(FMTLOAD(CREATE_TEMP_DIR_ERROR, (Root)));
+    }
+    bool Result = false;
+    try
+    {
+      TCopyParamType DownParam = TemporaryFileCopyParam(false);
+      {
+        TTransferBracket Bracket(false, Files->Count);
+        Terminal->ExceptionOnFail = true;
+        try
+        {
+          Terminal->CopyToLocal(Files.get(), Root, &DownParam, cpTemporary, NULL);
+        }
+        catch (...)
+        {
+          Terminal->ExceptionOnFail = false;
+          throw;
+        }
+        Terminal->ExceptionOnFail = false;
+      }
+      std::unique_ptr<TStringList> Temporary(new TStringList());
+      TSearchRecChecked Rec;
+      if (FindFirstUnchecked(Root + L"*", faAnyFile, Rec) == 0)
+      {
+        do
+        {
+          if ((Rec.Name != L".") && (Rec.Name != L".."))
+          {
+            Temporary->Add(Root + Rec.Name);
+          }
+        }
+        while (FindNextChecked(Rec) == 0);
+        FindClose(Rec);
+      }
+      if (Temporary->Count > 0)
+      {
+        TGUICopyParamType UpParam = GUIConfiguration->CurrentCopyParam;
+        UpParam.FileMask = FromUtf8(FileMask);
+        TTransferBracket Bracket(true, Temporary->Count);
+        Terminal->CopyToRemote(Temporary.get(), FromUtf8(Target), &UpParam, cpTemporary, NULL);
+      }
+      Result = true;
+    }
+    catch (...)
+    {
+      RecursiveDeleteFile(ExcludeTrailingBackslash(Root));
+      throw;
+    }
+    RecursiveDeleteFile(ExcludeTrailingBackslash(Root));
+    return Result;
   }
   catch (Exception & E)
   {

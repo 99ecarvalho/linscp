@@ -531,6 +531,14 @@
         <source>Edit &amp;Link...</source>
         <translation>Editar &amp;Link...</translation>
     </message>
+    <message>
+        <source>Du&amp;plicate...</source>
+        <translation>&amp;Duplicar...</translation>
+    </message>
+    <message>
+        <source>Mo&amp;ve To...</source>
+        <translation>Mo&amp;ver para...</translation>
+    </message>
 </context>
 <context>
     <name>PreferencesDialog</name>
@@ -1179,6 +1187,17 @@
     <message>
         <source>Delete</source>
         <translation>Excluir</translation>
+    </message>
+</context>
+<context>
+    <name>RemoteTransferDialog</name>
+    <message>
+        <source>Target &amp;session:</source>
+        <translation>Sessão de destino:</translation>
+    </message>
+    <message>
+        <source>Duplicate via local &amp;temporary copy</source>
+        <translation>Duplicar por cópia local &amp;temporária</translation>
     </message>
 </context>
 <context>
