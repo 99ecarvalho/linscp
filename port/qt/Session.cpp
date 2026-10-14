@@ -981,6 +981,389 @@ void TSession::SyncQueue(TSyncChecklist & Checklist)
   }
 }
 
+// --- Properties --------------------------------------------------------------
+
+namespace
+{
+
+std::unique_ptr<TStringList> FileListOf(TTerminal * Terminal, const std::vector<std::string> & Names)
+{
+  std::unique_ptr<TStringList> Files(new TStringList());
+  for (const std::string & Name : Names)
+  {
+    TRemoteFile * File = FindFile(Terminal, Name);
+    Files->AddObject(File->FileName, File);
+  }
+  return Files;
+}
+
+TRightsState RightsStateOf(const TRights & Rights)
+{
+  TRightsState Result;
+  Result.Set = 0;
+  Result.Unset = 0;
+  for (int Right = TRights::rrFirst; Right <= TRights::rrLast; Right++)
+  {
+    const unsigned Flag = TRights::RightToFlag(static_cast<TRights::TRight>(Right));
+    switch (Rights.RightUndef[static_cast<TRights::TRight>(Right)])
+    {
+      case TRights::rsYes: Result.Set |= Flag; break;
+      case TRights::rsNo: Result.Unset |= Flag; break;
+      default: break;
+    }
+  }
+  return Result;
+}
+
+TRights RightsOf(const TRightsState & State)
+{
+  TRights Result;
+  Result.AllowUndef = true;
+  for (int Right = TRights::rrFirst; Right <= TRights::rrLast; Right++)
+  {
+    const unsigned Flag = TRights::RightToFlag(static_cast<TRights::TRight>(Right));
+    Result.RightUndef[static_cast<TRights::TRight>(Right)] =
+      (State.Set & Flag) ? TRights::rsYes : ((State.Unset & Flag) ? TRights::rsNo : TRights::rsUndef);
+  }
+  if (!Result.IsUndef)
+  {
+    Result.AllowUndef = false;
+  }
+  return Result;
+}
+
+// TPropertiesDialog::LoadRemoteToken.
+UnicodeString TokenText(const TRemoteToken & Token, bool ByID)
+{
+  if (ByID && Token.IDValid)
+  {
+    return Token.NameValid ? FORMAT(L"%s [%d]", (Token.Name, int(Token.ID))) : FORMAT(L"[%d]", (int(Token.ID)));
+  }
+  return Token.Name;
+}
+
+// TPropertiesDialog::StoreRemoteToken.
+TRemoteToken StoreToken(unsigned int ID, const UnicodeString & Text, const TRemoteTokenList * List)
+{
+  const TRemoteToken * Token = (List != NULL) ? List->Find(ID) : NULL;
+  if (Token != NULL)
+  {
+    return *Token;
+  }
+  TRemoteToken Result;
+  Result.ID = ID;
+  Result.Name = Text;
+  return Result;
+}
+
+TRemoteToken StoreToken(const TRemoteToken & Orig, UnicodeString Text, int Message, const TRemoteTokenList * List, bool ByID)
+{
+  TRemoteToken Result;
+  Text = Text.Trim();
+  if (!Text.IsEmpty())
+  {
+    if (ByID)
+    {
+      int IDStart = Text.LastDelimiter(L"[");
+      if ((IDStart >= 0) && (Text[Text.Length()] == L']'))
+      {
+        int ID;
+        UnicodeString IDStr = Text.SubString(IDStart + 1, Text.Length() - IDStart - 1);
+        if (!TryStrToInt(IDStr, ID))
+        {
+          throw Exception(LoadStr(Message));
+        }
+        Result = StoreToken(ID, Text.SubString(1, IDStart - 1).Trim(), List);
+      }
+      else
+      {
+        const TRemoteToken * Token = (List != NULL) ? List->Find(Text) : NULL;
+        int ID;
+        if (Token != NULL)
+        {
+          Result = *Token;
+        }
+        else if (TryStrToInt(Text, ID))
+        {
+          Result = StoreToken(ID, Text, List);
+        }
+        else
+        {
+          throw Exception(MainInstructions(FMTLOAD(PROPERTIES_UNKNOWN_TOKEN, (Text))));
+        }
+      }
+    }
+    else
+    {
+      Result.Name = Text;
+    }
+  }
+  if (TokenText(Result, ByID) == TokenText(Orig, ByID))
+  {
+    Result = Orig;
+  }
+  return Result;
+}
+
+class TChecksumCollector
+{
+public:
+  std::vector<std::pair<std::string, std::string>> Result;
+
+  void __fastcall Calculated(const UnicodeString & FileName, const UnicodeString & /*Alg*/, const UnicodeString & Hash)
+  {
+    Result.emplace_back(Utf8(FileName), Utf8(Hash));
+  }
+};
+
+}  // namespace
+
+std::string RightsText(const TRightsState & Rights)
+{
+  return Utf8(RightsOf(Rights).Text);
+}
+
+bool RightsFromText(const std::string & Text, TRightsState & Rights)
+{
+  const UnicodeString Value = FromUtf8(Text).Trim();
+  try
+  {
+    TRights Result;
+    if ((Value.Length() == 3) || (Value.Length() == 4))
+    {
+      Result.Octal = Value;
+    }
+    else if (Value.Length() == TRights::TextLen)
+    {
+      Result.AllowUndef = true;
+      Result.Text = Value;
+    }
+    else
+    {
+      return false;
+    }
+    Rights = RightsStateOf(Result);
+    return true;
+  }
+  catch (Exception &)
+  {
+    return false;
+  }
+}
+
+TPropertiesInfo TSession::PropertiesOf(const std::vector<std::string> & Names)
+{
+  try
+  {
+    CheckActive(*this);
+    TTerminal * Terminal = F->Terminal.get();
+    std::unique_ptr<TStringList> Files = FileListOf(Terminal, Names);
+    Terminal->LoadFilesProperties(Files.get());
+    // Loading may have read the files again.
+    Files = FileListOf(Terminal, Names);
+    TPropertiesInfo Result;
+    const bool ByID = Terminal->IsCapable[fcGroupOwnerChangingByID];
+    Result.CanChangeGroup = Terminal->IsCapable[fcGroupChanging];
+    Result.CanChangeOwner = Terminal->IsCapable[fcOwnerChanging];
+    Result.CanChangeRights = Terminal->IsCapable[fcModeChanging];
+    // As upstream: the server's lists, and what the directory's first
+    // hundred files and the selection have.
+    std::unique_ptr<TRemoteTokenList> Groups(Result.CanChangeGroup ? Terminal->Groups->Duplicate() : new TRemoteTokenList());
+    std::unique_ptr<TRemoteTokenList> Users(Result.CanChangeOwner ? Terminal->Users->Duplicate() : new TRemoteTokenList());
+    TRemoteDirectory * Directory = Terminal->Files;
+    const int Count = std::min(Directory->Count, 100);
+    for (int Index = 0; Index < Count; Index++)
+    {
+      Groups->AddUnique(Directory->Files[Index]->Group);
+      Users->AddUnique(Directory->Files[Index]->Owner);
+    }
+    for (int Index = 0; Index < Files->Count; Index++)
+    {
+      TRemoteFile * File = static_cast<TRemoteFile *>(Files->Objects[Index]);
+      Groups->AddUnique(File->Group);
+      Users->AddUnique(File->Owner);
+    }
+    if (Result.CanChangeGroup)
+    {
+      for (int Index = 0; Index < Groups->Count(); Index++)
+      {
+        Result.Groups.push_back(Utf8(TokenText(*Groups->Token(Index), ByID)));
+      }
+    }
+    if (Result.CanChangeOwner)
+    {
+      for (int Index = 0; Index < Users->Count(); Index++)
+      {
+        Result.Owners.push_back(Utf8(TokenText(*Users->Token(Index), ByID)));
+      }
+    }
+    const TRemoteProperties Common = TRemoteProperties::CommonProperties(Files.get());
+    Result.Properties.HasRights = Common.Valid.Contains(vpRights);
+    if (Result.Properties.HasRights)
+    {
+      Result.Properties.Rights = RightsStateOf(Common.Rights);
+    }
+    Result.Properties.HasOwner = Common.Valid.Contains(vpOwner);
+    Result.Properties.Owner = Utf8(TokenText(Common.Owner, ByID));
+    Result.Properties.HasGroup = Common.Valid.Contains(vpGroup);
+    Result.Properties.Group = Utf8(TokenText(Common.Group, ByID));
+    // TPropertiesDialog::LoadInfo.
+    for (int Index = 0; Index < Files->Count; Index++)
+    {
+      TRemoteFile * File = static_cast<TRemoteFile *>(Files->Objects[Index]);
+      if (File->IsDirectory)
+      {
+        Result.Directories++;
+        Result.CanCalculateSize = Result.CanCalculateSize || !File->IsSymLink;
+      }
+      else
+      {
+        Result.Files++;
+      }
+      if (File->IsSymLink)
+      {
+        Result.SymLinks++;
+      }
+      Result.Size += File->Size;
+    }
+    if ((Files->Count == 1) && static_cast<TRemoteFile *>(Files->Objects[0])->IsSymLink)
+    {
+      Result.LinkTarget = Utf8(static_cast<TRemoteFile *>(Files->Objects[0])->LinkTo);
+    }
+    // TCustomScpExplorerForm::CanCalculateChecksum, without the secondary
+    // shell.
+    if (Terminal->IsCapable[fcCalculatingChecksum])
+    {
+      std::unique_ptr<TStrings> Algs(new TStringList());
+      Terminal->GetSupportedChecksumAlgs(Algs.get());
+      for (int Index = 0; Index < Algs->Count; Index++)
+      {
+        Result.ChecksumAlgorithms.push_back(Utf8(Algs->Strings[Index]));
+      }
+    }
+    return Result;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+// TPropertiesDialog::GetFileProperties, then TCustomScpExplorerForm's
+// SetProperties.
+bool TSession::SetProperties(const std::vector<std::string> & Names, const TFileProperties & Properties)
+{
+  try
+  {
+    CheckActive(*this);
+    TTerminal * Terminal = F->Terminal.get();
+    std::unique_ptr<TStringList> Files = FileListOf(Terminal, Names);
+    const bool ByID = Terminal->IsCapable[fcGroupOwnerChangingByID];
+    TRemoteProperties Current = TRemoteProperties::CommonProperties(Files.get());
+    // What the dialog could change (TPropertiesDialog::SetFileProperties).
+    TValidProperties Valid;
+    if (Current.Valid.Contains(vpRights) && Terminal->IsCapable[fcModeChanging])
+    {
+      Valid << vpRights;
+    }
+    if (Current.Valid.Contains(vpOwner) && Terminal->IsCapable[fcOwnerChanging])
+    {
+      Valid << vpOwner;
+    }
+    if (Current.Valid.Contains(vpGroup) && Terminal->IsCapable[fcGroupChanging])
+    {
+      Valid << vpGroup;
+    }
+    Current.Valid = Valid;
+    Current.Recursive = false;
+    TRemoteProperties New;
+    if (Terminal->IsCapable[fcModeChanging] && Properties.HasRights)
+    {
+      New.Valid << vpRights;
+      New.Rights = RightsOf(Properties.Rights);
+      New.AddXToDirectories = Properties.AddXToDirectories;
+    }
+    if (Terminal->IsCapable[fcGroupChanging])
+    {
+      New.Group = StoreToken(Current.Group, FromUtf8(Properties.Group), PROPERTIES_INVALID_GROUP, Terminal->Groups, ByID);
+      if (New.Group.IsSet)
+      {
+        New.Valid << vpGroup;
+      }
+    }
+    if (Terminal->IsCapable[fcOwnerChanging])
+    {
+      New.Owner = StoreToken(Current.Owner, FromUtf8(Properties.Owner), PROPERTIES_INVALID_OWNER, Terminal->Users, ByID);
+      if (New.Owner.IsSet)
+      {
+        New.Valid << vpOwner;
+      }
+    }
+    New.Recursive = Properties.Recursive;
+    New = TRemoteProperties::ChangedProperties(Current, New);
+    if (New.Valid.Empty() && !New.Recursive)
+    {
+      return false;
+    }
+    Terminal->ExceptionOnFail = true;
+    try
+    {
+      Terminal->ChangeFilesProperties(Files.get(), &New);
+    }
+    catch (...)
+    {
+      Terminal->ExceptionOnFail = false;
+      throw;
+    }
+    Terminal->ExceptionOnFail = false;
+    return true;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void TSession::CalculateSize(const std::vector<std::string> & Names, std::int64_t & Size, int & Files, int & Directories,
+  int & SymLinks)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TStringList> List = FileListOf(F->Terminal.get(), Names);
+    TCalculateSizeStats Stats;
+    TCalculateSizeParams Params;
+    Params.Stats = &Stats;
+    __int64 Total = 0;
+    F->Terminal->CalculateFilesSize(List.get(), Total, Params);
+    Size = Total;
+    Files = Stats.Files;
+    Directories = Stats.Directories;
+    SymLinks = Stats.SymLinks;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+std::vector<std::pair<std::string, std::string>> TSession::Checksums(const std::vector<std::string> & Names,
+  const std::string & Algorithm)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TStringList> List = FileListOf(F->Terminal.get(), Names);
+    TChecksumCollector Collector;
+    F->Terminal->CalculateFilesChecksum(FromUtf8(Algorithm), List.get(), CLOSURE_OF(&Collector, Calculated));
+    return Collector.Result;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 // --- Editing -----------------------------------------------------------------
 
 struct TEditedFile::TShared

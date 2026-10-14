@@ -36,7 +36,7 @@ def dfm_captions(path):
     i = 0
     while i < len(lines):
         line = lines[i].strip()
-        m = re.match(r'(?:object|inherited) (\w+):', line)
+        m = re.match(r'(?:object|inherited|inline) (\w+):', line)
         if m:
             names.append(m.group(1))
         elif line in ('item', '<item') or line.endswith('= <') or line.endswith('<item'):
@@ -108,6 +108,8 @@ CONTEXT_FORMS = {
     'FileView': ['SelectMask.dfm'],
     'EditorWindow': ['Editor.dfm', 'Editor.rc'],
     'FindDialog': ['Editor.dfm'],
+    'PropertiesDialog': ['Properties.dfm'],
+    'RightsFrame': ['Rights.dfm'],
 }
 
 

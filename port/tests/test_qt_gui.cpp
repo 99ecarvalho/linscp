@@ -28,6 +28,11 @@
 //     all, go to line, the status bar; a remote file downloaded, saved back
 //     through the queue, its temporary copy gone once closed; editors
 //     closed with the session, saving first
+//   test_qt_gui properties /ini=nul <port> -platform offscreen
+//     Files > Properties over the suite's FTP server (which keeps SITE
+//     CHMOD's modes): the dialog's texts, the rights frame (octal, menu,
+//     mixed bits for several files), permissions changed, a directory's
+//     size calculated, recursion offered for directories
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -88,6 +93,8 @@
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
 #include "AboutDialog.h"
+#include "PropertiesDialog.h"
+#include "RightsFrame.h"
 #include "EditorWindow.h"
 
 #include <QPlainTextEdit>
@@ -1774,6 +1781,109 @@ void Editing(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+void Properties(const char * Port)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = { "secret" };
+    Check(Window.OpenUrl(QStringLiteral("ftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "the session opens");
+    CoreBridge::TSession * Session = Window.Session();
+    RemotePanel * Remote = Window.Panel();
+
+    // The rights frame alone.
+    {
+      RightsFrame Frame;
+      CoreBridge::TRightsState State;
+      State.Set = 0644;
+      State.Unset = 07777 & ~0644u;
+      Frame.SetRights(State);
+      Check(Frame.OctalEdit()->text() == QStringLiteral("0644"), "the octal form");
+      Check(Frame.Text() == QStringLiteral("rw-r--r--"), "and core's text");
+      Frame.OctalEdit()->setText(QStringLiteral("750"));
+      Q_EMIT Frame.OctalEdit()->textEdited(QStringLiteral("750"));
+      Check((Frame.Rights().Set == 0750) && (Frame.Check(5)->checkState() == Qt::Checked) &&
+        (Frame.Check(11)->checkState() == Qt::Unchecked), "typing octal sets the boxes");
+      QApplication::clipboard()->setText(QStringLiteral("rwxrwx---"));
+      Frame.Paste();
+      Check(Frame.Rights().Set == 0770, "pasted as text");
+      Frame.CopyAsOctal();
+      Check(QApplication::clipboard()->text() == QStringLiteral("0770"), "copied as octal");
+      Frame.AllRights();
+      Check(Frame.Rights().Set == 0777, "all rights");
+      Frame.SetAllowUndef(true);
+      Frame.LeaveAsIs();
+      Check((Frame.Rights().Set == 0) && (Frame.Rights().Unset == 0) && Frame.OctalEdit()->text().isEmpty(),
+        "left as is: every bit mixed, no octal");
+    }
+
+    // One file.
+    Remote->Select({ QStringLiteral("hello.txt") });
+    Window.ActivatePanel(false);
+    CoreBridge::TPropertiesInfo Info = Session->PropertiesOf({ "hello.txt" });
+    Check(Info.Properties.HasRights && (Info.Properties.Rights.Set == 0644) && Info.CanChangeRights,
+      "a file's permissions, which the server can change");
+    Check((Info.Files == 1) && (Info.Directories == 0) && (Info.Size == 14) && !Info.CanCalculateSize, "its kind and size");
+    {
+      PropertiesDialog Dialog(Session, { "hello.txt" }, QStringLiteral("/"), Info);
+      Check(Dialog.windowTitle() == QStringLiteral("hello.txt Properties"), "the dialog's title, WinSCP's");
+      Check(Dialog.FileEdit()->text() == QStringLiteral("hello.txt"), "names the file");
+      Check(Dialog.SizeEdit()->text() == QStringLiteral("14 B"), "its size");
+      Check(!Dialog.OkButton()->isEnabled() && Dialog.RecursiveCheck()->isHidden(), "nothing to apply yet, no recursion");
+      Dialog.Rights()->Check(5)->setCheckState(Qt::Checked);
+      Check(Dialog.OkButton()->isEnabled() && (Dialog.Rights()->OctalEdit()->text() == QStringLiteral("0744")), "a change can be");
+    }
+    // Through Files > Properties: the dialog's change applied.
+    Responder.Custom = [](QWidget * Modal)
+    {
+      PropertiesDialog * Dialog = qobject_cast<PropertiesDialog *>(Modal);
+      if (Dialog == nullptr)
+      {
+        return false;
+      }
+      CoreBridge::TRightsState State;
+      State.Set = 0600;
+      State.Unset = 07777 & ~0600u;
+      Dialog->Rights()->SetRights(State);
+      Dialog->OkButton()->click();
+      return true;
+    };
+    Check(Window.Properties(), "Properties changes the permissions");
+    Info = Session->PropertiesOf({ "hello.txt" });
+    Check(Info.Properties.Rights.Set == 0600, "as the server now lists them");
+
+    // A file and a directory: mixed bits, the size calculated, recursion.
+    Responder.Custom = nullptr;
+    Info = Session->PropertiesOf({ "hello.txt", "sub" });
+    Check((Info.Files == 1) && (Info.Directories == 1) && Info.CanCalculateSize, "a directory's size is to be calculated");
+    {
+      PropertiesDialog Dialog(Session, { "hello.txt", "sub" }, QStringLiteral("/"), Info);
+      Check(Dialog.windowTitle() == QStringLiteral("hello.txt, ... Properties"), "several: WinSCP's title");
+      Check(Dialog.SizeEdit()->text() == CoreBridge::Text(CoreBridge::TText::PropertiesUnknownSize).c_str(), "size unknown");
+      Check(Dialog.FileEdit()->text() == QStringLiteral("1 file, 1 folder"), "counted");
+      Check(Dialog.Rights()->AllowUndef() && (Dialog.Rights()->Check(5)->checkState() == Qt::PartiallyChecked) &&
+        Dialog.Rights()->OctalEdit()->text().isEmpty(), "bits they differ in mixed");
+      Check(!Dialog.RecursiveCheck()->isHidden(), "recursion offered");
+      Check(Dialog.CalculateSize() && (Dialog.SizeEdit()->text() == QStringLiteral("14 B")), "the size calculated");
+      Dialog.RecursiveCheck()->setChecked(true);
+      Check(Dialog.OkButton()->isEnabled(), "recursion alone is a change");
+    }
+    CoreBridge::TFileProperties Change = Session->PropertiesOf({ "sub" }).Properties;
+    Change.Rights.Set = 0700;
+    Change.Rights.Unset = 07777 & ~0700u;
+    Check(Session->SetProperties({ "sub" }, Change), "a directory's permissions");
+    Check(Session->PropertiesOf({ "sub" }).Properties.Rights.Set == 0700, "changed");
+    Check(!Session->SetProperties({ "sub" }, Change), "and nothing to change the second time");
+    Frontend.SetWindow(nullptr);
+  }
+  CoreBridge::Finalize();
+}
+
 void Session(const char * Port)
 {
   QtFrontend Frontend;
@@ -1859,6 +1969,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 5) && (std::strcmp(argv[1], "drop") == 0))
   {
     DragAndDrop(argv[3], QString::fromLocal8Bit(argv[4]));
+  }
+  else if ((argc >= 4) && (std::strcmp(argv[1], "properties") == 0))
+  {
+    Properties(argv[3]);
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "edit") == 0))
   {

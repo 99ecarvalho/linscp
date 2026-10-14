@@ -15,6 +15,7 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace CoreBridge
@@ -472,6 +473,16 @@ enum class TText
   CopyParamDefault,     // "&Default" (the default transfer settings)
   CopyParamDuplicate,   // "Transfer settings preset with description '%s' already exists."
   WinScpCopyright,      // "Copyright © 2000–2026 Martin Prikryl"
+  PropertiesFile,       // "%d file"
+  PropertiesFiles,      // "%d files"
+  PropertiesDirectory,  // "%d folder"
+  PropertiesDirectories, // "%d folders"
+  PropertiesSymlink,    // "%d symbolic link"
+  PropertiesSymlinks,   // "%d symbolic links"
+  PropertiesFileCaption, // "%s Properties"
+  PropertiesFilesCaption, // "%s, ... Properties"
+  PropertiesUnknownSize, // "Unknown"
+  PropertiesChecksumUnknown, // "Unknown"
 };
 std::string Text(TText Text);
 
@@ -498,6 +509,61 @@ struct TInfo
   std::string ConfigurationStorage;
 };
 TInfo Info();
+
+// --- Properties (P3-06a) ------------------------------------------------------
+
+// Permissions as core's TRights keeps them: the bits set and the bits unset
+// (of 07777); a bit in neither is mixed, as several files' can be.
+struct TRightsState
+{
+  unsigned Set = 0;
+  unsigned Unset = 07777;
+};
+
+// As core's TRights writes them: "rwxr-xr-x", with '$' for a mixed bit.
+std::string RightsText(const TRightsState & Rights);
+// Core's reading of "rwxr-xr-x" or an octal "0755"/"755"; false when it is
+// neither.
+bool RightsFromText(const std::string & Text, TRightsState & Rights);
+
+// What the Properties dialog changes, as core's TRemoteProperties. Owner
+// and group are as the dialog shows them: a name, or with "by ID" servers
+// "name [id]" (TPropertiesDialog::LoadRemoteToken).
+struct TFileProperties
+{
+  bool HasRights = false;
+  TRightsState Rights;
+  bool AddXToDirectories = false;
+  bool HasOwner = false;
+  std::string Owner;
+  bool HasGroup = false;
+  std::string Group;
+  bool Recursive = false;
+};
+
+// What the dialog shows of a selection, as TCustomScpExplorerForm's
+// SetProperties gathers it.
+struct TPropertiesInfo
+{
+  // What the files have in common.
+  TFileProperties Properties;
+  bool CanChangeRights = false;
+  bool CanChangeOwner = false;
+  bool CanChangeGroup = false;
+  // The owners and groups to offer.
+  std::vector<std::string> Owners;
+  std::vector<std::string> Groups;
+  int Files = 0;
+  int Directories = 0;
+  int SymLinks = 0;
+  std::int64_t Size = 0;
+  // A directory to recurse into: its size is to be calculated.
+  bool CanCalculateSize = false;
+  // Where a single link points.
+  std::string LinkTarget;
+  // The server's checksum algorithms; empty when it calculates none.
+  std::vector<std::string> ChecksumAlgorithms;
+};
 
 // --- A session ---------------------------------------------------------------
 
@@ -789,6 +855,23 @@ public:
   void SyncQueue(TSyncChecklist & Checklist);
   // Whether the server can set times, which "synchronize timestamps" needs.
   bool CanSyncTimestamps() const;
+
+  // Properties, as WinSCP's (TCustomScpExplorerForm::SetProperties): of
+  // entries of the current directory, their properties loaded first where
+  // the listing lacks them. Throw TCoreError.
+  TPropertiesInfo PropertiesOf(const std::vector<std::string> & Names);
+  // Changes what Properties says differently from what the files have
+  // (TRemoteProperties::ChangedProperties); an owner or group that is not
+  // one is core's error. False when nothing was changed in full.
+  bool SetProperties(const std::vector<std::string> & Names, const TFileProperties & Properties);
+  // The entries' size, directories recursed, and how many of each kind
+  // (CalculateFilesSize).
+  void CalculateSize(const std::vector<std::string> & Names, std::int64_t & Size, int & Files, int & Directories,
+    int & SymLinks);
+  // Each file's checksum by the algorithm, recursing directories, as file
+  // name and checksum (CalculateFilesChecksum).
+  std::vector<std::pair<std::string, std::string>> Checksums(const std::vector<std::string> & Names,
+    const std::string & Algorithm);
 
   // Editing, as WinSCP's (TCustomScpExplorerForm's ExecuteFile and
   // ExecutedFileChanged): an entry of the current directory downloaded to a

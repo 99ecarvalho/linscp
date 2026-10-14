@@ -81,6 +81,10 @@ public:
   // Closes them, each asking to save a modified file, the remote ones'
   // uploads done here. False when one stayed open.
   bool CloseEditors(bool RemoteOnly);
+  // Files > Properties (F9), as WinSCP's: the remote panel's selection (or
+  // its focused entry) in the Properties dialog, its changes applied. False
+  // when nothing was changed. Local files' properties are the system's.
+  bool Properties();
   // Options > Preferences: false when cancelled.
   bool PreferencesDialog();
   // The preferences applied to the window and its panels.
@@ -134,6 +138,7 @@ private:
   QAction * FMoveAction = nullptr;
   QAction * FSynchronizeAction = nullptr;
   QAction * FEditAction = nullptr;
+  QAction * FPropertiesAction = nullptr;
   // The editors, and for a remote file what it was downloaded as.
   struct TEdited
   {

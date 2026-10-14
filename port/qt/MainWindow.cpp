@@ -39,6 +39,7 @@
 #include "RemotePanel.h"
 #include "SiteManager.h"
 #include "PreferencesDialog.h"
+#include "PropertiesDialog.h"
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
 
@@ -175,6 +176,8 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   QMenu * FilesMenu = menuBar()->addMenu(tr("F&iles"));
   FEditAction = FilesMenu->addAction(tr("&Edit"), this, [this]() { EditCurrent(); });
   FEditAction->setShortcut(QKeySequence(Qt::Key_F4));
+  FilesMenu->addSeparator();
+  FPropertiesAction = FilesMenu->addAction(tr("&Properties"), this, [this]() { Properties(); });
   FilesMenu->addSeparator();
   FCopyAction = FilesMenu->addAction(tr("&Copy..."), this, [this]() { TransferSelected(false, true); });
   FCopyAction->setShortcut(QKeySequence(Qt::Key_F5));
@@ -365,6 +368,7 @@ void MainWindow::ApplyPreferences()
   FPanels->insertWidget(0, Preferences.SwappedPanels ? static_cast<QWidget *>(FPanel) : static_cast<QWidget *>(FLocal));
   // NonVisual.cpp's: Explorer's keys copy with Ctrl+K, as F5 refreshes.
   FCopyAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::CTRL | Qt::Key_K) : QKeySequence(Qt::Key_F5));
+  FPropertiesAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::ALT | Qt::Key_Return) : QKeySequence(Qt::Key_F9));
   // As TScpCommanderForm::ConfigurationChanged: the site's local directory is
   // Home, with "default directory is home", unless it remembers the last.
   FLocal->HomeDirectory =
@@ -934,6 +938,7 @@ void MainWindow::UpdateActions()
   FOpenAction->setEnabled(!FBusy);
   FSitesAction->setEnabled(!FBusy);
   FEditAction->setEnabled(!FBusy);
+  FPropertiesAction->setEnabled(!FBusy && FSession);
   FCopyAction->setEnabled(!FBusy && FSession);
   FMoveAction->setEnabled(!FBusy && FSession);
   FSynchronizeAction->setEnabled(!FBusy && FSession);
@@ -1118,4 +1123,50 @@ void MainWindow::CleanUpEdited()
     QDir(QString::fromStdString(Directory)).removeRecursively();
   }
   FEditedCleanUp.clear();
+}
+
+bool MainWindow::Properties()
+{
+  if (FBusy || !FSession || FLocalActive)
+  {
+    return false;
+  }
+  QStringList Names = FPanel->Selected();
+  if (Names.isEmpty())
+  {
+    const CoreBridge::TRemoteEntry * Entry = FPanel->View()->CurrentEntry();
+    if (Entry != nullptr)
+    {
+      Names.append(QString::fromStdString(Entry->Name));
+    }
+  }
+  if (Names.isEmpty())
+  {
+    return false;
+  }
+  std::vector<std::string> List;
+  for (const QString & Name : Names)
+  {
+    List.push_back(Name.toStdString());
+  }
+  FBusy = true;
+  UpdateActions();
+  bool Result = false;
+  try
+  {
+    const CoreBridge::TPropertiesInfo Info = FSession->PropertiesOf(List);
+    ::PropertiesDialog Dialog(FSession.get(), List, FPanel->Path(), Info, this);
+    if (Dialog.exec() == QDialog::Accepted)
+    {
+      Result = FSession->SetProperties(List, Dialog.Properties());
+    }
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  FPanel->Refresh();
+  UpdateActions();
+  return Result;
 }

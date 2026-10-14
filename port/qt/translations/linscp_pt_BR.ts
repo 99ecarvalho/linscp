@@ -493,6 +493,10 @@
         <source>&amp;Edit</source>
         <translation>&amp;Editar</translation>
     </message>
+    <message>
+        <source>&amp;Properties</source>
+        <translation>&amp;Propriedades</translation>
+    </message>
 </context>
 <context>
     <name>PreferencesDialog</name>
@@ -929,6 +933,61 @@
     </message>
 </context>
 <context>
+    <name>PropertiesDialog</name>
+    <message>
+        <source>Location:</source>
+        <translation>Local:</translation>
+    </message>
+    <message>
+        <source>C&amp;alculate</source>
+        <translation>C&amp;alcular</translation>
+    </message>
+    <message>
+        <source>Size:</source>
+        <translation>Tamanho:</translation>
+    </message>
+    <message>
+        <source>Links to:</source>
+        <translation>Link para:</translation>
+    </message>
+    <message>
+        <source>Group:</source>
+        <translation>Grupo</translation>
+    </message>
+    <message>
+        <source>Owner:</source>
+        <translation>Proprietário</translation>
+    </message>
+    <message>
+        <source>Permissions:</source>
+        <translation>Permissões</translation>
+    </message>
+    <message>
+        <source>Set owner, group and permissions &amp;recursively</source>
+        <translation>Atribuir dono, grupo e permissões &amp;recursivamente</translation>
+    </message>
+    <message>
+        <source>Common</source>
+        <translation>Comum</translation>
+    </message>
+    <message>
+        <source>&amp;Algorithm:</source>
+        <translation>&amp;Algoritmo</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate checksum</source>
+        <translation>&amp;Calcular Checksum</translation>
+    </message>
+    <message>
+        <source>Checksum</source>
+        <translation>Checksum</translation>
+    </message>
+    <message>
+        <source>File</source>
+        <translation>Arquivo</translation>
+    </message>
+</context>
+<context>
     <name>QDialog</name>
     <message>
         <source>&amp;Never show this banner again</source>
@@ -1094,6 +1153,81 @@
     <message>
         <source>Delete</source>
         <translation>Excluir</translation>
+    </message>
+</context>
+<context>
+    <name>RightsFrame</name>
+    <message>
+        <source>&amp;Owner</source>
+        <translation>&amp;Proprietário</translation>
+    </message>
+    <message>
+        <source>&amp;Group</source>
+        <translation>&amp;Grupo</translation>
+    </message>
+    <message>
+        <source>Ot&amp;hers</source>
+        <translation>&amp;Outros</translation>
+    </message>
+    <message>
+        <source>R</source>
+        <translation>R</translation>
+    </message>
+    <message>
+        <source>W</source>
+        <translation>W</translation>
+    </message>
+    <message>
+        <source>X</source>
+        <translation>X</translation>
+    </message>
+    <message>
+        <source>Set UID</source>
+        <translation>Ajustar UID</translation>
+    </message>
+    <message>
+        <source>Set GID</source>
+        <translation>Ajustar GID</translation>
+    </message>
+    <message>
+        <source>Sticky bit</source>
+        <translation>Bit contrário</translation>
+    </message>
+    <message>
+        <source>O&amp;ctal:</source>
+        <translation>O&amp;ctal</translation>
+    </message>
+    <message>
+        <source>Add &amp;X to directories</source>
+        <translation>Adicionar &amp;X aos diretórios</translation>
+    </message>
+    <message>
+        <source>&amp;No Rights</source>
+        <translation>&amp;Sem direitos</translation>
+    </message>
+    <message>
+        <source>&amp;Default Rights</source>
+        <translation>&amp;Direitos Padrão</translation>
+    </message>
+    <message>
+        <source>&amp;All Rights</source>
+        <translation>Direitos &amp;Totais</translation>
+    </message>
+    <message>
+        <source>&amp;Leave as Is</source>
+        <translation>D&amp;eixe como está</translation>
+    </message>
+    <message>
+        <source>&amp;Copy as Text</source>
+        <translation>&amp;Copiar como texto</translation>
+    </message>
+    <message>
+        <source>Copy as &amp;Octal</source>
+        <translation>Copiar como &amp;Octal</translation>
+    </message>
+    <message>
+        <source>&amp;Paste</source>
+        <translation>Co&amp;lar</translation>
     </message>
 </context>
 <context>

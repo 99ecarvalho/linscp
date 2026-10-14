@@ -627,6 +627,16 @@ std::string Text(TText Text)
     case TText::CopyParamDefault: Ident = COPY_PARAM_DEFAULT; break;
     case TText::CopyParamDuplicate: Ident = COPY_PARAM_DUPLICATE; break;
     case TText::WinScpCopyright: Ident = WINSCP_COPYRIGHT; break;
+    case TText::PropertiesFile: Ident = PROPERTIES_FILE; break;
+    case TText::PropertiesFiles: Ident = PROPERTIES_FILES; break;
+    case TText::PropertiesDirectory: Ident = PROPERTIES_DIRECTORY; break;
+    case TText::PropertiesDirectories: Ident = PROPERTIES_DIRECTORIES; break;
+    case TText::PropertiesSymlink: Ident = PROPERTIES_SYMLINK; break;
+    case TText::PropertiesSymlinks: Ident = PROPERTIES_SYMLINKS; break;
+    case TText::PropertiesFileCaption: Ident = PROPERTIES_FILE_CAPTION; break;
+    case TText::PropertiesFilesCaption: Ident = PROPERTIES_FILES_CAPTION; break;
+    case TText::PropertiesUnknownSize: Ident = PROPERTIES_UNKNOWN_SIZE; break;
+    case TText::PropertiesChecksumUnknown: Ident = PROPERTIES_CHECKSUM_UNKNOWN; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));
