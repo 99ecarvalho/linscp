@@ -19,12 +19,15 @@
 #include <FileOperationProgress.h>
 #include <Queue.h>
 #include <GUIConfiguration.h>
+#include <SynchronizeController.h>
+#include <HelpWin.h>
 
 #include "ShellConfiguration.h"
 #include "TransferSettings.h"
 #include "GenerateCode.h"
 #include "CustomCommandsSlice.h"
 #include "CustomCommandType.h"
+#include "DiscMon.hpp"
 
 #include <TextsWin.h>
 
@@ -35,8 +38,13 @@
 namespace CoreBridge
 {
 
+class TKeepUpToDateRun;
+
 struct TSession::TImpl
 {
+  // Out of line: TKeepUpToDateRun is complete only further on.
+  ~TImpl();
+
   std::unique_ptr<TSessionData> Data;
   std::unique_ptr<TTerminal> Terminal;
   // The background queue, made with its first item; its status as last
@@ -50,6 +58,10 @@ struct TSession::TImpl
   int QueueDone = 0;
   // The last search's files (Find files), by full path, as found.
   std::vector<std::pair<UnicodeString, std::unique_ptr<TRemoteFile>>> Found;
+  // Keeping the remote directory up to date, and where its errors go with
+  // "continue on error" (TSynchronizeDialog::FeedSynchronizeError).
+  std::unique_ptr<TKeepUpToDateRun> KeepUpToDate;
+  std::function<void(const UnicodeString & Message, TStrings * MoreMessages)> FeedError;
 
   // The queue's events come on its threads: they only flag the change.
   void __fastcall QueueListUpdate(TTerminalQueue * /*Queue*/)
@@ -92,6 +104,13 @@ struct TSession::TImpl
     unsigned int Answers, const TQueryParams * Params, unsigned int & Answer, ::TQueryType QueryType,
     void * /*Arg*/)
   {
+    // As TCustomScpExplorerForm::MoreMessageDialog while keeping up to date.
+    if (FeedError && (Params != NULL) && FLAGSET(Params->Params, qpAllowContinueOnError))
+    {
+      FeedError(Query, MoreMessages);
+      Answer = ContinueAnswer(Answers);
+      return;
+    }
     Answer = AskFrontend(Query, MoreMessages, QueryType, Answers, Params);
   }
 
@@ -783,6 +802,7 @@ bool TSession::QueueResume(std::uintptr_t Id)
 
 void TSession::Close()
 {
+  KeepUpToDateStop();
   // The queue's connections and threads go first: they use the session's.
   delete F->QueueStatus;
   F->QueueStatus = NULL;
@@ -1007,6 +1027,389 @@ void TSession::SyncQueue(TSyncChecklist & Checklist)
   catch (Exception & E)
   {
     throw CoreErrorOf(E);
+  }
+}
+
+// --- Keeping the remote directory up to date -------------------------------
+
+namespace
+{
+
+// The params and options the dialog sets (TSynchronizeDialog's GetParams).
+const int KeepUpToDateDialogParams =
+  TTerminal::spDelete | TTerminal::spExistingOnly | TTerminal::spSelectedOnly | TTerminal::spTimestamp;
+const int KeepUpToDateDialogOptions = soRecurse | soSynchronize | soSynchronizeAsk | soContinueOnError;
+// Those of the GUI's synchronize params keep-up-to-date does not use
+// (DoSynchronizeDirectories' UnusedParams).
+const int KeepUpToDateUnusedParams =
+  TTerminal::spPreviewChanges | TTerminal::spTimestamp | TTerminal::spNotByTime | TTerminal::spBySize |
+  TTerminal::spCaseSensitive | TTerminal::spMirror | TTerminal::spByChecksum;
+
+TSynchronizeParamType SynchronizeParamsOf(const TKeepUpToDateParams & Params)
+{
+  TSynchronizeParamType Result;
+  Result.LocalDirectory = FromUtf8(Params.LocalDirectory);
+  Result.RemoteDirectory = FromUtf8(Params.RemoteDirectory);
+  Result.Params =
+    (GUIConfiguration->SynchronizeParams & ~(KeepUpToDateUnusedParams | KeepUpToDateDialogParams)) |
+    FLAGMASK(Params.Delete, TTerminal::spDelete) |
+    FLAGMASK(Params.ExistingOnly, TTerminal::spExistingOnly) |
+    FLAGMASK(Params.SelectedOnly, TTerminal::spSelectedOnly);
+  using TFirst = TKeepUpToDateParams::TSynchronizeFirst;
+  Result.Options =
+    (GUIConfiguration->SynchronizeOptions & ~KeepUpToDateDialogOptions) |
+    FLAGMASK(Params.Recurse, soRecurse) |
+    FLAGMASK(Params.SynchronizeFirst == TFirst::Yes, soSynchronize) |
+    FLAGMASK(Params.SynchronizeFirst == TFirst::Ask, soSynchronizeAsk) |
+    FLAGMASK(Params.ContinueOnError, soContinueOnError);
+  return Result;
+}
+
+}  // namespace
+
+TKeepUpToDateParams KeepUpToDateDefaults()
+{
+  const int Params = GUIConfiguration->SynchronizeParams;
+  const int Options = GUIConfiguration->SynchronizeOptions;
+  TKeepUpToDateParams Result;
+  Result.Delete = FLAGSET(Params, TTerminal::spDelete);
+  Result.ExistingOnly = FLAGSET(Params, TTerminal::spExistingOnly);
+  Result.SelectedOnly = FLAGSET(Params, TTerminal::spSelectedOnly);
+  Result.Recurse = FLAGSET(Options, soRecurse);
+  using TFirst = TKeepUpToDateParams::TSynchronizeFirst;
+  Result.SynchronizeFirst =
+    FLAGSET(Options, soSynchronizeAsk) ? TFirst::Ask : (FLAGSET(Options, soSynchronize) ? TFirst::Yes : TFirst::No);
+  Result.ContinueOnError = FLAGSET(Options, soContinueOnError);
+  return Result;
+}
+
+void SaveKeepUpToDateDefaults(const TKeepUpToDateParams & Params, bool SaveSettings)
+{
+  const TSynchronizeParamType SParams = SynchronizeParamsOf(Params);
+  if (SaveSettings)
+  {
+    GUIConfiguration->SynchronizeParams =
+      SParams.Params | (GUIConfiguration->SynchronizeParams & KeepUpToDateUnusedParams);
+    GUIConfiguration->SynchronizeOptions = SParams.Options;
+  }
+  else if (FLAGSET(GUIConfiguration->SynchronizeOptions, soSynchronizeAsk) &&
+           FLAGCLEAR(SParams.Options, soSynchronizeAsk) &&
+           FLAGSET(SParams.Options, soSynchronize))
+  {
+    GUIConfiguration->SynchronizeOptions =
+      (GUIConfiguration->SynchronizeOptions & ~soSynchronizeAsk) | soSynchronize;
+  }
+}
+
+std::string KeepUpToDateSynchronizeQuestion()
+{
+  return Utf8(LoadStr(SYNCHRONISE_BEFORE_KEEPUPTODATE2));
+}
+
+// Keep-up-to-date, as TCustomScpExplorerForm runs TSynchronizeController
+// (DoSynchronizeDirectories, DoSynchronize, Synchronize), with
+// TSynchronizeDialog's handlers (DoLog, DoAbort, FeedSynchronizeError).
+class TKeepUpToDateRun
+{
+public:
+  TKeepUpToDateRun(TTerminal * ATerminal, const TKeepUpToDateEvents & AEvents) :
+    FTerminal(ATerminal),
+    FEvents(AEvents),
+    FController(CLOSURE(DoSynchronize), CLOSURE(DoSynchronizeInvalid), CLOSURE(DoSynchronizeTooManyDirectories))
+  {
+  }
+
+  ~TKeepUpToDateRun()
+  {
+    Stop();
+  }
+
+  void Start(const TSynchronizeParamType & Params, const TCopyParamType & CopyParam,
+    const std::vector<std::string> & Selected)
+  {
+    FParams = Params;
+    // As TCustomScpExplorerForm::GetSynchronizeOptions.
+    if (FLAGSET(Params.Params, TTerminal::spSelectedOnly) && !Selected.empty())
+    {
+      FOptions.Filter = new TStringList();
+      FOptions.Filter->CaseSensitive = false;
+      FOptions.Filter->Duplicates = Types::dupAccept;
+      for (const std::string & Name : Selected)
+      {
+        FOptions.Filter->Add(FromUtf8(Name));
+      }
+      FOptions.Filter->Sort();
+    }
+    // Uploads and deletes are logged as the GUI's FileOperationFinished does.
+    FPreviousOnFinished = FTerminal->OnFinished;
+    FTerminal->OnFinished = CLOSURE(FileOperationFinished);
+    FStarted = true;
+    try
+    {
+      FController.StartStop(NULL, true, FParams, CopyParam, &FOptions, CLOSURE(DoAbort), TSynchronizeThreadsEvent(),
+        CLOSURE(DoLog));
+    }
+    catch (...)
+    {
+      Stop();
+      throw;
+    }
+  }
+
+  void Stop()
+  {
+    if (FStarted)
+    {
+      FStarted = false;
+      FController.StartStop(NULL, false, FParams, TCopyParamType(), NULL, TSynchronizeAbortEvent(),
+        TSynchronizeThreadsEvent(), TSynchronizeLog());
+      FTerminal->OnFinished = FPreviousOnFinished;
+    }
+  }
+
+  bool ContinueOnError() const
+  {
+    return FLAGSET(FParams.Options, soContinueOnError);
+  }
+
+  void FeedError(const UnicodeString & Message, TStrings * MoreMessages)
+  {
+    Log(TKeepUpToDateLog::ContinuedError, Message, MoreMessages);
+  }
+
+private:
+  TTerminal * FTerminal;
+  TKeepUpToDateEvents FEvents;
+  TSynchronizeController FController;
+  TSynchronizeParamType FParams;
+  TSynchronizeOptions FOptions;
+  TFileOperationFinished FPreviousOnFinished;
+  bool FStarted = false;
+
+  void Log(TKeepUpToDateLog Entry, const UnicodeString & Message, TStrings * MoreMessages)
+  {
+    if (FEvents.OnLog)
+    {
+      const std::string More =
+        ((MoreMessages != NULL) && (MoreMessages->Count > 0)) ? Utf8(UnformatMessage(MoreMessages->Text)) : std::string();
+      FEvents.OnLog(Entry, Utf8(UnformatMessage(Message)), More);
+    }
+    // The dialog's OnSynchronizeSessionLog (SynchronizeSessionLog).
+    LogSynchronizeEvent(FTerminal, Message);
+  }
+
+  void __fastcall DoLog(TSynchronizeController * /*Controller*/, TSynchronizeLogEntry Entry,
+    const UnicodeString Message)
+  {
+    Log(static_cast<TKeepUpToDateLog>(Entry), Message, NULL);
+  }
+
+  void __fastcall DoAbort(TObject * /*Sender*/, bool Close)
+  {
+    if (FEvents.OnAbort)
+    {
+      FEvents.OnAbort(Close);
+    }
+  }
+
+  void __fastcall FileOperationFinished(TFileOperation Operation, TOperationSide Side, bool Temp,
+    const UnicodeString & FileName, bool Success, bool NotCancelled, TOnceDoneOperation & OnceDoneOperation)
+  {
+    if (FPreviousOnFinished != NULL)
+    {
+      FPreviousOnFinished(Operation, Side, Temp, FileName, Success, NotCancelled, OnceDoneOperation);
+    }
+    if (Success)
+    {
+      if ((Operation == foCopy) && (Side == osLocal))
+      {
+        FController.LogOperation(soUpload, FileName);
+      }
+      else if ((Operation == foDelete) && (Side == osRemote))
+      {
+        FController.LogOperation(soDelete, FileName);
+      }
+    }
+  }
+
+  void ShowException(Exception & E)
+  {
+    TError Error;
+    if (ErrorOf(&E, Error))
+    {
+      Frontend()->ShowError(Error);
+    }
+  }
+
+  void __fastcall DoSynchronize(TSynchronizeController * /*Sender*/, const UnicodeString LocalDirectory,
+    const UnicodeString RemoteDirectory, const TCopyParamType & CopyParam, const TSynchronizeParamType & Params,
+    TSynchronizeChecklist ** Checklist, TSynchronizeOptions * Options, bool Full)
+  {
+    if (FTerminal->Status != ssOpened)
+    {
+      return;
+    }
+    try
+    {
+      int PParams = Params.Params;
+      if (!Full)
+      {
+        PParams |= TTerminal::spNoRecurse | TTerminal::spUseCache | TTerminal::spDelayProgress;
+        if (FLAGSET(Params.Options, soRecurse))
+        {
+          PParams |= TTerminal::spSubDirs;
+        }
+      }
+      else if (FLAGCLEAR(Params.Options, soRecurse))
+      {
+        // A non-recursive keep-up-to-date's full synchronization is too.
+        PParams |= TTerminal::spNoRecurse;
+      }
+      Synchronize(LocalDirectory, RemoteDirectory, CopyParam, PParams, Checklist, Options);
+    }
+    catch (Exception & E)
+    {
+      if (!FTerminal->Active)
+      {
+        ShowException(E);
+        throw;
+      }
+      else if (!ContinueOnError())
+      {
+        // Mostly EAbort, which shows nothing; otherwise an error listing
+        // directories while looking for differences.
+        ShowException(E);
+        throw;
+      }
+      // Else already logged, through FeedError.
+    }
+  }
+
+  // As TCustomScpExplorerForm::Synchronize (keep-up-to-date mode).
+  void Synchronize(const UnicodeString & LocalDirectory, const UnicodeString & RemoteDirectory,
+    const TCopyParamType & CopyParam, int Params, TSynchronizeChecklist ** Checklist, TSynchronizeOptions * Options)
+  {
+    std::unique_ptr<TSynchronizeChecklist> AChecklist(FTerminal->SynchronizeCollect(LocalDirectory, RemoteDirectory,
+      TTerminal::smRemote, &CopyParam, Params | TTerminal::spNoConfirmation, TSynchronizeDirectory(), Options));
+    if (AChecklist->CheckedCount > 0)
+    {
+      TTransferBracket Bracket(true, AChecklist->CheckedCount);
+      FTerminal->SynchronizeApply(AChecklist.get(), &CopyParam, Params | TTerminal::spNoConfirmation,
+        TSynchronizeDirectory(), TProcessedSynchronizationChecklistItem(), TUpdatedSynchronizationChecklistItems(),
+        NULL, NULL);
+    }
+    if (Checklist != NULL)
+    {
+      *Checklist = AChecklist.release();
+    }
+  }
+
+  void __fastcall DoSynchronizeInvalid(TSynchronizeController * /*Sender*/, const UnicodeString Directory,
+    const UnicodeString ErrorStr)
+  {
+    TError Error;
+    Error.Message = Utf8(Directory.IsEmpty() ? LoadStr(WATCH_ERROR_GENERAL) : FMTLOAD(WATCH_ERROR_DIRECTORY, (Directory)));
+    Error.MoreMessages = Utf8(ErrorStr);
+    Frontend()->ShowError(Error);
+  }
+
+  // As TCustomScpExplorerForm::DoSynchronizeTooManyDirectories.
+  void __fastcall DoSynchronizeTooManyDirectories(TSynchronizeController * /*Sender*/, int & MaxDirectories)
+  {
+    if (MaxDirectories < GUIConfiguration->MaxWatchDirectories)
+    {
+      MaxDirectories = GUIConfiguration->MaxWatchDirectories;
+    }
+    else
+    {
+      TQueryParams Params(qpNeverAskAgainCheck, HELP_TOO_MANY_WATCH_DIRECTORIES);
+      const unsigned int Result = AskFrontend(FMTLOAD(TOO_MANY_WATCH_DIRECTORIES, (MaxDirectories, MaxDirectories)),
+        NULL, qtConfirmation, qaYes | qaNo, &Params);
+      if ((Result == qaYes) || (Result == qaNeverAskAgain))
+      {
+        MaxDirectories *= 2;
+        if (Result == qaNeverAskAgain)
+        {
+          GUIConfiguration->MaxWatchDirectories = MaxDirectories;
+        }
+      }
+      else
+      {
+        Abort();
+      }
+    }
+  }
+};
+
+TSession::TImpl::~TImpl() = default;
+
+void TSession::KeepUpToDateStart(const TKeepUpToDateParams & Params, const TTransferSettings * Settings,
+  const std::vector<std::string> & Selected, const TKeepUpToDateEvents & Events)
+{
+  try
+  {
+    CheckActive(*this);
+    KeepUpToDateStop();
+    // As DoStartStop: the question is asked by now.
+    TKeepUpToDateParams Started = Params;
+    if (Started.SynchronizeFirst == TKeepUpToDateParams::TSynchronizeFirst::Ask)
+    {
+      Started.SynchronizeFirst = TKeepUpToDateParams::TSynchronizeFirst::No;
+    }
+    // As TSynchronizeDialog::GetCopyParams.
+    TGUICopyParamType CopyParam = TransferCopyParam(Settings);
+    CopyParam.PreserveTime = true;
+    CopyParam.NewerOnly = false;
+    std::unique_ptr<TKeepUpToDateRun> Run(new TKeepUpToDateRun(F->Terminal.get(), Events));
+    TKeepUpToDateRun * R = Run.get();
+    if (Started.ContinueOnError)
+    {
+      F->FeedError = [R](const UnicodeString & Message, TStrings * MoreMessages) { R->FeedError(Message, MoreMessages); };
+    }
+    try
+    {
+      R->Start(SynchronizeParamsOf(Started), CopyParam, Selected);
+    }
+    catch (...)
+    {
+      F->FeedError = nullptr;
+      throw;
+    }
+    F->KeepUpToDate = std::move(Run);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void TSession::KeepUpToDateStop()
+{
+  F->FeedError = nullptr;
+  F->KeepUpToDate.reset();
+}
+
+bool TSession::KeepingUpToDate() const
+{
+  return (F->KeepUpToDate != NULL);
+}
+
+void TSession::KeepUpToDateIdle()
+{
+  if (F->KeepUpToDate != NULL)
+  {
+    try
+    {
+      TDiscMonitor::Pump();
+      if (F->Terminal != NULL)
+      {
+        F->Terminal->Idle();
+      }
+    }
+    catch (Exception & E)
+    {
+      throw CoreErrorOf(E);
+    }
   }
 }
 

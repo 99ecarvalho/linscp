@@ -802,7 +802,9 @@ def main():
                              'libs/neon', 'libs/libs3',
                              'source/windows/GUIConfiguration.cpp', 'source/windows/GUIConfiguration.h',
                              # Their slices only (slices.json): the rest is the VCL GUI's.
-                             'source/windows/WinConfiguration.cpp', 'source/windows/WinConfiguration.h'])
+                             'source/windows/WinConfiguration.cpp', 'source/windows/WinConfiguration.h',
+                             'source/windows/SynchronizeController.cpp',
+                             'source/windows/SynchronizeController.h'])
     ap.add_argument('--slices', default=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'slices.json'),
                     help="part-file units (ADR 0014): their manifest")
     ap.add_argument('--slice-out',

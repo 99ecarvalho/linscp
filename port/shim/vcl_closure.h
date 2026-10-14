@@ -259,6 +259,8 @@ auto MakeClosure(const C * Instance, R (C::*Method)(A...) const)
 // rather than by WinSCP, so it has to come from here.
 class TObject;
 using TNotifyEvent = TClosure<void(TObject *)>;
+// TThread::Synchronize's argument, which TDiscMonitor's OnSynchronize passes on.
+using TThreadMethod = TClosure<void()>;
 
 // Used at the call sites the transform rewrites. The enclosing class comes from
 // decltype(*this), so the macro needs only the method name -- which is all the

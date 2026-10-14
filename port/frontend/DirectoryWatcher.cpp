@@ -67,6 +67,9 @@ struct TDirectoryWatcher::TImpl
   OVERLAPPED Overlapped{};
   alignas(DWORD) unsigned char Buffer[64 * 1024];
   int Count = 0;
+  // A read issued and not yet collected: only then is there one to cancel
+  // and wait for.
+  bool Pending = false;
 
   void Issue()
   {
@@ -80,6 +83,10 @@ struct TDirectoryWatcher::TImpl
     {
       Error = LastSysErrorMessage();
       ErrorDirectory = Root;
+    }
+    else
+    {
+      Pending = true;
     }
   }
 
@@ -189,6 +196,35 @@ struct TDirectoryWatcher::TImpl
     }
   }
 #endif
+
+  void Release()
+  {
+#if defined(_WIN32)
+    if (Handle != INVALID_HANDLE_VALUE)
+    {
+      if (Pending)
+      {
+        CancelIo(Handle);
+        DWORD Ignored;
+        GetOverlappedResult(Handle, &Overlapped, &Ignored, TRUE);
+        Pending = false;
+      }
+      CloseHandle(Handle);
+      Handle = INVALID_HANDLE_VALUE;
+    }
+    if (Event != NULL)
+    {
+      CloseHandle(Event);
+      Event = NULL;
+    }
+#else
+    if (Fd >= 0)
+    {
+      close(Fd);
+      Fd = -1;
+    }
+#endif
+  }
 };
 
 TDirectoryWatcher::TDirectoryWatcher(const UnicodeString & Root, bool Recursive, TFilter Filter) :
@@ -197,58 +233,48 @@ TDirectoryWatcher::TDirectoryWatcher(const UnicodeString & Root, bool Recursive,
   F->Root = WithoutSlash(Root);
   F->Recursive = Recursive;
   F->Filter = std::move(Filter);
+  // The filter may throw (the shell's asks whether to watch more), and a
+  // destructor does not run for a constructor that throws.
+  try
+  {
 #if defined(_WIN32)
-  F->Handle = CreateFileW(F->Root.c_str(), FILE_LIST_DIRECTORY,
-    FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING,
-    FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL);
-  if (F->Handle == INVALID_HANDLE_VALUE)
-  {
-    throw Exception(FMTLOAD(WATCH_ERROR_DIRECTORY, (F->Root)) + L"\n" + LastSysErrorMessage());
-  }
-  F->Event = CreateEventW(NULL, TRUE, FALSE, NULL);
-  F->CountDirectories(F->Root);
-  F->Issue();
+    F->Handle = CreateFileW(F->Root.c_str(), FILE_LIST_DIRECTORY,
+      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING,
+      FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, NULL);
+    if (F->Handle == INVALID_HANDLE_VALUE)
+    {
+      throw Exception(FMTLOAD(WATCH_ERROR_DIRECTORY, (F->Root)) + L"\n" + LastSysErrorMessage());
+    }
+    F->Event = CreateEventW(NULL, TRUE, FALSE, NULL);
+    F->CountDirectories(F->Root);
+    F->Issue();
 #else
-  F->Fd = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
-  if (F->Fd < 0)
-  {
-    throw Exception(LoadStr(WATCH_ERROR_GENERAL) + L"\n" + UnicodeString(std::strerror(errno)));
-  }
-  F->Add(F->Root);
-  if (F->Watches.empty())
-  {
-    const UnicodeString Reason = F->Error;
-    close(F->Fd);
-    F->Fd = -1;
-    throw Exception(FMTLOAD(WATCH_ERROR_DIRECTORY, (F->Root)) + L"\n" + Reason);
-  }
+    F->Fd = inotify_init1(IN_NONBLOCK | IN_CLOEXEC);
+    if (F->Fd < 0)
+    {
+      throw Exception(LoadStr(WATCH_ERROR_GENERAL) + L"\n" + UnicodeString(std::strerror(errno)));
+    }
+    F->Add(F->Root);
+    if (F->Watches.empty())
+    {
+      throw Exception(FMTLOAD(WATCH_ERROR_DIRECTORY, (F->Root)) + L"\n" + F->Error);
+    }
 #endif
-  if (!F->Error.IsEmpty())
+    if (!F->Error.IsEmpty())
+    {
+      throw Exception(FMTLOAD(WATCH_ERROR_DIRECTORY, (F->ErrorDirectory)) + L"\n" + F->Error);
+    }
+  }
+  catch (...)
   {
-    throw Exception(FMTLOAD(WATCH_ERROR_DIRECTORY, (F->ErrorDirectory)) + L"\n" + F->Error);
+    F->Release();
+    throw;
   }
 }
 
 TDirectoryWatcher::~TDirectoryWatcher()
 {
-#if defined(_WIN32)
-  if (F->Handle != INVALID_HANDLE_VALUE)
-  {
-    CancelIo(F->Handle);
-    DWORD Ignored;
-    GetOverlappedResult(F->Handle, &F->Overlapped, &Ignored, TRUE);
-    CloseHandle(F->Handle);
-  }
-  if (F->Event != NULL)
-  {
-    CloseHandle(F->Event);
-  }
-#else
-  if (F->Fd >= 0)
-  {
-    close(F->Fd);
-  }
-#endif
+  F->Release();
 }
 
 int TDirectoryWatcher::Directories() const
@@ -273,6 +299,7 @@ void TDirectoryWatcher::Wait(unsigned int Timeout)
     return;
   }
   DWORD Bytes = 0;
+  F->Pending = false;
   if (!GetOverlappedResult(F->Handle, &F->Overlapped, &Bytes, FALSE))
   {
     F->Error = LastSysErrorMessage();

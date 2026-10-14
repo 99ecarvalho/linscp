@@ -1,10 +1,12 @@
 # The frontend half of core's Interface.h every program shares
 # (FrontendCommon.cpp), process startup, and upstream's TProgramParams
 # (windows/ProgParams.h; its .cpp is carried in HeadlessMain.cpp, since
-# upstream's now needs the VCL forms).
+# upstream's now needs the VCL forms), and the directory watcher both
+# keepuptodate and the shell's keep-up-to-date use.
 add_library(linscp-frontend-common STATIC EXCLUDE_FROM_ALL
   FrontendCommon.cpp
-  HeadlessMain.cpp)
+  HeadlessMain.cpp
+  DirectoryWatcher.cpp)
 target_link_libraries(linscp-frontend-common PUBLIC linscp-core)
 target_include_directories(linscp-frontend-common PUBLIC
   "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -72,8 +74,7 @@ endif()
 
 # The scripting client, winscp.com's counterpart: core's script on standard
 # input and output (CliMain.cpp, StdioConsole.cpp).
-add_executable(linscp-cli EXCLUDE_FROM_ALL CliMain.cpp StdioConsole.cpp ExternalConsole.cpp
-  DirectoryWatcher.cpp)
+add_executable(linscp-cli EXCLUDE_FROM_ALL CliMain.cpp StdioConsole.cpp ExternalConsole.cpp)
 # console/Console.h: winscp.com's protocol structure, used as upstream's.
 target_include_directories(linscp-cli PRIVATE "${LINSCP_UPSTREAM}/source/resource"
   "${LINSCP_UPSTREAM}/source/console")

@@ -10,7 +10,8 @@ The server is rclone's SFTP, or the suite's own FTP server (ftp_server.py);
 user linscp, password secret either way. Or (sshd) OpenSSH's sshd, with a
 real shell, letting the current user ({user}) in with a fresh key ({key}).
 The arguments default to /ini=nul {port} {protocol}, with the server's port
-and protocol filled in, {tmp} with a temporary directory of the test's own,
+and protocol filled in, {tmp} with a temporary directory of the test's own
+({hosttmp}: the same as the server sees it, a host path even under Wine),
 and {key} with an OpenSSH private key made there (ssh-keygen).
 
 Exits 77 without rclone (or sshd).
@@ -62,7 +63,7 @@ def main():
                 target_tmp = subprocess.run(['winepath', '-w', tmp], capture_output=True, text=True,
                                             env=dict(os.environ, WINEDEBUG='-all')).stdout.strip() or tmp
             cmd = ([a.emulator] if a.emulator else []) + [a.test] + [
-                x.replace('{port}', str(port)).replace('{protocol}', a.protocol).replace('{tmp}', target_tmp)
+                x.replace('{port}', str(port)).replace('{protocol}', a.protocol).replace('{tmp}', target_tmp).replace('{hosttmp}', tmp)
                 .replace('{key}', key).replace('{user}', getpass.getuser()) for x in args]
             p = subprocess.run(cmd, capture_output=True, text=True, timeout=240)
             print(p.stdout, end='')

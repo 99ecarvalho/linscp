@@ -1048,6 +1048,50 @@ private:
   std::vector<TSyncItem> FItems;
 };
 
+// --- Keeping the remote directory up to date -------------------------------
+
+// The Keep Remote Directory up to Date dialog's settings, as WinSCP's
+// (TSynchronizeParamType: its spXXX params and soXXX options).
+struct TKeepUpToDateParams
+{
+  std::string LocalDirectory;
+  std::string RemoteDirectory;
+  bool Delete = false;
+  bool ExistingOnly = false;
+  bool SelectedOnly = false;
+  // "Update subdirectories" (soRecurse).
+  bool Recurse = false;
+  // "Synchronize on start": a full synchronization first, or (Ask: the box
+  // grayed) the question whether to (SYNCHRONISE_BEFORE_KEEPUPTODATE2).
+  enum class TSynchronizeFirst { No, Yes, Ask };
+  TSynchronizeFirst SynchronizeFirst = TSynchronizeFirst::No;
+  bool ContinueOnError = false;
+};
+
+// As TCustomScpExplorerForm::DoSynchronizeDirectories: the settings kept
+// (GUIConfiguration's SynchronizeParams and SynchronizeOptions), with no
+// directories; saved back with "use same options next time", or else only
+// an Ask the question's "never ask again" made Yes.
+TKeepUpToDateParams KeepUpToDateDefaults();
+void SaveKeepUpToDateDefaults(const TKeepUpToDateParams & Params, bool SaveSettings);
+// The synchronize-on-start question, as TSynchronizeDialog::Start asks it.
+std::string KeepUpToDateSynchronizeQuestion();
+
+// What keeping up to date logs (TSynchronizeLogEntry).
+enum class TKeepUpToDateLog { Scan, Start, Change, Upload, Delete, DirChange, ContinuedError };
+
+struct TKeepUpToDateEvents
+{
+  // A line of the dialog's log (TSynchronizeDialog::DoLogInternal); with
+  // "continue on error", errors are ContinuedError lines, with their more
+  // messages, instead of dialogs.
+  std::function<void(TKeepUpToDateLog Entry, const std::string & Message, const std::string & MoreMessages)> OnLog;
+  // It stopped itself, after an error or when the directory could no longer
+  // be watched; Close when the session is gone too (the dialog closes). The
+  // shell is to call KeepUpToDateStop once back from KeepUpToDateIdle.
+  std::function<void(bool Close)> OnAbort;
+};
+
 class TSession
 {
 public:
@@ -1173,6 +1217,20 @@ public:
   void SyncQueue(TSyncChecklist & Checklist);
   // Whether the server can set times, which "synchronize timestamps" needs.
   bool CanSyncTimestamps() const;
+  // Commands > Keep Remote Directory up to Date, as WinSCP's (upstream's
+  // TSynchronizeController, compiled as it is): the local directory
+  // watched, and each directory that changed, once quiet, synchronized to
+  // the remote one; a full synchronization first when Params says.
+  // Selected: the names "selected files only" limits the directories' first
+  // level to. Throws TCoreError (Aborted when the question whether to watch
+  // more directories is answered no).
+  void KeepUpToDateStart(const TKeepUpToDateParams & Params, const TTransferSettings * Settings,
+    const std::vector<std::string> & Selected, const TKeepUpToDateEvents & Events);
+  void KeepUpToDateStop();
+  bool KeepingUpToDate() const;
+  // To be called regularly on the GUI thread (a timer) while it runs: the
+  // changes collected and synchronized.
+  void KeepUpToDateIdle();
   // Commands > Server/Protocol Information (TCustomScpExplorerForm's
   // FileSystemInfo), and the space available below Path. Throw TCoreError.
   TServerInfo ServerInfo();

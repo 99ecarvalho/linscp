@@ -69,6 +69,15 @@
           "until": "^class TMasterPasswordDialog : public TCustomDialog\\s*$"
         }
       ]
+    },
+    {
+      "output": "windows/SynchronizeController.cpp",
+      "source": "source/windows/SynchronizeController.cpp",
+      "transformed": true,
+      "prologue": [
+        "#include \"KeepUpToDateSlice.h\""
+      ],
+      "from": "^#include <RemoteFiles.h>\\s*$"
     }
   ]
 }

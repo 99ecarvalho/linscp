@@ -366,10 +366,15 @@ if(TARGET linscp)
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
             tools /ini=nul {port} {tmp}/local -platform offscreen)
   set_tests_properties(qt_gui_tools PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+  add_test(NAME qt_gui_keep
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
+            --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
+            keep /ini=nul {port} {tmp} -platform offscreen)
+  set_tests_properties(qt_gui_keep PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
   add_test(NAME qt_gui_commands
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" --protocol sshd "$<TARGET_FILE:test_qt_gui>"
-            commands /ini=nul {port} {key} {user} {tmp} -platform offscreen)
+            commands /ini=nul {port} {key} {user} {tmp} {hosttmp} -platform offscreen)
   set_tests_properties(qt_gui_commands PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
   add_test(NAME qt_gui_session
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"

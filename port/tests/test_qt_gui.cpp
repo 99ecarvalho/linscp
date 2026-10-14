@@ -141,6 +141,8 @@
 #include <QPlainTextEdit>
 #include <QTemporaryDir>
 #include "EditorWindow.h"
+#include "KeepUpToDateDialog.h"
+#include <QThread>
 
 #include <QPlainTextEdit>
 #include <QTextBlock>
@@ -2567,7 +2569,10 @@ void Tools(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
-void Commands(const char * Port, const QString & Key, const QString & User, const QString & Directory)
+// HostDirectory: Directory as the server sees it, the host's path (under
+// Wine, Directory is a Windows one).
+void Commands(const char * Port, const QString & Key, const QString & User, const QString & Directory,
+  const QString & HostDirectory)
 {
   QtFrontend Frontend;
   CoreBridge::Initialize(&Frontend);
@@ -2633,7 +2638,7 @@ void Commands(const char * Port, const QString & Key, const QString & User, cons
       File.open(QIODevice::WriteOnly);
       File.write("12345");
     }
-    Check(Remote->ChangeDirectory(Work), "in the test's directory");
+    Check(Remote->ChangeDirectory(HostDirectory + QStringLiteral("/commands")), "in the test's directory");
     Check(Window.Session()->CanRunShellCommands(), "SCP runs commands in its shell");
 
     CoreBridge::TCustomCommandDefinition Static;
@@ -2741,6 +2746,174 @@ void Session(const char * Port)
 
 }  // namespace
 
+// Commands > Keep Remote Directory up to Date: the dialog, and upstream's
+// controller watching the local directory and uploading what changes to
+// rclone's tree ({tmp}/root), deleting what goes.
+void KeepUpToDateTest(const char * Port, const QString & Tmp)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = { "secret" };
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "the session opens");
+    CoreBridge::TSession * Session = Window.Session();
+    const QDir Local(QDir(Tmp).filePath(QStringLiteral("local")));
+    const QDir Remote(QDir(Tmp).filePath(QStringLiteral("root/sub")));
+    const auto Write = [](const QString & Path, const QByteArray & Data)
+    {
+      QFile File(Path);
+      File.open(QIODevice::WriteOnly);
+      File.write(Data);
+    };
+    const auto WaitFor = [](const std::function<bool()> & Condition)
+    {
+      QElapsedTimer Timer;
+      Timer.start();
+      while (!Condition() && (Timer.elapsed() < 15000))
+      {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
+        QThread::msleep(20);
+      }
+      return Condition();
+    };
+    const auto Logged = [](KeepUpToDateDialog & Dialog, const QString & Text)
+    {
+      for (int Index = 0; Index < Dialog.Log()->topLevelItemCount(); Index++)
+      {
+        if (Dialog.Log()->topLevelItem(Index)->text(1).contains(Text))
+        {
+          return true;
+        }
+      }
+      return false;
+    };
+    Write(Local.filePath(QStringLiteral("first.txt")), "first");
+
+    CoreBridge::TKeepUpToDateParams Params = CoreBridge::KeepUpToDateDefaults();
+    Params.LocalDirectory = QDir::toNativeSeparators(Local.path()).toStdString();
+    Params.RemoteDirectory = "/sub";
+    Params.Delete = true;
+    Params.Recurse = true;
+    Params.SynchronizeFirst = CoreBridge::TKeepUpToDateParams::TSynchronizeFirst::Yes;
+    {
+      KeepUpToDateDialog Dialog(*Session, Params, {}, &Window);
+      Dialog.show();
+      Check(Dialog.windowTitle() == QStringLiteral("Keep remote directory up to date"), "WinSCP's title");
+      Check(!Dialog.SelectedOnlyCheck()->isEnabled(), "nothing selected: no \"selected files only\"");
+      Check(Dialog.DeleteCheck()->isChecked() && Dialog.RecurseCheck()->isChecked() &&
+        (Dialog.SynchronizeCheck()->checkState() == Qt::Checked), "the params shown");
+      Check(Dialog.Start(), "it starts");
+      Check(Dialog.Synchronizing() && Dialog.StopButton()->isVisible() && !Dialog.StartButton()->isVisible() &&
+        !Dialog.CloseButton()->isVisible(), "Stop in Start's place, no Close");
+      Check(Dialog.windowTitle() == QStringLiteral("Keeping remote directory up to date ..."), "the title says so");
+      Check(QFileInfo::exists(Remote.filePath(QStringLiteral("first.txt"))), "synchronized on start: the file is up");
+      Check(Logged(Dialog, QStringLiteral("Watching for changes")), "the log says what is watched");
+
+      Write(Local.filePath(QStringLiteral("second.txt")), "second");
+      Check(WaitFor([&Remote]() { return QFileInfo::exists(Remote.filePath(QStringLiteral("second.txt"))); }),
+        "a new file is uploaded");
+      Check(WaitFor([&]() { return Logged(Dialog, QStringLiteral("uploaded")); }), "and logged");
+      Local.mkdir(QStringLiteral("deeper"));
+      Write(Local.filePath(QStringLiteral("deeper/third.txt")), "third");
+      Check(WaitFor([&Remote]() { return QFileInfo::exists(Remote.filePath(QStringLiteral("deeper/third.txt"))); }),
+        "a new subdirectory's file too");
+      QFile::remove(Local.filePath(QStringLiteral("first.txt")));
+      Check(WaitFor([&Remote]() { return !QFileInfo::exists(Remote.filePath(QStringLiteral("first.txt"))); }),
+        "a deleted file is deleted");
+      Check(WaitFor([&]() { return Logged(Dialog, QStringLiteral("deleted")); }), "and logged");
+      Dialog.Stop();
+      Check(!Dialog.Synchronizing() && !Session->KeepingUpToDate() && Dialog.StartButton()->isVisible(), "Stop stops");
+      Write(Local.filePath(QStringLiteral("after.txt")), "after");
+      QElapsedTimer Timer;
+      Timer.start();
+      while (Timer.elapsed() < 1500)
+      {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 50);
+      }
+      Check(!QFileInfo::exists(Remote.filePath(QStringLiteral("after.txt"))), "and nothing is uploaded after");
+
+      // Grayed "synchronize on start": asked, never again.
+      Dialog.SynchronizeCheck()->setCheckState(Qt::PartiallyChecked);
+      QString Asked;
+      Responder.Custom = [&Asked](QWidget * Modal)
+      {
+        QueryDialog * Query = qobject_cast<QueryDialog *>(Modal);
+        if ((Query == nullptr) || (Query->NeverAskAgain() == nullptr))
+        {
+          return false;
+        }
+        for (const QLabel * Label : Query->findChildren<QLabel *>())
+        {
+          Asked += Label->text();
+        }
+        Query->NeverAskAgain()->setChecked(true);
+        Query->Buttons()[0]->click();
+        return true;
+      };
+      Check(Dialog.Start(), "it starts again");
+      Responder.Custom = nullptr;
+      Check(Asked.contains(QStringLiteral("synchronisation")), "after WinSCP's question");
+      Check(Dialog.SynchronizeCheck()->checkState() == Qt::Checked, "never again: the box checked");
+      Check(QFileInfo::exists(Remote.filePath(QStringLiteral("after.txt"))), "and synchronized first");
+
+      // The directory gone: the watch fails, and stops with an error.
+      const int Errors = Responder.Errors;
+      QDir(Local.filePath(QStringLiteral("deeper"))).removeRecursively();
+      Check(WaitFor([&Remote]() { return !QFileInfo::exists(Remote.filePath(QStringLiteral("deeper"))); }),
+        "a deleted directory is deleted");
+      QDir(Local.path()).removeRecursively();
+      // Wine refuses to remove a directory a handle is open on (Windows
+      // marks it to go once closed): there the watch loses nothing.
+      if (!QFileInfo::exists(Local.path()))
+      {
+        Check(WaitFor([&Dialog]() { return !Dialog.Synchronizing(); }), "the watched directory gone: it stops");
+        Check(Responder.Errors > Errors, "with an error");
+      }
+      Dialog.Stop();
+      QDir().mkpath(Local.path());
+
+      // Its settings, kept "next time".
+      CoreBridge::TKeepUpToDateParams Kept = Dialog.Params();
+      CoreBridge::SaveKeepUpToDateDefaults(Kept, true);
+      const CoreBridge::TKeepUpToDateParams Saved = CoreBridge::KeepUpToDateDefaults();
+      Check(Saved.Delete && Saved.Recurse && (Saved.SynchronizeFirst == CoreBridge::TKeepUpToDateParams::TSynchronizeFirst::Yes),
+        "the options kept");
+    }
+    {
+      // "Never ask again" without "use same options" still saves Yes.
+      Params.SynchronizeFirst = CoreBridge::TKeepUpToDateParams::TSynchronizeFirst::Ask;
+      CoreBridge::SaveKeepUpToDateDefaults(Params, true);
+      Params.SynchronizeFirst = CoreBridge::TKeepUpToDateParams::TSynchronizeFirst::Yes;
+      Params.Delete = false;
+      CoreBridge::SaveKeepUpToDateDefaults(Params, false);
+      const CoreBridge::TKeepUpToDateParams Saved = CoreBridge::KeepUpToDateDefaults();
+      Check((Saved.SynchronizeFirst == CoreBridge::TKeepUpToDateParams::TSynchronizeFirst::Yes) && Saved.Delete,
+        "an answered question remembered, nothing else");
+    }
+
+    // From the menu: the panels' directories, and what is selected.
+    Window.Local()->ChangeDirectory(Local.path());
+    Window.Panel()->ChangeDirectory(QStringLiteral("/sub"));
+    bool Shown = false;
+    QTimer::singleShot(0, &Window, [&Window, &Shown]()
+    {
+      KeepUpToDateDialog * Dialog = Window.KeepUpToDateWindow();
+      Shown = (Dialog != nullptr) && (Dialog->RemoteEdit()->text() == QStringLiteral("/sub"));
+      if (Dialog != nullptr)
+      {
+        Dialog->CloseButton()->click();
+      }
+    });
+    Check(Window.KeepUpToDate() && Shown, "Commands > Keep Remote Directory up to Date opens it on the panels' directories");
+  }
+  CoreBridge::Finalize();
+}
+
 int main(int argc, char ** argv)
 {
   QApplication App(argc, argv);
@@ -2788,7 +2961,12 @@ int main(int argc, char ** argv)
   }
   else if ((argc >= 7) && (std::strcmp(argv[1], "commands") == 0))
   {
-    Commands(argv[3], QString::fromLocal8Bit(argv[4]), QString::fromLocal8Bit(argv[5]), QString::fromLocal8Bit(argv[6]));
+    Commands(argv[3], QString::fromLocal8Bit(argv[4]), QString::fromLocal8Bit(argv[5]), QString::fromLocal8Bit(argv[6]),
+      QString::fromLocal8Bit((argc >= 8) ? argv[7] : argv[6]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "keep") == 0))
+  {
+    KeepUpToDateTest(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "tools") == 0))
   {

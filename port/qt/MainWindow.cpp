@@ -52,6 +52,7 @@
 #include <QProcess>
 #include "QueryDialog.h"
 #include "SynchronizeDialog.h"
+#include "KeepUpToDateDialog.h"
 #include "TransferSettingsDialog.h"
 
 namespace
@@ -217,6 +218,9 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FGenerateSessionUrlAction = CommandsMenu->addAction(tr("Generate Session &URL/Code..."), this, [this]() { GenerateUrl(false); });
   FSynchronizeAction = CommandsMenu->addAction(tr("&Synchronize..."), this, [this]() { Synchronize(true); });
   FSynchronizeAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
+  FKeepUpToDateAction = CommandsMenu->addAction(tr("&Keep Remote Directory up to Date..."), this,
+    [this]() { KeepUpToDate(); });
+  FKeepUpToDateAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_U));
 
   QMenu * ViewMenu = menuBar()->addMenu(tr("&View"));
   FHiddenAction = ViewMenu->addAction(tr("Show &Hidden Files"));
@@ -905,6 +909,55 @@ bool MainWindow::Synchronize(bool Confirm)
   return SynchronizeDirectories(LocalDirectory, RemoteDirectory, Params, &Settings);
 }
 
+// As TCustomScpExplorerForm::DoSynchronizeDirectories, from the Commander's
+// SynchronizeDirectories: the panels' directories, the settings kept, and
+// what is selected in either panel for "selected files only".
+bool MainWindow::KeepUpToDate()
+{
+  if (FBusy || !FSession || !FSession->Active())
+  {
+    return false;
+  }
+  CoreBridge::TKeepUpToDateParams Params = CoreBridge::KeepUpToDateDefaults();
+  Params.LocalDirectory = QDir::toNativeSeparators(FLocal->Path()).toStdString();
+  Params.RemoteDirectory = FPanel->Path().toStdString();
+  std::vector<std::string> Selected;
+  for (const QStringList & Names : { FPanel->Selected(), FLocal->Selected() })
+  {
+    for (const QString & Name : Names)
+    {
+      Selected.push_back(Name.toStdString());
+    }
+  }
+  FBusy = true;
+  UpdateActions();
+  bool Result;
+  {
+    KeepUpToDateDialog Dialog(*FSession, Params, Selected, this);
+    FKeepUpToDate = &Dialog;
+    Dialog.exec();
+    FKeepUpToDate = nullptr;
+    Result = true;
+    try
+    {
+      CoreBridge::SaveKeepUpToDateDefaults(Dialog.Params(), Dialog.SaveSettings());
+      Dialog.TransferSettings()->Commit();
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+    }
+  }
+  FBusy = false;
+  UpdateActions();
+  // What was uploaded or deleted shows.
+  if (FSession && FSession->Active())
+  {
+    FPanel->Refresh();
+  }
+  return Result;
+}
+
 // As TCustomScpExplorerForm::DoFullSynchronizeDirectories.
 bool MainWindow::SynchronizeDirectories(const QString & LocalDirectory, const QString & RemoteDirectory,
   const CoreBridge::TSyncParams & Params, const CoreBridge::TTransferSettings * Settings)
@@ -1004,6 +1057,7 @@ void MainWindow::UpdateActions()
   FCopyAction->setEnabled(!FBusy && FSession);
   FMoveAction->setEnabled(!FBusy && FSession);
   FSynchronizeAction->setEnabled(!FBusy && FSession);
+  FKeepUpToDateAction->setEnabled(!FBusy && FSession);
   FDisconnectAction->setEnabled(!FBusy && FSession);
 }
 

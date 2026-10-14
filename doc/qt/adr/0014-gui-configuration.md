@@ -340,5 +340,50 @@ Running them follows `TCustomScpExplorerForm::CustomCommand` and
 session. Local commands, extensions and their options are not ported yet.
 
 Verified by `qt_gui_commands`, against OpenSSH's sshd over SCP, which has
-a real shell, on Linux. Windows builds the slices; the test skips there
-for want of an sshd.
+a real shell: on Linux, and under Wine against the host's sshd. On native
+Windows the test skips, since Windows' sshd lets no one in when run
+unprivileged.
+
+## Amendment 2026-10-14: keep-up-to-date's controller (P3-06e)
+
+WinSCP's keep-up-to-date is `windows/SynchronizeController.cpp`'s
+`TSynchronizeController`. It uses core only, apart from the Delphi
+component it watches with, `TDiscMonitor` (`packages/my/DiscMon.pas`).
+It is compiled as it is, as a slice of the whole file after its includes.
+
+- **The slice.** `SynchronizeController.cpp` and `.h` join the
+  transform's scope. The `.cpp` is sliced from `#include <RemoteFiles.h>`
+  on, after `port/qt/KeepUpToDateSlice.h`, which stands for `WinPCH.h`. The
+  header is used from the mirror as it is.
+- **`TDiscMonitor` is linscp's** (`port/qt/DiscMon.hpp`), with the
+  members the controller uses. It lists the directories with upstream's
+  `AddDirectory` logic, filter and "too many directories" question
+  included. The watching itself is `TDirectoryWatcher`'s, which the
+  command-line client's `keepuptodate` already used; it moves to
+  `linscp-frontend-common`.
+  - Upstream's monitor runs a thread of its own and fires its events
+    through `TThread::Synchronize`. Linscp's has no thread: the dialog's
+    timer polls it (`TDiscMonitor::Pump`), on the GUI thread, where the
+    events then fire.
+  - An event may close or free the monitor, as the controller's abort
+    does; polling stops at once when one does.
+- **Closure-site discovery covers the slices.** `bind_closures.py` also
+  compiles each slice cut from a transformed file. The diagnostics name
+  upstream's file through `#line`, so the sites are recorded, and bound,
+  in the mirror's file, like core's. There are 5, all in the controller's
+  `StartStop`.
+- **The shim gains** `TComponent`, only as far as its owner, and
+  `TThreadMethod`.
+- **What surrounds the controller follows WinSCP:**
+  - `TCustomScpExplorerForm`'s `DoSynchronizeDirectories`,
+    `DoSynchronize`, `Synchronize` and `GetSynchronizeOptions`, ported in
+    the bridge;
+  - `TSynchronizeDialog`'s log, abort and "continue on error". With
+    "continue on error", errors go to the log, as `MoreMessageDialog` sends
+    them there.
+  - Uploads and deletes are logged from the terminal's `OnFinished`, as
+    the GUI's `FileOperationFinished` logs them.
+
+Verified by `qt_gui_keep` on Linux, under Wine and on native Windows. Under
+Wine a watched directory cannot be deleted, so the test's "watched
+directory gone" step runs only where it can.

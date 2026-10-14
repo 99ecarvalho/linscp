@@ -64,6 +64,12 @@ public:
   // directories, the direction from the active panel, after the Synchronize
   // dialog unless Confirm is false.
   bool Synchronize(bool Confirm = true);
+  // Commands > Keep Remote Directory up to Date (Ctrl+U), as WinSCP's
+  // Commander: the panels' directories in its dialog, which watches and
+  // synchronizes until closed.
+  bool KeepUpToDate();
+  // The dialog, while open: for tests.
+  class KeepUpToDateDialog * KeepUpToDateWindow() const { return FKeepUpToDate; }
   // Compares and, after the checklist when Params asks to preview, applies
   // (or queues). False when cancelled or nothing was applied.
   bool SynchronizeDirectories(const QString & LocalDirectory, const QString & RemoteDirectory,
@@ -197,6 +203,8 @@ private:
   QAction * FCopyAction = nullptr;
   QAction * FMoveAction = nullptr;
   QAction * FSynchronizeAction = nullptr;
+  QAction * FKeepUpToDateAction = nullptr;
+  class KeepUpToDateDialog * FKeepUpToDate = nullptr;
   QAction * FEditAction = nullptr;
   QAction * FPropertiesAction = nullptr;
   QAction * FLinkAction = nullptr;

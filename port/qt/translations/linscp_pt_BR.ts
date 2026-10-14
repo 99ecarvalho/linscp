@@ -599,6 +599,85 @@
     </message>
 </context>
 <context>
+    <name>KeepUpToDateDialog</name>
+    <message>
+        <source>Directories</source>
+        <translation>Diretórios</translation>
+    </message>
+    <message>
+        <source>&amp;Watch for changes in the local directory:</source>
+        <translation>&amp;Observar alterações no diretório local...</translation>
+    </message>
+    <message>
+        <source>B&amp;rowse...</source>
+        <translation>P&amp;rocurar...</translation>
+    </message>
+    <message>
+        <source>Select local directory</source>
+        <translation>Selecione o diretório local</translation>
+    </message>
+    <message>
+        <source>... &amp;and automatically reflect them on the remote directory:</source>
+        <translation>...e &amp;automaticamente refletí-las no diretório remoto</translation>
+    </message>
+    <message>
+        <source>Synchronize options</source>
+        <translation>Opções de sincronização</translation>
+    </message>
+    <message>
+        <source>&amp;Delete files</source>
+        <translation>E&amp;xcluir arquivos</translation>
+    </message>
+    <message>
+        <source>&amp;Existing files only</source>
+        <translation>Apenas arquivos &amp;existentes</translation>
+    </message>
+    <message>
+        <source>Update s&amp;ubdirectories</source>
+        <translation>Atualizar s&amp;ubdiretórios</translation>
+    </message>
+    <message>
+        <source>Synchronize on s&amp;tart</source>
+        <translation>Sincronizar ao i&amp;niciar</translation>
+    </message>
+    <message>
+        <source>Selected files o&amp;nly</source>
+        <translation>Ape&amp;nas arquivos selecionados</translation>
+    </message>
+    <message>
+        <source>Continue on &amp;error</source>
+        <translation>Continuar com erros</translation>
+    </message>
+    <message>
+        <source>Use same &amp;options next time</source>
+        <translation>Usar mesmas &amp;opções na próxima vez</translation>
+    </message>
+    <message>
+        <source>&amp;Start</source>
+        <translation>Ini&amp;ciar</translation>
+    </message>
+    <message>
+        <source>&amp;Stop</source>
+        <translation>&amp;Parar</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>Minimi&amp;zar</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fechar</translation>
+    </message>
+    <message>
+        <source>Keeping remote directory up to date ...</source>
+        <translation>Atualizando diretório remoto ...</translation>
+    </message>
+    <message>
+        <source>Keep remote directory up to date</source>
+        <translation>Manter diretório remoto atualizado</translation>
+    </message>
+</context>
+<context>
     <name>LinkDialog</name>
     <message>
         <source>&amp;Link/shortcut file:</source>
@@ -919,6 +998,10 @@
     <message>
         <source>&amp;Enter...</source>
         <translation>&amp;Entrar...</translation>
+    </message>
+    <message>
+        <source>&amp;Keep Remote Directory up to Date...</source>
+        <translation>&amp;Manter Diretório Remoto Atualizado</translation>
     </message>
 </context>
 <context>

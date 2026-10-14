@@ -123,6 +123,7 @@ CONTEXT_FORMS = {
     'ConsoleDialog': ['Console.dfm'],
     'ImportSitesDialog': ['ImportSessions.dfm'],
     'CustomCommandDialog': ['CustomCommand.dfm'],
+    'KeepUpToDateDialog': ['Synchronize.dfm'],
 }
 
 

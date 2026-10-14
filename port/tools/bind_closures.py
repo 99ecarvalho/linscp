@@ -75,7 +75,7 @@ INCLUDES = [
 ]
 
 
-def compile_tu(path, gen, target='x86_64-w64-mingw32'):
+def compile_tu(path, gen, target='x86_64-w64-mingw32', extra_includes=()):
     cmd = ['clang++', f'--target={target}', '-std=c++17', '-fsyntax-only',
            '-fms-extensions', '-fshort-wchar', '-ferror-limit=0',
            # One line per diagnostic. Without this clang interleaves the source
@@ -83,21 +83,31 @@ def compile_tu(path, gen, target='x86_64-w64-mingw32'):
            # from macro' notes that follow an error.
            '-fno-caret-diagnostics', '-fmacro-backtrace-limit=0',
            '-Wno-everything']
-    for inc in [os.path.join(gen, g) for g in GEN_INCLUDES] + INCLUDES:
+    for inc in list(extra_includes) + [os.path.join(gen, g) for g in GEN_INCLUDES] + INCLUDES:
         cmd += ['-I', inc]
     cmd += _upstream_defines().flags(target)
     cmd.append(path)
     return subprocess.run(cmd, capture_output=True, text=True).stderr
 
 
+def _slice_units(gen):
+    """The slices (port/tools/slices.json) cut from transformed files, as the
+    shell compiles them: their diagnostics name upstream's file through
+    #line, so their sites are recorded, and bound, there."""
+    manifest = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'slices.json')
+    includes = ['port/qt', os.path.join(gen, 'source/windows'), os.path.join(gen + '-slices', 'windows')]
+    for slice_ in json.load(open(manifest, encoding='utf-8'))['slices']:
+        if slice_.get('transformed', True) and slice_['output'].endswith('.cpp'):
+            yield os.path.join(gen + '-slices', slice_['output']), includes
+
+
 def discover(gen):
     """Resolve each diagnostic to the place the identifier actually appears."""
     found = {}
     core = os.path.join(gen, 'source/core')
-    for name in sorted(os.listdir(core)):
-        if not name.endswith('.cpp'):
-            continue
-        lines = compile_tu(os.path.join(core, name), gen).split('\n')
+    units = [(os.path.join(core, name), ()) for name in sorted(os.listdir(core)) if name.endswith('.cpp')]
+    for path, includes in units + list(_slice_units(gen)):
+        lines = compile_tu(path, gen, extra_includes=includes).split('\n')
         i = 0
         while i < len(lines):
             m = DIAG.match(lines[i])
@@ -123,7 +133,9 @@ def discover(gen):
             # definition it is the member function we need to bind.
             chosen = None
             for path, lineno, col in chain:
-                rel = os.path.relpath(path, gen)
+                # A slice's #line names upstream's file, relative already.
+                in_gen = os.path.isabs(path) or os.path.normpath(path).startswith(os.path.normpath(gen) + os.sep)
+                rel = os.path.relpath(path, gen) if in_gen else path
                 found_at = method_name_at(gen, rel, lineno, col)
                 if found_at is not None and found_at[1] not in macros:
                     chosen = (rel, lineno, found_at[0])

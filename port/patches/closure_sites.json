@@ -779,6 +779,36 @@
       "line": 329,
       "column": 38,
       "identifier": "InitSslSession"
+    },
+    {
+      "file": "source/windows/SynchronizeController.cpp",
+      "line": 76,
+      "column": 51,
+      "identifier": "SynchronizeTooManyDirectories"
+    },
+    {
+      "file": "source/windows/SynchronizeController.cpp",
+      "line": 77,
+      "column": 50,
+      "identifier": "SynchronizeDirectoriesChange"
+    },
+    {
+      "file": "source/windows/SynchronizeController.cpp",
+      "line": 78,
+      "column": 39,
+      "identifier": "SynchronizeFilter"
+    },
+    {
+      "file": "source/windows/SynchronizeController.cpp",
+      "line": 81,
+      "column": 39,
+      "identifier": "SynchronizeChange"
+    },
+    {
+      "file": "source/windows/SynchronizeController.cpp",
+      "line": 82,
+      "column": 40,
+      "identifier": "SynchronizeInvalid"
     }
   ]
 }

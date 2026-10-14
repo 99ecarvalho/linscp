@@ -95,6 +95,19 @@ public:
   virtual void Assign(TPersistent * Source) { (void)Source; }
 };
 
+// The VCL's component, only as far as its owner: windows/SynchronizeController
+// creates its TDiscMonitor with one. Owned components are not freed with
+// their owner; that unit frees its own.
+class TComponent : public TPersistent
+{
+public:
+  explicit TComponent(TComponent * AOwner) : FOwner(AOwner) {}
+  TComponent * GetOwner() const { return FOwner; }
+
+private:
+  TComponent * FOwner;
+};
+
 // Borland's method pointer: a code address plus the instance it is bound to.
 struct TMethod
 {
