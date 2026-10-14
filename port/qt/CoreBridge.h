@@ -520,6 +520,7 @@ enum class TText
   SelectMaskSelectCaption, // "Select"
   SelectMaskDeselectCaption, // "Deselect"
   FilterMaskCaption, // "Filter"
+  NotSupported, // "Operation not supported."
 };
 std::string Text(TText Text);
 
@@ -648,6 +649,10 @@ struct TBookmarkEntry
 std::vector<TBookmarkEntry> Bookmarks(const std::string & SessionKey);
 // Replaces them, and saves.
 void SetBookmarks(const std::string & SessionKey, const std::vector<TBookmarkEntry> & Bookmarks);
+// Ask before a separate shell session opens (GUIConfiguration's
+// ConfirmCommandSession).
+bool ConfirmCommandSession();
+void SetConfirmCommandSession(bool Confirm);
 // Open directory's page: the shared bookmarks (WinConfiguration's
 // UseSharedBookmarks).
 bool UseSharedBookmarks();
@@ -1059,6 +1064,19 @@ public:
   // FileSystemInfo), and the space available below Path. Throw TCoreError.
   TServerInfo ServerInfo();
   TSpaceInfo SpaceAvailable(const std::string & Path);
+  // The console (Commands > Open Terminal), as TCustomScpExplorerForm's
+  // OpenConsole: whether commands can run here (the protocol's, or a
+  // shell session's already open), or in a separate shell session
+  // (fcSecondaryShell), which opens after WinSCP's question
+  // (CommandSessionQuestion; GUIConfiguration's ConfirmCommandSession).
+  bool CanRunCommands() const;
+  bool CanOpenShellSession() const;
+  std::string CommandSessionQuestion() const;
+  void OpenShellSession();
+  // A command run (AnyCommand), each line of its output and errors given
+  // to Output as it comes; the current directory read after. Throws
+  // TCoreError.
+  void RunCommand(const std::string & Command, const std::function<void(const std::string & Line)> & Output);
   // Commands > Generate Session URL/Code and Files > Generate File URL, as
   // TCustomScpExplorerForm's GenerateUrl over this session's data
   // (SessionDataForCode). Throws TCoreError.

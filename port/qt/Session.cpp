@@ -1308,6 +1308,91 @@ TSpaceInfo TSession::SpaceAvailable(const std::string & Path)
   }
 }
 
+bool TSession::CanRunCommands() const
+{
+  return Active() && (F->Terminal->IsCapable[fcAnyCommand] || F->Terminal->CommandSessionOpened);
+}
+
+bool TSession::CanOpenShellSession() const
+{
+  return Active() && F->Terminal->IsCapable[fcSecondaryShell];
+}
+
+std::string TSession::CommandSessionQuestion() const
+{
+  const UnicodeString Protocol = F->Terminal->GetFileSystemInfo().ProtocolName;
+  return Utf8(FMTLOAD(PERFORM_ON_COMMAND_SESSION2, (Protocol, Protocol)));
+}
+
+// TCustomScpExplorerForm::CommandSessionFallback.
+void TSession::OpenShellSession()
+{
+  try
+  {
+    CheckActive(*this);
+    F->Terminal->CommandSession->Open();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+namespace
+{
+
+class TOutputCollector
+{
+public:
+  std::function<void(const std::string &)> Output;
+
+  void __fastcall Captured(const UnicodeString & Str, TCaptureOutputType OutputType)
+  {
+    // TConsoleDialog::AddLine: output and errors.
+    if (((OutputType == cotOutput) || (OutputType == cotError)) && Output)
+    {
+      Output(Utf8(Str));
+    }
+  }
+};
+
+}  // namespace
+
+// TConsoleDialog::DoExecuteCommand.
+void TSession::RunCommand(const std::string & Command, const std::function<void(const std::string & Line)> & Output)
+{
+  try
+  {
+    CheckActive(*this);
+    TTerminal * Terminal = F->Terminal.get();
+    TOutputCollector Collector;
+    Collector.Output = Output;
+    Terminal->ExceptionOnFail = true;
+    try
+    {
+      Terminal->AnyCommand(FromUtf8(Command), CLOSURE_OF(&Collector, Captured));
+    }
+    catch (...)
+    {
+      Terminal->ExceptionOnFail = false;
+      if (Terminal->Active)
+      {
+        Terminal->ReadCurrentDirectory();
+      }
+      throw;
+    }
+    Terminal->ExceptionOnFail = false;
+    if (Terminal->Active)
+    {
+      Terminal->ReadCurrentDirectory();
+    }
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 // TCustomScpExplorerForm::SessionDataForCode, then the dialog's
 // generation.
 TGeneratedCode TSession::GenerateCode(const TGenerateCodeOptions & Options)

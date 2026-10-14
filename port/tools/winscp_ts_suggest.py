@@ -36,9 +36,10 @@ def dfm_captions(path):
     i = 0
     while i < len(lines):
         line = lines[i].strip()
-        m = re.match(r'(?:object|inherited|inline) (\w+):', line)
+        m = re.match(r'(?:object|inherited|inline) (\w+)(:?)', line)
         if m:
-            names.append(m.group(1))
+            # An object with no name ("object TTBXItem") has no keys.
+            names.append(m.group(1) if m.group(2) else None)
         elif line in ('item', '<item') or line.endswith('= <') or line.endswith('<item'):
             # A collection's item (list view columns...): its end is not an
             # object's.
@@ -119,6 +120,7 @@ CONTEXT_FORMS = {
     'EditMaskDialog': ['EditMask.dfm'],
     'ServerInfoDialog': ['FileSystemInfo.dfm'],
     'GenerateUrlDialog': ['GenerateUrl.dfm'],
+    'ConsoleDialog': ['Console.dfm'],
 }
 
 

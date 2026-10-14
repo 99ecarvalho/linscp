@@ -412,6 +412,24 @@ void SetGenerateCodeSettings(const TGenerateCodeOptions & Options)
   }
 }
 
+bool ConfirmCommandSession()
+{
+  return GUIConfiguration->ConfirmCommandSession;
+}
+
+void SetConfirmCommandSession(bool Confirm)
+{
+  try
+  {
+    GUIConfiguration->ConfirmCommandSession = Confirm;
+    Configuration->SaveExplicit();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 bool UseSharedBookmarks()
 {
   return Shell()->Settings().UseSharedBookmarks;
@@ -852,6 +870,7 @@ std::string Text(TText Text)
     case TText::SelectMaskSelectCaption: Ident = SELECT_MASK_SELECT_CAPTION; break;
     case TText::SelectMaskDeselectCaption: Ident = SELECT_MASK_DESELECT_CAPTION; break;
     case TText::FilterMaskCaption: Ident = FILTER_MASK_CAPTION; break;
+    case TText::NotSupported: Ident = NOTSUPPORTED; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

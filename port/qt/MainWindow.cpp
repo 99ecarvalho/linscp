@@ -47,6 +47,7 @@
 #include "FindFilesDialog.h"
 #include "ServerInfoDialog.h"
 #include "GenerateUrlDialog.h"
+#include "ConsoleDialog.h"
 #include "QueryDialog.h"
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
@@ -205,6 +206,8 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
 
   QMenu * CommandsMenu = menuBar()->addMenu(tr("&Commands"));
   FFindFilesAction = CommandsMenu->addAction(tr("&Find Files..."), this, [this]() { FindFilesDialog(); });
+  FConsoleAction = CommandsMenu->addAction(tr("Open &Terminal"), this, [this]() { OpenConsole(); });
+  FConsoleAction->setShortcut(QKeySequence(Qt::SHIFT | Qt::CTRL | Qt::Key_T));
   CommandsMenu->addSeparator();
   FServerInfoAction = CommandsMenu->addAction(tr("Server/Protocol &Information"), this, [this]() { ServerInfo(); });
   FGenerateSessionUrlAction = CommandsMenu->addAction(tr("Generate Session &URL/Code..."), this, [this]() { GenerateUrl(false); });
@@ -988,6 +991,7 @@ void MainWindow::UpdateActions()
   FOpenDirectoryAction->setEnabled(!FBusy);
   FFindFilesAction->setEnabled(!FBusy && FSession);
   FServerInfoAction->setEnabled(!FBusy && FSession);
+  FConsoleAction->setEnabled(!FBusy && FSession);
   FGenerateSessionUrlAction->setEnabled(!FBusy && FSession);
   FGenerateFileUrlAction->setEnabled(!FBusy && FSession);
   FAddBookmarkAction->setEnabled(!FBusy);
@@ -1673,4 +1677,82 @@ void MainWindow::GenerateUrl(bool Files)
   }
   GenerateUrlDialog Dialog(FSession.get(), Paths, this);
   Dialog.exec();
+}
+
+// As TCustomScpExplorerForm::EnsureCommandSessionFallback, then the console.
+bool MainWindow::OpenConsole()
+{
+  if (FBusy || !FSession)
+  {
+    return false;
+  }
+  if (!FSession->CanRunCommands())
+  {
+    if (!FSession->CanOpenShellSession())
+    {
+      CoreBridge::TError Error;
+      Error.Message = CoreBridge::Text(CoreBridge::TText::NotSupported);
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      Frontend.ShowError(Error);
+      return false;
+    }
+    if (CoreBridge::ConfirmCommandSession())
+    {
+      CoreBridge::TQuery Query;
+      Query.Type = CoreBridge::TQueryType::Confirmation;
+      Query.Message = FSession->CommandSessionQuestion();
+      CoreBridge::TQueryButton OK;
+      OK.Answer = CoreBridge::AnswerOK;
+      OK.Caption = "OK";
+      CoreBridge::TQueryButton Cancel;
+      Cancel.Answer = CoreBridge::AnswerCancel;
+      Cancel.Caption = "Cancel";
+      Query.Buttons = { OK, Cancel };
+      Query.CancelAnswer = CoreBridge::AnswerCancel;
+      Query.NeverAskAgainCheck = true;
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      const CoreBridge::TQueryResult Answer = Frontend.Query(Query);
+      if (Answer.Answer != CoreBridge::AnswerOK)
+      {
+        return false;
+      }
+      if (Answer.NeverAskAgain)
+      {
+        try
+        {
+          CoreBridge::SetConfirmCommandSession(false);
+        }
+        catch (const CoreBridge::TCoreError & E)
+        {
+          ShowError(E);
+        }
+      }
+    }
+    FBusy = true;
+    UpdateActions();
+    bool Opened = false;
+    try
+    {
+      FSession->OpenShellSession();
+      Opened = true;
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+    }
+    FBusy = false;
+    UpdateActions();
+    if (!Opened)
+    {
+      return false;
+    }
+  }
+  ConsoleDialog Dialog(FSession.get(), this);
+  Dialog.exec();
+  // A "cd" or a change made there: the panel reads its directory again.
+  FPanel->Refresh();
+  UpdateTitle();
+  return true;
 }

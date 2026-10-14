@@ -36,7 +36,8 @@
 //     (F7) with permissions, kept for next time; links (Alt+F6): the
 //     dialog, local links made and edited (FTP makes none); Duplicate
 //     and Move To (Shift+F5, Shift+F6) within the server, through a
-//     temporary copy where the server copies nothing itself
+//     temporary copy where the server copies nothing itself; the console
+//     (FTP's protocol commands)
 //   test_qt_gui bookmarks /ini=nul <port> <directory> -platform offscreen
 //     Open directory and bookmarks (Ctrl+O, Ctrl+B): the site's and the
 //     shared bookmarks added, ordered, removed and kept; a bookmark
@@ -125,6 +126,7 @@
 #include "EditMaskDialog.h"
 #include "ServerInfoDialog.h"
 #include "GenerateUrlDialog.h"
+#include "ConsoleDialog.h"
 #include "RtfText.h"
 #include <QTextBrowser>
 #include <QPlainTextEdit>
@@ -2048,6 +2050,36 @@ void Properties(const char * Port)
       Remote->Names().contains(QStringLiteral("copy.txt")), "into the directory, under its name");
     Remote->ChangeDirectory(QStringLiteral("/"));
     Responder.Custom = nullptr;
+
+    // The console: FTP runs its protocol's commands.
+    Check(Session->CanRunCommands(), "FTP runs commands itself");
+    {
+      ConsoleDialog Console(Session);
+      Check(Console.DirectoryLabel()->text() == QStringLiteral("/"), "the current directory");
+      Check(Console.Execute(QStringLiteral("PWD")) && Console.Output()->toPlainText().contains(QStringLiteral("257")),
+        "a command's output");
+      Check(Console.Output()->toPlainText().startsWith(QStringLiteral("/$ PWD")), "after the prompt, as WinSCP's");
+      // FTP keeps its own idea of the directory, as upstream's: a raw CWD
+      // leaves the session's.
+      Check(Console.Execute(QStringLiteral("SYST")) && Console.Output()->toPlainText().contains(QStringLiteral("215")),
+        "another");
+      Console.Execute(QStringLiteral("PWD"));
+      Check(Console.CommandCombo()->count() == 2, "the commands kept, each once");
+    }
+    Responder.Custom = [](QWidget * Modal)
+    {
+      ConsoleDialog * Console = qobject_cast<ConsoleDialog *>(Modal);
+      if (Console == nullptr)
+      {
+        return false;
+      }
+      Console->Execute(QStringLiteral("PWD"));
+      Console->reject();
+      return true;
+    };
+    Check(Window.OpenConsole(), "Open Terminal");
+    Responder.Custom = nullptr;
+    Remote->ChangeDirectory(QStringLiteral("/"));
     Frontend.SetWindow(nullptr);
   }
   CoreBridge::Finalize();
@@ -2440,6 +2472,13 @@ void Tools(const char * Port, const QString & Directory)
       Check((Dialog.Pages()->count() == 1) && (Dialog.windowTitle() == QStringLiteral("Generate file URL")), "a file's URL only");
       Check(Dialog.Text().endsWith(QStringLiteral("/hello.txt")), "the file's URL");
     }
+    // The console over SFTP: a separate shell session, asked first (rclone
+    // has no shell, so it fails to open).
+    Check(!Session->CanRunCommands() && Session->CanOpenShellSession(), "SFTP needs a shell session for commands");
+    Responder.LastQuery.clear();
+    Responder.Errors = 0;
+    Check(!Window.OpenConsole() && Responder.LastQuery.contains(QStringLiteral("shell")) && (Responder.Errors == 1),
+      "asked first, and the shell's failure shown");
     Check(RtfToText(QStringLiteral("a\\\\b\\{c\\}\\par\nd\\u228?e")) == QStringLiteral("a\\b{c}\nd\u00e4e"), "RTF escapes as text");
     Frontend.SetWindow(nullptr);
   }

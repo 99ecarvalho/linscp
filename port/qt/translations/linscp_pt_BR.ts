@@ -41,6 +41,29 @@
     </message>
 </context>
 <context>
+    <name>ConsoleDialog</name>
+    <message>
+        <source>Console</source>
+        <translation>Console</translation>
+    </message>
+    <message>
+        <source>&amp;Execute</source>
+        <translation>&amp;Executar</translation>
+    </message>
+    <message>
+        <source>Enter &amp;command:</source>
+        <translation>&amp;Comando Enter</translation>
+    </message>
+    <message>
+        <source>Current directory:</source>
+        <translation>Diretório atual:</translation>
+    </message>
+    <message>
+        <source>Do not execute commands that require user-input or data transfer</source>
+        <translation>Atenção: NÃO execute comandos que requeiram entrada do usuário</translation>
+    </message>
+</context>
+<context>
     <name>CreateDirectoryDialog</name>
     <message>
         <source>Create folder</source>
@@ -810,6 +833,10 @@
     <message>
         <source>Generate Session &amp;URL/Code...</source>
         <translation>Gerar &amp;URL/Código da Sessão...</translation>
+    </message>
+    <message>
+        <source>Open &amp;Terminal</source>
+        <translation>Abrir &amp;Terminal</translation>
     </message>
 </context>
 <context>

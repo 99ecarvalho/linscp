@@ -121,6 +121,10 @@ public:
   // Commands > Generate Session URL/Code, Files > Generate File URL (the
   // remote panel's selection), as WinSCP's.
   void GenerateUrl(bool Files);
+  // Commands > Open Terminal (Shift+Ctrl+T), as WinSCP's OpenConsole:
+  // where the protocol runs no commands, a separate shell session opened
+  // first, after asking. False when the console did not open.
+  bool OpenConsole();
   // Options > Preferences: false when cancelled.
   bool PreferencesDialog();
   // The preferences applied to the window and its panels.
@@ -188,6 +192,7 @@ private:
   QAction * FFindFilesAction = nullptr;
   QAction * FFilterAction = nullptr;
   QAction * FServerInfoAction = nullptr;
+  QAction * FConsoleAction = nullptr;
   QAction * FGenerateSessionUrlAction = nullptr;
   QAction * FGenerateFileUrlAction = nullptr;
   QAction * FAddBookmarkAction = nullptr;
