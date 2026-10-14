@@ -106,15 +106,26 @@ execute_process(
   COMMAND_ERROR_IS_FATAL ANY)
 string(REPLACE "\n" ";" _gen_files "${_gen_files}")
 list(TRANSFORM _gen_files PREPEND "${LINSCP_GEN}/")
+# Slices (port/tools/slices.json): upstream code from files otherwise bound to
+# the VCL GUI, outside the mirror (ADR 0014).
+set(LINSCP_GEN_SLICES "${LINSCP_GEN}-slices")
+execute_process(
+  COMMAND "${Python3_EXECUTABLE}" "${LINSCP_TRANSFORM}" --list-slices
+  OUTPUT_VARIABLE _slice_files OUTPUT_STRIP_TRAILING_WHITESPACE
+  COMMAND_ERROR_IS_FATAL ANY)
+string(REPLACE "\n" ";" _slice_files "${_slice_files}")
+list(TRANSFORM _slice_files PREPEND "${LINSCP_GEN_SLICES}/")
+list(APPEND _gen_files ${_slice_files})
 add_custom_command(
   OUTPUT  "${LINSCP_GEN_STAMP}"
   BYPRODUCTS ${_gen_files}
   COMMAND "${Python3_EXECUTABLE}" "${LINSCP_TRANSFORM}"
-          --src "${LINSCP_UPSTREAM}" --out "${LINSCP_GEN}"
+          --src "${LINSCP_UPSTREAM}" --out "${LINSCP_GEN}" --slice-out "${LINSCP_GEN_SLICES}"
   COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/verify_transform.py"
           "${LINSCP_GEN}" "${LINSCP_UPSTREAM}"
   COMMAND "${CMAKE_COMMAND}" -E touch "${LINSCP_GEN_STAMP}"
   DEPENDS "${LINSCP_TRANSFORM}" "${CMAKE_SOURCE_DIR}/port/tools/verify_transform.py"
+          "${CMAKE_SOURCE_DIR}/port/tools/slices.json"
           ${LINSCP_PATCHES}
   COMMENT "Transforming upstream core and verifying the diff is property-only"
   VERBATIM)
