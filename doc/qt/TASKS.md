@@ -129,6 +129,12 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P3-04c | Preferences: Window, Explorer, File colors; the panels' layout kept between runs | M | P3-04a | Split from P3-04 |
 | P3-04d | Preferences: Storage, Logging, Network, Security, Updates (core's `Configuration`) | M | P3-04a | Split from P3-04 |
 | P3-04e | Preferences: Editors, Integration, Applications, Commands, Drag & Drop | M | P3-04a, P3-05, P3-08 | Split from P3-04 |
+| P3-06a | Dialogs, file operations: Properties (`Properties`, `Rights`: permissions, owner, group, recursive), Create folder with attributes (`CreateDirectory`), link (`Symlink`), remote copy and move (`RemoteTransfer`, `TRemoteMoveDialog`), local copy and move (`CopyLocal`); Shift+F5/F6, F7 and Alt+Enter as WinSCP's | L | P3-02 | Split from P3-06 |
+| P3-06b | Dialogs, navigation: Open directory and bookmarks (`OpenDirectory`), Location profiles, Find files (`FileFind`), Filter and edit masks (`DoFilterMaskDialog`, `EditMask`) | L | P3-02 | Split from P3-06 |
+| P3-06c | Dialogs, session tools: Server and protocol information (`FileSystemInfo`), Generate URL and code (`GenerateUrl`), Console, raw site settings (`TSiteRawDialog`), Import sites (`ImportSessions`) | L | P2-04 | Split from P3-06 |
+| P3-06d | Dialogs, custom commands: `CustomCommand`, `TCustomCommandOptionsDialog`, the commands menu running them (core's `TRemoteCustomCommand`, local commands) | M | P3-02 | Split from P3-06; Preferences > Commands is P3-04e |
+| P3-06e | Dialogs, keep remote directory up to date (`Synchronize`): core's `TSynchronizeController` over the local panel's watcher | M | P3-03 | Split from P3-06 |
+| P3-06f | Dialogs, the rest: Save workspace, Shortcut, Cleanup application data, License, S3 tags (`TTagDialog`) | M | P3-04a | Split from P3-06; WinSCP's usage statistics dialog is its telemetry's, not ported |
 
 ## P4 — Cleanup
 

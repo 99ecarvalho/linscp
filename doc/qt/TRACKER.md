@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 9 | 16 | Parity on features users depend on |
+| P3 Qt parity | 9 | 22 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **87** | **103** | |
+| **Total** | **87** | **109** | |
 
 ## Next three actions
 
@@ -235,7 +235,8 @@ internal editor, remote files downloaded to a temporary directory and
 uploaded back on save, as WinSCP (ADR 0015). P2-10 and P2-11 wait, at the
 user's request.
 
-1. **P3-06**: the remaining dialogs, batched (split first).
+1. **P3-06a**: the file operations' dialogs (Properties first), then
+   P3-06b…f.
 2. **P3-08**, then **P3-04e**: shell integration, then Preferences'
    Editors page with external editors (ADR 0015).
 3. Offer `core-log-file-name-delimiter.patch` and
@@ -762,7 +763,13 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-04d | Preferences: Storage, Logging, Network, Security, Updates | done | Network, Security, Logging, Storage over core's configuration (ADR 0014); the temporary directory used; upstream's `%TEMP%`/`%APPDATA%` defaults working on POSIX (Win32 layer, `core-log-file-name-delimiter.patch`); ctests `qt_session`/`qt_session_ftp`, `win32_on_posix`, `qt_gui_preferences`; native on Windows 11 too. Updates not offered (WinSCP's own); master password, host CAs not yet |
 | P3-04e | Preferences: Editors, Integration, Applications, Commands, Drag & Drop | todo | after P3-05, P3-08 |
 | P3-05 | Internal editor | done | `port/qt/EditorWindow.cpp` (WinSCP's editor: find and replace, go to line, UTF-8 or the system's code page with fallback, BOM and line endings kept, status bar); Files > Edit (F4), local files in place, remote ones through `TSession::EditDownload`/`EditUpload` (temporary directory, queue upload, "check not modified"), editors closed with the session; `core-local-eol-platform.patch`; ctests `qt_gui_edit`, `qt_session`/`qt_session_ftp`; native on Windows 11 too. Not yet (ADR 0015): reload from the server, save all, window position and font, external editors (P3-04e) |
-| P3-06 | Remaining 48 dialogs, batched | todo | XL — split into P3-06a…f |
+| P3-06 | Remaining 48 dialogs, batched | wip | split into P3-06a…f (below), each counted as its own task; done when they are. Written by hand from the `.dfm`s, as P3-02…05 were, without waiting on P3-01 |
+| P3-06a | Dialogs: file operations | wip | Properties, Create folder, link, remote and local copy and move |
+| P3-06b | Dialogs: navigation | todo | Open directory and bookmarks, Location profiles, Find files, masks |
+| P3-06c | Dialogs: session tools | todo | Server information, Generate URL, Console, raw site settings, Import sites |
+| P3-06d | Dialogs: custom commands | todo | |
+| P3-06e | Dialogs: keep remote directory up to date | todo | |
+| P3-06f | Dialogs: the rest | todo | workspace, shortcut, cleanup, license, S3 tags; usage statistics not ported |
 | P3-07 | Drag & drop | done | between the panels, within one (onto a directory), and from other programs onto the remote panel: `FileView` in `port/qt/FileList.cpp`, `MainWindow::Drop`, `TSession::Move`; `RemoteFileDrag` (remote files out to other programs, downloaded at the drop); ctest `qt_gui_drop`; native on Windows 11 too; dragging out checked by hand with Explorer (Windows 11) and Nautilus, foreground and background |
 | P3-08 | Shell integration | todo | |
 | P3-09 | Accessibility | todo | |
