@@ -126,7 +126,8 @@ public:
   // (the timer's job; for tests).
   void CheckExternalEdited();
   int ExternalEditedCount() const { return static_cast<int>(FExternalEdited.size()); }
-  EditorWindow * EditRemote(const QString & Name);
+  // New: a file not on the server, made empty (NewFile).
+  EditorWindow * EditRemote(const QString & Name, bool New = false);
   EditorWindow * EditLocal(const QString & FileName);
   // The editors open: the remote ones only, or all.
   std::vector<EditorWindow *> Editors(bool RemoteOnly = false) const;
@@ -246,6 +247,27 @@ public:
   bool ChangePassword();
   bool InstallPublicKey(const QString * FileName = nullptr);
   bool ClearCaches();
+  // Commands > Compare Directories (Shift+F2), as TScpCommanderForm's: in
+  // each panel, the files newer than the other panel's of the name, or
+  // missing there (and, by Preferences, of another size), selected; WinSCP's
+  // message when there are none. False then.
+  bool CompareDirectories();
+  // Commands > Synchronize Browsing (Ctrl+Alt+B): a panel's change of
+  // directory followed by the other, relative to where both were
+  // (SynchronizeBrowsingLocal and ...Remote); a directory that is not there
+  // created if the user wants, else browsing synchronization turned off.
+  void SetSynchronizeBrowsing(bool On);
+  bool SynchronizeBrowsing() const;
+  // Files > Calculate Directory Sizes (Shift+Alt+Enter): the selected
+  // directories' sizes, shown in the Size column.
+  bool CalculateDirectorySizes();
+  // Go To > Path from Other Panel (Ctrl+.): in a local tab, the panel to the
+  // other's directory.
+  bool PathFromOtherPanel(bool Local);
+  // Files > New > File, as EditNew: a file of the name asked for (the
+  // focused file's, else "New file"; given: no prompt), edited -- an
+  // existing one as it is, a new one empty, uploaded when saved.
+  EditorWindow * NewFile(const QString * Name = nullptr);
   bool LocalBrowser() const;
   // The panel on a side as a local one: the left (Local) panel, or the
   // right one in a local tab; null for the remote panel.
@@ -321,6 +343,16 @@ private:
   QAction * FChangePasswordAction = nullptr;
   QAction * FPublicKeyAction = nullptr;
   QAction * FClearCachesAction = nullptr;
+  QAction * FCompareAction = nullptr;
+  QAction * FSyncBrowseAction = nullptr;
+  QAction * FDirectorySizesAction = nullptr;
+  QAction * FNewFileAction = nullptr;
+  // Synchronized browsing: each side's directory as last loaded (local:
+  // [1]), and while following the other.
+  QString FPrevPath[2];
+  bool FSynchronisingBrowse = false;
+  void PanelLoaded(bool Local);
+  bool SyncBrowse(bool Local, const QString & PrevPath, QString & NewPath, bool Create);
   QAction * FAboutAction = nullptr;
   QAction * FOpenCurrentAction = nullptr;
   QAction * FExploreAction = nullptr;
@@ -386,6 +418,7 @@ private:
     QString OtherLocalPath;
     // A local tab's name, as renamed (a session's is its own).
     QString Name;
+    bool SynchronizeBrowsing = false;
   };
   // The right panel's place: the remote panel, or in a local tab the other
   // local one.

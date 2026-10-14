@@ -73,6 +73,10 @@ public:
   QString Filter() const;
   QStringList Selected() const;
   void Select(const QStringList & Names);
+  // The entries shown (filtered, hidden files as the setting says), in the
+  // panel's order; and a directory's size, calculated, shown.
+  std::vector<CoreBridge::TRemoteEntry> Entries() const;
+  void SetDirectorySize(const QString & Name, std::int64_t Size);
   QStringList Names() const;
   QString Path() const;
   // The directories visited: back, this one, forward.

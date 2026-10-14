@@ -249,6 +249,8 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     TCloseSubKeyPath Close(Storage);
     Storage->WriteBool(L"SwappedPanels", FSettings.SwappedPanels);
     Storage->WriteBool(L"ExplorerKeyboardShortcuts", FSettings.ExplorerKeyboardShortcuts);
+    Storage->WriteBool(L"CompareByTime", FSettings.CompareByTime);
+    Storage->WriteBool(L"CompareBySize", FSettings.CompareBySize);
     Storage->WriteInteger(L"CurrentPanel", FSettings.CurrentPanel);
     Storage->WriteFloat(L"LocalPanelWidth", FSettings.LocalPanelWidth);
     if (!FSettings.WindowParams.IsEmpty())
@@ -463,6 +465,8 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.SwappedPanels = Storage->ReadBool(L"SwappedPanels", FSettings.SwappedPanels);
     FSettings.ExplorerKeyboardShortcuts =
       Storage->ReadBool(L"ExplorerKeyboardShortcuts", FSettings.ExplorerKeyboardShortcuts);
+    FSettings.CompareByTime = Storage->ReadBool(L"CompareByTime", FSettings.CompareByTime);
+    FSettings.CompareBySize = Storage->ReadBool(L"CompareBySize", FSettings.CompareBySize);
     FSettings.CurrentPanel = Storage->ReadInteger(L"CurrentPanel", FSettings.CurrentPanel);
     FSettings.LocalPanelWidth = Storage->ReadFloat(L"LocalPanelWidth", FSettings.LocalPanelWidth);
     FSettings.WindowParams = Storage->ReadString(L"WindowParams", FSettings.WindowParams);

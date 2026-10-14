@@ -34,6 +34,9 @@ public:
   using QAbstractTableModel::QAbstractTableModel;
   void SetEntries(std::vector<CoreBridge::TRemoteEntry> Entries, bool WithParent);
   const CoreBridge::TRemoteEntry * Entry(int Row) const;
+  // Files > Calculate Directory Sizes: a directory's size shown in its row,
+  // until the list is set again. False when it has no such directory.
+  bool SetDirectorySize(const QString & Name, std::int64_t Size);
   bool IsParent(int Row) const { return FWithParent && (Row == 0); }
   // The rights column as file attributes (a Windows local panel's).
   void SetAttributes(bool Attributes) { FAttributes = Attributes; }
@@ -58,6 +61,8 @@ signals:
 
 private:
   std::vector<CoreBridge::TRemoteEntry> FEntries;
+  // The directories whose size has been calculated, by index.
+  std::vector<bool> FSized;
   bool FWithParent = false;
   bool FAttributes = false;
   CoreBridge::TPreferences::TSizeFormat FSizeFormat = CoreBridge::TPreferences::TSizeFormat::Kilobytes;

@@ -156,6 +156,15 @@ QWidget * PreferencesDialog::MakeCommanderPage(const TPreferences & Preferences)
   FUseLocationProfiles->setChecked(Preferences.UseLocationProfiles);
   MiscLayout->addRow(FUseLocationProfiles);
   Layout->addWidget(Misc);
+  QGroupBox * Compare = new QGroupBox(tr("Compare directory criteria"), Page);
+  QVBoxLayout * CompareLayout = new QVBoxLayout(Compare);
+  FCompareByTime = new QCheckBox(tr("Compare by &time"), Compare);
+  FCompareByTime->setChecked(Preferences.CompareByTime);
+  CompareLayout->addWidget(FCompareByTime);
+  FCompareBySize = new QCheckBox(tr("Compare by &size"), Compare);
+  FCompareBySize->setChecked(Preferences.CompareBySize);
+  CompareLayout->addWidget(FCompareBySize);
+  Layout->addWidget(Compare);
   Layout->addStretch(1);
   return Page;
 }
@@ -886,6 +895,8 @@ TPreferences PreferencesDialog::Preferences() const
   Result.SizeFormat = static_cast<TPreferences::TSizeFormat>(FSizeFormat->currentIndex());
   Result.SwappedPanels = FSwappedPanels->isChecked();
   Result.ExplorerKeyboardShortcuts = (FKeyboardShortcuts->currentIndex() == 1);
+  Result.CompareByTime = FCompareByTime->isChecked();
+  Result.CompareBySize = FCompareBySize->isChecked();
   Result.UseLocationProfiles = FUseLocationProfiles->isChecked();
   Result.QueueTransfersLimit = FQueueTransfersLimit->value();
   Result.QueueKeepDoneItemsFor = FQueueKeepDone->currentData().toInt();

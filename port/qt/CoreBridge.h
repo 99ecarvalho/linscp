@@ -399,6 +399,9 @@ struct TPreferences
   bool SwappedPanels = false;
   // Explorer's keys (F5 refresh, Ctrl+K copy) rather than the Commander's.
   bool ExplorerKeyboardShortcuts = false;
+  // Compare Directories: a file is newer, or of another size.
+  bool CompareByTime = true;
+  bool CompareBySize = false;
   // Open Directory as Location Profiles (a local and a remote directory
   // each) rather than the side's bookmarks.
   bool UseLocationProfiles = false;
@@ -636,6 +639,14 @@ enum class TText
   PasswordChanged, // "Password has been changed."
   PublicKeyTitle, // "Select key to install into server"
   NotOpenSsh, // "**Install public key to non-OpenSSH server?**..." (%s: the server's)
+  CompareNoDifferences, // "No differences found."
+  SyncBrowseCreate, // "**Do you want to try to create directory '%s'?**..."
+  SyncBrowseError, // "Cannot open corresponding directory in the opposite panel. ..."
+  SyncBrowseToggle, // "Synchronized browsing was turned %s.|on|off"
+  NewFileName, // "New file"
+  EditFileCaption, // "Edit file"
+  EditFilePrompt, // "&Enter file name:"
+  CreateFileError, // "Can't create file '%s'."
   NotSupported, // "Operation not supported."
   LicenseCaption, // "%s license"
   TagAdd,         // "Add tag"
@@ -967,6 +978,10 @@ struct TRemoteEntry
   // As core formats it for display, and as seconds since 1970 for sorting.
   std::string Modified;
   double ModifiedTime = 0;
+  // What the time says (the listing's TModificationFmt): Compare
+  // Directories compares to the coarser of two.
+  enum class TPrecision { None, Day, Minute, Second };
+  TPrecision ModifiedPrecision = TPrecision::Second;
   std::string Rights;
   std::string Owner;
   std::string Group;
@@ -1582,6 +1597,13 @@ public:
   // the temporary files' transfer settings (TemporaryFileCopyParam). Throws
   // TCoreError.
   TEditedFile EditDownload(const std::string & Name, bool ForceText = true);
+  // Files > New > File, as TCustomScpExplorerForm::EditNew: an empty file
+  // of that name made in such a temporary directory, to be edited and
+  // uploaded as one downloaded (nothing on the server until it is saved).
+  // Exists: there is such a file in the current directory already (edit
+  // that instead). Throws TCoreError.
+  TEditedFile EditNew(const std::string & Name);
+  bool FileExists(const std::string & Name);
   // Its changed copy uploaded back over the original: through the queue
   // where the protocol has background transfers (as TEditorUploadQueueItem,
   // the file's source timestamp refreshed after), else here. With "check not

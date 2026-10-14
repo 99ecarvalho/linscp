@@ -77,6 +77,9 @@ struct TShellSettings
   // Interface\Commander (TScpCommanderConfiguration).
   bool SwappedPanels = false;
   bool ExplorerKeyboardShortcuts = false;
+  // Compare Directories' criteria (ScpCommander.CompareByTime, CompareBySize).
+  bool CompareByTime = true;
+  bool CompareBySize = false;
   // The layout, kept between runs, in TWinConfiguration's own formats: the
   // window's placement ("left;top;right;bottom;state;ppi", "-1;-1;w;h;..."
   // never placed; empty here for the shell's default), the local panel's

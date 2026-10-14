@@ -3924,6 +3924,132 @@ void SessionCommandsTest(const char * Port, const QString & Key, const QString &
   CoreBridge::Finalize();
 }
 
+// P3-14's panel commands: Compare Directories, Synchronize Browsing,
+// Calculate Directory Sizes, New File, Path from Other Panel.
+void PanelCommandsTest(const char * Port, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = std::deque<QString>(4, QStringLiteral("secret"));
+    const QDir Local(Directory);
+    const QDir Root(Local.filePath(QStringLiteral("../root")));
+    auto Write = [](const QString & Path, const QByteArray & Data, const QDateTime & Time)
+    {
+      QFile File(Path);
+      File.open(QIODevice::WriteOnly);
+      File.write(Data);
+      File.flush();
+      File.setFileTime(Time, QFileDevice::FileModificationTime);
+    };
+    QDir().mkpath(Local.path());
+    QDir().mkpath(Root.filePath(QStringLiteral("cmp")));
+    QDir().mkpath(Local.filePath(QStringLiteral("cmp")));
+    const QDateTime Old = QDateTime::currentDateTime().addDays(-2);
+    const QDateTime New = QDateTime::currentDateTime().addDays(-1);
+    // same.txt alike; newer.txt newer locally; remote.txt remote only;
+    // local.txt local only; size.txt alike in time, not in size.
+    Write(Local.filePath(QStringLiteral("cmp/same.txt")), "same", Old);
+    Write(Root.filePath(QStringLiteral("cmp/same.txt")), "same", Old);
+    Write(Local.filePath(QStringLiteral("cmp/newer.txt")), "newer", New);
+    Write(Root.filePath(QStringLiteral("cmp/newer.txt")), "older", Old);
+    Write(Root.filePath(QStringLiteral("cmp/remote.txt")), "remote", Old);
+    Write(Local.filePath(QStringLiteral("cmp/local.txt")), "local", Old);
+    Write(Local.filePath(QStringLiteral("cmp/size.txt")), "size, longer", Old);
+    Write(Root.filePath(QStringLiteral("cmp/size.txt")), "size", Old);
+
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "(connected)");
+    Window.Local()->ChangeDirectory(Local.filePath(QStringLiteral("cmp")));
+    Check(Window.Panel()->ChangeDirectory(QStringLiteral("/cmp")), "(both in cmp)");
+    Check(Window.CompareDirectories(), "Compare Directories finds differences");
+    QStringList LocalSelected = Window.Local()->Selected();
+    LocalSelected.sort();
+    Check(LocalSelected == QStringList({ QStringLiteral("local.txt"), QStringLiteral("newer.txt") }),
+      "locally: the newer and the one missing remotely");
+    Check(Window.Panel()->Selected() == QStringList({ QStringLiteral("remote.txt") }), "remotely: the one missing locally");
+    CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+    Preferences.CompareBySize = true;
+    CoreBridge::SetPreferences(Preferences);
+    Window.CompareDirectories();
+    Check(Window.Local()->Selected().contains(QStringLiteral("size.txt")) && Window.Panel()->Selected().contains(QStringLiteral("size.txt")),
+      "by size too, as Preferences say");
+    Preferences.CompareBySize = false;
+    CoreBridge::SetPreferences(Preferences);
+
+    // Calculate Directory Sizes: the sizes in the Size column.
+    Window.Local()->ChangeDirectory(Local.path());
+    Window.Panel()->ChangeDirectory(QStringLiteral("/"));
+    Window.ActivatePanel(false);
+    Window.Panel()->Select({ QStringLiteral("cmp") });
+    Check(Window.CalculateDirectorySizes(), "Calculate Directory Sizes (remote)");
+    bool Sized = false;
+    for (const CoreBridge::TRemoteEntry & Entry : Window.Panel()->Entries())
+    {
+      Sized = Sized || ((Entry.Name == "cmp") && (Entry.Size == 4 + 5 + 6 + 4));
+    }
+    Check(Sized, "the directory's size, its files'");
+    Window.ActivatePanel(true);
+    Window.Local()->Select({ QStringLiteral("cmp") });
+    Check(Window.CalculateDirectorySizes(), "Calculate Directory Sizes (local)");
+    Sized = false;
+    for (const CoreBridge::TRemoteEntry & Entry : Window.Local()->Entries())
+    {
+      Sized = Sized || ((Entry.Name == "cmp") && (Entry.Size == 4 + 5 + 5 + 12));
+    }
+    Check(Sized, "and locally");
+
+    // New File: a local one made and edited; a remote one edited empty,
+    // on the server once saved.
+    const QString LocalNew = QStringLiteral("new-local.txt");
+    EditorWindow * Editor = Window.NewFile(&LocalNew);
+    Check((Editor != nullptr) && QFileInfo::exists(Local.filePath(LocalNew)), "New File (local): made and edited");
+    if (Editor != nullptr)
+    {
+      Editor->close();
+    }
+    Window.ActivatePanel(false);
+    const QString RemoteNew = QStringLiteral("new-remote.txt");
+    Editor = Window.NewFile(&RemoteNew);
+    Check((Editor != nullptr) && !QFileInfo::exists(Root.filePath(RemoteNew)), "New File (remote): edited, not on the server yet");
+    if (Editor != nullptr)
+    {
+      // (Typed: setPlainText would leave it unmodified.)
+      Editor->Editor()->insertPlainText(QStringLiteral("new\n"));
+      Check(Editor->Save(), "(saved)");
+      Check(WaitUntil([&Root, &RemoteNew]() { return QFileInfo::exists(Root.filePath(RemoteNew)); }), "uploaded when saved");
+      Editor->close();
+    }
+
+    // Synchronize Browsing: into a subdirectory, the other follows; one
+    // missing there is offered to be created (Yes).
+    QDir().mkpath(Local.filePath(QStringLiteral("cmp/sub")));
+    Window.Local()->ChangeDirectory(Local.path());
+    Window.Panel()->ChangeDirectory(QStringLiteral("/"));
+    Window.SetSynchronizeBrowsing(true);
+    Check(Window.SynchronizeBrowsing(), "Synchronize Browsing on");
+    Window.Local()->ChangeDirectory(Local.filePath(QStringLiteral("cmp")));
+    Check(Window.Panel()->Path() == QStringLiteral("/cmp"), "the remote panel follows the local one");
+    Window.Panel()->ChangeDirectory(QStringLiteral("/"));
+    Check(QDir(Window.Local()->Path()) == Local, "and back, the local one the remote one");
+    Window.Local()->ChangeDirectory(Local.filePath(QStringLiteral("cmp/sub")));
+    Check((Window.Panel()->Path() == QStringLiteral("/cmp/sub")) && QFileInfo(Root.filePath(QStringLiteral("cmp/sub"))).isDir(),
+      "a directory missing there created, after asking");
+    Window.SetSynchronizeBrowsing(false);
+
+    // Path from Other Panel: a local tab's.
+    Window.NewLocalTab();
+    Window.OtherLocal()->ChangeDirectory(Local.filePath(QStringLiteral("cmp")));
+    Check(Window.PathFromOtherPanel(true) && (QDir(Window.Local()->Path()) == QDir(Local.filePath(QStringLiteral("cmp")))),
+      "Path from Other Panel");
+  }
+  CoreBridge::Finalize();
+}
+
 // The menu bar as text, a menu's items indented under it, separators as
 // "----": for comparing with WinSCP's (forms/ScpCommander.dfm).
 void DumpMenu(QMenu * Menu, int Depth, QString & Out)
@@ -3984,6 +4110,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 6) && (std::strcmp(argv[1], "sessioncommands") == 0))
   {
     SessionCommandsTest(argv[3], QString::fromLocal8Bit(argv[4]), QString::fromLocal8Bit(argv[5]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "panelcommands") == 0))
+  {
+    PanelCommandsTest(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 3) && (std::strcmp(argv[1], "menus") == 0))
   {

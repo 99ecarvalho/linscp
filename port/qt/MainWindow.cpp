@@ -18,6 +18,8 @@
 #include <QFileInfo>
 #include <QMimeData>
 #include <QUrl>
+#include <QDateTime>
+#include <QDirIterator>
 #include <QFileDialog>
 #include <QFormLayout>
 #include <QTemporaryDir>
@@ -31,6 +33,7 @@
 #include <QVBoxLayout>
 
 #include <algorithm>
+#include <cmath>
 
 #include "AboutDialog.h"
 #include "EditorWindow.h"
@@ -186,6 +189,10 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
       }
     });
   }
+  // As DoDirViewLoaded: synchronized browsing follows (not the other local
+  // panel's).
+  connect(FLocal, &LocalPanel::Changed, this, [this]() { PanelLoaded(true); });
+  connect(FPanel, &RemotePanel::Changed, this, [this]() { PanelLoaded(false); });
   // Tab: to the other panel.
   connect(FLocal->View(), &FileView::SwitchPanel, this, [this]() { ActivatePanel(false); });
   connect(FPanel->View(), &FileView::SwitchPanel, this, [this]() { ActivatePanel(true); });
@@ -1413,6 +1420,10 @@ void MainWindow::UpdateActions()
     FPublicKeyAction->setEnabled(!FBusy && Active && FSession->CanUploadPublicKey());
     // (As the menu opens, too: the caches fill as the panel is browsed.)
     FClearCachesAction->setEnabled(!FBusy && Active && !FSession->CachesEmpty());
+    FCompareAction->setEnabled(!FBusy && (Active || LocalBrowser()));
+    FSyncBrowseAction->setEnabled(!FBusy && Active);
+    FDirectorySizesAction->setEnabled(!FBusy && (Active || SideLocal(FLocalActive)));
+    FNewFileAction->setEnabled(!FBusy && (Active || SideLocal(FLocalActive)));
   }
   FSaveWorkspaceAction->setEnabled(!FBusy && (TabCount() > 0));
   FCloseTabAction->setEnabled(!FBusy && FSession);
@@ -1807,7 +1818,7 @@ EditorWindow * MainWindow::EditLocal(const QString & FileName)
   return ShowEditor(Editor);
 }
 
-EditorWindow * MainWindow::EditRemote(const QString & Name)
+EditorWindow * MainWindow::EditRemote(const QString & Name, bool New)
 {
   if (FBusy || !FSession)
   {
@@ -1830,7 +1841,8 @@ EditorWindow * MainWindow::EditRemote(const QString & Name)
   std::shared_ptr<CoreBridge::TEditedFile> File;
   try
   {
-    File = std::make_shared<CoreBridge::TEditedFile>(FSession->EditDownload(Name.toStdString()));
+    File = std::make_shared<CoreBridge::TEditedFile>(New ? FSession->EditNew(Name.toStdString()) :
+      FSession->EditDownload(Name.toStdString()));
   }
   catch (const CoreBridge::TCoreError & E)
   {
@@ -2785,6 +2797,7 @@ void MainWindow::ParkActiveTab()
     Tab.OtherLocalPath = FOtherLocal->Path();
   }
   Tab.QueueDone = FQueueDone;
+  Tab.SynchronizeBrowsing = (FSyncBrowseAction != nullptr) && FSyncBrowseAction->isChecked();
   FActiveTab = -1;
 }
 
@@ -2871,6 +2884,14 @@ void MainWindow::UnparkTab(int Index)
     FOtherLocal->ChangeDirectory(Tab.OtherLocalPath);
   }
   ShowLocalBrowser(Tab.LocalBrowser);
+  // As the tab's StateData: its synchronized browsing, its directories as
+  // loaded (the switch is no change of directory to follow).
+  if (FSyncBrowseAction != nullptr)
+  {
+    FSyncBrowseAction->setChecked(Tab.SynchronizeBrowsing);
+  }
+  FPrevPath[1] = FLocal->Path();
+  FPrevPath[0] = FPanel->Path();
   if (FSession)
   {
     ApplyPreferences();
@@ -3140,6 +3161,10 @@ QMenu * MainWindow::PanelMenu(bool Local)
     {
       GoTo->addAction(Action);
     }
+    // In a local tab only, both sides local and elsewhere.
+    QAction * OtherPath = GoTo->addAction(tr("Path fro&m Other Panel"), this, [this, Local]() { PathFromOtherPanel(Local); });
+    OtherPath->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Period));
+    OtherPath->setEnabled(!FBusy && LocalBrowser() && (QDir(FLocal->Path()) != QDir(FOtherLocal->Path())));
     GoTo->addSeparator();
     GoTo->addAction((Side != nullptr) ? Side->BackAction() : FPanel->BackAction());
     GoTo->addAction((Side != nullptr) ? Side->ForwardAction() : FPanel->ForwardAction());
@@ -3192,6 +3217,7 @@ void MainWindow::BuildMenus()
   };
   QMenu * Files = menuBar()->addMenu(tr("&Files"));
   QMenu * New = Files->addMenu(tr("&New"));
+  FNewFileAction = New->addAction(tr("&File..."), this, [this]() { NewFile(); });
   New->addAction(tr("&Directory..."), this, OnActive(&LocalPanel::NewFolderAction, &RemotePanel::NewFolderAction));
   Files->addSeparator();
   Files->addAction(FOpenCurrentAction);
@@ -3213,10 +3239,18 @@ void MainWindow::BuildMenus()
   Names->addAction(FGenerateFileUrlAction);
   Files->addSeparator();
   Files->addAction(FPropertiesAction);
+  FDirectorySizesAction = Files->addAction(tr("&Calculate Directory Sizes"), this, [this]() { CalculateDirectorySizes(); });
+  FDirectorySizesAction->setShortcut(QKeySequence(Qt::SHIFT | Qt::ALT | Qt::Key_Return));
 
   QMenu * Commands = menuBar()->addMenu(tr("&Commands"));
+  FCompareAction = Commands->addAction(tr("&Compare Directories"), this, [this]() { CompareDirectories(); });
+  FCompareAction->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F2));
   Commands->addAction(FKeepUpToDateAction);
   Commands->addAction(FSynchronizeAction);
+  FSyncBrowseAction = Commands->addAction(tr("Synchronize &Browsing"));
+  FSyncBrowseAction->setCheckable(true);
+  FSyncBrowseAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_B));
+  connect(FSyncBrowseAction, &QAction::triggered, this, [this](bool On) { SetSynchronizeBrowsing(On); });
   Commands->addAction(FFindFilesAction);
   Commands->addMenu(FStaticCommandsMenu);
   Commands->addSeparator();
@@ -3753,4 +3787,411 @@ bool MainWindow::ClearCaches()
   FSession->ClearCaches();
   UpdateActions();
   return true;
+}
+
+// --- Panel commands (P3-14) ---------------------------------------------------------
+
+namespace
+{
+
+// A modification time as wall-clock seconds at the precision given
+// (ReduceDateTimePrecision): the remote panel's are the server's wall
+// clock; a local file's are made so (Local).
+double ComparableTime(const CoreBridge::TRemoteEntry & Entry, bool Local, CoreBridge::TRemoteEntry::TPrecision Precision)
+{
+  using TPrecision = CoreBridge::TRemoteEntry::TPrecision;
+  // To the millisecond first: a TDateTime made seconds can fall just short
+  // of a whole one.
+  double Time = std::round(Entry.ModifiedTime * 1000) / 1000;
+  if (Local)
+  {
+    Time += QDateTime::fromSecsSinceEpoch(static_cast<qint64>(Time)).offsetFromUtc();
+  }
+  switch (Precision)
+  {
+    case TPrecision::None: return 0;
+    case TPrecision::Day: return std::floor(Time / 86400) * 86400;
+    case TPrecision::Minute: return std::floor(Time / 60) * 60;
+    case TPrecision::Second: return std::floor(Time);
+  }
+  return Time;
+}
+
+// TCustomDirView::ProcessChangedFiles: the files of Entries newer than (or,
+// by size, unlike) those of Mirror's of the name, or not in Mirror.
+QStringList ChangedFiles(const std::vector<CoreBridge::TRemoteEntry> & Entries, bool Local,
+  const std::vector<CoreBridge::TRemoteEntry> & Mirror, bool MirrorLocal, bool ByTime, bool BySize)
+{
+  QStringList Result;
+#if defined(Q_OS_WIN)
+  const Qt::CaseSensitivity Case = MirrorLocal ? Qt::CaseInsensitive : Qt::CaseSensitive;
+#else
+  const Qt::CaseSensitivity Case = Qt::CaseSensitive;
+#endif
+  for (const CoreBridge::TRemoteEntry & Entry : Entries)
+  {
+    if (Entry.Directory)
+    {
+      continue;
+    }
+    const QString Name = QString::fromStdString(Entry.Name);
+    const CoreBridge::TRemoteEntry * Other = nullptr;
+    for (const CoreBridge::TRemoteEntry & Candidate : Mirror)
+    {
+      if (QString::fromStdString(Candidate.Name).compare(Name, Case) == 0)
+      {
+        Other = &Candidate;
+        break;
+      }
+    }
+    bool Changed = (Other == nullptr);
+    if (Other != nullptr)
+    {
+      bool SameTime = true;
+      if (ByTime)
+      {
+        const auto Precision = std::min(Entry.ModifiedPrecision, Other->ModifiedPrecision);
+        const double Time = ComparableTime(Entry, Local, Precision);
+        double OtherTime = ComparableTime(*Other, MirrorLocal, Precision);
+        SameTime = (Time == OtherTime);
+        if (Precision == CoreBridge::TRemoteEntry::TPrecision::Second)
+        {
+          // "1 ms more solves the rounding issues."
+          OtherTime += 1.001;
+        }
+        Changed = (Time > OtherTime);
+      }
+      if (!Changed && SameTime && BySize)
+      {
+        Changed = (Entry.Size != Other->Size);
+      }
+    }
+    if (Changed)
+    {
+      Result.append(Name);
+    }
+  }
+  return Result;
+}
+
+}  // namespace
+
+bool MainWindow::CompareDirectories()
+{
+  LocalPanel * Right = SideLocal(false);
+  if (FBusy || (!Right && !(FSession && FSession->Active())))
+  {
+    return false;
+  }
+  const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+  const std::vector<CoreBridge::TRemoteEntry> LeftEntries = FLocal->Entries();
+  const std::vector<CoreBridge::TRemoteEntry> RightEntries = Right ? Right->Entries() : FPanel->Entries();
+  const QStringList LeftChanged = ChangedFiles(LeftEntries, true, RightEntries, Right != nullptr,
+    Preferences.CompareByTime, Preferences.CompareBySize);
+  const QStringList RightChanged = ChangedFiles(RightEntries, Right != nullptr, LeftEntries, true,
+    Preferences.CompareByTime, Preferences.CompareBySize);
+  FLocal->Select(LeftChanged);
+  if (Right != nullptr)
+  {
+    Right->Select(RightChanged);
+  }
+  else
+  {
+    FPanel->Select(RightChanged);
+  }
+  if (LeftChanged.isEmpty() && RightChanged.isEmpty())
+  {
+    Inform(this, CoreBridge::Text(CoreBridge::TText::CompareNoDifferences));
+    return false;
+  }
+  return true;
+}
+
+bool MainWindow::SynchronizeBrowsing() const
+{
+  return (FSyncBrowseAction != nullptr) && FSyncBrowseAction->isChecked();
+}
+
+// As SynchronizeBrowsingChanged: noted in the status bar.
+void MainWindow::SetSynchronizeBrowsing(bool On)
+{
+  FSyncBrowseAction->setChecked(On);
+  FPrevPath[1] = FLocal->Path();
+  FPrevPath[0] = FPanel->Path();
+  const QStringList Parts = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::SyncBrowseToggle)).split(QLatin1Char('|'));
+  statusBar()->showMessage(Parts.value(0).replace(QStringLiteral("%s"), Parts.value(On ? 1 : 2)));
+}
+
+// SynchronizeBrowsingLocal and ...Remote: the other side's directory for
+// the change from PrevPath to where the panel (Local: the local one) is
+// now, by what both share: false when they share no common path.
+bool MainWindow::SyncBrowse(bool Local, const QString & PrevPath, QString & NewPath, bool Create)
+{
+  const QString Current = Local ? FLocal->Path() : FPanel->Path();
+  // The panels' own paths: '/' separated, the local one's cleaned.
+  auto Parent = [](const QString & Path)
+  {
+    const QString Clean = (Path.size() > 1) && Path.endsWith(QLatin1Char('/')) ? Path.chopped(1) : Path;
+    const int Slash = Clean.lastIndexOf(QLatin1Char('/'));
+    return (Slash > 0) ? Clean.left(Slash) : ((Slash == 0) ? QStringLiteral("/") : Clean);
+  };
+  auto WithSlash = [](const QString & Path) { return Path.endsWith(QLatin1Char('/')) ? Path : (Path + QLatin1Char('/')); };
+#if defined(Q_OS_WIN)
+  const Qt::CaseSensitivity Case = Local ? Qt::CaseInsensitive : Qt::CaseSensitive;
+#else
+  const Qt::CaseSensitivity Case = Qt::CaseSensitive;
+#endif
+  // ExtractCommonPath: the longest directory both are in.
+  QString Common = WithSlash(PrevPath);
+  while (!WithSlash(Current).startsWith(Common, Case))
+  {
+    const QString Up = WithSlash(Parent(Common));
+    if (Up == Common)
+    {
+      return false;
+    }
+    Common = Up;
+  }
+  QString Prev = WithSlash(PrevPath);
+  NewPath = Local ? FPanel->Path() : FLocal->Path();
+  while (Prev.compare(Common, Case) != 0)
+  {
+    const QString Up = Parent(NewPath);
+    if (Up == NewPath)
+    {
+      return false;
+    }
+    NewPath = Up;
+    Prev = WithSlash(Parent(Prev));
+  }
+  const QString Relative = WithSlash(Current).mid(Prev.size());
+  NewPath = WithSlash(NewPath) + Relative;
+  if ((NewPath.size() > 1) && NewPath.endsWith(QLatin1Char('/')))
+  {
+    NewPath.chop(1);
+  }
+  if (Create)
+  {
+    if (Local)
+    {
+      FSession->CreateDirectory(NewPath.toStdString());
+    }
+    else
+    {
+      QDir().mkpath(NewPath);
+    }
+  }
+  return true;
+}
+
+void MainWindow::PanelLoaded(bool Local)
+{
+  const QString Current = Local ? FLocal->Path() : FPanel->Path();
+  const QString PrevPath = FPrevPath[Local ? 1 : 0];
+  FPrevPath[Local ? 1 : 0] = Current;
+  if (FSynchronisingBrowse || !SynchronizeBrowsing() || PrevPath.isEmpty() || (PrevPath == Current) ||
+      LocalBrowser() || !FSession || !FSession->Active() || FBusy)
+  {
+    return;
+  }
+  FSynchronisingBrowse = true;
+  QString NewPath;
+  bool Followed = false;
+  bool Known = SyncBrowse(Local, PrevPath, NewPath, false);
+  if (Known)
+  {
+    Followed = Local ? FPanel->ChangeDirectory(NewPath) : FLocal->ChangeDirectory(NewPath);
+    const QString There = Local ? FPanel->Path() : FLocal->Path();
+    Followed = Followed || (QDir::cleanPath(There) == QDir::cleanPath(NewPath));
+    if (!Followed)
+    {
+      // As WinSCP: offered to be created, else synchronization off.
+      CoreBridge::TQuery Query;
+      Query.Type = CoreBridge::TQueryType::Confirmation;
+      Query.Message = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::SyncBrowseCreate))
+        .replace(QStringLiteral("%s"), Local ? NewPath : QDir::toNativeSeparators(NewPath)).toStdString();
+      CoreBridge::TQueryButton Yes;
+      Yes.Answer = CoreBridge::AnswerYes;
+      Yes.Caption = "&Yes";
+      CoreBridge::TQueryButton No;
+      No.Answer = CoreBridge::AnswerNo;
+      No.Caption = "&No";
+      Query.Buttons = { Yes, No };
+      Query.CancelAnswer = CoreBridge::AnswerNo;
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      if (Frontend.Query(Query).Answer == CoreBridge::AnswerYes)
+      {
+        try
+        {
+          SyncBrowse(Local, PrevPath, NewPath, true);
+          Followed = Local ? FPanel->ChangeDirectory(NewPath) : FLocal->ChangeDirectory(NewPath);
+        }
+        catch (const CoreBridge::TCoreError & E)
+        {
+          ShowError(E);
+        }
+      }
+      if (!Followed)
+      {
+        FSyncBrowseAction->setChecked(false);
+      }
+    }
+  }
+  else
+  {
+    FSyncBrowseAction->setChecked(false);
+    Inform(this, CoreBridge::Text(CoreBridge::TText::SyncBrowseError));
+  }
+  FPrevPath[1] = FLocal->Path();
+  FPrevPath[0] = FPanel->Path();
+  FSynchronisingBrowse = false;
+}
+
+bool MainWindow::CalculateDirectorySizes()
+{
+  if (FBusy)
+  {
+    return false;
+  }
+  LocalPanel * Panel = SideLocal(FLocalActive);
+  if ((Panel == nullptr) && !(FSession && FSession->Active()))
+  {
+    return false;
+  }
+  // The selection's directories (or the focused one's).
+  QStringList Directories;
+  for (const CoreBridge::TRemoteEntry & Entry : (Panel != nullptr) ? Panel->Entries() : FPanel->Entries())
+  {
+    const QString Name = QString::fromStdString(Entry.Name);
+    if (Entry.Directory && ((Panel != nullptr) ? Panel->Selected() : FPanel->Selected()).contains(Name))
+    {
+      Directories.append(Name);
+    }
+  }
+  if (Directories.isEmpty())
+  {
+    return false;
+  }
+  FBusy = true;
+  UpdateActions();
+  bool Result = true;
+  for (const QString & Name : Directories)
+  {
+    if (Panel != nullptr)
+    {
+      // As CalculateLocalFilesSize: every file under it.
+      std::int64_t Size = 0;
+      QDirIterator It(QDir(Panel->Path()).filePath(Name), QDir::Files | QDir::Hidden | QDir::System | QDir::NoDotAndDotDot,
+        QDirIterator::Subdirectories);
+      while (It.hasNext())
+      {
+        It.next();
+        Size += It.fileInfo().size();
+      }
+      Panel->SetDirectorySize(Name, Size);
+    }
+    else
+    {
+      try
+      {
+        std::int64_t Size = 0;
+        int Files = 0;
+        int Subdirectories = 0;
+        int SymLinks = 0;
+        FSession->CalculateSize({ Name.toStdString() }, Size, Files, Subdirectories, SymLinks);
+        FPanel->SetDirectorySize(Name, Size);
+      }
+      catch (const CoreBridge::TCoreError & E)
+      {
+        ShowError(E);
+        Result = false;
+        break;
+      }
+    }
+  }
+  FBusy = false;
+  UpdateActions();
+  return Result;
+}
+
+bool MainWindow::PathFromOtherPanel(bool Local)
+{
+  if (FBusy || !LocalBrowser())
+  {
+    return false;
+  }
+  return SideLocal(Local)->ChangeDirectory(SideLocal(!Local)->Path());
+}
+
+EditorWindow * MainWindow::NewFile(const QString * Name)
+{
+  if (FBusy)
+  {
+    return nullptr;
+  }
+  LocalPanel * Panel = SideLocal(FLocalActive);
+  if ((Panel == nullptr) && !(FSession && FSession->Active()))
+  {
+    return nullptr;
+  }
+  QString Names;
+  if (Name != nullptr)
+  {
+    Names = *Name;
+  }
+  else
+  {
+    // The focused file's name, else "New file".
+    const CoreBridge::TRemoteEntry * Focused = ((Panel != nullptr) ? Panel->View() : FPanel->View())->CurrentEntry();
+    const QString Suggested = ((Focused != nullptr) && !Focused->Directory) ? QString::fromStdString(Focused->Name) :
+      QString::fromStdString(CoreBridge::Text(CoreBridge::TText::NewFileName));
+    bool OK = false;
+    Names = QInputDialog::getText(this, QString::fromStdString(CoreBridge::Text(CoreBridge::TText::EditFileCaption)),
+      QString::fromStdString(CoreBridge::Text(CoreBridge::TText::EditFilePrompt)), QLineEdit::Normal, Suggested, &OK);
+    if (!OK)
+    {
+      return nullptr;
+    }
+  }
+  EditorWindow * Result = nullptr;
+  // Several, separated as file masks are.
+  for (QString One : Names.split(QLatin1Char(';'), Qt::SkipEmptyParts))
+  {
+    One = One.trimmed();
+    if (One.isEmpty())
+    {
+      continue;
+    }
+    if (Panel != nullptr)
+    {
+      const QString FileName = QDir(Panel->Path()).absoluteFilePath(One);
+      QFile File(FileName);
+      if (!File.exists() && !File.open(QIODevice::WriteOnly))
+      {
+        CoreBridge::TError Error;
+        Error.Message = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::CreateFileError))
+          .replace(QStringLiteral("%s"), QDir::toNativeSeparators(FileName)).toStdString();
+        QtFrontend Frontend;
+        Frontend.SetWindow(this);
+        Frontend.ShowError(Error);
+        return Result;
+      }
+      File.close();
+      Panel->Refresh();
+      Result = EditLocal(FileName);
+    }
+    else
+    {
+      try
+      {
+        Result = FSession->FileExists(One.toStdString()) ? EditRemote(One) : EditRemote(One, true);
+      }
+      catch (const CoreBridge::TCoreError & E)
+      {
+        ShowError(E);
+      }
+    }
+  }
+  return Result;
 }

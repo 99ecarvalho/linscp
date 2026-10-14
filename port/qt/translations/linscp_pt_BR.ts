@@ -1389,6 +1389,26 @@ Local: %2</translation>
         <source>PuTTY Private Key Files (*.ppk);;All Private Key Files (*.ppk *.pem *.key id_*);;All Files (*)</source>
         <translation>Arquivos de chave privada do PuTTY (*.ppk);;Todos os arquivos de chave privada (*.ppk *.pem *.key id_*);;Todos os arquivos (*)</translation>
     </message>
+    <message>
+        <source>Path fro&amp;m Other Panel</source>
+        <translation>Ca&amp;minho do painel oposto</translation>
+    </message>
+    <message>
+        <source>&amp;File...</source>
+        <translation>&amp;Arquivo...</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Calcular Tamanho de Diretórios</translation>
+    </message>
+    <message>
+        <source>&amp;Compare Directories</source>
+        <translation>&amp;Comparar Diretórios</translation>
+    </message>
+    <message>
+        <source>Synchronize &amp;Browsing</source>
+        <translation>Sincronizar &amp;Localização</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>
@@ -2054,6 +2074,18 @@ Local: %2</translation>
     <message>
         <source>Pages</source>
         <translation>Páginas</translation>
+    </message>
+    <message>
+        <source>Compare directory criteria</source>
+        <translation>Comparar critérios de diretórios</translation>
+    </message>
+    <message>
+        <source>Compare by &amp;time</source>
+        <translation>Comparar por &amp;tempo</translation>
+    </message>
+    <message>
+        <source>Compare by &amp;size</source>
+        <translation>Comparar por &amp;tamanho</translation>
     </message>
 </context>
 <context>

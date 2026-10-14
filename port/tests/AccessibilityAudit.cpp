@@ -95,6 +95,9 @@ bool WinScpClash(const QString & One, const QString & Other)
     { QStringLiteral("&Rename Tab"), QStringLiteral("&Reconnect Session") },
     { QStringLiteral("&Close Tab"), QStringLiteral("&Change Password...") },
     { QStringLiteral("Server/Protocol &Information"), QStringLiteral("&Install Public Key into Server...") },
+    // NonVisual.dfm, Files and Commands.
+    { QStringLiteral("File &Custom Commands"), QStringLiteral("&Calculate Directory Sizes") },
+    { QStringLiteral("&Compare Directories"), QStringLiteral("Static &Custom Commands") },
     // A default custom command's name and the Enter... item.
     { QStringLiteral("&Execute"), QStringLiteral("&Enter...") },
   };

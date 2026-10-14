@@ -248,6 +248,8 @@ TPreferences Preferences()
   Result.DefaultDirIsHome = Settings.DefaultDirIsHome;
   Result.SwappedPanels = Settings.SwappedPanels;
   Result.ExplorerKeyboardShortcuts = Settings.ExplorerKeyboardShortcuts;
+  Result.CompareByTime = Settings.CompareByTime;
+  Result.CompareBySize = Settings.CompareBySize;
   Result.UseLocationProfiles = Settings.UseLocationProfiles;
   Result.PathInCaption = static_cast<TPreferences::TPathInCaption>(Settings.PathInCaption);
   Result.KeepOpenWhenNoSession = Settings.KeepOpenWhenNoSession;
@@ -543,6 +545,8 @@ void SetPreferences(const TPreferences & Preferences)
   Settings.DefaultDirIsHome = Preferences.DefaultDirIsHome;
   Settings.SwappedPanels = Preferences.SwappedPanels;
   Settings.ExplorerKeyboardShortcuts = Preferences.ExplorerKeyboardShortcuts;
+  Settings.CompareByTime = Preferences.CompareByTime;
+  Settings.CompareBySize = Preferences.CompareBySize;
   Settings.UseLocationProfiles = Preferences.UseLocationProfiles;
   Settings.AutoOpenInPutty = Preferences.AutoOpenInPutty;
   Settings.PathInCaption = static_cast<int>(Preferences.PathInCaption);
@@ -963,6 +967,14 @@ std::string Text(TText Text)
     case TText::PasswordChanged: Ident = PASSWORD_CHANGED; break;
     case TText::PublicKeyTitle: Ident = LOGIN_PUBLIC_KEY_TITLE; break;
     case TText::NotOpenSsh: Ident = LOGIN_NOT_OPENSSH; break;
+    case TText::CompareNoDifferences: Ident = COMPARE_NO_DIFFERENCES; break;
+    case TText::SyncBrowseCreate: Ident = SYNC_DIR_BROWSE_CREATE2; break;
+    case TText::SyncBrowseError: Ident = SYNC_DIR_BROWSE_ERROR; break;
+    case TText::SyncBrowseToggle: Ident = SYNC_DIR_BROWSE_TOGGLE; break;
+    case TText::NewFileName: Ident = NEW_FILE; break;
+    case TText::EditFileCaption: Ident = EDIT_FILE_CAPTION; break;
+    case TText::EditFilePrompt: Ident = EDIT_FILE_PROMPT; break;
+    case TText::CreateFileError: Ident = CREATE_FILE_ERROR; break;
     case TText::NotSupported: Ident = NOTSUPPORTED; break;
     case TText::LicenseCaption: Ident = LICENSE_CAPTION; break;
     case TText::TagAdd: Ident = TAG_ADD; break;

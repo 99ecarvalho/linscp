@@ -172,6 +172,8 @@ private:
   QCheckBox * FDirectoriesByName = nullptr;
   QComboBox * FSizeFormat = nullptr;
   QCheckBox * FSwappedPanels = nullptr;
+  QCheckBox * FCompareByTime = nullptr;
+  QCheckBox * FCompareBySize = nullptr;
   QComboBox * FKeyboardShortcuts = nullptr;
   QCheckBox * FUseLocationProfiles = nullptr;
   QListWidget * FLanguages = nullptr;

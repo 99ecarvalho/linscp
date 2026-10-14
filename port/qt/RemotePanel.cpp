@@ -527,3 +527,22 @@ QString RemotePanel::Filter() const
 {
   return FSort->Mask();
 }
+
+std::vector<CoreBridge::TRemoteEntry> RemotePanel::Entries() const
+{
+  std::vector<CoreBridge::TRemoteEntry> Result;
+  for (int Row = 0; Row < FSort->rowCount(); Row++)
+  {
+    const CoreBridge::TRemoteEntry * Entry = FModel->Entry(FSort->mapToSource(FSort->index(Row, 0)).row());
+    if (Entry != nullptr)
+    {
+      Result.push_back(*Entry);
+    }
+  }
+  return Result;
+}
+
+void RemotePanel::SetDirectorySize(const QString & Name, std::int64_t Size)
+{
+  FModel->SetDirectorySize(Name, Size);
+}

@@ -395,6 +395,15 @@ TRemoteEntry EntryOf(const TRemoteFile * File)
   Entry.Modified = Utf8(File->UserModificationStr);
   // TDateTime counts days from 1899-12-30; 1970 is day 25569.
   Entry.ModifiedTime = (static_cast<double>(File->Modification) - 25569.0) * 86400.0;
+  // TUnixDirView::ItemFileTime's.
+  switch (File->ModificationFmt)
+  {
+    case mfNone: Entry.ModifiedPrecision = TRemoteEntry::TPrecision::None; break;
+    case mfMDHM:
+    case mfYMDHM: Entry.ModifiedPrecision = TRemoteEntry::TPrecision::Minute; break;
+    case mfMDY: Entry.ModifiedPrecision = TRemoteEntry::TPrecision::Day; break;
+    case mfFull: Entry.ModifiedPrecision = TRemoteEntry::TPrecision::Second; break;
+  }
   Entry.Rights = Utf8(File->RightsStr);
   Entry.Owner = Utf8(File->Owner.DisplayText);
   Entry.Group = Utf8(File->Group.DisplayText);
@@ -2598,43 +2607,57 @@ private:
 
 // TCustomScpExplorerForm::TemporaryDirectoryForRemoteFiles, then
 // TemporarilyDownloadFiles.
+namespace
+{
+
+// TemporaryDirectoryForRemoteFiles: where a remote file edited goes, made;
+// Root: what to delete after, when not deterministic.
+UnicodeString TemporaryEditDirectory(TTerminal * Terminal, const TCopyParamType & CopyParam, UnicodeString & Root)
+{
+  TShellConfiguration * Shell = dynamic_cast<TShellConfiguration *>(GUIConfiguration);
+  const TShellSettings & Settings = Shell->Settings();
+  const UnicodeString RemoteDirectory = Terminal->CurrentDirectory;
+  UnicodeString Directory;
+  if (!Settings.TemporaryDirectoryDeterministic)
+  {
+    Root = IncludeTrailingBackslash(Configuration->TemporaryDir());
+    Directory = Root;
+  }
+  else
+  {
+    Directory = IncludeTrailingBackslash(Shell->ExpandedTemporaryDirectory());
+  }
+  if (Settings.TemporaryDirectoryAppendSession)
+  {
+    Directory = IncludeTrailingBackslash(Directory + MakeValidFileName(Terminal->SessionData->SessionName));
+  }
+  if (Settings.TemporaryDirectoryAppendPath)
+  {
+    UnicodeString Path = RemoteDirectory;
+    if (!Path.IsEmpty() && (Path[1] == L'/'))
+    {
+      Path.Delete(1, 1);
+    }
+    Directory = IncludeTrailingBackslash(Directory + CopyParam.ValidLocalPath(FromUnixPath(Path)));
+  }
+  if (!ForceDirectories(ApiPath(Directory)))
+  {
+    throw EOSExtException(FMTLOAD(CREATE_TEMP_DIR_ERROR, (Directory)));
+  }
+  return Directory;
+}
+
+}  // namespace
+
 TEditedFile TSession::EditDownload(const std::string & Name, bool ForceText)
 {
   try
   {
     CheckActive(*this);
-    TShellConfiguration * Shell = dynamic_cast<TShellConfiguration *>(GUIConfiguration);
-    const TShellSettings & Settings = Shell->Settings();
     TCopyParamType CopyParam = TemporaryFileCopyParam(ForceText);
     const UnicodeString RemoteDirectory = F->Terminal->CurrentDirectory;
     UnicodeString Root;
-    UnicodeString Directory;
-    if (!Settings.TemporaryDirectoryDeterministic)
-    {
-      Root = IncludeTrailingBackslash(Configuration->TemporaryDir());
-      Directory = Root;
-    }
-    else
-    {
-      Directory = IncludeTrailingBackslash(Shell->ExpandedTemporaryDirectory());
-    }
-    if (Settings.TemporaryDirectoryAppendSession)
-    {
-      Directory = IncludeTrailingBackslash(Directory + MakeValidFileName(F->Terminal->SessionData->SessionName));
-    }
-    if (Settings.TemporaryDirectoryAppendPath)
-    {
-      UnicodeString Path = RemoteDirectory;
-      if (!Path.IsEmpty() && (Path[1] == L'/'))
-      {
-        Path.Delete(1, 1);
-      }
-      Directory = IncludeTrailingBackslash(Directory + CopyParam.ValidLocalPath(FromUnixPath(Path)));
-    }
-    if (!ForceDirectories(ApiPath(Directory)))
-    {
-      throw EOSExtException(FMTLOAD(CREATE_TEMP_DIR_ERROR, (Directory)));
-    }
+    const UnicodeString Directory = TemporaryEditDirectory(F->Terminal.get(), CopyParam, Root);
     TRemoteFile * File = FindFile(F->Terminal.get(), Name);
     std::unique_ptr<TStringList> Files(new TStringList());
     Files->AddObject(File->FileName, File);
@@ -2665,6 +2688,58 @@ TEditedFile TSession::EditDownload(const std::string & Name, bool ForceText)
     Result.OriginalName = Name;
     Result.ForceText = ForceText;
     Result.SetSourceTimestamp(UnixTimeOf(Modification));
+    return Result;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+bool TSession::FileExists(const std::string & Name)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TRemoteFile> File(F->Terminal->TryReadFile(UnixCombinePaths(F->Terminal->CurrentDirectory, FromUtf8(Name))));
+    return (File.get() != NULL) && !File->IsDirectory;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+TEditedFile TSession::EditNew(const std::string & Name)
+{
+  try
+  {
+    CheckActive(*this);
+    TCopyParamType CopyParam = TemporaryFileCopyParam(true);
+    const UnicodeString RemoteDirectory = F->Terminal->CurrentDirectory;
+    UnicodeString Root;
+    const UnicodeString Directory = TemporaryEditDirectory(F->Terminal.get(), CopyParam, Root);
+    const UnicodeString LocalFile = Directory + F->Terminal->ChangeFileName(&CopyParam, FromUtf8(Name), osRemote, false);
+    if (!::FileExists(ApiPath(LocalFile)))
+    {
+      THandle File = FileCreate(ApiPath(LocalFile));
+      if (File == reinterpret_cast<THandle>(INVALID_HANDLE_VALUE))
+      {
+        if (!Root.IsEmpty())
+        {
+          RecursiveDeleteFile(ExcludeTrailingBackslash(Root));
+        }
+        throw Exception(FMTLOAD(CREATE_FILE_ERROR, (LocalFile)));
+      }
+      FileClose(File);
+    }
+    TEditedFile Result;
+    Result.LocalFile = Utf8(LocalFile);
+    Result.RootDirectory = Utf8(Root);
+    Result.RemoteDirectory = Utf8(RemoteDirectory);
+    Result.OriginalName = Name;
+    Result.ForceText = true;
+    // No source timestamp: nothing to check as not modified.
     return Result;
   }
   catch (Exception & E)

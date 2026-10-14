@@ -897,9 +897,26 @@ void FileListModel::SetEntries(std::vector<CoreBridge::TRemoteEntry> Entries, bo
 {
   beginResetModel();
   FEntries = std::move(Entries);
+  FSized.assign(FEntries.size(), false);
   FWithParent = WithParent;
   UpdateColors();
   endResetModel();
+}
+
+bool FileListModel::SetDirectorySize(const QString & Name, std::int64_t Size)
+{
+  for (size_t Index = 0; Index < FEntries.size(); Index++)
+  {
+    if (FEntries[Index].Directory && (QString::fromStdString(FEntries[Index].Name) == Name))
+    {
+      FEntries[Index].Size = Size;
+      FSized[Index] = true;
+      const int Row = static_cast<int>(Index) + (FWithParent ? 1 : 0);
+      emit dataChanged(index(Row, SizeColumn), index(Row, SizeColumn));
+      return true;
+    }
+  }
+  return false;
 }
 
 const CoreBridge::TRemoteEntry * FileListModel::Entry(int Row) const
@@ -980,7 +997,8 @@ QVariant FileListModel::data(const QModelIndex & Index, int Role) const
       switch (Index.column())
       {
         case NameColumn: return QString::fromStdString(E->Name);
-        case SizeColumn: return E->Directory ? QVariant() : FormatPanelBytes(E->Size, FSizeFormat);
+        case SizeColumn:
+          return (E->Directory && !FSized[Index.row() - (FWithParent ? 1 : 0)]) ? QVariant() : FormatPanelBytes(E->Size, FSizeFormat);
         case ModifiedColumn: return QString::fromStdString(E->Modified);
         case RightsColumn: return QString::fromStdString(E->Rights);
         case OwnerColumn: return QString::fromStdString(E->Owner);
