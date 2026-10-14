@@ -7,11 +7,14 @@
 
 #include <QMainWindow>
 
+#include <QPointer>
+
 #include <memory>
 #include <vector>
 
 #include "CoreBridge.h"
 
+class EditorWindow;
 class QAction;
 class QLineEdit;
 class QMimeData;
@@ -64,6 +67,20 @@ public:
   // (or queues). False when cancelled or nothing was applied.
   bool SynchronizeDirectories(const QString & LocalDirectory, const QString & RemoteDirectory,
     const CoreBridge::TSyncParams & Params, const CoreBridge::TTransferSettings * Settings = nullptr);
+  // Files > Edit (F4), as WinSCP's internal editor: the active panel's
+  // focused file in an editor window of its own. A remote one is
+  // downloaded to a temporary directory first, uploaded back each time it
+  // is saved, and its directory removed once the editor is closed and its
+  // uploads are done (ADR 0015). Null when no editor opened; an editor
+  // already open on the file is brought up instead.
+  EditorWindow * EditCurrent();
+  EditorWindow * EditRemote(const QString & Name);
+  EditorWindow * EditLocal(const QString & FileName);
+  // The editors open: the remote ones only, or all.
+  std::vector<EditorWindow *> Editors(bool RemoteOnly = false) const;
+  // Closes them, each asking to save a modified file, the remote ones'
+  // uploads done here. False when one stayed open.
+  bool CloseEditors(bool RemoteOnly);
   // Options > Preferences: false when cancelled.
   bool PreferencesDialog();
   // The preferences applied to the window and its panels.
@@ -98,6 +115,12 @@ protected:
 
 private:
   bool Open(std::unique_ptr<CoreBridge::TSession> Session);
+  // Loads it and shows it; null (and gone) when it could not be read.
+  EditorWindow * ShowEditor(EditorWindow * Editor);
+  bool EditUpload(CoreBridge::TEditedFile & File);
+  // Removes the closed editors' temporary directories, once the queue has
+  // no uploads left for them (or there is no session).
+  void CleanUpEdited();
   void ShowError(const CoreBridge::TCoreError & E);
   void UpdateActions();
 
@@ -110,6 +133,17 @@ private:
   QAction * FCopyAction = nullptr;
   QAction * FMoveAction = nullptr;
   QAction * FSynchronizeAction = nullptr;
+  QAction * FEditAction = nullptr;
+  // The editors, and for a remote file what it was downloaded as.
+  struct TEdited
+  {
+    QPointer<EditorWindow> Editor;
+    std::shared_ptr<CoreBridge::TEditedFile> File;
+  };
+  std::vector<TEdited> FEdited;
+  std::vector<std::string> FEditedCleanUp;
+  // Closing the editors: their uploads here, not queued.
+  bool FClosingEditors = false;
   QAction * FHiddenAction = nullptr;
   class QSplitter * FPanels = nullptr;
   QSplitter * FVertical = nullptr;

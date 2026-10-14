@@ -20,6 +20,7 @@ the decisions table in [TRACKER.md](../TRACKER.md).
 | [0012](0012-qt-shell-core-bridge.md) | The Qt shell reaches core through `CoreBridge`; Qt and the VCL shim never share a unit |
 | [0013](0013-translations.md) | Core is translated with WinSCP's translations through upstream's `ResInstance` hook; the shell with Qt Linguist |
 | [0014](0014-gui-configuration.md) | The shell's settings are upstream's `TGUIConfiguration`, compiled as it is; `TWinConfiguration`'s keys mirrored |
+| [0015](0015-editing.md) | Files are edited as WinSCP edits them: its internal editor, external editors later; core's local end of line is the platform's |
 
 Write one when a decision constrains later work or would be costly to undo;
 number in order, never renumber, and amend rather than rewrite an accepted

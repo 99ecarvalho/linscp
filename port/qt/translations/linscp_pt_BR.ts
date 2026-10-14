@@ -2,6 +2,209 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pt_BR">
 <context>
+    <name>EditorWindow</name>
+    <message>
+        <source>Replace</source>
+        <translation>Substituir</translation>
+    </message>
+    <message>
+        <source>Find</source>
+        <translation>Procurar</translation>
+    </message>
+    <message>
+        <source>Fi&amp;nd what:</source>
+        <translation>&amp;Procurar:</translation>
+    </message>
+    <message>
+        <source>Re&amp;place with:</source>
+        <translation>Su&amp;bstituir por:</translation>
+    </message>
+    <message>
+        <source>Match &amp;whole word only</source>
+        <translation>Coincidir &amp;palavra inteira</translation>
+    </message>
+    <message>
+        <source>Match &amp;case</source>
+        <translation>Diferenciar &amp;maiúsculas de minúsculas</translation>
+    </message>
+    <message>
+        <source>Direction</source>
+        <translation>Direção</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>A&amp;cima</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>A&amp;baixo</translation>
+    </message>
+    <message>
+        <source>&amp;Find Next</source>
+        <translation>Procurar &amp;próximo</translation>
+    </message>
+    <message>
+        <source>&amp;Replace</source>
+        <translation>&amp;Substituir</translation>
+    </message>
+    <message>
+        <source>Replace &amp;All</source>
+        <translation>Substituir &amp;tudo</translation>
+    </message>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;Arquivo</translation>
+    </message>
+    <message>
+        <source>&amp;Save</source>
+        <translation>&amp;Salvar</translation>
+    </message>
+    <message>
+        <source>&amp;Reload</source>
+        <translation>&amp;Recarregar</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>&amp;Fechar</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Editar</translation>
+    </message>
+    <message>
+        <source>&amp;Undo</source>
+        <translation>&amp;Desfazer</translation>
+    </message>
+    <message>
+        <source>Re&amp;do</source>
+        <translation>&amp;Refazer</translation>
+    </message>
+    <message>
+        <source>Cu&amp;t</source>
+        <translation>Recor&amp;tar</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copiar</translation>
+    </message>
+    <message>
+        <source>&amp;Paste</source>
+        <translation>Co&amp;lar</translation>
+    </message>
+    <message>
+        <source>&amp;Delete</source>
+        <translation>E&amp;xcluir</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Selecionar &amp;Tudo</translation>
+    </message>
+    <message>
+        <source>&amp;Search</source>
+        <translation>&amp;Pesquisar</translation>
+    </message>
+    <message>
+        <source>&amp;Find...</source>
+        <translation>&amp;Procurar...</translation>
+    </message>
+    <message>
+        <source>&amp;Replace...</source>
+        <translation>&amp;Substituir...</translation>
+    </message>
+    <message>
+        <source>Find &amp;Next</source>
+        <translation>Procurar &amp;próximo</translation>
+    </message>
+    <message>
+        <source>&amp;Go to Line Number...</source>
+        <translation>&amp;Ir para a linha número...</translation>
+    </message>
+    <message>
+        <source>Go to line</source>
+        <translation>Ir para linha</translation>
+    </message>
+    <message>
+        <source>Line number:</source>
+        <translation>Linha número:</translation>
+    </message>
+    <message>
+        <source>E&amp;ncoding</source>
+        <translation>&amp;Codificação</translation>
+    </message>
+    <message>
+        <source>UTF-8</source>
+        <translation>UTF-8</translation>
+    </message>
+    <message>
+        <source>Editor</source>
+        <translation>Editor</translation>
+    </message>
+    <message>
+        <source>Error loading file &apos;%1&apos;.</source>
+        <translation>Erro carregando arquivo &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Error loading file &apos;%1&apos; using &apos;%2&apos; encoding.</source>
+        <translation>Erro carregando arquivo &apos;%1&apos; usando codificação &apos;%2&apos;</translation>
+    </message>
+    <message>
+        <source>Falling back to &apos;%1&apos; encoding.</source>
+        <translation>Retornando à codificação &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Cannot create file &quot;%1&quot;. %2</source>
+        <translation>Não é possível criar o arquivo &quot;%1&quot;. %2</translation>
+    </message>
+    <message>
+        <source>File was modified. Changes will be lost, if file is reloaded. Continue?</source>
+        <translation>O arquivo foi modificado. As mudanças serão perdidas, se o arquivo for recarregado. Deseja continuar?</translation>
+    </message>
+    <message>
+        <source>File was modified. Changes will be lost, if file is reloaded using different encoding. Continue?</source>
+        <translation>O arquivo foi modificado. Mudanças serão perdidas, se o arquivo for recarregado usando codificação diferente. Continuar?</translation>
+    </message>
+    <message>
+        <source>Could not find the string &apos;%1&apos;.</source>
+        <translation>Não foi possível encontrar a String &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Total replacements performed: %1</source>
+        <translation>Total de substituições realizadas: %1</translation>
+    </message>
+    <message>
+        <source>Invalid line number.</source>
+        <translation>Número de linha inválido.</translation>
+    </message>
+    <message>
+        <source>Line: %1/%2</source>
+        <translation>Linha: %1/%2</translation>
+    </message>
+    <message>
+        <source>Column: %1</source>
+        <translation>Coluna: %1</translation>
+    </message>
+    <message>
+        <source>Character: %1 (0x%2)</source>
+        <translation>Caracter: %1 (0x%2)</translation>
+    </message>
+    <message>
+        <source>Encoding: %1</source>
+        <translation>Codificando: %1</translation>
+    </message>
+    <message>
+        <source>Saving...</source>
+        <translation>Salvando...</translation>
+    </message>
+    <message>
+        <source>Modified</source>
+        <translation>Modificado</translation>
+    </message>
+    <message>
+        <source>File was modified. Save changes?</source>
+        <translation>O arquivo foi modificado. Deseja salvar as mudanças?</translation>
+    </message>
+</context>
+<context>
     <name>FileListModel</name>
     <message>
         <source>Name</source>
@@ -258,6 +461,10 @@ Configuração: %4</translation>
     <message>
         <source>&amp;Preferences...</source>
         <translation>&amp;Preferências...</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Editar</translation>
     </message>
 </context>
 <context>

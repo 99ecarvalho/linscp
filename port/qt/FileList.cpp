@@ -142,6 +142,12 @@ FileView::FileView(QWidget * Parent) :
   setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
 
+const CoreBridge::TRemoteEntry * FileView::CurrentEntry() const
+{
+  const QModelIndex Current = currentIndex();
+  return Current.isValid() ? EntryAt(Current.row()) : nullptr;
+}
+
 bool FileView::EditCurrentName()
 {
   const QModelIndex Current = currentIndex();

@@ -22,6 +22,12 @@
 //     transfers between the panels: an upload from the local panel, a
 //     download from the remote one, a remote directory moved down, an upload
 //     cancelled from the progress window
+//   test_qt_gui edit /ini=nul <port> <directory> -platform offscreen
+//     the internal editor (F4): a local file edited in place, its line
+//     endings, BOM and encoding kept (Latin-1 falling back), find, replace
+//     all, go to line, the status bar; a remote file downloaded, saved back
+//     through the queue, its temporary copy gone once closed; editors
+//     closed with the session, saving first
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -80,6 +86,10 @@
 #include "PreferencesDialog.h"
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
+#include "EditorWindow.h"
+
+#include <QPlainTextEdit>
+#include <QTextBlock>
 
 #include <QFile>
 
@@ -1589,6 +1599,179 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
   CoreBridge::Finalize();
 }
 
+QByteArray ReadAll(const QString & FileName)
+{
+  QFile File(FileName);
+  return File.open(QIODevice::ReadOnly) ? File.readAll() : QByteArray();
+}
+
+void WriteAll(const QString & FileName, const QByteArray & Data)
+{
+  QFile File(FileName);
+  File.open(QIODevice::WriteOnly | QIODevice::Truncate);
+  File.write(Data);
+}
+
+bool WaitUntil(const std::function<bool()> & Condition)
+{
+  QElapsedTimer Timer;
+  Timer.start();
+  while (!Condition() && (Timer.elapsed() < 30000))
+  {
+    QApplication::processEvents(QEventLoop::AllEvents, 50);
+  }
+  return Condition();
+}
+
+void Editing(const char * Port, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = { "secret" };
+    // The editor's messages and questions: OK, Yes.
+    Responder.AcceptDialogs = true;
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "the session opens");
+    const QDir Dir(Directory);
+    LocalPanel * Local = Window.Local();
+    RemotePanel * Remote = Window.Panel();
+
+    // A local file, edited in place: its CRLF line endings kept.
+    WriteAll(Dir.filePath(QStringLiteral("crlf.txt")), "one\r\ntwo\r\n");
+    Local->ChangeDirectory(Directory);
+    Local->Select({ QStringLiteral("crlf.txt") });
+    Window.ActivatePanel(true);
+    EditorWindow * Editor = Window.EditCurrent();
+    Check((Editor != nullptr) && Editor->isVisible(), "F4 opens the local file in the editor");
+    if (Editor == nullptr)
+    {
+      return;
+    }
+    Check(Editor->Editor()->toPlainText() == QStringLiteral("one\ntwo\n"), "its text, lines as lines");
+    Check(Editor->CrLf() && Editor->Utf8() && !Editor->Bom() && !Editor->Modified(), "CRLF, UTF-8, no BOM, unmodified");
+    Check(Editor->windowTitle().contains(QStringLiteral("crlf.txt")) && Editor->windowTitle().contains(EditorWindow::tr("Editor")),
+      "the title names the file and the editor");
+    Check(Window.EditCurrent() == Editor, "F4 again brings the same editor up");
+    Editor->Editor()->moveCursor(QTextCursor::End);
+    Editor->Editor()->insertPlainText(QStringLiteral("three\n"));
+    Check(Editor->Modified() && (Editor->StatusText(4) == EditorWindow::tr("Modified")), "typing modifies it, as the status says");
+    Check(Editor->Save() && !Editor->Modified(), "saved");
+    Check(ReadAll(Dir.filePath(QStringLiteral("crlf.txt"))) == "one\r\ntwo\r\nthree\r\n", "in place, CRLF kept");
+
+    // Find, replace all, go to line, the status bar.
+    Editor->Editor()->moveCursor(QTextCursor::Start);
+    EditorWindow::TFind Find;
+    Find.Text = QStringLiteral("TWO");
+    Check((Editor->Find(EditorWindow::TFindMode::Find, Find) == 1) && (Editor->Editor()->textCursor().selectedText() == QStringLiteral("two")),
+      "find, in any case by default");
+    Find.MatchCase = true;
+    Editor->Editor()->moveCursor(QTextCursor::Start);
+    Responder.Accepted.clear();
+    Check((Editor->Find(EditorWindow::TFindMode::Find, Find) == 0) && !Responder.Accepted.isEmpty(), "matching case, not found, and said so");
+    Check(CoreBridge::EditorSettings().FindMatchCase && (CoreBridge::EditorSettings().FindText == "TWO"), "the search kept for next time");
+    EditorWindow::TFind Replace;
+    Replace.Text = QStringLiteral("o");
+    Replace.ReplaceText = QStringLiteral("0");
+    Editor->Editor()->moveCursor(QTextCursor::Start);
+    Check(Editor->Find(EditorWindow::TFindMode::ReplaceAll, Replace) == 2, "replace all");
+    Check(Editor->Editor()->toPlainText() == QStringLiteral("0ne\ntw0\nthree\n"), "every one");
+    Editor->Editor()->undo();
+    Check(Editor->Editor()->toPlainText() == QStringLiteral("one\ntwo\nthree\n"), "undone in one step");
+    Check(Editor->GoToLine(3) && (Editor->Editor()->textCursor().blockNumber() == 2), "go to line");
+    Check(!Editor->GoToLine(9) && !Editor->GoToLine(0), "not to one there is not");
+    Editor->Editor()->moveCursor(QTextCursor::Right);
+    Check(Editor->StatusText(0) == EditorWindow::tr("Line: %1/%2").arg(3).arg(4), "the status: the line");
+    Check(Editor->StatusText(1) == EditorWindow::tr("Column: %1").arg(2), "the column");
+    Check(Editor->StatusText(2) == EditorWindow::tr("Character: %1 (0x%2)").arg(104).arg(QStringLiteral("68")), "the character");
+    Check(Editor->StatusText(3) == EditorWindow::tr("Encoding: %1").arg(EditorWindow::tr("UTF-8")), "the encoding");
+    // Closing a modified file asks to save it (the responder says Yes).
+    Editor->Editor()->moveCursor(QTextCursor::End);
+    Editor->Editor()->insertPlainText(QStringLiteral("four"));
+    Check(Window.CloseEditors(false), "closing asks, and saves");
+    Check(ReadAll(Dir.filePath(QStringLiteral("crlf.txt"))) == "one\r\ntwo\r\nthree\r\nfour", "what was typed");
+    Check(Window.Editors().empty(), "and the editor is gone");
+
+    // Not UTF-8: read in the system's code page instead, with a message;
+    // saved in it.
+    WriteAll(Dir.filePath(QStringLiteral("latin.txt")), "caf\xe9\n");
+    Responder.Accepted.clear();
+    Editor = Window.EditLocal(Dir.filePath(QStringLiteral("latin.txt")));
+    Check((Editor != nullptr) && !Responder.Accepted.isEmpty(), "a file not in UTF-8 falls back, saying so");
+    if (Editor != nullptr)
+    {
+      Check(!Editor->Utf8() && (Editor->Editor()->toPlainText() == QStringLiteral("caf\u00e9\n")), "and reads in the other encoding");
+      Editor->Editor()->moveCursor(QTextCursor::End);
+      Editor->Editor()->insertPlainText(QStringLiteral("cr\u00e8me\n"));
+      Check(Editor->Save() && (ReadAll(Dir.filePath(QStringLiteral("latin.txt"))) == "caf\xe9\ncr\xe8me\n"), "and saves in it");
+      Check(Editor->SetUtf8(true) == false, "it is not UTF-8: it stays as it was");
+      Check(!Editor->Utf8(), "in its encoding");
+      Editor->close();
+    }
+    // A BOM says UTF-8, and is kept.
+    WriteAll(Dir.filePath(QStringLiteral("bom.txt")), "\xEF\xBB\xBFx\n");
+    Editor = Window.EditLocal(Dir.filePath(QStringLiteral("bom.txt")));
+    Check((Editor != nullptr) && Editor->Bom() && (Editor->Editor()->toPlainText() == QStringLiteral("x\n")), "a BOM: UTF-8, not in the text");
+    if (Editor != nullptr)
+    {
+      Editor->Editor()->insertPlainText(QStringLiteral("y"));
+      Check(Editor->Save() && (ReadAll(Dir.filePath(QStringLiteral("bom.txt"))) == "\xEF\xBB\xBFyx\n"), "and kept when saved");
+      Editor->close();
+    }
+
+    // A remote file: downloaded to a temporary directory, saved back
+    // through the queue.
+    WriteAll(Dir.filePath(QStringLiteral("remote.txt")), "remote\n");
+    Check(Window.Upload({ QStringLiteral("remote.txt") }, QStringLiteral("/"), false), "a file to edit remotely");
+    Remote->Select({ QStringLiteral("remote.txt") });
+    Window.ActivatePanel(false);
+    Editor = Window.EditCurrent();
+    Check(Editor != nullptr, "F4 opens a remote file");
+    if (Editor == nullptr)
+    {
+      return;
+    }
+    const QString Temporary = Editor->FileName();
+    Check(QFileInfo(Temporary).fileName() == QStringLiteral("remote.txt") && !Temporary.startsWith(Directory),
+      "from a temporary copy");
+    Check(Editor->windowTitle().startsWith(QStringLiteral("/remote.txt")), "its title the remote path");
+    // Text mode: the platform's line endings locally.
+    Check(Editor->Editor()->toPlainText() == QStringLiteral("remote\n") && (Editor->CrLf() == (QDir::separator() == QLatin1Char('\\'))),
+      "with its text, as the platform's lines");
+    Check(Window.EditCurrent() == Editor, "F4 again brings it up");
+    Editor->Editor()->moveCursor(QTextCursor::End);
+    Editor->Editor()->insertPlainText(QStringLiteral("edited\n"));
+    Check(Editor->Save(), "saving uploads");
+    Check(WaitUntil([&Window]() { return Window.Session()->QueueEmpty(); }), "through the queue");
+    QDir().mkpath(Dir.filePath(QStringLiteral("down")));
+    Check(Window.Download({ QStringLiteral("remote.txt") }, Dir.filePath(QStringLiteral("down")), false) &&
+      (ReadAll(Dir.filePath(QStringLiteral("down/remote.txt"))) == "remote\nedited\n"), "the server has it");
+    Editor->close();
+    Check(WaitUntil([&Temporary]() { return !QFileInfo::exists(Temporary); }), "closed, its temporary copy is removed");
+
+    // Disconnecting closes remote editors: a modified one saved first, here.
+    Remote->Select({ QStringLiteral("remote.txt") });
+    Editor = Window.EditCurrent();
+    Check(Editor != nullptr, "opened again");
+    if (Editor != nullptr)
+    {
+      Editor->Editor()->moveCursor(QTextCursor::End);
+      Editor->Editor()->insertPlainText(QStringLiteral("again\n"));
+      Check(Window.CloseEditors(true) && Window.Editors().empty(), "closed with the session, after saving");
+      Check(Window.Session()->QueueEmpty(), "uploaded at once, not queued");
+      QFile::remove(Dir.filePath(QStringLiteral("down/remote.txt")));
+      Check(Window.Download({ QStringLiteral("remote.txt") }, Dir.filePath(QStringLiteral("down")), false) &&
+        (ReadAll(Dir.filePath(QStringLiteral("down/remote.txt"))) == "remote\nedited\nagain\n"), "the server has that too");
+    }
+    Frontend.SetWindow(nullptr);
+  }
+  CoreBridge::Finalize();
+}
+
 void Session(const char * Port)
 {
   QtFrontend Frontend;
@@ -1661,6 +1844,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 5) && (std::strcmp(argv[1], "drop") == 0))
   {
     DragAndDrop(argv[3], QString::fromLocal8Bit(argv[4]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "edit") == 0))
+  {
+    Editing(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "session") == 0))
   {

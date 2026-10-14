@@ -287,6 +287,10 @@ struct TEditorSettings
 TEditorSettings EditorSettings();
 // Saves them.
 void SetEditorSettings(const TEditorSettings & Settings);
+// The system's code page as core names it (DefaultEncodingName: the ANSI
+// code page on Windows, Latin-1 elsewhere), the internal editor's other
+// encoding.
+std::string DefaultEncodingName();
 
 // --- Preferences (P3-04, ADR 0014) --------------------------------------------
 
@@ -793,8 +797,9 @@ public:
   // where the protocol has background transfers (as TEditorUploadQueueItem,
   // the file's source timestamp refreshed after), else here. With "check not
   // modified", a file changed on the server since is asked about first;
-  // false when the user declined. Throws TCoreError.
-  bool EditUpload(TEditedFile & File);
+  // false when the user declined. Not Background: here in any case (the
+  // session is about to close). Throws TCoreError.
+  bool EditUpload(TEditedFile & File, bool Background = true);
   // To be called regularly on the GUI thread (a timer): keeps the queue's
   // connections alive, and asks the questions its transfers wait on -- the
   // first one pending, through the frontend, as WinSCP pops them up. True

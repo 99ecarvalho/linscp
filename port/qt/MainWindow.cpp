@@ -30,6 +30,7 @@
 
 #include <algorithm>
 
+#include "EditorWindow.h"
 #include "FileList.h"
 #include "QtFrontend.h"
 #include "LocalPanel.h"
@@ -60,6 +61,10 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   // As WinSCP: the last session closed, the window too unless kept open.
   FDisconnectAction = FileMenu->addAction(tr("&Disconnect"), this, [this]()
   {
+    if (!CloseEditors(true))
+    {
+      return;
+    }
     Disconnect();
     if (!CoreBridge::Preferences().KeepOpenWhenNoSession)
     {
@@ -167,6 +172,9 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   });
 
   QMenu * FilesMenu = menuBar()->addMenu(tr("F&iles"));
+  FEditAction = FilesMenu->addAction(tr("&Edit"), this, [this]() { EditCurrent(); });
+  FEditAction->setShortcut(QKeySequence(Qt::Key_F4));
+  FilesMenu->addSeparator();
   FCopyAction = FilesMenu->addAction(tr("&Copy..."), this, [this]() { TransferSelected(false, true); });
   FCopyAction->setShortcut(QKeySequence(Qt::Key_F5));
   FMoveAction = FilesMenu->addAction(tr("&Move..."), this, [this]() { TransferSelected(true, true); });
@@ -364,10 +372,25 @@ void MainWindow::ApplyPreferences()
   UpdateTitle();
 }
 
-MainWindow::~MainWindow() = default;
+MainWindow::~MainWindow()
+{
+  // Editors are windows of their own (not children): they go with it.
+  for (EditorWindow * Editor : Editors())
+  {
+    delete Editor;
+  }
+  FSession.reset();
+  CleanUpEdited();
+}
 
 void MainWindow::closeEvent(QCloseEvent * Event)
 {
+  // As WinSCP: the editors close first, each asking to save.
+  if (!CloseEditors(false))
+  {
+    Event->ignore();
+    return;
+  }
   SaveLayout();
   Disconnect();
   QMainWindow::closeEvent(Event);
@@ -425,7 +448,7 @@ bool MainWindow::SiteManagerDialog()
 
 bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
 {
-  if (FBusy)
+  if (FBusy || !CloseEditors(true))
   {
     return false;
   }
@@ -513,6 +536,7 @@ void MainWindow::Disconnect()
     }
     FSession->Close();
     FSession.reset();
+    CleanUpEdited();
     FLocal->HomeDirectory.clear();
     statusBar()->showMessage(tr("Disconnected"));
   }
@@ -626,6 +650,7 @@ void MainWindow::QueueIdle()
     FLocal->Refresh();
     FQueue->Update();
   }
+  CleanUpEdited();
 }
 
 bool MainWindow::TransferSelected(bool Move, bool Confirm, bool Background)
@@ -907,6 +932,7 @@ void MainWindow::UpdateActions()
 {
   FOpenAction->setEnabled(!FBusy);
   FSitesAction->setEnabled(!FBusy);
+  FEditAction->setEnabled(!FBusy);
   FCopyAction->setEnabled(!FBusy && FSession);
   FMoveAction->setEnabled(!FBusy && FSession);
   FSynchronizeAction->setEnabled(!FBusy && FSession);
@@ -919,4 +945,178 @@ void MainWindow::About()
     tr("%1 %2\nQt %3\nConfiguration: %4").arg(
       QString::fromStdString(FInfo.AppName), QString::fromStdString(FInfo.Version),
       QString::fromLatin1(qVersion()), QString::fromStdString(FInfo.ConfigurationStorage)));
+}
+
+EditorWindow * MainWindow::EditCurrent()
+{
+  if (FBusy)
+  {
+    return nullptr;
+  }
+  const FileView * View = FLocalActive ? FLocal->View() : FPanel->View();
+  const CoreBridge::TRemoteEntry * Entry = View->CurrentEntry();
+  // As WinSCP's: files only.
+  if ((Entry == nullptr) || Entry->Directory)
+  {
+    return nullptr;
+  }
+  const QString Name = QString::fromStdString(Entry->Name);
+  return FLocalActive ? EditLocal(QDir(FLocal->Path()).filePath(Name)) : EditRemote(Name);
+}
+
+EditorWindow * MainWindow::ShowEditor(EditorWindow * Editor)
+{
+  Editor->setAttribute(Qt::WA_DeleteOnClose);
+  if (!Editor->Load())
+  {
+    delete Editor;
+    return nullptr;
+  }
+  Editor->show();
+  Editor->raise();
+  Editor->activateWindow();
+  return Editor;
+}
+
+EditorWindow * MainWindow::EditLocal(const QString & FileName)
+{
+  const QString Path = QFileInfo(FileName).absoluteFilePath();
+  for (const TEdited & Edited : FEdited)
+  {
+    if (Edited.Editor && !Edited.File && (QFileInfo(Edited.Editor->FileName()).absoluteFilePath() == Path))
+    {
+      Edited.Editor->raise();
+      Edited.Editor->activateWindow();
+      return Edited.Editor;
+    }
+  }
+  // Edited in place, as WinSCP's local files.
+  EditorWindow * Editor = new EditorWindow(Path, QDir::toNativeSeparators(Path), QString::fromStdString(FInfo.AppName));
+  FEdited.push_back({ Editor, nullptr });
+  return ShowEditor(Editor);
+}
+
+EditorWindow * MainWindow::EditRemote(const QString & Name)
+{
+  if (FBusy || !FSession)
+  {
+    return nullptr;
+  }
+  const QString Directory = FPanel->Path();
+  const QString RemotePath = Directory + (Directory.endsWith(QLatin1Char('/')) ? QString() : QStringLiteral("/")) + Name;
+  for (const TEdited & Edited : FEdited)
+  {
+    if (Edited.Editor && Edited.File &&
+        (QString::fromStdString(Edited.File->RemoteDirectory) == Directory) && (QString::fromStdString(Edited.File->OriginalName) == Name))
+    {
+      Edited.Editor->raise();
+      Edited.Editor->activateWindow();
+      return Edited.Editor;
+    }
+  }
+  FBusy = true;
+  UpdateActions();
+  std::shared_ptr<CoreBridge::TEditedFile> File;
+  try
+  {
+    File = std::make_shared<CoreBridge::TEditedFile>(FSession->EditDownload(Name.toStdString()));
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  UpdateActions();
+  if (!File)
+  {
+    return nullptr;
+  }
+  EditorWindow * Editor = new EditorWindow(QString::fromStdString(File->LocalFile), RemotePath, QString::fromStdString(FInfo.AppName));
+  Editor->OnFileChanged = [this, File]() { return EditUpload(*File); };
+  // Its temporary directory goes once it is closed and uploaded.
+  connect(Editor, &QObject::destroyed, this, [this, File]()
+  {
+    if (!File->RootDirectory.empty())
+    {
+      FEditedCleanUp.push_back(File->RootDirectory);
+    }
+    CleanUpEdited();
+  });
+  FEdited.push_back({ Editor, File });
+  return ShowEditor(Editor);
+}
+
+bool MainWindow::EditUpload(CoreBridge::TEditedFile & File)
+{
+  if (FBusy || !FSession)
+  {
+    return false;
+  }
+  FBusy = true;
+  UpdateActions();
+  bool Result = false;
+  try
+  {
+    Result = FSession->EditUpload(File, !FClosingEditors);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  UpdateActions();
+  // Uploaded here (not queued): the panel shows it now.
+  if (Result && FSession->QueueEmpty())
+  {
+    FPanel->Refresh();
+  }
+  return Result;
+}
+
+std::vector<EditorWindow *> MainWindow::Editors(bool RemoteOnly) const
+{
+  std::vector<EditorWindow *> Result;
+  for (const TEdited & Edited : FEdited)
+  {
+    if (Edited.Editor && (!RemoteOnly || Edited.File))
+    {
+      Result.push_back(Edited.Editor);
+    }
+  }
+  return Result;
+}
+
+bool MainWindow::CloseEditors(bool RemoteOnly)
+{
+  FClosingEditors = true;
+  bool Result = true;
+  for (EditorWindow * Editor : Editors(RemoteOnly))
+  {
+    if (!Editor->close())
+    {
+      Result = false;
+      break;
+    }
+    // Gone now, not later: its directory with it.
+    delete Editor;
+  }
+  FClosingEditors = false;
+  FEdited.erase(std::remove_if(FEdited.begin(), FEdited.end(), [](const TEdited & Edited) { return Edited.Editor.isNull(); }),
+    FEdited.end());
+  return Result;
+}
+
+void MainWindow::CleanUpEdited()
+{
+  FEdited.erase(std::remove_if(FEdited.begin(), FEdited.end(), [](const TEdited & Edited) { return Edited.Editor.isNull(); }),
+    FEdited.end());
+  if (FEditedCleanUp.empty() || (FSession && !FSession->QueueEmpty()))
+  {
+    return;
+  }
+  for (const std::string & Directory : FEditedCleanUp)
+  {
+    QDir(QString::fromStdString(Directory)).removeRecursively();
+  }
+  FEditedCleanUp.clear();
 }

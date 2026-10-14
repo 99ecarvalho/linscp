@@ -164,6 +164,8 @@ public:
   // Preferences, Panels: the whole name selected for renaming, rather than
   // the name without its extension (WinSCP's default).
   bool RenameWholeName = false;
+  // The focused entry; null for none or "..".
+  const CoreBridge::TRemoteEntry * CurrentEntry() const;
   // The panel's status line, as WinSCP's (FileStatusBarText): the selected
   // entries' size of all, and how many of how many; and how many hidden.
   QString StatusText() const;

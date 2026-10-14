@@ -1146,7 +1146,7 @@ TEditedFile TSession::EditDownload(const std::string & Name, bool ForceText)
 }
 
 // TCustomScpExplorerForm::ExecutedFileChanged's upload.
-bool TSession::EditUpload(TEditedFile & File)
+bool TSession::EditUpload(TEditedFile & File, bool Background)
 {
   try
   {
@@ -1173,7 +1173,7 @@ bool TSession::EditUpload(TEditedFile & File)
     CopyParam.FileMask =
       (ExtractFileName(FromUtf8(File.LocalFile)) == OriginalName) ? UnicodeString() : DelimitFileNameMask(OriginalName);
     const int Params = cpNoConfirmation | cpTemporary;
-    if (F->Terminal->IsCapable[fcBackgroundTransfers])
+    if (Background && F->Terminal->IsCapable[fcBackgroundTransfers])
     {
       F->EnsureQueue()->AddItem(new TEditorUploadQueueItem(F->Terminal.get(), Files.get(), RemoteDirectory, &CopyParam,
         Params, File, CheckNotModified));

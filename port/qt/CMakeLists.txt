@@ -7,7 +7,7 @@
 # std::wstring), so these units must have Qt's wchar_t, not the -fshort-wchar
 # every core unit has. Nothing wide crosses CoreBridge.h. Windows' wchar_t is
 # 2 bytes either way. See ADR 0001.
-add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp QtFrontend.cpp QueryDialog.cpp
+add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp EditorWindow.cpp QtFrontend.cpp QueryDialog.cpp
   PromptDialog.cpp Language.cpp SiteManager.cpp SiteAdvanced.cpp
   FileList.cpp RemotePanel.cpp LocalPanel.cpp
   TransferDialog.cpp QueuePanel.cpp SynchronizeDialog.cpp PreferencesDialog.cpp TransferSettingsDialog.cpp CoreBridge.h)

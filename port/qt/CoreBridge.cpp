@@ -321,6 +321,11 @@ TEditorSettings EditorSettings()
   return Result;
 }
 
+std::string DefaultEncodingName()
+{
+  return Utf8(::DefaultEncodingName());
+}
+
 void SetEditorSettings(const TEditorSettings & Editor)
 {
   TShellSettings Settings = Shell()->Settings();

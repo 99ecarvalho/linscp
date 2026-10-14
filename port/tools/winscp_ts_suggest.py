@@ -106,6 +106,8 @@ CONTEXT_FORMS = {
     'MainWindow': ['NonVisual.dfm', 'ScpCommander.dfm', 'CustomScpExplorer.dfm', 'Copy.dfm'],
     'QueuePanel': ['NonVisual.dfm', 'CustomScpExplorer.dfm'],
     'FileView': ['SelectMask.dfm'],
+    'EditorWindow': ['Editor.dfm', 'Editor.rc'],
+    'FindDialog': ['Editor.dfm'],
 }
 
 
@@ -128,9 +130,34 @@ def candidates(lang):
     return found
 
 
+PRINTF = r'%[-+ #0]*[0-9]*(?:\.[0-9]+)?[sdxXu]'
+
+
+def printf_english(found, english):
+    """WinSCP's text with printf placeholders where the shell's has Qt's %1,
+    %2... in the same order, or None."""
+    if not re.search(r'%\d', english):
+        return None
+    pattern = re.compile('^' + re.sub(r'%\d', lambda m: PRINTF, re.escape(english)) + '$')
+    for key in found:
+        if pattern.match(key):
+            return key
+    return None
+
+
+def qt_placeholders(text):
+    """WinSCP's printf placeholders, in order, as Qt's %1, %2..."""
+    count = iter(range(1, 100))
+    return re.sub(PRINTF, lambda m: '%%%d' % next(count), text)
+
+
 def choose(found, context, english):
     """The one translation: the context's forms' if they agree, else
     everyone's if they do."""
+    printf = printf_english(found, english)
+    if printf is not None:
+        translation, options = choose(found, context, printf)
+        return (qt_placeholders(translation) if translation is not None else None), options
     by_source = found.get(english) or {}
     preferred = []
     for form in CONTEXT_FORMS.get(context, []):

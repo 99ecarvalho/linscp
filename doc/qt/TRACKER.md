@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 8 | 16 | Parity on features users depend on |
+| P3 Qt parity | 9 | 16 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **86** | **103** | |
+| **Total** | **87** | **103** | |
 
 ## Next three actions
 
@@ -230,12 +230,16 @@ WinSCP's. Last used directories (P3-11, done): kept in the site when a session e
 as WinSCP. The Commander (P3-02, done): WinSCP's keys, rename in place, status lines,
 columns. Synchronization (P3-03, done): Commands > Synchronize, WinSCP's
 Synchronize dialog and checklist over core's own synchronization, applied
-here or in the queue. P2-10 and P2-11 wait, at the user's request.
+here or in the queue. Editing (P3-05, done): Files > Edit (F4) in WinSCP's
+internal editor, remote files downloaded to a temporary directory and
+uploaded back on save, as WinSCP (ADR 0015). P2-10 and P2-11 wait, at the
+user's request.
 
-1. **P3-05**: the internal editor (Q-3), and with it the temporary
-   directory's options and P3-04e's Editors page.
-2. **P3-06**: the remaining dialogs, batched (split first).
-3. Offer `core-log-file-name-delimiter.patch` upstream (ADR 0006).
+1. **P3-06**: the remaining dialogs, batched (split first).
+2. **P3-08**, then **P3-04e**: shell integration, then Preferences'
+   Editors page with external editors (ADR 0015).
+3. Offer `core-log-file-name-delimiter.patch` and
+   `core-local-eol-platform.patch` upstream (ADR 0006).
 
 ## Decisions taken
 
@@ -248,6 +252,7 @@ here or in the queue. P2-10 and P2-11 wait, at the user's request.
 | 2026-10-13 | The Windows toolchain is llvm-mingw against MSYS2's Qt 6.8.2 and its C++ runtime, all pinned; the GCC sysroot is retired (ADR 0011) | Debian has no Qt for mingw. MSYS2's clang64 Qt is that ABI and prebuilt; Debian's own Qt version, so its host tools serve the cross-build. Wine testing from Linux is kept, which clang-cl/MSVC would have weakened |
 | 2026-10-13 | P2-10 (packaging) and P2-11 (the P2 exit gate) wait; P3 goes first | The user's call: parity features before packaging. They stay `todo` |
 | 2026-10-13 | Remote files dragged out to other programs are downloaded on demand to a temporary directory (WinSCP's drag without its shell extension); no XDS | XDS exists only on X11 and GNOME Files dropped it; on-demand URLs work on X11, Wayland and Windows (ADR 0012) |
+| 2026-10-13 | Files are edited as WinSCP edits them: its internal editor now, external editors with Preferences > Editors; core's local end of line is the platform's (ADR 0015, Q-3) | WinSCP has both and defaults to the internal one; its temporary directories, transfer settings and queue upload are followed, so editing behaves the same. Core assumed CRLF locally, wrong on POSIX |
 | 2026-10-13 | The shell's settings are upstream's `TGUIConfiguration`, compiled as it is from the transformed tree, with `TWinConfiguration`'s keys mirrored by the shell's `TShellConfiguration` (ADR 0014) | Upstream's code keeps presets, synchronize and queue options and the language exactly as WinSCP does, and `WinSCP.ini` carries over both ways; a spike showed 23/11 errors (Linux/Windows), all shim-sized. `TWinConfiguration` is bound to the VCL GUI, so it is mirrored instead |
 | 2026-10-10 | Generated-tree model, not a source fork | Keeps the upstream diff structurally empty |
 | 2026-10-10 | Keep the VCL RTL shim permanently | De-shimming is a second project of similar size with no user benefit |
@@ -510,7 +515,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 |---|---|---|---|
 | Q-1 | P3 scope: faithful parity, or a deliberately narrower client? | P3 estimate (swings ~2 years) | — |
 | Q-2 | Access to a C++Builder 11 licence? (A native Windows host is available: the user runs things there on request, 2026-10-11) | P0-04, R1, R3 | — |
-| Q-3 | Internal editor, or delegate to the system editor? | P3-05 | — |
+| ~~Q-3~~ | ~~Internal editor, or delegate to the system editor?~~ — **resolved 2026-10-13**: both, as WinSCP; the internal editor first (ADR 0015) | — | — |
 | Q-4 | Ship 32-bit Windows, or x86-64 and arm64 only? | P0-10, packaging | — |
 | Q-5 | Approach the maintainer early for feedback, or after P1 lands? | social strategy, not architecture | — |
 | Q-6 | Far-NetBox licence: README says GPLv3, `LICENSE.txt` is the GPLv2 text | verbatim reuse of its shim (reference use is unaffected) | — |
@@ -756,7 +761,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-04c | Preferences: Window, Explorer, File colors | done | Window (path in title, keep open), File colors (`MaskMatchesPath`), the layout kept in WinSCP's formats (`DirViewParams`, `WindowParams`, `LocalPanelWidth`, `CurrentPanel`, the queue's height); pages in WinSCP's tree order; ctests `qt_gui_preferences`, `qt_gui_panel`; native on Windows 11 too. The Explorer page is not offered (no Explorer interface); not yet: minimize to tray, single instance |
 | P3-04d | Preferences: Storage, Logging, Network, Security, Updates | done | Network, Security, Logging, Storage over core's configuration (ADR 0014); the temporary directory used; upstream's `%TEMP%`/`%APPDATA%` defaults working on POSIX (Win32 layer, `core-log-file-name-delimiter.patch`); ctests `qt_session`/`qt_session_ftp`, `win32_on_posix`, `qt_gui_preferences`; native on Windows 11 too. Updates not offered (WinSCP's own); master password, host CAs not yet |
 | P3-04e | Preferences: Editors, Integration, Applications, Commands, Drag & Drop | todo | after P3-05, P3-08 |
-| P3-05 | Internal editor | wip | Q-3; the bridge's editing (`TSession::EditDownload`/`EditUpload`, `core-local-eol-platform.patch`) first |
+| P3-05 | Internal editor | done | `port/qt/EditorWindow.cpp` (WinSCP's editor: find and replace, go to line, UTF-8 or the system's code page with fallback, BOM and line endings kept, status bar); Files > Edit (F4), local files in place, remote ones through `TSession::EditDownload`/`EditUpload` (temporary directory, queue upload, "check not modified"), editors closed with the session; `core-local-eol-platform.patch`; ctests `qt_gui_edit`, `qt_session`/`qt_session_ftp`; native on Windows 11 too. Not yet (ADR 0015): reload from the server, save all, window position and font, external editors (P3-04e) |
 | P3-06 | Remaining 48 dialogs, batched | todo | XL — split into P3-06a…f |
 | P3-07 | Drag & drop | done | between the panels, within one (onto a directory), and from other programs onto the remote panel: `FileView` in `port/qt/FileList.cpp`, `MainWindow::Drop`, `TSession::Move`; `RemoteFileDrag` (remote files out to other programs, downloaded at the drop); ctest `qt_gui_drop`; native on Windows 11 too; dragging out checked by hand with Explorer (Windows 11) and Nautilus, foreground and background |
 | P3-08 | Shell integration | todo | |
