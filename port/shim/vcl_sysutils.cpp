@@ -4,6 +4,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <vector>
 
 #if !defined(_WIN32)
   #include <unistd.h>
@@ -312,6 +313,60 @@ bool DirectoryExists(const UnicodeString & Name)
 }
 
 #endif
+
+UnicodeString FileSearch(const UnicodeString & Name, const UnicodeString & DirList)
+{
+#if defined(_WIN32)
+  const wchar_t Separator = L';';
+  const wchar_t Delimiter = L'\\';
+#else
+  const wchar_t Separator = L':';
+  const wchar_t Delimiter = L'/';
+#endif
+  if (FileExists(Name))
+  {
+    return Name;
+  }
+  UnicodeString Rest = DirList;
+  while (!Rest.IsEmpty())
+  {
+    const int P = Rest.Pos(UnicodeString(Separator));
+    UnicodeString Dir = (P > 0) ? Rest.SubString(1, P - 1) : Rest;
+    Rest = (P > 0) ? Rest.SubString(P + 1, Rest.Length() - P) : UnicodeString();
+    if (Dir.IsEmpty())
+    {
+      continue;
+    }
+    if ((Dir[Dir.Length()] != Delimiter) && (Dir[Dir.Length()] != L'/'))
+    {
+      Dir += Delimiter;
+    }
+    if (FileExists(Dir + Name))
+    {
+      return Dir + Name;
+    }
+  }
+  return UnicodeString();
+}
+
+unsigned int GetFileVersion(const UnicodeString & FileName)
+{
+  DWORD Handle = 0;
+  const DWORD Size = GetFileVersionInfoSize(FileName.c_str(), &Handle);
+  if (Size == 0)
+  {
+    return static_cast<unsigned int>(-1);
+  }
+  std::vector<unsigned char> Data(Size);
+  VS_FIXEDFILEINFO * Info = nullptr;
+  UINT Length = 0;
+  if (!GetFileVersionInfo(FileName.c_str(), Handle, Size, Data.data()) ||
+      !VerQueryValue(Data.data(), L"\\", reinterpret_cast<LPVOID *>(&Info), &Length) || (Info == nullptr))
+  {
+    return static_cast<unsigned int>(-1);
+  }
+  return Info->dwFileVersionMS;
+}
 
 // --- Delphi's handle-based file API ----------------------------------------
 //

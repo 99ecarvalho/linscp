@@ -1109,6 +1109,39 @@ BOOL GetNamedPipeClientProcessId(HANDLE, PULONG)
   return FALSE;
 }
 
+HANDLE CreateNamedPipe(LPCWSTR, DWORD, DWORD, DWORD, DWORD, DWORD, DWORD, LPSECURITY_ATTRIBUTES)
+{
+  SetLastError(ERROR_NOT_SUPPORTED);
+  return INVALID_HANDLE_VALUE;
+}
+
+BOOL ConnectNamedPipe(HANDLE, LPOVERLAPPED)
+{
+  SetLastError(ERROR_INVALID_HANDLE);
+  return FALSE;
+}
+
+BOOL DisconnectNamedPipe(HANDLE)
+{
+  SetLastError(ERROR_INVALID_HANDLE);
+  return FALSE;
+}
+
+BOOL FlushFileBuffers(HANDLE File)
+{
+  const int Fd = FdOf(File);
+  if (Fd < 0)
+  {
+    SetLastError(ERROR_INVALID_HANDLE);
+    return FALSE;
+  }
+  if ((fsync(Fd) != 0) && (errno != EINVAL) && (errno != EROFS))
+  {
+    return Fail();
+  }
+  return TRUE;
+}
+
 BOOL GetUserNameA(LPSTR Buffer, LPDWORD Size)
 {
   const passwd * Pw = getpwuid(geteuid());

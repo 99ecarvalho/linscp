@@ -25,6 +25,16 @@ int main(int argc, char ** argv)
   }
 
   QApplication App(argc, argv);
+  // Core sees what Qt leaves of the command line: its own switches and the
+  // session to open, as WinSCP.exe's.
+  {
+    std::vector<std::string> Arguments;
+    for (const QString & Argument : App.arguments().mid(1))
+    {
+      Arguments.push_back(Argument.toStdString());
+    }
+    CoreBridge::SetArguments(Arguments);
+  }
   // Core's questions while it starts go to dialogs of their own; once the
   // window exists, they belong to it.
   QtFrontend Frontend;
@@ -56,8 +66,9 @@ int main(int argc, char ** argv)
     Window.show();
     if (!Smoke)
     {
-      // As WinSCP starts: with its Login dialog, the site manager.
-      QTimer::singleShot(0, &Window, [&Window]() { Window.SiteManagerDialog(); });
+      // As WinSCP starts: the session the command line names, else its
+      // Login dialog, the site manager.
+      QTimer::singleShot(0, &Window, [&Window]() { Window.StartUp(); });
     }
     if (Smoke)
     {

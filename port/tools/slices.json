@@ -1,5 +1,5 @@
 {
-  "comment": "Upstream code compiled as it is from part of a file whose rest is bound to the VCL GUI (ADR 0014, amendment P3-06d). Each slice is the lines from the one line matching 'from' up to the one matching 'until' (or the file's end), taken from the transformed file ('transformed': true; the file must be in the transform's scope) or the pristine one, after a linscp prologue, with #line so diagnostics name upstream's lines. Anchors must each match exactly once: a pin bump that moves or changes them fails the transform instead of cutting the wrong code.",
+  "comment": "Upstream code compiled as it is from part of a file whose rest is bound to the VCL GUI (ADR 0014, amendment P3-06d). Each slice is the lines from the one line matching 'from' up to the one matching 'until' (or the file's end), taken from the transformed file ('transformed': true; the file must be in the transform's scope) or the pristine one, after a linscp prologue (and before an epilogue, when one is given), with #line so diagnostics name upstream's lines. Anchors must each match exactly once: a pin bump that moves or changes them fails the transform instead of cutting the wrong code.",
   "slices": [
     {
       "output": "windows/CustomCommandType.h",
@@ -78,6 +78,27 @@
         "#include \"KeepUpToDateSlice.h\""
       ],
       "from": "^#include <RemoteFiles.h>\\s*$"
+    },
+    {
+      "output": "windows/PuttyTools.cpp",
+      "source": "source/windows/GUITools.cpp",
+      "transformed": true,
+      "prologue": [
+        "#include \"PuttySlice.h\"",
+        "// PuTTY's sessions on POSIX are files the registry export cannot reach: its command line instead (PuttySlice.h).",
+        "#if !defined(_WIN32)",
+        "#define IsUWP() true",
+        "#endif"
+      ],
+      "from": "^bool __fastcall FindFile\\(UnicodeString & Path\\)\\s*$",
+      "until": "^static HWND OperationStatusWindow = 0;",
+      "epilogue": [
+        "// GUIFinalize's share: the PuTTY sessions' cleanup waited for (PuttySlice.h).",
+        "void PuttySessionsFinalize()",
+        "{",
+        "  TPuttyCleanupThread::Finalize();",
+        "}"
+      ]
     }
   ]
 }

@@ -25,10 +25,10 @@ endif()
 # controller (ADR 0014).
 set(LINSCP_SLICE_SOURCES "${LINSCP_GEN_SLICES}/windows/CustomCommandType.cpp"
   "${LINSCP_GEN_SLICES}/windows/LocalCustomCommand.cpp" "${LINSCP_GEN_SLICES}/windows/CustomShortCuts.cpp"
-  "${LINSCP_GEN_SLICES}/windows/SynchronizeController.cpp")
+  "${LINSCP_GEN_SLICES}/windows/SynchronizeController.cpp" "${LINSCP_GEN_SLICES}/windows/PuttyTools.cpp")
 set_source_files_properties(${LINSCP_SLICE_SOURCES} PROPERTIES GENERATED TRUE)
 add_library(linscp-qt-core STATIC EXCLUDE_FROM_ALL CoreBridge.cpp QtInterface.cpp Session.cpp Sites.cpp
-  Keys.cpp ShellConfiguration.cpp TransferSettings.cpp GenerateCode.cpp CustomCommandsSlice.cpp CustomCommands.cpp DiscMon.cpp ${LINSCP_SLICE_SOURCES})
+  Keys.cpp ShellConfiguration.cpp TransferSettings.cpp GenerateCode.cpp CustomCommandsSlice.cpp CustomCommands.cpp DiscMon.cpp PuttySlice.cpp ${LINSCP_SLICE_SOURCES})
 add_dependencies(linscp-qt-core transform)
 target_link_libraries(linscp-qt-core PUBLIC linscp-runtime-base linscp-gui)
 # The generated GUIConfiguration.h before core's include path, which has

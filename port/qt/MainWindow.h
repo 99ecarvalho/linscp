@@ -23,6 +23,7 @@ class LocalPanel;
 class QueuePanel;
 class QTemporaryDir;
 class QTimer;
+class QUrl;
 class RemotePanel;
 
 class MainWindow : public QMainWindow
@@ -39,6 +40,15 @@ public:
   bool OpenSite(const CoreBridge::TSite & Site);
   // File > Site Manager: false when it was closed without logging in.
   bool SiteManagerDialog();
+  // As WinSCP starts: the session the command line names (a site or a URL,
+  // CoreBridge::TSession::FromCommandLine), else, or when it says too
+  // little or does not connect, the site manager.
+  void StartUp();
+  // Go To > Explore Directory (Ctrl+Alt+E): the local directory in the
+  // system's file manager. False when it could not be opened.
+  bool ExploreLocalDirectory();
+  // What opens URLs instead of the desktop's (tests).
+  void SetUrlOpener(std::function<bool(const QUrl &)> Opener) { FUrlOpener = std::move(Opener); }
   // Transfers between the panels, as WinSCP's Commander's F5 (copy) and F6
   // (move) from the active panel to the other's directory, after asking for
   // the target unless Confirm is false. False when nothing was transferred
@@ -68,6 +78,10 @@ public:
   // Commander: the panels' directories in its dialog, which watches and
   // synchronizes until closed.
   bool KeepUpToDate();
+  // Commands > Open in PuTTY (Ctrl+P), as WinSCP's: the session in the
+  // program Preferences name, PuTTY by default (on POSIX, if none, ssh in
+  // the desktop's terminal). False when it did not start (the error shown).
+  bool OpenInPutty();
   // The dialog, while open: for tests.
   class KeepUpToDateDialog * KeepUpToDateWindow() const { return FKeepUpToDate; }
   // Compares and, after the checklist when Params asks to preview, applies
@@ -145,6 +159,7 @@ public:
   // The custom commands' menus and keys, from the list as it is now.
   void UpdateCustomCommands();
   void UpdateBookmarkShortCuts();
+  CoreBridge::TCustomCommandPrompts CommandPrompts();
   class QMenu * FileCommandsMenu() const { return FFileCommandsMenu; }
   QMenu * StaticCommandsMenu() const { return FStaticCommandsMenu; }
   // Options > Preferences: false when cancelled.
@@ -208,6 +223,8 @@ private:
   QAction * FMoveAction = nullptr;
   QAction * FSynchronizeAction = nullptr;
   QAction * FKeepUpToDateAction = nullptr;
+  QAction * FPuttyAction = nullptr;
+  std::function<bool(const QUrl &)> FUrlOpener;
   std::vector<QAction *> FBookmarkActions;
   class KeepUpToDateDialog * FKeepUpToDate = nullptr;
   QAction * FEditAction = nullptr;

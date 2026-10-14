@@ -28,6 +28,9 @@
 #include "CustomCommandsSlice.h"
 #include "CustomCommandType.h"
 #include "DiscMon.hpp"
+#include "BridgeCustomCommand.h"
+#include "PuttySlice.h"
+#include "ProgParams.h"
 
 #include <TextsWin.h>
 
@@ -207,6 +210,45 @@ TSession::TSession(const std::string & Url) :
   {
     int ParsedInfo = 0;
     F->Data.reset(StoredSessions->ParseUrl(FromUtf8(Url), NULL, ParsedInfo));
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+TSession::TSession() :
+  F(new TImpl())
+{
+}
+
+std::unique_ptr<TSession> TSession::FromCommandLine(bool & CanOpen)
+{
+  CanOpen = false;
+  try
+  {
+    TProgramParams * Params = TProgramParams::Instance();
+    if (Params->ParamCount == 0)
+    {
+      return nullptr;
+    }
+    const UnicodeString SessionName = Params->Param[1];
+    // GetFolderOrWorkspaceName: several sites, which need tabs.
+    if ((StoredSessions->FindByName(DecodeUrlChars(SessionName)) == NULL) &&
+        StoredSessions->IsFolderOrWorkspace(DecodeUrlChars(SessionName)))
+    {
+      return nullptr;
+    }
+    // GetCommandLineParseUrlFlags; UNSAFE_SWITCH (WinInterface.h) is "Unsafe".
+    const int Flags = pufAllowStoredSiteWithProtocol | FLAGMASK(Params->FindSwitch(L"Unsafe"), pufUnsafe);
+    // A copy, as ParseUrl consumes /rawsettings.
+    TOptions Options(*Params);
+    int ParsedInfo = 0;
+    UnicodeString DownloadFile;
+    std::unique_ptr<TSession> Result(new TSession());
+    Result->F->Data.reset(StoredSessions->ParseUrl(SessionName, &Options, ParsedInfo, &DownloadFile, NULL, Flags));
+    CanOpen = Result->F->Data->CanOpen && FLAGCLEAR(ParsedInfo, piDefaultsOnly);
+    return Result;
   }
   catch (Exception & E)
   {
@@ -1801,78 +1843,35 @@ void TSession::RunCommand(const std::string & Command, const std::function<void(
 namespace
 {
 
-// TCustomScpExplorerForm::SessionDataForCode: the session's data as it is
-// now, its host key known. The caller owns it.
-TSessionData * SessionDataForCode(TTerminal * Terminal)
+// TCustomScpExplorerForm::CloneCurrentSessionData: the session's data as
+// it is now, the current directory and the credentials used. The caller
+// owns it.
+TSessionData * CloneCurrentSessionData(TTerminal * Terminal)
 {
   std::unique_ptr<TSessionData> Data(new TSessionData(L""));
   Data->Assign(Terminal->SessionData);
-  Data->RemoteDirectory = Terminal->CurrentDirectory;
+  // UpdateSessionData: only peeked.
+  const UnicodeString Current = Terminal->PeekCurrentDirectory();
+  if (!Current.IsEmpty())
+  {
+    Data->RemoteDirectory = Current;
+  }
   Terminal->UpdateSessionCredentials(Data.get());
   if (!Terminal->SessionData->HasSessionName())
   {
     Data->Name = UnicodeString();
   }
   Data->IsWorkspace = false;
-  Terminal->FillSessionDataForCode(Data.get());
   return Data.release();
 }
 
-// TWinInteractiveCustomCommand, its questions the frontend's.
-class TBridgeInteractiveCustomCommand : public TInteractiveCustomCommand
+// TCustomScpExplorerForm::SessionDataForCode: the same, its host key known.
+TSessionData * SessionDataForCode(TTerminal * Terminal)
 {
-public:
-  TBridgeInteractiveCustomCommand(TCustomCommand * ChildCustomCommand, const UnicodeString & Name,
-      const TCustomCommandPrompts & Prompts) :
-    TInteractiveCustomCommand(ChildCustomCommand),
-    FName(StripEllipsis(StripHotkey(Name))),
-    FPrompts(Prompts)
-  {
-  }
-
-protected:
-  virtual void __fastcall PatternHint(int Index, const UnicodeString & Pattern)
-  {
-    if (IsPromptPattern(Pattern))
-    {
-      UnicodeString Prompt;
-      UnicodeString Default;
-      bool Delimit = false;
-      ParsePromptPattern(Pattern, Prompt, Default, Delimit);
-      FIndexes.insert(std::make_pair(Index, FAsked.size()));
-      FAsked.emplace_back(Utf8(Prompt), Utf8(Default));
-    }
-  }
-
-  virtual void __fastcall Prompt(int Index, const UnicodeString & /*Prompt*/, UnicodeString & Value)
-  {
-    auto I = FIndexes.find(Index);
-    if (I == FIndexes.end())
-    {
-      return;
-    }
-    if (FValues.empty())
-    {
-      if (!FPrompts.Prompt || !FPrompts.Prompt(Utf8(FName), FAsked, FValues) || (FValues.size() != FAsked.size()))
-      {
-        Abort();
-      }
-    }
-    Value = FromUtf8(FValues[I->second]);
-  }
-
-  virtual void __fastcall Execute(const UnicodeString & Command, UnicodeString & Value)
-  {
-    Value = FPrompts.Execute ? TrimRight(FromUtf8(FPrompts.Execute(Utf8(Command)))) : UnicodeString();
-  }
-
-private:
-  UnicodeString FName;
-  TCustomCommandPrompts FPrompts;
-  std::map<int, size_t> FIndexes;
-  std::vector<std::pair<std::string, std::string>> FAsked;
-  std::vector<std::string> FValues;
-};
+  std::unique_ptr<TSessionData> Data(CloneCurrentSessionData(Terminal));
+  Terminal->FillSessionDataForCode(Data.get());
+  return Data.release();
+}
 
 class TCommandOutput
 {
@@ -2710,6 +2709,35 @@ bool TSession::EditUpload(TEditedFile & File, bool Background)
       }
     }
     return true;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+// Commands > Open in PuTTY, as TTerminalManager::OpenInPutty: the session as
+// it is now, through its tunnel's local port where it has one, in
+// upstream's OpenSessionInPutty (the PuTTY slice, PuttySlice.h), its
+// command's prompt patterns asked through Prompts.
+void TSession::OpenInPutty(const TCustomCommandPrompts & Prompts)
+{
+  try
+  {
+    CheckActive(*this);
+    TTerminal * Terminal = F->Terminal.get();
+    Configuration->Usage->Inc(L"OpenInPutty");
+    std::unique_ptr<TSessionData> Data(CloneCurrentSessionData(Terminal));
+    if (Terminal->TunnelLocalPortNumber != 0)
+    {
+      Data->ConfigureTunnel(Terminal->TunnelLocalPortNumber);
+    }
+    struct TPrompts
+    {
+      explicit TPrompts(const TCustomCommandPrompts & Prompts) { SetPuttyCommandPrompts(Prompts); }
+      ~TPrompts() { SetPuttyCommandPrompts(TCustomCommandPrompts()); }
+    } PromptsInUse(Prompts);
+    OpenSessionInPutty(Data.get());
   }
   catch (Exception & E)
   {

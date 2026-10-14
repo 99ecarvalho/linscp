@@ -49,6 +49,11 @@ TProgramParams * __fastcall TProgramParams::Instance()
   return ProgramParamsOwner.get();
 }
 //---------------------------------------------------------------------------
+void SetProgramCommandLine(const wchar_t * CommandLine)
+{
+  ProgramParamsOwner.reset(new TProgramParams(UnicodeString(CommandLine)));
+}
+//---------------------------------------------------------------------------
 __fastcall TProgramParams::TProgramParams()
 {
   Init(CmdLine);

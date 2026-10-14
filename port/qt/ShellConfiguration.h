@@ -137,6 +137,8 @@ protected:
   virtual void __fastcall LoadData(THierarchicalStorage * Storage);
   virtual void __fastcall Saved();
   virtual void __fastcall DefaultLocalized();
+  // TGUIConfiguration's, with PuttyPath's POSIX default (PosixPuttyPath).
+  virtual void __fastcall Default();
 
 private:
   // TWinConfiguration::DoFindTemporaryFolders: NULL when there are none.

@@ -20,6 +20,8 @@
 #include <FtpFileSystem.h>
 #include <S3FileSystem.h>
 
+#include "PuttySlice.h"
+
 namespace
 {
 
@@ -285,6 +287,9 @@ TPreferences Preferences()
   Result.LocalPortNumberMax = Configuration->LocalPortNumberMax;
   Result.TryFtpWhenSshFails = Configuration->TryFtpWhenSshFails;
   Result.SessionRememberPassword = GUIConfiguration->SessionRememberPassword;
+  Result.PuttyPath = Utf8(GUIConfiguration->PuttyPath);
+  Result.PuttyPassword = GUIConfiguration->PuttyPassword;
+  Result.TelnetForFtpInPutty = GUIConfiguration->TelnetForFtpInPutty;
   Result.AuthAgent = Configuration->AuthAgent;
   if (Configuration->Storage == stNul)
   {
@@ -562,6 +567,9 @@ void SetPreferences(const TPreferences & Preferences)
     Configuration->LocalPortNumberMax = Preferences.LocalPortNumberMax;
     Configuration->TryFtpWhenSshFails = Preferences.TryFtpWhenSshFails;
     GUIConfiguration->SessionRememberPassword = Preferences.SessionRememberPassword;
+    GUIConfiguration->PuttyPath = FromUtf8(Preferences.PuttyPath);
+    GUIConfiguration->PuttyPassword = Preferences.PuttyPassword;
+    GUIConfiguration->TelnetForFtpInPutty = Preferences.TelnetForFtpInPutty;
     Configuration->AuthAgent = Preferences.AuthAgent;
     Configuration->RandomSeedFile = FromUtf8(Preferences.RandomSeedFile);
     // The storage moves as the dialog's OK moves it, when it is one of the
@@ -676,6 +684,17 @@ void GuiStarted()
   Screen->FormCount = 1;
 }
 
+void SetArguments(const std::vector<std::string> & Arguments)
+{
+  // ParamStr(0) first, as TProgramParams skips it.
+  UnicodeString CommandLine = ShellQuoteStr(ParamStr(0));
+  for (const std::string & Argument : Arguments)
+  {
+    CommandLine += L" " + ShellQuoteStr(FromUtf8(Argument));
+  }
+  SetProgramCommandLine(CommandLine.c_str());
+}
+
 void Initialize(IFrontend * AFrontend)
 {
   GFrontend = AFrontend;
@@ -692,6 +711,8 @@ void Initialize(IFrontend * AFrontend)
 
 void Finalize()
 {
+  // As upstream's WinSCP.cpp: GUIFinalize, before core's.
+  PuttySessionsFinalize();
   HeadlessFinalize();
   GFrontend = NULL;
   GGuiThread = 0;

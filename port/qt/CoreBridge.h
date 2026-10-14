@@ -151,6 +151,14 @@ public:
   virtual void ProcessEvents() = 0;
   virtual void SetClipboard(const std::string & Text) = 0;
   virtual bool GetClipboard(std::string & Text) = 0;
+  // Starts a program, not waiting for it, as upstream's ExecuteShell: its
+  // parameters as one string, as Windows passes them (split into a shell's
+  // words on POSIX), in Directory unless empty. False when it did not start.
+  virtual bool StartProgram(const std::string & /*Program*/, const std::string & /*Params*/,
+    const std::string & /*Directory*/)
+  {
+    return false;
+  }
 };
 
 // --- Core's lifetime -----------------------------------------------------------
@@ -169,6 +177,10 @@ public:
 // Starts core as upstream's WinSCP.exe does, with this process's command
 // line, and the shell as its frontend (kept, not owned). Throws TCoreError.
 void Initialize(IFrontend * Frontend);
+// The arguments core is to see, as upstream's GUI sees its command line
+// (switches, and the session to open), instead of the process's: what Qt
+// leaves of them. Before Initialize.
+void SetArguments(const std::vector<std::string> & Arguments);
 // Saves the configuration and stops core.
 void Finalize();
 
@@ -379,6 +391,12 @@ struct TPreferences
   // Security: passwords remembered for the session; the agent (0 Pageant,
   // 1 OpenSSH's ssh-agent).
   bool SessionRememberPassword = true;
+  // Integration > Applications (GUIConfiguration's): the program Open in
+  // PuTTY runs, with WinSCP's patterns, and whether it is given the
+  // password; FTP sessions opened in PuTTY as Telnet.
+  std::string PuttyPath;
+  bool PuttyPassword = false;
+  bool TelnetForFtpInPutty = true;
   int AuthAgent = 0;
   // Storage: where the configuration is (the registry, the automatic INI
   // file, a custom one; or a file given on the command line, or none), the
@@ -1150,6 +1168,14 @@ public:
   explicit TSession(const std::string & Url);
   // A site as edited, saved or not.
   explicit TSession(const TSite & Site);
+  // The session the command line names, as WinSCP.exe starts with one
+  // (WinMain's AutoStartSession, GetLoginData): a site's name or a URL,
+  // with the switches that go with it (/privatekey=, /hostkey=,
+  // /rawsettings ...; as unsafe with /unsafe). Null without one. CanOpen:
+  // whether it says enough to connect; if not, WinSCP shows the Login
+  // dialog with it. A folder of sites (several sessions, P3-13) is none
+  // yet. Throws TCoreError.
+  static std::unique_ptr<TSession> FromCommandLine(bool & CanOpen);
   ~TSession();
   TSession(const TSession &) = delete;
   TSession & operator=(const TSession &) = delete;
@@ -1293,6 +1319,12 @@ public:
   // (Aborted when the prompts were cancelled).
   std::vector<std::string> RunCustomCommand(const TCustomCommandDefinition & Command,
     const std::vector<std::string> & Names, const TCustomCommandPrompts & Prompts);
+  // Commands > Open in PuTTY, as WinSCP's: the session as it is now, in
+  // the program Preferences > Integration > Applications names
+  // (GUIConfiguration's PuttyPath), PuTTY's own options added unless its
+  // command has the session's patterns. Prompts: its prompt patterns'.
+  // Throws TCoreError.
+  void OpenInPutty(const TCustomCommandPrompts & Prompts = TCustomCommandPrompts());
   // Whether custom commands can run here: the protocol's shell, or a shell
   // session's already open (fcShellAnyCommand).
   bool CanRunShellCommands() const;
@@ -1363,6 +1395,7 @@ public:
   void Close();
 
 private:
+  TSession();
   struct TImpl;
   std::unique_ptr<TImpl> F;
 };

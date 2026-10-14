@@ -96,6 +96,13 @@ int FileWrite(THandle Handle, const TBytes Buffer, int Offset, int Count);
 
 bool FileExists(const UnicodeString & FileName);
 bool DirectoryExists(const UnicodeString & Name);
+// Delphi's FileSearch: Name as given, else in each directory of DirList,
+// separated by the platform's PathSep (';' on Windows, ':' on POSIX); the
+// first that exists, or empty.
+UnicodeString FileSearch(const UnicodeString & Name, const UnicodeString & DirList);
+// Delphi's GetFileVersion: the file's VERSIONINFO file version, its major
+// and minor in the high and low word; (unsigned)-1 without one.
+unsigned int GetFileVersion(const UnicodeString & FileName);
 
 // Delphi's FileSetAttr: 0 on success, otherwise the error code. On POSIX only
 // faReadOnly has a meaning -- it clears the write permission bits, and its

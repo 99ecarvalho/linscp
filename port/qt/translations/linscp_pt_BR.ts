@@ -1056,6 +1056,14 @@ Local: %2</translation>
         <source>&amp;Keep Remote Directory up to Date...</source>
         <translation>&amp;Manter Diretório Remoto Atualizado</translation>
     </message>
+    <message>
+        <source>&amp;Explore Directory</source>
+        <translation>&amp;Explorar Diretório</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Abrir no &amp;PuTTY</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

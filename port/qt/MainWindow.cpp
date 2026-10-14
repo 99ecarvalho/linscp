@@ -49,6 +49,7 @@
 #include "GenerateUrlDialog.h"
 #include "ConsoleDialog.h"
 #include "CustomCommandDialog.h"
+#include <QDesktopServices>
 #include <QProcess>
 #include "QueryDialog.h"
 #include "SynchronizeDialog.h"
@@ -207,12 +208,17 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FOpenDirectoryAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_O));
   FAddBookmarkAction = GoMenu->addAction(tr("&Add Path to Bookmarks"), this, [this]() { OpenDirectory(true); });
   FAddBookmarkAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_B));
+  // The local panel's (the Commander's Local > Go To).
+  QAction * ExploreAction = GoMenu->addAction(tr("&Explore Directory"), this, [this]() { ExploreLocalDirectory(); });
+  ExploreAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_E));
 
   QMenu * CommandsMenu = menuBar()->addMenu(tr("&Commands"));
   FFindFilesAction = CommandsMenu->addAction(tr("&Find Files..."), this, [this]() { FindFilesDialog(); });
   FStaticCommandsMenu = CommandsMenu->addMenu(tr("Static &Custom Commands"));
   FConsoleAction = CommandsMenu->addAction(tr("Open &Terminal"), this, [this]() { OpenConsole(); });
   FConsoleAction->setShortcut(QKeySequence(Qt::SHIFT | Qt::CTRL | Qt::Key_T));
+  FPuttyAction = CommandsMenu->addAction(tr("Open in &PuTTY"), this, [this]() { OpenInPutty(); });
+  FPuttyAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
   CommandsMenu->addSeparator();
   FServerInfoAction = CommandsMenu->addAction(tr("Server/Protocol &Information"), this, [this]() { ServerInfo(); });
   FGenerateSessionUrlAction = CommandsMenu->addAction(tr("Generate Session &URL/Code..."), this, [this]() { GenerateUrl(false); });
@@ -476,6 +482,32 @@ bool MainWindow::OpenSite(const CoreBridge::TSite & Site)
   {
     ShowError(E);
     return false;
+  }
+}
+
+// As TScpCommanderForm::ExploreLocalDirectory: the system's file manager
+// on the local panel's directory.
+bool MainWindow::ExploreLocalDirectory()
+{
+  const QUrl Url = QUrl::fromLocalFile(FLocal->Path());
+  return FUrlOpener ? FUrlOpener(Url) : QDesktopServices::openUrl(Url);
+}
+
+void MainWindow::StartUp()
+{
+  bool CanOpen = false;
+  std::unique_ptr<CoreBridge::TSession> Session;
+  try
+  {
+    Session = CoreBridge::TSession::FromCommandLine(CanOpen);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  if (!Session || !CanOpen || !Open(std::move(Session)))
+  {
+    SiteManagerDialog();
   }
 }
 
@@ -910,6 +942,49 @@ bool MainWindow::Synchronize(bool Confirm)
   return SynchronizeDirectories(LocalDirectory, RemoteDirectory, Params, &Settings);
 }
 
+// A custom command's prompt patterns asked in WinSCP's dialog; its !`command`
+// patterns run here, their output taken.
+CoreBridge::TCustomCommandPrompts MainWindow::CommandPrompts()
+{
+  CoreBridge::TCustomCommandPrompts Prompts;
+  Prompts.Prompt = [this](const std::string & Name, const std::vector<std::pair<std::string, std::string>> & Asked,
+    std::vector<std::string> & Values)
+  {
+    return CustomCommandPrompts(this, Name, Asked, Values);
+  };
+  Prompts.Execute = [](const std::string & Line)
+  {
+    QProcess Process;
+#if defined(_WIN32)
+    Process.start(QStringLiteral("cmd.exe"), { QStringLiteral("/c"), QString::fromStdString(Line) });
+#else
+    Process.start(QStringLiteral("/bin/sh"), { QStringLiteral("-c"), QString::fromStdString(Line) });
+#endif
+    Process.waitForFinished(-1);
+    return QString::fromLocal8Bit(Process.readAllStandardOutput()).toStdString();
+  };
+  return Prompts;
+}
+
+// Commands > Open in PuTTY, as TCustomScpExplorerForm's PuttyAction.
+bool MainWindow::OpenInPutty()
+{
+  if (FBusy || !FSession || !FSession->Active())
+  {
+    return false;
+  }
+  try
+  {
+    FSession->OpenInPutty(CommandPrompts());
+    return true;
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+}
+
 // As TCustomScpExplorerForm::DoSynchronizeDirectories, from the Commander's
 // SynchronizeDirectories: the panels' directories, the settings kept, and
 // what is selected in either panel for "selected files only".
@@ -1051,6 +1126,7 @@ void MainWindow::UpdateActions()
   FFindFilesAction->setEnabled(!FBusy && FSession);
   FServerInfoAction->setEnabled(!FBusy && FSession);
   FConsoleAction->setEnabled(!FBusy && FSession);
+  FPuttyAction->setEnabled(!FBusy && FSession);
   FGenerateSessionUrlAction->setEnabled(!FBusy && FSession);
   FGenerateFileUrlAction->setEnabled(!FBusy && FSession);
   FAddBookmarkAction->setEnabled(!FBusy);
@@ -1946,24 +2022,7 @@ bool MainWindow::RunCustomCommand(const CoreBridge::TCustomCommandDefinition & C
   {
     List.push_back(Name.toStdString());
   }
-  CoreBridge::TCustomCommandPrompts Prompts;
-  Prompts.Prompt = [this](const std::string & Name, const std::vector<std::pair<std::string, std::string>> & Asked,
-    std::vector<std::string> & Values)
-  {
-    return CustomCommandPrompts(this, Name, Asked, Values);
-  };
-  // !`command`: run here, its output taken.
-  Prompts.Execute = [](const std::string & Line)
-  {
-    QProcess Process;
-#if defined(_WIN32)
-    Process.start(QStringLiteral("cmd.exe"), { QStringLiteral("/c"), QString::fromStdString(Line) });
-#else
-    Process.start(QStringLiteral("/bin/sh"), { QStringLiteral("-c"), QString::fromStdString(Line) });
-#endif
-    Process.waitForFinished(-1);
-    return QString::fromLocal8Bit(Process.readAllStandardOutput()).toStdString();
-  };
+  const CoreBridge::TCustomCommandPrompts Prompts = CommandPrompts();
   FBusy = true;
   UpdateActions();
   bool Result = false;

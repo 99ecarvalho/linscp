@@ -2628,6 +2628,53 @@ void Tools(const char * Port, const QString & Directory)
       Check((Dialog.Pages()->count() == 1) && (Dialog.windowTitle() == QStringLiteral("Generate file URL")), "a file's URL only");
       Check(Dialog.Text().endsWith(QStringLiteral("/hello.txt")), "the file's URL");
     }
+    // Commands > Open in PuTTY: the program Preferences name, given the
+    // session on its command line (POSIX) or as a PuTTY session (Windows).
+    {
+#if defined(Q_OS_WIN)
+      const QString Program = QDir::toNativeSeparators(QDir(Directory).filePath(QStringLiteral("putty.exe")));
+#else
+      const QString Program = QDir(Directory).filePath(QStringLiteral("putty"));
+#endif
+      {
+        QFile File(Program);
+        File.open(QIODevice::WriteOnly);
+      }
+      const CoreBridge::TPreferences Saved = CoreBridge::Preferences();
+      Check(!Saved.PuttyPath.empty(), "a default PuTTY command");
+      CoreBridge::TPreferences Preferences = Saved;
+      Preferences.PuttyPath = QStringLiteral("\"%1\" -extra").arg(Program).toStdString();
+      CoreBridge::SetPreferences(Preferences);
+      QString Started;
+      QString Params;
+      Frontend.SetStartProgram([&Started, &Params](const QString & AProgram, const QString & AParams, const QString &)
+      {
+        Started = AProgram;
+        Params = AParams;
+        return true;
+      });
+      Check(Window.OpenInPutty() && (QDir::fromNativeSeparators(Started) == QDir::fromNativeSeparators(Program)),
+        "PuTTY started");
+#if defined(Q_OS_WIN)
+      Check(Params.contains(QStringLiteral("-load ")) && Params.endsWith(QStringLiteral("-extra")),
+        "with the session exported to PuTTY's, and the command's own parameters");
+#else
+      Check(Params.startsWith(QStringLiteral("127.0.0.1 -l linscp -P %1").arg(QString::fromLatin1(Port))) &&
+        Params.endsWith(QStringLiteral("-extra")), "with the session on its command line, and the command's own parameters");
+#endif
+      // A command with the session's patterns gets no PuTTY options.
+      Preferences.PuttyPath = QStringLiteral("\"%1\" !U@!@:!#").arg(Program).toStdString();
+      CoreBridge::SetPreferences(Preferences);
+      Check(Window.OpenInPutty() && (Params == QStringLiteral("linscp@127.0.0.1:%1").arg(QString::fromLatin1(Port))),
+        "a site command, its patterns completed");
+      const int Errors = Responder.Errors;
+      Preferences.PuttyPath = QStringLiteral("\"%1\"").arg(QDir(Directory).filePath(QStringLiteral("missing/putty"))).toStdString();
+      CoreBridge::SetPreferences(Preferences);
+      Check(!Window.OpenInPutty() && (Responder.Errors == Errors + 1), "a program not found: an error");
+      Frontend.SetStartProgram(nullptr);
+      CoreBridge::SetPreferences(Saved);
+    }
+
     // The console over SFTP: a separate shell session, asked first (rclone
     // has no shell, so it fails to open).
     Check(!Session->CanRunCommands() && Session->CanOpenShellSession(), "SFTP needs a shell session for commands");
@@ -3102,6 +3149,46 @@ void Tags(const char * Port)
   CoreBridge::Finalize();
 }
 
+// The command line's session, as WinSCP.exe's: linscp sftp://... opens it,
+// in the URL's directory, with no site manager.
+void StartUpTest(const char * Port)
+{
+  CoreBridge::SetArguments({ "/ini=nul", QStringLiteral("sftp://linscp@127.0.0.1:%1/sub/").arg(QString::fromLatin1(Port)).toStdString() });
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = { "secret" };
+    bool SiteManagerShown = false;
+    Responder.Custom = [&SiteManagerShown](QWidget * Modal)
+    {
+      if (qobject_cast<SiteManager *>(Modal) == nullptr)
+      {
+        return false;
+      }
+      SiteManagerShown = true;
+      static_cast<QDialog *>(Modal)->reject();
+      return true;
+    };
+    bool CanOpen = false;
+    Check(CoreBridge::TSession::FromCommandLine(CanOpen) && CanOpen, "the command line names a session that can open");
+    Window.StartUp();
+    Check((Window.Session() != nullptr) && Window.Session()->Active(), "it is opened at start");
+    Check(Window.Panel()->Path() == QStringLiteral("/sub"), "in the URL's directory");
+    Check(!SiteManagerShown && (Responder.PasswordPrompts == 1), "asked only the password, no site manager");
+    // Go To > Explore Directory: the local directory, to the desktop.
+    QUrl Opened;
+    Window.SetUrlOpener([&Opened](const QUrl & Url) { Opened = Url; return true; });
+    Check(Window.ExploreLocalDirectory() && Opened.isLocalFile() &&
+      (QDir(Opened.toLocalFile()) == QDir(Window.Local()->Path())), "Explore Directory opens the local directory");
+  }
+  CoreBridge::Finalize();
+}
+
 int main(int argc, char ** argv)
 {
   QApplication App(argc, argv);
@@ -3151,6 +3238,10 @@ int main(int argc, char ** argv)
   {
     Commands(argv[3], QString::fromLocal8Bit(argv[4]), QString::fromLocal8Bit(argv[5]), QString::fromLocal8Bit(argv[6]),
       QString::fromLocal8Bit((argc >= 8) ? argv[7] : argv[6]));
+  }
+  else if ((argc >= 4) && (std::strcmp(argv[1], "startup") == 0))
+  {
+    StartUpTest(argv[3]);
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "tags") == 0))
   {

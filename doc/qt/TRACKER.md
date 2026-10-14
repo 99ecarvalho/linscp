@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 15 | 24 | Parity on features users depend on |
+| P3 Qt parity | 16 | 24 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **93** | **111** | |
+| **Total** | **94** | **111** | |
 
 ## Next three actions
 
@@ -235,11 +235,15 @@ internal editor, remote files downloaded to a temporary directory and
 uploaded back on save, as WinSCP (ADR 0015). Keeping the remote directory
 up to date (P3-06e, done): Commands > Keep Remote Directory up to Date, over
 upstream's own controller. The rest of the dialogs (P3-06f, done): License and
-third-party credits, Clean Up, S3 tags, bookmark shortcuts. P2-10 and P2-11 wait, at the user's request.
+third-party credits, Clean Up, S3 tags, bookmark shortcuts. Shell integration
+(P3-08, done): Open in PuTTY (or a terminal), a session named on the command
+line, Explore Directory. P2-10 and P2-11 wait, at the user's request.
 
-1. **P3-08**: shell integration.
-2. **P3-04e**: Preferences' Editors page with external editors (ADR 0015),
-   Integration, Applications, Commands, Drag & Drop.
+1. **P3-04e**: Preferences' Editors page with external editors and a remote
+   file opened with its associated application (ADR 0015), Integration (the
+   URL handler), Applications (PuTTY), Commands, Drag & Drop.
+2. **P3-12** and **P3-13**: the local browser, and session tabs with
+   workspaces.
 3. Offer `core-log-file-name-delimiter.patch` and
    `core-local-eol-platform.patch` upstream (ADR 0006).
 
@@ -254,6 +258,7 @@ third-party credits, Clean Up, S3 tags, bookmark shortcuts. P2-10 and P2-11 wait
 | 2026-10-13 | The Windows toolchain is llvm-mingw against MSYS2's Qt 6.8.2 and its C++ runtime, all pinned; the GCC sysroot is retired (ADR 0011) | Debian has no Qt for mingw. MSYS2's clang64 Qt is that ABI and prebuilt; Debian's own Qt version, so its host tools serve the cross-build. Wine testing from Linux is kept, which clang-cl/MSVC would have weakened |
 | 2026-10-13 | P2-10 (packaging) and P2-11 (the P2 exit gate) wait; P3 goes first | The user's call: parity features before packaging. They stay `todo` |
 | 2026-10-13 | Remote files dragged out to other programs are downloaded on demand to a temporary directory (WinSCP's drag without its shell extension); no XDS | XDS exists only on X11 and GNOME Files dropped it; on-demand URLs work on X11, Wayland and Windows (ADR 0012) |
+| 2026-10-14 | Open in PuTTY is upstream's, sliced; on POSIX PuTTY gets the session on its command line, and without PuTTY the default is `ssh` in the desktop's terminal (ADR 0014) | PuTTY's POSIX sessions are files the registry export cannot reach, and upstream already builds the command line for the Store's PuTTY; WinSCP's session patterns make the terminal command a plain setting the user can change |
 | 2026-10-14 | Save Workspace waits for session tabs (new task P3-13) | A workspace is WinSCP's set of open tabs; the shell holds one session, so there is nothing yet to save or reopen together |
 | 2026-10-14 | Keep-up-to-date is upstream's `TSynchronizeController`, sliced, over a linscp `TDiscMonitor` with no thread of its own: the GUI's timer polls it (ADR 0014) | Upstream's controller unchanged, closure sites discovered as core's; one directory watcher for the shell and the command-line client |
 | 2026-10-14 | Upstream code bound up with the VCL GUI in one file is compiled from slices the transform cuts by anchored line ranges, outside the mirror: first WinSCP's custom commands (ADR 0014) | The user's choice over mirroring ~930 lines by hand: upstream's own logic, extensions' parsing included, with no drift; anchors that must match exactly once fail a pin bump loudly |
@@ -775,7 +780,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-06e | Dialogs: keep remote directory up to date | done | Upstream's `TSynchronizeController` compiled as it is from a slice, over linscp's `TDiscMonitor` (the directory watcher `keepuptodate` uses, polled from the GUI's timer; ADR 0014 amendment); Commands > Keep Remote Directory up to Date (Ctrl+U), WinSCP's dialog and log, its options kept as `GUIConfiguration` keeps them, the synchronize-on-start question, "continue on error"; ctest `qt_gui_keep` (Linux, Wine, native Windows). Not yet: start in a new window, minimize to the tray, transfer presets' menu |
 | P3-06f | Dialogs: the rest | done | About's License button and WinSCP's third-party list (core's libraries, Expat's license shown, Qt after them; the License dialog); Clean Up (the site manager's Tools; `TCleanupDialog`'s data over core's cleanups, temporary folders as `TWinConfiguration`); S3 tags on Properties' Tags page with the Add/Edit tag dialog (the suite's S3 server gains `?acl` and `?tagging`; ctest `qt_gui_tags`); Select keyboard shortcut for shared bookmarks and location profiles, which then open them from the main window. Save Workspace moved to P3-13 (tabs); usage statistics not ported |
 | P3-07 | Drag & drop | done | between the panels, within one (onto a directory), and from other programs onto the remote panel: `FileView` in `port/qt/FileList.cpp`, `MainWindow::Drop`, `TSession::Move`; `RemoteFileDrag` (remote files out to other programs, downloaded at the drop); ctest `qt_gui_drop`; native on Windows 11 too; dragging out checked by hand with Explorer (Windows 11) and Nautilus, foreground and background |
-| P3-08 | Shell integration | todo | |
+| P3-08 | Shell integration | done | Commands > Open in PuTTY (Ctrl+P): upstream's `OpenSessionInPutty` compiled from a slice of `GUITools.cpp` (ADR 0014 amendment), the program started through the frontend; on POSIX the session on PuTTY's command line, and by default PuTTY if installed, else `ssh` in the desktop's terminal ("open in terminal"). `linscp <site or URL>` opens it at start, as WinSCP.exe (`TSession::FromCommandLine`; ctest `qt_gui_startup`). Go To > Explore Directory (Ctrl+Alt+E). Local files open with their associated application, as before. Not yet: a remote file opened with its associated application and registering as the URL handler (with Preferences > Integration, P3-04e); folders of sites on the command line (P3-13) |
 | P3-09 | Accessibility | todo | |
 | P3-10 | P3 exit gate | todo | |
 | P3-11 | Remember last used directories | done | `TSite::UpdateDirectories` (advanced settings' Directories page), `TSession::SaveDirectories` as `TTerminalManager::SaveTerminal` on disconnect, another session, or closing; the local directory's quiet fallback; ctest `qt_gui_sites`; native on Windows 11 too. "Preserve local directory" is P3-04's |

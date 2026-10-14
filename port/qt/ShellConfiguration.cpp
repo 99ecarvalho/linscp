@@ -29,6 +29,38 @@ private:
 
 TShellConfiguration * WinConfiguration = NULL;
 
+namespace
+{
+
+#if !defined(_WIN32)
+// Upstream's default, %ProgramFiles%\PuTTY\putty.exe, has no POSIX
+// counterpart: PuTTY where it is installed; else OpenSSH's ssh in the
+// desktop's terminal, in the current remote directory. That is a site
+// command (WinSCP's patterns: !U user, !@ host, !# port, !/ directory), to
+// which OpenSessionInPutty adds none of PuTTY's options.
+UnicodeString PosixPuttyPath()
+{
+  const UnicodeString Path = GetEnvironmentVariable(L"PATH");
+  if (!FileSearch(L"putty", Path).IsEmpty())
+  {
+    return FormatCommand(L"putty", L"");
+  }
+  static const wchar_t * const Terminals[][2] = {
+    { L"x-terminal-emulator", L"-e" }, { L"gnome-terminal", L"--" }, { L"konsole", L"-e" },
+    { L"xfce4-terminal", L"-x" }, { L"xterm", L"-e" } };
+  for (const auto & Terminal : Terminals)
+  {
+    if (!FileSearch(Terminal[0], Path).IsEmpty())
+    {
+      return FORMAT(L"%s %s ssh -t -p !# !U@!@ \"cd '!/'; exec $SHELL -l\"", (Terminal[0], Terminal[1]));
+    }
+  }
+  return FormatCommand(L"putty", L"");
+}
+#endif
+
+}  // namespace
+
 TShellConfiguration::TShellConfiguration() :
   FBookmarks(new TBookmarks()),
   FCustomCommandList(new TCustomCommandList()),
@@ -256,6 +288,14 @@ void __fastcall TShellConfiguration::Saved()
 
 // As TWinConfiguration::DefaultLocalized: WinSCP's own commands, until the
 // user's are loaded.
+void __fastcall TShellConfiguration::Default()
+{
+  TGUIConfiguration::Default();
+#if !defined(_WIN32)
+  PuttyPath = PosixPuttyPath();
+#endif
+}
+
 void __fastcall TShellConfiguration::DefaultLocalized()
 {
   TGUIConfiguration::DefaultLocalized();

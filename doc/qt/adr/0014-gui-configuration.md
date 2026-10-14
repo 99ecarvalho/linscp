@@ -387,3 +387,49 @@ It is compiled as it is, as a slice of the whole file after its includes.
 Verified by `qt_gui_keep` on Linux, under Wine and on native Windows. Under
 Wine a watched directory cannot be deleted, so the test's "watched
 directory gone" step runs only where it can.
+
+## Amendment 2026-10-14: Open in PuTTY (P3-08)
+
+Commands > Open in PuTTY is upstream's `OpenSessionInPutty`, compiled as it
+is, with its helpers from the same part of `windows/GUITools.cpp`:
+`FindFile`, the PuTTY session export, its cleanup thread, and the password
+pipe.
+
+- **The slice.** `GUITools.cpp` joins the transform's scope only to be
+  sliced. Its slice runs from `FindFile` to the operation status window
+  that follows `OpenSessionInPutty`.
+  - The transform now notes, rather than fails on, what it cannot handle in
+    a file it transforms only for slices, when that is outside every
+    slice. Such lines are never compiled. Here that is a `__property`
+    republished in a VCL toolbar class.
+  - Slices may have an epilogue: linscp's lines after upstream's. This one
+    has `PuttySessionsFinalize`, the `TPuttyCleanupThread::Finalize` that
+    upstream's `GUIFinalize` calls, which the bridge's `Finalize` calls
+    before core's.
+- **What surrounds it is linscp's** (`port/qt/PuttySlice.h`):
+  - `ExecuteShellChecked`, over the frontend's new `StartProgram`
+    (`QProcess::startDetached`; on Windows with the command line as
+    given);
+  - `TWinInteractiveCustomCommand`, the bridge's prompts (moved to
+    `BridgeCustomCommand.h`);
+  - `FileExistsFix` (PasTools.pas).
+- **On POSIX the session goes on PuTTY's command line.** PuTTY there keeps
+  its sessions in files under `~/.putty`, which the registry export cannot
+  reach. The slice's prologue has `IsUWP()` true on POSIX, so upstream's own
+  branch for the Store's PuTTY, which has the same limit, builds the
+  command line.
+  - The password pipe has no POSIX counterpart: the platform layer's
+    `CreateNamedPipe` fails. With PuTTY's auto setting, a program not named
+    `putty.exe` gets `-pw`, as upstream gives it to PuTTY before 0.77.
+- **The default program on POSIX** (`TShellConfiguration::Default`) is
+  `putty` where it is installed. Otherwise it is OpenSSH's `ssh` in the
+  desktop's terminal, in the current remote directory, written with WinSCP's
+  session patterns. Upstream adds no PuTTY options to a site command like
+  that. On Windows the default is upstream's.
+- **The shim gains** `FileSearch` and `GetFileVersion`. The platform layer
+  gains the named-pipe API (failing) and `FlushFileBuffers` (`fsync`).
+
+Verified by `qt_gui_tools`: the program started with the session, the
+command line on Linux and an exported PuTTY session on Windows (under Wine
+and natively); a site command with its patterns completed; and a program
+not found reported.

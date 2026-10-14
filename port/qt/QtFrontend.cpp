@@ -7,6 +7,7 @@
 #include <QDialogButtonBox>
 #include <QFontDatabase>
 #include <QPlainTextEdit>
+#include <QProcess>
 #include <QVBoxLayout>
 
 #include "PromptDialog.h"
@@ -128,4 +129,28 @@ bool QtFrontend::GetClipboard(std::string & Text)
 {
   Text = QApplication::clipboard()->text().toStdString();
   return !Text.empty();
+}
+
+bool QtFrontend::StartProgram(const std::string & Program, const std::string & Params, const std::string & Directory)
+{
+  const QString AProgram = QString::fromStdString(Program);
+  const QString AParams = QString::fromStdString(Params);
+  const QString ADirectory = QString::fromStdString(Directory);
+  if (FStartProgram)
+  {
+    return FStartProgram(AProgram, AParams, ADirectory);
+  }
+  QProcess Process;
+  Process.setProgram(AProgram);
+#if defined(Q_OS_WIN)
+  // As ShellExecute has them: the program parses its own command line.
+  Process.setNativeArguments(AParams);
+#else
+  Process.setArguments(QProcess::splitCommand(AParams));
+#endif
+  if (!ADirectory.isEmpty())
+  {
+    Process.setWorkingDirectory(ADirectory);
+  }
+  return Process.startDetached();
 }

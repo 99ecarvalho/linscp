@@ -1054,6 +1054,24 @@ BOOL CreateProcessA(LPCSTR Application, LPSTR CommandLine, LPSECURITY_ATTRIBUTES
 BOOL GetExitCodeProcess(HANDLE Process, LPDWORD ExitCode);
 // No named pipes exist, so no handle is one's server end: fails.
 BOOL GetNamedPipeClientProcessId(HANDLE Pipe, PULONG ClientProcessId);
+// Nor can one be made (as for PuTTY's -pwfile): CreateNamedPipe fails with
+// ERROR_NOT_SUPPORTED, and so the rest, given no pipe.
+#define PIPE_ACCESS_OUTBOUND          0x00000002
+#define FILE_FLAG_FIRST_PIPE_INSTANCE 0x00080000
+#define PIPE_TYPE_BYTE                0x00000000
+#define PIPE_READMODE_BYTE            0x00000000
+#define PIPE_NOWAIT                   0x00000001
+#define PIPE_REJECT_REMOTE_CLIENTS    0x00000008
+#define NMPWAIT_USE_DEFAULT_WAIT      0x00000000
+#define ERROR_PIPE_CONNECTED          535
+#define ERROR_PIPE_LISTENING          536
+HANDLE CreateNamedPipe(LPCWSTR Name, DWORD OpenMode, DWORD PipeMode, DWORD MaxInstances, DWORD OutBufferSize,
+  DWORD InBufferSize, DWORD DefaultTimeOut, LPSECURITY_ATTRIBUTES SecurityAttributes);
+BOOL ConnectNamedPipe(HANDLE Pipe, LPOVERLAPPED Overlapped);
+BOOL DisconnectNamedPipe(HANDLE Pipe);
+// fsync(2); a handle that cannot be synced (a pipe, a terminal) has
+// nothing buffered here, which is success.
+BOOL FlushFileBuffers(HANDLE File);
 // The plain user name, from the password database.
 BOOL GetUserNameA(LPSTR Buffer, LPDWORD Size);
 BOOL TerminateProcess(HANDLE Process, UINT ExitCode);

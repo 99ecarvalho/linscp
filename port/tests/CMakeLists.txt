@@ -371,6 +371,11 @@ if(TARGET linscp)
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" --protocol s3 "$<TARGET_FILE:test_qt_gui>"
             tags /ini=nul {port} -platform offscreen)
   set_tests_properties(qt_gui_tags PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+  add_test(NAME qt_gui_startup
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
+            --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
+            startup /ini=nul {port} -platform offscreen)
+  set_tests_properties(qt_gui_startup PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
   add_test(NAME qt_gui_keep
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"

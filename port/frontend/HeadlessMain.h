@@ -9,5 +9,9 @@
 void HeadlessInitialize();
 // Saves the configuration and tears core and the log down.
 void HeadlessFinalize();
+// The command line TProgramParams parses, instead of the process's: for a
+// program whose own options (Qt's) are no business of core's. Before
+// HeadlessInitialize.
+void SetProgramCommandLine(const wchar_t * CommandLine);
 
 #endif

@@ -40,10 +40,17 @@ public:
   void ProcessEvents() override;
   void SetClipboard(const std::string & Text) override;
   bool GetClipboard(std::string & Text) override;
+  bool StartProgram(const std::string & Program, const std::string & Params, const std::string & Directory) override;
+  // Programs started go here instead (tests).
+  void SetStartProgram(std::function<bool(const QString & Program, const QString & Params, const QString & Directory)> Start)
+  {
+    FStartProgram = std::move(Start);
+  }
 
 private:
   QPointer<QWidget> FWindow;
   std::function<void(const QString &)> FStatus;
+  std::function<bool(const QString &, const QString &, const QString &)> FStartProgram;
   std::unique_ptr<TransferDialog> FTransfer;
 };
 
