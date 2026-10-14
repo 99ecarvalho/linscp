@@ -113,6 +113,17 @@ Local: %2</translation>
     </message>
 </context>
 <context>
+    <name>CopyLocalDialog</name>
+    <message>
+        <source>&amp;Target path:</source>
+        <translation>Diretório de &amp;destino</translation>
+    </message>
+    <message>
+        <source>B&amp;rowse...</source>
+        <translation>P&amp;rocurar...</translation>
+    </message>
+</context>
+<context>
     <name>CreateDirectoryDialog</name>
     <message>
         <source>Create folder</source>
@@ -527,6 +538,34 @@ Local: %2</translation>
     <message>
         <source>&amp;Clear</source>
         <translation>&amp;Limpar</translation>
+    </message>
+    <message>
+        <source>&amp;Size</source>
+        <translation>&amp;Tamanho</translation>
+    </message>
+    <message>
+        <source>&amp;Date modified</source>
+        <translation>&amp;Data modificada</translation>
+    </message>
+    <message>
+        <source>&amp;Attributes</source>
+        <translation>&amp;Atributos</translation>
+    </message>
+    <message>
+        <source>&amp;Permissions</source>
+        <translation>&amp;Permissões</translation>
+    </message>
+    <message>
+        <source>&amp;Owner</source>
+        <translation>&amp;Proprietário</translation>
+    </message>
+    <message>
+        <source>&amp;Group</source>
+        <translation>&amp;Grupo</translation>
+    </message>
+    <message>
+        <source>&amp;Link Target</source>
+        <translation>Des&amp;tino do Link</translation>
     </message>
 </context>
 <context>
@@ -1135,10 +1174,6 @@ Local: %2</translation>
         <translation>&amp;Abas</translation>
     </message>
     <message>
-        <source>&amp;New Tab...</source>
-        <translation>&amp;Nova aba...</translation>
-    </message>
-    <message>
         <source>Du&amp;plicate Tab</source>
         <translation>Du&amp;plicar Aba</translation>
     </message>
@@ -1257,6 +1292,42 @@ Local: %2</translation>
     <message>
         <source>Si&amp;tes</source>
         <translation>&amp;Sites</translation>
+    </message>
+    <message>
+        <source>%1 – %2</source>
+        <translation>%1 – %2</translation>
+    </message>
+    <message>
+        <source>&amp;New Tab</source>
+        <translation>&amp;Nova Aba</translation>
+    </message>
+    <message>
+        <source>&amp;Remote Tab...</source>
+        <translation>Aba &amp;Remota...</translation>
+    </message>
+    <message>
+        <source>&amp;Local Tab</source>
+        <translation>Aba &amp;Local</translation>
+    </message>
+    <message>
+        <source>Cannot copy &apos;%1&apos; into itself.</source>
+        <translation>Não é possível copiar &apos;%1&apos; para dentro de si mesmo.</translation>
+    </message>
+    <message>
+        <source>Cannot remove &apos;%1&apos;.</source>
+        <translation>Não é possível remover &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Cannot copy &apos;%1&apos; onto itself.</source>
+        <translation>Não é possível copiar &apos;%1&apos; sobre si mesmo.</translation>
+    </message>
+    <message>
+        <source>Cannot overwrite &apos;%1&apos;.</source>
+        <translation>Não é possível sobrescrever &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Cannot copy &apos;%1&apos; to &apos;%2&apos;: %3</source>
+        <translation>Não é possível copiar &apos;%1&apos; para &apos;%2&apos;: %3</translation>
     </message>
 </context>
 <context>

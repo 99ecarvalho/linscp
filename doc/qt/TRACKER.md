@@ -11,7 +11,7 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 20 | 24 | Parity on features users depend on |
+| P3 Qt parity | 21 | 24 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
 | **Total** | **97** | **111** | |
 
@@ -240,11 +240,13 @@ third-party credits, Clean Up, S3 tags, bookmark shortcuts. Shell integration
 line, Explore Directory. The rest of Preferences (P3-04e, done): Editors with
 external editors and the associated application, Internal editor,
 Integration, Applications, Commands. Session tabs and workspaces (P3-13,
-done): several sessions at once, saved together and opened again.
+done): several sessions at once, saved together and opened again. The
+local browser (P3-12, done): local tabs, copying and moving between two
+local panels.
 P2-10 and P2-11 wait, at the user's request.
 
-1. **P3-12**: the local browser (a tab too).
-2. **P3-09**: accessibility; then the P3 exit gate (**P3-10**).
+1. **P3-09**: accessibility.
+2. The P3 exit gate (**P3-10**).
 3. Offer `core-log-file-name-delimiter.patch` and
    `core-local-eol-platform.patch` upstream (ADR 0006).
 
@@ -787,7 +789,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-09 | Accessibility | todo | |
 | P3-10 | P3 exit gate | todo | |
 | P3-11 | Remember last used directories | done | `TSite::UpdateDirectories` (advanced settings' Directories page), `TSession::SaveDirectories` as `TTerminalManager::SaveTerminal` on disconnect, another session, or closing; the local directory's quiet fallback; ctest `qt_gui_sites`; native on Windows 11 too. "Preserve local directory" is P3-04's |
-| P3-12 | Local-to-local browsing | todo | WinSCP's local browser and CopyLocal; after P3-06 |
+| P3-12 | Local-to-local browsing | done | Tabs > New Tab > Local Tab, as WinSCP's local browser: a tab with no session and a second local panel in the remote one's place (the right side, swapped with it), titled by its two directories; Copy and Move (F5, F6) and drags between its panels copy and move local files (`LocalLocalCopy`), after the Copy dialog (`TCopyLocalDialog`: target path and file mask, Browse, the directory created after asking, several files to one name confirmed), an existing file overwritten after asking, a directory merged; the popups, Mark, Files and the Right menu act on the panel focused. Not yet: local tabs in saved workspaces. ctest `qt_gui_localtab` |
 | P3-13 | Session tabs and workspaces | done | Tabs: a session opened goes to a tab of its own, each tab with its own remote and local directories, its editors uploading to it whichever tab is active, every tab's session kept alive (`TTerminal::Idle`, which the shell had not called); the Tabs menu (New, Duplicate, Close Ctrl+Shift+D, Next and Previous Ctrl+Tab). Workspaces: Tabs > Save Workspace (`TSaveWorkspaceDialog`'s name, passwords and automatic saving) stores the tabs as core's workspace sessions; the site manager lists workspaces, logs in to one (a tab per session) and deletes it; saved on closing when automatic and opened at the next start; a workspace or folder of sites named on the command line opens in tabs. ctest `qt_gui_tabs` |
 
 ### P4 — Cleanup

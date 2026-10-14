@@ -830,6 +830,11 @@ std::string NormalizeMask(const std::string & Mask)
   return Utf8(TFileMasks::NormalizeMask(FromUtf8(Mask)));
 }
 
+std::string MaskFileName(const std::string & FileName, const std::string & Mask)
+{
+  return Utf8(::MaskFileName(FromUtf8(FileName), FromUtf8(Mask)));
+}
+
 bool MaskMatchesPath(const std::string & Masks, const std::string & Path, bool Local, bool Directory,
   std::int64_t Size, double ModifiedTime)
 {
@@ -941,6 +946,12 @@ std::string Text(TText Text)
     case TText::SelectMaskSelectCaption: Ident = SELECT_MASK_SELECT_CAPTION; break;
     case TText::SelectMaskDeselectCaption: Ident = SELECT_MASK_DESELECT_CAPTION; break;
     case TText::FilterMaskCaption: Ident = FILTER_MASK_CAPTION; break;
+    case TText::CopyLocalCopyCaption: Ident = COPY_LOCAL_COPY_CAPTION; break;
+    case TText::CopyLocalMoveCaption: Ident = COPY_LOCAL_MOVE_CAPTION; break;
+    case TText::CreateLocalDirectory: Ident = CREATE_LOCAL_DIRECTORY; break;
+    case TText::CreateLocalDirectoryError: Ident = CREATE_LOCAL_DIR_ERROR; break;
+    case TText::SelectLocalDirectory: Ident = SELECT_LOCAL_DIRECTORY; break;
+    case TText::FileOverwrite: Ident = FILE_OVERWRITE; break;
     case TText::NotSupported: Ident = NOTSUPPORTED; break;
     case TText::LicenseCaption: Ident = LICENSE_CAPTION; break;
     case TText::TagAdd: Ident = TAG_ADD; break;

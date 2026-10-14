@@ -117,6 +117,7 @@
 #include <QLineEdit>
 #include <QTreeView>
 #include "SiteManager.h"
+#include "CopyLocalDialog.h"
 #include "PreferencesDialog.h"
 #include "Integration.h"
 #include <QSettings>
@@ -3567,6 +3568,16 @@ void TabsTest(const char * Port, const QString & Directory)
     Check(Window.CloseTab(0) && (Window.TabCount() == 1) && !Window.Editors(true).size(), "closing the first closes its editors");
     Check(Window.Session() != nullptr, "the last tab active");
 
+    // A local tab beside the session's: the right panel local there only.
+    CoreBridge::TSession * Remaining = Window.Session();
+    Window.NewLocalTab();
+    Check((Window.TabCount() == 2) && (Window.Session() == nullptr) && Window.OtherLocal()->isVisible(),
+      "a local tab beside a session's");
+    Check(Window.SwitchTab(0) && (Window.Session() == Remaining) && Window.Panel()->isVisible() &&
+      !Window.OtherLocal()->isVisible(), "back on the session's tab, the remote panel");
+    Check(Window.SwitchTab(1) && Window.CloseTab(1) && (Window.TabCount() == 1) && (Window.Session() == Remaining) &&
+      Window.Panel()->isVisible(), "the local tab closed, the session's active again");
+
     // A workspace: the tabs saved together, closed, and opened again, each
     // with its directories; then deleted in the site manager.
     Window.Local()->ChangeDirectory(QDir(Directory).filePath(QStringLiteral("first")));
@@ -3630,10 +3641,134 @@ void TabsTest(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// The local browser: a tab with a local directory in each panel, copying
+// and moving between them (F5, F6, the Copy dialog's mask, a drag), as
+// WinSCP's local-local mode.
+void LocalTabTest(const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    const QDir A(QDir(Directory).filePath(QStringLiteral("a")));
+    const QDir B(QDir(Directory).filePath(QStringLiteral("b")));
+    QDir().mkpath(A.filePath(QStringLiteral("sub")));
+    QDir().mkpath(B.path());
+    auto Write = [](const QString & Path, const QByteArray & Data)
+    {
+      QFile File(Path);
+      File.open(QIODevice::WriteOnly);
+      File.write(Data);
+    };
+    auto Read = [](const QString & Path)
+    {
+      QFile File(Path);
+      return File.open(QIODevice::ReadOnly) ? File.readAll() : QByteArray();
+    };
+    Write(A.filePath(QStringLiteral("x.txt")), "x\n");
+    Write(A.filePath(QStringLiteral("sub/y.txt")), "y\n");
+
+    Window.Local()->ChangeDirectory(A.path());
+    Window.NewLocalTab();
+    Check(Window.LocalBrowser() && (Window.TabCount() == 1) && (Window.Session() == nullptr), "Local Tab: a tab with no session");
+    Check(Window.OtherLocal()->isVisible() && !Window.Panel()->isVisible(), "the right panel local too");
+    Check(QDir(Window.OtherLocal()->Path()) == A, "on the local panel's directory to start with");
+    Window.OtherLocal()->ChangeDirectory(B.path());
+    Check(Window.TabBar()->tabText(0) == QStringLiteral("a – b"), "its title the two directories'");
+    Check(Window.SideLocal(false) == Window.OtherLocal(), "the right side is the other local panel");
+
+    // F5: the selection to the other panel, without the dialog.
+    Window.ActivatePanel(true);
+    Window.Local()->Select({ QStringLiteral("x.txt"), QStringLiteral("sub") });
+    Check(Window.TransferSelected(false, false), "Copy between the local panels");
+    Check((Read(B.filePath(QStringLiteral("x.txt"))) == "x\n") && (Read(B.filePath(QStringLiteral("sub/y.txt"))) == "y\n"),
+      "a file and a directory with its contents copied");
+    Check(QFileInfo::exists(A.filePath(QStringLiteral("x.txt"))), "the source kept");
+    Check(Window.OtherLocal()->Names().contains(QStringLiteral("x.txt")), "the other panel refreshed");
+
+    // Again: the file there, overwritten after asking (Yes).
+    Write(A.filePath(QStringLiteral("x.txt")), "x2\n");
+    Window.Local()->Select({ QStringLiteral("x.txt") });
+    Check(Window.LocalLocalCopy(false, false) && (Read(B.filePath(QStringLiteral("x.txt"))) == "x2\n") &&
+      Responder.LastQuery.contains(QStringLiteral("x.txt")), "an existing file overwritten after asking");
+
+    // The Copy dialog: the target path's mask renames.
+    bool DialogShown = false;
+    Responder.Custom = [&DialogShown](QWidget * Modal)
+    {
+      CopyLocalDialog * Dialog = qobject_cast<CopyLocalDialog *>(Modal);
+      if (Dialog == nullptr)
+      {
+        return false;
+      }
+      DialogShown = true;
+      Dialog->DirectoryEdit()->setText(Dialog->Directory() + QStringLiteral("*.bak"));
+      Dialog->accept();
+      return true;
+    };
+    Window.Local()->Select({ QStringLiteral("x.txt") });
+    Check(Window.LocalLocalCopy(false, true) && DialogShown && QFileInfo::exists(B.filePath(QStringLiteral("x.bak"))),
+      "the Copy dialog, its mask renaming");
+    Responder.Custom = nullptr;
+
+    // F6 the other way: moved from the right panel to the left.
+    Window.ActivatePanel(false);
+    Window.OtherLocal()->Select({ QStringLiteral("x.bak") });
+    Check(Window.TransferSelected(true, false) && QFileInfo::exists(A.filePath(QStringLiteral("x.bak"))) &&
+      !QFileInfo::exists(B.filePath(QStringLiteral("x.bak"))), "Move from the right panel to the left");
+
+    // A drag from the left panel dropped on the right.
+    Write(A.filePath(QStringLiteral("z.txt")), "z\n");
+    Window.Local()->Refresh();
+    TFileDrag Drag;
+    Drag.Local = true;
+    Drag.Directory = A.path();
+    Drag.Names = { QStringLiteral("z.txt") };
+    std::unique_ptr<QMimeData> Data(MakeFileDrag(Drag));
+    Check(Window.Drop(false, Data.get(), QString(), false, false) && (Read(B.filePath(QStringLiteral("z.txt"))) == "z\n"),
+      "a drag between the panels copies");
+
+    // Copying a directory into itself is refused.
+    Window.ActivatePanel(true);
+    Window.Local()->Select({ QStringLiteral("sub") });
+    const QString Into = QDir::toNativeSeparators(A.filePath(QStringLiteral("sub")));
+    const QStringList Sub = { A.filePath(QStringLiteral("sub")) };
+    Check(!Window.LocalLocalCopy(false, false, &Sub, &Into) && (Responder.Errors > 0), "not into itself");
+
+    // The right side's menus are the local panel's.
+    QMenu * Menu = Window.ContextMenu(false, false, QPoint(), false);
+    bool Explore = false;
+    for (const QAction * Action : Menu->findChildren<QMenu *>().value(0)->actions())
+    {
+      Explore = Explore || (Action->text() == MainWindow::tr("&Explore Directory"));
+    }
+    delete Menu;
+    Check(Explore, "the right panel's popup is a local one");
+
+    // Tabs: another local tab, each keeping its directories.
+    Window.NewLocalTab();
+    Window.Local()->ChangeDirectory(B.path());
+    Window.OtherLocal()->ChangeDirectory(A.filePath(QStringLiteral("sub")));
+    Check((Window.TabCount() == 2) && Window.SwitchTab(0) && (QDir(Window.Local()->Path()) == A) &&
+      (QDir(Window.OtherLocal()->Path()) == B), "each tab its own directories");
+    Check(Window.SwitchTab(1) && (QDir(Window.Local()->Path()) == B) &&
+      (QDir(Window.OtherLocal()->Path()) == QDir(A.filePath(QStringLiteral("sub")))), "and the other's");
+    Check(Window.CloseTab(1) && Window.CloseTab(0) && (Window.TabCount() == 0) && Window.Panel()->isVisible() &&
+      !Window.OtherLocal()->isVisible(), "the last closed, the remote panel back");
+  }
+  CoreBridge::Finalize();
+}
+
 // The menu bar as text, a menu's items indented under it, separators as
 // "----": for comparing with WinSCP's (forms/ScpCommander.dfm).
-void DumpMenu(const QMenu * Menu, int Depth, QString & Out)
+void DumpMenu(QMenu * Menu, int Depth, QString & Out)
 {
+  // What is filled as the menu opens.
+  emit Menu->aboutToShow();
   for (const QAction * Action : Menu->actions())
   {
     if (!Action->isVisible())
@@ -3672,6 +3807,10 @@ int main(int argc, char ** argv)
   if ((argc >= 2) && (std::strcmp(argv[1], "dialogs") == 0))
   {
     Dialogs();
+  }
+  else if ((argc >= 4) && (std::strcmp(argv[1], "localtab") == 0))
+  {
+    LocalTabTest(QString::fromLocal8Bit(argv[3]));
   }
   else if ((argc >= 3) && (std::strcmp(argv[1], "menus") == 0))
   {

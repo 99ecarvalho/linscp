@@ -230,6 +230,25 @@ public:
   // Tabs > Duplicate Tab: the active session's site, as it is now, in a new
   // tab (TCustomScpExplorerForm::DuplicateTab).
   bool DuplicateTab();
+  // Tabs > New Tab > Local Tab, as WinSCP's local browser (NewLocalTab): a
+  // tab with no session and a local directory in each panel, both on the
+  // local panel's to start with. Copy and Move (F5, F6) and drags between
+  // its panels copy and move local files (LocalLocalCopy).
+  void NewLocalTab();
+  bool LocalBrowser() const;
+  // The panel on a side as a local one: the left (Local) panel, or the
+  // right one in a local tab; null for the remote panel.
+  LocalPanel * SideLocal(bool Local) const;
+  LocalPanel * OtherLocal() const { return FOtherLocal; }
+  // The active local panel's directory (the left one's, when the remote is active).
+  QString ActiveLocalPath() const;
+  LocalPanel * ActiveLocal() const;
+  // As TScpCommanderForm::LocalLocalCopy: the active panel's selection (or
+  // the given full paths) to the other panel's directory, after the Copy
+  // or Move dialog unless Confirm is false (then Target, else the other
+  // panel's, with Mask). False when cancelled or something failed.
+  bool LocalLocalCopy(bool Move, bool Confirm = true, const QStringList * Sources = nullptr,
+    const QString * Target = nullptr, const QString & Mask = QStringLiteral("*.*"));
   // Tabs > Save Workspace (TCustomScpExplorerForm::SaveWorkspace): the
   // tabs' sessions saved together, after its dialog, unless Name is given
   // (tests). Opening one (the site manager's, or at start): each of its
@@ -289,6 +308,7 @@ private:
   QAction * FOpenCurrentAction = nullptr;
   QAction * FExploreAction = nullptr;
   QAction * FPreferencesAction = nullptr;
+  LocalPanel * FOtherLocal = nullptr;
   QMenu * FLocalMenu = nullptr;
   QMenu * FRemoteMenu = nullptr;
   // The menu bar, as WinSCP's Commander's (forms/ScpCommander.dfm).
@@ -344,7 +364,13 @@ private:
     std::unique_ptr<CoreBridge::TSession> Session;
     QString LocalPath;
     int QueueDone = 0;
+    // WinSCP's local browser: no session, the right panel local too.
+    bool LocalBrowser = false;
+    QString OtherLocalPath;
   };
+  // The right panel's place: the remote panel, or in a local tab the other
+  // local one.
+  void ShowLocalBrowser(bool Local);
   std::vector<TTab> FTabs;
   int FActiveTab = -1;
   QTabBar * FTabBar = nullptr;

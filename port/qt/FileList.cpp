@@ -509,12 +509,30 @@ QString FileView::ColumnsParams(const std::vector<int> & Map, int Count) const
     .arg(Entries.join(QLatin1Char(';'))).arg(logicalDpiX()).arg(Order.join(QLatin1Char(';')));
 }
 
-QMenu * FileView::ColumnsMenu()
+QMenu * FileView::ColumnsMenu(bool MenuCaptions)
 {
   QMenu * Menu = new QMenu(this);
   for (int Column = FileListModel::NameColumn + 1; Column < model()->columnCount(); Column++)
   {
-    QAction * Action = Menu->addAction(model()->headerData(Column, Qt::Horizontal).toString());
+    const QString Header = model()->headerData(Column, Qt::Horizontal).toString();
+    QString Caption = Header;
+    // As the main menu's Columns (NonVisual.dfm's ShowHide...ColumnAction).
+    if (MenuCaptions)
+    {
+      switch (Column)
+      {
+        case FileListModel::SizeColumn: Caption = tr("&Size"); break;
+        case FileListModel::ModifiedColumn: Caption = tr("&Date modified"); break;
+        case FileListModel::RightsColumn:
+          Caption = (Header == FileListModel::tr("Attributes")) ? tr("&Attributes") : tr("&Permissions");
+          break;
+        case FileListModel::OwnerColumn: Caption = tr("&Owner"); break;
+        case FileListModel::GroupColumn: Caption = tr("&Group"); break;
+        case FileListModel::LinkTargetColumn: Caption = tr("&Link Target"); break;
+        default: break;
+      }
+    }
+    QAction * Action = Menu->addAction(Caption);
     Action->setCheckable(true);
     Action->setChecked(!isColumnHidden(Column));
     connect(Action, &QAction::toggled, this, [this, Column](bool Shown) { setColumnHidden(Column, !Shown); });

@@ -57,10 +57,19 @@
 #include "KeepUpToDateDialog.h"
 #include "EditorPreferencesDialog.h"
 #include "SaveWorkspaceDialog.h"
+#include "CopyLocalDialog.h"
 #include "TransferSettingsDialog.h"
 
 namespace
 {
+
+// ExtractShortName: a path's last part, the root as it is.
+QString ShortPath(const QString & Path)
+{
+  const QString Clean = QDir::cleanPath(Path);
+  const QString Last = QFileInfo(Clean).fileName();
+  return QDir::toNativeSeparators(Last.isEmpty() ? Clean : Last);
+}
 
 
 }  // namespace
@@ -103,11 +112,15 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FPanels = Panels;
   FLocal = new LocalPanel(Panels);
   FPanel = new RemotePanel(Panels);
+  // The local browser's right panel, in the remote one's place in a local tab.
+  FOtherLocal = new LocalPanel(Panels);
+  FOtherLocal->setVisible(false);
   Panels->setChildrenCollapsible(false);
   FQueue = new QueuePanel(Vertical);
   // Dropped: handled once the drag is over (its loop is the source's, and on
   // Windows the system's), with a copy of what was dropped.
-  for (FileView * View : { FLocal->View(), FPanel->View() })
+  // (The other local panel is the right side, as the remote one.)
+  for (FileView * View : { FLocal->View(), FPanel->View(), FOtherLocal->View() })
   {
     const bool OnLocal = (View == FLocal->View());
     connect(View, &FileView::Dropped, this, [this, OnLocal](const QMimeData * Data, const QString & OnDirectory, Qt::DropAction Action)
@@ -157,6 +170,19 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   // Right clicks: WinSCP's popups.
   FLocal->OnContextMenu = [this](const QPoint & Global, bool OnItem) { ContextMenu(true, OnItem, Global); };
   FPanel->OnContextMenu = [this](const QPoint & Global, bool OnItem) { ContextMenu(false, OnItem, Global); };
+  FOtherLocal->OnContextMenu = [this](const QPoint & Global, bool OnItem) { ContextMenu(false, OnItem, Global); };
+  connect(FOtherLocal->View(), &FileView::SwitchPanel, this, [this]() { ActivatePanel(true); });
+  // A local tab's title follows its directories.
+  for (LocalPanel * Panel : { FLocal, FOtherLocal })
+  {
+    connect(Panel, &LocalPanel::Changed, this, [this]()
+    {
+      if (LocalBrowser())
+      {
+        UpdateTabs();
+      }
+    });
+  }
   // Tab: to the other panel.
   connect(FLocal->View(), &FileView::SwitchPanel, this, [this]() { ActivatePanel(false); });
   connect(FPanel->View(), &FileView::SwitchPanel, this, [this]() { ActivatePanel(true); });
@@ -220,7 +246,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
     {
       FLocalActive = true;
     }
-    else if ((Now != nullptr) && FPanel->isAncestorOf(Now))
+    else if ((Now != nullptr) && (FPanel->isAncestorOf(Now) || FOtherLocal->isAncestorOf(Now)))
     {
       FLocalActive = false;
     }
@@ -413,8 +439,13 @@ void MainWindow::RestoreLayout()
   FPanel->SetColumnsParams(QString::fromStdString(Layout.RemoteDirViewParams));
   const int Total = std::max(FPanels->width(), width());
   const int LocalWidth = static_cast<int>(Total * std::clamp(Layout.LocalPanelWidth, 0.1, 0.9));
-  FPanels->setSizes(FPanels->widget(0) == FLocal ? QList<int>{ LocalWidth, Total - LocalWidth } :
-    QList<int>{ Total - LocalWidth, LocalWidth });
+  // (The right side's two panels share its width, one shown.)
+  QList<int> Sizes;
+  for (int Index = 0; Index < FPanels->count(); Index++)
+  {
+    Sizes.append((FPanels->widget(Index) == FLocal) ? LocalWidth : (Total - LocalWidth));
+  }
+  FPanels->setSizes(Sizes);
   const int QueueHeight = Layout.QueueViewHeight * Dpi / std::max(1, Layout.QueueViewHeightPixelsPerInch);
   FVertical->setSizes({ std::max(100, height() - QueueHeight), QueueHeight });
   ActivatePanel(Layout.CurrentPanel == 0);
@@ -433,8 +464,9 @@ void MainWindow::SaveLayout()
     .arg(Bounds.right() + 1 - Area.left()).arg(Bounds.bottom() + 1 - Area.top())
     .arg(isMaximized() ? 2 : 0).arg(Dpi).toStdString();
   const QList<int> Sizes = FPanels->sizes();
-  const int Total = std::max(1, Sizes.value(0) + Sizes.value(1));
-  const int LocalWidth = (FPanels->widget(0) == FLocal) ? Sizes.value(0) : Sizes.value(1);
+  const int LocalWidth = Sizes.value(FPanels->indexOf(FLocal));
+  const int Total = std::max(1, LocalWidth + Sizes.value(FPanels->indexOf(FOtherLocal->isVisible() ? static_cast<QWidget *>(FOtherLocal) :
+    static_cast<QWidget *>(FPanel))));
   Layout.LocalPanelWidth = static_cast<double>(LocalWidth) / Total;
   Layout.CurrentPanel = FLocalActive ? 0 : 1;
   Layout.LocalDirViewParams = FLocal->ColumnsParams().toStdString();
@@ -479,7 +511,17 @@ void MainWindow::ApplyPreferences()
   FPanel->ApplyPreferences(Preferences);
   FHiddenAction->setChecked(Preferences.ShowHiddenFiles);
   // Commander: local left, remote right, unless swapped.
-  FPanels->insertWidget(0, Preferences.SwappedPanels ? static_cast<QWidget *>(FPanel) : static_cast<QWidget *>(FLocal));
+  // The other local panel where the remote one is.
+  if (Preferences.SwappedPanels)
+  {
+    FPanels->insertWidget(0, FOtherLocal);
+    FPanels->insertWidget(0, FPanel);
+  }
+  else
+  {
+    FPanels->insertWidget(0, FLocal);
+  }
+  FOtherLocal->ApplyPreferences(Preferences);
   // NonVisual.cpp's: Explorer's keys copy with Ctrl+K, as F5 refreshes.
   FCopyAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::CTRL | Qt::Key_K) : QKeySequence(Qt::Key_F5));
   FPropertiesAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::ALT | Qt::Key_Return) : QKeySequence(Qt::Key_F9));
@@ -584,7 +626,7 @@ bool MainWindow::OpenSite(const CoreBridge::TSite & Site)
 // on the local panel's directory.
 bool MainWindow::ExploreLocalDirectory()
 {
-  const QUrl Url = QUrl::fromLocalFile(FLocal->Path());
+  const QUrl Url = QUrl::fromLocalFile(ActiveLocalPath());
   return FUrlOpener ? FUrlOpener(Url) : QDesktopServices::openUrl(Url);
 }
 
@@ -693,6 +735,7 @@ bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
   {
     FTabs.push_back(TTab());
     FActiveTab = static_cast<int>(FTabs.size()) - 1;
+    ShowLocalBrowser(false);
   }
   else if (Previous >= 0)
   {
@@ -770,6 +813,10 @@ void MainWindow::Disconnect()
     if (!FTabs.empty())
     {
       UnparkTab(std::min(Closed, static_cast<int>(FTabs.size()) - 1));
+    }
+    else
+    {
+      ShowLocalBrowser(false);
     }
   }
   UpdateTabs();
@@ -851,7 +898,8 @@ bool MainWindow::Download(const QStringList & Names, const QString & Target, boo
 void MainWindow::ActivatePanel(bool Local)
 {
   FLocalActive = Local;
-  (Local ? static_cast<QWidget *>(FLocal->View()) : static_cast<QWidget *>(FPanel->View()))->setFocus();
+  LocalPanel * Panel = SideLocal(Local);
+  ((Panel != nullptr) ? static_cast<QWidget *>(Panel->View()) : static_cast<QWidget *>(FPanel->View()))->setFocus();
 }
 
 void MainWindow::QueueIdle()
@@ -910,6 +958,10 @@ void MainWindow::QueueIdle()
 
 bool MainWindow::TransferSelected(bool Move, bool Confirm, bool Background)
 {
+  if (LocalBrowser())
+  {
+    return LocalLocalCopy(Move, Confirm);
+  }
   const bool FromLocal = FLocalActive;
   const QStringList Names = FromLocal ? FLocal->Selected() : FPanel->Selected();
   const QString Target = FromLocal ? FPanel->Path() : QDir::toNativeSeparators(FLocal->Path());
@@ -937,6 +989,33 @@ bool MainWindow::Drop(bool OnLocal, const QMimeData * Data, const QString & OnDi
     return false;
   }
   TFileDrag Drag;
+  // A local tab: between its panels, local files copied or moved, as
+  // WinSCP's local-local drag (LocalLocalCopy with DragDrop).
+  if (LocalBrowser())
+  {
+    LocalPanel * Panel = SideLocal(OnLocal);
+    if (!ReadFileDrag(Data, Drag) || !Drag.Local)
+    {
+      return false;
+    }
+    const QString Target = DropTarget(Panel->Path(), OnDirectory, false);
+    QStringList Sources;
+    for (const QString & Name : Drag.Names)
+    {
+      Sources.append(QDir(Drag.Directory).filePath(Name));
+    }
+    if (QDir(Drag.Directory) == QDir(Target))
+    {
+      return false;
+    }
+    if (QDir(Drag.Directory) == QDir(Panel->Path()))
+    {
+      // Within the panel, onto one of its directories: moved there.
+      return OnDirectory.isEmpty() ? false : Panel->MoveInto(Drag.Names, OnDirectory);
+    }
+    const QString NativeTarget = QDir::toNativeSeparators(Target);
+    return LocalLocalCopy(Move, Confirm, &Sources, &NativeTarget);
+  }
   if (ReadFileDrag(Data, Drag))
   {
     if (Drag.Local == OnLocal)
@@ -1313,8 +1392,8 @@ void MainWindow::UpdateActions()
   FGenerateFileUrlAction->setEnabled(!FBusy && FSession);
   FAddBookmarkAction->setEnabled(!FBusy);
   FMoveToAction->setEnabled(!FBusy && FSession);
-  FCopyAction->setEnabled(!FBusy && FSession);
-  FMoveAction->setEnabled(!FBusy && FSession);
+  FCopyAction->setEnabled(!FBusy && (FSession || LocalBrowser()));
+  FMoveAction->setEnabled(!FBusy && (FSession || LocalBrowser()));
   FSynchronizeAction->setEnabled(!FBusy && FSession);
   FKeepUpToDateAction->setEnabled(!FBusy && FSession);
   FDisconnectAction->setEnabled(!FBusy && FSession);
@@ -1334,13 +1413,14 @@ void MainWindow::About()
 // The active panel's focused file: files only, as WinSCP's.
 bool MainWindow::CurrentFile(bool & Local, QString & Name, std::int64_t & Size, double & ModifiedTime) const
 {
-  const FileView * View = FLocalActive ? FLocal->View() : FPanel->View();
+  LocalPanel * Panel = SideLocal(FLocalActive);
+  const FileView * View = (Panel != nullptr) ? Panel->View() : FPanel->View();
   const CoreBridge::TRemoteEntry * Entry = View->CurrentEntry();
-  if ((Entry == nullptr) || Entry->Directory || (!FLocalActive && !FSession))
+  if ((Entry == nullptr) || Entry->Directory || ((Panel == nullptr) && !FSession))
   {
     return false;
   }
-  Local = FLocalActive;
+  Local = (Panel != nullptr);
   Name = QString::fromStdString(Entry->Name);
   Size = Entry->Size;
   ModifiedTime = Entry->ModifiedTime;
@@ -1377,7 +1457,7 @@ EditorWindow * MainWindow::EditCurrent()
     EditExternally(Editor, Local, Name);
     return nullptr;
   }
-  return Local ? EditLocal(QDir(FLocal->Path()).filePath(Name)) : EditRemote(Name);
+  return Local ? EditLocal(QDir(ActiveLocalPath()).filePath(Name)) : EditRemote(Name);
 }
 
 bool MainWindow::EditCurrentWith(int Index)
@@ -1434,7 +1514,7 @@ bool MainWindow::EditCurrentWith(int Index)
   }
   if (Editor.Kind == CoreBridge::TEditorDefinition::TKind::Internal)
   {
-    return (Local ? EditLocal(QDir(FLocal->Path()).filePath(Name)) : EditRemote(Name)) != nullptr;
+    return (Local ? EditLocal(QDir(ActiveLocalPath()).filePath(Name)) : EditRemote(Name)) != nullptr;
   }
   return EditExternally(Editor, Local, Name);
 }
@@ -1459,14 +1539,17 @@ QMenu * MainWindow::ContextMenu(bool Local, bool OnItem, const QPoint & Global, 
   // The panel clicked is the one acted on.
   ActivatePanel(Local);
   UpdateActions();
+  // The panel as a local one (the right one in a local tab too).
+  LocalPanel * Side = SideLocal(Local);
+  const bool IsLocal = (Side != nullptr);
   QMenu * Menu = new QMenu(this);
   Menu->setAttribute(Qt::WA_DeleteOnClose, Show);
   if (OnItem)
   {
-    const FileView * View = Local ? FLocal->View() : FPanel->View();
+    const FileView * View = IsLocal ? Side->View() : FPanel->View();
     const CoreBridge::TRemoteEntry * Entry = View->CurrentEntry();
     // CurrentAddEditLinkContextAction: a link's own.
-    if (!Local && (Entry != nullptr) && Entry->Link)
+    if (!IsLocal && (Entry != nullptr) && Entry->Link)
     {
       Menu->addAction(FLinkAction);
     }
@@ -1476,26 +1559,26 @@ QMenu * MainWindow::ContextMenu(bool Local, bool OnItem, const QPoint & Global, 
     Menu->addSeparator();
     Menu->addAction(FCopyAction);
     Menu->addAction(FMoveAction);
-    if (!Local)
+    if (!IsLocal)
     {
       Menu->addAction(FDuplicateAction);
       Menu->addAction(FMoveToAction);
     }
-    Menu->addAction(Local ? FLocal->DeleteAction() : FPanel->DeleteAction());
-    Menu->addAction(Local ? FLocal->RenameAction() : FPanel->RenameAction());
+    Menu->addAction(IsLocal ? Side->DeleteAction() : FPanel->DeleteAction());
+    Menu->addAction(IsLocal ? Side->RenameAction() : FPanel->RenameAction());
     Menu->addSeparator();
-    if (!Local)
+    if (!IsLocal)
     {
       Menu->addMenu(FFileCommandsMenu);
     }
     QMenu * Names = Menu->addMenu(tr("&File Names"));
     Names->addAction(tr("&Copy to Clipboard"), this, [this, Local]() { CopyFileNames(Local, false); });
     Names->addAction(tr("Copy to Clipboard (Include &Paths)"), this, [this, Local]() { CopyFileNames(Local, true); });
-    if (!Local)
+    if (!IsLocal)
     {
       Names->addAction(FGenerateFileUrlAction);
     }
-    if (!Local)
+    if (!IsLocal)
     {
       Menu->addSeparator();
       Menu->addAction(FPropertiesAction);
@@ -1505,31 +1588,31 @@ QMenu * MainWindow::ContextMenu(bool Local, bool OnItem, const QPoint & Global, 
   {
     QMenu * GoTo = Menu->addMenu(tr("&Go To"));
     GoTo->addAction(FOpenDirectoryAction);
-    if (Local)
+    if (IsLocal)
     {
       GoTo->addAction(tr("&Explore Directory"), this, [this]() { ExploreLocalDirectory(); });
     }
     GoTo->addSeparator();
-    for (QAction * Action : Local ?
-           std::initializer_list<QAction *>{ FLocal->ParentAction(), FLocal->RootAction(), FLocal->HomeAction() } :
+    for (QAction * Action : IsLocal ?
+           std::initializer_list<QAction *>{ Side->ParentAction(), Side->RootAction(), Side->HomeAction() } :
            std::initializer_list<QAction *>{ FPanel->ParentAction(), FPanel->RootAction(), FPanel->HomeAction() })
     {
       GoTo->addAction(Action);
     }
     GoTo->addSeparator();
-    GoTo->addAction(Local ? FLocal->BackAction() : FPanel->BackAction());
-    GoTo->addAction(Local ? FLocal->ForwardAction() : FPanel->ForwardAction());
-    Menu->addAction(Local ? FLocal->RefreshAction() : FPanel->RefreshAction());
+    GoTo->addAction(IsLocal ? Side->BackAction() : FPanel->BackAction());
+    GoTo->addAction(IsLocal ? Side->ForwardAction() : FPanel->ForwardAction());
+    Menu->addAction(IsLocal ? Side->RefreshAction() : FPanel->RefreshAction());
     Menu->addAction(FAddBookmarkAction);
     Menu->addAction(FFilterAction);
-    Menu->addAction(tr("&Copy Path to Clipboard"), this, [this, Local]()
+    Menu->addAction(tr("&Copy Path to Clipboard"), this, [this, Side, IsLocal]()
     {
-      QApplication::clipboard()->setText(Local ? QDir::toNativeSeparators(FLocal->Path()) : FPanel->Path());
+      QApplication::clipboard()->setText(IsLocal ? QDir::toNativeSeparators(Side->Path()) : FPanel->Path());
     });
     Menu->addSeparator();
     QMenu * New = Menu->addMenu(tr("&New"));
-    New->addAction(Local ? FLocal->NewFolderAction() : FPanel->NewFolderAction());
-    if (!Local)
+    New->addAction(IsLocal ? Side->NewFolderAction() : FPanel->NewFolderAction());
+    if (!IsLocal)
     {
       Menu->addMenu(FStaticCommandsMenu);
     }
@@ -1543,7 +1626,8 @@ QMenu * MainWindow::ContextMenu(bool Local, bool OnItem, const QPoint & Global, 
 
 void MainWindow::CopyFileNames(bool Local, bool Paths)
 {
-  const QStringList Names = Local ? FLocal->Selected() : FPanel->Selected();
+  LocalPanel * Panel = SideLocal(Local);
+  const QStringList Names = (Panel != nullptr) ? Panel->Selected() : FPanel->Selected();
   QStringList Lines;
   for (const QString & Name : Names)
   {
@@ -1551,9 +1635,9 @@ void MainWindow::CopyFileNames(bool Local, bool Paths)
     {
       Lines.append(Name);
     }
-    else if (Local)
+    else if (Panel != nullptr)
     {
-      Lines.append(QDir::toNativeSeparators(QDir(FLocal->Path()).filePath(Name)));
+      Lines.append(QDir::toNativeSeparators(QDir(Panel->Path()).filePath(Name)));
     }
     else
     {
@@ -1572,7 +1656,7 @@ bool MainWindow::EditExternally(const CoreBridge::TEditorDefinition & Editor, bo
   QString LocalFile;
   if (Local)
   {
-    LocalFile = QDir(FLocal->Path()).filePath(Name);
+    LocalFile = QDir(ActiveLocalPath()).filePath(Name);
   }
   else
   {
@@ -1915,11 +1999,14 @@ bool MainWindow::Properties()
 
 bool MainWindow::AddEditLink()
 {
-  if (FBusy || (!FLocalActive && (!FSession || !FSession->CanLink())))
+  // The local panel's (either, in a local tab), else the remote one's.
+  LocalPanel * Panel = SideLocal(FLocalActive);
+  const bool IsLocal = (Panel != nullptr);
+  if (FBusy || (!IsLocal && (!FSession || !FSession->CanLink())))
   {
     return false;
   }
-  const FileView * View = FLocalActive ? FLocal->View() : FPanel->View();
+  const FileView * View = IsLocal ? Panel->View() : FPanel->View();
   const CoreBridge::TRemoteEntry * Entry = View->CurrentEntry();
   bool Edit = false;
   QString FileName;
@@ -1927,26 +2014,26 @@ bool MainWindow::AddEditLink()
   if (Entry != nullptr)
   {
     const QString Name = QString::fromStdString(Entry->Name);
-    Edit = Entry->Link && (FLocalActive || FSession->CanEditLinks());
+    Edit = Entry->Link && (IsLocal || FSession->CanEditLinks());
     if (Edit)
     {
       FileName = Name;
-      PointTo = FLocalActive ? QFileInfo(QDir(FLocal->Path()).filePath(Name)).symLinkTarget() : QString::fromStdString(Entry->LinkTarget);
+      PointTo = IsLocal ? QFileInfo(QDir(Panel->Path()).filePath(Name)).symLinkTarget() : QString::fromStdString(Entry->LinkTarget);
     }
     else
     {
       PointTo = Name;
     }
   }
-  LinkDialog Dialog(FileName, PointTo, !FLocalActive, Edit, !FLocalActive && FSession->CanHardLink(), this);
+  LinkDialog Dialog(FileName, PointTo, !IsLocal, Edit, !IsLocal && FSession->CanHardLink(), this);
   if (Dialog.exec() != QDialog::Accepted)
   {
     return false;
   }
   bool Result = false;
-  if (FLocalActive)
+  if (IsLocal)
   {
-    const QString Path = QDir(FLocal->Path()).filePath(Dialog.FileName());
+    const QString Path = QDir(Panel->Path()).filePath(Dialog.FileName());
     if (Edit)
     {
       QFile::remove(Path);
@@ -1961,7 +2048,7 @@ bool MainWindow::AddEditLink()
       Frontend.SetWindow(this);
       Frontend.ShowError(Error);
     }
-    FLocal->Refresh();
+    Panel->Refresh();
     return Result;
   }
   FBusy = true;
@@ -2039,8 +2126,9 @@ bool MainWindow::RemoteTransfer(bool Move)
 // ChangeDirectory is false then).
 bool MainWindow::GoLocal(const QString & Directory)
 {
-  return FLocal->ChangeDirectory(Directory) ||
-    (QDir::cleanPath(QDir::fromNativeSeparators(Directory)) == QDir::cleanPath(FLocal->Path()));
+  LocalPanel * Panel = ActiveLocal();
+  return Panel->ChangeDirectory(Directory) ||
+    (QDir::cleanPath(QDir::fromNativeSeparators(Directory)) == QDir::cleanPath(Panel->Path()));
 }
 
 bool MainWindow::GoRemote(const QString & Directory)
@@ -2142,7 +2230,7 @@ bool MainWindow::OpenBookmark(bool AddBookmark, bool & Switched)
 {
   const bool Local = FLocalActive || !FSession;
   bool Shared = CoreBridge::UseSharedBookmarks();
-  const QString Directory = Local ? QDir::toNativeSeparators(FLocal->Path()) : FPanel->Path();
+  const QString Directory = Local ? QDir::toNativeSeparators(ActiveLocalPath()) : FPanel->Path();
   if (AddBookmark)
   {
     // As upstream: asked first, the checkbox choosing the shared bookmarks.
@@ -2182,7 +2270,7 @@ bool MainWindow::OpenBookmark(bool AddBookmark, bool & Switched)
   while (true)
   {
     // Site bookmarks are the site's: with a session, on either side.
-    OpenDirectoryDialog Dialog(!Local, Name, Local ? FLocal->History() : FPanel->History(),
+    OpenDirectoryDialog Dialog(!Local, Name, Local ? ActiveLocal()->History() : FPanel->History(),
       FSession ? FSession->SessionKey() : std::string(), AddBookmark, Shared, this, FSession != nullptr);
     if (Dialog.exec() != QDialog::Accepted)
     {
@@ -2347,7 +2435,9 @@ bool MainWindow::DeleteFound(const std::vector<int> & Indexes, const QStringList
 
 bool MainWindow::Filter()
 {
-  QString Mask = FLocalActive ? FLocal->Filter() : FPanel->Filter();
+  LocalPanel * Panel = SideLocal(FLocalActive);
+  const bool IsLocal = (Panel != nullptr);
+  QString Mask = IsLocal ? Panel->Filter() : FPanel->Filter();
   if (Mask.isEmpty())
   {
     Mask = QStringLiteral("*.*");
@@ -2367,9 +2457,9 @@ bool MainWindow::Filter()
     ShowError(E);
     return false;
   }
-  if (FLocalActive)
+  if (IsLocal)
   {
-    FLocal->SetFilter(Normalized);
+    Panel->SetFilter(Normalized);
   }
   else
   {
@@ -2674,8 +2764,76 @@ void MainWindow::ParkActiveTab()
   TTab & Tab = FTabs[FActiveTab];
   Tab.Session = std::move(FSession);
   Tab.LocalPath = FLocal->Path();
+  if (Tab.LocalBrowser)
+  {
+    Tab.OtherLocalPath = FOtherLocal->Path();
+  }
   Tab.QueueDone = FQueueDone;
   FActiveTab = -1;
+}
+
+void MainWindow::ShowLocalBrowser(bool Local)
+{
+  const bool Focused = FPanel->isAncestorOf(focusWidget()) || FOtherLocal->isAncestorOf(focusWidget());
+  if (FOtherLocal->isVisible() == Local)
+  {
+    return;
+  }
+  // The shown one takes the hidden one's width.
+  QList<int> Sizes = FPanels->sizes();
+  const int Right = Sizes.value(FPanels->indexOf(Local ? static_cast<QWidget *>(FPanel) : static_cast<QWidget *>(FOtherLocal)));
+  FPanel->setVisible(!Local);
+  FOtherLocal->setVisible(Local);
+  Sizes = FPanels->sizes();
+  Sizes[FPanels->indexOf(Local ? static_cast<QWidget *>(FOtherLocal) : static_cast<QWidget *>(FPanel))] = Right;
+  FPanels->setSizes(Sizes);
+  if (Focused)
+  {
+    ActivatePanel(false);
+  }
+}
+
+bool MainWindow::LocalBrowser() const
+{
+  return (FActiveTab >= 0) && (FActiveTab < TabCount()) && FTabs[FActiveTab].LocalBrowser;
+}
+
+LocalPanel * MainWindow::SideLocal(bool Local) const
+{
+  return Local ? FLocal : (LocalBrowser() ? FOtherLocal : nullptr);
+}
+
+LocalPanel * MainWindow::ActiveLocal() const
+{
+  LocalPanel * Panel = SideLocal(FLocalActive);
+  return (Panel != nullptr) ? Panel : FLocal;
+}
+
+QString MainWindow::ActiveLocalPath() const
+{
+  return ActiveLocal()->Path();
+}
+
+void MainWindow::NewLocalTab()
+{
+  if (FBusy)
+  {
+    return;
+  }
+  ParkActiveTab();
+  TTab Tab;
+  Tab.LocalBrowser = true;
+  FTabs.push_back(std::move(Tab));
+  FActiveTab = TabCount() - 1;
+  FPanel->SetSession(nullptr);
+  FQueue->SetSession(nullptr);
+  FQueueDone = 0;
+  FOtherLocal->ApplyPreferences(CoreBridge::Preferences());
+  FOtherLocal->ChangeDirectory(FLocal->Path());
+  ShowLocalBrowser(true);
+  UpdateTabs();
+  UpdateTitle();
+  UpdateActions();
 }
 
 // As TTerminalManager::SetActiveTerminal: the panels on the tab's session,
@@ -2692,6 +2850,11 @@ void MainWindow::UnparkTab(int Index)
   {
     FLocal->ChangeDirectory(Tab.LocalPath);
   }
+  if (Tab.LocalBrowser && !Tab.OtherLocalPath.isEmpty())
+  {
+    FOtherLocal->ChangeDirectory(Tab.OtherLocalPath);
+  }
+  ShowLocalBrowser(Tab.LocalBrowser);
   if (FSession)
   {
     ApplyPreferences();
@@ -2723,7 +2886,8 @@ bool MainWindow::CloseTab(int Index)
   {
     return false;
   }
-  if (!CloseEditors(true, FSession.get()))
+  // (A local tab has no remote editors of its own.)
+  if (FSession && !CloseEditors(true, FSession.get()))
   {
     return false;
   }
@@ -2769,7 +2933,14 @@ void MainWindow::UpdateTabs()
   for (int Index = 0; Index < TabCount(); Index++)
   {
     CoreBridge::TSession * Session = TabSession(Index);
-    const QString Name = (Session != nullptr) ? QString::fromStdString(Session->Name()) : QString();
+    QString Name = (Session != nullptr) ? QString::fromStdString(Session->Name()) : QString();
+    // As GetLocalBrowserSessionTitle: the two directories' last parts.
+    if (FTabs[Index].LocalBrowser)
+    {
+      const bool Active = (Index == FActiveTab);
+      Name = tr("%1 \u2013 %2").arg(ShortPath(Active ? FLocal->Path() : FTabs[Index].LocalPath),
+        ShortPath(Active ? FOtherLocal->Path() : FTabs[Index].OtherLocalPath));
+    }
     if (Index >= FTabBar->count())
     {
       FTabBar->addTab(Name);
@@ -2900,7 +3071,8 @@ bool MainWindow::OpenWorkspace(const QString & Name)
 
 FileView * MainWindow::ActiveView() const
 {
-  return FLocalActive ? FLocal->View() : FPanel->View();
+  LocalPanel * Panel = SideLocal(FLocalActive);
+  return (Panel != nullptr) ? Panel->View() : FPanel->View();
 }
 
 // Mark > Select/Unselect Files with Same Extension: the focused file's.
@@ -2917,55 +3089,55 @@ void MainWindow::SelectSameExtension(bool Select)
 }
 
 // The Local and Remote menus, as WinSCP's: the panel's own, acted on as the
-// active one.
+// active one; filled as the menu opens, the right side being the remote
+// panel or, in a local tab, the other local one.
 QMenu * MainWindow::PanelMenu(bool Local)
 {
-  QMenu * Menu = menuBar()->addMenu(Local ? tr("&Local") : tr("&Remote"));
-  auto OnPanel = [this, Local](auto Function)
+  QMenu * Menu = menuBar()->addMenu(Local ? tr("&Local") : tr("&Right"));
+  connect(Menu, &QMenu::aboutToShow, this, [this, Local, Menu]()
   {
-    return [this, Local, Function]()
+    Menu->clear();
+    LocalPanel * Side = SideLocal(Local);
+    auto OnPanel = [this, Local](auto Function)
     {
-      ActivatePanel(Local);
-      Function();
+      return [this, Local, Function]()
+      {
+        ActivatePanel(Local);
+        Function();
+      };
     };
-  };
-  QMenu * GoTo = Menu->addMenu(tr("&Go To"));
-  GoTo->addAction(tr("&Open Directory/Bookmark..."), this, OnPanel([this]() { OpenDirectory(false); }));
-  if (Local)
-  {
-    GoTo->addAction(FExploreAction);
-  }
-  GoTo->addSeparator();
-  for (QAction * Action : Local ?
-         std::initializer_list<QAction *>{ FLocal->ParentAction(), FLocal->RootAction(), FLocal->HomeAction() } :
-         std::initializer_list<QAction *>{ FPanel->ParentAction(), FPanel->RootAction(), FPanel->HomeAction() })
-  {
-    GoTo->addAction(Action);
-  }
-  GoTo->addSeparator();
-  GoTo->addAction(Local ? FLocal->BackAction() : FPanel->BackAction());
-  GoTo->addAction(Local ? FLocal->ForwardAction() : FPanel->ForwardAction());
-  Menu->addAction(Local ? FLocal->RefreshAction() : FPanel->RefreshAction());
-  Menu->addAction(tr("&Add Path to Bookmarks"), this, OnPanel([this]() { OpenDirectory(true); }));
-  Menu->addAction(tr("Copy &Path to Clipboard"), this, [this, Local]()
-  {
-    QApplication::clipboard()->setText(Local ? QDir::toNativeSeparators(FLocal->Path()) : FPanel->Path());
-  });
-  Menu->addSeparator();
-  // The view's columns, as its header's menu.
-  QMenu * Columns = Menu->addMenu(tr("&Columns"));
-  connect(Columns, &QMenu::aboutToShow, this, [this, Local, Columns]()
-  {
-    Columns->clear();
-    QMenu * Own = (Local ? FLocal->View() : FPanel->View())->ColumnsMenu();
-    for (QAction * Action : Own->actions())
+    QMenu * GoTo = Menu->addMenu(tr("&Go To"));
+    GoTo->addAction(tr("&Open Directory/Bookmark..."), this, OnPanel([this]() { OpenDirectory(false); }));
+    if (Side != nullptr)
     {
-      Action->setParent(Columns);
-      Columns->addAction(Action);
+      QAction * Explore = GoTo->addAction(FExploreAction->text(), this, OnPanel([this]() { ExploreLocalDirectory(); }));
+      Explore->setShortcut(FExploreAction->shortcut());
     }
-    delete Own;
+    GoTo->addSeparator();
+    for (QAction * Action : (Side != nullptr) ?
+           std::initializer_list<QAction *>{ Side->ParentAction(), Side->RootAction(), Side->HomeAction() } :
+           std::initializer_list<QAction *>{ FPanel->ParentAction(), FPanel->RootAction(), FPanel->HomeAction() })
+    {
+      GoTo->addAction(Action);
+    }
+    GoTo->addSeparator();
+    GoTo->addAction((Side != nullptr) ? Side->BackAction() : FPanel->BackAction());
+    GoTo->addAction((Side != nullptr) ? Side->ForwardAction() : FPanel->ForwardAction());
+    Menu->addAction((Side != nullptr) ? Side->RefreshAction() : FPanel->RefreshAction());
+    Menu->addAction(tr("&Add Path to Bookmarks"), this, OnPanel([this]() { OpenDirectory(true); }));
+    Menu->addAction(tr("Copy &Path to Clipboard"), this, [this, Side]()
+    {
+      QApplication::clipboard()->setText((Side != nullptr) ? QDir::toNativeSeparators(Side->Path()) : FPanel->Path());
+    });
+    Menu->addSeparator();
+    // The view's columns, as its header's menu.
+    FileView * View = (Side != nullptr) ? Side->View() : FPanel->View();
+    QMenu * Columns = View->ColumnsMenu(true);
+    Columns->setTitle(tr("&Columns"));
+    Columns->setParent(Menu, Columns->windowFlags());
+    Menu->addMenu(Columns);
+    Menu->addAction(tr("&Filter..."), this, OnPanel([this]() { Filter(); }));
   });
-  Menu->addAction(tr("&Filter..."), this, OnPanel([this]() { Filter(); }));
   return Menu;
 }
 
@@ -2994,7 +3166,8 @@ void MainWindow::BuildMenus()
   {
     return [this, LocalAction, RemoteAction]()
     {
-      (FLocalActive ? (FLocal->*LocalAction)() : (FPanel->*RemoteAction)())->trigger();
+      LocalPanel * Panel = SideLocal(FLocalActive);
+      ((Panel != nullptr) ? (Panel->*LocalAction)() : (FPanel->*RemoteAction)())->trigger();
     };
   };
   QMenu * Files = menuBar()->addMenu(tr("&Files"));
@@ -3033,9 +3206,13 @@ void MainWindow::BuildMenus()
   Commands->addAction(FQuitAction);
 
   QMenu * Tabs = menuBar()->addMenu(tr("&Tabs"));
-  QAction * NewTab = Tabs->addAction(tr("&New Tab..."), this, &MainWindow::SiteManagerDialog);
-  NewTab->setShortcut(FSitesAction->shortcut());
+  // As WinSCP's New Tab: a remote one (the Login dialog, Ctrl+N) or a
+  // local browser.
+  QMenu * NewTab = Tabs->addMenu(tr("&New Tab"));
+  QAction * RemoteTab = NewTab->addAction(tr("&Remote Tab..."), this, &MainWindow::SiteManagerDialog);
+  RemoteTab->setShortcut(FSitesAction->shortcut());
   FSitesAction->setShortcut(QKeySequence());
+  NewTab->addAction(tr("&Local Tab"), this, &MainWindow::NewLocalTab);
   Tabs->addAction(FCloseTabAction);
   Tabs->addAction(FDuplicateTabAction);
   Tabs->addSeparator();
@@ -3103,4 +3280,200 @@ void MainWindow::BuildMenus()
   // The keys of what no menu shows.
   addActions({ FSitesAction, FOpenAction, FOpenDirectoryAction, FAddBookmarkAction, FFilterAction, FHiddenAction,
     FNextTabAction, FPreviousTabAction, FExploreAction });
+}
+
+// --- The local browser ----------------------------------------------------------
+
+namespace
+{
+
+// One file or directory, copied (Move: moved) to Destination, as the
+// shell's file operation WinSCP gives this to (TFileOperator): a directory
+// merged into one that is there; a file that is, overwritten after
+// asking. Error: what failed; false then, or when cancelled.
+bool LocalCopyEntry(QWidget * Window, const QString & Source, const QString & Destination, bool Move,
+  bool Confirm, int & OverwriteAll, QString & Error)
+{
+  const QFileInfo Info(Source);
+  if (Info.isDir() && !Info.isSymLink())
+  {
+    const QString Clean = QDir::cleanPath(Source);
+    if ((QDir::cleanPath(Destination) == Clean) || QDir::cleanPath(Destination).startsWith(Clean + QLatin1Char('/')))
+    {
+      Error = MainWindow::tr("Cannot copy '%1' into itself.").arg(QDir::toNativeSeparators(Source));
+      return false;
+    }
+    // A move within one file system: renamed whole.
+    if (Move && !QFileInfo::exists(Destination) && QDir().rename(Source, Destination))
+    {
+      return true;
+    }
+    if (!QFileInfo(Destination).isDir() && !QDir().mkpath(Destination))
+    {
+      Error = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::CreateLocalDirectoryError))
+        .replace(QStringLiteral("%s"), QDir::toNativeSeparators(Destination));
+      return false;
+    }
+    const QFileInfoList Entries = QDir(Source).entryInfoList(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::Hidden | QDir::System);
+    for (const QFileInfo & Entry : Entries)
+    {
+      if (!LocalCopyEntry(Window, Entry.filePath(), QDir(Destination).filePath(Entry.fileName()), Move, Confirm,
+            OverwriteAll, Error))
+      {
+        return false;
+      }
+    }
+    if (Move && !QDir(Source).rmdir(QStringLiteral(".")) && !QDir().rmdir(Source))
+    {
+      Error = MainWindow::tr("Cannot remove '%1'.").arg(QDir::toNativeSeparators(Source));
+      return false;
+    }
+    return true;
+  }
+  if (QFileInfo::exists(Destination) || QFileInfo(Destination).isSymLink())
+  {
+    if (QFileInfo(Destination).canonicalFilePath() == Info.canonicalFilePath())
+    {
+      Error = MainWindow::tr("Cannot copy '%1' onto itself.").arg(QDir::toNativeSeparators(Source));
+      return false;
+    }
+    int Answer = OverwriteAll;
+    if (Confirm && (Answer == 0))
+    {
+      CoreBridge::TQuery Query;
+      Query.Type = CoreBridge::TQueryType::Confirmation;
+      Query.Message = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::FileOverwrite))
+        .replace(QStringLiteral("%s"), QDir::toNativeSeparators(Destination)).toStdString();
+      for (const auto & Button : std::initializer_list<std::pair<unsigned, const char *>>{
+             { CoreBridge::AnswerYes, "&Yes" }, { CoreBridge::AnswerYesToAll, "Yes to &All" },
+             { CoreBridge::AnswerNo, "&No" }, { CoreBridge::AnswerNoToAll, "N&o to All" },
+             { CoreBridge::AnswerCancel, "Cancel" } })
+      {
+        CoreBridge::TQueryButton QueryButton;
+        QueryButton.Answer = Button.first;
+        QueryButton.Caption = Button.second;
+        Query.Buttons.push_back(QueryButton);
+      }
+      Query.CancelAnswer = CoreBridge::AnswerCancel;
+      QtFrontend Frontend;
+      Frontend.SetWindow(Window);
+      Answer = static_cast<int>(Frontend.Query(Query).Answer);
+      if (Answer == CoreBridge::AnswerYesToAll)
+      {
+        OverwriteAll = CoreBridge::AnswerYes;
+      }
+      else if (Answer == CoreBridge::AnswerNoToAll)
+      {
+        OverwriteAll = CoreBridge::AnswerNo;
+      }
+    }
+    if (Answer == CoreBridge::AnswerCancel)
+    {
+      return false;
+    }
+    if ((Answer == CoreBridge::AnswerNo) || (Answer == CoreBridge::AnswerNoToAll))
+    {
+      return true;
+    }
+    if (!QFile::remove(Destination))
+    {
+      Error = MainWindow::tr("Cannot overwrite '%1'.").arg(QDir::toNativeSeparators(Destination));
+      return false;
+    }
+  }
+  if (Move && QFile::rename(Source, Destination))
+  {
+    return true;
+  }
+  QFile File(Source);
+  if (!File.copy(Destination))
+  {
+    Error = MainWindow::tr("Cannot copy '%1' to '%2': %3")
+      .arg(QDir::toNativeSeparators(Source), QDir::toNativeSeparators(Destination), File.errorString());
+    return false;
+  }
+  if (Move && !QFile::remove(Source))
+  {
+    Error = MainWindow::tr("Cannot remove '%1'.").arg(QDir::toNativeSeparators(Source));
+    return false;
+  }
+  return true;
+}
+
+}  // namespace
+
+bool MainWindow::LocalLocalCopy(bool Move, bool Confirm, const QStringList * Sources, const QString * Target,
+  const QString & Mask)
+{
+  if (FBusy || !LocalBrowser())
+  {
+    return false;
+  }
+  LocalPanel * Source = SideLocal(FLocalActive);
+  LocalPanel * Other = SideLocal(!FLocalActive);
+  QStringList Paths;
+  if (Sources != nullptr)
+  {
+    Paths = *Sources;
+  }
+  else
+  {
+    for (const QString & Name : Source->Selected())
+    {
+      Paths.append(QDir(Source->Path()).filePath(Name));
+    }
+  }
+  if (Paths.isEmpty())
+  {
+    return false;
+  }
+  QString Directory = (Target != nullptr) ? *Target : QDir::toNativeSeparators(Other->Path());
+  QString FileMask = Mask;
+  if (Confirm)
+  {
+    CopyLocalDialog Dialog(Move, Paths.size() > 1, Directory, FileMask, this);
+    if (Dialog.exec() != QDialog::Accepted)
+    {
+      return false;
+    }
+    Directory = Dialog.Directory();
+    FileMask = Dialog.FileMask();
+  }
+  const QString Destination = QDir::fromNativeSeparators(Directory);
+  FBusy = true;
+  UpdateActions();
+  bool Result = true;
+  int OverwriteAll = 0;
+  QString Error;
+  for (const QString & Path : Paths)
+  {
+    const QString Name = QString::fromStdString(CoreBridge::MaskFileName(QFileInfo(Path).fileName().toStdString(),
+      FileMask.toStdString()));
+    if (!LocalCopyEntry(this, Path, QDir(Destination).filePath(Name), Move, true, OverwriteAll, Error))
+    {
+      Result = false;
+      break;
+    }
+  }
+  FBusy = false;
+  Source->View()->clearSelection();
+  // As ReloadLocalDirectory: both panels, as either may show either.
+  FLocal->Refresh();
+  FOtherLocal->Refresh();
+  UpdateActions();
+  if (!Error.isEmpty())
+  {
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Error;
+    Query.Message = Error.toStdString();
+    CoreBridge::TQueryButton OK;
+    OK.Answer = CoreBridge::AnswerOK;
+    OK.Caption = "OK";
+    Query.Buttons = { OK };
+    Query.CancelAnswer = CoreBridge::AnswerOK;
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    Frontend.Query(Query);
+  }
+  return Result;
 }

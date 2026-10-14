@@ -191,7 +191,8 @@ public:
   // until shown; the header's context menu shows and hides each but the
   // name. To call once the model is set.
   void SetupColumns();
-  QMenu * ColumnsMenu();
+  // MenuCaptions: the main menu's names for them, else the headers'.
+  QMenu * ColumnsMenu(bool MenuCaptions = false);
   // The columns' layout as WinSCP keeps it (TIEListViewColProperties'
   // params: "sort;ascending|width,visible;...;@ppi|order"), over WinSCP's
   // columns: Map gives each of the model's columns its WinSCP index (-1:

@@ -14,6 +14,8 @@ import argparse, os, re, subprocess, sys
 # linscp's own: (menu path, caption).
 EXTRA = {
     ('Files', 'Edit With'), ('Files', 'Copy'), ('Files', 'Move'),
+    # The local panel's POSIX columns.
+    ('Columns', 'Permissions'), ('Columns', 'Owner'), ('Columns', 'Group'), ('Columns', 'Link Target'),
 }
 # WinSCP's captions that linscp's shell gives otherwise.
 RENAMES = {'LocalX': 'Left', 'RemoteX': 'Right'}

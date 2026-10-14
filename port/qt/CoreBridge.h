@@ -619,6 +619,12 @@ enum class TText
   SelectMaskSelectCaption, // "Select"
   SelectMaskDeselectCaption, // "Deselect"
   FilterMaskCaption, // "Filter"
+  CopyLocalCopyCaption, // "Copy"
+  CopyLocalMoveCaption, // "Move"
+  CreateLocalDirectory, // "Directory '%s' doesn't exist. Create?"
+  CreateLocalDirectoryError, // "Can't create folder '%s'."
+  SelectLocalDirectory, // "Select local directory."
+  FileOverwrite, // "File '%s' already exists. Overwrite?"
   NotSupported, // "Operation not supported."
   LicenseCaption, // "%s license"
   TagAdd,         // "Add tag"
@@ -701,6 +707,9 @@ TMaskParts SplitMask(const std::string & Mask);
 std::string ComposeMask(const TMaskParts & Parts);
 // TFileMasks::NormalizeMask: "*.*" and the like as no mask ("").
 std::string NormalizeMask(const std::string & Mask);
+// A name through a transfer's file mask ("*.bak": the name with that
+// extension), as core's MaskFileName.
+std::string MaskFileName(const std::string & FileName, const std::string & Mask);
 // The same against a full path (local or remote), as the panels' file
 // colors match (TCustomScpExplorerForm::DirViewGetItemColor), so masks with
 // directories work.
