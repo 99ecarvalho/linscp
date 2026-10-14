@@ -541,6 +541,17 @@ struct TFileProperties
   bool Recursive = false;
 };
 
+// The Create folder dialog's permissions, and as kept for next time
+// (GUIConfiguration's NewDirectoryProperties).
+struct TNewDirectory
+{
+  bool SetRights = false;
+  TRightsState Rights;
+};
+TNewDirectory NewDirectorySettings();
+// Saves them ("use same settings next time").
+void SetNewDirectorySettings(const TNewDirectory & Settings);
+
 // What the dialog shows of a selection, as TCustomScpExplorerForm's
 // SetProperties gathers it.
 struct TPropertiesInfo
@@ -810,7 +821,12 @@ public:
   // Reads the current directory again.
   void Refresh();
   // In the current directory, or at a full path.
-  void CreateDirectory(const std::string & Name);
+  // As TCustomScpExplorerForm::CreateRemoteDirectory: with the Create
+  // folder dialog's permissions, when set, and the transfer settings'
+  // encryption of new files.
+  void CreateDirectory(const std::string & Name, const TNewDirectory * Properties = nullptr);
+  // Whether the server can set permissions (fcModeChanging).
+  bool CanChangeRights() const;
   // An entry of the current directory, to a new name (or path).
   void Rename(const std::string & Name, const std::string & NewName);
   // Entries of the current directory into another remote directory (a full

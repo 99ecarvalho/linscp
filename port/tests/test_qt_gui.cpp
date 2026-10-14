@@ -32,7 +32,8 @@
 //     Files > Properties over the suite's FTP server (which keeps SITE
 //     CHMOD's modes): the dialog's texts, the rights frame (octal, menu,
 //     mixed bits for several files), permissions changed, a directory's
-//     size calculated, recursion offered for directories
+//     size calculated, recursion offered for directories; Create folder
+//     (F7) with permissions, kept for next time
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -57,6 +58,7 @@
 #include <QMimeData>
 #include <QUrl>
 #include <QIcon>
+#include <QGroupBox>
 
 #include <memory>
 
@@ -95,6 +97,7 @@
 #include "AboutDialog.h"
 #include "PropertiesDialog.h"
 #include "RightsFrame.h"
+#include "CreateDirectoryDialog.h"
 #include "EditorWindow.h"
 
 #include <QPlainTextEdit>
@@ -1879,6 +1882,41 @@ void Properties(const char * Port)
     Check(Session->SetProperties({ "sub" }, Change), "a directory's permissions");
     Check(Session->PropertiesOf({ "sub" }).Properties.Rights.Set == 0700, "changed");
     Check(!Session->SetProperties({ "sub" }, Change), "and nothing to change the second time");
+
+    // Create folder (F7): the name, and permissions for a remote one.
+    {
+      CreateDirectoryDialog Local(QStringLiteral("New folder"), false, false, CoreBridge::TNewDirectory());
+      Check(Local.AttributesGroup()->isHidden() && Local.SaveSettingsCheck()->isHidden(), "a local folder: a name only");
+      Local.NameEdit()->setText(QStringLiteral("  "));
+      Check(!Local.OkButton()->isEnabled(), "and one is needed");
+      CreateDirectoryDialog Dialog(QStringLiteral("New folder"), true, Session->CanChangeRights(), CoreBridge::NewDirectorySettings());
+      Check(!Dialog.SetRightsCheck()->isChecked() && !Dialog.Rights()->isEnabled() && Dialog.SetRightsCheck()->isEnabled(),
+        "a remote one: permissions not set by default, settable");
+      Dialog.SetRightsCheck()->setChecked(true);
+      Check(Dialog.Rights()->isEnabled(), "set, the rights frame is on");
+    }
+    Responder.Custom = [](QWidget * Modal)
+    {
+      CreateDirectoryDialog * Dialog = qobject_cast<CreateDirectoryDialog *>(Modal);
+      if (Dialog == nullptr)
+      {
+        return false;
+      }
+      Dialog->NameEdit()->setText(QStringLiteral("made"));
+      Dialog->SetRightsCheck()->setChecked(true);
+      CoreBridge::TRightsState State;
+      State.Set = 0750;
+      State.Unset = 07777 & ~0750u;
+      Dialog->Rights()->SetRights(State);
+      Dialog->SaveSettingsCheck()->setChecked(true);
+      Dialog->OkButton()->click();
+      return true;
+    };
+    Check(Remote->NewFolderDialog() && Remote->Names().contains(QStringLiteral("made")), "F7 makes the folder");
+    Check(Session->PropertiesOf({ "made" }).Properties.Rights.Set == 0750, "with its permissions");
+    Check(CoreBridge::NewDirectorySettings().SetRights && (CoreBridge::NewDirectorySettings().Rights.Set == 0750),
+      "kept for next time");
+    Responder.Custom = nullptr;
     Frontend.SetWindow(nullptr);
   }
   CoreBridge::Finalize();

@@ -18,6 +18,7 @@
 
 #include <functional>
 
+#include "CreateDirectoryDialog.h"
 #include "QtFrontend.h"
 
 namespace
@@ -59,13 +60,7 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   Bar->addSeparator();
   FNewFolderAction = Add(QStyle::SP_FileDialogNewFolder, tr("Create Directory"), QKeySequence(Qt::Key_F7), [this]()
   {
-    bool OK = false;
-    const QString Name = QInputDialog::getText(this, tr("Create folder"), tr("New &folder name:"), QLineEdit::Normal,
-      CoreText(CoreBridge::TText::NewFolderName), &OK).trimmed();
-    if (OK && !Name.isEmpty())
-    {
-      NewFolder(Name);
-    }
+    NewFolderDialog();
   });
   FRenameAction = Add(QStyle::SP_FileDialogDetailedView, tr("Rename"), QKeySequence(Qt::Key_F2), [this]()
   {
@@ -249,9 +244,36 @@ bool RemotePanel::Refresh()
   return Run([this]() { FSession->Refresh(); }, false);
 }
 
-bool RemotePanel::NewFolder(const QString & Name)
+bool RemotePanel::NewFolderDialog()
 {
-  const bool Result = Run([this, &Name]() { FSession->CreateDirectory(Name.toStdString()); }, false);
+  if (FSession == nullptr)
+  {
+    return false;
+  }
+  CreateDirectoryDialog Dialog(CoreText(CoreBridge::TText::NewFolderName), true, FSession->CanChangeRights(),
+    CoreBridge::NewDirectorySettings(), this);
+  if (Dialog.exec() != QDialog::Accepted)
+  {
+    return false;
+  }
+  const CoreBridge::TNewDirectory Settings = Dialog.Settings();
+  if (Dialog.SaveSettings())
+  {
+    try
+    {
+      CoreBridge::SetNewDirectorySettings(Settings);
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+    }
+  }
+  return NewFolder(Dialog.Name().trimmed(), &Settings);
+}
+
+bool RemotePanel::NewFolder(const QString & Name, const CoreBridge::TNewDirectory * Settings)
+{
+  const bool Result = Run([this, &Name, Settings]() { FSession->CreateDirectory(Name.toStdString(), Settings); }, false);
   if (Result)
   {
     Select({ Name });

@@ -21,6 +21,7 @@
 #include <QUrl>
 #include <QVBoxLayout>
 
+#include "CreateDirectoryDialog.h"
 #include "QtFrontend.h"
 
 namespace
@@ -111,13 +112,7 @@ LocalPanel::LocalPanel(QWidget * Parent) :
   Bar->addSeparator();
   FNewFolderAction = Add(QStyle::SP_FileDialogNewFolder, tr("Create Directory"), QKeySequence(Qt::Key_F7), [this]()
   {
-    bool OK = false;
-    const QString Name = QInputDialog::getText(this, tr("Create folder"), tr("New &folder name:"), QLineEdit::Normal,
-      CoreText(CoreBridge::TText::NewFolderName), &OK).trimmed();
-    if (OK && !Name.isEmpty())
-    {
-      NewFolder(Name);
-    }
+    NewFolderDialog();
   });
   FRenameAction = Add(QStyle::SP_FileDialogDetailedView, tr("Rename"), QKeySequence(Qt::Key_F2), [this]()
   {
@@ -302,6 +297,12 @@ bool LocalPanel::Refresh()
 {
   Reload();
   return true;
+}
+
+bool LocalPanel::NewFolderDialog()
+{
+  CreateDirectoryDialog Dialog(CoreText(CoreBridge::TText::NewFolderName), false, false, CoreBridge::TNewDirectory(), this);
+  return (Dialog.exec() == QDialog::Accepted) && NewFolder(Dialog.Name().trimmed());
 }
 
 bool LocalPanel::NewFolder(const QString & Name)

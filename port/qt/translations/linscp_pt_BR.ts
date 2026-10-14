@@ -41,6 +41,29 @@
     </message>
 </context>
 <context>
+    <name>CreateDirectoryDialog</name>
+    <message>
+        <source>Create folder</source>
+        <translation>Criar pasta</translation>
+    </message>
+    <message>
+        <source>New &amp;folder name:</source>
+        <translation>Nome da no&amp;va pasta:</translation>
+    </message>
+    <message>
+        <source>Attributes</source>
+        <translation>Atributos</translation>
+    </message>
+    <message>
+        <source>Set pe&amp;rmissions</source>
+        <translation>Definir permissões</translation>
+    </message>
+    <message>
+        <source>Use &amp;same settings next time</source>
+        <translation>Usar as &amp;mesmas configurações na próxima vez</translation>
+    </message>
+</context>
+<context>
     <name>EditorWindow</name>
     <message>
         <source>Replace</source>
@@ -326,14 +349,6 @@
     <message>
         <source>Create Directory</source>
         <translation>Criar diretório</translation>
-    </message>
-    <message>
-        <source>Create folder</source>
-        <translation>Criar pasta</translation>
-    </message>
-    <message>
-        <source>New &amp;folder name:</source>
-        <translation>Nome da no&amp;va pasta:</translation>
     </message>
     <message>
         <source>Rename</source>
@@ -1137,14 +1152,6 @@
     <message>
         <source>Create Directory</source>
         <translation>Criar diretório</translation>
-    </message>
-    <message>
-        <source>Create folder</source>
-        <translation>Criar pasta</translation>
-    </message>
-    <message>
-        <source>New &amp;folder name:</source>
-        <translation>Nome da no&amp;va pasta:</translation>
     </message>
     <message>
         <source>Rename</source>

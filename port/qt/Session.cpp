@@ -376,6 +376,9 @@ TRemoteFile * FindFile(TTerminal * Terminal, const std::string & Name)
   throw Exception(FMTLOAD(FILE_NOT_EXISTS, (FileName)));
 }
 
+// Core's TRights of the bridge's (Properties, below).
+TRights RightsOf(const TRightsState & State);
+
 }  // namespace
 
 // As TUnixDirView::ExecuteHomeDirectory: with "default directory is home",
@@ -433,14 +436,21 @@ void TSession::Refresh()
   }
 }
 
-void TSession::CreateDirectory(const std::string & Name)
+void TSession::CreateDirectory(const std::string & Name, const TNewDirectory * NewDirectory)
 {
   try
   {
     CheckActive(*this);
-    // Core reads the properties whatever is set in them: none here, the
-    // server's defaults (as the GUI's Create folder with nothing ticked).
+    // Core reads the properties whatever is set in them: with nothing set,
+    // the server's defaults (as the GUI's Create folder with nothing ticked).
     TRemoteProperties Properties;
+    if ((NewDirectory != NULL) && NewDirectory->SetRights && F->Terminal->IsCapable[fcModeChanging])
+    {
+      Properties.Valid << vpRights;
+      Properties.Rights = RightsOf(NewDirectory->Rights);
+    }
+    Properties.Valid << vpEncrypt;
+    Properties.Encrypt = GUIConfiguration->CurrentCopyParam.EncryptNewFiles;
     F->Terminal->CreateDirectory(FromUtf8(Name), &Properties);
   }
   catch (Exception & E)
@@ -1117,6 +1127,37 @@ public:
 };
 
 }  // namespace
+
+bool TSession::CanChangeRights() const
+{
+  return Active() && F->Terminal->IsCapable[fcModeChanging];
+}
+
+TNewDirectory NewDirectorySettings()
+{
+  const TRemoteProperties Properties = GUIConfiguration->NewDirectoryProperties;
+  TNewDirectory Result;
+  Result.SetRights = Properties.Valid.Contains(vpRights);
+  // A sensible value even when not set, as TCreateDirectoryDialog expects.
+  Result.Rights = RightsStateOf(Properties.Rights);
+  return Result;
+}
+
+void SetNewDirectorySettings(const TNewDirectory & Settings)
+{
+  try
+  {
+    TRemoteProperties Properties = GUIConfiguration->NewDirectoryProperties;
+    Properties.Rights = RightsOf(Settings.Rights);
+    Properties.Valid = Settings.SetRights ? (Properties.Valid << vpRights) : (Properties.Valid >> vpRights);
+    GUIConfiguration->NewDirectoryProperties = Properties;
+    Configuration->SaveExplicit();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
 
 std::string RightsText(const TRightsState & Rights)
 {

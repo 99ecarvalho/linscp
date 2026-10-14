@@ -110,6 +110,7 @@ CONTEXT_FORMS = {
     'FindDialog': ['Editor.dfm'],
     'PropertiesDialog': ['Properties.dfm'],
     'RightsFrame': ['Rights.dfm'],
+    'CreateDirectoryDialog': ['CreateDirectory.dfm'],
 }
 
 

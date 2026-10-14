@@ -38,6 +38,8 @@ public:
   bool Home();
   bool Refresh();
   bool NewFolder(const QString & Name);
+  // F7: the Create folder dialog, then the folder.
+  bool NewFolderDialog();
   bool Rename(const QString & Name, const QString & NewName);
   // The selected entries, to the trash (or for good where there is no
   // trash), after core's confirmation unless not asked.

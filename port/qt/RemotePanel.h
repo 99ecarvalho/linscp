@@ -44,7 +44,11 @@ public:
   bool Root();
   bool Home();
   bool Refresh();
-  bool NewFolder(const QString & Name);
+  // With the permissions the Create folder dialog sets, when given.
+  bool NewFolder(const QString & Name, const CoreBridge::TNewDirectory * Settings = nullptr);
+  // F7: the Create folder dialog, then the folder. False when cancelled or
+  // not made.
+  bool NewFolderDialog();
   bool Rename(const QString & Name, const QString & NewName);
   // The selected entries, after asking (core's confirmation) unless not.
   bool DeleteSelected(bool Confirm = true);
