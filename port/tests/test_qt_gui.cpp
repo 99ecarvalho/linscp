@@ -128,6 +128,7 @@
 #include "GenerateUrlDialog.h"
 #include "ConsoleDialog.h"
 #include "SiteRawDialog.h"
+#include "ImportSitesDialog.h"
 #include "RtfText.h"
 #include <QTextBrowser>
 #include <QPlainTextEdit>
@@ -537,6 +538,46 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
       Check(CoreBridge::LoadSite("Tests/rclone").Timeout == 33, "saved with the site");
       const QString Again = QString::fromStdString(CoreBridge::SiteRawSettings(CoreBridge::LoadSite("Tests/rclone"), "Tests/rclone"));
       Check(Again.contains(QStringLiteral("PingIntervalSecs=21")), "an option the form has no field for too");
+    }
+    // Import sites: from an INI file, and known_hosts' host keys.
+    {
+      const QString Ini = QDir(Directory).filePath(QStringLiteral("import.ini"));
+      {
+        QFile File(Ini);
+        File.open(QIODevice::WriteOnly);
+        File.write("[Sessions\\Imported%20site]\nHostName=import.example\nUserName=bob\n");
+      }
+      ImportSitesDialog Import;
+      Check(Import.SourceCombo()->count() == 6, "WinSCP's six sources");
+      Import.SourceCombo()->setCurrentIndex(CoreBridge::TImportSites::Kitty);
+      Check((Import.List()->count() > 0) || !Import.ErrorLabel()->isHidden(), "a source with nothing says why");
+      Import.SourceCombo()->setCurrentIndex(CoreBridge::TImportSites::Ini);
+      Import.LoadIni(Ini);
+      Check((Import.List()->count() == 1) && (Import.List()->item(0)->text() == QStringLiteral("Imported site")),
+        "the INI file's site");
+      // As core selects them: a site not stored yet, checked.
+      Check((Import.List()->item(0)->checkState() == Qt::Checked) && Import.OkButton()->isEnabled(), "new: checked");
+      Import.List()->item(0)->setCheckState(Qt::Unchecked);
+      Check(!Import.OkButton()->isEnabled(), "none checked: nothing to import");
+      Import.List()->item(0)->setCheckState(Qt::Checked);
+      Import.OkButton()->click();
+      Check((Import.Imported().size() == 1) && CoreBridge::SiteExists(Import.Imported().front()) &&
+        (CoreBridge::LoadSite(Import.Imported().front()).HostName == "import.example"), "imported");
+      CoreBridge::DeleteSite(Import.Imported().front());
+    }
+    if (!Key.isEmpty())
+    {
+      QFile Public(Key + QStringLiteral(".pub"));
+      if (Public.open(QIODevice::ReadOnly))
+      {
+        const QString Line = QStringLiteral("knownhost.example ") + QString::fromUtf8(Public.readAll()).trimmed();
+        ImportSitesDialog Import;
+        Import.SourceCombo()->setCurrentIndex(CoreBridge::TImportSites::KnownHosts);
+        Import.LoadKnownHosts(Line);
+        Check((Import.List()->count() == 1) && Import.List()->item(0)->text().contains(QStringLiteral("knownhost.example")),
+          "a known_hosts line pasted");
+        Check(Import.List()->item(0)->toolTip().contains(QStringLiteral("ssh-ed25519")), "its host key's algorithm");
+      }
     }
     {
       SiteManager Dialog(&Window);

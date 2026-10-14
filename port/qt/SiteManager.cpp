@@ -22,6 +22,7 @@
 #include "QtFrontend.h"
 #include "SiteAdvanced.h"
 #include "SiteRawDialog.h"
+#include "ImportSitesDialog.h"
 #include <QMenu>
 #include <QToolButton>
 
@@ -157,6 +158,11 @@ SiteManager::SiteManager(QWidget * Parent) :
   FLogin->setDefault(true);
   FSave = Box->addButton(tr("&Save"), QDialogButtonBox::ActionRole);
   QPushButton * Close = Box->addButton(tr("Close"), QDialogButtonBox::RejectRole);
+  // As upstream's Login: Tools, its menu.
+  QPushButton * Tools = Box->addButton(tr("&Tools"), QDialogButtonBox::ResetRole);
+  QMenu * ToolsMenu = new QMenu(Tools);
+  ToolsMenu->addAction(tr("&Import Sites..."), this, [this]() { ImportSites(); });
+  Tools->setMenu(ToolsMenu);
   connect(FLogin, &QPushButton::clicked, this, &SiteManager::accept);
   connect(FSave, &QPushButton::clicked, this, &SiteManager::Save);
   connect(Close, &QPushButton::clicked, this, &QDialog::reject);
@@ -442,6 +448,18 @@ void SiteManager::Advanced()
   {
     FSite = Dialog.Site();
   }
+}
+
+bool SiteManager::ImportSites()
+{
+  ImportSitesDialog Dialog(this);
+  if (Dialog.exec() != QDialog::Accepted)
+  {
+    return false;
+  }
+  // As upstream: the first imported selected.
+  Fill(Dialog.Imported().empty() ? QString() : QString::fromStdString(Dialog.Imported().front()));
+  return true;
 }
 
 bool SiteManager::RawSettings(const QString * Raw)

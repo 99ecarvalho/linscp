@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 11 | 23 | Parity on features users depend on |
+| P3 Qt parity | 12 | 23 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **89** | **110** | |
+| **Total** | **90** | **110** | |
 
 ## Next three actions
 
@@ -235,8 +235,8 @@ internal editor, remote files downloaded to a temporary directory and
 uploaded back on save, as WinSCP (ADR 0015). P2-10 and P2-11 wait, at the
 user's request.
 
-1. **P3-06c**: the session tools' dialogs (server information, Generate
-   URL, Console, raw site settings, Import sites), then P3-06d…f.
+1. **P3-06d**: custom commands, then P3-06e (keep remote directory up
+   to date) and P3-06f.
 2. **P3-08**, then **P3-04e**: shell integration, then Preferences'
    Editors page with external editors (ADR 0015).
 3. Offer `core-log-file-name-delimiter.patch` and
@@ -766,7 +766,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-06 | Remaining 48 dialogs, batched | wip | split into P3-06a…f (below), each counted as its own task; done when they are. Written by hand from the `.dfm`s, as P3-02…05 were, without waiting on P3-01 |
 | P3-06a | Dialogs: file operations | done | Properties (F9: `PropertiesDialog`, `RightsFrame` with mixed bits, owner and group, recursion, size, checksums) over core's `TRemoteProperties`; Create folder (F7) with permissions kept in `NewDirectoryProperties`; links (Alt+F6, local ones the system's); Duplicate and Move To (Shift+F5/F6) within the server, through a temporary copy where it cannot copy; ctest `qt_gui_properties` (FTP); native on Windows 11 too. WinSCP's CopyLocal belongs to its local-to-local browsing, which the shell does not have. Not yet: local files' properties, S3 ACLs and tags, the secondary shell for checksums and copies |
 | P3-06b | Dialogs: navigation | done | Open directory and bookmarks (Ctrl+O, Ctrl+B) over core's `TBookmarks`, kept by `TShellConfiguration` under `TWinConfiguration`'s keys; Location Profiles (the Commander's preference), with folders; Find Files (Alt+F7) over core's `FilesFind`; Edit file mask; the panels' filter (Ctrl+Alt+F) and the Select dialogs' Edit...; ctests `qt_gui_bookmarks`, `qt_gui_keys`; native on Windows 11 too. Not yet: bookmarks' shortcuts (shown, not editable or bound), the Go To menu's bookmark list, opened folders kept, mask hints |
-| P3-06c | Dialogs: session tools | todo | Server information, Generate URL, Console, raw site settings, Import sites |
+| P3-06c | Dialogs: session tools | done | Server/Protocol Information (`TSession::ServerInfo`, space available); Generate Session URL/Code and File URL (TGenerateUrlDialog's generation ported to `GenerateCode.cpp`, its RTF shown by `RtfText.cpp`, scripts for linscp's command-line client); Open Terminal (core's `AnyCommand`, a separate shell session after WinSCP's question); Edit Raw Settings (the site manager's Advanced dropdown); Tools > Import Sites (PuTTY, KiTTY, FileZilla, OpenSSH, INI, known_hosts); ctests `qt_gui_tools`, `qt_gui_properties`, `qt_gui_sites`; native on Windows 11 too. Not yet: the transfer code from the Copy dialog, the console's window size kept, OpenSSH key conversion on import |
 | P3-06d | Dialogs: custom commands | todo | |
 | P3-06e | Dialogs: keep remote directory up to date | todo | |
 | P3-06f | Dialogs: the rest | todo | workspace, shortcut, cleanup, license, S3 tags; usage statistics not ported |

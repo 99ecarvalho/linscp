@@ -529,6 +529,29 @@
     </message>
 </context>
 <context>
+    <name>ImportSitesDialog</name>
+    <message>
+        <source>&amp;Import from:</source>
+        <translation>&amp;Importar de</translation>
+    </message>
+    <message>
+        <source>B&amp;rowse...</source>
+        <translation>P&amp;rocurar...</translation>
+    </message>
+    <message>
+        <source>&amp;Paste</source>
+        <translation>Co&amp;lar</translation>
+    </message>
+    <message>
+        <source>Un/check &amp;all</source>
+        <translation>des/selecionar &amp;tudo</translation>
+    </message>
+    <message>
+        <source>INI files (*.ini);;All files (*)</source>
+        <translation>Arquivos INI (*.ini);;Todos os arquivos (*)</translation>
+    </message>
+</context>
+<context>
     <name>LinkDialog</name>
     <message>
         <source>&amp;Link/shortcut file:</source>
@@ -1892,6 +1915,14 @@
     <message>
         <source>Edit &amp;Raw Settings...</source>
         <translation>Editar &amp;Parâmetros Avançados...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Ferramentas</translation>
+    </message>
+    <message>
+        <source>&amp;Import Sites...</source>
+        <translation>&amp;Importar...</translation>
     </message>
 </context>
 <context>

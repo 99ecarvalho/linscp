@@ -9,6 +9,10 @@
 #include <CoreMain.h>
 #include <SessionData.h>
 #include <TextsWin.h>
+#include <GUIConfiguration.h>
+#include <Configuration.h>
+#include <HierarchicalStorage.h>
+#include <Common.h>
 
 #include <memory>
 
@@ -410,3 +414,161 @@ void DeleteSite(const std::string & Name)
 }
 
 }
+
+namespace CoreBridge
+{
+
+// --- Import sites --------------------------------------------------------------
+
+struct TImportSites::TImpl
+{
+  std::unique_ptr<TStoredSessionList> Lists[SourceCount];
+  UnicodeString Errors[SourceCount];
+  UnicodeString IniFileName;
+};
+
+TImportSites::TImportSites() :
+  F(new TImpl())
+{
+  try
+  {
+    UnicodeString Error;
+    F->Lists[Putty].reset(GUIConfiguration->SelectPuttySessionsForImport(OriginalPuttyRegistryStorageKey, L"PuTTY", StoredSessions, Error));
+    F->Errors[Putty] = Error;
+    F->Lists[Kitty].reset(GUIConfiguration->SelectPuttySessionsForImport(KittyRegistryStorageKey, L"KiTTY", StoredSessions, Error));
+    F->Errors[Kitty] = Error;
+    F->Lists[FileZilla].reset(Configuration->SelectFilezillaSessionsForImport(StoredSessions, Error));
+    F->Errors[FileZilla] = Error;
+    F->Lists[OpenSsh].reset(Configuration->SelectOpensshSessionsForImport(StoredSessions, Error));
+    F->Errors[OpenSsh] = Error;
+    F->Lists[Ini].reset(Configuration->SelectSessionsForImport(StoredSessions, F->IniFileName, Error));
+    F->Errors[Ini] = Error;
+    F->Lists[KnownHosts].reset(Configuration->SelectKnownHostsSessionsForImport(StoredSessions, Error));
+    F->Errors[KnownHosts] = Error;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+TImportSites::~TImportSites() = default;
+
+std::string TImportSites::SourceName(int Source) const
+{
+  static const char * const Names[] = { "PuTTY", "KiTTY", "FileZilla", "OpenSSH", "INI file", "known_hosts" };
+  return ((Source >= 0) && (Source < SourceCount)) ? Names[Source] : std::string();
+}
+
+std::string TImportSites::Error(int Source) const
+{
+  return ((Source >= 0) && (Source < SourceCount)) ? Utf8(F->Errors[Source]) : std::string();
+}
+
+// TImportSessionsDialog::SessionListView2InfoTip.
+std::vector<std::pair<std::string, std::string>> TImportSites::Sites(int Source) const
+{
+  std::vector<std::pair<std::string, std::string>> Result;
+  TStoredSessionList * List = ((Source >= 0) && (Source < SourceCount)) ? F->Lists[Source].get() : NULL;
+  for (int Index = 0; (List != NULL) && (Index < List->Count); Index++)
+  {
+    TSessionData * Data = List->Sessions[Index];
+    UnicodeString InfoTip;
+    if (Source == KnownHosts)
+    {
+      UnicodeString Algs;
+      UnicodeString HostKeys = Data->HostKey;
+      while (!HostKeys.IsEmpty())
+      {
+        UnicodeString HostKey = CutToChar(HostKeys, L';', true);
+        UnicodeString Alg = CutToChar(HostKey, L':', true);
+        AddToList(Algs, Alg, L", ");
+      }
+      InfoTip = FMTLOAD(IMPORT_KNOWNHOSTS_INFO_TIP, (Data->HostName, Algs));
+    }
+    else
+    {
+      InfoTip = Data->InfoTip;
+    }
+    Result.emplace_back(Utf8(Data->Name), Utf8(InfoTip));
+  }
+  return Result;
+}
+
+bool TImportSites::Selected(int Source, int Index) const
+{
+  TStoredSessionList * List = F->Lists[Source].get();
+  return (List != NULL) && (Index >= 0) && (Index < List->Count) && List->Sessions[Index]->Selected;
+}
+
+void TImportSites::Select(int Source, int Index, bool Selected)
+{
+  TStoredSessionList * List = F->Lists[Source].get();
+  if ((List != NULL) && (Index >= 0) && (Index < List->Count))
+  {
+    List->Sessions[Index]->Selected = Selected;
+  }
+}
+
+void TImportSites::LoadIni(const std::string & FileName)
+{
+  F->IniFileName = FromUtf8(FileName);
+  UnicodeString Error;
+  F->Lists[Ini].reset(Configuration->SelectSessionsForImport(StoredSessions, F->IniFileName, Error));
+  F->Errors[Ini] = Error;
+}
+
+void TImportSites::LoadKnownHosts(const std::string & Text)
+{
+  std::unique_ptr<TStrings> Lines(new TStringList());
+  Lines->Text = FromUtf8(Text);
+  UnicodeString Error;
+  F->Lists[KnownHosts].reset(Configuration->SelectKnownHostsSessionsForImport(Lines.get(), StoredSessions, Error));
+  F->Errors[KnownHosts] = Error;
+}
+
+std::vector<std::string> TImportSites::Import(int Source)
+{
+  try
+  {
+    // As Execute's ClearSelections: only the source shown is imported.
+    for (int Index = 0; Index < SourceCount; Index++)
+    {
+      TStoredSessionList * List = F->Lists[Index].get();
+      for (int Site = 0; (Index != Source) && (List != NULL) && (Site < List->Count); Site++)
+      {
+        List->Sessions[Site]->Selected = false;
+      }
+    }
+    std::unique_ptr<TList> Imported(new TList());
+    UnicodeString PuttyHostKeysSourceKey = OriginalPuttyRegistryStorageKey;
+    StoredSessions->Import(F->Lists[Putty].get(), true, Imported.get());
+    TStoredSessionList::ImportHostKeys(PuttyHostKeysSourceKey, F->Lists[Putty].get(), true);
+    StoredSessions->Import(F->Lists[Kitty].get(), true, Imported.get());
+    TStoredSessionList::ImportHostKeys(KittyRegistryStorageKey, F->Lists[Kitty].get(), true);
+    StoredSessions->Import(F->Lists[FileZilla].get(), true, Imported.get());
+    // FileZilla uses PuTTY's host key store
+    TStoredSessionList::ImportHostKeys(PuttyHostKeysSourceKey, F->Lists[FileZilla].get(), true);
+    StoredSessions->Import(F->Lists[OpenSsh].get(), true, Imported.get());
+    if (StoredSessions->Import(F->Lists[Ini].get(), true, Imported.get()))
+    {
+      std::unique_ptr<THierarchicalStorage> IniStorage(TIniFileStorage::CreateFromPath(F->IniFileName));
+      TStoredSessionList::ImportHostKeys(IniStorage.get(), F->Lists[Ini].get(), true);
+    }
+    // The actual import will be done by ImportSelectedKnownHosts
+    TStoredSessionList::SelectKnownHostsForSelectedSessions(F->Lists[KnownHosts].get(), F->Lists[OpenSsh].get());
+    TStoredSessionList::ImportSelectedKnownHosts(F->Lists[KnownHosts].get());
+    std::vector<std::string> Result;
+    for (int Index = 0; Index < Imported->Count; Index++)
+    {
+      Result.push_back(Utf8(static_cast<TSessionData *>(Imported->Items[Index])->Name));
+    }
+    return Result;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+}  // namespace CoreBridge

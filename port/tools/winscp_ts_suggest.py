@@ -121,6 +121,7 @@ CONTEXT_FORMS = {
     'ServerInfoDialog': ['FileSystemInfo.dfm'],
     'GenerateUrlDialog': ['GenerateUrl.dfm'],
     'ConsoleDialog': ['Console.dfm'],
+    'ImportSitesDialog': ['ImportSessions.dfm'],
 }
 
 

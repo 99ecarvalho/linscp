@@ -514,6 +514,8 @@ enum class TText
   SiteRawAdd, // "&Add..."
   SiteRawAddCaption, // "Add Raw Site Setting"
   SiteRawAddLabel, // "&Site Setting:"
+  ImportCaption, // "Import sites"
+  ImportIniTitle, // "Select file to import sites from"
   FindFileTitle, // "Find"
   FindFileFinding, // "Finding ..."
   FindFileInDirectory, // "Searching in %s"
@@ -809,6 +811,37 @@ struct TSite
   // fields above.
   bool HasRawSettings = false;
   std::string RawSettings;
+};
+
+// Import sites, as WinSCP's (forms/ImportSessions.cpp's
+// DoImportSessionsDialog): the sites other programs keep, by source --
+// PuTTY, KiTTY, FileZilla, OpenSSH's config, an INI file (WinSCP's), and
+// OpenSSH's known_hosts (host keys) -- each with why it has none.
+class TImportSites
+{
+public:
+  enum TSource { Putty, Kitty, FileZilla, OpenSsh, Ini, KnownHosts, SourceCount };
+  // Gathers them all. Throws TCoreError.
+  TImportSites();
+  ~TImportSites();
+  std::string SourceName(int Source) const;
+  std::string Error(int Source) const;
+  // Each site's name and description (its info tip), as listed.
+  std::vector<std::pair<std::string, std::string>> Sites(int Source) const;
+  bool Selected(int Source, int Index) const;
+  void Select(int Source, int Index, bool Selected);
+  // Browse... (an INI file) and Paste (known_hosts lines): that source
+  // read again from them.
+  void LoadIni(const std::string & FileName);
+  void LoadKnownHosts(const std::string & Text);
+  // The source's selected sites imported (their host keys with them), as
+  // TImportSessionsDialog::Execute and DoImportSessionsDialog; the names
+  // given them. Throws TCoreError.
+  std::vector<std::string> Import(int Source);
+
+private:
+  struct TImpl;
+  std::unique_ptr<TImpl> F;
 };
 
 // --- Private keys -----------------------------------------------------------

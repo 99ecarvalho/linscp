@@ -52,6 +52,8 @@ public:
   // options as edited, given (else the dialog asks); false when cancelled
   // or they did not apply.
   bool RawSettings(const QString * Raw = nullptr);
+  // Tools > Import Sites: false when cancelled.
+  bool ImportSites();
   // Checks the private key as upstream does before logging in or saving, and
   // offers converting an OpenSSH one. False to stop.
   bool VerifyKey();

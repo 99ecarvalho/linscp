@@ -864,6 +864,8 @@ std::string Text(TText Text)
     case TText::SiteRawAdd: Ident = SITE_RAW_ADD; break;
     case TText::SiteRawAddCaption: Ident = SITE_RAW_ADD_CAPTION; break;
     case TText::SiteRawAddLabel: Ident = SITE_RAW_ADD_LABEL; break;
+    case TText::ImportCaption: Ident = IMPORT_CAPTION; break;
+    case TText::ImportIniTitle: Ident = IMPORT_INI_TITLE; break;
     case TText::FindFileTitle: Ident = FIND_FILE_TITLE; break;
     case TText::FindFileFinding: Ident = FIND_FILE_FINDING; break;
     case TText::FindFileInDirectory: Ident = FIND_FILE_IN_DIRECTORY; break;
