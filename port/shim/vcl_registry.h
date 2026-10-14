@@ -82,6 +82,8 @@ public:
                        int BufSize);
 
 private:
+  HKEY BaseKey(const UnicodeString & Key) const;
+
   HKEY FRootKey = HKEY_CURRENT_USER;
   HKEY FCurrentKey = nullptr;
   UnicodeString FCurrentPath;

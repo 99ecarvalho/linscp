@@ -1936,10 +1936,20 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
 #if defined(Q_OS_WIN)
       QString Error;
       Check(Integration::RegisterUrlHandler(Error), "registered to handle URL addresses");
-      const QString Command = QSettings(QStringLiteral("HKEY_CURRENT_USER\\Software\\Classes\\sftp\\shell\\open\\command"),
-        QSettings::NativeFormat).value(QStringLiteral("Default")).toString() +
-        QSettings(QStringLiteral("HKEY_LOCAL_MACHINE\\Software\\Classes\\sftp\\shell\\open\\command"),
-        QSettings::NativeFormat).value(QStringLiteral("Default")).toString();
+      // The machine's classes, or the user's when those cannot be written;
+      // through the 32-bit view upstream writes with (KEY_WOW64_32KEY), which
+      // Windows shares for classes and Wine does not.
+      QString Command;
+      for (const char * Root : { "HKEY_CURRENT_USER", "HKEY_LOCAL_MACHINE" })
+      {
+        const QSettings Key(QStringLiteral("%1\\Software\\Classes\\sftp\\shell\\open\\command").arg(QString::fromLatin1(Root)),
+          QSettings::Registry32Format);
+        Command += Key.value(QStringLiteral("Default")).toString() + QStringLiteral(" | ");
+      }
+      if (!Command.contains(QStringLiteral("/Unsafe")))
+      {
+        std::printf("sftp's command: %s\n", Command.toUtf8().constData());
+      }
       Check(Command.contains(QFileInfo(QCoreApplication::applicationFilePath()).fileName(), Qt::CaseInsensitive) &&
         Command.contains(QStringLiteral("/Unsafe")), "sftp:// opens the program, with /Unsafe and the URL");
       Check(Integration::UnregisterUrlHandler(Error), "and unregistered");

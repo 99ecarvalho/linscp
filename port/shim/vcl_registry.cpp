@@ -9,17 +9,24 @@
 
 namespace {
 
-// Delphi strips a leading backslash and opens relative to RootKey.
+bool IsRelative(const UnicodeString & Key)
+{
+  return Key.IsEmpty() || ((Key[1] != L'\\') && (Key[1] != L'/'));
+}
+
+// Delphi's: a leading backslash stripped (the key is RootKey's).
 UnicodeString Relative(const UnicodeString & Key)
 {
-  if (!Key.IsEmpty() && (Key[1] == L'\\' || Key[1] == L'/'))
-  {
-    return Key.SubString(2);
-  }
-  return Key;
+  return IsRelative(Key) ? Key : Key.SubString(2);
 }
 
 }  // namespace
+
+// Delphi's GetBaseKey: a relative key is the open key's, else RootKey's.
+HKEY TRegistry::BaseKey(const UnicodeString & Key) const
+{
+  return (IsRelative(Key) && (FCurrentKey != nullptr)) ? FCurrentKey : FRootKey;
+}
 
 TRegistry::~TRegistry()
 {
@@ -29,28 +36,32 @@ TRegistry::~TRegistry()
 bool TRegistry::OpenKey(const UnicodeString & Key, bool CanCreate)
 {
   const UnicodeString Path = Relative(Key);
+  const HKEY Base = BaseKey(Key);
   HKEY Opened = nullptr;
   LONG Result;
   if (CanCreate)
   {
     DWORD Disposition = 0;
-    Result = RegCreateKeyExW(FRootKey, Path.c_str(), 0, nullptr,
+    Result = RegCreateKeyExW(Base, Path.c_str(), 0, nullptr,
                              REG_OPTION_NON_VOLATILE,
                              static_cast<REGSAM>(FAccess), nullptr, &Opened,
                              &Disposition);
   }
   else
   {
-    Result = RegOpenKeyExW(FRootKey, Path.c_str(), 0,
+    Result = RegOpenKeyExW(Base, Path.c_str(), 0,
                            static_cast<REGSAM>(FAccess), &Opened);
   }
   if (Result != ERROR_SUCCESS)
   {
     return false;
   }
+  // As Delphi's ChangeKey: the path is the open key's and this one.
+  const UnicodeString NewPath =
+    ((Base == FCurrentKey) && (FCurrentKey != nullptr) && !FCurrentPath.IsEmpty()) ? (FCurrentPath + L"\\" + Path) : Path;
   CloseKey();
   FCurrentKey = Opened;
-  FCurrentPath = Path;
+  FCurrentPath = NewPath;
   return true;
 }
 
@@ -78,7 +89,7 @@ bool TRegistry::CreateKey(const UnicodeString & Key)
   HKEY Created = nullptr;
   DWORD Disposition = 0;
   const LONG Result = RegCreateKeyExW(
-    FRootKey, Relative(Key).c_str(), 0, nullptr, REG_OPTION_NON_VOLATILE,
+    BaseKey(Key), Relative(Key).c_str(), 0, nullptr, REG_OPTION_NON_VOLATILE,
     static_cast<REGSAM>(FAccess), nullptr, &Created, &Disposition);
   if (Result != ERROR_SUCCESS)
   {
@@ -90,7 +101,7 @@ bool TRegistry::CreateKey(const UnicodeString & Key)
 
 bool TRegistry::DeleteKey(const UnicodeString & Key)
 {
-  return RegDeleteKeyW(FRootKey, Relative(Key).c_str()) == ERROR_SUCCESS;
+  return RegDeleteKeyW(BaseKey(Key), Relative(Key).c_str()) == ERROR_SUCCESS;
 }
 
 bool TRegistry::DeleteValue(const UnicodeString & Name)
@@ -102,7 +113,7 @@ bool TRegistry::DeleteValue(const UnicodeString & Name)
 bool TRegistry::KeyExists(const UnicodeString & Key)
 {
   HKEY Opened = nullptr;
-  if (RegOpenKeyExW(FRootKey, Relative(Key).c_str(), 0, KEY_READ,
+  if (RegOpenKeyExW(BaseKey(Key), Relative(Key).c_str(), 0, KEY_READ,
                     &Opened) != ERROR_SUCCESS)
   {
     return false;
@@ -285,6 +296,7 @@ void TRegistry::WriteBinaryData(const UnicodeString & Name, const void * Buffer,
 #else   // POSIX: there is no registry.
 
 TRegistry::~TRegistry() = default;
+HKEY TRegistry::BaseKey(const UnicodeString &) const { return FRootKey; }
 
 // Everything reports "absent" rather than "empty". Returning defaults for
 // settings a user has actually set would look to them like their configuration
