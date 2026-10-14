@@ -9,6 +9,7 @@
 
 #include <QPointer>
 
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -98,6 +99,19 @@ public:
   // as WinSCP's DoOpenDirectoryDialog for the active panel: the directory
   // chosen opened, the dialog again when it cannot be. False when none was.
   bool OpenDirectory(bool AddBookmark = false);
+  // Find Files (Alt+F7, F3 with Explorer's keys): WinSCP's dialog, beside
+  // the window. Its search and actions: FindFiles searches with the
+  // window busy (false when it failed, its error shown); FocusRemote opens
+  // the file's directory in the remote panel and focuses it; the found
+  // files downloaded (after the Copy dialog) and deleted (after core's
+  // confirmation).
+  void FindFilesDialog();
+  bool FindFiles(const QString & Directory, const QString & Mask,
+    const std::function<bool(const std::string & Directory, const CoreBridge::TRemoteEntry & Entry)> & Found,
+    const std::function<bool(const std::string & Directory)> & Searching);
+  bool FocusRemote(const QString & Directory, const QString & Name);
+  bool DownloadFound(const std::vector<int> & Indexes, const QStringList & Names);
+  bool DeleteFound(const std::vector<int> & Indexes, const QStringList & Names);
   // Options > Preferences: false when cancelled.
   bool PreferencesDialog();
   // The preferences applied to the window and its panels.
@@ -139,6 +153,8 @@ private:
   bool OpenBookmark(bool AddBookmark, bool & Switched);
   bool OpenLocationProfile(bool AddBookmark, bool & Switched);
   bool GoLocal(const QString & Directory);
+  bool CopyDialog(bool FromLocal, const QStringList & Names, QString & Target, bool Move, bool * Background,
+    CoreBridge::TTransferSettings & Settings);
   bool GoRemote(const QString & Directory);
   // Removes the closed editors' temporary directories, once the queue has
   // no uploads left for them (or there is no session).
@@ -160,6 +176,7 @@ private:
   QAction * FLinkAction = nullptr;
   QAction * FDuplicateAction = nullptr;
   QAction * FOpenDirectoryAction = nullptr;
+  QAction * FFindFilesAction = nullptr;
   QAction * FAddBookmarkAction = nullptr;
   QAction * FMoveToAction = nullptr;
   // The editors, and for a remote file what it was downloaded as.

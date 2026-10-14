@@ -13,6 +13,7 @@
 #include <SessionData.h>
 #include <Terminal.h>
 #include <FileSystems.h>
+#include <FileMasks.h>
 #include <TextsCore.h>
 #include <CopyParam.h>
 #include <FileOperationProgress.h>
@@ -44,6 +45,8 @@ struct TSession::TImpl
   // core drops done items at once unless told to keep them).
   int QueueAdded = 0;
   int QueueDone = 0;
+  // The last search's files (Find files), by full path, as found.
+  std::vector<std::pair<UnicodeString, std::unique_ptr<TRemoteFile>>> Found;
 
   // The queue's events come on its threads: they only flag the change.
   void __fastcall QueueListUpdate(TTerminalQueue * /*Queue*/)
@@ -303,6 +306,29 @@ std::string TSession::LocalDirectory() const
   return Utf8(F->Data->LocalDirectoryExpanded);
 }
 
+namespace
+{
+
+TRemoteEntry EntryOf(const TRemoteFile * File)
+{
+  TRemoteEntry Entry;
+  Entry.Name = Utf8(File->FileName);
+  Entry.Directory = File->IsDirectory;
+  Entry.Size = File->Size;
+  Entry.Modified = Utf8(File->UserModificationStr);
+  // TDateTime counts days from 1899-12-30; 1970 is day 25569.
+  Entry.ModifiedTime = (static_cast<double>(File->Modification) - 25569.0) * 86400.0;
+  Entry.Rights = Utf8(File->RightsStr);
+  Entry.Owner = Utf8(File->Owner.DisplayText);
+  Entry.Group = Utf8(File->Group.DisplayText);
+  Entry.Link = File->IsSymLink;
+  Entry.LinkTarget = Utf8(File->LinkTo);
+  Entry.Hidden = (Entry.Name.size() > 1) && (Entry.Name[0] == '.');
+  return Entry;
+}
+
+}  // namespace
+
 std::vector<TRemoteEntry> TSession::List() const
 {
   std::vector<TRemoteEntry> Result;
@@ -316,20 +342,7 @@ std::vector<TRemoteEntry> TSession::List() const
       {
         continue;
       }
-      TRemoteEntry Entry;
-      Entry.Name = Utf8(File->FileName);
-      Entry.Directory = File->IsDirectory;
-      Entry.Size = File->Size;
-      Entry.Modified = Utf8(File->UserModificationStr);
-      // TDateTime counts days from 1899-12-30; 1970 is day 25569.
-      Entry.ModifiedTime = (static_cast<double>(File->Modification) - 25569.0) * 86400.0;
-      Entry.Rights = Utf8(File->RightsStr);
-      Entry.Owner = Utf8(File->Owner.DisplayText);
-      Entry.Group = Utf8(File->Group.DisplayText);
-      Entry.Link = File->IsSymLink;
-      Entry.LinkTarget = Utf8(File->LinkTo);
-      Entry.Hidden = (Entry.Name.size() > 1) && (Entry.Name[0] == '.');
-      Result.push_back(Entry);
+      Result.push_back(EntryOf(File));
     }
   }
   return Result;
@@ -1194,6 +1207,107 @@ std::string MultiFilesToOneConfirmation(const std::string & Target, bool Unix)
 std::string TSession::SessionKey() const
 {
   return Active() ? Utf8(F->Terminal->SessionData->SessionKey) : std::string();
+}
+
+namespace
+{
+
+class TFindCollector
+{
+public:
+  std::function<bool(const std::string &, const TRemoteEntry &)> Found;
+  std::function<bool(const std::string &)> Searching;
+  std::vector<std::pair<UnicodeString, std::unique_ptr<TRemoteFile>>> * Files;
+
+  void __fastcall FileFound(TTerminal * /*Terminal*/, const UnicodeString FileName, const TRemoteFile * File, bool & Cancel)
+  {
+    Files->emplace_back(FileName, std::unique_ptr<TRemoteFile>(File->Duplicate(true)));
+    if (Found && !Found(Utf8(UnixExtractFilePath(FileName)), EntryOf(File)))
+    {
+      Cancel = true;
+    }
+  }
+
+  void __fastcall FindingFile(TTerminal * /*Terminal*/, const UnicodeString Directory, bool & Cancel)
+  {
+    if (Searching && !Searching(Utf8(Directory)))
+    {
+      Cancel = true;
+    }
+  }
+};
+
+}  // namespace
+
+void TSession::FindFiles(const std::string & Directory, const std::string & Mask,
+  const std::function<bool(const std::string & Directory, const TRemoteEntry & Entry)> & Found,
+  const std::function<bool(const std::string & Directory)> & Searching)
+{
+  try
+  {
+    CheckActive(*this);
+    F->Found.clear();
+    TFileMasks Masks(FromUtf8(Mask));
+    TFindCollector Collector;
+    Collector.Found = Found;
+    Collector.Searching = Searching;
+    Collector.Files = &F->Found;
+    F->Terminal->FilesFind(FromUtf8(Directory), Masks, CLOSURE_OF(&Collector, FileFound), CLOSURE_OF(&Collector, FindingFile));
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+namespace
+{
+
+std::unique_ptr<TStringList> FoundList(
+  const std::vector<std::pair<UnicodeString, std::unique_ptr<TRemoteFile>>> & Found, const std::vector<int> & Indexes)
+{
+  std::unique_ptr<TStringList> Files(new TStringList());
+  for (int Index : Indexes)
+  {
+    if ((Index >= 0) && (Index < static_cast<int>(Found.size())))
+    {
+      Files->AddObject(Found[Index].first, Found[Index].second.get());
+    }
+  }
+  return Files;
+}
+
+}  // namespace
+
+bool TSession::DownloadFound(const std::vector<int> & Indexes, const std::string & LocalDirectory,
+  const TTransferSettings * Settings)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TStringList> Files = FoundList(F->Found, Indexes);
+    TGUICopyParamType CopyParam = TransferCopyParam(Settings);
+    TTransferBracket Bracket(false, Files->Count);
+    return F->Terminal->CopyToLocal(Files.get(), IncludeTrailingBackslash(FromUtf8(LocalDirectory)), &CopyParam, 0, NULL);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+bool TSession::DeleteFound(const std::vector<int> & Indexes)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TStringList> Files = FoundList(F->Found, Indexes);
+    return F->Terminal->DeleteFiles(Files.get());
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
 }
 
 bool TSession::CanRemoteCopy() const

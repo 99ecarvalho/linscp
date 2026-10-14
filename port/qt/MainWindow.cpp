@@ -44,6 +44,7 @@
 #include "RemoteTransferDialog.h"
 #include "OpenDirectoryDialog.h"
 #include "LocationProfilesDialog.h"
+#include "FindFilesDialog.h"
 #include "QueryDialog.h"
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
@@ -200,6 +201,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FAddBookmarkAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_B));
 
   QMenu * CommandsMenu = menuBar()->addMenu(tr("&Commands"));
+  FFindFilesAction = CommandsMenu->addAction(tr("&Find Files..."), this, [this]() { FindFilesDialog(); });
   FSynchronizeAction = CommandsMenu->addAction(tr("&Synchronize..."), this, [this]() { Synchronize(true); });
   FSynchronizeAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
 
@@ -386,6 +388,7 @@ void MainWindow::ApplyPreferences()
   FPropertiesAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::ALT | Qt::Key_Return) : QKeySequence(Qt::Key_F9));
   FLinkAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_L) : QKeySequence(Qt::ALT | Qt::Key_F6));
   FMoveToAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_M) : QKeySequence(Qt::SHIFT | Qt::Key_F6));
+  FFindFilesAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::Key_F3) : QKeySequence(Qt::ALT | Qt::Key_F7));
   // As TScpCommanderForm::ConfigurationChanged: the site's local directory is
   // Home, with "default directory is home", unless it remembers the last.
   FLocal->HomeDirectory =
@@ -756,6 +759,58 @@ bool MainWindow::Drop(bool OnLocal, const QMimeData * Data, const QString & OnDi
   return Transfer(true, Sources, DropTarget(FPanel->Path(), OnDirectory, true), Move, Confirm, false);
 }
 
+// As WinSCP's Copy dialog: where to, editable, the transfer settings, and
+// (Background given) whether through the queue. False when cancelled.
+bool MainWindow::CopyDialog(bool FromLocal, const QStringList & Names, QString & Target, bool Move, bool * Background,
+  CoreBridge::TTransferSettings & Settings)
+{
+  const QString What = (Names.size() == 1) ? QStringLiteral("'%1'").arg(QFileInfo(Names.first()).fileName()) : tr("%n file(s)", nullptr, Names.size());
+  const QString Prompt = FromLocal ?
+    (Move ? tr("Move %1 to remote directory:") : tr("Upload %1 to remote directory:")).arg(What) :
+    (Move ? tr("Move %1 to local directory:") : tr("Download %1 to local directory:")).arg(What);
+  QDialog Dialog(this);
+  Dialog.setWindowTitle(Move ? tr("Move") : tr("Copy"));
+  QFormLayout * Layout = new QFormLayout(&Dialog);
+  QLineEdit * TargetEdit = new QLineEdit(Target, &Dialog);
+  TargetEdit->setMinimumWidth(380);
+  Layout->addRow(new QLabel(Prompt, &Dialog));
+  Layout->addRow(TargetEdit);
+  // The transfer settings, as WinSCP's Copy dialog shows them; the
+  // background default is theirs.
+  TransferSettingsBox * SettingsBox = new TransferSettingsBox(&Dialog);
+  Layout->addRow(SettingsBox);
+  QCheckBox * InBackground = nullptr;
+  if (Background != nullptr)
+  {
+    InBackground = new QCheckBox(tr("Transfer in &background (add to transfer queue)"), &Dialog);
+    InBackground->setChecked(*Background || SettingsBox->Settings().Queue);
+    Layout->addRow(InBackground);
+  }
+  QDialogButtonBox * Box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &Dialog);
+  connect(Box, &QDialogButtonBox::accepted, &Dialog, &QDialog::accept);
+  connect(Box, &QDialogButtonBox::rejected, &Dialog, &QDialog::reject);
+  Layout->addRow(Box);
+  if ((Dialog.exec() != QDialog::Accepted) || TargetEdit->text().trimmed().isEmpty())
+  {
+    return false;
+  }
+  Target = TargetEdit->text().trimmed();
+  if (Background != nullptr)
+  {
+    *Background = InBackground->isChecked();
+  }
+  Settings = SettingsBox->Settings();
+  try
+  {
+    SettingsBox->Commit();
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  return true;
+}
+
 bool MainWindow::Transfer(bool FromLocal, const QStringList & Names, QString Target, bool Move, bool Confirm, bool Background)
 {
   if (Names.isEmpty() || !FSession || !FSession->Active() || FBusy)
@@ -763,46 +818,9 @@ bool MainWindow::Transfer(bool FromLocal, const QStringList & Names, QString Tar
     return false;
   }
   CoreBridge::TTransferSettings Settings = CoreBridge::CurrentTransferSettings();
-  if (Confirm)
+  if (Confirm && !CopyDialog(FromLocal, Names, Target, Move, &Background, Settings))
   {
-    // As WinSCP's Copy dialog: where to, editable.
-    const QString What = (Names.size() == 1) ? QStringLiteral("'%1'").arg(QFileInfo(Names.first()).fileName()) : tr("%n file(s)", nullptr, Names.size());
-    const QString Prompt = FromLocal ?
-      (Move ? tr("Move %1 to remote directory:") : tr("Upload %1 to remote directory:")).arg(What) :
-      (Move ? tr("Move %1 to local directory:") : tr("Download %1 to local directory:")).arg(What);
-    QDialog Dialog(this);
-    Dialog.setWindowTitle(Move ? tr("Move") : tr("Copy"));
-    QFormLayout * Layout = new QFormLayout(&Dialog);
-    QLineEdit * TargetEdit = new QLineEdit(Target, &Dialog);
-    TargetEdit->setMinimumWidth(380);
-    Layout->addRow(new QLabel(Prompt, &Dialog));
-    Layout->addRow(TargetEdit);
-    // The transfer settings, as WinSCP's Copy dialog shows them; the
-    // background default is theirs.
-    TransferSettingsBox * SettingsBox = new TransferSettingsBox(&Dialog);
-    Layout->addRow(SettingsBox);
-    QCheckBox * InBackground = new QCheckBox(tr("Transfer in &background (add to transfer queue)"), &Dialog);
-    InBackground->setChecked(Background || SettingsBox->Settings().Queue);
-    Layout->addRow(InBackground);
-    QDialogButtonBox * Box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &Dialog);
-    connect(Box, &QDialogButtonBox::accepted, &Dialog, &QDialog::accept);
-    connect(Box, &QDialogButtonBox::rejected, &Dialog, &QDialog::reject);
-    Layout->addRow(Box);
-    if ((Dialog.exec() != QDialog::Accepted) || TargetEdit->text().trimmed().isEmpty())
-    {
-      return false;
-    }
-    Target = TargetEdit->text().trimmed();
-    Background = InBackground->isChecked();
-    Settings = SettingsBox->Settings();
-    try
-    {
-      SettingsBox->Commit();
-    }
-    catch (const CoreBridge::TCoreError & E)
-    {
-      ShowError(E);
-    }
+    return false;
   }
   if (Background)
   {
@@ -959,6 +977,7 @@ void MainWindow::UpdateActions()
   FLinkAction->setEnabled(!FBusy);
   FDuplicateAction->setEnabled(!FBusy && FSession);
   FOpenDirectoryAction->setEnabled(!FBusy);
+  FFindFilesAction->setEnabled(!FBusy && FSession);
   FAddBookmarkAction->setEnabled(!FBusy);
   FMoveToAction->setEnabled(!FBusy && FSession);
   FCopyAction->setEnabled(!FBusy && FSession);
@@ -1439,5 +1458,128 @@ bool MainWindow::OpenLocationProfile(bool AddBookmark, bool & Switched)
   {
     Result = GoRemote(Dialog.RemoteDirectory()) && Result;
   }
+  return Result;
+}
+
+void MainWindow::FindFilesDialog()
+{
+  if (FBusy || !FSession)
+  {
+    return;
+  }
+  ::FindFilesDialog * Dialog = new ::FindFilesDialog(this, FPanel->Path());
+  Dialog->show();
+  Dialog->raise();
+  Dialog->activateWindow();
+}
+
+bool MainWindow::FindFiles(const QString & Directory, const QString & Mask,
+  const std::function<bool(const std::string & Directory, const CoreBridge::TRemoteEntry & Entry)> & Found,
+  const std::function<bool(const std::string & Directory)> & Searching)
+{
+  if (FBusy || !FSession)
+  {
+    return false;
+  }
+  FBusy = true;
+  UpdateActions();
+  bool Result = false;
+  try
+  {
+    FSession->FindFiles(Directory.toStdString(), Mask.toStdString(), Found, Searching);
+    Result = true;
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  UpdateActions();
+  return Result;
+}
+
+bool MainWindow::FocusRemote(const QString & Directory, const QString & Name)
+{
+  if (FBusy || !FSession || !GoRemote(Directory))
+  {
+    return false;
+  }
+  FPanel->Select({ Name });
+  ActivatePanel(false);
+  raise();
+  activateWindow();
+  return true;
+}
+
+bool MainWindow::DownloadFound(const std::vector<int> & Indexes, const QStringList & Names)
+{
+  if (FBusy || !FSession)
+  {
+    return false;
+  }
+  QString Target = QDir::toNativeSeparators(FLocal->Path());
+  CoreBridge::TTransferSettings Settings = CoreBridge::CurrentTransferSettings();
+  if (!CopyDialog(false, Names, Target, false, nullptr, Settings))
+  {
+    return false;
+  }
+  FBusy = true;
+  UpdateActions();
+  bool Result = false;
+  try
+  {
+    Result = FSession->DownloadFound(Indexes, QDir::toNativeSeparators(Target).toStdString(), &Settings);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  FLocal->Refresh();
+  UpdateActions();
+  return Result;
+}
+
+bool MainWindow::DeleteFound(const std::vector<int> & Indexes, const QStringList & Names)
+{
+  if (FBusy || !FSession)
+  {
+    return false;
+  }
+  // Core's confirmation, as the panels ask it.
+  const bool One = (Names.size() == 1);
+  QString Message = QString::fromStdString(CoreBridge::Text(One ? CoreBridge::TText::ConfirmDeleteFile : CoreBridge::TText::ConfirmDeleteFiles));
+  Message = One ? Message.replace(QStringLiteral("%s"), Names.first()) : Message.replace(QStringLiteral("%d"), QString::number(Names.size()));
+  CoreBridge::TQuery Query;
+  Query.Type = CoreBridge::TQueryType::Confirmation;
+  Query.Message = Message.toStdString();
+  CoreBridge::TQueryButton OK;
+  OK.Answer = CoreBridge::AnswerOK;
+  OK.Caption = "OK";
+  CoreBridge::TQueryButton Cancel;
+  Cancel.Answer = CoreBridge::AnswerCancel;
+  Cancel.Caption = "Cancel";
+  Query.Buttons = { OK, Cancel };
+  Query.CancelAnswer = CoreBridge::AnswerCancel;
+  QtFrontend Frontend;
+  Frontend.SetWindow(QApplication::activeWindow());
+  if (Frontend.Query(Query).Answer != CoreBridge::AnswerOK)
+  {
+    return false;
+  }
+  FBusy = true;
+  UpdateActions();
+  bool Result = false;
+  try
+  {
+    Result = FSession->DeleteFound(Indexes);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  FPanel->Refresh();
+  UpdateActions();
   return Result;
 }

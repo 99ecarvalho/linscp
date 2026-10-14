@@ -740,6 +740,13 @@ std::string Text(TText Text)
     case TText::MoveBookmarkCaption: Ident = MOVE_BOOKMARK_CAPTION; break;
     case TText::MoveBookmarkPrompt: Ident = MOVE_BOOKMARK_PROMPT; break;
     case TText::BookmarkInfoTip: Ident = BOOKMARK_INFO_TIP; break;
+    case TText::FindFileTitle: Ident = FIND_FILE_TITLE; break;
+    case TText::FindFileFinding: Ident = FIND_FILE_FINDING; break;
+    case TText::FindFileInDirectory: Ident = FIND_FILE_IN_DIRECTORY; break;
+    case TText::FindFileDone: Ident = FIND_FILE_DONE; break;
+    case TText::FindFileAborted: Ident = FIND_FILE_ABORTED; break;
+    case TText::FindFileStart: Ident = FIND_FILE_START; break;
+    case TText::FindFileStop: Ident = FIND_FILE_STOP; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

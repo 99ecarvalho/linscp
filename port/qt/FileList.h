@@ -158,6 +158,10 @@ public:
   // False when the mask is not one (the error is shown).
   bool SelectByMask(bool Select, const QString & Masks, bool Directories);
   void SelectByMaskDialog(bool Select);
+  // The mask last given (WinConfiguration's SelectMask), which Find files
+  // shares.
+  static QString LastMask() { return FLastMask; }
+  static void SetLastMask(const QString & Mask) { FLastMask = Mask; }
   // F2, as WinSCP's Commander renames: the focused entry's name edited in
   // place. False when there is none ("..").
   bool EditCurrentName();

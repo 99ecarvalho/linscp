@@ -321,6 +321,61 @@
     </message>
 </context>
 <context>
+    <name>FindFilesDialog</name>
+    <message>
+        <source>Filter</source>
+        <translation>Filtrar</translation>
+    </message>
+    <message>
+        <source>&amp;File mask:</source>
+        <translation>&amp;Máscara do arquivo:</translation>
+    </message>
+    <message>
+        <source>Sear&amp;ch in:</source>
+        <translation>Pro&amp;curar em:</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Nome</translation>
+    </message>
+    <message>
+        <source>Directory</source>
+        <translation>Diretório</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Tamanho</translation>
+    </message>
+    <message>
+        <source>Date modified</source>
+        <translation>Data modificada</translation>
+    </message>
+    <message>
+        <source>Fo&amp;cus</source>
+        <translation>Fo&amp;co</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Editar</translation>
+    </message>
+    <message>
+        <source>Down&amp;load...</source>
+        <translation>&amp;Download...</translation>
+    </message>
+    <message>
+        <source>&amp;Delete</source>
+        <translation>E&amp;xcluir</translation>
+    </message>
+    <message>
+        <source>&amp;Copy Results</source>
+        <translation>&amp;Copiar Resultados</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fechar</translation>
+    </message>
+</context>
+<context>
     <name>LinkDialog</name>
     <message>
         <source>&amp;Link/shortcut file:</source>
@@ -605,6 +660,10 @@
     <message>
         <source>&amp;Add Path to Bookmarks</source>
         <translation>&amp;Adicionar aos Favoritos</translation>
+    </message>
+    <message>
+        <source>&amp;Find Files...</source>
+        <translation>&amp;Localizar arquivos...</translation>
     </message>
 </context>
 <context>

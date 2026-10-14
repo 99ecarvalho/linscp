@@ -510,6 +510,13 @@ enum class TText
   MoveBookmarkCaption, // "Move Location Profile"
   MoveBookmarkPrompt, // "New folder name:"
   BookmarkInfoTip, // "Local: %s\nRemote: %s"
+  FindFileTitle, // "Find"
+  FindFileFinding, // "Finding ..."
+  FindFileInDirectory, // "Searching in %s"
+  FindFileDone, // "Done."
+  FindFileAborted, // "Aborted."
+  FindFileStart, // "&Start"
+  FindFileStop, // "&Stop"
 };
 std::string Text(TText Text);
 
@@ -901,6 +908,20 @@ public:
     bool Direct);
   // Whether Path is a directory on the server.
   bool DirectoryExists(const std::string & Path);
+  // Find files, as TFileFindDialog over core's FilesFind: Directory and
+  // below searched for what matches Mask (core's file masks); Found is
+  // given each file (its directory, and it), Searching each directory
+  // entered; either returning false stops the search. The files found are
+  // kept by their order, for the calls after, until the next search.
+  // Throws TCoreError (a mask that is not one; the listing failing).
+  void FindFiles(const std::string & Directory, const std::string & Mask,
+    const std::function<bool(const std::string & Directory, const TRemoteEntry & Entry)> & Found,
+    const std::function<bool(const std::string & Directory)> & Searching);
+  // The files found, by their order: downloaded, deleted (the caller
+  // confirms). False when not done in full; throw TCoreError.
+  bool DownloadFound(const std::vector<int> & Indexes, const std::string & LocalDirectory,
+    const TTransferSettings * Settings = nullptr);
+  bool DeleteFound(const std::vector<int> & Indexes);
   // A link FileName to PointTo in the current directory; Replace: the
   // existing link FileName is deleted first (an edit). Throws TCoreError.
   void CreateLink(const std::string & FileName, const std::string & PointTo, bool Symbolic, bool Replace);

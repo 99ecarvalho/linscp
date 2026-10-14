@@ -115,6 +115,7 @@ CONTEXT_FORMS = {
     'RemoteTransferDialog': ['RemoteTransfer.dfm'],
     'OpenDirectoryDialog': ['OpenDirectory.dfm'],
     'LocationProfilesDialog': ['LocationProfiles.dfm'],
+    'FindFilesDialog': ['FileFind.dfm'],
 }
 
 

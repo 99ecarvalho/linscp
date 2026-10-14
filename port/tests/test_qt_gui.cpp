@@ -43,7 +43,9 @@
 //     opened; a directory that cannot be opened asked for again; the
 //     local panel's too; Location Profiles (the Commander's preference):
 //     profiles added, foldered, renamed, ordered, removed, opened into
-//     both panels, and the switch between the two dialogs
+//     both panels, and the switch between the two dialogs; Find files
+//     (Alt+F7): found below a directory, focused, copied, downloaded,
+//     deleted, a mask that is not one
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -112,6 +114,7 @@
 #include "RemoteTransferDialog.h"
 #include "OpenDirectoryDialog.h"
 #include "LocationProfilesDialog.h"
+#include "FindFilesDialog.h"
 #include <QTemporaryDir>
 #include "EditorWindow.h"
 
@@ -2257,6 +2260,45 @@ void BookmarksTest(const char * Port, const QString & Directory)
     Check(!Window.OpenDirectory() && (Profile == 1) && (Bookmark == 1) && !CoreBridge::Preferences().UseLocationProfiles,
       "Bookmarks... switches to the Open directory dialog, from now on");
     Responder.Custom = nullptr;
+
+    // Find files.
+    {
+      QFile File(QDir(Directory).filePath(QStringLiteral("found.log")));
+      File.open(QIODevice::WriteOnly);
+      File.write("log\n");
+    }
+    Window.Local()->Refresh();
+    Check(Window.Upload({ QStringLiteral("found.log") }, QStringLiteral("/sub"), false), "a file to find, down a directory");
+    QFile::remove(QDir(Directory).filePath(QStringLiteral("found.log")));
+    Remote->ChangeDirectory(QStringLiteral("/"));
+    FindFilesDialog * Find = new FindFilesDialog(&Window, Remote->Path());
+    Find->show();
+    Find->MaskCombo()->setEditText(QStringLiteral("*.log"));
+    Find->Start();
+    Check((Find->Results()->topLevelItemCount() == 1) && (Find->Results()->topLevelItem(0)->text(0) == QStringLiteral("found.log")) &&
+      (Find->Results()->topLevelItem(0)->text(1) == QStringLiteral("/sub/")), "found below, with its directory");
+    Check(Find->Status()->text() == QString::fromStdString(CoreBridge::Text(CoreBridge::TText::FindFileDone)), "and done");
+    Check(FileView::LastMask() == QStringLiteral("*.log"), "the mask kept, as Select's");
+    Find->Results()->topLevelItem(0)->setSelected(true);
+    Find->CopyResults();
+    Check(QApplication::clipboard()->text() == QStringLiteral("/sub/found.log"), "results copied as paths");
+    Find->Focus();
+    Check((Remote->Path() == QStringLiteral("/sub")) && Remote->Selected().contains(QStringLiteral("found.log")), "focused in the panel");
+    Remote->ChangeDirectory(QStringLiteral("/"));
+    Responder.AcceptDialogs = true;
+    Find->Download();
+    Check(QFile::exists(QDir(Directory).filePath(QStringLiteral("found.log"))), "downloaded from where it was found");
+    Find->Delete();
+    Responder.AcceptDialogs = false;
+    Check(Find->Results()->topLevelItemCount() == 0, "deleted, off the list");
+    Remote->ChangeDirectory(QStringLiteral("/sub"));
+    Check(!Remote->Names().contains(QStringLiteral("found.log")), "and off the server");
+    Responder.Errors = 0;
+    Find->MaskCombo()->setEditText(QStringLiteral("*.log>xyz"));
+    Find->Start();
+    Check((Responder.Errors == 1) &&
+      (Find->Status()->text() == QString::fromStdString(CoreBridge::Text(CoreBridge::TText::FindFileAborted))), "a mask that is not one");
+    Find->close();
     Frontend.SetWindow(nullptr);
   }
   CoreBridge::Finalize();
