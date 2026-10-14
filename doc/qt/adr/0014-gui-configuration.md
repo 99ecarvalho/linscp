@@ -284,5 +284,4 @@ Verified by `qt_session`/`qt_session_ftp` (logging on writes the session
 and XML logs; the default path in `TMPDIR` where `TEMP` is not set),
 `win32_on_posix` (the variables' fallbacks) and `qt_gui_preferences` (the
 pages, saved under core's `Logging` and `Interface` keys, the temporary
-directory in use): Linux and Wine. Natively on Windows 11 is to be
-checked; the VM was not reachable.
+directory in use): Linux, Wine, natively on Windows 11.

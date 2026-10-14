@@ -11,6 +11,11 @@ built so that upstream WinSCP remains trackable with near-zero merge cost.
 | [TASKS.md](TASKS.md) | Work breakdown with stable task IDs |
 | [TRACKER.md](TRACKER.md) | Live status per task |
 | [ESTIMATES.md](ESTIMATES.md) | Effort model, including AI-assisted estimate |
+| [windows-toolchain.md](windows-toolchain.md) | The Windows build: llvm-mingw, MSYS2's Qt, the pins, running it |
+| [windows-vm-hints.md](windows-vm-hints.md) | The Windows test VM: SSH access, what the tests need on it |
+| [translations.md](translations.md) | Core's, the shell's and Qt's translations |
+| [putty-deltas.md](putty-deltas.md) | WinSCP's PuTTY against stock PuTTY |
+| [adr/](adr/README.md) | Architecture decision records |
 
 ## Goal
 

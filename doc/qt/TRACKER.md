@@ -235,8 +235,7 @@ here or in the queue. P2-10 and P2-11 wait, at the user's request.
 1. **P3-05**: the internal editor (Q-3), and with it the temporary
    directory's options and P3-04e's Editors page.
 2. **P3-06**: the remaining dialogs, batched (split first).
-3. Offer `core-log-file-name-delimiter.patch` upstream (ADR 0006); run
-   P3-04d's tests natively on Windows 11 when the VM is back.
+3. Offer `core-log-file-name-delimiter.patch` upstream (ADR 0006).
 
 ## Decisions taken
 
@@ -755,7 +754,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-04a | Preferences foundation, Languages, Panels, Commander | done | upstream's `GUIConfiguration` compiled as it is (`port/gui`, ADR 0014); `TShellConfiguration` mirroring `TWinConfiguration`'s keys; the language as upstream chooses it; Options > Preferences (Ctrl+Alt+P) with Panels, Commander and Languages, applied to the panels; ctests `qt_gui_preferences`, `qt_gui_sites`, `qt_language`; native on Windows 11 too. Not yet on these pages (ADR 0014): incremental search, panel state, full row, double-click, font, Explorer-style selection, tree, location profiles, compare criteria |
 | P3-04b | Preferences: Transfer, Background, Endurance | done | transfers use the GUI's settings (`TTransferSettings`, `port/qt/TransferSettings.cpp`); the Copy and Synchronize dialogs' Transfer settings group and dialog (`TransferSettingsDialog.cpp`); Preferences' Transfer (presets), Background, Endurance; ctests `qt_session`/`qt_session_ftp`, `qt_gui_preferences`; native on Windows 11 too. Not yet (ADR 0014): autoselection rules, parallel threshold, queue enabling and list visibility |
 | P3-04c | Preferences: Window, Explorer, File colors | done | Window (path in title, keep open), File colors (`MaskMatchesPath`), the layout kept in WinSCP's formats (`DirViewParams`, `WindowParams`, `LocalPanelWidth`, `CurrentPanel`, the queue's height); pages in WinSCP's tree order; ctests `qt_gui_preferences`, `qt_gui_panel`; native on Windows 11 too. The Explorer page is not offered (no Explorer interface); not yet: minimize to tray, single instance |
-| P3-04d | Preferences: Storage, Logging, Network, Security, Updates | done | Network, Security, Logging, Storage over core's configuration (ADR 0014); the temporary directory used; upstream's `%TEMP%`/`%APPDATA%` defaults working on POSIX (Win32 layer, `core-log-file-name-delimiter.patch`); ctests `qt_session`/`qt_session_ftp`, `win32_on_posix`, `qt_gui_preferences`; Linux and Wine (native Windows 11 to check: the VM was down). Updates not offered (WinSCP's own); master password, host CAs not yet |
+| P3-04d | Preferences: Storage, Logging, Network, Security, Updates | done | Network, Security, Logging, Storage over core's configuration (ADR 0014); the temporary directory used; upstream's `%TEMP%`/`%APPDATA%` defaults working on POSIX (Win32 layer, `core-log-file-name-delimiter.patch`); ctests `qt_session`/`qt_session_ftp`, `win32_on_posix`, `qt_gui_preferences`; native on Windows 11 too. Updates not offered (WinSCP's own); master password, host CAs not yet |
 | P3-04e | Preferences: Editors, Integration, Applications, Commands, Drag & Drop | todo | after P3-05, P3-08 |
 | P3-05 | Internal editor | todo | Q-3 |
 | P3-06 | Remaining 48 dialogs, batched | todo | XL — split into P3-06a…f |
