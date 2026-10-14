@@ -136,6 +136,14 @@ TSessionData * SessionDataOf(const TSite & Site, const std::string & BaseName)
   std::unique_ptr<TSessionData> Data(new TSessionData(L""));
   TSessionData * Base = !BaseName.empty() ? StoredSite(BaseName) : NULL;
   Data->Assign((Base != NULL) ? Base : StoredSessions->DefaultSettings);
+  // Raw settings edited: they replace the base's, as TSiteRawDialog's
+  // Execute (the fields below set the rest).
+  if (Site.HasRawSettings)
+  {
+    Data->DefaultSettings();
+    std::unique_ptr<TStrings> Raw(TextToStringList(FromUtf8(Site.RawSettings)));
+    Data->ApplyRawSettings(Raw.get(), false);
+  }
   Data->FSProtocol = FSProtocolOf(Site.Protocol);
   Data->Ftps = FtpsOf(Site.Protocol, Site.Encryption);
   Data->HostName = FromUtf8(Site.HostName);
@@ -205,6 +213,130 @@ TSite LoadSite(const std::string & Name)
     throw TCoreError(Error, false);
   }
   return SiteOf(Data);
+}
+
+namespace
+{
+
+TStringList * RawLines(const std::string & RawSettings)
+{
+  std::unique_ptr<TStringList> Lines(new TStringList());
+  Lines->Text = FromUtf8(RawSettings);
+  // Empty lines are no settings.
+  for (int Index = Lines->Count - 1; Index >= 0; Index--)
+  {
+    if (Lines->Strings[Index].Trim().IsEmpty())
+    {
+      Lines->Delete(Index);
+    }
+  }
+  return Lines.release();
+}
+
+}  // namespace
+
+std::string SiteRawSettings(const TSite & Site, const std::string & BaseName)
+{
+  try
+  {
+    std::unique_ptr<TSessionData> Data(SessionDataOf(Site, BaseName));
+    std::unique_ptr<TSessionData> FactoryDefaults(new TSessionData(L""));
+    std::unique_ptr<TSessionData> RawData(new TSessionData(L""));
+    RawData->Assign(Data.get());
+    // SFTP-only is not reflected by the protocol prefix, we have to use rawsettings for that
+    if (RawData->FSProtocol != fsSFTPonly)
+    {
+      RawData->FSProtocol = FactoryDefaults->FSProtocol;
+    }
+    RawData->HostName = FactoryDefaults->HostName;
+    RawData->PortNumber = FactoryDefaults->PortNumber;
+    RawData->UserName = FactoryDefaults->UserName;
+    RawData->Password = FactoryDefaults->Password;
+    RawData->Ftps = FactoryDefaults->Ftps;
+    std::unique_ptr<TStrings> Options(RawData->SaveToOptions(FactoryDefaults.get(), false, false));
+    return Utf8(Options->Text);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+TSite ApplySiteRawSettings(const TSite & Site, const std::string & BaseName, const std::string & RawSettings)
+{
+  try
+  {
+    std::unique_ptr<TSessionData> Data(SessionDataOf(Site, BaseName));
+    std::unique_ptr<TSessionData> BackupData(new TSessionData(L""));
+    BackupData->Assign(Data.get());
+    Data->DefaultSettings();
+    Data->FSProtocol = BackupData->FSProtocol;
+    Data->HostName = BackupData->HostName;
+    Data->PortNumber = BackupData->PortNumber;
+    Data->UserName = BackupData->UserName;
+    Data->Password = BackupData->Password;
+    Data->Ftps = BackupData->Ftps;
+    std::unique_ptr<TStrings> Settings(RawLines(RawSettings));
+    Data->ApplyRawSettings(Settings.get(), false);
+    TSite Result = SiteOf(Data.get());
+    Result.Name = Site.Name;
+    Result.HasRawSettings = true;
+    // As they are now: what applying them made of them.
+    std::unique_ptr<TSessionData> FactoryDefaults(new TSessionData(L""));
+    Data->FSProtocol = (Data->FSProtocol != fsSFTPonly) ? FactoryDefaults->FSProtocol : Data->FSProtocol;
+    Data->HostName = FactoryDefaults->HostName;
+    Data->PortNumber = FactoryDefaults->PortNumber;
+    Data->UserName = FactoryDefaults->UserName;
+    Data->Password = FactoryDefaults->Password;
+    Data->Ftps = FactoryDefaults->Ftps;
+    std::unique_ptr<TStrings> Options(Data->SaveToOptions(FactoryDefaults.get(), false, false));
+    Result.RawSettings = Utf8(Options->Text);
+    return Result;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+// TSiteRawDialog::AddButtonClick's list.
+std::vector<std::pair<std::string, std::string>> RawSettingsToAdd(const std::string & RawSettings)
+{
+  std::unique_ptr<TSessionData> FactoryDefaults(new TSessionData(L""));
+  std::unique_ptr<TSessionData> BasicData(new TSessionData(L""));
+  BasicData->FSProtocol = TFSProtocol(FactoryDefaults->FSProtocol + 1);
+  UnicodeString RandomAppendix(L"_");
+  BasicData->HostName = FactoryDefaults->HostName + RandomAppendix;
+  BasicData->Ftps = TFtps(FactoryDefaults->Ftps + 1);
+  BasicData->PortNumber = BasicData->GetDefaultPort() + 1;
+  BasicData->UserName = FactoryDefaults->UserName + RandomAppendix;
+  BasicData->Password = FactoryDefaults->Password + RandomAppendix;
+  std::unique_ptr<TStrings> BasicOptions(BasicData->SaveToOptions(FactoryDefaults.get(), false, false));
+  std::unique_ptr<TStrings> AllOptions(TSessionData::GetAllOptionNames(false));
+  std::unique_ptr<TStringList> Names(CreateSortedStringList());
+  for (int Index = 0; Index < AllOptions->Count; Index++)
+  {
+    Names->Add(AllOptions->Names[Index]);
+  }
+  std::unique_ptr<TStrings> Settings(RawLines(RawSettings));
+  for (TStrings * Options : { BasicOptions.get(), Settings.get() })
+  {
+    for (int Index = 0; Index < Options->Count; Index++)
+    {
+      const UnicodeString Name = Options->Names[Index];
+      const int I = Name.IsEmpty() ? -1 : Names->IndexOf(Name);
+      if (I >= 0)
+      {
+        Names->Delete(I);
+      }
+    }
+  }
+  std::vector<std::pair<std::string, std::string>> Result;
+  for (int Index = 0; Index < Names->Count; Index++)
+  {
+    Result.emplace_back(Utf8(Names->Strings[Index]), Utf8(AllOptions->Values[Names->Strings[Index]]));
+  }
+  return Result;
 }
 
 void SaveSite(const TSite & Site, const std::string & BaseName)

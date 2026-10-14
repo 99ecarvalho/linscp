@@ -48,6 +48,10 @@ public:
   bool DeleteSelected(bool Confirm = true);
   // Edits the advanced settings in their dialog.
   void Advanced();
+  // Advanced's other choice, Edit Raw Settings (TSiteRawDialog). Raw: the
+  // options as edited, given (else the dialog asks); false when cancelled
+  // or they did not apply.
+  bool RawSettings(const QString * Raw = nullptr);
   // Checks the private key as upstream does before logging in or saving, and
   // offers converting an OpenSSH one. False to stop.
   bool VerifyKey();
@@ -94,7 +98,7 @@ private:
   QPushButton * FRename = nullptr;
   QPushButton * FDelete = nullptr;
   QPushButton * FNewFolder = nullptr;
-  QPushButton * FAdvanced = nullptr;
+  class QToolButton * FAdvanced = nullptr;
   // The site under the cursor, with what the form does not show.
   CoreBridge::TSite FSite;
   // Folders made in this dialog, with no site in them yet.

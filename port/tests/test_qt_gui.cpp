@@ -127,6 +127,7 @@
 #include "ServerInfoDialog.h"
 #include "GenerateUrlDialog.h"
 #include "ConsoleDialog.h"
+#include "SiteRawDialog.h"
 #include "RtfText.h"
 #include <QTextBrowser>
 #include <QPlainTextEdit>
@@ -503,6 +504,39 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
       QMetaObject::invokeMethod(&Window, "Disconnect");
       SiteAdvanced Advanced(CoreBridge::LoadSite("Tests/rclone"), &Window);
       Check(!Advanced.UpdateDirectories()->isChecked(), "the advanced settings show it");
+    }
+    // Edit Raw Settings: the site's settings as core's options.
+    {
+      SiteManager Dialog(&Window);
+      Dialog.SelectSite(QStringLiteral("Tests/rclone"));
+      const CoreBridge::TSite Site = Dialog.Site();
+      const QString Raw = QString::fromStdString(CoreBridge::SiteRawSettings(Site, Site.Name));
+      Check(!Raw.contains(QStringLiteral("HostName=")) && !Raw.contains(QStringLiteral("UserName=")),
+        "the host and user are the form's, not raw settings");
+      {
+        SiteRawDialog Raws(Raw);
+        Check(!Raws.AddSetting(QStringLiteral("HostName")), "the form's fields are not offered");
+        QString Default;
+        for (const auto & Option : CoreBridge::RawSettingsToAdd(Raw.toStdString()))
+        {
+          if (Option.first == "PingIntervalSecs")
+          {
+            Default = QString::fromStdString(Option.second);
+          }
+        }
+        Check(!Default.isEmpty() && Raws.AddSetting(QStringLiteral("PingIntervalSecs")) &&
+          (Raws.Editor()->textCursor().selectedText() == Default) &&
+          Raws.Settings().endsWith(QStringLiteral("PingIntervalSecs=") + Default), "an option added with its default, selected");
+        Check(!Raws.AddSetting(QStringLiteral("PingIntervalSecs")), "but not twice");
+      }
+      const QString Edited = Raw.trimmed() + QStringLiteral("\nTimeout=33\nPingIntervalSecs=21\n");
+      Check(Dialog.RawSettings(&Edited) && (Dialog.Site().Timeout == 33) && Dialog.Site().HasRawSettings,
+        "raw settings applied to the form's site");
+      Check(Dialog.HostName()->text() == QStringLiteral("127.0.0.1"), "its host as it was");
+      Dialog.Save();
+      Check(CoreBridge::LoadSite("Tests/rclone").Timeout == 33, "saved with the site");
+      const QString Again = QString::fromStdString(CoreBridge::SiteRawSettings(CoreBridge::LoadSite("Tests/rclone"), "Tests/rclone"));
+      Check(Again.contains(QStringLiteral("PingIntervalSecs=21")), "an option the form has no field for too");
     }
     {
       SiteManager Dialog(&Window);

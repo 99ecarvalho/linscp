@@ -510,6 +510,10 @@ enum class TText
   MoveBookmarkCaption, // "Move Location Profile"
   MoveBookmarkPrompt, // "New folder name:"
   BookmarkInfoTip, // "Local: %s\nRemote: %s"
+  SiteRawCaption, // "Raw Site Settings"
+  SiteRawAdd, // "&Add..."
+  SiteRawAddCaption, // "Add Raw Site Setting"
+  SiteRawAddLabel, // "&Site Setting:"
   FindFileTitle, // "Find"
   FindFileFinding, // "Finding ..."
   FindFileInDirectory, // "Searching in %s"
@@ -800,6 +804,11 @@ struct TSite
   bool TryAgent = true;
   bool KeyboardInteractive = true;
   bool AgentForwarding = false;
+  // Raw settings, once edited (Edit Raw Settings): the site's settings in
+  // core's options ("Name=Value" lines), replacing the base's under the
+  // fields above.
+  bool HasRawSettings = false;
+  std::string RawSettings;
 };
 
 // --- Private keys -----------------------------------------------------------
@@ -840,6 +849,16 @@ bool SiteExists(const std::string & Name);
 // asking before overwriting another is the dialog's (SiteExists). Throws
 // TCoreError: no name, a special site, a storage error.
 void SaveSite(const TSite & Site, const std::string & BaseName = std::string());
+// Edit Raw Settings, as TSiteRawDialog: the site's settings (of BaseName's
+// stored site, or the defaults, with Site's fields) as core's options
+// other than the protocol, host, port, user and password; and, the options
+// edited, the site they make (with HasRawSettings), as Execute applies
+// them. Throws TCoreError.
+std::string SiteRawSettings(const TSite & Site, const std::string & BaseName);
+TSite ApplySiteRawSettings(const TSite & Site, const std::string & BaseName, const std::string & RawSettings);
+// The options not yet among RawSettings, each with its default, sorted,
+// for the dialog's Add (TSiteRawDialog::AddButtonClick).
+std::vector<std::pair<std::string, std::string>> RawSettingsToAdd(const std::string & RawSettings);
 // As the Login dialog renames a site in its tree: saved under the new name,
 // the old one removed. Throws TCoreError.
 void RenameSite(const std::string & Name, const std::string & NewName);

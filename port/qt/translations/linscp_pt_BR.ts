@@ -1885,6 +1885,14 @@
         <source>Site &apos;%1&apos; already exists.</source>
         <translation>O site &apos;%1&apos; já existe.</translation>
     </message>
+    <message>
+        <source>A&amp;dvanced...</source>
+        <translation>A&amp;vançado...</translation>
+    </message>
+    <message>
+        <source>Edit &amp;Raw Settings...</source>
+        <translation>Editar &amp;Parâmetros Avançados...</translation>
+    </message>
 </context>
 <context>
     <name>SyncChecklistDialog</name>

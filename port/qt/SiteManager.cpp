@@ -21,6 +21,9 @@
 
 #include "QtFrontend.h"
 #include "SiteAdvanced.h"
+#include "SiteRawDialog.h"
+#include <QMenu>
+#include <QToolButton>
 
 namespace
 {
@@ -130,8 +133,15 @@ SiteManager::SiteManager(QWidget * Parent) :
   FPassword->setEchoMode(QLineEdit::Password);
   Form->addRow(tr("&Password:"), FPassword);
   FormLayout->addLayout(Form);
-  FAdvanced = new QPushButton(tr("Ad&vanced..."), FormPanel);
-  connect(FAdvanced, &QPushButton::clicked, this, &SiteManager::Advanced);
+  // As upstream's: Advanced..., with Edit Raw Settings beside it.
+  FAdvanced = new QToolButton(FormPanel);
+  FAdvanced->setText(tr("Ad&vanced..."));
+  FAdvanced->setPopupMode(QToolButton::MenuButtonPopup);
+  QMenu * AdvancedMenu = new QMenu(FAdvanced);
+  AdvancedMenu->addAction(tr("A&dvanced..."), this, &SiteManager::Advanced);
+  AdvancedMenu->addAction(tr("Edit &Raw Settings..."), this, [this]() { RawSettings(); });
+  FAdvanced->setMenu(AdvancedMenu);
+  connect(FAdvanced, &QToolButton::clicked, this, &SiteManager::Advanced);
   QHBoxLayout * AdvancedRow = new QHBoxLayout();
   AdvancedRow->addStretch(1);
   AdvancedRow->addWidget(FAdvanced);
@@ -432,6 +442,46 @@ void SiteManager::Advanced()
   {
     FSite = Dialog.Site();
   }
+}
+
+bool SiteManager::RawSettings(const QString * Raw)
+{
+  const CoreBridge::TSite Site = Edited();
+  // The site's stored settings under the dialog's fields.
+  const std::string Base = Site.Name;
+  QString Settings;
+  try
+  {
+    Settings = QString::fromStdString(Site.HasRawSettings ? Site.RawSettings : CoreBridge::SiteRawSettings(Site, Base));
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+  if (Raw != nullptr)
+  {
+    Settings = *Raw;
+  }
+  else
+  {
+    SiteRawDialog Dialog(Settings, this);
+    if (Dialog.exec() != QDialog::Accepted)
+    {
+      return false;
+    }
+    Settings = Dialog.Settings();
+  }
+  try
+  {
+    SetEdited(CoreBridge::ApplySiteRawSettings(Site, Base, Settings.toStdString()));
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+  return true;
 }
 
 // As upstream's VerifyAndConvertKey on login and save: an OpenSSH key is

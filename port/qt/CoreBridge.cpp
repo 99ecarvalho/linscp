@@ -860,6 +860,10 @@ std::string Text(TText Text)
     case TText::MoveBookmarkCaption: Ident = MOVE_BOOKMARK_CAPTION; break;
     case TText::MoveBookmarkPrompt: Ident = MOVE_BOOKMARK_PROMPT; break;
     case TText::BookmarkInfoTip: Ident = BOOKMARK_INFO_TIP; break;
+    case TText::SiteRawCaption: Ident = SITE_RAW_CAPTION; break;
+    case TText::SiteRawAdd: Ident = SITE_RAW_ADD; break;
+    case TText::SiteRawAddCaption: Ident = SITE_RAW_ADD_CAPTION; break;
+    case TText::SiteRawAddLabel: Ident = SITE_RAW_ADD_LABEL; break;
     case TText::FindFileTitle: Ident = FIND_FILE_TITLE; break;
     case TText::FindFileFinding: Ident = FIND_FILE_FINDING; break;
     case TText::FindFileInDirectory: Ident = FIND_FILE_IN_DIRECTORY; break;
