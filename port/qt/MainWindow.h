@@ -85,6 +85,11 @@ public:
   // its focused entry) in the Properties dialog, its changes applied. False
   // when nothing was changed. Local files' properties are the system's.
   bool Properties();
+  // Files > Edit Link (Alt+F6), as WinSCP's AddEditLink: a link in the
+  // active panel's directory, to its focused entry, or that entry edited
+  // when it is a link. Locally, the system's (a symbolic link, a shortcut
+  // on Windows). False when none was made.
+  bool AddEditLink();
   // Options > Preferences: false when cancelled.
   bool PreferencesDialog();
   // The preferences applied to the window and its panels.
@@ -139,6 +144,7 @@ private:
   QAction * FSynchronizeAction = nullptr;
   QAction * FEditAction = nullptr;
   QAction * FPropertiesAction = nullptr;
+  QAction * FLinkAction = nullptr;
   // The editors, and for a remote file what it was downloaded as.
   struct TEdited
   {

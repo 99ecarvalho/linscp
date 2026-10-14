@@ -637,6 +637,9 @@ std::string Text(TText Text)
     case TText::PropertiesFilesCaption: Ident = PROPERTIES_FILES_CAPTION; break;
     case TText::PropertiesUnknownSize: Ident = PROPERTIES_UNKNOWN_SIZE; break;
     case TText::PropertiesChecksumUnknown: Ident = PROPERTIES_CHECKSUM_UNKNOWN; break;
+    case TText::LinkAddCaption: Ident = LINK_ADD_CAPTION; break;
+    case TText::LinkEditCaption: Ident = LINK_EDIT_CAPTION; break;
+    case TText::CreateLinkError: Ident = CREATE_LINK_ERROR; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

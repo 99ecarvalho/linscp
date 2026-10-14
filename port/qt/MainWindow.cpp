@@ -40,6 +40,7 @@
 #include "SiteManager.h"
 #include "PreferencesDialog.h"
 #include "PropertiesDialog.h"
+#include "LinkDialog.h"
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
 
@@ -177,6 +178,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FEditAction = FilesMenu->addAction(tr("&Edit"), this, [this]() { EditCurrent(); });
   FEditAction->setShortcut(QKeySequence(Qt::Key_F4));
   FilesMenu->addSeparator();
+  FLinkAction = FilesMenu->addAction(tr("Edit &Link..."), this, [this]() { AddEditLink(); });
   FPropertiesAction = FilesMenu->addAction(tr("&Properties"), this, [this]() { Properties(); });
   FilesMenu->addSeparator();
   FCopyAction = FilesMenu->addAction(tr("&Copy..."), this, [this]() { TransferSelected(false, true); });
@@ -369,6 +371,7 @@ void MainWindow::ApplyPreferences()
   // NonVisual.cpp's: Explorer's keys copy with Ctrl+K, as F5 refreshes.
   FCopyAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::CTRL | Qt::Key_K) : QKeySequence(Qt::Key_F5));
   FPropertiesAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::ALT | Qt::Key_Return) : QKeySequence(Qt::Key_F9));
+  FLinkAction->setShortcut(Preferences.ExplorerKeyboardShortcuts ? QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_L) : QKeySequence(Qt::ALT | Qt::Key_F6));
   // As TScpCommanderForm::ConfigurationChanged: the site's local directory is
   // Home, with "default directory is home", unless it remembers the last.
   FLocal->HomeDirectory =
@@ -939,6 +942,7 @@ void MainWindow::UpdateActions()
   FSitesAction->setEnabled(!FBusy);
   FEditAction->setEnabled(!FBusy);
   FPropertiesAction->setEnabled(!FBusy && FSession);
+  FLinkAction->setEnabled(!FBusy);
   FCopyAction->setEnabled(!FBusy && FSession);
   FMoveAction->setEnabled(!FBusy && FSession);
   FSynchronizeAction->setEnabled(!FBusy && FSession);
@@ -1160,6 +1164,74 @@ bool MainWindow::Properties()
     {
       Result = FSession->SetProperties(List, Dialog.Properties());
     }
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  FPanel->Refresh();
+  UpdateActions();
+  return Result;
+}
+
+bool MainWindow::AddEditLink()
+{
+  if (FBusy || (!FLocalActive && (!FSession || !FSession->CanLink())))
+  {
+    return false;
+  }
+  const FileView * View = FLocalActive ? FLocal->View() : FPanel->View();
+  const CoreBridge::TRemoteEntry * Entry = View->CurrentEntry();
+  bool Edit = false;
+  QString FileName;
+  QString PointTo;
+  if (Entry != nullptr)
+  {
+    const QString Name = QString::fromStdString(Entry->Name);
+    Edit = Entry->Link && (FLocalActive || FSession->CanEditLinks());
+    if (Edit)
+    {
+      FileName = Name;
+      PointTo = FLocalActive ? QFileInfo(QDir(FLocal->Path()).filePath(Name)).symLinkTarget() : QString::fromStdString(Entry->LinkTarget);
+    }
+    else
+    {
+      PointTo = Name;
+    }
+  }
+  LinkDialog Dialog(FileName, PointTo, !FLocalActive, Edit, !FLocalActive && FSession->CanHardLink(), this);
+  if (Dialog.exec() != QDialog::Accepted)
+  {
+    return false;
+  }
+  bool Result = false;
+  if (FLocalActive)
+  {
+    const QString Path = QDir(FLocal->Path()).filePath(Dialog.FileName());
+    if (Edit)
+    {
+      QFile::remove(Path);
+    }
+    Result = QFile::link(Dialog.PointTo(), Path);
+    if (!Result)
+    {
+      CoreBridge::TError Error;
+      Error.Message = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::CreateLinkError))
+        .replace(QStringLiteral("%s"), QDir::toNativeSeparators(Path)).toStdString();
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      Frontend.ShowError(Error);
+    }
+    FLocal->Refresh();
+    return Result;
+  }
+  FBusy = true;
+  UpdateActions();
+  try
+  {
+    FSession->CreateLink(Dialog.FileName().toStdString(), Dialog.PointTo().toStdString(), Dialog.SymbolicLink(), Edit);
+    Result = true;
   }
   catch (const CoreBridge::TCoreError & E)
   {

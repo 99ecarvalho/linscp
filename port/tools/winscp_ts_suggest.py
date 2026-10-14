@@ -111,6 +111,7 @@ CONTEXT_FORMS = {
     'PropertiesDialog': ['Properties.dfm'],
     'RightsFrame': ['Rights.dfm'],
     'CreateDirectoryDialog': ['CreateDirectory.dfm'],
+    'LinkDialog': ['Symlink.dfm'],
 }
 
 

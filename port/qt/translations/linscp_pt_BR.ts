@@ -321,6 +321,21 @@
     </message>
 </context>
 <context>
+    <name>LinkDialog</name>
+    <message>
+        <source>&amp;Link/shortcut file:</source>
+        <translation>Arquivo de &amp;link/atalho:</translation>
+    </message>
+    <message>
+        <source>&amp;Point link/shortcut to:</source>
+        <translation>A&amp;pontar link/atalho para:</translation>
+    </message>
+    <message>
+        <source>&amp;Hard link</source>
+        <translation>&amp;Hard link</translation>
+    </message>
+</context>
+<context>
     <name>LocalPanel</name>
     <message>
         <source>Back</source>
@@ -511,6 +526,10 @@
     <message>
         <source>&amp;Properties</source>
         <translation>&amp;Propriedades</translation>
+    </message>
+    <message>
+        <source>Edit &amp;Link...</source>
+        <translation>Editar &amp;Link...</translation>
     </message>
 </context>
 <context>

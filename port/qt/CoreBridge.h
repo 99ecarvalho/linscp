@@ -483,6 +483,9 @@ enum class TText
   PropertiesFilesCaption, // "%s, ... Properties"
   PropertiesUnknownSize, // "Unknown"
   PropertiesChecksumUnknown, // "Unknown"
+  LinkAddCaption,       // "Add link/shortcut"
+  LinkEditCaption,      // "Edit link/shortcut"
+  CreateLinkError,      // "Cannot create link '%s'."
 };
 std::string Text(TText Text);
 
@@ -827,6 +830,15 @@ public:
   void CreateDirectory(const std::string & Name, const TNewDirectory * Properties = nullptr);
   // Whether the server can set permissions (fcModeChanging).
   bool CanChangeRights() const;
+  // Links, as TCustomScpExplorerForm::AddEditLink: whether links can be
+  // made (symbolic links resolved, and the server makes them), hard ones
+  // too, and existing links edited (the site resolves them).
+  bool CanLink() const;
+  bool CanHardLink() const;
+  bool CanEditLinks() const;
+  // A link FileName to PointTo in the current directory; Replace: the
+  // existing link FileName is deleted first (an edit). Throws TCoreError.
+  void CreateLink(const std::string & FileName, const std::string & PointTo, bool Symbolic, bool Replace);
   // An entry of the current directory, to a new name (or path).
   void Rename(const std::string & Name, const std::string & NewName);
   // Entries of the current directory into another remote directory (a full

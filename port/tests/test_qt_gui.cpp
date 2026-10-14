@@ -33,7 +33,8 @@
 //     CHMOD's modes): the dialog's texts, the rights frame (octal, menu,
 //     mixed bits for several files), permissions changed, a directory's
 //     size calculated, recursion offered for directories; Create folder
-//     (F7) with permissions, kept for next time
+//     (F7) with permissions, kept for next time; links (Alt+F6): the
+//     dialog, local links made and edited (FTP makes none)
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -98,6 +99,8 @@
 #include "PropertiesDialog.h"
 #include "RightsFrame.h"
 #include "CreateDirectoryDialog.h"
+#include "LinkDialog.h"
+#include <QTemporaryDir>
 #include "EditorWindow.h"
 
 #include <QPlainTextEdit>
@@ -1916,6 +1919,56 @@ void Properties(const char * Port)
     Check(Session->PropertiesOf({ "made" }).Properties.Rights.Set == 0750, "with its permissions");
     Check(CoreBridge::NewDirectorySettings().SetRights && (CoreBridge::NewDirectorySettings().Rights.Set == 0750),
       "kept for next time");
+    Responder.Custom = nullptr;
+
+    // Links (Alt+F6).
+    {
+      LinkDialog Dialog(QString(), QStringLiteral("hello.txt"), true, false, true);
+      Check(Dialog.windowTitle() == QString::fromStdString(CoreBridge::Text(CoreBridge::TText::LinkAddCaption)), "WinSCP's title");
+      Check(!Dialog.OkButton()->isEnabled() && Dialog.HardLinkCheck()->isEnabled(), "a name is needed; hard links offered");
+      Dialog.FileNameEdit()->setText(QStringLiteral("link"));
+      Check(Dialog.OkButton()->isEnabled() && Dialog.SymbolicLink(), "symbolic by default");
+      LinkDialog Editing(QStringLiteral("link"), QStringLiteral("hello.txt"), true, true, true);
+      Check(Editing.FileNameEdit()->isReadOnly() && !Editing.HardLinkCheck()->isEnabled() &&
+        (Editing.windowTitle() == QString::fromStdString(CoreBridge::Text(CoreBridge::TText::LinkEditCaption))),
+        "editing: the name fixed, no hard link");
+    }
+    Check(!Session->CanLink(), "FTP makes no links");
+    Remote->Select({ QStringLiteral("hello.txt") });
+    Window.ActivatePanel(false);
+    Check(!Window.AddEditLink(), "so Alt+F6 does nothing there");
+    QTemporaryDir LocalDirectory;
+    {
+      QFile Target(QDir(LocalDirectory.path()).filePath(QStringLiteral("target.txt")));
+      Target.open(QIODevice::WriteOnly);
+      Target.write("t");
+    }
+    LocalPanel * Local = Window.Local();
+    Local->ChangeDirectory(LocalDirectory.path());
+    Local->Select({ QStringLiteral("target.txt") });
+    Window.ActivatePanel(true);
+#if defined(_WIN32)
+    const QString LinkName = QStringLiteral("target.lnk");
+#else
+    const QString LinkName = QStringLiteral("target-link");
+#endif
+    Responder.Custom = [&LinkName](QWidget * Modal)
+    {
+      LinkDialog * Dialog = qobject_cast<LinkDialog *>(Modal);
+      if (Dialog == nullptr)
+      {
+        return false;
+      }
+      Check((Dialog->PointToEdit()->text() == QStringLiteral("target.txt")) && Dialog->FileNameEdit()->text().isEmpty() &&
+        !Dialog->HardLinkCheck()->isEnabled(), "a local link to the focused file, symbolic");
+      Dialog->FileNameEdit()->setText(LinkName);
+      Dialog->OkButton()->click();
+      return true;
+    };
+    Check(Window.AddEditLink(), "Alt+F6 makes a local link");
+    Check(QFileInfo(QDir(LocalDirectory.path()).filePath(LinkName)).isSymLink() &&
+      QFileInfo(QDir(LocalDirectory.path()).filePath(LinkName)).symLinkTarget().endsWith(QStringLiteral("target.txt")),
+      "pointing to the file");
     Responder.Custom = nullptr;
     Frontend.SetWindow(nullptr);
   }

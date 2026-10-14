@@ -12,6 +12,7 @@
 #include <RemoteFiles.h>
 #include <SessionData.h>
 #include <Terminal.h>
+#include <FileSystems.h>
 #include <TextsCore.h>
 #include <CopyParam.h>
 #include <FileOperationProgress.h>
@@ -1131,6 +1132,51 @@ public:
 bool TSession::CanChangeRights() const
 {
   return Active() && F->Terminal->IsCapable[fcModeChanging];
+}
+
+bool TSession::CanLink() const
+{
+  return Active() && F->Terminal->ResolvingSymlinks && F->Terminal->IsCapable[fcSymbolicLink];
+}
+
+bool TSession::CanHardLink() const
+{
+  return Active() && F->Terminal->IsCapable[fcHardLink];
+}
+
+bool TSession::CanEditLinks() const
+{
+  return Active() && F->Terminal->SessionData->ResolveSymlinks;
+}
+
+void TSession::CreateLink(const std::string & FileName, const std::string & PointTo, bool Symbolic, bool Replace)
+{
+  try
+  {
+    CheckActive(*this);
+    TTerminal * Terminal = F->Terminal.get();
+    if (Replace)
+    {
+      TRemoteFile * File = FindFile(Terminal, FileName);
+      int Params = dfNoRecursive;
+      Terminal->ExceptionOnFail = true;
+      try
+      {
+        Terminal->DeleteFile(L"", File, &Params);
+      }
+      catch (...)
+      {
+        Terminal->ExceptionOnFail = false;
+        throw;
+      }
+      Terminal->ExceptionOnFail = false;
+    }
+    Terminal->CreateLink(FromUtf8(FileName), FromUtf8(PointTo), Symbolic);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
 }
 
 TNewDirectory NewDirectorySettings()

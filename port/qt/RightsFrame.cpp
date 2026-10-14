@@ -74,7 +74,7 @@ RightsFrame::RightsFrame(QWidget * Parent) :
   Layout->setColumnStretch(5, 1);
   for (QCheckBox * Box : FChecks)
   {
-    connect(Box, &QCheckBox::stateChanged, this, [this]()
+    connect(Box, &QCheckBox::checkStateChanged, this, [this]()
     {
       if (!FUpdating)
       {
