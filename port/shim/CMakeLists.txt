@@ -70,7 +70,8 @@ target_link_libraries(linscp-shim PUBLIC linscp-expat)
 find_package(Threads REQUIRED)
 target_link_libraries(linscp-shim PUBLIC Threads::Threads)
 if(WIN32)
-  target_link_libraries(linscp-shim PUBLIC ole32)
+  # version: GetFileVersion's VERSIONINFO reading.
+  target_link_libraries(linscp-shim PUBLIC ole32 version)
 endif()
 target_compile_features(linscp-shim PUBLIC cxx_std_17)
 # Core's configuration, publicly: the shim must see exactly what core sees, and
