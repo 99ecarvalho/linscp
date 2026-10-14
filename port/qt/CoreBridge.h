@@ -625,6 +625,17 @@ enum class TText
   CreateLocalDirectoryError, // "Can't create folder '%s'."
   SelectLocalDirectory, // "Select local directory."
   FileOverwrite, // "File '%s' already exists. Overwrite?"
+  SaveSessionCaption, // "Save session as site"
+  SaveSessionPrompt, // "&Site name:"
+  SaveSessionFolder, // "&Folder:"
+  SaveSessionRootFolder, // "<none>"
+  SaveSessionPassword, // "Save &password (not recommended)"
+  SaveSessionPasswordRecommended, // "Save &password"
+  RenameTabTitle, // "Rename tab"
+  RenameTabPrompt, // "&New tab name:"
+  PasswordChanged, // "Password has been changed."
+  PublicKeyTitle, // "Select key to install into server"
+  NotOpenSsh, // "**Install public key to non-OpenSSH server?**..." (%s: the server's)
   NotSupported, // "Operation not supported."
   LicenseCaption, // "%s license"
   TagAdd,         // "Add tag"
@@ -1312,6 +1323,51 @@ public:
   // DuplicateTab: CloneCurrentSessionData), not opened yet. Throws
   // TCoreError.
   std::unique_ptr<TSession> Duplicate() const;
+  // Tabs > Reconnect Session, as TTerminalManager::ReconnectActiveTerminal:
+  // a session that has lost its connection opened again
+  // (TTerminal::Reopen), in the directory it was in. Throws TCoreError.
+  void Reconnect();
+  // The connection closed, the session kept, as a lost one leaves it (tests).
+  void DropConnection();
+  // Commands > Clear Caches (TTerminal::ClearCaches); whether there is
+  // anything to clear (AreCachesEmpty).
+  bool CachesEmpty() const;
+  void ClearCaches();
+  // Tabs > Change Password, as TCustomScpExplorerForm::ChangePassword: a
+  // secondary session that authenticates with the password only and asks
+  // for a new one. CanChangePassword: the protocol's fcChangePassword.
+  // Throws TCoreError (Aborted when cancelled).
+  bool CanChangePassword() const;
+  void ChangePassword();
+  // Tabs > Install Public Key into Server (SFTP: TTerminal::UploadPublicKey,
+  // the key added to ~/.ssh/authorized_keys): its report. IsOpenSsh: the
+  // server says it is OpenSSH (else WinSCP asks first); SshImplementation
+  // is what it says. Throws TCoreError.
+  bool CanUploadPublicKey() const;
+  bool IsOpenSsh() const;
+  std::string SshImplementation() const;
+  std::string UploadPublicKey(const std::string & FileName);
+  std::string PublicKeyFile() const;
+  // Tabs > Save Session as Site (TCustomScpExplorerForm::SaveCurrentSession,
+  // DoSaveSession): the session as it is now saved under Name; its
+  // passwords only if SavePassword. Defaults: what the dialog starts with.
+  struct TSaveAsSite
+  {
+    std::string Name;
+    // The session has a password to save (and storing them is allowed);
+    // saving it is not recommended (no master password, not anonymous);
+    // the box's initial state.
+    bool CanSavePassword = false;
+    bool NotRecommended = true;
+    bool SavePassword = false;
+    // The sites' folders, sorted.
+    std::vector<std::string> Folders;
+  };
+  TSaveAsSite SaveAsSiteDefaults() const;
+  void SaveAsSite(const std::string & Name, bool SavePassword);
+  // Tabs > Rename Tab (TCustomScpExplorerForm::RenameTab): the session's
+  // name, as its tab shows it. Throws TCoreError for a name that is not one.
+  void Rename(const std::string & Name);
   // A workspace's sessions, in its order, not opened yet
   // (GetFolderOrWorkspace). Throws TCoreError.
   static std::vector<std::unique_ptr<TSession>> Workspace(const std::string & Name);

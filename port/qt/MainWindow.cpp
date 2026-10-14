@@ -18,6 +18,7 @@
 #include <QFileInfo>
 #include <QMimeData>
 #include <QUrl>
+#include <QFileDialog>
 #include <QFormLayout>
 #include <QTemporaryDir>
 #include <QTabBar>
@@ -58,6 +59,8 @@
 #include "EditorPreferencesDialog.h"
 #include "SaveWorkspaceDialog.h"
 #include "CopyLocalDialog.h"
+#include "SaveSiteDialog.h"
+#include "KeyVerify.h"
 #include "TransferSettingsDialog.h"
 
 namespace
@@ -1400,6 +1403,17 @@ void MainWindow::UpdateActions()
   FKeepUpToDateAction->setEnabled(!FBusy && FSession);
   FDisconnectAction->setEnabled(!FBusy && FSession);
   FDuplicateTabAction->setEnabled(!FBusy && FSession);
+  if (FRenameTabAction != nullptr)
+  {
+    const bool Active = FSession && FSession->Active();
+    FRenameTabAction->setEnabled(!FBusy && (FActiveTab >= 0));
+    FReconnectAction->setEnabled(!FBusy && FSession && !Active);
+    FSaveSiteAction->setEnabled(!FBusy && FSession);
+    FChangePasswordAction->setEnabled(!FBusy && Active && FSession->CanChangePassword());
+    FPublicKeyAction->setEnabled(!FBusy && Active && FSession->CanUploadPublicKey());
+    // (As the menu opens, too: the caches fill as the panel is browsed.)
+    FClearCachesAction->setEnabled(!FBusy && Active && !FSession->CachesEmpty());
+  }
   FSaveWorkspaceAction->setEnabled(!FBusy && (TabCount() > 0));
   FCloseTabAction->setEnabled(!FBusy && FSession);
   FNextTabAction->setEnabled(!FBusy && (TabCount() > 1));
@@ -2937,7 +2951,11 @@ void MainWindow::UpdateTabs()
     CoreBridge::TSession * Session = TabSession(Index);
     QString Name = (Session != nullptr) ? QString::fromStdString(Session->Name()) : QString();
     // As GetLocalBrowserSessionTitle: the two directories' last parts.
-    if (FTabs[Index].LocalBrowser)
+    if (FTabs[Index].LocalBrowser && !FTabs[Index].Name.isEmpty())
+    {
+      Name = FTabs[Index].Name;
+    }
+    else if (FTabs[Index].LocalBrowser)
     {
       const bool Active = (Index == FActiveTab);
       Name = tr("%1 \u2013 %2").arg(ShortPath(Active ? FLocal->Path() : FTabs[Index].LocalPath),
@@ -3205,6 +3223,8 @@ void MainWindow::BuildMenus()
   Commands->addAction(FConsoleAction);
   Commands->addAction(FPuttyAction);
   Commands->addSeparator();
+  FClearCachesAction = Commands->addAction(tr("Clea&r Caches"), this, [this]() { ClearCaches(); });
+  Commands->addSeparator();
   Commands->addAction(FQuitAction);
 
   QMenu * Tabs = menuBar()->addMenu(tr("&Tabs"));
@@ -3217,11 +3237,16 @@ void MainWindow::BuildMenus()
   NewTab->addAction(tr("&Local Tab"), this, &MainWindow::NewLocalTab);
   Tabs->addAction(FCloseTabAction);
   Tabs->addAction(FDuplicateTabAction);
+  FRenameTabAction = Tabs->addAction(tr("&Rename Tab"), this, [this]() { RenameTab(); });
   Tabs->addSeparator();
   Tabs->addAction(FDisconnectAction);
+  FReconnectAction = Tabs->addAction(tr("&Reconnect Session"), this, [this]() { ReconnectSession(); });
+  FSaveSiteAction = Tabs->addAction(tr("&Save Session as Site..."), this, [this]() { SaveSessionAsSite(); });
   Tabs->addSeparator();
   Tabs->addAction(FServerInfoAction);
   Tabs->addAction(FGenerateSessionUrlAction);
+  FChangePasswordAction = Tabs->addAction(tr("&Change Password..."), this, [this]() { ChangePassword(); });
+  FPublicKeyAction = Tabs->addAction(tr("&Install Public Key into Server..."), this, [this]() { InstallPublicKey(); });
   Tabs->addSeparator();
   // As WinSCP's Opened Tabs and Workspaces: listed as the menu opens.
   QMenu * Opened = Tabs->addMenu(tr("&Opened Tabs"));
@@ -3478,4 +3503,254 @@ bool MainWindow::LocalLocalCopy(bool Move, bool Confirm, const QStringList * Sou
     Frontend.Query(Query);
   }
   return Result;
+}
+
+// --- Session commands (P3-14) ------------------------------------------------------
+
+namespace
+{
+
+void Inform(QWidget * Window, const std::string & Message)
+{
+  CoreBridge::TQuery Query;
+  Query.Type = CoreBridge::TQueryType::Information;
+  Query.Message = Message;
+  CoreBridge::TQueryButton OK;
+  OK.Answer = CoreBridge::AnswerOK;
+  OK.Caption = "OK";
+  Query.Buttons = { OK };
+  Query.CancelAnswer = CoreBridge::AnswerOK;
+  QtFrontend Frontend;
+  Frontend.SetWindow(Window);
+  Frontend.Query(Query);
+}
+
+}  // namespace
+
+bool MainWindow::ReconnectSession()
+{
+  if (FBusy || !FSession || FSession->Active())
+  {
+    return false;
+  }
+  FBusy = true;
+  UpdateActions();
+  bool Result = false;
+  try
+  {
+    statusBar()->showMessage(tr("Connecting to %1...").arg(QString::fromStdString(FSession->Name())));
+    FSession->Reconnect();
+    Result = true;
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  statusBar()->showMessage(Result ? tr("Connected") : tr("Not connected"));
+  FPanel->SetSession(FSession.get());
+  FQueue->SetSession(FSession.get());
+  UpdateTabs();
+  UpdateTitle();
+  UpdateActions();
+  return Result;
+}
+
+bool MainWindow::SaveSessionAsSite(const QString * Name, bool SavePassword)
+{
+  if (FBusy || !FSession)
+  {
+    return false;
+  }
+  CoreBridge::TSession::TSaveAsSite Defaults = FSession->SaveAsSiteDefaults();
+  while (true)
+  {
+    QString AName;
+    bool ASavePassword = SavePassword;
+    if (Name != nullptr)
+    {
+      AName = *Name;
+    }
+    else
+    {
+      SaveSiteDialog Dialog(Defaults, this);
+      if (Dialog.exec() != QDialog::Accepted)
+      {
+        return false;
+      }
+      AName = Dialog.Name();
+      ASavePassword = Dialog.SavePassword();
+    }
+    try
+    {
+      FSession->SaveAsSite(AName.toStdString(), ASavePassword);
+      return true;
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+      // As DoValidate: the dialog again, with what was typed.
+      if (Name != nullptr)
+      {
+        return false;
+      }
+      Defaults.Name = AName.toStdString();
+      Defaults.SavePassword = ASavePassword;
+    }
+  }
+}
+
+// As RenameTab: the name asked for, the session's (or the local tab's).
+bool MainWindow::RenameTab(const QString * Name)
+{
+  if (FBusy || (FActiveTab < 0))
+  {
+    return false;
+  }
+  const QString Current = FSession ? QString::fromStdString(FSession->Name()) : FTabBar->tabText(FActiveTab);
+  QString NewName;
+  if (Name != nullptr)
+  {
+    NewName = *Name;
+  }
+  else
+  {
+    bool OK = false;
+    NewName = QInputDialog::getText(this, QString::fromStdString(CoreBridge::Text(CoreBridge::TText::RenameTabTitle)),
+      QString::fromStdString(CoreBridge::Text(CoreBridge::TText::RenameTabPrompt)), QLineEdit::Normal, Current, &OK);
+    if (!OK)
+    {
+      return false;
+    }
+  }
+  // When submitting the default name, do not fix it.
+  if (NewName == Current)
+  {
+    return false;
+  }
+  try
+  {
+    if (FSession)
+    {
+      FSession->Rename(NewName.toStdString());
+    }
+    else
+    {
+      FTabs[FActiveTab].Name = NewName;
+    }
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+  UpdateTabs();
+  UpdateTitle();
+  return true;
+}
+
+bool MainWindow::ChangePassword()
+{
+  if (FBusy || !FSession || !FSession->CanChangePassword())
+  {
+    return false;
+  }
+  FBusy = true;
+  UpdateActions();
+  bool Result = false;
+  try
+  {
+    FSession->ChangePassword();
+    Result = true;
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  UpdateActions();
+  if (Result)
+  {
+    Inform(this, CoreBridge::Text(CoreBridge::TText::PasswordChanged));
+  }
+  return Result;
+}
+
+// As TTerminalManager::UploadPublicKey: the key chosen (the site's to start
+// with), converted if need be; a server that is not OpenSSH asked about.
+bool MainWindow::InstallPublicKey(const QString * FileName)
+{
+  if (FBusy || !FSession || !FSession->CanUploadPublicKey())
+  {
+    return false;
+  }
+  QString Key;
+  if (FileName != nullptr)
+  {
+    Key = *FileName;
+  }
+  else
+  {
+    Key = QFileDialog::getOpenFileName(this, QString::fromStdString(CoreBridge::Text(CoreBridge::TText::PublicKeyTitle)),
+      QString::fromStdString(FSession->PublicKeyFile()),
+      tr("PuTTY Private Key Files (*.ppk);;All Private Key Files (*.ppk *.pem *.key id_*);;All Files (*)"));
+    if (Key.isEmpty())
+    {
+      return false;
+    }
+  }
+  if (!VerifyAndConvertKey(this, Key, false, [this](const QString & Suggested) { return ChooseConvertedKeyFile(this, Suggested); }))
+  {
+    return false;
+  }
+  if (!FSession->IsOpenSsh())
+  {
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Confirmation;
+    Query.Message = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::NotOpenSsh))
+      .replace(QStringLiteral("%s"), QString::fromStdString(FSession->SshImplementation())).toStdString();
+    CoreBridge::TQueryButton OK;
+    OK.Answer = CoreBridge::AnswerOK;
+    OK.Caption = "OK";
+    CoreBridge::TQueryButton Cancel;
+    Cancel.Answer = CoreBridge::AnswerCancel;
+    Cancel.Caption = "Cancel";
+    Query.Buttons = { OK, Cancel };
+    Query.CancelAnswer = CoreBridge::AnswerCancel;
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    if (Frontend.Query(Query).Answer != CoreBridge::AnswerOK)
+    {
+      return false;
+    }
+  }
+  FBusy = true;
+  UpdateActions();
+  std::string Installed;
+  try
+  {
+    Installed = FSession->UploadPublicKey(QDir::toNativeSeparators(Key).toStdString());
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  UpdateActions();
+  if (!Installed.empty())
+  {
+    Inform(this, Installed);
+  }
+  return !Installed.empty();
+}
+
+bool MainWindow::ClearCaches()
+{
+  if (FBusy || !FSession || !FSession->Active())
+  {
+    return false;
+  }
+  FSession->ClearCaches();
+  UpdateActions();
+  return true;
 }

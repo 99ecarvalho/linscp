@@ -1,4 +1,5 @@
 #include "SiteManager.h"
+#include "KeyVerify.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -56,11 +57,7 @@ SiteManager::SiteManager(QWidget * Parent) :
 {
   setWindowTitle(tr("Login"));
   resize(780, 460);
-  ChooseConvertedKeyFile = [this](const QString & Suggested)
-  {
-    return QFileDialog::getSaveFileName(this, tr("Save converted private key"), Suggested,
-      tr("PuTTY Private Key Files (*.ppk)"));
-  };
+  ChooseConvertedKeyFile = [this](const QString & Suggested) { return ::ChooseConvertedKeyFile(this, Suggested); };
 
   QVBoxLayout * Layout = new QVBoxLayout(this);
   QSplitter * Splitter = new QSplitter(this);
@@ -569,61 +566,16 @@ bool SiteManager::VerifyKey()
   {
     return true;
   }
-  const CoreBridge::TKeyCheck Check = CoreBridge::CheckKey(Site.PrivateKeyFile);
-  QtFrontend Frontend;
-  Frontend.SetWindow(this);
-  if (Check.Status == CoreBridge::TKeyCheck::TStatus::Convertible)
+  QString FileName = QString::fromStdString(Site.PrivateKeyFile);
+  if (!VerifyAndConvertKey(this, FileName, true, ChooseConvertedKeyFile))
   {
-    CoreBridge::TQuery Query;
-    Query.Type = CoreBridge::TQueryType::Confirmation;
-    Query.Message = Check.Message;
-    CoreBridge::TQueryButton OK;
-    OK.Answer = CoreBridge::AnswerOK;
-    OK.Caption = "OK";
-    CoreBridge::TQueryButton Cancel;
-    Cancel.Answer = CoreBridge::AnswerCancel;
-    Cancel.Caption = "Cancel";
-    Query.Buttons = { OK, Cancel };
-    Query.CancelAnswer = CoreBridge::AnswerCancel;
-    if (Frontend.Query(Query).Answer != CoreBridge::AnswerOK)
-    {
-      return false;
-    }
-    const QString Target = ChooseConvertedKeyFile(QString::fromStdString(Check.ConvertedFileName));
-    if (Target.isEmpty())
-    {
-      return false;
-    }
-    try
-    {
-      ShowMessage(CoreBridge::TQueryType::Information,
-        QString::fromStdString(CoreBridge::ConvertKey(Site.PrivateKeyFile, Target.toStdString())));
-    }
-    catch (const CoreBridge::TCoreError & E)
-    {
-      ShowError(E);
-      return false;
-    }
-    CoreBridge::TSite Converted = Site;
-    Converted.PrivateKeyFile = Target.toStdString();
-    FSite = Converted;
-    return true;
+    return false;
   }
-  if (Check.Status == CoreBridge::TKeyCheck::TStatus::Unusable)
+  if (FileName.toStdString() != Site.PrivateKeyFile)
   {
-    // Upstream's: Ignore to go on anyway, Abort to stop.
-    CoreBridge::TQuery Query;
-    Query.Type = CoreBridge::TQueryType::Warning;
-    Query.Message = Check.Message;
-    CoreBridge::TQueryButton Abort;
-    Abort.Answer = CoreBridge::AnswerAbort;
-    Abort.Caption = "&Abort";
-    CoreBridge::TQueryButton Ignore;
-    Ignore.Answer = CoreBridge::AnswerIgnore;
-    Ignore.Caption = "&Ignore";
-    Query.Buttons = { Abort, Ignore };
-    Query.CancelAnswer = CoreBridge::AnswerAbort;
-    return Frontend.Query(Query).Answer == CoreBridge::AnswerIgnore;
+    CoreBridge::TSite Converted = Site;
+    Converted.PrivateKeyFile = FileName.toStdString();
+    FSite = Converted;
   }
   return true;
 }

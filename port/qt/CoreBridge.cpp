@@ -952,6 +952,17 @@ std::string Text(TText Text)
     case TText::CreateLocalDirectoryError: Ident = CREATE_LOCAL_DIR_ERROR; break;
     case TText::SelectLocalDirectory: Ident = SELECT_LOCAL_DIRECTORY; break;
     case TText::FileOverwrite: Ident = FILE_OVERWRITE; break;
+    case TText::SaveSessionCaption: Ident = SAVE_SESSION_CAPTION; break;
+    case TText::SaveSessionPrompt: Ident = SAVE_SESSION_PROMPT; break;
+    case TText::SaveSessionFolder: Ident = SAVE_SESSION_FOLDER; break;
+    case TText::SaveSessionRootFolder: Ident = SAVE_SESSION_ROOT_FOLDER2; break;
+    case TText::SaveSessionPassword: Ident = SAVE_SESSION_PASSWORD; break;
+    case TText::SaveSessionPasswordRecommended: Ident = SAVE_SESSION_PASSWORD_RECOMMENDED; break;
+    case TText::RenameTabTitle: Ident = RENAME_TAB_TITLE; break;
+    case TText::RenameTabPrompt: Ident = RENAME_TAB_PROMPT; break;
+    case TText::PasswordChanged: Ident = PASSWORD_CHANGED; break;
+    case TText::PublicKeyTitle: Ident = LOGIN_PUBLIC_KEY_TITLE; break;
+    case TText::NotOpenSsh: Ident = LOGIN_NOT_OPENSSH; break;
     case TText::NotSupported: Ident = NOTSUPPORTED; break;
     case TText::LicenseCaption: Ident = LICENSE_CAPTION; break;
     case TText::TagAdd: Ident = TAG_ADD; break;

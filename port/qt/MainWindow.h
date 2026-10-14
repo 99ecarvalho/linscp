@@ -235,6 +235,17 @@ public:
   // local panel's to start with. Copy and Move (F5, F6) and drags between
   // its panels copy and move local files (LocalLocalCopy).
   void NewLocalTab();
+  // The Tabs and Commands menus' session commands, as WinSCP's (P3-14):
+  // Reconnect Session (a session that lost its connection), Save Session
+  // as Site (Name given: no dialog), Rename Tab (Name given: no prompt),
+  // Change Password, Install Public Key into Server (FileName given: no
+  // file dialog), Clear Caches. False when nothing was done.
+  bool ReconnectSession();
+  bool SaveSessionAsSite(const QString * Name = nullptr, bool SavePassword = false);
+  bool RenameTab(const QString * Name = nullptr);
+  bool ChangePassword();
+  bool InstallPublicKey(const QString * FileName = nullptr);
+  bool ClearCaches();
   bool LocalBrowser() const;
   // The panel on a side as a local one: the left (Local) panel, or the
   // right one in a local tab; null for the remote panel.
@@ -304,6 +315,12 @@ private:
   QAction * FDuplicateTabAction = nullptr;
   QAction * FSaveWorkspaceAction = nullptr;
   QAction * FQuitAction = nullptr;
+  QAction * FRenameTabAction = nullptr;
+  QAction * FReconnectAction = nullptr;
+  QAction * FSaveSiteAction = nullptr;
+  QAction * FChangePasswordAction = nullptr;
+  QAction * FPublicKeyAction = nullptr;
+  QAction * FClearCachesAction = nullptr;
   QAction * FAboutAction = nullptr;
   QAction * FOpenCurrentAction = nullptr;
   QAction * FExploreAction = nullptr;
@@ -367,6 +384,8 @@ private:
     // WinSCP's local browser: no session, the right panel local too.
     bool LocalBrowser = false;
     QString OtherLocalPath;
+    // A local tab's name, as renamed (a session's is its own).
+    QString Name;
   };
   // The right panel's place: the remote panel, or in a local tab the other
   // local one.

@@ -121,6 +121,7 @@
 #include "AccessibilityAudit.h"
 #include "EditorPreferencesDialog.h"
 #include "SaveWorkspaceDialog.h"
+#include "SaveSiteDialog.h"
 #include "PreferencesDialog.h"
 #include "Integration.h"
 #include <QSettings>
@@ -3852,6 +3853,77 @@ void AccessibilityTest(const char * Port)
   CoreBridge::Finalize();
 }
 
+// P3-14's session commands: Save Session as Site, Rename Tab, Clear
+// Caches, Reconnect Session, Install Public Key into Server (into the test
+// server's root, not this account's).
+void SessionCommandsTest(const char * Port, const QString & Key, const QString & Root)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = std::deque<QString>(4, QStringLiteral("secret"));
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "(connected)");
+    Check(Window.Panel()->ChangeDirectory(QStringLiteral("/sub")), "(in /sub)");
+
+    // Save Session as Site: the session as it is, in a folder, no password.
+    const QString Site = QStringLiteral("Saved/Mine");
+    Check(Window.SaveSessionAsSite(&Site, false) && CoreBridge::SiteExists(Site.toStdString()), "Save Session as Site");
+    const CoreBridge::TSite Saved = CoreBridge::LoadSite(Site.toStdString());
+    Check((Saved.HostName == "127.0.0.1") && (Saved.Port == std::atoi(Port)) && Saved.Password.empty(),
+      "its host and port, not its password");
+    Check(Saved.RemoteDirectory == "/sub", "and the directory it is in");
+    {
+      SaveSiteDialog Dialog(Window.Session()->SaveAsSiteDefaults(), &Window);
+      Check(Dialog.SavePasswordCheck()->isEnabled() && !Dialog.SavePasswordCheck()->isChecked(),
+        "the dialog offers the password, not checked (not recommended)");
+      Dialog.NameEdit()->setText(QStringLiteral("Other"));
+      Dialog.FolderCombo()->setEditText(QStringLiteral("Saved"));
+      Check(Dialog.Name() == QStringLiteral("Saved/Other"), "its name with the folder");
+    }
+
+    // Rename Tab.
+    const QString Tab = QStringLiteral("Renamed");
+    Check(Window.RenameTab(&Tab) && (Window.TabBar()->tabText(0) == Tab), "Rename Tab");
+
+    // Clear Caches: the directories read are cached; cleared.
+    Window.Panel()->ChangeDirectory(QStringLiteral("/"));
+    Window.Panel()->ChangeDirectory(QStringLiteral("/sub"));
+    Check(!Window.Session()->CachesEmpty(), "(the directories read are cached)");
+    Check(Window.ClearCaches() && Window.Session()->CachesEmpty(), "Clear Caches");
+
+    // A lost connection: reconnected, in the directory it was in.
+    Window.Session()->DropConnection();
+    Check(!Window.Session()->Active() && (Window.TabCount() == 1), "(the connection lost, the tab kept)");
+    Check(Window.ReconnectSession() && Window.Session()->Active(), "Reconnect Session");
+    Check(QString::fromStdString(Window.Session()->CurrentDirectory()) == QStringLiteral("/sub"), "where it was");
+
+    // Install Public Key: the test server is not OpenSSH (asked, OK); the
+    // key, converted to PuTTY's format first, added to the server's
+    // authorized keys.
+    const QString Ppk = QDir(QFileInfo(Key).path()).filePath(QStringLiteral("install.ppk"));
+    try
+    {
+      CoreBridge::ConvertKey(Key.toStdString(), Ppk.toStdString());
+    }
+    catch (const CoreBridge::TCoreError &)
+    {
+    }
+    Check(QFileInfo::exists(Ppk), "(a PuTTY key)");
+    Check(Window.Session()->CanUploadPublicKey() && !Window.Session()->IsOpenSsh(), "an SFTP server, not OpenSSH");
+    Check(Window.InstallPublicKey(&Ppk), "Install Public Key into Server");
+    QFile Authorized(QDir(Root).filePath(QStringLiteral(".ssh/authorized_keys")));
+    Check(Authorized.open(QIODevice::ReadOnly) && Authorized.readAll().contains("ssh-ed25519 "), "the key is authorized");
+    // (SSH changes passwords as it authenticates: offered, as WinSCP does.)
+    Check(Window.Session()->CanChangePassword(), "Change Password offered over SSH");
+  }
+  CoreBridge::Finalize();
+}
+
 // The menu bar as text, a menu's items indented under it, separators as
 // "----": for comparing with WinSCP's (forms/ScpCommander.dfm).
 void DumpMenu(QMenu * Menu, int Depth, QString & Out)
@@ -3908,6 +3980,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 4) && (std::strcmp(argv[1], "accessibility") == 0))
   {
     AccessibilityTest(argv[3]);
+  }
+  else if ((argc >= 6) && (std::strcmp(argv[1], "sessioncommands") == 0))
+  {
+    SessionCommandsTest(argv[3], QString::fromLocal8Bit(argv[4]), QString::fromLocal8Bit(argv[5]));
   }
   else if ((argc >= 3) && (std::strcmp(argv[1], "menus") == 0))
   {

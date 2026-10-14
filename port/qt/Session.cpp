@@ -2889,4 +2889,210 @@ bool TSession::WorkspaceHasPasswords(const std::vector<TWorkspaceTab> & Tabs)
   }
 }
 
+
+// --- The Tabs and Commands menus' session commands (P3-14) -------------------
+
+void TSession::Reconnect()
+{
+  try
+  {
+    if (F->Terminal == NULL)
+    {
+      Open();
+      return;
+    }
+    if (!F->Terminal->Active)
+    {
+      F->Terminal->Reopen(0);
+    }
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void TSession::DropConnection()
+{
+  if (Active())
+  {
+    try
+    {
+      F->Terminal->Close();
+    }
+    catch (Exception &)
+    {
+    }
+  }
+}
+
+bool TSession::CachesEmpty() const
+{
+  return !Active() || F->Terminal->AreCachesEmpty;
+}
+
+void TSession::ClearCaches()
+{
+  if (Active())
+  {
+    F->Terminal->ClearCaches();
+  }
+}
+
+bool TSession::CanChangePassword() const
+{
+  return Active() && F->Terminal->IsCapable[fcChangePassword];
+}
+
+void TSession::ChangePassword()
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TSessionData> Data(F->Terminal->SessionData->Clone());
+    Data->DisableAuthentationsExceptPassword();
+    Data->ChangePassword = true;
+    std::unique_ptr<TTerminal> Secondary(F->Terminal->CreateSecondarySession(L"ChangePassword", Data.get()));
+    Secondary->AutoReadDirectory = false;
+    Secondary->OnQueryUser = CLOSURE_OF(F.get(), QueryUser);
+    Secondary->OnPromptUser = CLOSURE_OF(F.get(), PromptUser);
+    Secondary->OnDisplayBanner = CLOSURE_OF(F.get(), DisplayBanner);
+    Secondary->OnShowExtendedException = CLOSURE_OF(F.get(), ShowExtendedException);
+    Secondary->OnInformation = CLOSURE_OF(F.get(), Information);
+    Secondary->Open();
+    Secondary->Close();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+bool TSession::CanUploadPublicKey() const
+{
+  // CanPrivateKeyUpload: "no nice way to assert SSH2".
+  return Active() && (F->Terminal->FSProtocol == cfsSFTP);
+}
+
+std::string TSession::SshImplementation() const
+{
+  return Active() ? Utf8(F->Terminal->GetSessionInfo().SshImplementation) : std::string();
+}
+
+bool TSession::IsOpenSsh() const
+{
+  return ::IsOpenSSH(FromUtf8(SshImplementation()));
+}
+
+std::string TSession::PublicKeyFile() const
+{
+  return Utf8(F->Data->PublicKeyFile);
+}
+
+std::string TSession::UploadPublicKey(const std::string & FileName)
+{
+  try
+  {
+    CheckActive(*this);
+    const UnicodeString Result = F->Terminal->UploadPublicKey(FromUtf8(FileName));
+    F->Terminal->LogEvent(L"Public key installation done.");
+    F->Terminal->Log->AddSeparator();
+    return Utf8(Result);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+TSession::TSaveAsSite TSession::SaveAsSiteDefaults() const
+{
+  TSaveAsSite Result;
+  std::unique_ptr<TSessionData> Data(Active() ? CloneCurrentSessionData(F->Terminal.get()) : F->Data->Clone());
+  Result.Name = Utf8(Data->SessionName);
+  // As DoSaveSession.
+  const bool UseMasterPassword = false;
+  Result.NotRecommended = !UseMasterPassword && !SameText(Data->UserName, AnonymousUserName);
+  Result.CanSavePassword = !Configuration->DisablePasswordStoring && Data->HasAnySessionPassword();
+  if (Result.CanSavePassword)
+  {
+    TSessionData * Original = StoredSessions->FindSame(Data.get());
+    Result.SavePassword = ((Original != NULL) && Original->HasAnySessionPassword()) || !Result.NotRecommended;
+  }
+  std::unique_ptr<TStringList> Folders(new TStringList());
+  for (int Index = 0; Index < StoredSessions->Count; Index++)
+  {
+    TSessionData * Site = StoredSessions->Sessions[Index];
+    if (!Site->Special && !Site->IsWorkspace)
+    {
+      const UnicodeString Folder = Site->FolderName;
+      if (!Folder.IsEmpty() && (Folders->IndexOf(Folder) < 0))
+      {
+        Folders->Add(Folder);
+      }
+    }
+  }
+  Folders->Sort();
+  for (int Index = 0; Index < Folders->Count; Index++)
+  {
+    Result.Folders.push_back(Utf8(Folders->Strings[Index]));
+  }
+  return Result;
+}
+
+void TSession::SaveAsSite(const std::string & Name, bool SavePassword)
+{
+  try
+  {
+    const UnicodeString AName = FromUtf8(Name);
+    // TSaveSessionDialog::DoValidate, SessionNameValidate.
+    TSessionData::ValidateName(TSessionData::ExtractLocalName(AName));
+    TSessionData::ValidatePath(AName);
+    TSessionData * Existing = static_cast<TSessionData *>(StoredSessions->FindByName(AName));
+    if ((Existing != NULL) && Existing->Special)
+    {
+      throw Exception(FMTLOAD(CANNOT_OVERWRITE_SPECIAL_SESSION, (AName)));
+    }
+    const UnicodeString Folder = TSessionData::ExtractFolderName(AName);
+    if (!Folder.IsEmpty() && StoredSessions->IsWorkspace(Folder))
+    {
+      throw Exception(FMTLOAD(WORKSPACE_NOT_FOLDER, (Folder)));
+    }
+    std::unique_ptr<TSessionData> Data(Active() ? CloneCurrentSessionData(F->Terminal.get()) : F->Data->Clone());
+    if (!SavePassword)
+    {
+      Data->ClearSessionPasswords();
+    }
+    StoredSessions->NewSession(AName, Data.get());
+    // Modified only, explicit.
+    StoredSessions->Save(false, true);
+    if (!Data->HostKey.IsEmpty())
+    {
+      Data->CacheHostKeyIfNotCached();
+    }
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void TSession::Rename(const std::string & Name)
+{
+  try
+  {
+    const UnicodeString AName = FromUtf8(Name);
+    TSessionData::ValidateName(AName);
+    F->Data->Name = AName;
+    if (F->Terminal != NULL)
+    {
+      F->Terminal->SessionData->Name = AName;
+    }
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 }

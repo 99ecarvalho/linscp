@@ -1361,6 +1361,34 @@ Local: %2</translation>
         <source>Cop&amp;y...</source>
         <translation>Cop&amp;iar...</translation>
     </message>
+    <message>
+        <source>Clea&amp;r Caches</source>
+        <translation>Limpa&amp;r Cache</translation>
+    </message>
+    <message>
+        <source>&amp;Rename Tab</source>
+        <translation>&amp;Renomear Aba</translation>
+    </message>
+    <message>
+        <source>&amp;Reconnect Session</source>
+        <translation>&amp;Reconectar Sessão</translation>
+    </message>
+    <message>
+        <source>&amp;Save Session as Site...</source>
+        <translation>&amp;Salvar Sessão como Site...</translation>
+    </message>
+    <message>
+        <source>&amp;Change Password...</source>
+        <translation>&amp;Alterar Senha...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>&amp;Instalar Chave Pública no Servidor...</translation>
+    </message>
+    <message>
+        <source>PuTTY Private Key Files (*.ppk);;All Private Key Files (*.ppk *.pem *.key id_*);;All Files (*)</source>
+        <translation>Arquivos de chave privada do PuTTY (*.ppk);;Todos os arquivos de chave privada (*.ppk *.pem *.key id_*);;Todos os arquivos (*)</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>
