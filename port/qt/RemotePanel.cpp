@@ -48,15 +48,15 @@ RemotePanel::RemotePanel(QWidget * Parent) :
     addAction(Action);
     return Action;
   };
-  FBackAction = Add(QStyle::SP_ArrowBack, tr("Back"), QKeySequence::Back, [this]() { Back(); });
-  FForwardAction = Add(QStyle::SP_ArrowForward, tr("Forward"), QKeySequence::Forward, [this]() { Forward(); });
-  FParentAction = Add(QStyle::SP_FileDialogToParent, tr("Parent directory"), QKeySequence(Qt::Key_Backspace), [this]() { RemotePanel::Parent(); });
+  FBackAction = Add(QStyle::SP_ArrowBack, tr("&Back"), QKeySequence::Back, [this]() { Back(); });
+  FForwardAction = Add(QStyle::SP_ArrowForward, tr("&Forward"), QKeySequence::Forward, [this]() { Forward(); });
+  FParentAction = Add(QStyle::SP_FileDialogToParent, tr("&Parent Directory"), QKeySequence(Qt::Key_Backspace), [this]() { RemotePanel::Parent(); });
   // As TCustomDirView.KeyDown: Alt+Up and Ctrl+PgUp too.
   FParentAction->setShortcuts({ QKeySequence(Qt::Key_Backspace), QKeySequence(Qt::ALT | Qt::Key_Up),
     QKeySequence(Qt::CTRL | Qt::Key_PageUp) });
-  FRootAction = Add(QStyle::SP_DriveHDIcon, tr("Root directory"), QKeySequence(Qt::CTRL | Qt::Key_Backslash), [this]() { Root(); });
-  FHomeAction = Add(QStyle::SP_DirHomeIcon, tr("Home directory"), QKeySequence(Qt::CTRL | Qt::Key_H), [this]() { Home(); });
-  FRefreshAction = Add(QStyle::SP_BrowserReload, tr("Refresh"), QKeySequence(Qt::CTRL | Qt::Key_R), [this]() { Refresh(); });
+  FRootAction = Add(QStyle::SP_DriveHDIcon, tr("&Root Directory"), QKeySequence(Qt::CTRL | Qt::Key_Backslash), [this]() { Root(); });
+  FHomeAction = Add(QStyle::SP_DirHomeIcon, tr("&Home Directory"), QKeySequence(Qt::CTRL | Qt::Key_H), [this]() { Home(); });
+  FRefreshAction = Add(QStyle::SP_BrowserReload, tr("&Refresh"), QKeySequence(Qt::CTRL | Qt::Key_R), [this]() { Refresh(); });
   Bar->addSeparator();
   FNewFolderAction = Add(QStyle::SP_FileDialogNewFolder, tr("Create Directory"), QKeySequence(Qt::Key_F7), [this]()
   {

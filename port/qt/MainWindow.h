@@ -26,6 +26,7 @@ class QTemporaryDir;
 class QTimer;
 class QUrl;
 class QMenu;
+class FileView;
 class RemotePanel;
 
 class MainWindow : public QMainWindow
@@ -283,6 +284,18 @@ private:
   QAction * FPuttyAction = nullptr;
   QAction * FDuplicateTabAction = nullptr;
   QAction * FSaveWorkspaceAction = nullptr;
+  QAction * FQuitAction = nullptr;
+  QAction * FAboutAction = nullptr;
+  QAction * FOpenCurrentAction = nullptr;
+  QAction * FExploreAction = nullptr;
+  QAction * FPreferencesAction = nullptr;
+  QMenu * FLocalMenu = nullptr;
+  QMenu * FRemoteMenu = nullptr;
+  // The menu bar, as WinSCP's Commander's (forms/ScpCommander.dfm).
+  void BuildMenus();
+  QMenu * PanelMenu(bool Local);
+  FileView * ActiveView() const;
+  void SelectSameExtension(bool Select);
   QAction * FCloseTabAction = nullptr;
   QAction * FNextTabAction = nullptr;
   QAction * FPreviousTabAction = nullptr;

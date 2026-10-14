@@ -798,30 +798,6 @@ Local: %2</translation>
 <context>
     <name>LocalPanel</name>
     <message>
-        <source>Back</source>
-        <translation>Voltar</translation>
-    </message>
-    <message>
-        <source>Forward</source>
-        <translation>Avançar</translation>
-    </message>
-    <message>
-        <source>Parent directory</source>
-        <translation>Diretório acima</translation>
-    </message>
-    <message>
-        <source>Root directory</source>
-        <translation>Diretório Raiz</translation>
-    </message>
-    <message>
-        <source>Home directory</source>
-        <translation>Diretório Inicial</translation>
-    </message>
-    <message>
-        <source>Refresh</source>
-        <translation>Atualizar</translation>
-    </message>
-    <message>
         <source>Create Directory</source>
         <translation>Criar diretório</translation>
     </message>
@@ -832,6 +808,30 @@ Local: %2</translation>
     <message>
         <source>Delete</source>
         <translation>Excluir</translation>
+    </message>
+    <message>
+        <source>&amp;Back</source>
+        <translation>&amp;Voltar</translation>
+    </message>
+    <message>
+        <source>&amp;Forward</source>
+        <translation>&amp;Avançar</translation>
+    </message>
+    <message>
+        <source>&amp;Parent Directory</source>
+        <translation>Diretório &amp;acima</translation>
+    </message>
+    <message>
+        <source>&amp;Root Directory</source>
+        <translation>Diretório &amp;Raiz</translation>
+    </message>
+    <message>
+        <source>&amp;Home Directory</source>
+        <translation>Diretório &amp;Inicial</translation>
+    </message>
+    <message>
+        <source>&amp;Refresh</source>
+        <translation>&amp;Atualizar</translation>
     </message>
 </context>
 <context>
@@ -896,20 +896,8 @@ Local: %2</translation>
 <context>
     <name>MainWindow</name>
     <message>
-        <source>&amp;File</source>
-        <translation>&amp;Arquivo</translation>
-    </message>
-    <message>
         <source>&amp;Open URL...</source>
         <translation>&amp;Abrir URL...</translation>
-    </message>
-    <message>
-        <source>&amp;Disconnect</source>
-        <translation>&amp;Desconectar</translation>
-    </message>
-    <message>
-        <source>E&amp;xit</source>
-        <translation>&amp;Sair</translation>
     </message>
     <message>
         <source>&amp;Help</source>
@@ -956,16 +944,8 @@ Local: %2</translation>
         <translation>&amp;Gerenciador de Site...</translation>
     </message>
     <message>
-        <source>&amp;View</source>
-        <translation>&amp;Exibir</translation>
-    </message>
-    <message>
         <source>Show &amp;Hidden Files</source>
         <translation>Exibir arquivos &amp;ocultos</translation>
-    </message>
-    <message>
-        <source>F&amp;iles</source>
-        <translation>&amp;Arquivos</translation>
     </message>
     <message>
         <source>&amp;Copy...</source>
@@ -1177,6 +1157,106 @@ Local: %2</translation>
     <message>
         <source>Save Wor&amp;kspace...</source>
         <translation>Salvar &amp;Espaço de trabalho...</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Desconectar Sessão</translation>
+    </message>
+    <message>
+        <source>&amp;Quit</source>
+        <translation>Sai&amp;r</translation>
+    </message>
+    <message>
+        <source>&amp;Local</source>
+        <translation>&amp;Local</translation>
+    </message>
+    <message>
+        <source>&amp;Left</source>
+        <translation>&amp;Esquerdo</translation>
+    </message>
+    <message>
+        <source>&amp;Remote</source>
+        <translation>&amp;Remoto</translation>
+    </message>
+    <message>
+        <source>&amp;Right</source>
+        <translation>&amp;Direito</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>&amp;Copiar endereço</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Colunas</translation>
+    </message>
+    <message>
+        <source>&amp;Mark</source>
+        <translation>&amp;Marcar</translation>
+    </message>
+    <message>
+        <source>&amp;Select/Unselect</source>
+        <translation>(des)&amp;Selecionar</translation>
+    </message>
+    <message>
+        <source>Sele&amp;ct Files...</source>
+        <translation>Sele&amp;cionar Arquivos</translation>
+    </message>
+    <message>
+        <source>&amp;Unselect Files...</source>
+        <translation>Desseleci&amp;onar arquivos</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Selecionar &amp;Tudo</translation>
+    </message>
+    <message>
+        <source>&amp;Invert Selection</source>
+        <translation>&amp;Inverter seleção</translation>
+    </message>
+    <message>
+        <source>C&amp;lear Selection</source>
+        <translation>&amp;Limpar seleção</translation>
+    </message>
+    <message>
+        <source>Select Files with Same &amp;Extension</source>
+        <translation>Selecionar arquivos com mesma &amp;Extensão</translation>
+    </message>
+    <message>
+        <source>Unselect Files with Same E&amp;xtension</source>
+        <translation>Deselecionar Arquivos com Mesma Extensão</translation>
+    </message>
+    <message>
+        <source>&amp;Files</source>
+        <translation>Ar&amp;quivos</translation>
+    </message>
+    <message>
+        <source>&amp;Directory...</source>
+        <translation>&amp;Diretório...</translation>
+    </message>
+    <message>
+        <source>&amp;Delete</source>
+        <translation>E&amp;xcluir</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Renomear</translation>
+    </message>
+    <message>
+        <source>Copy to &amp;Clipboard</source>
+        <translation>&amp;Copiar nome</translation>
+    </message>
+    <message>
+        <source>&amp;Opened Tabs</source>
+        <translation>Abas Abertas</translation>
+    </message>
+    <message>
+        <source>&amp;Workspaces</source>
+        <translation>&amp;Espaços de Trabalho</translation>
+    </message>
+    <message>
+        <source>Si&amp;tes</source>
+        <translation>&amp;Sites</translation>
     </message>
 </context>
 <context>
@@ -2051,30 +2131,6 @@ Local: %2</translation>
 <context>
     <name>RemotePanel</name>
     <message>
-        <source>Back</source>
-        <translation>Voltar</translation>
-    </message>
-    <message>
-        <source>Forward</source>
-        <translation>Avançar</translation>
-    </message>
-    <message>
-        <source>Parent directory</source>
-        <translation>Diretório acima</translation>
-    </message>
-    <message>
-        <source>Root directory</source>
-        <translation>Diretório Raiz</translation>
-    </message>
-    <message>
-        <source>Home directory</source>
-        <translation>Diretório Inicial</translation>
-    </message>
-    <message>
-        <source>Refresh</source>
-        <translation>Atualizar</translation>
-    </message>
-    <message>
         <source>Create Directory</source>
         <translation>Criar diretório</translation>
     </message>
@@ -2085,6 +2141,30 @@ Local: %2</translation>
     <message>
         <source>Delete</source>
         <translation>Excluir</translation>
+    </message>
+    <message>
+        <source>&amp;Back</source>
+        <translation>&amp;Voltar</translation>
+    </message>
+    <message>
+        <source>&amp;Forward</source>
+        <translation>&amp;Avançar</translation>
+    </message>
+    <message>
+        <source>&amp;Parent Directory</source>
+        <translation>Diretório &amp;acima</translation>
+    </message>
+    <message>
+        <source>&amp;Root Directory</source>
+        <translation>Diretório &amp;Raiz</translation>
+    </message>
+    <message>
+        <source>&amp;Home Directory</source>
+        <translation>Diretório &amp;Inicial</translation>
+    </message>
+    <message>
+        <source>&amp;Refresh</source>
+        <translation>&amp;Atualizar</translation>
     </message>
 </context>
 <context>

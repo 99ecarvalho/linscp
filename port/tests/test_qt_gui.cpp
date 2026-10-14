@@ -77,6 +77,7 @@
 #include <QComboBox>
 #include <QHeaderView>
 #include <QMenu>
+#include <QMenuBar>
 #include <QRadioButton>
 #include <QDragEnterEvent>
 #include <QMessageBox>
@@ -1849,7 +1850,7 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       Closing.show();
       for (QAction * Action : Closing.findChildren<QAction *>())
       {
-        if (Action->text() == MainWindow::tr("&Disconnect"))
+        if (Action->text() == MainWindow::tr("&Disconnect Session"))
         {
           Action->setEnabled(true);
           Action->trigger();
@@ -3629,6 +3630,41 @@ void TabsTest(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// The menu bar as text, a menu's items indented under it, separators as
+// "----": for comparing with WinSCP's (forms/ScpCommander.dfm).
+void DumpMenu(const QMenu * Menu, int Depth, QString & Out)
+{
+  for (const QAction * Action : Menu->actions())
+  {
+    if (!Action->isVisible())
+    {
+      continue;
+    }
+    Out += QString(Depth * 2, QLatin1Char(' ')) + (Action->isSeparator() ? QStringLiteral("----") : Action->text()) + QLatin1Char('\n');
+    if (Action->menu() != nullptr)
+    {
+      DumpMenu(Action->menu(), Depth + 1, Out);
+    }
+  }
+}
+
+void Menus()
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    QString Out;
+    for (const QAction * Action : Window.menuBar()->actions())
+    {
+      Out += Action->text() + QLatin1Char('\n');
+      DumpMenu(Action->menu(), 1, Out);
+    }
+    std::fputs(Out.toUtf8().constData(), stdout);
+  }
+  CoreBridge::Finalize();
+}
+
 int main(int argc, char ** argv)
 {
   QApplication App(argc, argv);
@@ -3636,6 +3672,10 @@ int main(int argc, char ** argv)
   if ((argc >= 2) && (std::strcmp(argv[1], "dialogs") == 0))
   {
     Dialogs();
+  }
+  else if ((argc >= 3) && (std::strcmp(argv[1], "menus") == 0))
+  {
+    Menus();
   }
   else if ((argc >= 3) && (std::strcmp(argv[1], "language") == 0))
   {

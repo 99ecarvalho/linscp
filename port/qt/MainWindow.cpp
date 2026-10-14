@@ -71,13 +71,16 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
 {
   setWindowTitle(QString::fromStdString(FInfo.AppName));
 
-  QMenu * FileMenu = menuBar()->addMenu(tr("&File"));
+  // The actions, placed in WinSCP's menus by BuildMenus once the panels are
+  // made; each the window's too, so its key works wherever it is shown.
+  QMenu * FileMenu = new QMenu(this);
   FSitesAction = FileMenu->addAction(tr("&Site Manager..."), this, &MainWindow::SiteManagerDialog);
+  // Ctrl+N: WinSCP's New Tab, the Login dialog.
   FSitesAction->setShortcut(QKeySequence::New);
   FOpenAction = FileMenu->addAction(tr("&Open URL..."), this, &MainWindow::OpenUrlDialog);
   // Ctrl+O is Open Directory's, as WinSCP's.
   // As WinSCP: the last session closed, the window too unless kept open.
-  FDisconnectAction = FileMenu->addAction(tr("&Disconnect"), this, [this]()
+  FDisconnectAction = FileMenu->addAction(tr("&Disconnect Session"), this, [this]()
   {
     if ((FActiveTab >= 0) && !CloseTab(FActiveTab))
     {
@@ -88,12 +91,10 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
       close();
     }
   });
-  FileMenu->addSeparator();
-  QAction * Quit = FileMenu->addAction(tr("E&xit"), this, &QWidget::close);
+  FQuitAction = FileMenu->addAction(tr("&Quit"), this, &QWidget::close);
   // F10 too, as WinSCP's Commander.
-  Quit->setShortcuts({ QKeySequence(QKeySequence::Quit), QKeySequence(Qt::Key_F10) });
-  QMenu * HelpMenu = menuBar()->addMenu(tr("&Help"));
-  HelpMenu->addAction(tr("&About..."), this, &MainWindow::About);
+  FQuitAction->setShortcuts({ QKeySequence(QKeySequence::Quit), QKeySequence(Qt::Key_F10) });
+  FAboutAction = FileMenu->addAction(tr("&About..."), this, &MainWindow::About);
 
   // The panels side by side, the queue below them, as WinSCP's Commander.
   QSplitter * Vertical = new QSplitter(Qt::Vertical, this);
@@ -225,11 +226,11 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
     }
   });
 
-  QMenu * FilesMenu = menuBar()->addMenu(tr("F&iles"));
+  QMenu * FilesMenu = new QMenu(this);
   FEditAction = FilesMenu->addAction(tr("&Edit"), this, [this]() { EditCurrent(); });
   FEditAction->setShortcut(QKeySequence(Qt::Key_F4));
   // As WinSCP's Edit With submenu: the editors, then one asked for.
-  FEditWithMenu = FilesMenu->addMenu(tr("Edit &With"));
+  FEditWithMenu = new QMenu(tr("Edit &With"), this);
   connect(FEditWithMenu, &QMenu::aboutToShow, this, [this]()
   {
     FEditWithMenu->clear();
@@ -241,13 +242,11 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
     FEditWithMenu->addSeparator();
     FEditWithMenu->addAction(tr("Edit &With..."), this, [this]() { EditCurrentWith(-1); });
   });
-  FilesMenu->addAction(tr("&Open"), this, [this]() { OpenCurrent(); });
-  FilesMenu->addSeparator();
+  FOpenCurrentAction = FilesMenu->addAction(tr("&Open"), this, [this]() { OpenCurrent(); });
   FLinkAction = FilesMenu->addAction(tr("Edit &Link..."), this, [this]() { AddEditLink(); });
   FPropertiesAction = FilesMenu->addAction(tr("&Properties"), this, [this]() { Properties(); });
   FGenerateFileUrlAction = FilesMenu->addAction(tr("Generate File &URL..."), this, [this]() { GenerateUrl(true); });
-  FFileCommandsMenu = FilesMenu->addMenu(tr("File &Custom Commands"));
-  FilesMenu->addSeparator();
+  FFileCommandsMenu = new QMenu(tr("File &Custom Commands"), this);
   FCopyAction = FilesMenu->addAction(tr("&Copy..."), this, [this]() { TransferSelected(false, true); });
   FCopyAction->setShortcut(QKeySequence(Qt::Key_F5));
   FMoveAction = FilesMenu->addAction(tr("&Move..."), this, [this]() { TransferSelected(true, true); });
@@ -256,23 +255,22 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FDuplicateAction->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F5));
   FMoveToAction = FilesMenu->addAction(tr("Mo&ve To..."), this, [this]() { RemoteTransfer(true); });
 
-  QMenu * GoMenu = menuBar()->addMenu(tr("&Go To"));
+  QMenu * GoMenu = FilesMenu;
   FOpenDirectoryAction = GoMenu->addAction(tr("&Open Directory/Bookmark..."), this, [this]() { OpenDirectory(false); });
   FOpenDirectoryAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_O));
   FAddBookmarkAction = GoMenu->addAction(tr("&Add Path to Bookmarks"), this, [this]() { OpenDirectory(true); });
   FAddBookmarkAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_B));
   // The local panel's (the Commander's Local > Go To).
-  QAction * ExploreAction = GoMenu->addAction(tr("&Explore Directory"), this, [this]() { ExploreLocalDirectory(); });
-  ExploreAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_E));
+  FExploreAction = GoMenu->addAction(tr("&Explore Directory"), this, [this]() { ExploreLocalDirectory(); });
+  FExploreAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_E));
 
-  QMenu * CommandsMenu = menuBar()->addMenu(tr("&Commands"));
+  QMenu * CommandsMenu = FilesMenu;
   FFindFilesAction = CommandsMenu->addAction(tr("&Find Files..."), this, [this]() { FindFilesDialog(); });
-  FStaticCommandsMenu = CommandsMenu->addMenu(tr("Static &Custom Commands"));
+  FStaticCommandsMenu = new QMenu(tr("Static &Custom Commands"), this);
   FConsoleAction = CommandsMenu->addAction(tr("Open &Terminal"), this, [this]() { OpenConsole(); });
   FConsoleAction->setShortcut(QKeySequence(Qt::SHIFT | Qt::CTRL | Qt::Key_T));
   FPuttyAction = CommandsMenu->addAction(tr("Open in &PuTTY"), this, [this]() { OpenInPutty(); });
   FPuttyAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_P));
-  CommandsMenu->addSeparator();
   FServerInfoAction = CommandsMenu->addAction(tr("Server/Protocol &Information"), this, [this]() { ServerInfo(); });
   FGenerateSessionUrlAction = CommandsMenu->addAction(tr("Generate Session &URL/Code..."), this, [this]() { GenerateUrl(false); });
   FSynchronizeAction = CommandsMenu->addAction(tr("&Synchronize..."), this, [this]() { Synchronize(true); });
@@ -282,8 +280,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FKeepUpToDateAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_U));
 
   // As WinSCP's Tabs menu.
-  QMenu * TabsMenu = menuBar()->addMenu(tr("&Tabs"));
-  TabsMenu->addAction(tr("&New Tab..."), this, &MainWindow::SiteManagerDialog);
+  QMenu * TabsMenu = FilesMenu;
   FDuplicateTabAction = TabsMenu->addAction(tr("Du&plicate Tab"), this, [this]() { DuplicateTab(); });
   FCloseTabAction = TabsMenu->addAction(tr("&Close Tab"), this, [this]()
   {
@@ -294,13 +291,12 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   });
   FCloseTabAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_D));
   FSaveWorkspaceAction = TabsMenu->addAction(tr("Save Wor&kspace..."), this, [this]() { SaveWorkspace(); });
-  TabsMenu->addSeparator();
   FNextTabAction = TabsMenu->addAction(tr("&Next Tab"), this, [this]() { CycleTabs(true); });
   FNextTabAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Tab));
   FPreviousTabAction = TabsMenu->addAction(tr("&Previous Tab"), this, [this]() { CycleTabs(false); });
   FPreviousTabAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Backtab));
 
-  QMenu * ViewMenu = menuBar()->addMenu(tr("&View"));
+  QMenu * ViewMenu = FilesMenu;
   FHiddenAction = ViewMenu->addAction(tr("Show &Hidden Files"));
   FHiddenAction->setCheckable(true);
   FHiddenAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_H));
@@ -323,9 +319,10 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FFilterAction = ViewMenu->addAction(tr("&Filter..."), this, [this]() { Filter(); });
   FFilterAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_F));
 
-  QMenu * OptionsMenu = menuBar()->addMenu(tr("&Options"));
-  QAction * PreferencesAction = OptionsMenu->addAction(tr("&Preferences..."), this, [this]() { PreferencesDialog(); });
-  PreferencesAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_P));
+  QMenu * OptionsMenu = FilesMenu;
+  FPreferencesAction = OptionsMenu->addAction(tr("&Preferences..."), this, [this]() { PreferencesDialog(); });
+  FPreferencesAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_P));
+  BuildMenus();
 
   statusBar()->showMessage(tr("%1 %2").arg(QString::fromStdString(FInfo.AppName), QString::fromStdString(FInfo.Version)));
   // From now on a language chosen applies on the next start, as WinSCP's.
@@ -1295,6 +1292,12 @@ bool MainWindow::SynchronizeDirectories(const QString & LocalDirectory, const QS
 
 void MainWindow::UpdateActions()
 {
+  // As WinSCP's: Local and Remote with a session, else Left and Right.
+  if (FLocalMenu != nullptr)
+  {
+    FLocalMenu->setTitle(FSession ? tr("&Local") : tr("&Left"));
+    FRemoteMenu->setTitle(FSession ? tr("&Remote") : tr("&Right"));
+  }
   FOpenAction->setEnabled(!FBusy);
   FSitesAction->setEnabled(!FBusy);
   FEditAction->setEnabled(!FBusy);
@@ -2891,4 +2894,213 @@ bool MainWindow::OpenWorkspace(const QString & Name)
     SwitchTab(First);
   }
   return Any;
+}
+
+// --- Menus --------------------------------------------------------------------
+
+FileView * MainWindow::ActiveView() const
+{
+  return FLocalActive ? FLocal->View() : FPanel->View();
+}
+
+// Mark > Select/Unselect Files with Same Extension: the focused file's.
+void MainWindow::SelectSameExtension(bool Select)
+{
+  FileView * View = ActiveView();
+  const CoreBridge::TRemoteEntry * Entry = View->CurrentEntry();
+  if ((Entry != nullptr) && !Entry->Directory)
+  {
+    const QString Name = QString::fromStdString(Entry->Name);
+    const int Dot = Name.lastIndexOf(QLatin1Char('.'));
+    View->SelectByMask(Select, (Dot > 0) ? (QStringLiteral("*") + Name.mid(Dot)) : QStringLiteral("*."), false);
+  }
+}
+
+// The Local and Remote menus, as WinSCP's: the panel's own, acted on as the
+// active one.
+QMenu * MainWindow::PanelMenu(bool Local)
+{
+  QMenu * Menu = menuBar()->addMenu(Local ? tr("&Local") : tr("&Remote"));
+  auto OnPanel = [this, Local](auto Function)
+  {
+    return [this, Local, Function]()
+    {
+      ActivatePanel(Local);
+      Function();
+    };
+  };
+  QMenu * GoTo = Menu->addMenu(tr("&Go To"));
+  GoTo->addAction(tr("&Open Directory/Bookmark..."), this, OnPanel([this]() { OpenDirectory(false); }));
+  if (Local)
+  {
+    GoTo->addAction(FExploreAction);
+  }
+  GoTo->addSeparator();
+  for (QAction * Action : Local ?
+         std::initializer_list<QAction *>{ FLocal->ParentAction(), FLocal->RootAction(), FLocal->HomeAction() } :
+         std::initializer_list<QAction *>{ FPanel->ParentAction(), FPanel->RootAction(), FPanel->HomeAction() })
+  {
+    GoTo->addAction(Action);
+  }
+  GoTo->addSeparator();
+  GoTo->addAction(Local ? FLocal->BackAction() : FPanel->BackAction());
+  GoTo->addAction(Local ? FLocal->ForwardAction() : FPanel->ForwardAction());
+  Menu->addAction(Local ? FLocal->RefreshAction() : FPanel->RefreshAction());
+  Menu->addAction(tr("&Add Path to Bookmarks"), this, OnPanel([this]() { OpenDirectory(true); }));
+  Menu->addAction(tr("Copy &Path to Clipboard"), this, [this, Local]()
+  {
+    QApplication::clipboard()->setText(Local ? QDir::toNativeSeparators(FLocal->Path()) : FPanel->Path());
+  });
+  Menu->addSeparator();
+  // The view's columns, as its header's menu.
+  QMenu * Columns = Menu->addMenu(tr("&Columns"));
+  connect(Columns, &QMenu::aboutToShow, this, [this, Local, Columns]()
+  {
+    Columns->clear();
+    QMenu * Own = (Local ? FLocal->View() : FPanel->View())->ColumnsMenu();
+    for (QAction * Action : Own->actions())
+    {
+      Action->setParent(Columns);
+      Columns->addAction(Action);
+    }
+    delete Own;
+  });
+  Menu->addAction(tr("&Filter..."), this, OnPanel([this]() { Filter(); }));
+  return Menu;
+}
+
+// As WinSCP's Commander's menu bar: Local, Mark, Files, Commands, Tabs,
+// Options, Remote, Help, each in its order. What linscp does not have yet
+// is left out, as are the actions WinSCP keeps to keys (Next and Previous
+// Tab, Show Hidden Files, Ctrl+O and Ctrl+B on the active panel).
+void MainWindow::BuildMenus()
+{
+  FLocalMenu = PanelMenu(true);
+
+  QMenu * Mark = menuBar()->addMenu(tr("&Mark"));
+  Mark->addAction(tr("&Select/Unselect"), this, [this]() { ActiveView()->ToggleCurrent(); });
+  Mark->addAction(tr("Sele&ct Files..."), this, [this]() { ActiveView()->SelectByMaskDialog(true); });
+  Mark->addAction(tr("&Unselect Files..."), this, [this]() { ActiveView()->SelectByMaskDialog(false); });
+  Mark->addAction(tr("Select &All"), this, [this]() { ActiveView()->selectAll(); });
+  Mark->addSeparator();
+  Mark->addAction(tr("&Invert Selection"), this, [this]() { ActiveView()->InvertSelection(); });
+  Mark->addAction(tr("C&lear Selection"), this, [this]() { ActiveView()->clearSelection(); });
+  Mark->addSeparator();
+  Mark->addAction(tr("Select Files with Same &Extension"), this, [this]() { SelectSameExtension(true); });
+  Mark->addAction(tr("Unselect Files with Same E&xtension"), this, [this]() { SelectSameExtension(false); });
+
+  // The active panel's.
+  auto OnActive = [this](QAction * (LocalPanel::*LocalAction)() const, QAction * (RemotePanel::*RemoteAction)() const)
+  {
+    return [this, LocalAction, RemoteAction]()
+    {
+      (FLocalActive ? (FLocal->*LocalAction)() : (FPanel->*RemoteAction)())->trigger();
+    };
+  };
+  QMenu * Files = menuBar()->addMenu(tr("&Files"));
+  QMenu * New = Files->addMenu(tr("&New"));
+  New->addAction(tr("&Directory..."), this, OnActive(&LocalPanel::NewFolderAction, &RemotePanel::NewFolderAction));
+  Files->addSeparator();
+  Files->addAction(FOpenCurrentAction);
+  Files->addAction(FEditAction);
+  Files->addMenu(FEditWithMenu);
+  Files->addAction(FLinkAction);
+  Files->addSeparator();
+  Files->addAction(FCopyAction);
+  Files->addAction(FMoveAction);
+  Files->addAction(FDuplicateAction);
+  Files->addAction(FMoveToAction);
+  Files->addAction(tr("&Delete"), this, OnActive(&LocalPanel::DeleteAction, &RemotePanel::DeleteAction));
+  Files->addAction(tr("&Rename"), this, OnActive(&LocalPanel::RenameAction, &RemotePanel::RenameAction));
+  Files->addSeparator();
+  Files->addMenu(FFileCommandsMenu);
+  QMenu * Names = Files->addMenu(tr("&File Names"));
+  Names->addAction(tr("Copy to &Clipboard"), this, [this]() { CopyFileNames(FLocalActive, false); });
+  Names->addAction(tr("Copy to Clipboard (Include &Paths)"), this, [this]() { CopyFileNames(FLocalActive, true); });
+  Names->addAction(FGenerateFileUrlAction);
+  Files->addSeparator();
+  Files->addAction(FPropertiesAction);
+
+  QMenu * Commands = menuBar()->addMenu(tr("&Commands"));
+  Commands->addAction(FKeepUpToDateAction);
+  Commands->addAction(FSynchronizeAction);
+  Commands->addAction(FFindFilesAction);
+  Commands->addMenu(FStaticCommandsMenu);
+  Commands->addSeparator();
+  Commands->addAction(FConsoleAction);
+  Commands->addAction(FPuttyAction);
+  Commands->addSeparator();
+  Commands->addAction(FQuitAction);
+
+  QMenu * Tabs = menuBar()->addMenu(tr("&Tabs"));
+  QAction * NewTab = Tabs->addAction(tr("&New Tab..."), this, &MainWindow::SiteManagerDialog);
+  NewTab->setShortcut(FSitesAction->shortcut());
+  FSitesAction->setShortcut(QKeySequence());
+  Tabs->addAction(FCloseTabAction);
+  Tabs->addAction(FDuplicateTabAction);
+  Tabs->addSeparator();
+  Tabs->addAction(FDisconnectAction);
+  Tabs->addSeparator();
+  Tabs->addAction(FServerInfoAction);
+  Tabs->addAction(FGenerateSessionUrlAction);
+  Tabs->addSeparator();
+  // As WinSCP's Opened Tabs and Workspaces: listed as the menu opens.
+  QMenu * Opened = Tabs->addMenu(tr("&Opened Tabs"));
+  connect(Opened, &QMenu::aboutToShow, this, [this, Opened]()
+  {
+    Opened->clear();
+    for (int Index = 0; Index < TabCount(); Index++)
+    {
+      QAction * Action = Opened->addAction(FTabBar->tabText(Index), this, [this, Index]() { SwitchTab(Index); });
+      Action->setCheckable(true);
+      Action->setChecked(Index == FActiveTab);
+    }
+  });
+  QMenu * Workspaces = Tabs->addMenu(tr("&Workspaces"));
+  connect(Workspaces, &QMenu::aboutToShow, this, [this, Workspaces]()
+  {
+    Workspaces->clear();
+    for (const std::string & Name : CoreBridge::WorkspaceNames())
+    {
+      const QString AName = QString::fromStdString(Name);
+      Workspaces->addAction(AName, this, [this, AName]() { OpenWorkspace(AName); });
+    }
+  });
+  Tabs->addAction(FSaveWorkspaceAction);
+  Tabs->addSeparator();
+  // As WinSCP's Sites: the site manager, then the sites to open in a tab.
+  QMenu * Sites = Tabs->addMenu(tr("Si&tes"));
+  connect(Sites, &QMenu::aboutToShow, this, [this, Sites]()
+  {
+    Sites->clear();
+    Sites->addAction(FSitesAction);
+    Sites->addAction(FOpenAction);
+    Sites->addSeparator();
+    for (const std::string & Name : CoreBridge::SiteNames())
+    {
+      Sites->addAction(QString::fromStdString(Name), this, [this, Name]()
+      {
+        try
+        {
+          OpenSite(CoreBridge::LoadSite(Name));
+        }
+        catch (const CoreBridge::TCoreError & E)
+        {
+          ShowError(E);
+        }
+      });
+    }
+  });
+
+  QMenu * Options = menuBar()->addMenu(tr("&Options"));
+  Options->addAction(FPreferencesAction);
+
+  FRemoteMenu = PanelMenu(false);
+
+  QMenu * Help = menuBar()->addMenu(tr("&Help"));
+  Help->addAction(FAboutAction);
+
+  // The keys of what no menu shows.
+  addActions({ FSitesAction, FOpenAction, FOpenDirectoryAction, FAddBookmarkAction, FFilterAction, FHiddenAction,
+    FNextTabAction, FPreviousTabAction, FExploreAction });
 }
