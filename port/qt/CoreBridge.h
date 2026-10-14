@@ -543,6 +543,7 @@ enum class TText
   NewFolderCaption,     // "Create site folder"
   NewFolderPrompt,      // "New &folder name:"
   ConfirmDeleteFolder,  // "Are you sure you want to delete site folder '%s' with %d site(s)?"
+  ConfirmDeleteWorkspace, // "Are you sure you want to delete workspace '%s' with %d session(s)?"
   ConfirmDeleteFile,    // "Are you sure you want to delete file '%s'?"
   ConfirmDeleteFiles,   // "Are you sure you want to delete %d selected files?"
   NewFolderName,        // "New folder"
@@ -637,6 +638,12 @@ enum class TText
   CreateDesktopIconAllUsers, // "**Do you want to create desktop icon for all users?**\n \nYou must have administrator privileges for this."
   RegisterUrlError, // "Cannot register application to handle URL addresses."
   CreateShortcutError, // "Cannot create shortcut."
+  SaveWorkspaceCaption, // "Save workspace as"
+  SaveWorkspacePrompt, // "&Save workspace as:"
+  SaveWorkspacePasswords, // "Save &passwords (not recommended)"
+  SaveWorkspacePasswordsRecommended, // "Save &passwords"
+  SaveWorkspaceAuto, // "Enable &automatic saving of this workspace"
+  NewWorkspace, // "My Workspace"
 };
 std::string Text(TText Text);
 
@@ -1118,6 +1125,28 @@ std::vector<std::pair<std::string, std::string>> RawSettingsToAdd(const std::str
 void RenameSite(const std::string & Name, const std::string & NewName);
 void DeleteSite(const std::string & Name);
 
+// Workspaces, as WinSCP's (TStoredSessionList's): the tabs' sessions kept
+// together under a name, each with its directories. Their names
+// (GetWorkspaces); one removed with its sessions; a name's check as
+// TSaveWorkspaceDialog::DoValidate does it (TCoreError when it is not one,
+// or a site folder's).
+std::vector<std::string> WorkspaceNames();
+void DeleteWorkspace(const std::string & Name);
+int WorkspaceSessionCount(const std::string & Name);
+void ValidateWorkspaceName(const std::string & Name);
+// What WinSCP keeps for them (TWinConfiguration's): the workspace saved
+// automatically when the window closes, with passwords or not, and whether
+// it was (LastStoredSession), so it opens at the next start.
+struct TWorkspaceSettings
+{
+  bool AutoSave = false;
+  bool AutoSavePasswords = false;
+  std::string AutoWorkspace;
+  std::string LastStoredSession;
+};
+TWorkspaceSettings WorkspaceSettings();
+void SetWorkspaceSettings(const TWorkspaceSettings & Settings);
+
 // A background transfer of the session's queue, as WinSCP's queue panel
 // lists it.
 struct TQueueEntry
@@ -1265,13 +1294,29 @@ public:
   // with the switches that go with it (/privatekey=, /hostkey=,
   // /rawsettings ...; as unsafe with /unsafe). Null without one. CanOpen:
   // whether it says enough to connect; if not, WinSCP shows the Login
-  // dialog with it. A folder of sites (several sessions, P3-13) is none
-  // yet. Throws TCoreError.
+  // dialog with it. A folder of sites or a workspace is none: its name is
+  // CommandLineFolderOrWorkspace's (else empty), opened with Workspace.
+  // Throws TCoreError.
   static std::unique_ptr<TSession> FromCommandLine(bool & CanOpen);
+  static std::string CommandLineFolderOrWorkspace();
   // A session on the same site, as it is now (TCustomScpExplorerForm's
   // DuplicateTab: CloneCurrentSessionData), not opened yet. Throws
   // TCoreError.
   std::unique_ptr<TSession> Duplicate() const;
+  // A workspace's sessions, in its order, not opened yet
+  // (GetFolderOrWorkspace). Throws TCoreError.
+  static std::vector<std::unique_ptr<TSession>> Workspace(const std::string & Name);
+  // The tabs saved as a workspace (DoCollectWorkspace, DoSaveWorkspace):
+  // each session as it is now, with its local directory; passwords only if
+  // asked. HasPasswords: whether any has one to save (SaveWorkspace's
+  // AnyNonStoredSessionWithPassword). Throw TCoreError.
+  struct TWorkspaceTab
+  {
+    const TSession * Session = nullptr;
+    std::string LocalDirectory;
+  };
+  static void SaveWorkspace(const std::string & Name, const std::vector<TWorkspaceTab> & Tabs, bool SavePasswords);
+  static bool WorkspaceHasPasswords(const std::vector<TWorkspaceTab> & Tabs);
   // To be called regularly on the GUI thread, for every open session: its
   // keepalives and dropped-connection checks (TTerminal::Idle, as
   // TTerminalManager::Idle calls it).

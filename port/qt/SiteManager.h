@@ -30,10 +30,13 @@ public:
 
   // After an accepted exec(): the site to log in to, as edited.
   CoreBridge::TSite Site() const;
+  // After an accepted exec() on a workspace: its name (empty for a site).
+  QString Workspace() const;
 
   // What the buttons do, for tests and the buttons alike.
   bool SelectSite(const QString & Name);
   bool SelectFolder(const QString & Path);
+  bool SelectWorkspace(const QString & Name);
   void SelectNewSite();
   // Saves the form as Name (Folder/Site), the password only if SavePassword;
   // asks before overwriting another site. False when it did not save.
@@ -44,7 +47,8 @@ public:
   bool RenameSelected(const QString & NewName);
   // A folder under the selected one, in the tree until a site is saved in it.
   void NewFolder(const QString & Name);
-  // Deletes the selected site or folder, after asking unless Confirm is false.
+  // Deletes the selected site, folder or workspace, after asking unless
+  // Confirm is false.
   bool DeleteSelected(bool Confirm = true);
   // Edits the advanced settings in their dialog.
   void Advanced();
@@ -84,6 +88,7 @@ private:
   void Load(const CoreBridge::TSite & Site);
   QString SelectedName() const;
   QString SelectedFolder() const;
+  QString SelectedWorkspace() const;
   QStringList SitesIn(const QString & Folder) const;
   void ShowError(const CoreBridge::TCoreError & E);
   void ShowMessage(CoreBridge::TQueryType Type, const QString & Message);

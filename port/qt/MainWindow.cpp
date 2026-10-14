@@ -56,6 +56,7 @@
 #include "SynchronizeDialog.h"
 #include "KeepUpToDateDialog.h"
 #include "EditorPreferencesDialog.h"
+#include "SaveWorkspaceDialog.h"
 #include "TransferSettingsDialog.h"
 
 namespace
@@ -292,6 +293,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
     }
   });
   FCloseTabAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_D));
+  FSaveWorkspaceAction = TabsMenu->addAction(tr("Save Wor&kspace..."), this, [this]() { SaveWorkspace(); });
   TabsMenu->addSeparator();
   FNextTabAction = TabsMenu->addAction(tr("&Next Tab"), this, [this]() { CycleTabs(true); });
   FNextTabAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Tab));
@@ -515,6 +517,23 @@ void MainWindow::closeEvent(QCloseEvent * Event)
     return;
   }
   SaveLayout();
+  // As FormClose: the workspace saved automatically, when that is on (an
+  // empty one is not), and noted as the last stored, so it opens next time.
+  CoreBridge::TWorkspaceSettings Workspace = CoreBridge::WorkspaceSettings();
+  if (Workspace.AutoSave && (TabCount() > 0))
+  {
+    try
+    {
+      const QString Name = WorkspaceName();
+      CoreBridge::TSession::SaveWorkspace(Name.toStdString(), WorkspaceTabs(), Workspace.AutoSavePasswords);
+      Workspace.LastStoredSession = Name.toStdString();
+      CoreBridge::SetWorkspaceSettings(Workspace);
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+    }
+  }
   // Every tab's session closed, each keeping its directories.
   while (!FTabs.empty())
   {
@@ -584,6 +603,22 @@ void MainWindow::StartUp()
   {
     ShowError(E);
   }
+  // A folder of sites or a workspace named: each of its sessions in a tab.
+  const QString Named = QString::fromStdString(CoreBridge::TSession::CommandLineFolderOrWorkspace());
+  if (!Session && !Named.isEmpty() && OpenWorkspace(Named))
+  {
+    return;
+  }
+  // As the explorer's start: the workspace saved automatically when the
+  // window last closed, when no session is named.
+  const CoreBridge::TWorkspaceSettings Workspace = CoreBridge::WorkspaceSettings();
+  if (!Session && Named.isEmpty() && Workspace.AutoSave && !Workspace.AutoWorkspace.empty() &&
+      (QString::fromStdString(Workspace.LastStoredSession).compare(QString::fromStdString(Workspace.AutoWorkspace),
+        Qt::CaseInsensitive) == 0) &&
+      OpenWorkspace(QString::fromStdString(Workspace.AutoWorkspace)))
+  {
+    return;
+  }
   if (!Session || !CanOpen || !Open(std::move(Session)))
   {
     SiteManagerDialog();
@@ -600,6 +635,10 @@ bool MainWindow::SiteManagerDialog()
   if (Dialog.exec() != QDialog::Accepted)
   {
     return false;
+  }
+  if (!Dialog.Workspace().isEmpty())
+  {
+    return OpenWorkspace(Dialog.Workspace());
   }
   return OpenSite(Dialog.Site());
 }
@@ -1277,6 +1316,7 @@ void MainWindow::UpdateActions()
   FKeepUpToDateAction->setEnabled(!FBusy && FSession);
   FDisconnectAction->setEnabled(!FBusy && FSession);
   FDuplicateTabAction->setEnabled(!FBusy && FSession);
+  FSaveWorkspaceAction->setEnabled(!FBusy && (TabCount() > 0));
   FCloseTabAction->setEnabled(!FBusy && FSession);
   FNextTabAction->setEnabled(!FBusy && (TabCount() > 1));
   FPreviousTabAction->setEnabled(!FBusy && (TabCount() > 1));
@@ -2742,4 +2782,113 @@ void MainWindow::UpdateTabs()
   }
   FTabBar->setVisible(TabCount() > 0);
   FUpdatingTabs = false;
+}
+
+// --- Workspaces --------------------------------------------------------------------
+
+std::vector<CoreBridge::TSession::TWorkspaceTab> MainWindow::WorkspaceTabs() const
+{
+  std::vector<CoreBridge::TSession::TWorkspaceTab> Result;
+  for (int Index = 0; Index < TabCount(); Index++)
+  {
+    CoreBridge::TSession::TWorkspaceTab Tab;
+    Tab.Session = TabSession(Index);
+    Tab.LocalDirectory = QDir::toNativeSeparators((Index == FActiveTab) ? FLocal->Path() : FTabs[Index].LocalPath).toStdString();
+    if (Tab.Session != nullptr)
+    {
+      Result.push_back(Tab);
+    }
+  }
+  return Result;
+}
+
+QString MainWindow::WorkspaceName() const
+{
+  if (!FLastWorkspace.isEmpty())
+  {
+    return FLastWorkspace;
+  }
+  const std::string Auto = CoreBridge::WorkspaceSettings().AutoWorkspace;
+  return !Auto.empty() ? QString::fromStdString(Auto) :
+    QString::fromStdString(CoreBridge::Text(CoreBridge::TText::NewWorkspace));
+}
+
+bool MainWindow::SaveWorkspace(const QString * Name, bool SavePasswords, bool AutoSave)
+{
+  if (FBusy || (TabCount() == 0))
+  {
+    return false;
+  }
+  const std::vector<CoreBridge::TSession::TWorkspaceTab> Tabs = WorkspaceTabs();
+  QString AName;
+  try
+  {
+    if (Name != nullptr)
+    {
+      AName = *Name;
+      CoreBridge::ValidateWorkspaceName(AName.toStdString());
+    }
+    else
+    {
+      const bool CanSavePasswords = CoreBridge::TSession::WorkspaceHasPasswords(Tabs);
+      SaveWorkspaceDialog Dialog(WorkspaceName(), CanSavePasswords, false, false, this);
+      if (Dialog.exec() != QDialog::Accepted)
+      {
+        return false;
+      }
+      AName = Dialog.Name();
+      SavePasswords = Dialog.SavePasswords();
+      AutoSave = Dialog.AutoSave();
+    }
+    // As DoSaveWorkspace.
+    FLastWorkspace = AName;
+    CoreBridge::TSession::SaveWorkspace(AName.toStdString(), Tabs, SavePasswords);
+    if (AutoSave)
+    {
+      CoreBridge::TWorkspaceSettings Workspace = CoreBridge::WorkspaceSettings();
+      Workspace.AutoSave = true;
+      Workspace.AutoWorkspace = AName.toStdString();
+      Workspace.AutoSavePasswords = SavePasswords;
+      CoreBridge::SetWorkspaceSettings(Workspace);
+    }
+    return true;
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+}
+
+// As DoOpenFolderOrWorkspace: each of its sessions connected in a tab of its
+// own (WinSCP connects the first only, unless "connect all"), the first
+// active.
+bool MainWindow::OpenWorkspace(const QString & Name)
+{
+  if (FBusy)
+  {
+    return false;
+  }
+  std::vector<std::unique_ptr<CoreBridge::TSession>> Sessions;
+  try
+  {
+    Sessions = CoreBridge::TSession::Workspace(Name.toStdString());
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+  const int First = TabCount();
+  bool Any = false;
+  for (std::unique_ptr<CoreBridge::TSession> & Session : Sessions)
+  {
+    Any = Open(std::move(Session)) || Any;
+  }
+  if (Any)
+  {
+    FLastWorkspace = Name;
+    SwitchTab(First);
+  }
+  return Any;
 }

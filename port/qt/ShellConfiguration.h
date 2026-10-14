@@ -29,6 +29,12 @@ struct TShellSettings
   bool KeepOpenWhenNoSession = true;
   // Integration > Applications: each new session opened in PuTTY too.
   bool AutoOpenInPutty = false;
+  // Workspaces: saved automatically on closing, with passwords or not, and
+  // under which name; the last site or workspace stored on closing.
+  bool AutoSaveWorkspace = false;
+  bool AutoSaveWorkspacePasswords = false;
+  UnicodeString AutoWorkspace;
+  UnicodeString LastStoredSession;
   // File colors (TFileColorData::SaveList: "BBGGRR:mask" items, comma text).
   UnicodeString FileColors;
   // Storage: where temporary files go (empty: the system's temporary

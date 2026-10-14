@@ -222,6 +222,19 @@ TSession::TSession() :
 {
 }
 
+// As GetFolderOrWorkspaceName.
+std::string TSession::CommandLineFolderOrWorkspace()
+{
+  TProgramParams * Params = TProgramParams::Instance();
+  if (Params->ParamCount == 0)
+  {
+    return std::string();
+  }
+  const UnicodeString Name = DecodeUrlChars(Params->Param[1]);
+  return ((StoredSessions->FindByName(Name) == NULL) && StoredSessions->IsFolderOrWorkspace(Name)) ?
+    Utf8(Name) : std::string();
+}
+
 std::unique_ptr<TSession> TSession::FromCommandLine(bool & CanOpen)
 {
   CanOpen = false;
@@ -2769,6 +2782,106 @@ void TSession::Idle()
   try
   {
     F->Terminal->Idle();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+std::vector<std::unique_ptr<TSession>> TSession::Workspace(const std::string & Name)
+{
+  try
+  {
+    std::unique_ptr<TObjectList> List(new TObjectList());
+    StoredSessions->GetFolderOrWorkspace(FromUtf8(Name), List.get());
+    std::vector<std::unique_ptr<TSession>> Result;
+    for (int Index = 0; Index < List->Count; Index++)
+    {
+      std::unique_ptr<TSession> Session(new TSession());
+      Session->F->Data.reset(new TSessionData(L""));
+      Session->F->Data->Assign(static_cast<TSessionData *>(List->Items[Index]));
+      Result.push_back(std::move(Session));
+    }
+    return Result;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+namespace
+{
+
+// As TTerminalManager::SaveWorkspace: each tab's session data as it is, its
+// local directory the tab's, a link to its stored site when it is one.
+TObjectList * WorkspaceData(const std::vector<TSession::TWorkspaceTab> & Tabs,
+  const std::function<TSessionData *(const TSession *)> & Clone)
+{
+  std::unique_ptr<TObjectList> Result(new TObjectList());
+  for (std::size_t Index = 0; Index < Tabs.size(); Index++)
+  {
+    std::unique_ptr<TSessionData> Data(Clone(Tabs[Index].Session));
+    if (!Tabs[Index].LocalDirectory.empty())
+    {
+      Data->LocalDirectory = FromUtf8(Tabs[Index].LocalDirectory);
+    }
+    Result->Add(StoredSessions->SaveWorkspaceData(Data.get(), static_cast<int>(Index)));
+  }
+  return Result.release();
+}
+
+}  // namespace
+
+void TSession::SaveWorkspace(const std::string & Name, const std::vector<TWorkspaceTab> & Tabs, bool SavePasswords)
+{
+  try
+  {
+    std::unique_ptr<TObjectList> DataList(WorkspaceData(Tabs, [](const TSession * Session)
+    {
+      return (Session->F->Terminal != NULL) ? CloneCurrentSessionData(Session->F->Terminal.get()) :
+        Session->F->Data->Clone();
+    }));
+    // As DoSaveWorkspace.
+    if (!SavePasswords)
+    {
+      for (int Index = 0; Index < DataList->Count; Index++)
+      {
+        TSessionData * Data = static_cast<TSessionData *>(DataList->Items[Index]);
+        if (Data->Link.IsEmpty())
+        {
+          Data->ClearSessionPasswords();
+        }
+      }
+    }
+    StoredSessions->NewWorkspace(FromUtf8(Name), DataList.get());
+    StoredSessions->Save(false, true);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+bool TSession::WorkspaceHasPasswords(const std::vector<TWorkspaceTab> & Tabs)
+{
+  try
+  {
+    std::unique_ptr<TObjectList> DataList(WorkspaceData(Tabs, [](const TSession * Session)
+    {
+      return (Session->F->Terminal != NULL) ? CloneCurrentSessionData(Session->F->Terminal.get()) :
+        Session->F->Data->Clone();
+    }));
+    for (int Index = 0; Index < DataList->Count; Index++)
+    {
+      TSessionData * Data = static_cast<TSessionData *>(DataList->Items[Index]);
+      if (Data->Link.IsEmpty() && Data->HasAnySessionPassword())
+      {
+        return true;
+      }
+    }
+    return false;
   }
   catch (Exception & E)
   {

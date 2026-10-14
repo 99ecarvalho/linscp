@@ -33,10 +33,10 @@ namespace
 using TProtocol = CoreBridge::TSite::TProtocol;
 using TEncryption = CoreBridge::TSite::TEncryption;
 
-// Tree items: a site carries its full name, a folder its path; "New Site"
-// neither.
+// Tree items: a site carries its full name, a folder its path, a workspace
+// its name; "New Site" neither.
 enum { NameRole = Qt::UserRole, KindRole };
-enum TKind { NewSiteKind, FolderKind, SiteKind };
+enum TKind { NewSiteKind, FolderKind, SiteKind, WorkspaceKind };
 
 QString CoreText(CoreBridge::TText Text)
 {
@@ -238,6 +238,15 @@ void SiteManager::Fill(const QString & Select, const QStringList & ExtraFolders)
       Selected = Item;
     }
   }
+  // As the Login dialog's tree: the workspaces after the sites.
+  const QIcon WorkspaceIcon = style()->standardIcon(QStyle::SP_DesktopIcon);
+  for (const std::string & Name : CoreBridge::WorkspaceNames())
+  {
+    QTreeWidgetItem * Item = new QTreeWidgetItem(FTree, { QString::fromStdString(Name) });
+    Item->setData(0, KindRole, WorkspaceKind);
+    Item->setData(0, NameRole, QString::fromStdString(Name));
+    Item->setIcon(0, WorkspaceIcon);
+  }
   FTree->expandAll();
   FTree->setCurrentItem(Selected);
   CurrentChanged();
@@ -290,6 +299,30 @@ bool SiteManager::SelectSite(const QString & Name)
   for (QTreeWidgetItemIterator It(FTree); *It != nullptr; ++It)
   {
     if (((*It)->data(0, KindRole).toInt() == SiteKind) && ((*It)->data(0, NameRole).toString() == Name))
+    {
+      FTree->setCurrentItem(*It);
+      return true;
+    }
+  }
+  return false;
+}
+
+QString SiteManager::SelectedWorkspace() const
+{
+  const QTreeWidgetItem * Item = FTree->currentItem();
+  return ((Item != nullptr) && (Item->data(0, KindRole).toInt() == WorkspaceKind)) ? Item->data(0, NameRole).toString() : QString();
+}
+
+QString SiteManager::Workspace() const
+{
+  return SelectedWorkspace();
+}
+
+bool SiteManager::SelectWorkspace(const QString & Name)
+{
+  for (QTreeWidgetItemIterator It(FTree); *It != nullptr; ++It)
+  {
+    if (((*It)->data(0, KindRole).toInt() == WorkspaceKind) && ((*It)->data(0, NameRole).toString() == Name))
     {
       FTree->setCurrentItem(*It);
       return true;
@@ -596,7 +629,7 @@ bool SiteManager::VerifyKey()
 
 void SiteManager::accept()
 {
-  if (VerifyKey())
+  if (!SelectedWorkspace().isEmpty() || VerifyKey())
   {
     QDialog::accept();
   }
@@ -755,6 +788,42 @@ void SiteManager::NewFolder(const QString & Name)
 
 bool SiteManager::DeleteSelected(bool Confirm)
 {
+  // A workspace: its sessions, as the Login dialog's delete.
+  const QString Workspace = SelectedWorkspace();
+  if (!Workspace.isEmpty())
+  {
+    if (Confirm)
+    {
+      CoreBridge::TQuery Query;
+      Query.Type = CoreBridge::TQueryType::Confirmation;
+      Query.Message = CoreText(CoreBridge::TText::ConfirmDeleteWorkspace, Workspace,
+        CoreBridge::WorkspaceSessionCount(Workspace.toStdString())).toStdString();
+      CoreBridge::TQueryButton OK;
+      OK.Answer = CoreBridge::AnswerOK;
+      OK.Caption = "OK";
+      CoreBridge::TQueryButton Cancel;
+      Cancel.Answer = CoreBridge::AnswerCancel;
+      Cancel.Caption = "Cancel";
+      Query.Buttons = { OK, Cancel };
+      Query.CancelAnswer = CoreBridge::AnswerCancel;
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      if (Frontend.Query(Query).Answer != CoreBridge::AnswerOK)
+      {
+        return false;
+      }
+    }
+    try
+    {
+      CoreBridge::DeleteWorkspace(Workspace.toStdString());
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+    }
+    Fill(QString());
+    return true;
+  }
   const QString Name = SelectedName();
   const QString Folder = Name.isEmpty() ? SelectedFolder() : QString();
   if (Name.isEmpty() && Folder.isEmpty())
@@ -809,13 +878,15 @@ void SiteManager::UpdateButtons()
 {
   const QTreeWidgetItem * Item = FTree->currentItem();
   const int Kind = (Item != nullptr) ? Item->data(0, KindRole).toInt() : FolderKind;
+  // A workspace: logged in to or deleted, not edited.
+  const bool Form = (Kind == SiteKind) || (Kind == NewSiteKind);
   FLogin->setEnabled(Kind != FolderKind);
-  FSave->setEnabled(Kind != FolderKind);
-  FAdvanced->setEnabled(Kind != FolderKind);
-  FRename->setEnabled(Kind != NewSiteKind);
+  FSave->setEnabled(Form);
+  FAdvanced->setEnabled(Form);
+  FRename->setEnabled((Kind == SiteKind) || (Kind == FolderKind));
   FDelete->setEnabled(Kind != NewSiteKind);
   for (QWidget * Field : std::initializer_list<QWidget *>{ FProtocol, FEncryption, FHostName, FPort, FUserName, FPassword })
   {
-    Field->setEnabled(Kind != FolderKind);
+    Field->setEnabled(Form);
   }
 }

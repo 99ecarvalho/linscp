@@ -1174,6 +1174,10 @@ Local: %2</translation>
         <source>&amp;Previous Tab</source>
         <translation>Aba a&amp;nterior</translation>
     </message>
+    <message>
+        <source>Save Wor&amp;kspace...</source>
+        <translation>Salvar &amp;Espaço de trabalho...</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

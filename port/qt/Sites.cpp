@@ -396,6 +396,70 @@ bool SiteExists(const std::string & Name)
   return StoredSite(Name) != NULL;
 }
 
+std::vector<std::string> WorkspaceNames()
+{
+  std::unique_ptr<TStrings> Names(StoredSessions->GetWorkspaces());
+  std::vector<std::string> Result;
+  for (int Index = 0; Index < Names->Count; Index++)
+  {
+    Result.push_back(Utf8(Names->Strings[Index]));
+  }
+  return Result;
+}
+
+int WorkspaceSessionCount(const std::string & Name)
+{
+  const UnicodeString AName = FromUtf8(Name);
+  int Result = 0;
+  for (int Index = 0; Index < StoredSessions->Count; Index++)
+  {
+    TSessionData * Data = StoredSessions->Sessions[Index];
+    if (Data->IsWorkspace && Data->IsInFolderOrWorkspace(AName))
+    {
+      Result++;
+    }
+  }
+  return Result;
+}
+
+void DeleteWorkspace(const std::string & Name)
+{
+  try
+  {
+    const UnicodeString AName = FromUtf8(Name);
+    for (int Index = StoredSessions->Count - 1; Index >= 0; Index--)
+    {
+      TSessionData * Data = StoredSessions->Sessions[Index];
+      if (Data->IsWorkspace && Data->IsInFolderOrWorkspace(AName))
+      {
+        Data->Remove();
+        StoredSessions->Remove(Data);
+      }
+    }
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void ValidateWorkspaceName(const std::string & Name)
+{
+  try
+  {
+    const UnicodeString AName = FromUtf8(Name);
+    TSessionData::ValidateName(AName);
+    if (StoredSessions->IsFolder(AName))
+    {
+      throw Exception(FMTLOAD(FOLDER_NOT_WORKSPACE, (AName)));
+    }
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 void DeleteSite(const std::string & Name)
 {
   try

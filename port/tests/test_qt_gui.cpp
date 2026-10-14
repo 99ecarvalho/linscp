@@ -3520,7 +3520,7 @@ void TabsTest(const char * Port, const QString & Directory)
     Window.show();
     TResponder Responder;
     Responder.Frontend = &Frontend;
-    Responder.Passwords = { "secret", "secret", "secret" };
+    Responder.Passwords = std::deque<QString>(10, QStringLiteral("secret"));
     Responder.AcceptDialogs = true;
     const QString Url = QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port));
     const QDir Root(QDir(Directory).filePath(QStringLiteral("../root")));
@@ -3565,6 +3565,66 @@ void TabsTest(const char * Port, const QString & Directory)
     Check(Window.CloseTab(1) && (Window.TabCount() == 2) && (Window.TabSession(0) == First), "closing one keeps the rest");
     Check(Window.CloseTab(0) && (Window.TabCount() == 1) && !Window.Editors(true).size(), "closing the first closes its editors");
     Check(Window.Session() != nullptr, "the last tab active");
+
+    // A workspace: the tabs saved together, closed, and opened again, each
+    // with its directories; then deleted in the site manager.
+    Window.Local()->ChangeDirectory(QDir(Directory).filePath(QStringLiteral("first")));
+    if (Window.Panel()->Path() != QStringLiteral("/"))
+    {
+      Check(Window.Panel()->ChangeDirectory(QStringLiteral("/")), "(the first at the root)");
+    }
+    Check(Window.OpenUrl(Url) && (Window.TabCount() == 2), "(a second tab)");
+    Window.Local()->ChangeDirectory(QDir(Directory).filePath(QStringLiteral("second")));
+    Check(Window.Panel()->ChangeDirectory(QStringLiteral("/sub")), "(the second in /sub)");
+    const QString Name = QStringLiteral("Linscp Workspace");
+    Check(Window.SaveWorkspace(&Name, false, true), "Save Workspace");
+    const std::vector<std::string> Workspaces = CoreBridge::WorkspaceNames();
+    Check((Workspaces.size() == 1) && (QString::fromStdString(Workspaces[0]) == Name), "the workspace stored");
+    Check(CoreBridge::WorkspaceSessionCount(Name.toStdString()) == 2, "with both tabs' sessions");
+    Check(QString::fromStdString(CoreBridge::WorkspaceSettings().AutoWorkspace) == Name, "saved automatically from now on");
+    Check(Window.WorkspaceName() == Name, "the name offered next time");
+    Check(Window.CloseTab(1) && Window.CloseTab(0) && (Window.TabCount() == 0), "(both tabs closed)");
+    Check(Window.OpenWorkspace(Name) && (Window.TabCount() == 2) && (Window.ActiveTab() == 0), "Open the workspace: two tabs");
+    Check((Window.Panel()->Path() == QStringLiteral("/")) &&
+      (QDir(Window.Local()->Path()) == QDir(QDir(Directory).filePath(QStringLiteral("first")))),
+      "the first with its directories");
+    Check(Window.SwitchTab(1) && (Window.Panel()->Path() == QStringLiteral("/sub")) &&
+      (QDir(Window.Local()->Path()) == QDir(QDir(Directory).filePath(QStringLiteral("second")))),
+      "the second with its directories");
+    {
+      SiteManager Sites(&Window);
+      Check(Sites.SelectWorkspace(Name) && Sites.Workspace() == Name, "the site manager lists the workspace");
+      Check(!Sites.HostName()->isEnabled(), "not edited there");
+      Check(Sites.DeleteSelected(false) && CoreBridge::WorkspaceNames().empty() && !Sites.SelectWorkspace(Name),
+        "deleted with its sessions");
+    }
+    // Saved automatically on closing, and opened again at the next start.
+    Window.close();
+    Check(Window.TabCount() == 0, "closing the window closes the tabs");
+    Check(CoreBridge::WorkspaceSessionCount(Name.toStdString()) == 2, "the workspace saved on closing");
+    Check(QString::fromStdString(CoreBridge::WorkspaceSettings().LastStoredSession) == Name, "noted as the last stored");
+    MainWindow Next(CoreBridge::Info());
+    Frontend.SetWindow(&Next);
+    Next.show();
+    // (Not this test's arguments.)
+    CoreBridge::SetArguments({ "/ini=nul" });
+    Next.StartUp();
+    Check((Next.TabCount() == 2) && (Next.Panel()->Path() == QStringLiteral("/")) && Next.SwitchTab(1) &&
+      (Next.Panel()->Path() == QStringLiteral("/sub")), "the next start opens it");
+    Next.close();
+    // Named on the command line: opened whatever the automatic one.
+    CoreBridge::SetArguments({ "/ini=nul", Name.toStdString() });
+    MainWindow Named(CoreBridge::Info());
+    Frontend.SetWindow(&Named);
+    Named.show();
+    CoreBridge::TWorkspaceSettings Workspace = CoreBridge::WorkspaceSettings();
+    Workspace.AutoSave = false;
+    CoreBridge::SetWorkspaceSettings(Workspace);
+    Check(CoreBridge::TSession::CommandLineFolderOrWorkspace() == Name.toStdString(), "a workspace on the command line");
+    Named.StartUp();
+    Check(Named.TabCount() == 2, "opened at start");
+    Named.close();
+    Frontend.SetWindow(&Window);
   }
   CoreBridge::Finalize();
 }

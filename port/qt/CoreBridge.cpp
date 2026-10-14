@@ -865,6 +865,7 @@ std::string Text(TText Text)
     case TText::NewFolderCaption: Ident = LOGIN_NEW_SESSION_FOLDER_CAPTION; break;
     case TText::NewFolderPrompt: Ident = LOGIN_NEW_SESSION_FOLDER_PROMPT; break;
     case TText::ConfirmDeleteFolder: Ident = LOGIN_DELETE_SESSION_FOLDER; break;
+    case TText::ConfirmDeleteWorkspace: Ident = LOGIN_DELETE_WORKSPACE; break;
     case TText::ConfirmDeleteFile: Ident = CONFIRM_DELETE_FILE; break;
     case TText::ConfirmDeleteFiles: Ident = CONFIRM_DELETE_FILES; break;
     case TText::NewFolderName: Ident = NEW_FOLDER; break;
@@ -959,6 +960,12 @@ std::string Text(TText Text)
     case TText::CreateDesktopIconAllUsers: Ident = CREATE_DESKTOP_ICON2; break;
     case TText::RegisterUrlError: Ident = REGISTER_URL_ERROR2; break;
     case TText::CreateShortcutError: Ident = CREATE_SHORTCUT_ERROR; break;
+    case TText::SaveWorkspaceCaption: Ident = SAVE_WORKSPACE_CAPTION; break;
+    case TText::SaveWorkspacePrompt: Ident = SAVE_WORKSPACE_PROMPT; break;
+    case TText::SaveWorkspacePasswords: Ident = SAVE_WORKSPACE_PASSWORDS; break;
+    case TText::SaveWorkspacePasswordsRecommended: Ident = SAVE_WORKSPACE_PASSWORDS_RECOMMENDED; break;
+    case TText::SaveWorkspaceAuto: Ident = SAVE_WORKSPACE_AUTO; break;
+    case TText::NewWorkspace: Ident = NEW_WORKSPACE; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));
@@ -1292,6 +1299,40 @@ void AutodetectEditorOptions(TEditorDefinition & Editor)
   Data.ExternalEditorOptionsAutodetect();
   Editor.Text = Data.ExternalEditorText;
   Editor.Sdi = Data.SDIExternalEditor;
+}
+
+}  // namespace CoreBridge
+
+namespace CoreBridge
+{
+
+TWorkspaceSettings WorkspaceSettings()
+{
+  const TShellSettings & Settings = Shell()->Settings();
+  TWorkspaceSettings Result;
+  Result.AutoSave = Settings.AutoSaveWorkspace;
+  Result.AutoSavePasswords = Settings.AutoSaveWorkspacePasswords;
+  Result.AutoWorkspace = Utf8(Settings.AutoWorkspace);
+  Result.LastStoredSession = Utf8(Settings.LastStoredSession);
+  return Result;
+}
+
+void SetWorkspaceSettings(const TWorkspaceSettings & Workspace)
+{
+  TShellSettings Settings = Shell()->Settings();
+  Settings.AutoSaveWorkspace = Workspace.AutoSave;
+  Settings.AutoSaveWorkspacePasswords = Workspace.AutoSavePasswords;
+  Settings.AutoWorkspace = FromUtf8(Workspace.AutoWorkspace);
+  Settings.LastStoredSession = FromUtf8(Workspace.LastStoredSession);
+  try
+  {
+    Shell()->SetSettings(Settings);
+    Configuration->SaveExplicit();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
 }
 
 }  // namespace CoreBridge

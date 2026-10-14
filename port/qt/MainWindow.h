@@ -229,6 +229,15 @@ public:
   // Tabs > Duplicate Tab: the active session's site, as it is now, in a new
   // tab (TCustomScpExplorerForm::DuplicateTab).
   bool DuplicateTab();
+  // Tabs > Save Workspace (TCustomScpExplorerForm::SaveWorkspace): the
+  // tabs' sessions saved together, after its dialog, unless Name is given
+  // (tests). Opening one (the site manager's, or at start): each of its
+  // sessions in a tab. False when nothing was saved or opened.
+  bool SaveWorkspace(const QString * Name = nullptr, bool SavePasswords = false, bool AutoSave = false);
+  bool OpenWorkspace(const QString & Name);
+  // As WorkspaceName: the last saved, else the automatic one, else "My
+  // Workspace".
+  QString WorkspaceName() const;
   class QTabBar * TabBar() const { return FTabBar; }
   RemotePanel * Panel() const { return FPanel; }
   LocalPanel * Local() const { return FLocal; }
@@ -273,6 +282,7 @@ private:
   QAction * FKeepUpToDateAction = nullptr;
   QAction * FPuttyAction = nullptr;
   QAction * FDuplicateTabAction = nullptr;
+  QAction * FSaveWorkspaceAction = nullptr;
   QAction * FCloseTabAction = nullptr;
   QAction * FNextTabAction = nullptr;
   QAction * FPreviousTabAction = nullptr;
@@ -325,6 +335,9 @@ private:
   std::vector<TTab> FTabs;
   int FActiveTab = -1;
   QTabBar * FTabBar = nullptr;
+  // WinConfiguration's LastWorkspace: this run's.
+  QString FLastWorkspace;
+  std::vector<CoreBridge::TSession::TWorkspaceTab> WorkspaceTabs() const;
   bool FUpdatingTabs = false;
   // The session parked into its tab, and the tab's back again.
   void ParkActiveTab();

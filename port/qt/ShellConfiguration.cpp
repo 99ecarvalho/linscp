@@ -198,6 +198,10 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteInteger(L"PathInCaption", FSettings.PathInCaption);
     Storage->WriteBool(L"KeepOpenWhenNoSession", FSettings.KeepOpenWhenNoSession);
     Storage->WriteBool(L"AutoOpenInPutty", FSettings.AutoOpenInPutty);
+    Storage->WriteBool(L"AutoSaveWorkspace", FSettings.AutoSaveWorkspace);
+    Storage->WriteBool(L"AutoSaveWorkspacePasswords", FSettings.AutoSaveWorkspacePasswords);
+    Storage->WriteString(L"AutoWorkspace", FSettings.AutoWorkspace);
+    Storage->WriteString(L"LastStoredSession", FSettings.LastStoredSession);
     Storage->WriteString(L"FileColors", FSettings.FileColors);
     Storage->WriteString(L"DDTemporaryDirectory", FSettings.DDTemporaryDirectory);
     Storage->WriteBool(L"TemporaryDirectoryAppendSession", FSettings.TemporaryDirectoryAppendSession);
@@ -412,6 +416,10 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.PathInCaption = Storage->ReadInteger(L"PathInCaption", FSettings.PathInCaption);
     FSettings.KeepOpenWhenNoSession = Storage->ReadBool(L"KeepOpenWhenNoSession", FSettings.KeepOpenWhenNoSession);
     FSettings.AutoOpenInPutty = Storage->ReadBool(L"AutoOpenInPutty", FSettings.AutoOpenInPutty);
+    FSettings.AutoSaveWorkspace = Storage->ReadBool(L"AutoSaveWorkspace", FSettings.AutoSaveWorkspace);
+    FSettings.AutoSaveWorkspacePasswords = Storage->ReadBool(L"AutoSaveWorkspacePasswords", FSettings.AutoSaveWorkspacePasswords);
+    FSettings.AutoWorkspace = Storage->ReadString(L"AutoWorkspace", FSettings.AutoWorkspace);
+    FSettings.LastStoredSession = Storage->ReadString(L"LastStoredSession", FSettings.LastStoredSession);
     FSettings.FileColors = Storage->ReadString(L"FileColors", FSettings.FileColors);
     FSettings.DDTemporaryDirectory = Storage->ReadString(L"DDTemporaryDirectory", FSettings.DDTemporaryDirectory);
     FSettings.TemporaryDirectoryAppendSession =
