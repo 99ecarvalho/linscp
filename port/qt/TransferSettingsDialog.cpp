@@ -33,7 +33,9 @@ TransferSettingsFrame::TransferSettingsFrame(QWidget * Parent) :
     ModeLayout->addWidget(Button);
     connect(Button, &QRadioButton::toggled, this, &TransferSettingsFrame::UpdateControls);
   }
-  ModeLayout->addWidget(new QLabel(tr("Transfer following &files in text mode:"), Mode));
+  QLabel * TextMaskLabel = new QLabel(tr("Transfer following &files in text mode:"), Mode);
+  TextMaskLabel->setBuddy(FTextMask);
+  ModeLayout->addWidget(TextMaskLabel);
   ModeLayout->addWidget(FTextMask);
   Layout->addWidget(Mode, 0, 0);
 

@@ -150,6 +150,7 @@ EditorWindow::EditorWindow(const QString & FileName, const QString & Caption, co
   FUtf8 = Settings.Utf8;
 
   FEditor = new QPlainTextEdit(this);
+  FEditor->setAccessibleName(tr("Text"));
   // As TEditorForm::ApplyConfiguration: the configured font, else the
   // system's fixed one; the colours, else the window's.
   QFont Font = QFontDatabase::systemFont(QFontDatabase::FixedFont);

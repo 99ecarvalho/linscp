@@ -118,6 +118,9 @@
 #include <QTreeView>
 #include "SiteManager.h"
 #include "CopyLocalDialog.h"
+#include "AccessibilityAudit.h"
+#include "EditorPreferencesDialog.h"
+#include "SaveWorkspaceDialog.h"
 #include "PreferencesDialog.h"
 #include "Integration.h"
 #include <QSettings>
@@ -167,6 +170,8 @@ namespace
 {
 
 int Failures = 0;
+// The audit of every window shown (main()).
+AccessibilityAudit * GAudit = nullptr;
 
 void Check(bool Condition, const char * What)
 {
@@ -1710,7 +1715,7 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
     bool CopyOnCtrlK = false;
     for (QAction * Action : Window.findChildren<QAction *>())
     {
-      CopyOnCtrlK = CopyOnCtrlK || ((Action->text() == MainWindow::tr("&Copy...")) &&
+      CopyOnCtrlK = CopyOnCtrlK || ((Action->text() == MainWindow::tr("Cop&y...")) &&
         (Action->shortcut() == QKeySequence(Qt::CTRL | Qt::Key_K)));
     }
     Check(CopyOnCtrlK, "Explorer's keys: Copy is Ctrl+K");
@@ -3763,6 +3768,90 @@ void LocalTabTest(const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// P3-09: the dialogs the other tests drive without showing them, shown
+// and audited, each page of those with pages; the audit of every other
+// window shown runs in all the tests.
+void AccessibilityTest(const char * Port)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = { "secret" };
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "(connected)");
+    const int Before = GAudit->Issues();
+    auto Audit = [](QWidget & Dialog)
+    {
+      Dialog.show();
+      QApplication::processEvents();
+      GAudit->Audit(&Dialog);
+      Dialog.hide();
+    };
+    {
+      AboutDialog Dialog(CoreBridge::Info(), &Window);
+      Audit(Dialog);
+    }
+    {
+      LicenseDialog Dialog(LicenseDialog::Product, &Window);
+      Audit(Dialog);
+    }
+    {
+      EditMaskDialog Dialog(QStringLiteral("*.txt"), &Window);
+      Audit(Dialog);
+    }
+    {
+      EditorPreferencesDialog Dialog(EditorPreferencesDialog::TMode::Add, CoreBridge::TEditorDefinition(), true, &Window);
+      Audit(Dialog);
+    }
+    {
+      ImportSitesDialog Dialog(&Window);
+      Audit(Dialog);
+    }
+    {
+      SaveWorkspaceDialog Dialog(QStringLiteral("My Workspace"), true, false, false, &Window);
+      Audit(Dialog);
+    }
+    {
+      SiteRawDialog Dialog(QStringLiteral("HostName=example.com"), &Window);
+      Audit(Dialog);
+    }
+    {
+      TransferSettingsDialog Dialog(CoreBridge::DefaultTransferSettings(), nullptr, &Window);
+      Audit(Dialog);
+    }
+    {
+      GenerateUrlDialog Dialog(Window.Session(), { "/hello.txt" }, &Window);
+      Audit(Dialog);
+    }
+    {
+      ServerInfoDialog Dialog(Window.Session(), Window.Session()->ServerInfo(), QStringLiteral("/"), &Window);
+      Audit(Dialog);
+    }
+    {
+      PreferencesDialog Dialog(&Window);
+      for (int Page = 0; Page < Dialog.Navigation()->count(); Page++)
+      {
+        Dialog.Navigation()->setCurrentRow(Page);
+        Audit(Dialog);
+      }
+    }
+    {
+      SiteAdvanced Dialog(CoreBridge::NewSite(), &Window);
+      for (int Page = 0; Page < Dialog.Pages()->count(); Page++)
+      {
+        Dialog.Pages()->setCurrentIndex(Page);
+        Audit(Dialog);
+      }
+    }
+    Check(GAudit->Issues() == Before, "every dialog accessible");
+  }
+  CoreBridge::Finalize();
+}
+
 // The menu bar as text, a menu's items indented under it, separators as
 // "----": for comparing with WinSCP's (forms/ScpCommander.dfm).
 void DumpMenu(QMenu * Menu, int Depth, QString & Out)
@@ -3804,6 +3893,10 @@ int main(int argc, char ** argv)
 {
   QApplication App(argc, argv);
   std::setvbuf(stdout, nullptr, _IONBF, 0);
+  // Every window shown, audited (P3-09).
+  AccessibilityAudit Audit(Failures);
+  App.installEventFilter(&Audit);
+  GAudit = &Audit;
   if ((argc >= 2) && (std::strcmp(argv[1], "dialogs") == 0))
   {
     Dialogs();
@@ -3811,6 +3904,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 4) && (std::strcmp(argv[1], "localtab") == 0))
   {
     LocalTabTest(QString::fromLocal8Bit(argv[3]));
+  }
+  else if ((argc >= 4) && (std::strcmp(argv[1], "accessibility") == 0))
+  {
+    AccessibilityTest(argv[3]);
   }
   else if ((argc >= 3) && (std::strcmp(argv[1], "menus") == 0))
   {

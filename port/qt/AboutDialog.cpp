@@ -91,6 +91,7 @@ AboutDialog::AboutDialog(const CoreBridge::TInfo & Info, QWidget * Parent) :
   // WinSCP's third-party list, core's (CoreBridge::ThirdPartyHtml), with Qt,
   // which the shell is built on, after it.
   FThirdParty = new QTextBrowser(this);
+  FThirdParty->setAccessibleName(tr("Third party software"));
   FThirdParty->setOpenLinks(false);
   FThirdParty->setHtml(QString::fromStdString(CoreBridge::ThirdPartyHtml(QLocale().nativeLanguageName().toStdString())) +
     QStringLiteral("<p>%1<br>%2<br>%3</p>").arg(

@@ -273,7 +273,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FPropertiesAction = FilesMenu->addAction(tr("&Properties"), this, [this]() { Properties(); });
   FGenerateFileUrlAction = FilesMenu->addAction(tr("Generate File &URL..."), this, [this]() { GenerateUrl(true); });
   FFileCommandsMenu = new QMenu(tr("File &Custom Commands"), this);
-  FCopyAction = FilesMenu->addAction(tr("&Copy..."), this, [this]() { TransferSelected(false, true); });
+  FCopyAction = FilesMenu->addAction(tr("Cop&y..."), this, [this]() { TransferSelected(false, true); });
   FCopyAction->setShortcut(QKeySequence(Qt::Key_F5));
   FMoveAction = FilesMenu->addAction(tr("&Move..."), this, [this]() { TransferSelected(true, true); });
   FMoveAction->setShortcut(QKeySequence(Qt::Key_F6));
@@ -1082,7 +1082,9 @@ bool MainWindow::CopyDialog(bool FromLocal, const QStringList & Names, QString &
   QFormLayout * Layout = new QFormLayout(&Dialog);
   QLineEdit * TargetEdit = new QLineEdit(Target, &Dialog);
   TargetEdit->setMinimumWidth(380);
-  Layout->addRow(new QLabel(Prompt, &Dialog));
+  QLabel * PromptLabel = new QLabel(Prompt, &Dialog);
+  PromptLabel->setBuddy(TargetEdit);
+  Layout->addRow(PromptLabel);
   Layout->addRow(TargetEdit);
   // The transfer settings, as WinSCP's Copy dialog shows them; the
   // background default is theirs.

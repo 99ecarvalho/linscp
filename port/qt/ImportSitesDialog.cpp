@@ -33,6 +33,7 @@ ImportSitesDialog::ImportSitesDialog(QWidget * Parent) :
   Top->addWidget(FPaste);
   Layout->addLayout(Top);
   FList = new QListWidget(this);
+  FList->setAccessibleName(tr("Sites"));
   Layout->addWidget(FList, 1);
   FError = new QLabel(this);
   FError->setWordWrap(true);

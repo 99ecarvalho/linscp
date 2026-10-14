@@ -80,6 +80,7 @@ ServerInfoDialog::ServerInfoDialog(CoreBridge::TSession * Session, const CoreBri
   QWidget * Protocol = new QWidget(FPages);
   QVBoxLayout * ProtocolLayout = new QVBoxLayout(Protocol);
   FServer = ItemView(Protocol);
+  FServer->setAccessibleName(tr("Protocol"));
   Fill(FServer, Info.Server);
   ProtocolLayout->addWidget(FServer, 1);
   FHostKeyGroup = new QGroupBox(tr("Server host key fingerprints"), Protocol);
@@ -121,6 +122,7 @@ ServerInfoDialog::ServerInfoDialog(CoreBridge::TSession * Session, const CoreBri
   QWidget * Capabilities = new QWidget(FPages);
   QVBoxLayout * CapabilitiesLayout = new QVBoxLayout(Capabilities);
   FCapabilities = ItemView(Capabilities);
+  FCapabilities->setAccessibleName(tr("Capabilities"));
   Fill(FCapabilities, Info.Capabilities);
   CapabilitiesLayout->addWidget(FCapabilities, 1);
   FInfoGroup = new QGroupBox(tr("Additional information"), Capabilities);
@@ -148,6 +150,7 @@ ServerInfoDialog::ServerInfoDialog(CoreBridge::TSession * Session, const CoreBri
   PathRow->addWidget(FCheckSpace);
   SpaceLayout->addLayout(PathRow);
   FSpace = ItemView(Space);
+  FSpace->setAccessibleName(tr("Space available"));
   SpaceLayout->addWidget(FSpace, 1);
   FSpacePage = FPages->addTab(Space, tr("Space available"));
   FPages->setTabEnabled(FSpacePage, Info.CanCheckSpace);

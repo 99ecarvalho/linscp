@@ -62,6 +62,7 @@ QueryDialog::QueryDialog(const CoreBridge::TQuery & Query, QWidget * Parent) :
   if (!Query.MoreMessages.empty())
   {
     QPlainTextEdit * More = new QPlainTextEdit(QString::fromStdString(Query.MoreMessages), this);
+    More->setAccessibleName(tr("More messages"));
     More->setReadOnly(true);
     More->setMaximumHeight(fontMetrics().lineSpacing() * 8);
     Layout->addWidget(More);

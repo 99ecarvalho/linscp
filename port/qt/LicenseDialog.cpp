@@ -30,6 +30,7 @@ LicenseDialog::LicenseDialog(TLicense License, QWidget * Parent) :
 
   QVBoxLayout * Layout = new QVBoxLayout(this);
   FText = new QPlainTextEdit(Text, this);
+  FText->setAccessibleName(windowTitle());
   FText->setReadOnly(true);
   FText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
   FText->setLineWrapMode(QPlainTextEdit::NoWrap);

@@ -51,6 +51,10 @@
         <source>&amp;License...</source>
         <translation>&amp;Licença</translation>
     </message>
+    <message>
+        <source>Third party software</source>
+        <translation>Software de terceiros</translation>
+    </message>
 </context>
 <context>
     <name>CleanupDialog</name>
@@ -88,6 +92,10 @@ Local: %2</translation>
         <source>Un/check &amp;all</source>
         <translation>(des)Marcar &amp;todos</translation>
     </message>
+    <message>
+        <source>Application data</source>
+        <translation>Dados do aplicativo</translation>
+    </message>
 </context>
 <context>
     <name>ConsoleDialog</name>
@@ -110,6 +118,10 @@ Local: %2</translation>
     <message>
         <source>Do not execute commands that require user-input or data transfer</source>
         <translation>Atenção: NÃO execute comandos que requeiram entrada do usuário</translation>
+    </message>
+    <message>
+        <source>Output</source>
+        <translation>Saída</translation>
     </message>
 </context>
 <context>
@@ -485,6 +497,10 @@ Local: %2</translation>
         <source>File was modified. Save changes?</source>
         <translation>O arquivo foi modificado. Deseja salvar as mudanças?</translation>
     </message>
+    <message>
+        <source>Text</source>
+        <translation>Texto</translation>
+    </message>
 </context>
 <context>
     <name>FileListModel</name>
@@ -626,6 +642,10 @@ Local: %2</translation>
         <source>&amp;Edit...</source>
         <translation>&amp;Editar...</translation>
     </message>
+    <message>
+        <source>Found files</source>
+        <translation>Arquivos encontrados</translation>
+    </message>
 </context>
 <context>
     <name>GenerateUrlDialog</name>
@@ -731,6 +751,10 @@ Local: %2</translation>
     <message>
         <source>INI files (*.ini);;All files (*)</source>
         <translation>Arquivos INI (*.ini);;Todos os arquivos (*)</translation>
+    </message>
+    <message>
+        <source>Sites</source>
+        <translation>Sessões armazenadas</translation>
     </message>
 </context>
 <context>
@@ -872,6 +896,14 @@ Local: %2</translation>
         <source>&amp;Refresh</source>
         <translation>&amp;Atualizar</translation>
     </message>
+    <message>
+        <source>Local path</source>
+        <translation>Caminho local</translation>
+    </message>
+    <message>
+        <source>Local files</source>
+        <translation>Arquivos locais</translation>
+    </message>
 </context>
 <context>
     <name>LocationProfilesDialog</name>
@@ -985,10 +1017,6 @@ Local: %2</translation>
     <message>
         <source>Show &amp;Hidden Files</source>
         <translation>Exibir arquivos &amp;ocultos</translation>
-    </message>
-    <message>
-        <source>&amp;Copy...</source>
-        <translation>&amp;Copiar...</translation>
     </message>
     <message>
         <source>&amp;Move...</source>
@@ -1328,6 +1356,10 @@ Local: %2</translation>
     <message>
         <source>Cannot copy &apos;%1&apos; to &apos;%2&apos;: %3</source>
         <translation>Não é possível copiar &apos;%1&apos; para &apos;%2&apos;: %3</translation>
+    </message>
+    <message>
+        <source>Cop&amp;y...</source>
+        <translation>Cop&amp;iar...</translation>
     </message>
 </context>
 <context>
@@ -1991,6 +2023,10 @@ Local: %2</translation>
         <source>Add %1 to &amp;search path</source>
         <translation>Adicionar o %1 ao caminho de &amp;pesquisa</translation>
     </message>
+    <message>
+        <source>Pages</source>
+        <translation>Páginas</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>
@@ -2077,6 +2113,10 @@ Local: %2</translation>
         <source>Tags</source>
         <translation>Marcadores</translation>
     </message>
+    <message>
+        <source>Name</source>
+        <translation>Nome</translation>
+    </message>
 </context>
 <context>
     <name>QDialog</name>
@@ -2110,6 +2150,10 @@ Local: %2</translation>
     <message>
         <source>%1 (%2 s)</source>
         <translation>%1 (%2 s)</translation>
+    </message>
+    <message>
+        <source>More messages</source>
+        <translation>Mais mensagens</translation>
     </message>
 </context>
 <context>
@@ -2198,6 +2242,10 @@ Local: %2</translation>
         <source>%1/s</source>
         <translation>%1/s</translation>
     </message>
+    <message>
+        <source>Queue</source>
+        <translation>Fila</translation>
+    </message>
 </context>
 <context>
     <name>RemotePanel</name>
@@ -2236,6 +2284,14 @@ Local: %2</translation>
     <message>
         <source>&amp;Refresh</source>
         <translation>&amp;Atualizar</translation>
+    </message>
+    <message>
+        <source>Remote path</source>
+        <translation>Caminho remoto</translation>
+    </message>
+    <message>
+        <source>Remote files</source>
+        <translation>Arquivos remotos</translation>
     </message>
 </context>
 <context>
@@ -2478,10 +2534,6 @@ Local: %2</translation>
         <translation>Tent&amp;ar autenticação usando agente</translation>
     </message>
     <message>
-        <source>Attempt &apos;&amp;keyboard-interactive&apos; authentication</source>
-        <translation>Tentar autenticação com o &apos;&amp;teclado interativo&apos;</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Permitir remessas de a&amp;gente</translation>
     </message>
@@ -2508,6 +2560,10 @@ Local: %2</translation>
     <message>
         <source>Re&amp;member last used directory</source>
         <translation>Le&amp;mbrar último diretório utilizado</translation>
+    </message>
+    <message>
+        <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
+        <translation>Tentar autenticação com o &apos;teclado interativo&apos; (SSH2)</translation>
     </message>
 </context>
 <context>
@@ -2569,10 +2625,6 @@ Local: %2</translation>
         <translation>Arquivos de chave privada do PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>New &amp;Folder...</source>
-        <translation>Nova &amp;Pasta...</translation>
-    </message>
-    <message>
         <source>Re&amp;name...</source>
         <translation>Re&amp;nomear...</translation>
     </message>
@@ -2611,6 +2663,14 @@ Local: %2</translation>
     <message>
         <source>&amp;Clean Up...</source>
         <translation>Lim&amp;par...</translation>
+    </message>
+    <message>
+        <source>Sites</source>
+        <translation>Sessões armazenadas</translation>
+    </message>
+    <message>
+        <source>Ne&amp;w Folder...</source>
+        <translation>No&amp;va pasta...</translation>
     </message>
 </context>
 <context>
@@ -2690,6 +2750,10 @@ Local: %2</translation>
     <message>
         <source>%1: %2 of %3</source>
         <translation>%1: %2 de %3</translation>
+    </message>
+    <message>
+        <source>Checklist</source>
+        <translation>Lista de verificação</translation>
     </message>
 </context>
 <context>

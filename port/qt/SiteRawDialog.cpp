@@ -26,6 +26,7 @@ SiteRawDialog::SiteRawDialog(const QString & Initial, QWidget * Parent) :
   setWindowTitle(CoreText(CoreBridge::TText::SiteRawCaption));
   QVBoxLayout * Layout = new QVBoxLayout(this);
   FSettings = new QPlainTextEdit(Initial.trimmed(), this);
+  FSettings->setAccessibleName(windowTitle());
   FSettings->setLineWrapMode(QPlainTextEdit::NoWrap);
   FSettings->setTabChangesFocus(true);
   Layout->addWidget(FSettings, 1);

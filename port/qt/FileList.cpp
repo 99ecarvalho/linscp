@@ -14,6 +14,7 @@
 #include <QHeaderView>
 #include <QKeyEvent>
 #include <QMenu>
+#include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QDir>
@@ -709,7 +710,9 @@ bool MaskDialog(QWidget * Parent, TMaskDialogMode Mode, QString & Mask, bool * D
     }
   });
   Row->addWidget(EditButton);
-  Layout->addRow(FileView::tr("File &mask:"), Row);
+  QLabel * MaskLabel = new QLabel(FileView::tr("File &mask:"), &Dialog);
+  MaskLabel->setBuddy(MaskEdit);
+  Layout->addRow(MaskLabel, Row);
   QCheckBox * DirectoriesCheck = nullptr;
   if ((Mode != TMaskDialogMode::Filter) && (Directories != nullptr))
   {

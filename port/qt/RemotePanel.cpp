@@ -71,6 +71,7 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   Layout->addWidget(Bar);
 
   FPath = new QLineEdit(this);
+  FPath->setAccessibleName(tr("Remote path"));
   connect(FPath, &QLineEdit::returnPressed, this, [this]() { ChangeDirectory(FPath->text().trimmed()); });
   Layout->addWidget(FPath);
 
@@ -79,6 +80,7 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   FSort->setSourceModel(FModel);
   FSort->setSortRole(FileListModel::SortRole);
   FView = new FileView(this);
+  FView->setAccessibleName(tr("Remote files"));
   FView->setModel(FSort);
   FView->SetupColumns();
   FView->setRootIsDecorated(false);

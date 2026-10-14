@@ -76,7 +76,9 @@ LocationProfilesDialog::LocationProfilesDialog(const QString & LocalDirectory, c
     }
   });
   LocalRow->addWidget(Browse);
-  Fields->addRow(tr("&Local directory:"), LocalRow);
+  QLabel * LocalLabel = new QLabel(tr("&Local directory:"), this);
+  LocalLabel->setBuddy(FLocal);
+  Fields->addRow(LocalLabel, LocalRow);
   FRemote = new QComboBox(this);
   FRemote->setEditable(true);
   FRemote->addItems(RemoteHistory);
@@ -141,6 +143,8 @@ QWidget * LocationProfilesDialog::MakePage(int Index)
   QHBoxLayout * Layout = new QHBoxLayout(Widget);
   FTrees[Index] = new QTreeWidget(Widget);
   FTrees[Index]->setHeaderHidden(true);
+  // Named as its tab.
+  FTrees[Index]->setAccessibleName((Index == 0) ? tr("Site Location profiles") : tr("Shared Location profiles"));
   FTrees[Index]->installEventFilter(this);
   Layout->addWidget(FTrees[Index], 1);
   QVBoxLayout * Buttons = new QVBoxLayout();

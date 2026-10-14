@@ -25,6 +25,7 @@ CleanupDialog::CleanupDialog(QWidget * Parent) :
   FList = new QTreeWidget(this);
   FList->setRootIsDecorated(false);
   FList->setHeaderLabels({ tr("Data"), tr("Location") });
+  FList->setAccessibleName(tr("Application data"));
   FList->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
   for (const CoreBridge::TCleanupData::TItem & Data : FData->Items())
   {

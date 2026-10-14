@@ -275,6 +275,7 @@ SyncChecklistDialog::SyncChecklistDialog(CoreBridge::TSyncChecklist & Checklist,
   QVBoxLayout * Layout = new QVBoxLayout(this);
   QHBoxLayout * Top = new QHBoxLayout();
   FList = new QTreeWidget(this);
+  FList->setAccessibleName(tr("Checklist"));
   FList->setRootIsDecorated(false);
   FList->setUniformRowHeights(true);
   FList->setSelectionMode(QAbstractItemView::ExtendedSelection);

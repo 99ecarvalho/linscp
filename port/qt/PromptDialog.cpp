@@ -27,6 +27,11 @@ PromptDialog::PromptDialog(const CoreBridge::TPrompt & Prompt, QWidget * Parent)
     QString Label = QString::fromStdString(Field.Label).trimmed();
     QLabel * Caption = new QLabel(Label, this);
     Caption->setBuddy(Edit);
+    // A prompt with no label: named by the prompt, for screen readers.
+    if (Label.isEmpty())
+    {
+      Edit->setAccessibleName(!Prompt.Name.empty() ? QString::fromStdString(Prompt.Name) : windowTitle());
+    }
     Form->addRow(Caption, Edit);
     FFields.append(Edit);
   }

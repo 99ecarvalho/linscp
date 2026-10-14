@@ -19,6 +19,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QToolTip>
 #include <QRadioButton>
 #include <QSpinBox>
 #include <QGridLayout>
@@ -54,6 +55,7 @@ PreferencesDialog::PreferencesDialog(QWidget * Parent) :
   QVBoxLayout * Layout = new QVBoxLayout(this);
   QHBoxLayout * Main = new QHBoxLayout();
   FNavigation = new QListWidget(this);
+  FNavigation->setAccessibleName(tr("Pages"));
   FNavigation->setMaximumWidth(170);
   FPages = new QStackedWidget(this);
   Main->addWidget(FNavigation);
@@ -167,6 +169,7 @@ QWidget * PreferencesDialog::MakeLanguagesPage()
   QGroupBox * Group = new QGroupBox(tr("Languages"), Page);
   QVBoxLayout * GroupLayout = new QVBoxLayout(Group);
   FLanguages = new QListWidget(Group);
+  FLanguages->setAccessibleName(Group->title());
   const unsigned Chosen = CoreBridge::PreferredLocale();
   for (const CoreBridge::TLocaleOption & Option : CoreBridge::Locales())
   {
@@ -317,6 +320,7 @@ QWidget * PreferencesDialog::MakeFileColorsPage()
   QGroupBox * Group = new QGroupBox(tr("File colors"), Page);
   QHBoxLayout * GroupLayout = new QHBoxLayout(Group);
   FFileColorsList = new QListWidget(Group);
+  FFileColorsList->setAccessibleName(Group->title());
   connect(FFileColorsList, &QListWidget::currentRowChanged, this, &PreferencesDialog::UpdateControls);
   GroupLayout->addWidget(FFileColorsList, 1);
   QVBoxLayout * Buttons = new QVBoxLayout();
@@ -632,6 +636,7 @@ QWidget * PreferencesDialog::MakeTransferPage()
   QGroupBox * Group = new QGroupBox(tr("Transfer settings presets"), Page);
   QHBoxLayout * GroupLayout = new QHBoxLayout(Group);
   FPresetsList = new QListWidget(Group);
+  FPresetsList->setAccessibleName(Group->title());
   connect(FPresetsList, &QListWidget::currentRowChanged, this, &PreferencesDialog::UpdateControls);
   connect(FPresetsList, &QListWidget::itemDoubleClicked, this, [this]() { EditPresetDialog(false, false); });
   GroupLayout->addWidget(FPresetsList, 1);
@@ -857,7 +862,9 @@ QWidget * PreferencesDialog::MakeEndurancePage(const TPreferences & Preferences)
   ReopenLayout->addWidget(FReopenAutoInactive, 2, 0);
   ReopenLayout->addWidget(FReopenAutoStall, 3, 0);
   ReopenLayout->addWidget(FReopenAutoStallSeconds, 3, 1);
-  ReopenLayout->addWidget(new QLabel(tr("&Keep reconnecting for:"), Reopen), 4, 0);
+  QLabel * ReopenTimeoutLabel = new QLabel(tr("&Keep reconnecting for:"), Reopen);
+  ReopenTimeoutLabel->setBuddy(FReopenTimeout);
+  ReopenLayout->addWidget(ReopenTimeoutLabel, 4, 0);
   ReopenLayout->addWidget(FReopenTimeout, 4, 1);
   Layout->addWidget(Reopen);
   Layout->addStretch(1);
@@ -985,8 +992,15 @@ QWidget * PreferencesDialog::MakeApplicationsPage(const TPreferences & Preferenc
       FPuttyPath->setText(QStringLiteral("\"%1\"").arg(QDir::toNativeSeparators(Program)));
     }
   });
-  QLabel * Patterns = new QLabel(tr("&patterns"), Group);
+  // WinSCP's hint label, as a button so the keyboard reaches it: the
+  // patterns shown when pressed, as on hover.
+  QPushButton * Patterns = new QPushButton(tr("&patterns"), Group);
+  Patterns->setFlat(true);
   Patterns->setToolTip(QString::fromStdString(CoreBridge::PuttyPatternsHint()));
+  connect(Patterns, &QPushButton::clicked, this, [Patterns]()
+  {
+    QToolTip::showText(Patterns->mapToGlobal(QPoint(0, Patterns->height())), Patterns->toolTip(), Patterns);
+  });
   GroupLayout->addWidget(PathLabel, 0, 0, 1, 2);
   GroupLayout->addWidget(FPuttyPath, 1, 0);
   GroupLayout->addWidget(Browse, 1, 1);
@@ -1030,6 +1044,7 @@ QWidget * PreferencesDialog::MakeCommandsPage()
   QGroupBox * Group = new QGroupBox(tr("Custom commands"), Page);
   QHBoxLayout * GroupLayout = new QHBoxLayout(Group);
   FCommandsList = new QTreeWidget(Group);
+  FCommandsList->setAccessibleName(Group->title());
   FCommandsList->setRootIsDecorated(false);
   FCommandsList->setHeaderLabels({ tr("Description"), tr("Command"), tr("L/R") });
   FCommandsList->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
@@ -1175,6 +1190,7 @@ QWidget * PreferencesDialog::MakeEditorsPage()
   QGroupBox * Preference = new QGroupBox(tr("Editor preference"), Page);
   QHBoxLayout * PreferenceLayout = new QHBoxLayout(Preference);
   FEditorsList = new QTreeWidget(Preference);
+  FEditorsList->setAccessibleName(Preference->title());
   FEditorsList->setRootIsDecorated(false);
   FEditorsList->setHeaderLabels({ tr("Editor"), tr("Mask"), tr("Text") });
   FEditorsList->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);

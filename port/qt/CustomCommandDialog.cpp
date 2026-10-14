@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QToolTip>
 #include <QRadioButton>
 #include <QVBoxLayout>
 
@@ -102,9 +103,16 @@ CustomCommandDialog::CustomCommandDialog(TMode Mode, const CoreBridge::TCustomCo
     GroupLayout->addWidget(Check);
     connect(Check, &QCheckBox::toggled, this, &CustomCommandDialog::UpdateControls);
   }
-  QLabel * Hint = new QLabel(tr("&patterns"), Group);
+  // WinSCP's hint label, as a button so the keyboard reaches it: the
+  // patterns shown when pressed, as on hover.
+  QPushButton * Hint = new QPushButton(tr("&patterns"), Group);
+  Hint->setFlat(true);
   Hint->setToolTip(PatternsHint());
-  GroupLayout->addWidget(Hint);
+  connect(Hint, &QPushButton::clicked, this, [this, Hint]()
+  {
+    QToolTip::showText(Hint->mapToGlobal(QPoint(0, Hint->height())), PatternsHint(), Hint);
+  });
+  GroupLayout->addWidget(Hint, 0, Qt::AlignLeft);
   FShortCut = new QComboBox(Group);
   if (Mode != TMode::AdHoc)
   {

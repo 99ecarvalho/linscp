@@ -48,6 +48,7 @@ QueuePanel::QueuePanel(QWidget * Parent) :
     [this]() { ResumeSelected(); });
   Layout->addWidget(Bar);
   FList = new QTreeWidget(this);
+  FList->setAccessibleName(tr("Queue"));
   FList->setRootIsDecorated(false);
   FList->setUniformRowHeights(true);
   FList->setHeaderLabels({ tr("Operation"), tr("Source"), tr("Destination"), tr("Transferred"), tr("Speed"), tr("Progress") });

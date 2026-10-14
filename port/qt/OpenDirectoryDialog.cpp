@@ -152,6 +152,8 @@ QWidget * OpenDirectoryDialog::MakePage(int Page)
   QHBoxLayout * Layout = new QHBoxLayout(Widget);
   FLists[Page] = new QListWidget(Widget);
   FLists[Page]->installEventFilter(this);
+  // Named as its tab.
+  FLists[Page]->setAccessibleName((Page == 0) ? tr("Site bookmarks") : tr("Shared bookmarks"));
   Layout->addWidget(FLists[Page], 1);
   QVBoxLayout * Buttons = new QVBoxLayout();
   FAdd[Page] = new QPushButton(tr("&Add"), Widget);

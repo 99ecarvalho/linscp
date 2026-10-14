@@ -81,6 +81,7 @@ PropertiesDialog::PropertiesDialog(CoreBridge::TSession * Session, const std::ve
     (Directory1 ? QFileIconProvider::Folder : QFileIconProvider::File)).pixmap(32, 32));
   Head->addWidget(Icon);
   FFile = View(Common);
+  FFile->setAccessibleName(tr("Name"));
   Head->addWidget(FFile, 1);
   CommonLayout->addLayout(Head);
   CommonLayout->addWidget(Line(Common));
@@ -95,7 +96,9 @@ PropertiesDialog::PropertiesDialog(CoreBridge::TSession * Session, const std::ve
   FCalculate->setVisible(Info.CanCalculateSize);
   connect(FCalculate, &QPushButton::clicked, this, [this]() { CalculateSize(); });
   SizeRow->addWidget(FCalculate);
-  Fields->addRow(tr("Size:"), SizeRow);
+  QLabel * SizeLabel = new QLabel(tr("Size:"), Common);
+  SizeLabel->setBuddy(FSize);
+  Fields->addRow(SizeLabel, SizeRow);
   FLink = View(Common);
   FLink->setText(QString::fromStdString(Info.LinkTarget));
   if (!Info.LinkTarget.empty())
@@ -187,6 +190,7 @@ PropertiesDialog::PropertiesDialog(CoreBridge::TSession * Session, const std::ve
       QGroupBox * Group = new QGroupBox(tr("Checksum"), Checksum);
       QVBoxLayout * GroupLayout = new QVBoxLayout(Group);
       FChecksum = View(Group);
+      FChecksum->setAccessibleName(tr("Checksum"));
       FChecksum->setText(CoreText(CoreBridge::TText::PropertiesChecksumUnknown));
       GroupLayout->addWidget(FChecksum);
       ChecksumLayout->addWidget(Group);

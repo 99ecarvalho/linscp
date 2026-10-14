@@ -289,7 +289,7 @@ if(TARGET linscp)
   set_tests_properties(qt_session_ftp PROPERTIES DEPENDS qt_session_build SKIP_RETURN_CODE 77 TIMEOUT 300)
   # The Qt side: the dialogs alone, then the main window opening a session
   # with every question answered through them.
-  add_executable(test_qt_gui EXCLUDE_FROM_ALL test_qt_gui.cpp)
+  add_executable(test_qt_gui EXCLUDE_FROM_ALL test_qt_gui.cpp AccessibilityAudit.cpp)
   target_include_directories(test_qt_gui PRIVATE "${CMAKE_SOURCE_DIR}/port/qt")
   find_package(Qt6 REQUIRED COMPONENTS Test)
   target_link_libraries(test_qt_gui PRIVATE linscp-qt-ui linscp-qt-core Qt6::Test)
@@ -321,6 +321,11 @@ if(TARGET linscp)
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
             local /ini=nul {tmp}/local -platform offscreen)
   set_tests_properties(qt_gui_local PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+  add_test(NAME qt_gui_accessibility
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
+            --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
+            accessibility /ini=nul {port} -platform offscreen)
+  set_tests_properties(qt_gui_accessibility PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
   add_test(NAME qt_gui_localtab
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"

@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QFormLayout>
 #include <QHBoxLayout>
+#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QSpinBox>
@@ -49,7 +50,9 @@ SiteAdvanced::SiteAdvanced(const CoreBridge::TSite & Site, QWidget * Parent) :
   QHBoxLayout * LocalRow = new QHBoxLayout();
   LocalRow->addWidget(FLocalDirectory, 1);
   LocalRow->addWidget(BrowseLocal);
-  DirectoriesForm->addRow(tr("&Local directory:"), LocalRow);
+  QLabel * LocalLabel = new QLabel(tr("&Local directory:"), Directories);
+  LocalLabel->setBuddy(FLocalDirectory);
+  DirectoriesForm->addRow(LocalLabel, LocalRow);
   FUpdateDirectories = new QCheckBox(tr("Re&member last used directory"), Directories);
   FUpdateDirectories->setChecked(Site.UpdateDirectories);
   DirectoriesForm->addRow(FUpdateDirectories);
@@ -103,7 +106,7 @@ SiteAdvanced::SiteAdvanced(const CoreBridge::TSite & Site, QWidget * Parent) :
   FTryAgent = new QCheckBox(tr("Attempt authentication using &Pageant or ssh-agent"), Authentication);
   FTryAgent->setChecked(Site.TryAgent);
   AuthenticationForm->addRow(FTryAgent);
-  FKeyboardInteractive = new QCheckBox(tr("Attempt '&keyboard-interactive' authentication"), Authentication);
+  FKeyboardInteractive = new QCheckBox(tr("Attempt 'keyboard-&interactive' authentication"), Authentication);
   FKeyboardInteractive->setChecked(Site.KeyboardInteractive);
   AuthenticationForm->addRow(FKeyboardInteractive);
   FAgentForwarding = new QCheckBox(tr("Allow agent &forwarding"), Authentication);
@@ -123,7 +126,9 @@ SiteAdvanced::SiteAdvanced(const CoreBridge::TSite & Site, QWidget * Parent) :
   QHBoxLayout * KeyRow = new QHBoxLayout();
   KeyRow->addWidget(FPrivateKeyFile, 1);
   KeyRow->addWidget(BrowseKey);
-  AuthenticationForm->addRow(tr("Private &key file:"), KeyRow);
+  QLabel * KeyLabel = new QLabel(tr("Private &key file:"), Authentication);
+  KeyLabel->setBuddy(FPrivateKeyFile);
+  AuthenticationForm->addRow(KeyLabel, KeyRow);
   const int AuthenticationIndex = FPages->addTab(Authentication, tr("SSH Authentication"));
   FPages->setTabEnabled(AuthenticationIndex, Ssh);
 

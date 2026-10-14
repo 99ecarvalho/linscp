@@ -70,6 +70,7 @@ SiteManager::SiteManager(QWidget * Parent) :
   QVBoxLayout * TreeLayout = new QVBoxLayout(TreePanel);
   TreeLayout->setContentsMargins(0, 0, 0, 0);
   FTree = new QTreeWidget(TreePanel);
+  FTree->setAccessibleName(tr("Sites"));
   FTree->setHeaderHidden(true);
   connect(FTree, &QTreeWidget::currentItemChanged, this, &SiteManager::CurrentChanged);
   connect(FTree, &QTreeWidget::itemActivated, this, [this](QTreeWidgetItem * Item)
@@ -81,7 +82,7 @@ SiteManager::SiteManager(QWidget * Parent) :
   });
   TreeLayout->addWidget(FTree, 1);
   QHBoxLayout * TreeButtons = new QHBoxLayout();
-  FNewFolder = new QPushButton(tr("New &Folder..."), TreePanel);
+  FNewFolder = new QPushButton(tr("Ne&w Folder..."), TreePanel);
   FRename = new QPushButton(tr("Re&name..."), TreePanel);
   FDelete = new QPushButton(tr("&Delete"), TreePanel);
   TreeButtons->addWidget(FNewFolder);

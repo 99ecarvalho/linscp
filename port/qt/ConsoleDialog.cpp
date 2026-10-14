@@ -29,7 +29,9 @@ ConsoleDialog::ConsoleDialog(CoreBridge::TSession * Session, QWidget * Parent) :
   FExecute = new QPushButton(tr("&Execute"), this);
   FExecute->setDefault(true);
   Row->addWidget(FExecute);
-  Fields->addRow(tr("Enter &command:"), Row);
+  QLabel * CommandLabel = new QLabel(tr("Enter &command:"), this);
+  CommandLabel->setBuddy(FCommand);
+  Fields->addRow(CommandLabel, Row);
   FDirectory = new QLabel(this);
   FDirectory->setTextInteractionFlags(Qt::TextSelectableByMouse);
   Fields->addRow(tr("Current directory:"), FDirectory);
@@ -37,6 +39,7 @@ ConsoleDialog::ConsoleDialog(CoreBridge::TSession * Session, QWidget * Parent) :
   Layout->addWidget(new QLabel(tr("Do not execute commands that require user-input or data transfer"), this));
   FOutput = new QPlainTextEdit(this);
   FOutput->setReadOnly(true);
+  FOutput->setAccessibleName(tr("Output"));
   FOutput->setLineWrapMode(QPlainTextEdit::NoWrap);
   FOutput->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
   // As upstream's: light grey on black.

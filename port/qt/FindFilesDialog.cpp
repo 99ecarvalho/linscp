@@ -76,7 +76,9 @@ FindFilesDialog::FindFilesDialog(MainWindow * Window, const QString & Directory)
     }
   });
   MaskRow->addWidget(EditMask);
-  Fields->addRow(tr("&File mask:"), MaskRow);
+  QLabel * MaskLabel = new QLabel(tr("&File mask:"), Filter);
+  MaskLabel->setBuddy(FMask);
+  Fields->addRow(MaskLabel, MaskRow);
   FDirectory = new QComboBox(Filter);
   FDirectory->setEditable(true);
   FDirectory->setEditText(Directory);
@@ -94,6 +96,7 @@ FindFilesDialog::FindFilesDialog(MainWindow * Window, const QString & Directory)
   QHBoxLayout * Middle = new QHBoxLayout();
   FResults = new QTreeWidget(this);
   FResults->setHeaderLabels({ tr("Name"), tr("Directory"), tr("Size"), tr("Date modified") });
+  FResults->setAccessibleName(tr("Found files"));
   FResults->setRootIsDecorated(false);
   FResults->setSelectionMode(QAbstractItemView::ExtendedSelection);
   FResults->setSortingEnabled(true);

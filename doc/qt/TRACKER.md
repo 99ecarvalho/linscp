@@ -11,7 +11,7 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 21 | 24 | Parity on features users depend on |
+| P3 Qt parity | 22 | 24 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
 | **Total** | **97** | **111** | |
 
@@ -242,11 +242,13 @@ external editors and the associated application, Internal editor,
 Integration, Applications, Commands. Session tabs and workspaces (P3-13,
 done): several sessions at once, saved together and opened again. The
 local browser (P3-12, done): local tabs, copying and moving between two
-local panels.
+local panels. Accessibility (P3-09, done): every window the GUI tests show
+is audited for screen-reader names, label mnemonics and clashes.
 P2-10 and P2-11 wait, at the user's request.
 
-1. **P3-09**: accessibility.
-2. The P3 exit gate (**P3-10**).
+1. The P3 exit gate (**P3-10**).
+2. Decide P3-01 (the `.dfm` → `.ui` converter): every dialog is written by
+   hand now.
 3. Offer `core-log-file-name-delimiter.patch` and
    `core-local-eol-platform.patch` upstream (ADR 0006).
 
@@ -786,7 +788,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-06f | Dialogs: the rest | done | About's License button and WinSCP's third-party list (core's libraries, Expat's license shown, Qt after them; the License dialog); Clean Up (the site manager's Tools; `TCleanupDialog`'s data over core's cleanups, temporary folders as `TWinConfiguration`); S3 tags on Properties' Tags page with the Add/Edit tag dialog (the suite's S3 server gains `?acl` and `?tagging`; ctest `qt_gui_tags`); Select keyboard shortcut for shared bookmarks and location profiles, which then open them from the main window. Save Workspace moved to P3-13 (tabs); usage statistics not ported |
 | P3-07 | Drag & drop | done | between the panels, within one (onto a directory), and from other programs onto the remote panel: `FileView` in `port/qt/FileList.cpp`, `MainWindow::Drop`, `TSession::Move`; `RemoteFileDrag` (remote files out to other programs, downloaded at the drop); ctest `qt_gui_drop`; native on Windows 11 too; dragging out checked by hand with Explorer (Windows 11) and Nautilus, foreground and background |
 | P3-08 | Shell integration | done | Commands > Open in PuTTY (Ctrl+P): upstream's `OpenSessionInPutty` compiled from a slice of `GUITools.cpp` (ADR 0014 amendment), the program started through the frontend; on POSIX the session on PuTTY's command line, and by default PuTTY if installed, else `ssh` in the desktop's terminal ("open in terminal"). `linscp <site or URL>` opens it at start, as WinSCP.exe (`TSession::FromCommandLine`; ctest `qt_gui_startup`). Go To > Explore Directory (Ctrl+Alt+E). Local files open with their associated application, as before. Not yet: a remote file opened with its associated application and registering as the URL handler (with Preferences > Integration, P3-04e); folders of sites on the command line (P3-13) |
-| P3-09 | Accessibility | todo | |
+| P3-09 | Accessibility | done | An audit (`port/tests/AccessibilityAudit.cpp`) of every window the GUI tests show, the first time each appears, and of each page of the dialogs with pages (ctest `qt_gui_accessibility` shows those the other tests only drive): every control that takes the focus has a name for screen readers (its text, its label's, or one given); every label's mnemonic reaches a control (a buddy); no two visible controls of a window, nor items of a menu, share a mnemonic, except where WinSCP's own forms do (listed). Fixed: labels with no buddy (their `&` shown as is), unnamed lists, views and paths (the panels' named Local/Remote files and path), WinSCP's `&patterns` hints reachable by keyboard, linscp's own clashing captions (New Folder, keyboard-interactive, Copy). Platform standard buttons (OK, Cancel) keep the platform's mnemonics |
 | P3-10 | P3 exit gate | todo | |
 | P3-11 | Remember last used directories | done | `TSite::UpdateDirectories` (advanced settings' Directories page), `TSession::SaveDirectories` as `TTerminalManager::SaveTerminal` on disconnect, another session, or closing; the local directory's quiet fallback; ctest `qt_gui_sites`; native on Windows 11 too. "Preserve local directory" is P3-04's |
 | P3-12 | Local-to-local browsing | done | Tabs > New Tab > Local Tab, as WinSCP's local browser: a tab with no session and a second local panel in the remote one's place (the right side, swapped with it), titled by its two directories; Copy and Move (F5, F6) and drags between its panels copy and move local files (`LocalLocalCopy`), after the Copy dialog (`TCopyLocalDialog`: target path and file mask, Browse, the directory created after asking, several files to one name confirmed), an existing file overwritten after asking, a directory merged; the popups, Mark, Files and the Right menu act on the panel focused. Not yet: local tabs in saved workspaces. ctest `qt_gui_localtab` |

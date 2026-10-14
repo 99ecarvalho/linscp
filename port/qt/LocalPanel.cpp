@@ -128,6 +128,7 @@ LocalPanel::LocalPanel(QWidget * Parent) :
   Layout->addWidget(Bar);
 
   FPath = new QLineEdit(this);
+  FPath->setAccessibleName(tr("Local path"));
   connect(FPath, &QLineEdit::returnPressed, this, [this]() { ChangeDirectory(FPath->text().trimmed()); });
   Layout->addWidget(FPath);
 
@@ -139,6 +140,7 @@ LocalPanel::LocalPanel(QWidget * Parent) :
   FSort->setSourceModel(FModel);
   FSort->setSortRole(FileListModel::SortRole);
   FView = new FileView(this);
+  FView->setAccessibleName(tr("Local files"));
   FView->setModel(FSort);
   FView->SetupColumns();
   FView->setRootIsDecorated(false);
