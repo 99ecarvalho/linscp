@@ -195,6 +195,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"DefaultDirIsHome", FSettings.DefaultDirIsHome);
     Storage->WriteInteger(L"PathInCaption", FSettings.PathInCaption);
     Storage->WriteBool(L"KeepOpenWhenNoSession", FSettings.KeepOpenWhenNoSession);
+    Storage->WriteBool(L"AutoOpenInPutty", FSettings.AutoOpenInPutty);
     Storage->WriteString(L"FileColors", FSettings.FileColors);
     Storage->WriteString(L"DDTemporaryDirectory", FSettings.DDTemporaryDirectory);
     Storage->WriteBool(L"TemporaryDirectoryAppendSession", FSettings.TemporaryDirectoryAppendSession);
@@ -363,6 +364,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.DefaultDirIsHome = Storage->ReadBool(L"DefaultDirIsHome", FSettings.DefaultDirIsHome);
     FSettings.PathInCaption = Storage->ReadInteger(L"PathInCaption", FSettings.PathInCaption);
     FSettings.KeepOpenWhenNoSession = Storage->ReadBool(L"KeepOpenWhenNoSession", FSettings.KeepOpenWhenNoSession);
+    FSettings.AutoOpenInPutty = Storage->ReadBool(L"AutoOpenInPutty", FSettings.AutoOpenInPutty);
     FSettings.FileColors = Storage->ReadString(L"FileColors", FSettings.FileColors);
     FSettings.DDTemporaryDirectory = Storage->ReadString(L"DDTemporaryDirectory", FSettings.DDTemporaryDirectory);
     FSettings.TemporaryDirectoryAppendSession =

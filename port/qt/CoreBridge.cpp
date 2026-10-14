@@ -290,6 +290,8 @@ TPreferences Preferences()
   Result.PuttyPath = Utf8(GUIConfiguration->PuttyPath);
   Result.PuttyPassword = GUIConfiguration->PuttyPassword;
   Result.TelnetForFtpInPutty = GUIConfiguration->TelnetForFtpInPutty;
+  Result.AutoOpenInPutty = Settings.AutoOpenInPutty;
+  Result.PuttyRegistryStorageKey = Utf8(Configuration->PuttyRegistryStorageKey);
   Result.AuthAgent = Configuration->AuthAgent;
   if (Configuration->Storage == stNul)
   {
@@ -508,7 +510,9 @@ std::string TemporaryDirectoryBase()
 
 void SetPreferences(const TPreferences & Preferences)
 {
-  TShellSettings Settings;
+  // What the preferences do not set stays (the layout, the internal
+  // editor's settings).
+  TShellSettings Settings = Shell()->Settings();
   Settings.ShowHiddenFiles = Preferences.ShowHiddenFiles;
   Settings.FormatSizeBytes = static_cast<int>(Preferences.SizeFormat);
   Settings.NaturalOrderNumericalSorting = Preferences.NaturalOrderNumericalSorting;
@@ -518,6 +522,7 @@ void SetPreferences(const TPreferences & Preferences)
   Settings.SwappedPanels = Preferences.SwappedPanels;
   Settings.ExplorerKeyboardShortcuts = Preferences.ExplorerKeyboardShortcuts;
   Settings.UseLocationProfiles = Preferences.UseLocationProfiles;
+  Settings.AutoOpenInPutty = Preferences.AutoOpenInPutty;
   Settings.PathInCaption = static_cast<int>(Preferences.PathInCaption);
   Settings.KeepOpenWhenNoSession = Preferences.KeepOpenWhenNoSession;
   // As TFileColorData::SaveList.
@@ -529,15 +534,6 @@ void SetPreferences(const TPreferences & Preferences)
   }
   Settings.FileColors = Colors->CommaText;
   Settings.DDTemporaryDirectory = FromUtf8(Preferences.TemporaryDirectory);
-  // The layout is SetLayout's.
-  const TShellSettings & Current = Shell()->Settings();
-  Settings.WindowParams = Current.WindowParams;
-  Settings.LocalPanelWidth = Current.LocalPanelWidth;
-  Settings.CurrentPanel = Current.CurrentPanel;
-  Settings.LocalDirViewParams = Current.LocalDirViewParams;
-  Settings.RemoteDirViewParams = Current.RemoteDirViewParams;
-  Settings.QueueViewHeight = Current.QueueViewHeight;
-  Settings.QueueViewHeightPixelsPerInch = Current.QueueViewHeightPixelsPerInch;
   try
   {
     Shell()->SetSettings(Settings);
@@ -570,6 +566,10 @@ void SetPreferences(const TPreferences & Preferences)
     GUIConfiguration->PuttyPath = FromUtf8(Preferences.PuttyPath);
     GUIConfiguration->PuttyPassword = Preferences.PuttyPassword;
     GUIConfiguration->TelnetForFtpInPutty = Preferences.TelnetForFtpInPutty;
+    if (!Preferences.PuttyRegistryStorageKey.empty())
+    {
+      Configuration->PuttyRegistryStorageKey = FromUtf8(Preferences.PuttyRegistryStorageKey);
+    }
     Configuration->AuthAgent = Preferences.AuthAgent;
     Configuration->RandomSeedFile = FromUtf8(Preferences.RandomSeedFile);
     // The storage moves as the dialog's OK moves it, when it is one of the
@@ -932,6 +932,41 @@ std::string Text(TText Text)
 }
 
 const char ExpatLicenseUrl[] = "license:expat";
+
+void PuttyCommandPatterns(const std::string & Command, bool & SiteCommand, bool & PasswordCommand)
+{
+  SiteCommand = false;
+  PasswordCommand = false;
+  try
+  {
+    TRemoteCustomCommand RemoteCustomCommand;
+    TInteractiveCustomCommand InteractiveCustomCommand(&RemoteCustomCommand);
+    const UnicodeString PuttyPath = InteractiveCustomCommand.Complete(FromUtf8(Command), false);
+    SiteCommand = RemoteCustomCommand.IsSiteCommand(PuttyPath);
+    PasswordCommand = RemoteCustomCommand.IsPasswordCommand(PuttyPath);
+  }
+  catch (...)
+  {
+    // As upstream: neither.
+  }
+}
+
+std::string PuttyPatternsHint()
+{
+  std::unique_ptr<TStrings> Hint(TextToStringList(LoadStr(PUTTY_PATTERNS_HINT2)));
+  Hint->Insert(7, LoadStr(PATTERNS_HINT_K));
+  return Utf8(TrimRight(StringsToText(Hint.get())));
+}
+
+std::vector<std::string> PuttyRegistryStorageKeys()
+{
+  return { Utf8(OriginalPuttyRegistryStorageKey), Utf8(KittyRegistryStorageKey) };
+}
+
+std::string CustomCommandSide(bool Local)
+{
+  return Utf8(LoadStr(Local ? CUSTOM_COMMAND_LOCAL : CUSTOM_COMMAND_REMOTE));
+}
 
 struct TCleanupData::TImpl
 {

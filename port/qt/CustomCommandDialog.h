@@ -28,8 +28,11 @@ public:
   enum class TMode { Add, Edit, AdHoc };
   // Commands: the list, for its names and duplicates; the shortcuts they
   // use are not offered.
+  // OtherShortCuts: those others use (the shared bookmarks'), not offered
+  // either.
   CustomCommandDialog(TMode Mode, const CoreBridge::TCustomCommandDefinition & Command,
-    const std::vector<CoreBridge::TCustomCommandDefinition> & Commands, QWidget * Parent = nullptr);
+    const std::vector<CoreBridge::TCustomCommandDefinition> & Commands, QWidget * Parent = nullptr,
+    const std::vector<unsigned> & OtherShortCuts = {});
 
   CoreBridge::TCustomCommandDefinition Command() const;
   // OK's checks, as FormCloseQuery: false (the error shown) when the

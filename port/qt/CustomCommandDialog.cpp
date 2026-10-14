@@ -46,7 +46,8 @@ QString PatternsHint()
 }  // namespace
 
 CustomCommandDialog::CustomCommandDialog(TMode Mode, const CoreBridge::TCustomCommandDefinition & Command,
-    const std::vector<CoreBridge::TCustomCommandDefinition> & Commands, QWidget * Parent) :
+  const std::vector<CoreBridge::TCustomCommandDefinition> & Commands, QWidget * Parent,
+  const std::vector<unsigned> & OtherShortCuts) :
   QDialog(Parent),
   FMode(Mode),
   FOriginal(Command),
@@ -108,7 +109,7 @@ CustomCommandDialog::CustomCommandDialog(TMode Mode, const CoreBridge::TCustomCo
   if (Mode != TMode::AdHoc)
   {
     // As InitializeShortCutCombo: those the other commands use left out.
-    std::vector<unsigned> Used;
+    std::vector<unsigned> Used = OtherShortCuts;
     for (const CoreBridge::TCustomCommandDefinition & Other : Commands)
     {
       if ((Other.ShortCut != 0) && (Other.Name != Command.Name))

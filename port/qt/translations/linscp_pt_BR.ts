@@ -1538,6 +1538,66 @@ Local: %2</translation>
         <source>&amp;Use Location Profiles instead of Directory Bookmarks</source>
         <translation>Usar padrões de localização contidos no diretório de Favoritos</translation>
     </message>
+    <message>
+        <source>Applications</source>
+        <translation>Programas</translation>
+    </message>
+    <message>
+        <source>Commands</source>
+        <translation>Comandos</translation>
+    </message>
+    <message>
+        <source>External applications</source>
+        <translation>Programas externos</translation>
+    </message>
+    <message>
+        <source>PuTTY/Terminal &amp;client path:</source>
+        <translation>Pasta &amp;cliente PuTTY/Terminal</translation>
+    </message>
+    <message>
+        <source>B&amp;rowse...</source>
+        <translation>P&amp;rocurar...</translation>
+    </message>
+    <message>
+        <source>PuTTY/Terminal client</source>
+        <translation>Cliente PuTTY/Terminal</translation>
+    </message>
+    <message>
+        <source>&amp;patterns</source>
+        <translation>&amp;padrões</translation>
+    </message>
+    <message>
+        <source>&amp;Remember session password and pass it to PuTTY (SSH)</source>
+        <translation>Lembrar senha de sessão e passá-la ao PuTTY (SSH)</translation>
+    </message>
+    <message>
+        <source>Open &amp;Telnet sessions in PuTTY for FTP sessions</source>
+        <translation>Abrir sessões &amp;Telnet no Putty para sessões FTP</translation>
+    </message>
+    <message>
+        <source>Automatically &amp;open new sessions in PuTTY</source>
+        <translation>Abrir n&amp;ovas sessões no PuTTY automaticamente</translation>
+    </message>
+    <message>
+        <source>PuTTY registry &amp;key:</source>
+        <translation>&amp;Chave de registro PuTTY:</translation>
+    </message>
+    <message>
+        <source>Custom commands</source>
+        <translation>Comandos personalizados</translation>
+    </message>
+    <message>
+        <source>Description</source>
+        <translation>Descrição</translation>
+    </message>
+    <message>
+        <source>Command</source>
+        <translation>Comando</translation>
+    </message>
+    <message>
+        <source>L/R</source>
+        <translation>L/R</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

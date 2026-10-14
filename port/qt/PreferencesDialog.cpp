@@ -1,6 +1,8 @@
 #include "PreferencesDialog.h"
 
 #include "TransferSettingsDialog.h"
+#include "CustomCommandDialog.h"
+#include "ShortCutDialog.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -17,6 +19,12 @@
 #include <QRadioButton>
 #include <QSpinBox>
 #include <QGridLayout>
+#include <QDir>
+#include <QFileDialog>
+#include <QHeaderView>
+#include <QKeyEvent>
+#include <QShortcut>
+#include <QTreeWidget>
 #include <QStackedWidget>
 #include <QVBoxLayout>
 
@@ -60,6 +68,9 @@ PreferencesDialog::PreferencesDialog(QWidget * Parent) :
   AddPage(tr("Network"), MakeNetworkPage(Preferences));
   AddPage(tr("Security"), MakeSecurityPage(Preferences));
   AddPage(tr("Logging"), MakeLoggingPage(Preferences));
+  // Integration's Applications, and Commands, as WinSCP's tree has them.
+  AddPage(tr("Applications"), MakeApplicationsPage(Preferences));
+  AddPage(tr("Commands"), MakeCommandsPage());
   AddPage(tr("Storage"), MakeStoragePage(Preferences));
   connect(FNavigation, &QListWidget::currentRowChanged, FPages, &QStackedWidget::setCurrentIndex);
   FNavigation->setCurrentRow(0);
@@ -198,6 +209,24 @@ void PreferencesDialog::UpdateControls()
   FLogMaxSizeCombo->setEnabled(FLogging->isChecked() && FLogMaxSize->isChecked());
   FLogMaxCountSpin->setEnabled(FLogging->isChecked() && FLogMaxCount->isChecked());
   FActionsLogFile->setEnabled(FLogActions->isChecked());
+  // As UpdateControls' PuTTY part.
+  bool SiteCommand = false;
+  bool PasswordCommand = false;
+  CoreBridge::PuttyCommandPatterns(FPuttyPath->text().toStdString(), SiteCommand, PasswordCommand);
+  const bool AnyPuttyPath = !FPuttyPath->text().isEmpty();
+  FPuttyPassword->setEnabled(AnyPuttyPath && !PasswordCommand);
+  FAutoOpenInPutty->setEnabled(AnyPuttyPath);
+  FTelnetForFtpInPutty->setEnabled(AnyPuttyPath && !SiteCommand);
+  if (FPuttyRegistryStorageKey != nullptr)
+  {
+    FPuttyRegistryStorageKey->setEnabled(AnyPuttyPath && !SiteCommand);
+    FPuttyRegistryStorageKeyLabel->setEnabled(FPuttyRegistryStorageKey->isEnabled());
+  }
+  const int CommandRow = FCommandsList->indexOfTopLevelItem(FCommandsList->currentItem());
+  FEditCommand->setEnabled(CommandRow >= 0);
+  FRemoveCommand->setEnabled(CommandRow >= 0);
+  FUpCommand->setEnabled(CommandRow > 0);
+  FDownCommand->setEnabled((CommandRow >= 0) && (CommandRow < FCommandsList->topLevelItemCount() - 1));
   FCustomIpEdit->setEnabled(FCustomIp->isChecked());
   FPortMin->setEnabled(FPortLimit->isChecked());
   FPortMax->setEnabled(FPortLimit->isChecked());
@@ -877,6 +906,14 @@ TPreferences PreferencesDialog::Preferences() const
   }
   Result.TemporaryDirectory = FCustomTemporary->isChecked() ? FTemporaryEdit->text().trimmed().toStdString() : std::string();
   Result.RandomSeedFile = FRandomSeedEdit->text().trimmed().toStdString();
+  Result.PuttyPath = FPuttyPath->text().toStdString();
+  Result.PuttyPassword = FPuttyPassword->isChecked();
+  Result.AutoOpenInPutty = FAutoOpenInPutty->isChecked();
+  Result.TelnetForFtpInPutty = FTelnetForFtpInPutty->isChecked();
+  if ((FPuttyRegistryStorageKey != nullptr) && (FPuttyRegistryStorageKey->currentIndex() >= 0))
+  {
+    Result.PuttyRegistryStorageKey = FPuttyRegistryStorageKey->currentText().toStdString();
+  }
   return Result;
 }
 
@@ -900,8 +937,208 @@ void PreferencesDialog::Save()
   Default.ResumeThreshold = static_cast<std::int64_t>(FResumeThreshold->value()) * 1024;
   CoreBridge::SetDefaultTransferSettings(Default);
   CoreBridge::SetTransferPresets(FPresets);
+  CoreBridge::SetCustomCommands(FCommands);
   if (FLanguages->currentItem() != nullptr)
   {
     CoreBridge::SetPreferredLocale(Locale());
   }
+}
+
+// Integration > Applications, as WinSCP's IntegrationAppSheet.
+QWidget * PreferencesDialog::MakeApplicationsPage(const TPreferences & Preferences)
+{
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  QGroupBox * Group = new QGroupBox(tr("External applications"), Page);
+  QGridLayout * GroupLayout = new QGridLayout(Group);
+  FPuttyPath = new QLineEdit(QString::fromStdString(Preferences.PuttyPath), Group);
+  QLabel * PathLabel = new QLabel(tr("PuTTY/Terminal &client path:"), Group);
+  PathLabel->setBuddy(FPuttyPath);
+  QPushButton * Browse = new QPushButton(tr("B&rowse..."), Group);
+  connect(Browse, &QPushButton::clicked, this, [this]()
+  {
+    const QString Program = QFileDialog::getOpenFileName(this, tr("PuTTY/Terminal client"));
+    if (!Program.isEmpty())
+    {
+      // As FormatCommand: the program quoted, before its parameters.
+      FPuttyPath->setText(QStringLiteral("\"%1\"").arg(QDir::toNativeSeparators(Program)));
+    }
+  });
+  QLabel * Patterns = new QLabel(tr("&patterns"), Group);
+  Patterns->setToolTip(QString::fromStdString(CoreBridge::PuttyPatternsHint()));
+  GroupLayout->addWidget(PathLabel, 0, 0, 1, 2);
+  GroupLayout->addWidget(FPuttyPath, 1, 0);
+  GroupLayout->addWidget(Browse, 1, 1);
+  GroupLayout->addWidget(Patterns, 2, 0, 1, 2, Qt::AlignRight);
+  FPuttyPassword = new QCheckBox(tr("&Remember session password and pass it to PuTTY (SSH)"), Group);
+  FPuttyPassword->setChecked(Preferences.PuttyPassword);
+  FTelnetForFtpInPutty = new QCheckBox(tr("Open &Telnet sessions in PuTTY for FTP sessions"), Group);
+  FTelnetForFtpInPutty->setChecked(Preferences.TelnetForFtpInPutty);
+  FAutoOpenInPutty = new QCheckBox(tr("Automatically &open new sessions in PuTTY"), Group);
+  FAutoOpenInPutty->setChecked(Preferences.AutoOpenInPutty);
+  GroupLayout->addWidget(FPuttyPassword, 3, 0, 1, 2);
+  GroupLayout->addWidget(FTelnetForFtpInPutty, 4, 0, 1, 2);
+  GroupLayout->addWidget(FAutoOpenInPutty, 5, 0, 1, 2);
+#if defined(Q_OS_WIN)
+  // PuTTY's sessions are in the registry on Windows only.
+  FPuttyRegistryStorageKey = new QComboBox(Group);
+  for (const std::string & Key : CoreBridge::PuttyRegistryStorageKeys())
+  {
+    FPuttyRegistryStorageKey->addItem(QString::fromStdString(Key));
+  }
+  FPuttyRegistryStorageKey->setCurrentIndex(
+    FPuttyRegistryStorageKey->findText(QString::fromStdString(Preferences.PuttyRegistryStorageKey)));
+  FPuttyRegistryStorageKeyLabel = new QLabel(tr("PuTTY registry &key:"), Group);
+  FPuttyRegistryStorageKeyLabel->setBuddy(FPuttyRegistryStorageKey);
+  GroupLayout->addWidget(FPuttyRegistryStorageKeyLabel, 6, 0, 1, 2);
+  GroupLayout->addWidget(FPuttyRegistryStorageKey, 7, 0, 1, 2);
+#endif
+  connect(FPuttyPath, &QLineEdit::textChanged, this, &PreferencesDialog::UpdateControls);
+  Layout->addWidget(Group);
+  Layout->addStretch(1);
+  return Page;
+}
+
+// Commands, as WinSCP's CustomCommandsSheet: the custom commands, their
+// order the menus'. (Extensions are not ported yet.)
+QWidget * PreferencesDialog::MakeCommandsPage()
+{
+  FCommands = CoreBridge::CustomCommands();
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  QGroupBox * Group = new QGroupBox(tr("Custom commands"), Page);
+  QHBoxLayout * GroupLayout = new QHBoxLayout(Group);
+  FCommandsList = new QTreeWidget(Group);
+  FCommandsList->setRootIsDecorated(false);
+  FCommandsList->setHeaderLabels({ tr("Description"), tr("Command"), tr("L/R") });
+  FCommandsList->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+  FCommandsList->header()->setSectionResizeMode(1, QHeaderView::Stretch);
+  FCommandsList->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+  FCommandsList->header()->setStretchLastSection(false);
+  GroupLayout->addWidget(FCommandsList, 1);
+  QVBoxLayout * Buttons = new QVBoxLayout();
+  QPushButton * Add = new QPushButton(tr("&Add..."), Group);
+  FEditCommand = new QPushButton(tr("&Edit..."), Group);
+  FRemoveCommand = new QPushButton(tr("&Remove"), Group);
+  FUpCommand = new QPushButton(tr("&Up"), Group);
+  FDownCommand = new QPushButton(tr("&Down"), Group);
+  for (QPushButton * Button : { Add, FEditCommand, FRemoveCommand, FUpCommand, FDownCommand })
+  {
+    Buttons->addWidget(Button);
+  }
+  Buttons->addStretch(1);
+  GroupLayout->addLayout(Buttons);
+  connect(Add, &QPushButton::clicked, this, [this]() { AddEditCommand(false); });
+  connect(FEditCommand, &QPushButton::clicked, this, [this]() { AddEditCommand(true); });
+  connect(FRemoveCommand, &QPushButton::clicked, this, &PreferencesDialog::RemoveCommand);
+  connect(FUpCommand, &QPushButton::clicked, this, [this]() { MoveCommand(-1); });
+  connect(FDownCommand, &QPushButton::clicked, this, [this]() { MoveCommand(1); });
+  connect(FCommandsList, &QTreeWidget::currentItemChanged, this, &PreferencesDialog::UpdateControls);
+  connect(FCommandsList, &QTreeWidget::itemDoubleClicked, this, [this]() { AddEditCommand(true); });
+  // As CustomCommandsViewKeyDown: Insert adds, Delete removes.
+  QShortcut * Insert = new QShortcut(QKeySequence(Qt::Key_Insert), FCommandsList, nullptr, nullptr, Qt::WidgetShortcut);
+  connect(Insert, &QShortcut::activated, this, [this]() { AddEditCommand(false); });
+  QShortcut * Delete = new QShortcut(QKeySequence(Qt::Key_Delete), FCommandsList, nullptr, nullptr, Qt::WidgetShortcut);
+  connect(Delete, &QShortcut::activated, this, [this]()
+  {
+    if (FRemoveCommand->isEnabled())
+    {
+      RemoveCommand();
+    }
+  });
+  Layout->addWidget(Group);
+  LoadCommands(-1);
+  return Page;
+}
+
+// As CustomCommandsViewData.
+void PreferencesDialog::LoadCommands(int Select)
+{
+  FCommandsList->clear();
+  for (const CoreBridge::TCustomCommandDefinition & Command : FCommands)
+  {
+    QTreeWidgetItem * Item = new QTreeWidgetItem(FCommandsList);
+    Item->setText(0, QString::fromStdString(Command.Name).remove(QLatin1Char('&')));
+    Item->setText(1, QString::fromStdString(Command.Command));
+    Item->setText(2, QString::fromStdString(CoreBridge::CustomCommandSide(Command.Local)));
+  }
+  if ((Select >= 0) && (Select < FCommandsList->topLevelItemCount()))
+  {
+    FCommandsList->setCurrentItem(FCommandsList->topLevelItem(Select));
+  }
+  UpdateControls();
+}
+
+// As TPreferencesDialog::AddEditCommand: a new command goes before the
+// selected one, or last; the shortcuts the shared bookmarks use are not
+// offered.
+bool PreferencesDialog::AddEditCommand(bool Edit, const CoreBridge::TCustomCommandDefinition * Command)
+{
+  const int Row = FCommandsList->indexOfTopLevelItem(FCommandsList->currentItem());
+  if (Edit && (Row < 0))
+  {
+    return false;
+  }
+  CoreBridge::TCustomCommandDefinition Result = Edit ? FCommands[Row] : CoreBridge::TCustomCommandDefinition();
+  if (Command != nullptr)
+  {
+    Result = *Command;
+  }
+  else
+  {
+    std::vector<unsigned> Bookmarks;
+    for (const CoreBridge::TBookmarkEntry & Bookmark : CoreBridge::Bookmarks(std::string()))
+    {
+      if (Bookmark.ShortCut != 0)
+      {
+        Bookmarks.push_back(Bookmark.ShortCut);
+      }
+    }
+    CustomCommandDialog Dialog(Edit ? CustomCommandDialog::TMode::Edit : CustomCommandDialog::TMode::Add, Result, FCommands,
+      this, Bookmarks);
+    if (Dialog.exec() != QDialog::Accepted)
+    {
+      return false;
+    }
+    Result = Dialog.Command();
+  }
+  int Index = Row;
+  if (Edit)
+  {
+    FCommands[Row] = Result;
+  }
+  else if (Row >= 0)
+  {
+    FCommands.insert(FCommands.begin() + Row, Result);
+  }
+  else
+  {
+    FCommands.push_back(Result);
+    Index = static_cast<int>(FCommands.size()) - 1;
+  }
+  LoadCommands(Index);
+  return true;
+}
+
+void PreferencesDialog::RemoveCommand()
+{
+  const int Row = FCommandsList->indexOfTopLevelItem(FCommandsList->currentItem());
+  if (Row < 0)
+  {
+    return;
+  }
+  FCommands.erase(FCommands.begin() + Row);
+  LoadCommands(qMin(Row, static_cast<int>(FCommands.size()) - 1));
+}
+
+void PreferencesDialog::MoveCommand(int By)
+{
+  const int Row = FCommandsList->indexOfTopLevelItem(FCommandsList->currentItem());
+  const int To = Row + By;
+  if ((Row < 0) || (To < 0) || (To >= static_cast<int>(FCommands.size())))
+  {
+    return;
+  }
+  std::swap(FCommands[Row], FCommands[To]);
+  LoadCommands(To);
 }

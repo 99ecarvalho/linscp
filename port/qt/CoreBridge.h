@@ -397,6 +397,11 @@ struct TPreferences
   std::string PuttyPath;
   bool PuttyPassword = false;
   bool TelnetForFtpInPutty = true;
+  // Each new session opened in PuTTY too (WinConfiguration's).
+  bool AutoOpenInPutty = false;
+  // Where PuTTY keeps its sessions in the registry: PuTTY's or KiTTY's
+  // (Configuration's PuttyRegistryStorageKey; Windows only).
+  std::string PuttyRegistryStorageKey;
   int AuthAgent = 0;
   // Storage: where the configuration is (the registry, the automatic INI
   // file, a custom one; or a file given on the command line, or none), the
@@ -570,6 +575,17 @@ enum class TText
   TagInvalidChar, // "Character \"%s\" is not allowed in tags."
 };
 std::string Text(TText Text);
+
+// The PuTTY command, as the Applications page checks it
+// (TPreferencesDialog::UpdateControls): whether it has the session's
+// patterns, so PuTTY's options are not added, and the password's. Its
+// patterns' hint (PUTTY_PATTERNS_HINT2 with !K's line).
+void PuttyCommandPatterns(const std::string & Command, bool & SiteCommand, bool & PasswordCommand);
+std::string PuttyPatternsHint();
+// The registry keys PuTTY's sessions may be under: PuTTY's own and KiTTY's.
+std::vector<std::string> PuttyRegistryStorageKeys();
+// The custom commands list's L/R column (CUSTOM_COMMAND_LOCAL/REMOTE).
+std::string CustomCommandSide(bool Local);
 
 // Help > About's third-party list, as TAboutDialog::GenerateThirdParty
 // writes it, in HTML: the translation in use, if any (LanguageName in place

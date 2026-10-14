@@ -1492,7 +1492,7 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
         PreferencesDialog::tr("Languages"), PreferencesDialog::tr("Panels"), PreferencesDialog::tr("File colors"),
         PreferencesDialog::tr("Transfer"), PreferencesDialog::tr("Background"), PreferencesDialog::tr("Endurance"),
         PreferencesDialog::tr("Network"), PreferencesDialog::tr("Security"), PreferencesDialog::tr("Logging"),
-        PreferencesDialog::tr("Storage") }),
+        PreferencesDialog::tr("Applications"), PreferencesDialog::tr("Commands"), PreferencesDialog::tr("Storage") }),
         "the dialog's pages, in the order of WinSCP's tree");
       Check(!Dialog.LoggingCheck()->isChecked() && !Dialog.LogFileEdit()->text().isEmpty() && !Dialog.LogFileEdit()->isEnabled(),
         "logging off, its default file shown, not editable until on");
@@ -1753,6 +1753,66 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       Check(!Closing.isVisible(), "without keeping it open, the window closes with the session");
       Off.KeepOpenWhenNoSession = true;
       CoreBridge::SetPreferences(Off);
+    }
+
+    // What the preferences do not set survives their saving.
+    {
+      CoreBridge::TEditorSettings Editor = CoreBridge::EditorSettings();
+      Editor.WordWrap = !Editor.WordWrap;
+      CoreBridge::SetEditorSettings(Editor);
+      CoreBridge::SetPreferences(CoreBridge::Preferences());
+      Check(CoreBridge::EditorSettings().WordWrap == Editor.WordWrap, "the editor's settings kept when preferences are saved");
+      Editor.WordWrap = !Editor.WordWrap;
+      CoreBridge::SetEditorSettings(Editor);
+    }
+
+    // Applications: the PuTTY command, its options as upstream enables them.
+    {
+      PreferencesDialog Dialog;
+      // PuTTY, or without it on POSIX ssh in a terminal, a site command.
+      Check(!Dialog.PuttyPathEdit()->text().isEmpty() && Dialog.PuttyPasswordCheck()->isEnabled(),
+        "a PuTTY command by default");
+      Dialog.PuttyPathEdit()->setText(QStringLiteral("putty"));
+      Check(Dialog.TelnetForFtpInPuttyCheck()->isEnabled(), "PuTTY itself: Telnet for FTP");
+      Dialog.PuttyPathEdit()->setText(QStringLiteral("ssh -p !# !U@!@"));
+      Check(!Dialog.TelnetForFtpInPuttyCheck()->isEnabled() && Dialog.PuttyPasswordCheck()->isEnabled(),
+        "a site command: no Telnet for FTP");
+      Dialog.PuttyPathEdit()->setText(QStringLiteral("sshpass -p !P ssh !U@!@"));
+      Check(!Dialog.PuttyPasswordCheck()->isEnabled(), "one with the password: no passing it");
+      Dialog.PuttyPathEdit()->clear();
+      Check(!Dialog.AutoOpenInPuttyCheck()->isEnabled(), "none: nothing to open");
+      Dialog.PuttyPathEdit()->setText(QStringLiteral("myputty"));
+      Dialog.AutoOpenInPuttyCheck()->setChecked(true);
+      const CoreBridge::TPreferences Saved = CoreBridge::Preferences();
+      Dialog.Save();
+      const CoreBridge::TPreferences Now = CoreBridge::Preferences();
+      Check((Now.PuttyPath == "myputty") && Now.AutoOpenInPutty, "saved");
+      CoreBridge::SetPreferences(Saved);
+    }
+
+    // Commands: the custom commands, edited.
+    {
+      const std::vector<CoreBridge::TCustomCommandDefinition> Before = CoreBridge::CustomCommands();
+      PreferencesDialog Dialog;
+      Check(Dialog.CommandsList()->topLevelItemCount() == static_cast<int>(Before.size()) && !Before.empty(),
+        "WinSCP's commands listed");
+      Check(Dialog.CommandsList()->topLevelItem(0)->text(2) == QStringLiteral("R"), "remote ones, R");
+      CoreBridge::TCustomCommandDefinition Command;
+      Command.Name = "Disk usage";
+      Command.Command = "du -sh \"!\"";
+      Dialog.CommandsList()->setCurrentItem(nullptr);
+      Check(Dialog.AddEditCommand(false, &Command) &&
+        (Dialog.CommandsList()->topLevelItemCount() == static_cast<int>(Before.size()) + 1) &&
+        (Dialog.Commands().back().Name == "Disk usage"), "added last, nothing selected");
+      Dialog.MoveCommand(-1);
+      Check(Dialog.Commands()[Before.size() - 1].Name == "Disk usage", "moved up");
+      Dialog.CommandsList()->setCurrentItem(Dialog.CommandsList()->topLevelItem(0));
+      Dialog.RemoveCommand();
+      Check(Dialog.Commands().size() == Before.size(), "one removed");
+      Dialog.Save();
+      Check((CoreBridge::CustomCommands().size() == Before.size()) &&
+        (CoreBridge::CustomCommands()[Before.size() - 2].Name == "Disk usage"), "and saved");
+      CoreBridge::SetCustomCommands(Before);
     }
     Frontend.SetWindow(nullptr);
   }

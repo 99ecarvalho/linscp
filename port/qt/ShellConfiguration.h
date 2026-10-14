@@ -27,6 +27,8 @@ struct TShellSettings
   // picFull, picNone); the window kept when the last session closes.
   int PathInCaption = 0;
   bool KeepOpenWhenNoSession = true;
+  // Integration > Applications: each new session opened in PuTTY too.
+  bool AutoOpenInPutty = false;
   // File colors (TFileColorData::SaveList: "BBGGRR:mask" items, comma text).
   UnicodeString FileColors;
   // Storage: where temporary files go (empty: the system's temporary

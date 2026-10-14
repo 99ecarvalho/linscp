@@ -1,8 +1,9 @@
 // The Preferences dialog, as WinSCP's (forms/Preferences.cpp): its pages
 // listed on the left, each one's settings on the right. The pages are
-// WinSCP's, with the settings the shell has so far (P3-04a…c): Window,
+// WinSCP's, with the settings the shell has so far (P3-04a…e): Window,
 // Commander, Languages, Panels, File colors, Transfer, Background,
-// Endurance. What they set is upstream's configuration (ADR 0014).
+// Endurance, Network, Security, Logging, Applications, Commands, Storage.
+// What they set is upstream's configuration (ADR 0014).
 #ifndef LINSCP_QT_PREFERENCES_DIALOG_H
 #define LINSCP_QT_PREFERENCES_DIALOG_H
 
@@ -97,6 +98,19 @@ public:
   QLabel * StorageLabel() const { return FStorageLabel; }
   QRadioButton * CustomTemporaryButton() const { return FCustomTemporary; }
   QLineEdit * TemporaryEdit() const { return FTemporaryEdit; }
+  // Applications.
+  QLineEdit * PuttyPathEdit() const { return FPuttyPath; }
+  QCheckBox * PuttyPasswordCheck() const { return FPuttyPassword; }
+  QCheckBox * AutoOpenInPuttyCheck() const { return FAutoOpenInPutty; }
+  QCheckBox * TelnetForFtpInPuttyCheck() const { return FTelnetForFtpInPutty; }
+  QComboBox * PuttyRegistryStorageKeyCombo() const { return FPuttyRegistryStorageKey; }
+  // Commands: the list, and its buttons' actions (Add and Edit through the
+  // Custom command dialog; Command given, without one).
+  class QTreeWidget * CommandsList() const { return FCommandsList; }
+  const std::vector<CoreBridge::TCustomCommandDefinition> & Commands() const { return FCommands; }
+  bool AddEditCommand(bool Edit, const CoreBridge::TCustomCommandDefinition * Command = nullptr);
+  void RemoveCommand();
+  void MoveCommand(int By);
 
 private:
   void AddPage(const QString & Name, QWidget * Page);
@@ -112,6 +126,9 @@ private:
   QWidget * MakeSecurityPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeLoggingPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeStoragePage(const CoreBridge::TPreferences & Preferences);
+  QWidget * MakeApplicationsPage(const CoreBridge::TPreferences & Preferences);
+  QWidget * MakeCommandsPage();
+  void LoadCommands(int Select);
   void LoadFileColors();
   bool FileColorDialog(CoreBridge::TPreferences::TFileColor & Color);
   void LoadPresets();
@@ -198,6 +215,18 @@ private:
   QRadioButton * FCustomTemporary = nullptr;
   QLineEdit * FTemporaryEdit = nullptr;
   QLineEdit * FRandomSeedEdit = nullptr;
+  QLineEdit * FPuttyPath = nullptr;
+  QCheckBox * FPuttyPassword = nullptr;
+  QCheckBox * FAutoOpenInPutty = nullptr;
+  QCheckBox * FTelnetForFtpInPutty = nullptr;
+  QComboBox * FPuttyRegistryStorageKey = nullptr;
+  QLabel * FPuttyRegistryStorageKeyLabel = nullptr;
+  std::vector<CoreBridge::TCustomCommandDefinition> FCommands;
+  QTreeWidget * FCommandsList = nullptr;
+  QPushButton * FEditCommand = nullptr;
+  QPushButton * FRemoveCommand = nullptr;
+  QPushButton * FUpCommand = nullptr;
+  QPushButton * FDownCommand = nullptr;
   // The pages exist: their controls can be updated.
   bool FBuilt = false;
 };

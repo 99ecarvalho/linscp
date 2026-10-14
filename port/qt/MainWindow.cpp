@@ -585,6 +585,16 @@ bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
     FQueueTimer->stop();
   }
   UpdateActions();
+  // As TTerminalManager::ConnectActiveTerminal: "automatically open new
+  // sessions in PuTTY" (CanOpenInPutty: a command to run).
+  if (Result)
+  {
+    const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+    if (Preferences.AutoOpenInPutty && !QString::fromStdString(Preferences.PuttyPath).trimmed().isEmpty())
+    {
+      OpenInPutty();
+    }
+  }
   return Result;
 }
 
