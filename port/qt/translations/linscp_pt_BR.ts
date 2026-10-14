@@ -2,6 +2,49 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="pt_BR">
 <context>
+    <name>AboutDialog</name>
+    <message>
+        <source>About %1</source>
+        <translation>Sobre o %1</translation>
+    </message>
+    <message>
+        <source>A Qt port of WinSCP for Linux and Windows</source>
+        <translation>Uma versão em Qt do WinSCP para Linux e Windows</translation>
+    </message>
+    <message>
+        <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
+        <translation>Versão: &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>Using: Qt %1 (headers: %2)</source>
+        <translation>Usando: Qt %1 (cabeçalhos: %2)</translation>
+    </message>
+    <message>
+        <source>Based on WinSCP %1: %2</source>
+        <translation>Baseado no WinSCP %1: %2</translation>
+    </message>
+    <message>
+        <source>Website: %1</source>
+        <translation>Site: %1</translation>
+    </message>
+    <message>
+        <source>Configuration: %1</source>
+        <translation>Configuração: %1</translation>
+    </message>
+    <message>
+        <source>Copyright (C) 2026 Eduardo Correia &amp;lt;%1&amp;gt;.</source>
+        <translation>Copyright (C) 2026 Eduardo Correia &amp;lt;%1&amp;gt;.</translation>
+    </message>
+    <message>
+        <source>WinSCP: %1.</source>
+        <translation>WinSCP: %1.</translation>
+    </message>
+    <message>
+        <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
+        <translation>Este programa é software livre; você pode redistribuí-lo e/ou modificá-lo sob os termos da Licença Pública Geral GNU versão 3, como o WinSCP.</translation>
+    </message>
+</context>
+<context>
     <name>EditorWindow</name>
     <message>
         <source>Replace</source>
@@ -362,18 +405,6 @@
     <message>
         <source>Disconnected</source>
         <translation>Desconectado</translation>
-    </message>
-    <message>
-        <source>About %1</source>
-        <translation>Sobre o %1</translation>
-    </message>
-    <message>
-        <source>%1 %2
-Qt %3
-Configuration: %4</source>
-        <translation>%1 %2
-Qt %3
-Configuração: %4</translation>
     </message>
     <message>
         <source>&amp;Site Manager...</source>

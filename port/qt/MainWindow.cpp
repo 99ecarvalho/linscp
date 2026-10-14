@@ -30,6 +30,7 @@
 
 #include <algorithm>
 
+#include "AboutDialog.h"
 #include "EditorWindow.h"
 #include "FileList.h"
 #include "QtFrontend.h"
@@ -941,10 +942,8 @@ void MainWindow::UpdateActions()
 
 void MainWindow::About()
 {
-  QMessageBox::about(this, tr("About %1").arg(QString::fromStdString(FInfo.AppName)),
-    tr("%1 %2\nQt %3\nConfiguration: %4").arg(
-      QString::fromStdString(FInfo.AppName), QString::fromStdString(FInfo.Version),
-      QString::fromLatin1(qVersion()), QString::fromStdString(FInfo.ConfigurationStorage)));
+  AboutDialog Dialog(FInfo, this);
+  Dialog.exec();
 }
 
 EditorWindow * MainWindow::EditCurrent()

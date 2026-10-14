@@ -51,6 +51,7 @@
 #include <QMessageBox>
 #include <QMimeData>
 #include <QUrl>
+#include <QIcon>
 
 #include <memory>
 
@@ -86,6 +87,7 @@
 #include "PreferencesDialog.h"
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
+#include "AboutDialog.h"
 #include "EditorWindow.h"
 
 #include <QPlainTextEdit>
@@ -1788,6 +1790,16 @@ void Session(const char * Port)
     Check(Responder.PasswordPrompts == 2, "and for the password, again after a wrong one");
     Check(Responder.Errors == 0, "with no error shown");
     Check((Window.Session() != nullptr) && Window.Session()->Active(), "the session is active");
+
+    // Help > About: the program, and WinSCP it is based on.
+    {
+      AboutDialog About(CoreBridge::Info(), &Window);
+      const CoreBridge::TInfo Info = CoreBridge::Info();
+      Check(About.NameLabel()->text() == QString::fromStdString(Info.AppName), "About names the program");
+      Check(About.VersionLabel()->text().contains(QString::fromStdString(Info.Version)), "its version");
+      Check(About.WinScpLabel()->text().contains(QStringLiteral("https://winscp.net/")), "and WinSCP, with its site");
+      Check(!QIcon(QStringLiteral(":/icons/Application.ico")).pixmap(64, 64).isNull(), "with WinSCP's icon");
+    }
 
     Responder.Passwords.clear();
     Check(!Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))),

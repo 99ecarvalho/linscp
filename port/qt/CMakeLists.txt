@@ -7,7 +7,7 @@
 # std::wstring), so these units must have Qt's wchar_t, not the -fshort-wchar
 # every core unit has. Nothing wide crosses CoreBridge.h. Windows' wchar_t is
 # 2 bytes either way. See ADR 0001.
-add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp EditorWindow.cpp QtFrontend.cpp QueryDialog.cpp
+add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp AboutDialog.cpp EditorWindow.cpp QtFrontend.cpp QueryDialog.cpp
   PromptDialog.cpp Language.cpp SiteManager.cpp SiteAdvanced.cpp
   FileList.cpp RemotePanel.cpp LocalPanel.cpp
   TransferDialog.cpp QueuePanel.cpp SynchronizeDialog.cpp PreferencesDialog.cpp TransferSettingsDialog.cpp CoreBridge.h)
@@ -77,6 +77,10 @@ foreach(_ts ${_shell_ts})
 endforeach()
 qt_add_resources(linscp-qt-ui shell_translations
   PREFIX /i18n BASE "${CMAKE_CURRENT_BINARY_DIR}/i18n" FILES ${_shell_qm})
+# WinSCP's application icon, from the pinned submodule as it is.
+qt_add_resources(linscp-qt-ui shell_icons
+  PREFIX /icons BASE "${CMAKE_SOURCE_DIR}/3rd-party/winscp/source/resource"
+  FILES "${CMAKE_SOURCE_DIR}/3rd-party/winscp/source/resource/Application.ico")
 add_custom_target(update_translations
   COMMAND "${LINSCP_LUPDATE}" -no-obsolete -locations none ${_shell_sources} -ts ${_shell_ts}
   WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"

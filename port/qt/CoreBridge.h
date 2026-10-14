@@ -471,6 +471,7 @@ enum class TText
   FileInfoHidden,       // "%s hidden"
   CopyParamDefault,     // "&Default" (the default transfer settings)
   CopyParamDuplicate,   // "Transfer settings preset with description '%s' already exists."
+  WinScpCopyright,      // "Copyright © 2000–2026 Martin Prikryl"
 };
 std::string Text(TText Text);
 

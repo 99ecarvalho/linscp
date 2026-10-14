@@ -626,6 +626,7 @@ std::string Text(TText Text)
     case TText::FileInfoHidden: Ident = FILE_INFO_HIDDEN2; break;
     case TText::CopyParamDefault: Ident = COPY_PARAM_DEFAULT; break;
     case TText::CopyParamDuplicate: Ident = COPY_PARAM_DUPLICATE; break;
+    case TText::WinScpCopyright: Ident = WINSCP_COPYRIGHT; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));
