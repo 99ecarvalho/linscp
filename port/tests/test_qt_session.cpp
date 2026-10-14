@@ -470,11 +470,15 @@ int main(int argc, char ** argv)
     std::ofstream(SyncLocal / "q.txt") << "queued";
     List = Session.SyncCollect(SyncLocal.string(), "/syncr", Params);
     Check(List && (List->Items().size() == 1), "a new file to synchronize");
+    const int DoneBefore = Session.QueueDoneCount();
     if (List)
     {
       Session.SyncQueue(*List);
     }
-    Check(!Session.QueueEmpty(), "goes to the queue");
+    // A file this small may be done already, under load: done through the
+    // queue then.
+    Session.QueueIdle();
+    Check(!Session.QueueEmpty() || (Session.QueueDoneCount() > DoneBefore), "goes to the queue");
     Wait();
     Session.ChangeDirectory("/syncr");
     Check(HasEntry(Session.List(), "q.txt", false), "and is uploaded from there");
