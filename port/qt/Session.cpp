@@ -18,9 +18,13 @@
 #include <Queue.h>
 #include <GUIConfiguration.h>
 
+#include "ShellConfiguration.h"
 #include "TransferSettings.h"
 
+#include <TextsWin.h>
+
 #include <atomic>
+#include <mutex>
 #include <memory>
 
 namespace CoreBridge
@@ -970,6 +974,226 @@ void TSession::SyncQueue(TSyncChecklist & Checklist)
       F->QueueAdded++;
     }
     F->QueueChanged = true;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+// --- Editing -----------------------------------------------------------------
+
+struct TEditedFile::TShared
+{
+  std::mutex Mutex;
+  double SourceTimestamp = 0;
+};
+
+TEditedFile::TEditedFile() :
+  FShared(std::make_shared<TShared>())
+{
+}
+
+double TEditedFile::SourceTimestamp() const
+{
+  std::lock_guard<std::mutex> Lock(FShared->Mutex);
+  return FShared->SourceTimestamp;
+}
+
+void TEditedFile::SetSourceTimestamp(double Timestamp)
+{
+  std::lock_guard<std::mutex> Lock(FShared->Mutex);
+  FShared->SourceTimestamp = Timestamp;
+}
+
+namespace
+{
+
+double UnixTimeOf(TDateTime DateTime)
+{
+  return (static_cast<double>(DateTime) - 25569.0) * 86400.0;
+}
+
+// TCustomScpExplorerForm::TemporaryFileCopyParam.
+TCopyParamType TemporaryFileCopyParam(bool ForceText)
+{
+  TCopyParamType CopyParam = GUIConfiguration->CurrentCopyParam;
+  CopyParam.FileNameCase = ncNoChange;
+  CopyParam.PreserveRights = false;
+  CopyParam.PreserveReadOnly = false;
+  CopyParam.ReplaceInvalidChars = true;
+  CopyParam.IncludeFileMask = TFileMasks();
+  CopyParam.NewerOnly = false;
+  CopyParam.FileMask = L"";
+  if (ForceText)
+  {
+    CopyParam.TransferMode = tmAscii;
+  }
+  return CopyParam;
+}
+
+// TCustomScpExplorerForm's TEditorUploadQueueItem: the upload, then the
+// file's timestamp on the server as the new source timestamp, on the
+// queue's own connection.
+class TEditorUploadQueueItem : public TUploadQueueItem
+{
+public:
+  TEditorUploadQueueItem(TTerminal * Terminal, TStrings * FilesToCopy, const UnicodeString & TargetDir,
+      const TCopyParamType * CopyParam, int Params, const TEditedFile & File, bool CheckNotModified) :
+    TUploadQueueItem(Terminal, FilesToCopy, TargetDir, CopyParam, Params, false),
+    FFile(File),
+    FCheckNotModified(CheckNotModified)
+  {
+  }
+
+protected:
+  virtual void __fastcall DoTransferExecute(TTerminal * Terminal, TParallelOperation * ParallelOperation)
+  {
+    TUploadQueueItem::DoTransferExecute(Terminal, ParallelOperation);
+    if (FCheckNotModified)
+    {
+      std::unique_ptr<TRemoteFile> Remote(
+        Terminal->TryReadFile(UnixCombinePaths(FromUtf8(FFile.RemoteDirectory), FromUtf8(FFile.OriginalName))));
+      if (Remote.get() != NULL)
+      {
+        FFile.SetSourceTimestamp(UnixTimeOf(Remote->Modification));
+      }
+    }
+  }
+
+private:
+  TEditedFile FFile;
+  bool FCheckNotModified;
+};
+
+}  // namespace
+
+// TCustomScpExplorerForm::TemporaryDirectoryForRemoteFiles, then
+// TemporarilyDownloadFiles.
+TEditedFile TSession::EditDownload(const std::string & Name, bool ForceText)
+{
+  try
+  {
+    CheckActive(*this);
+    TShellConfiguration * Shell = dynamic_cast<TShellConfiguration *>(GUIConfiguration);
+    const TShellSettings & Settings = Shell->Settings();
+    TCopyParamType CopyParam = TemporaryFileCopyParam(ForceText);
+    const UnicodeString RemoteDirectory = F->Terminal->CurrentDirectory;
+    UnicodeString Root;
+    UnicodeString Directory;
+    if (!Settings.TemporaryDirectoryDeterministic)
+    {
+      Root = IncludeTrailingBackslash(Configuration->TemporaryDir());
+      Directory = Root;
+    }
+    else
+    {
+      Directory = IncludeTrailingBackslash(Shell->ExpandedTemporaryDirectory());
+    }
+    if (Settings.TemporaryDirectoryAppendSession)
+    {
+      Directory = IncludeTrailingBackslash(Directory + MakeValidFileName(F->Terminal->SessionData->SessionName));
+    }
+    if (Settings.TemporaryDirectoryAppendPath)
+    {
+      UnicodeString Path = RemoteDirectory;
+      if (!Path.IsEmpty() && (Path[1] == L'/'))
+      {
+        Path.Delete(1, 1);
+      }
+      Directory = IncludeTrailingBackslash(Directory + CopyParam.ValidLocalPath(FromUnixPath(Path)));
+    }
+    if (!ForceDirectories(ApiPath(Directory)))
+    {
+      throw EOSExtException(FMTLOAD(CREATE_TEMP_DIR_ERROR, (Directory)));
+    }
+    TRemoteFile * File = FindFile(F->Terminal.get(), Name);
+    std::unique_ptr<TStringList> Files(new TStringList());
+    Files->AddObject(File->FileName, File);
+    const TDateTime Modification = File->Modification;
+    {
+      TTransferBracket Bracket(false, 1);
+      F->Terminal->ExceptionOnFail = true;
+      try
+      {
+        // As upstream: no confirmations, the same file may come over again.
+        F->Terminal->CopyToLocal(Files.get(), Directory, &CopyParam, cpNoConfirmation | cpTemporary, NULL);
+      }
+      catch (...)
+      {
+        F->Terminal->ExceptionOnFail = false;
+        if (!Root.IsEmpty())
+        {
+          RecursiveDeleteFile(ExcludeTrailingBackslash(Root));
+        }
+        throw;
+      }
+      F->Terminal->ExceptionOnFail = false;
+    }
+    TEditedFile Result;
+    Result.LocalFile = Utf8(Directory + F->Terminal->ChangeFileName(&CopyParam, FromUtf8(Name), osRemote, false));
+    Result.RootDirectory = Utf8(Root);
+    Result.RemoteDirectory = Utf8(RemoteDirectory);
+    Result.OriginalName = Name;
+    Result.ForceText = ForceText;
+    Result.SetSourceTimestamp(UnixTimeOf(Modification));
+    return Result;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+// TCustomScpExplorerForm::ExecutedFileChanged's upload.
+bool TSession::EditUpload(TEditedFile & File)
+{
+  try
+  {
+    CheckActive(*this);
+    TShellConfiguration * Shell = dynamic_cast<TShellConfiguration *>(GUIConfiguration);
+    const bool CheckNotModified = Shell->Settings().EditorCheckNotModified && (File.SourceTimestamp() != 0);
+    const UnicodeString RemoteDirectory = FromUtf8(File.RemoteDirectory);
+    const UnicodeString OriginalName = FromUtf8(File.OriginalName);
+    if (CheckNotModified)
+    {
+      std::unique_ptr<TRemoteFile> Remote(F->Terminal->TryReadFile(UnixCombinePaths(RemoteDirectory, OriginalName)));
+      if ((Remote.get() != NULL) && (UnixTimeOf(Remote->Modification) != File.SourceTimestamp()))
+      {
+        if (AskFrontend(MainInstructions(LoadStr(EDIT_CHANGED_EXTERNALLY)), NULL, qtConfirmation, qaOK | qaCancel, NULL) != qaOK)
+        {
+          return false;
+        }
+      }
+    }
+    std::unique_ptr<TStringList> Files(new TStringList());
+    Files->Add(FromUtf8(File.LocalFile));
+    TCopyParamType CopyParam = TemporaryFileCopyParam(File.ForceText);
+    // "" copies the name as it is; otherwise the original's name.
+    CopyParam.FileMask =
+      (ExtractFileName(FromUtf8(File.LocalFile)) == OriginalName) ? UnicodeString() : DelimitFileNameMask(OriginalName);
+    const int Params = cpNoConfirmation | cpTemporary;
+    if (F->Terminal->IsCapable[fcBackgroundTransfers])
+    {
+      F->EnsureQueue()->AddItem(new TEditorUploadQueueItem(F->Terminal.get(), Files.get(), RemoteDirectory, &CopyParam,
+        Params, File, CheckNotModified));
+      F->QueueAdded++;
+      F->QueueChanged = true;
+    }
+    else
+    {
+      TTransferBracket Bracket(true, 1);
+      F->Terminal->CopyToRemote(Files.get(), RemoteDirectory, &CopyParam, Params, NULL);
+      if (CheckNotModified)
+      {
+        std::unique_ptr<TRemoteFile> Remote(F->Terminal->TryReadFile(UnixCombinePaths(RemoteDirectory, OriginalName)));
+        if (Remote.get() != NULL)
+        {
+          File.SetSourceTimestamp(UnixTimeOf(Remote->Modification));
+        }
+      }
+    }
+    return true;
   }
   catch (Exception & E)
   {

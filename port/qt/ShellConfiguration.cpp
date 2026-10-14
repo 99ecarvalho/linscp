@@ -101,6 +101,12 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"KeepOpenWhenNoSession", FSettings.KeepOpenWhenNoSession);
     Storage->WriteString(L"FileColors", FSettings.FileColors);
     Storage->WriteString(L"DDTemporaryDirectory", FSettings.DDTemporaryDirectory);
+    Storage->WriteBool(L"TemporaryDirectoryAppendSession", FSettings.TemporaryDirectoryAppendSession);
+    Storage->WriteBool(L"TemporaryDirectoryDeterministic", FSettings.TemporaryDirectoryDeterministic);
+    Storage->WriteBool(L"TemporaryDirectoryAppendPath", FSettings.TemporaryDirectoryAppendPath);
+    Storage->WriteBool(L"TemporaryDirectoryCleanup", FSettings.TemporaryDirectoryCleanup);
+    Storage->WriteBool(L"ConfirmTemporaryDirectoryCleanup", FSettings.ConfirmTemporaryDirectoryCleanup);
+    Storage->WriteBool(L"EditorCheckNotModified", FSettings.EditorCheckNotModified);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander", true))
   {
@@ -123,6 +129,17 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
   {
     TCloseSubKeyPath Close(Storage);
     Storage->WriteString(L"DirViewParams", FSettings.RemoteDirViewParams);
+  }
+  if (Storage->OpenSubKeyPath(L"Interface\\Editor", true))
+  {
+    TCloseSubKeyPath Close(Storage);
+    Storage->WriteBool(L"WordWrap", FSettings.EditorWordWrap);
+    Storage->WriteInteger(L"TabSize", FSettings.EditorTabSize);
+    Storage->WriteInteger(L"Encoding", FSettings.EditorEncoding);
+    Storage->WriteString(L"FindText", FSettings.EditorFindText);
+    Storage->WriteString(L"ReplaceText", FSettings.EditorReplaceText);
+    Storage->WriteBool(L"FindMatchCase", FSettings.EditorFindMatchCase);
+    Storage->WriteBool(L"FindWholeWord", FSettings.EditorFindWholeWord);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\QueueView", true))
   {
@@ -151,6 +168,15 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.KeepOpenWhenNoSession = Storage->ReadBool(L"KeepOpenWhenNoSession", FSettings.KeepOpenWhenNoSession);
     FSettings.FileColors = Storage->ReadString(L"FileColors", FSettings.FileColors);
     FSettings.DDTemporaryDirectory = Storage->ReadString(L"DDTemporaryDirectory", FSettings.DDTemporaryDirectory);
+    FSettings.TemporaryDirectoryAppendSession =
+      Storage->ReadBool(L"TemporaryDirectoryAppendSession", FSettings.TemporaryDirectoryAppendSession);
+    FSettings.TemporaryDirectoryDeterministic =
+      Storage->ReadBool(L"TemporaryDirectoryDeterministic", FSettings.TemporaryDirectoryDeterministic);
+    FSettings.TemporaryDirectoryAppendPath = Storage->ReadBool(L"TemporaryDirectoryAppendPath", FSettings.TemporaryDirectoryAppendPath);
+    FSettings.TemporaryDirectoryCleanup = Storage->ReadBool(L"TemporaryDirectoryCleanup", FSettings.TemporaryDirectoryCleanup);
+    FSettings.ConfirmTemporaryDirectoryCleanup =
+      Storage->ReadBool(L"ConfirmTemporaryDirectoryCleanup", FSettings.ConfirmTemporaryDirectoryCleanup);
+    FSettings.EditorCheckNotModified = Storage->ReadBool(L"EditorCheckNotModified", FSettings.EditorCheckNotModified);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander", false))
   {
@@ -171,6 +197,17 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
   {
     TCloseSubKeyPath Close(Storage);
     FSettings.RemoteDirViewParams = Storage->ReadString(L"DirViewParams", FSettings.RemoteDirViewParams);
+  }
+  if (Storage->OpenSubKeyPath(L"Interface\\Editor", false))
+  {
+    TCloseSubKeyPath Close(Storage);
+    FSettings.EditorWordWrap = Storage->ReadBool(L"WordWrap", FSettings.EditorWordWrap);
+    FSettings.EditorTabSize = Storage->ReadInteger(L"TabSize", FSettings.EditorTabSize);
+    FSettings.EditorEncoding = Storage->ReadInteger(L"Encoding", FSettings.EditorEncoding);
+    FSettings.EditorFindText = Storage->ReadString(L"FindText", FSettings.EditorFindText);
+    FSettings.EditorReplaceText = Storage->ReadString(L"ReplaceText", FSettings.EditorReplaceText);
+    FSettings.EditorFindMatchCase = Storage->ReadBool(L"FindMatchCase", FSettings.EditorFindMatchCase);
+    FSettings.EditorFindWholeWord = Storage->ReadBool(L"FindWholeWord", FSettings.EditorFindWholeWord);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\QueueView", false))
   {

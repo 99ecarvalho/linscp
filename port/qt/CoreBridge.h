@@ -244,6 +244,50 @@ void SetDefaultTransferSettings(const TTransferSettings & Settings);
 void SetTransferPresets(const std::vector<TTransferPreset> & Presets);
 void SetCurrentTransferPreset(const std::string & Name);
 
+// --- Editing (P3-05, ADR 0015) ---------------------------------------------------
+
+// A remote file being edited: its temporary copy, where it came from, and
+// what it was like on the server when opened (seconds since 1970; 0
+// unknown), which an upload that went through the queue may update from the
+// queue's thread.
+class TEditedFile
+{
+public:
+  TEditedFile();
+  std::string LocalFile;
+  // The temporary directory made for it, to remove once done; empty when it
+  // is a shared one (TemporaryDirectoryDeterministic).
+  std::string RootDirectory;
+  std::string RemoteDirectory;
+  std::string OriginalName;
+  // Transferred as text (the internal editor's, and a text editor's).
+  bool ForceText = true;
+  double SourceTimestamp() const;
+  void SetSourceTimestamp(double Timestamp);
+
+private:
+  struct TShared;
+  std::shared_ptr<TShared> FShared;
+};
+
+// The internal editor's settings (TWinConfiguration's Editor), and
+// EditorCheckNotModified.
+struct TEditorSettings
+{
+  bool WordWrap = false;
+  int TabSize = 8;
+  // CP_UTF8 (WinSCP's default), else the system's code page.
+  bool Utf8 = true;
+  std::string FindText;
+  std::string ReplaceText;
+  bool FindMatchCase = false;
+  bool FindWholeWord = false;
+  bool CheckNotModified = false;
+};
+TEditorSettings EditorSettings();
+// Saves them.
+void SetEditorSettings(const TEditorSettings & Settings);
+
 // --- Preferences (P3-04, ADR 0014) --------------------------------------------
 
 // What the Preferences dialog sets, as WinSCP's (TWinConfiguration's
@@ -738,6 +782,19 @@ public:
   void SyncQueue(TSyncChecklist & Checklist);
   // Whether the server can set times, which "synchronize timestamps" needs.
   bool CanSyncTimestamps() const;
+
+  // Editing, as WinSCP's (TCustomScpExplorerForm's ExecuteFile and
+  // ExecutedFileChanged): an entry of the current directory downloaded to a
+  // temporary directory of its own (TemporaryDirectoryForRemoteFiles), with
+  // the temporary files' transfer settings (TemporaryFileCopyParam). Throws
+  // TCoreError.
+  TEditedFile EditDownload(const std::string & Name, bool ForceText = true);
+  // Its changed copy uploaded back over the original: through the queue
+  // where the protocol has background transfers (as TEditorUploadQueueItem,
+  // the file's source timestamp refreshed after), else here. With "check not
+  // modified", a file changed on the server since is asked about first;
+  // false when the user declined. Throws TCoreError.
+  bool EditUpload(TEditedFile & File);
   // To be called regularly on the GUI thread (a timer): keeps the queue's
   // connections alive, and asks the questions its transfers wait on -- the
   // first one pending, through the frontend, as WinSCP pops them up. True

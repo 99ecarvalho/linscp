@@ -29,6 +29,28 @@ struct TShellSettings
   // Storage: where temporary files go (empty: the system's temporary
   // directory), environment variables allowed.
   UnicodeString DDTemporaryDirectory;
+  // How edited files' temporary directories are made
+  // (TemporaryDirectoryForRemoteFiles): in a unique one under it or in the
+  // same place each time; with the session's name and the remote path
+  // appended; cleaned up at start (asking first).
+  bool TemporaryDirectoryAppendSession = false;
+  bool TemporaryDirectoryDeterministic = false;
+  bool TemporaryDirectoryAppendPath = true;
+  bool TemporaryDirectoryCleanup = true;
+  bool ConfirmTemporaryDirectoryCleanup = true;
+  // The internal editor (Interface\Editor): word wrap, tab size, the
+  // encoding (CP_UTF8, or 0 for the system's code page), and the last find
+  // and replace.
+  bool EditorWordWrap = false;
+  int EditorTabSize = 8;
+  int EditorEncoding = 65001;
+  UnicodeString EditorFindText;
+  UnicodeString EditorReplaceText;
+  bool EditorFindMatchCase = false;
+  bool EditorFindWholeWord = false;
+  // EditorCheckNotModified: ask before uploading over a file changed on the
+  // server since it was opened.
+  bool EditorCheckNotModified = false;
   // Interface\Commander (TScpCommanderConfiguration).
   bool SwappedPanels = false;
   bool ExplorerKeyboardShortcuts = false;

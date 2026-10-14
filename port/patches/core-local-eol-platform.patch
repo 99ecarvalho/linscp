@@ -1,0 +1,15 @@
+Make the local end of line the platform's.
+
+TConfiguration::GetLocalEOLType always says CRLF: core has only run on
+Windows, where local text files end their lines so. Text-mode transfers
+convert to and from it (SFTP, SCP), so on POSIX a text-mode download gave
+local files CRLF line endings, which POSIX programs do not expect, and the
+internal editor would have written them back so. The platform's delimiter
+tells the two apart in one expression both compilers take: a backslash on
+Windows, so upstream's behaviour is unchanged. Line counts are unchanged.
+
+--- a/source/core/Configuration.cpp
++++ b/source/core/Configuration.cpp
+@@ -2050,1 +2050,1 @@
+-  return eolCRLF;
++  return (PathDelim == L'\\') ? eolCRLF : eolLF;

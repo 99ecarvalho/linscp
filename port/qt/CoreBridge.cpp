@@ -306,6 +306,43 @@ TPreferences Preferences()
   return Result;
 }
 
+TEditorSettings EditorSettings()
+{
+  const TShellSettings & Settings = Shell()->Settings();
+  TEditorSettings Result;
+  Result.WordWrap = Settings.EditorWordWrap;
+  Result.TabSize = Settings.EditorTabSize;
+  Result.Utf8 = (Settings.EditorEncoding == CP_UTF8);
+  Result.FindText = Utf8(Settings.EditorFindText);
+  Result.ReplaceText = Utf8(Settings.EditorReplaceText);
+  Result.FindMatchCase = Settings.EditorFindMatchCase;
+  Result.FindWholeWord = Settings.EditorFindWholeWord;
+  Result.CheckNotModified = Settings.EditorCheckNotModified;
+  return Result;
+}
+
+void SetEditorSettings(const TEditorSettings & Editor)
+{
+  TShellSettings Settings = Shell()->Settings();
+  Settings.EditorWordWrap = Editor.WordWrap;
+  Settings.EditorTabSize = Editor.TabSize;
+  Settings.EditorEncoding = Editor.Utf8 ? CP_UTF8 : CP_ACP;
+  Settings.EditorFindText = FromUtf8(Editor.FindText);
+  Settings.EditorReplaceText = FromUtf8(Editor.ReplaceText);
+  Settings.EditorFindMatchCase = Editor.FindMatchCase;
+  Settings.EditorFindWholeWord = Editor.FindWholeWord;
+  Settings.EditorCheckNotModified = Editor.CheckNotModified;
+  try
+  {
+    Shell()->SetSettings(Settings);
+    Configuration->SaveExplicit();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 std::int64_t SizeOfText(const std::string & Text)
 {
   __int64 Size = 0;

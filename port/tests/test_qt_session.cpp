@@ -98,6 +98,12 @@ public:
       // Accept: upstream's first button, Yes; or Cancel.
       Result.Answer = AcceptHostKey ? CoreBridge::AnswerYes : CoreBridge::AnswerCancel;
     }
+    else if (QueryAnswer != 0)
+    {
+      // A scripted answer, and the question kept.
+      LastQuery = Query.Message;
+      Result.Answer = QueryAnswer;
+    }
     else
     {
       // Anything else here is core's "file exists": overwrite.
@@ -106,6 +112,10 @@ public:
     }
     return Result;
   }
+
+  // When not 0, what other questions are answered (the last one kept).
+  unsigned QueryAnswer = 0;
+  std::string LastQuery;
 
   bool Prompt(CoreBridge::TPrompt & Prompt) override
   {
@@ -481,6 +491,55 @@ int main(int argc, char ** argv)
     }
     Check(Cancelled, "comparing cancelled aborts");
     Check(!Sftp || Session.CanSyncTimestamps(), "timestamps can be synchronized over SFTP");
+
+    // Editing, as WinSCP's: a remote file into a temporary directory of its
+    // own, its changed copy back over it.
+    {
+      Session.ChangeDirectory("/");
+      std::ofstream(Local / "edit.txt") << "first\n";
+      Session.Upload({ (Local / "edit.txt").string() }, "");
+      CoreBridge::TEditedFile Edited = Session.EditDownload("edit.txt");
+      Check(fs::exists(Edited.LocalFile) && (fs::path(Edited.LocalFile).filename() == "edit.txt"),
+        "a file to edit is downloaded, under its name");
+      Check(!Edited.RootDirectory.empty() && (Edited.LocalFile.rfind(Edited.RootDirectory, 0) == 0),
+        "into a temporary directory of its own");
+      Check((Edited.RemoteDirectory == "/") && (Edited.OriginalName == "edit.txt") && (Edited.SourceTimestamp() > 0),
+        "knowing where it came from and how it was");
+      {
+        std::ifstream In(Edited.LocalFile);
+        std::string Line;
+        std::getline(In, Line);
+        Check(Line == "first", "whole");
+      }
+      std::ofstream(Edited.LocalFile, std::ios::trunc) << "second\n";
+      Check(Session.EditUpload(Edited), "the changed copy goes back");
+      Wait();
+      fs::remove(Local / "down" / "edit.txt");
+      Session.Refresh();
+      Session.Download({ "edit.txt" }, (Local / "down").string());
+      {
+        std::ifstream In(Local / "down" / "edit.txt");
+        std::string Line;
+        std::getline(In, Line);
+        Check(Line == "second", "and is on the server");
+      }
+      // "Check not modified": a file changed on the server since is asked
+      // about; declined, it is not uploaded.
+      CoreBridge::TEditorSettings Editor = CoreBridge::EditorSettings();
+      Check(!Editor.CheckNotModified && Editor.Utf8 && (Editor.TabSize == 8), "the editor's defaults are WinSCP's");
+      Editor.CheckNotModified = true;
+      CoreBridge::SetEditorSettings(Editor);
+      Edited.SetSourceTimestamp(1);
+      Frontend.QueryAnswer = CoreBridge::AnswerCancel;
+      Check(!Session.EditUpload(Edited) && !Frontend.LastQuery.empty(), "changed on the server: asked, declined, not uploaded");
+      Frontend.QueryAnswer = CoreBridge::AnswerOK;
+      Check(Session.EditUpload(Edited), "accepted, uploaded");
+      Wait();
+      Frontend.QueryAnswer = 0;
+      Editor.CheckNotModified = false;
+      CoreBridge::SetEditorSettings(Editor);
+      fs::remove_all(Edited.RootDirectory);
+    }
 
     // Logging (Preferences, core's configuration): a session opened with it
     // on writes its log and its XML log.
