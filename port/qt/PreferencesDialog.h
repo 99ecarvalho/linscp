@@ -14,6 +14,7 @@
 #include "CoreBridge.h"
 
 class QCheckBox;
+class QFont;
 class QComboBox;
 class QLabel;
 class QLineEdit;
@@ -21,6 +22,7 @@ class QRadioButton;
 class QSpinBox;
 class QListWidget;
 class QStackedWidget;
+class QTreeWidget;
 
 class PreferencesDialog : public QDialog
 {
@@ -98,6 +100,25 @@ public:
   QLabel * StorageLabel() const { return FStorageLabel; }
   QRadioButton * CustomTemporaryButton() const { return FCustomTemporary; }
   QLineEdit * TemporaryEdit() const { return FTemporaryEdit; }
+  // Editors and Internal editor.
+  QCheckBox * EditorCheckNotModifiedCheck() const { return FEditorCheckNotModified; }
+  // The editor preference list, and its buttons' actions (Add and Edit
+  // through the Editor preferences dialog; Editor given, without one).
+  QTreeWidget * EditorsList() const { return FEditorsList; }
+  const std::vector<CoreBridge::TEditorDefinition> & EditorDefinitions() const { return FEditors; }
+  bool AddEditEditor(bool Edit, const CoreBridge::TEditorDefinition * Editor = nullptr);
+  void RemoveEditor();
+  void MoveEditor(int By);
+  QCheckBox * EditorWordWrapCheck() const { return FEditorWordWrap; }
+  QSpinBox * EditorTabSizeSpin() const { return FEditorTabSize; }
+  QComboBox * EditorEncodingCombo() const { return FEditorEncoding; }
+  QLabel * EditorFontLabel() const { return FEditorFontLabel; }
+  QCheckBox * EditorWarnLargeFileCheck() const { return FEditorWarnLargeFile; }
+  QSpinBox * EditorLargeFileSizeSpin() const { return FEditorLargeFileSize; }
+  CoreBridge::TEditorSettings EditorSettings() const;
+  // The font and colour buttons' choices, given.
+  void SetEditorFont(const QFont & Font);
+  void SetEditorColors(int FontColor, int BackgroundColor);
   // Applications.
   QLineEdit * PuttyPathEdit() const { return FPuttyPath; }
   QCheckBox * PuttyPasswordCheck() const { return FPuttyPassword; }
@@ -127,6 +148,10 @@ private:
   QWidget * MakeLoggingPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeStoragePage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeApplicationsPage(const CoreBridge::TPreferences & Preferences);
+  QWidget * MakeEditorsPage();
+  QWidget * MakeInternalEditorPage();
+  void UpdateEditorFont();
+  void LoadEditors(int Select);
   QWidget * MakeCommandsPage();
   void LoadCommands(int Select);
   void LoadFileColors();
@@ -215,6 +240,20 @@ private:
   QRadioButton * FCustomTemporary = nullptr;
   QLineEdit * FTemporaryEdit = nullptr;
   QLineEdit * FRandomSeedEdit = nullptr;
+  CoreBridge::TEditorSettings FEditor;
+  QCheckBox * FEditorCheckNotModified = nullptr;
+  std::vector<CoreBridge::TEditorDefinition> FEditors;
+  QTreeWidget * FEditorsList = nullptr;
+  QPushButton * FEditEditor = nullptr;
+  QPushButton * FRemoveEditor = nullptr;
+  QPushButton * FUpEditor = nullptr;
+  QPushButton * FDownEditor = nullptr;
+  QCheckBox * FEditorWordWrap = nullptr;
+  QSpinBox * FEditorTabSize = nullptr;
+  QComboBox * FEditorEncoding = nullptr;
+  QLabel * FEditorFontLabel = nullptr;
+  QCheckBox * FEditorWarnLargeFile = nullptr;
+  QSpinBox * FEditorLargeFileSize = nullptr;
   QLineEdit * FPuttyPath = nullptr;
   QCheckBox * FPuttyPassword = nullptr;
   QCheckBox * FAutoOpenInPutty = nullptr;

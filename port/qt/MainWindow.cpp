@@ -54,6 +54,7 @@
 #include "QueryDialog.h"
 #include "SynchronizeDialog.h"
 #include "KeepUpToDateDialog.h"
+#include "EditorPreferencesDialog.h"
 #include "TransferSettingsDialog.h"
 
 namespace
@@ -172,6 +173,10 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FQueueTimer = new QTimer(this);
   FQueueTimer->setInterval(250);
   connect(FQueueTimer, &QTimer::timeout, this, &MainWindow::QueueIdle);
+  // As the explorer's timer calling TEditorManager::Check.
+  FExternalTimer = new QTimer(this);
+  FExternalTimer->setInterval(1000);
+  connect(FExternalTimer, &QTimer::timeout, this, &MainWindow::CheckExternalEdited);
 
   // The active panel follows the focus, as in WinSCP's Commander.
   connect(qApp, &QApplication::focusChanged, this, [this](QWidget *, QWidget * Now)
@@ -189,6 +194,20 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   QMenu * FilesMenu = menuBar()->addMenu(tr("F&iles"));
   FEditAction = FilesMenu->addAction(tr("&Edit"), this, [this]() { EditCurrent(); });
   FEditAction->setShortcut(QKeySequence(Qt::Key_F4));
+  // As WinSCP's Edit With submenu: the editors, then one asked for.
+  FEditWithMenu = FilesMenu->addMenu(tr("Edit &With"));
+  connect(FEditWithMenu, &QMenu::aboutToShow, this, [this]()
+  {
+    FEditWithMenu->clear();
+    const std::vector<CoreBridge::TEditorDefinition> All = CoreBridge::Editors();
+    for (int Index = 0; Index < static_cast<int>(All.size()); Index++)
+    {
+      FEditWithMenu->addAction(QString::fromStdString(All[Index].Name), this, [this, Index]() { EditCurrentWith(Index); });
+    }
+    FEditWithMenu->addSeparator();
+    FEditWithMenu->addAction(tr("Edit &With..."), this, [this]() { EditCurrentWith(-1); });
+  });
+  FilesMenu->addAction(tr("&Open"), this, [this]() { OpenCurrent(); });
   FilesMenu->addSeparator();
   FLinkAction = FilesMenu->addAction(tr("Edit &Link..."), this, [this]() { AddEditLink(); });
   FPropertiesAction = FilesMenu->addAction(tr("&Properties"), this, [this]() { Properties(); });
@@ -1154,21 +1173,238 @@ void MainWindow::About()
   Dialog.exec();
 }
 
-EditorWindow * MainWindow::EditCurrent()
+// The active panel's focused file: files only, as WinSCP's.
+bool MainWindow::CurrentFile(bool & Local, QString & Name, std::int64_t & Size, double & ModifiedTime) const
 {
-  if (FBusy)
-  {
-    return nullptr;
-  }
   const FileView * View = FLocalActive ? FLocal->View() : FPanel->View();
   const CoreBridge::TRemoteEntry * Entry = View->CurrentEntry();
-  // As WinSCP's: files only.
-  if ((Entry == nullptr) || Entry->Directory)
+  if ((Entry == nullptr) || Entry->Directory || (!FLocalActive && !FSession))
+  {
+    return false;
+  }
+  Local = FLocalActive;
+  Name = QString::fromStdString(Entry->Name);
+  Size = Entry->Size;
+  ModifiedTime = Entry->ModifiedTime;
+  return true;
+}
+
+EditorWindow * MainWindow::EditCurrent()
+{
+  bool Local = false;
+  QString Name;
+  std::int64_t Size = 0;
+  double ModifiedTime = 0;
+  if (FBusy || !CurrentFile(Local, Name, Size, ModifiedTime))
   {
     return nullptr;
   }
-  const QString Name = QString::fromStdString(Entry->Name);
-  return FLocalActive ? EditLocal(QDir(FLocal->Path()).filePath(Name)) : EditRemote(Name);
+  CoreBridge::TEditorDefinition Editor;
+  try
+  {
+    const std::vector<CoreBridge::TEditorDefinition> All = CoreBridge::Editors();
+    const int Index = CoreBridge::FindEditor(All, Name.toStdString(), Local, Size, ModifiedTime);
+    if (Index >= 0)
+    {
+      Editor = All[Index];
+    }
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return nullptr;
+  }
+  if (Editor.Kind != CoreBridge::TEditorDefinition::TKind::Internal)
+  {
+    EditExternally(Editor, Local, Name);
+    return nullptr;
+  }
+  return Local ? EditLocal(QDir(FLocal->Path()).filePath(Name)) : EditRemote(Name);
+}
+
+bool MainWindow::EditCurrentWith(int Index)
+{
+  bool Local = false;
+  QString Name;
+  std::int64_t Size = 0;
+  double ModifiedTime = 0;
+  if (FBusy || !CurrentFile(Local, Name, Size, ModifiedTime))
+  {
+    return false;
+  }
+  CoreBridge::TEditorDefinition Editor;
+  if (Index >= 0)
+  {
+    const std::vector<CoreBridge::TEditorDefinition> All = CoreBridge::Editors();
+    if (Index >= static_cast<int>(All.size()))
+    {
+      return false;
+    }
+    Editor = All[Index];
+  }
+  else
+  {
+    // As ExecuteCurrentFileWith: an external editor, remembered if asked
+    // (unless one with that command is).
+    Editor.Kind = CoreBridge::TEditorDefinition::TKind::External;
+    EditorPreferencesDialog Dialog(EditorPreferencesDialog::TMode::AdHoc, Editor, !Local, this);
+    if (Dialog.exec() != QDialog::Accepted)
+    {
+      return false;
+    }
+    Editor = Dialog.Editor();
+    if (Dialog.Remember())
+    {
+      std::vector<CoreBridge::TEditorDefinition> All = CoreBridge::Editors();
+      const bool Found = std::any_of(All.begin(), All.end(), [&Editor](const CoreBridge::TEditorDefinition & Other)
+      {
+        return (Other.Kind == CoreBridge::TEditorDefinition::TKind::External) && (Other.Command == Editor.Command);
+      });
+      if (!Found)
+      {
+        All.push_back(Editor);
+        try
+        {
+          CoreBridge::SetEditors(All);
+        }
+        catch (const CoreBridge::TCoreError & E)
+        {
+          ShowError(E);
+        }
+      }
+    }
+  }
+  if (Editor.Kind == CoreBridge::TEditorDefinition::TKind::Internal)
+  {
+    return (Local ? EditLocal(QDir(FLocal->Path()).filePath(Name)) : EditRemote(Name)) != nullptr;
+  }
+  return EditExternally(Editor, Local, Name);
+}
+
+bool MainWindow::OpenCurrent()
+{
+  bool Local = false;
+  QString Name;
+  std::int64_t Size = 0;
+  double ModifiedTime = 0;
+  if (FBusy || !CurrentFile(Local, Name, Size, ModifiedTime))
+  {
+    return false;
+  }
+  CoreBridge::TEditorDefinition Editor;
+  Editor.Kind = CoreBridge::TEditorDefinition::TKind::Open;
+  return EditExternally(Editor, Local, Name);
+}
+
+bool MainWindow::EditExternally(const CoreBridge::TEditorDefinition & Editor, bool Local, const QString & Name)
+{
+  const bool External = (Editor.Kind == CoreBridge::TEditorDefinition::TKind::External);
+  std::shared_ptr<CoreBridge::TEditedFile> File;
+  bool Fresh = false;
+  QString LocalFile;
+  if (Local)
+  {
+    LocalFile = QDir(FLocal->Path()).filePath(Name);
+  }
+  else
+  {
+    if (FBusy || !FSession)
+    {
+      return false;
+    }
+    const QString Directory = FPanel->Path();
+    // Open already: its copy, as it is.
+    for (const TExternalEdited & Edited : FExternalEdited)
+    {
+      if ((QString::fromStdString(Edited.File->RemoteDirectory) == Directory) &&
+          (QString::fromStdString(Edited.File->OriginalName) == Name))
+      {
+        File = Edited.File;
+      }
+    }
+    if (!File)
+    {
+      FBusy = true;
+      UpdateActions();
+      try
+      {
+        // As RemoteExecuteForceText: text for an external editor that asks for it.
+        File = std::make_shared<CoreBridge::TEditedFile>(FSession->EditDownload(Name.toStdString(), External && Editor.Text));
+        Fresh = true;
+      }
+      catch (const CoreBridge::TCoreError & E)
+      {
+        ShowError(E);
+      }
+      FBusy = false;
+      UpdateActions();
+      if (!File)
+      {
+        return false;
+      }
+    }
+    LocalFile = QString::fromStdString(File->LocalFile);
+  }
+  bool Started = false;
+  if (External)
+  {
+    try
+    {
+      CoreBridge::StartExternalEditor(Editor.Command, QDir::toNativeSeparators(LocalFile).toStdString());
+      Started = true;
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+    }
+  }
+  else
+  {
+    const QUrl Url = QUrl::fromLocalFile(LocalFile);
+    Started = FUrlOpener ? FUrlOpener(Url) : QDesktopServices::openUrl(Url);
+    if (!Started)
+    {
+      CoreBridge::TError Error;
+      Error.Message = CoreBridge::ExecuteFileError(QDir::toNativeSeparators(LocalFile).toStdString());
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      Frontend.ShowError(Error);
+    }
+  }
+  if (Fresh)
+  {
+    if (Started)
+    {
+      FExternalEdited.push_back({ File, QFileInfo(LocalFile).lastModified() });
+      FExternalTimer->start();
+    }
+    else if (!File->RootDirectory.empty())
+    {
+      QDir(QString::fromStdString(File->RootDirectory)).removeRecursively();
+    }
+  }
+  return Started;
+}
+
+// As TEditorManager::Check for files with no process: a changed time is a
+// save, uploaded.
+void MainWindow::CheckExternalEdited()
+{
+  for (std::size_t Index = 0; Index < FExternalEdited.size(); Index++)
+  {
+    if (FBusy || !FSession)
+    {
+      return;
+    }
+    TExternalEdited & Edited = FExternalEdited[Index];
+    const QDateTime Modified = QFileInfo(QString::fromStdString(Edited.File->LocalFile)).lastModified();
+    if (Modified.isValid() && (Modified != Edited.Modified))
+    {
+      Edited.Modified = Modified;
+      std::shared_ptr<CoreBridge::TEditedFile> File = Edited.File;
+      EditUpload(*File);
+    }
+  }
 }
 
 EditorWindow * MainWindow::ShowEditor(EditorWindow * Editor)
@@ -1296,6 +1532,18 @@ std::vector<EditorWindow *> MainWindow::Editors(bool RemoteOnly) const
 bool MainWindow::CloseEditors(bool RemoteOnly)
 {
   FClosingEditors = true;
+  // As CloseExternalFilesWithoutProcess: their last changes uploaded, then
+  // their directories cleaned up with the rest.
+  CheckExternalEdited();
+  for (const TExternalEdited & Edited : FExternalEdited)
+  {
+    if (!Edited.File->RootDirectory.empty())
+    {
+      FEditedCleanUp.push_back(Edited.File->RootDirectory);
+    }
+  }
+  FExternalEdited.clear();
+  FExternalTimer->stop();
   bool Result = true;
   for (EditorWindow * Editor : Editors(RemoteOnly))
   {

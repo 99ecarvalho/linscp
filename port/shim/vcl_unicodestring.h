@@ -95,6 +95,16 @@ public:
   // --- length ---------------------------------------------------------------
   int Length() const { return static_cast<int>(FData.size()); }
   bool IsEmpty() const { return FData.empty(); }
+
+  // C++Builder's: what the 1-based Index's character is in a surrogate
+  // pair, the UTF-16 counterpart of a multibyte character's lead and trail.
+  enum TStringMbcsByteType { ctNotLeadChar, ctLeadChar, ctTrailChar };
+  TStringMbcsByteType ByteType(int Index) const
+  {
+    const wchar_t Ch = (*this)[Index];
+    return ((Ch >= 0xD800) && (Ch <= 0xDBFF)) ? ctLeadChar :
+      (((Ch >= 0xDC00) && (Ch <= 0xDFFF)) ? ctTrailChar : ctNotLeadChar);
+  }
   void SetLength(int NewLength);
 
   // --- raw access -----------------------------------------------------------

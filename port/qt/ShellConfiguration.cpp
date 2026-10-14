@@ -9,6 +9,7 @@
 
 #include "FrontendCommon.h"
 #include "CustomCommandType.h"
+#include "EditorPreferences.h"
 #include <TextsWin.h>
 
 namespace
@@ -64,6 +65,7 @@ UnicodeString PosixPuttyPath()
 TShellConfiguration::TShellConfiguration() :
   FBookmarks(new TBookmarks()),
   FCustomCommandList(new TCustomCommandList()),
+  FEditorList(new TEditorList()),
   FCustomCommandOptions(new TStringList())
 {
   WinConfiguration = this;
@@ -270,6 +272,19 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteString(L"ReplaceText", FSettings.EditorReplaceText);
     Storage->WriteBool(L"FindMatchCase", FSettings.EditorFindMatchCase);
     Storage->WriteBool(L"FindWholeWord", FSettings.EditorFindWholeWord);
+    // As TWinConfiguration::SaveData: the editors, its subkeys.
+    if (All || FEditorList->Modified)
+    {
+      FEditorList->Save(Storage);
+    }
+    Storage->WriteString(L"FontName2", FSettings.EditorFontName);
+    Storage->WriteInteger(L"FontSize", FSettings.EditorFontSize);
+    Storage->WriteInteger(L"FontStyle", FSettings.EditorFontStyle);
+    Storage->WriteInteger(L"FontCharset", FSettings.EditorFontCharset);
+    Storage->WriteInteger(L"FontColor", FSettings.EditorFontColor);
+    Storage->WriteInteger(L"BackgroundColor", FSettings.EditorBackgroundColor);
+    Storage->WriteBool(L"WarnOrLargeFileSize", FSettings.EditorWarnOrLargeFileSize);
+    Storage->WriteInteger(L"LargeFileSize", FSettings.EditorLargeFileSize);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\QueueView", true))
   {
@@ -285,13 +300,45 @@ void __fastcall TShellConfiguration::Saved()
   TGUIConfiguration::Saved();
   FBookmarks->ModifyAll(false);
   FCustomCommandList->Reset();
+  FEditorList->Saved();
 }
 
 // As TWinConfiguration::DefaultLocalized: WinSCP's own commands, until the
 // user's are loaded.
+// As TWinConfiguration::LoadFrom's, for no editors kept: the internal
+// editor, then Notepad (Windows), or the associated application.
+void TShellConfiguration::DefaultEditorList()
+{
+  FEditorList->Clear();
+  FEditorList->Add(new TEditorPreferences());
+  TEditorData Data;
+#if defined(_WIN32)
+  Data.Editor = edExternal;
+  Data.ExternalEditor = TEditorPreferences::GetDefaultExternalEditor();
+  Data.ExternalEditorOptionsAutodetect();
+#else
+  Data.Editor = edOpen;
+#endif
+  FEditorList->Add(new TEditorPreferences(Data));
+  FEditorList->Saved();
+}
+
+void TShellConfiguration::SetEditorList(const TEditorList * List)
+{
+  if (!(*FEditorList == *List))
+  {
+    *FEditorList = *List;
+    Changed();
+  }
+}
+
 void __fastcall TShellConfiguration::Default()
 {
   TGUIConfiguration::Default();
+  if (FEditorList != NULL)
+  {
+    DefaultEditorList();
+  }
 #if !defined(_WIN32)
   PuttyPath = PosixPuttyPath();
 #endif
@@ -432,6 +479,23 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.EditorReplaceText = Storage->ReadString(L"ReplaceText", FSettings.EditorReplaceText);
     FSettings.EditorFindMatchCase = Storage->ReadBool(L"FindMatchCase", FSettings.EditorFindMatchCase);
     FSettings.EditorFindWholeWord = Storage->ReadBool(L"FindWholeWord", FSettings.EditorFindWholeWord);
+    // As TWinConfiguration::LoadData and LoadFrom: the editors, else (none
+    // kept) the defaults. WinSCP 4's single editor keys are not read.
+    std::unique_ptr<TEditorList> Editors(new TEditorList());
+    Editors->Load(Storage);
+    if (Editors->Count > 0)
+    {
+      *FEditorList = *Editors;
+      FEditorList->Saved();
+    }
+    FSettings.EditorFontName = Storage->ReadString(L"FontName2", FSettings.EditorFontName);
+    FSettings.EditorFontSize = Storage->ReadInteger(L"FontSize", FSettings.EditorFontSize);
+    FSettings.EditorFontStyle = Storage->ReadInteger(L"FontStyle", FSettings.EditorFontStyle);
+    FSettings.EditorFontCharset = Storage->ReadInteger(L"FontCharset", FSettings.EditorFontCharset);
+    FSettings.EditorFontColor = Storage->ReadInteger(L"FontColor", FSettings.EditorFontColor);
+    FSettings.EditorBackgroundColor = Storage->ReadInteger(L"BackgroundColor", FSettings.EditorBackgroundColor);
+    FSettings.EditorWarnOrLargeFileSize = Storage->ReadBool(L"WarnOrLargeFileSize", FSettings.EditorWarnOrLargeFileSize);
+    FSettings.EditorLargeFileSize = Storage->ReadInteger(L"LargeFileSize", FSettings.EditorLargeFileSize);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\QueueView", false))
   {

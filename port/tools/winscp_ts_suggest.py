@@ -126,6 +126,7 @@ CONTEXT_FORMS = {
     'KeepUpToDateDialog': ['Synchronize.dfm'],
     'CleanupDialog': ['Cleanup.dfm'],
     'LicenseDialog': ['License.dfm'],
+    'EditorPreferencesDialog': ['EditorPreferences.dfm'],
     'AboutDialog': ['About.dfm'],
 }
 

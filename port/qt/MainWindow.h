@@ -5,6 +5,7 @@
 #ifndef LINSCP_QT_MAIN_WINDOW_H
 #define LINSCP_QT_MAIN_WINDOW_H
 
+#include <QDateTime>
 #include <QMainWindow>
 
 #include <QPointer>
@@ -24,6 +25,7 @@ class QueuePanel;
 class QTemporaryDir;
 class QTimer;
 class QUrl;
+class QMenu;
 class RemotePanel;
 
 class MainWindow : public QMainWindow
@@ -94,7 +96,27 @@ public:
   // is saved, and its directory removed once the editor is closed and its
   // uploads are done (ADR 0015). Null when no editor opened; an editor
   // already open on the file is brought up instead.
+  //
+  // The editor is the first of Preferences > Editors whose mask matches the
+  // file (TWinConfiguration::DefaultEditorForFile), else the internal one.
+  // An external one, or the associated application, gets a remote file's
+  // temporary copy, uploaded back whenever its time changes, until the
+  // session closes (TEditorManager's files with no process); a local file
+  // as it is. Null then too.
   EditorWindow * EditCurrent();
+  // Files > Edit With: the given editor (its index in Preferences >
+  // Editors), or (-1) one asked for (Edit With..., TEditorPreferencesDialog
+  // ad hoc, which may remember it). Files > Open: the associated
+  // application (efShell). False when nothing was opened.
+  bool EditCurrentWith(int Editor);
+  bool OpenCurrent();
+  // As CustomExecuteFile's efExternalEditor and efShell, on a file of the
+  // active panel.
+  bool EditExternally(const CoreBridge::TEditorDefinition & Editor, bool Local, const QString & Name);
+  // The remote files open externally: checked, and changed ones uploaded
+  // (the timer's job; for tests).
+  void CheckExternalEdited();
+  int ExternalEditedCount() const { return static_cast<int>(FExternalEdited.size()); }
   EditorWindow * EditRemote(const QString & Name);
   EditorWindow * EditLocal(const QString & FileName);
   // The editors open: the remote ones only, or all.
@@ -252,6 +274,17 @@ private:
     std::shared_ptr<CoreBridge::TEditedFile> File;
   };
   std::vector<TEdited> FEdited;
+  // Remote files open in an external editor or their application, and their
+  // time as last uploaded.
+  struct TExternalEdited
+  {
+    std::shared_ptr<CoreBridge::TEditedFile> File;
+    QDateTime Modified;
+  };
+  std::vector<TExternalEdited> FExternalEdited;
+  QTimer * FExternalTimer = nullptr;
+  QMenu * FEditWithMenu = nullptr;
+  bool CurrentFile(bool & Local, QString & Name, std::int64_t & Size, double & ModifiedTime) const;
   std::vector<std::string> FEditedCleanUp;
   // Closing the editors: their uploads here, not queued.
   bool FClosingEditors = false;

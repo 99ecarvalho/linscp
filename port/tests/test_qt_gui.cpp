@@ -1490,7 +1490,7 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       }
       Check(Pages == QStringList({ PreferencesDialog::tr("Window"), PreferencesDialog::tr("Commander"),
         PreferencesDialog::tr("Languages"), PreferencesDialog::tr("Panels"), PreferencesDialog::tr("File colors"),
-        PreferencesDialog::tr("Transfer"), PreferencesDialog::tr("Background"), PreferencesDialog::tr("Endurance"),
+        PreferencesDialog::tr("Editors"), PreferencesDialog::tr("Internal editor"), PreferencesDialog::tr("Transfer"), PreferencesDialog::tr("Background"), PreferencesDialog::tr("Endurance"),
         PreferencesDialog::tr("Network"), PreferencesDialog::tr("Security"), PreferencesDialog::tr("Logging"),
         PreferencesDialog::tr("Applications"), PreferencesDialog::tr("Commands"), PreferencesDialog::tr("Storage") }),
         "the dialog's pages, in the order of WinSCP's tree");
@@ -1766,6 +1766,67 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       CoreBridge::SetEditorSettings(Editor);
     }
 
+    // Editors and Internal editor: saved, and what the editor then is.
+    {
+      const CoreBridge::TEditorSettings Before = CoreBridge::EditorSettings();
+      PreferencesDialog Dialog;
+      Check(Dialog.EditorWarnLargeFileCheck()->isChecked() && (Dialog.EditorLargeFileSizeSpin()->value() == 10240) &&
+        (Dialog.EditorTabSizeSpin()->value() == 8), "WinSCP's editor defaults");
+      Dialog.SetEditorFont(QFont(QStringLiteral("Monospace"), 13));
+      Dialog.SetEditorColors(0x112233, 0xffeedd);
+      Dialog.EditorTabSizeSpin()->setValue(4);
+      Dialog.EditorLargeFileSizeSpin()->setValue(1);
+      Dialog.EditorCheckNotModifiedCheck()->setChecked(true);
+      Dialog.Save();
+      const CoreBridge::TEditorSettings After = CoreBridge::EditorSettings();
+      Check((After.FontSize == 13) && (After.FontColor == 0x112233) && (After.BackgroundColor == 0xffeedd) &&
+        (After.TabSize == 4) && (After.LargeFileSize == 1) && After.CheckNotModified, "saved");
+      // The editor preference list.
+      Check(Dialog.EditorsList()->topLevelItemCount() == 2, "WinSCP's two editors listed");
+      CoreBridge::TEditorDefinition Vim;
+      Vim.Kind = CoreBridge::TEditorDefinition::TKind::External;
+      Vim.Command = "vim";
+      Vim.Mask = "*.conf";
+      Vim.Text = true;
+      Dialog.EditorsList()->setCurrentItem(Dialog.EditorsList()->topLevelItem(0));
+      Check(Dialog.AddEditEditor(false, &Vim) && (Dialog.EditorDefinitions()[0].Command == "vim") &&
+        (Dialog.EditorsList()->topLevelItem(0)->text(0) == QStringLiteral("Vim")) &&
+        (Dialog.EditorsList()->topLevelItem(0)->text(2) == PreferencesDialog::tr("Yes")), "an editor added before the selected one");
+      Dialog.Save();
+      Check((CoreBridge::Editors().size() == 3) && (CoreBridge::Editors()[0].Mask == "*.conf"), "the list saved");
+      Dialog.EditorsList()->setCurrentItem(Dialog.EditorsList()->topLevelItem(0));
+      Dialog.RemoveEditor();
+      Dialog.Save();
+      Check(CoreBridge::Editors().size() == 2, "and removed");
+      const QString Large = QDir(Directory).filePath(QStringLiteral("large.txt"));
+      {
+        QFile File(Large);
+        File.open(QIODevice::WriteOnly);
+        File.write(QByteArray(4096, 'x'));
+      }
+      EditorWindow Editor(Large, QString(), QStringLiteral("linscp"));
+      Check((Editor.Editor()->font().pointSize() == 13) &&
+        (Editor.Editor()->palette().color(QPalette::Base) == QColor(QRgb(0xffeedd))), "the editor in that font and colours");
+      QString Asked;
+      Responder.Custom = [&Asked](QWidget * Modal)
+      {
+        QueryDialog * Query = qobject_cast<QueryDialog *>(Modal);
+        if (Query == nullptr)
+        {
+          return false;
+        }
+        for (const QLabel * Label : Query->findChildren<QLabel *>())
+        {
+          Asked += Label->text();
+        }
+        Query->Buttons()[1]->click();
+        return true;
+      };
+      Check(!Editor.Load() && Asked.contains(QStringLiteral("large")), "a file over the size asked about, and declined");
+      Responder.Custom = nullptr;
+      CoreBridge::SetEditorSettings(Before);
+    }
+
     // Applications: the PuTTY command, its options as upstream enables them.
     {
       PreferencesDialog Dialog;
@@ -1986,6 +2047,64 @@ void Editing(const char * Port, const QString & Directory)
       QFile::remove(Dir.filePath(QStringLiteral("down/remote.txt")));
       Check(Window.Download({ QStringLiteral("remote.txt") }, Dir.filePath(QStringLiteral("down")), false) &&
         (ReadAll(Dir.filePath(QStringLiteral("down/remote.txt"))) == "remote\nedited\nagain\n"), "the server has that too");
+    }
+
+    // Preferences > Editors: an external editor by mask, its copy uploaded
+    // whenever it changes, until the session closes.
+    {
+      const std::vector<CoreBridge::TEditorDefinition> Defaults = CoreBridge::Editors();
+      Check((Defaults.size() == 2) && (Defaults[0].Kind == CoreBridge::TEditorDefinition::TKind::Internal),
+        "WinSCP's editors by default: the internal one first");
+      CoreBridge::TEditorDefinition External;
+      External.Kind = CoreBridge::TEditorDefinition::TKind::External;
+      External.Command = "myeditor --file !.! --wait";
+      External.Mask = "*.ext";
+      std::vector<CoreBridge::TEditorDefinition> Editors = Defaults;
+      Editors.insert(Editors.begin(), External);
+      CoreBridge::SetEditors(Editors);
+      Check((CoreBridge::FindEditor(CoreBridge::Editors(), "a.ext", false, 0, 0) == 0) &&
+        (CoreBridge::FindEditor(CoreBridge::Editors(), "a.txt", false, 0, 0) == 1), "each file its editor by mask");
+      Check(CoreBridge::Editors()[0].Name == "Myeditor", "named as WinSCP names it");
+      WriteAll(Dir.filePath(QStringLiteral("up.ext")), "external\n");
+      Check(Window.Upload({ Dir.filePath(QStringLiteral("up.ext")) }, QStringLiteral("/"), false), "a file for it");
+      QString Started;
+      QString Params;
+      Frontend.SetStartProgram([&Started, &Params](const QString & Program, const QString & AParams, const QString &)
+      {
+        Started = Program;
+        Params = AParams;
+        return true;
+      });
+      Remote->Refresh();
+      Remote->Select({ QStringLiteral("up.ext") });
+      Window.ActivatePanel(false);
+      Check((Window.EditCurrent() == nullptr) && (Started == QStringLiteral("myeditor")) &&
+        Params.startsWith(QStringLiteral("--file ")) && Params.endsWith(QStringLiteral(" --wait")) &&
+        (Window.ExternalEditedCount() == 1), "F4: the external editor, the temporary copy for !.!");
+      QString Copy = Params.mid(7, Params.length() - 7 - 7);
+      if (Copy.startsWith(QLatin1Char('"')))
+      {
+        Copy = Copy.mid(1, Copy.length() - 2);
+      }
+      Check(QFileInfo::exists(Copy), "a copy that exists");
+      QThread::msleep(1100);
+      WriteAll(Copy, "external\nsaved\n");
+      Window.CheckExternalEdited();
+      Check(WaitUntil([&Window]() { return Window.Session()->QueueEmpty(); }), "its change uploaded");
+      QFile::remove(Dir.filePath(QStringLiteral("down/up.ext")));
+      Check(Window.Download({ QStringLiteral("up.ext") }, Dir.filePath(QStringLiteral("down")), false) &&
+        (ReadAll(Dir.filePath(QStringLiteral("down/up.ext"))) == "external\nsaved\n"), "the server has it");
+      // The associated application (Files > Open), a local file as it is.
+      QUrl Opened;
+      Window.SetUrlOpener([&Opened](const QUrl & Url) { Opened = Url; return true; });
+      Local->Select({ QStringLiteral("crlf.txt") });
+      Window.ActivatePanel(true);
+      Check(Window.OpenCurrent() && (QDir(QFileInfo(Opened.toLocalFile()).path()) == QDir(Directory)), "Open: the local file itself");
+      Window.SetUrlOpener(nullptr);
+      Check(Window.CloseEditors(true) && (Window.ExternalEditedCount() == 0) &&
+        WaitUntil([&Copy]() { return !QFileInfo::exists(Copy); }), "the session closing ends it, its copy removed");
+      Frontend.SetStartProgram(nullptr);
+      CoreBridge::SetEditors(Defaults);
     }
     Frontend.SetWindow(nullptr);
   }

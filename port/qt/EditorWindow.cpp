@@ -7,6 +7,7 @@
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QFontDatabase>
 #include <QFormLayout>
 #include <QGroupBox>
@@ -17,6 +18,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QPalette>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QRadioButton>
@@ -27,6 +29,8 @@
 #include <QVBoxLayout>
 
 #include "CoreBridge.h"
+#include "QtFrontend.h"
+#include "FileList.h"
 
 // Find and Replace, as the system's dialogs WinSCP's editor uses: modeless,
 // beside the editor.
@@ -146,7 +150,32 @@ EditorWindow::EditorWindow(const QString & FileName, const QString & Caption, co
   FUtf8 = Settings.Utf8;
 
   FEditor = new QPlainTextEdit(this);
-  FEditor->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+  // As TEditorForm::ApplyConfiguration: the configured font, else the
+  // system's fixed one; the colours, else the window's.
+  QFont Font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+  if (!Settings.FontName.empty())
+  {
+    Font.setFamily(QString::fromStdString(Settings.FontName));
+  }
+  if (Settings.FontSize > 0)
+  {
+    Font.setPointSize(Settings.FontSize);
+  }
+  Font.setBold(Settings.FontBold);
+  Font.setItalic(Settings.FontItalic);
+  Font.setUnderline(Settings.FontUnderline);
+  Font.setStrikeOut(Settings.FontStrikeOut);
+  FEditor->setFont(Font);
+  QPalette Palette = FEditor->palette();
+  if (Settings.BackgroundColor >= 0)
+  {
+    Palette.setColor(QPalette::Base, QColor(QRgb(Settings.BackgroundColor)));
+  }
+  if (Settings.FontColor >= 0)
+  {
+    Palette.setColor(QPalette::Text, QColor(QRgb(Settings.FontColor)));
+  }
+  FEditor->setPalette(Palette);
   FEditor->setLineWrapMode(Settings.WordWrap ? QPlainTextEdit::WidgetWidth : QPlainTextEdit::NoWrap);
   FEditor->setTabStopDistance(FEditor->fontMetrics().horizontalAdvance(QLatin1Char(' ')) * qMax(1, Settings.TabSize));
   setCentralWidget(FEditor);
@@ -248,7 +277,52 @@ bool EditorWindow::Modified() const
 
 bool EditorWindow::Load()
 {
-  return LoadAs(FUtf8, true);
+  return CheckFileSize() && LoadAs(FUtf8, true);
+}
+
+// As TEditorForm::CheckFileSize: a file larger than the configured size is
+// asked about first, "never ask again" turning the warning off.
+bool EditorWindow::CheckFileSize()
+{
+  CoreBridge::TEditorSettings Settings = CoreBridge::EditorSettings();
+  const qint64 Size = QFileInfo(FFileName).size();
+  if (!Settings.WarnOnLargeFile || (Size <= static_cast<qint64>(Settings.LargeFileSize) * 1024))
+  {
+    return true;
+  }
+  CoreBridge::TQuery Query;
+  Query.Type = CoreBridge::TQueryType::Confirmation;
+  Query.Message = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::EditorLargeFile))
+    .replace(QStringLiteral("%s"), FormatBytes(Size)).remove(QStringLiteral("**")).toStdString();
+  CoreBridge::TQueryButton OK;
+  OK.Answer = CoreBridge::AnswerOK;
+  OK.Caption = "OK";
+  CoreBridge::TQueryButton Cancel;
+  Cancel.Answer = CoreBridge::AnswerCancel;
+  Cancel.Caption = "Cancel";
+  Query.Buttons = { OK, Cancel };
+  Query.CancelAnswer = CoreBridge::AnswerCancel;
+  Query.NeverAskAgainCheck = true;
+  QtFrontend Frontend;
+  Frontend.SetWindow(this);
+  const CoreBridge::TQueryResult Answer = Frontend.Query(Query);
+  if (Answer.Answer != CoreBridge::AnswerOK)
+  {
+    return false;
+  }
+  if (Answer.NeverAskAgain)
+  {
+    Settings.WarnOnLargeFile = false;
+    try
+    {
+      CoreBridge::SetEditorSettings(Settings);
+    }
+    catch (const CoreBridge::TCoreError &)
+    {
+      // Asked again next time.
+    }
+  }
+  return true;
 }
 
 // Primary: the encoding is the configured one, so a file in the other is

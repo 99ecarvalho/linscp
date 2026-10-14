@@ -84,11 +84,10 @@ POSIX, a text-mode download then gave local files CRLF line endings.
   - reloading a remote file from the server (WinSCP's `OnFileReload`;
     Reload rereads the temporary copy);
   - "Save all", the editor's window position, font and colour;
-  - the large-file warning;
+  - the large-file warning (done: see the amendment below);
   - WinSCP's "never ask again" on the encoding fallback;
-  - opening a remote file with its associated application (WinSCP's
-    Open);
-  - Edit with…;
+  - opening a remote file with its associated application, and Edit
+    with… (done: see the amendment below);
   - the cleanup confirmation for temporary directories left from a
     previous run (`ConfirmTemporaryDirectoryCleanup`).
 
@@ -107,3 +106,48 @@ POSIX, a text-mode download then gave local files CRLF line endings.
   - editors closed with the session, saved first in the foreground.
 - Natively on Windows 11, `qt_gui_edit` and `qt_session` too, where text
   mode gives CRLF.
+
+## Amendment 2026-10-14: external editors and the associated application (P3-04e)
+
+Preferences > Editors lists the editors files open in, as WinSCP's. F4
+uses the first editor whose mask matches the file, else the internal one.
+Files > Edit With offers each editor, or one asked for, which may be
+remembered. Files > Open uses the file's associated application.
+
+- **The list is upstream's.** `TEditorData`, `TEditorPreferences` and
+  `TEditorList` are compiled as they are, from slices of
+  `WinConfiguration.h` and `.cpp` (ADR 0014). The shell's configuration
+  keeps the list where `TWinConfiguration` keeps it: the subkeys of
+  `Interface\Editor`.
+  - The default list is upstream's when nothing is kept: the internal
+    editor, then Notepad. On POSIX the second is the associated
+    application.
+  - WinSCP 4's single-editor keys are not read.
+- **Starting an editor is upstream's** (`CustomExecuteFile`): the command
+  is split, its `!.!` becomes the file or the file is appended, and it
+  runs through the frontend's `StartProgram`. The associated application
+  is `QDesktopServices::openUrl`.
+- **A remote file's copy is watched as TEditorManager watches files with
+  no process.** It is downloaded to a temporary directory, with text mode
+  where the editor asks for it. Each change of its time is a save,
+  uploaded, as the internal editor's are, with "check not modified". The
+  copy is kept until the session closes. Then its last change is uploaded
+  in the foreground, and its directory is removed with the internal
+  editors'.
+  - The shell does not wait on the editor's process, which upstream does
+    for an SDI editor. So the copy outlives the editor's window until the
+    session ends, as it does in WinSCP for an MDI editor or the
+    associated application.
+- **The internal editor's own page** sets the font, the text and
+  background colours, the tab size, the encoding and word wrap, as WinSCP's
+  Internal editor page does. The large-file question is also asked, with
+  "never ask again".
+- **Not yet:** detecting an MDI editor and the "editor closed too early"
+  question; "Use default system editor".
+
+Verified by `qt_gui_edit` (an external editor chosen by mask, given
+`!.!`; its copy's change uploaded; Open on a local file; the copy gone
+with the session) and `qt_gui_preferences` (the pages; the editor in the
+font and colours; the large-file question). Both run on Linux, under Wine
+and on native Windows.
+

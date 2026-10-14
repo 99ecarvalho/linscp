@@ -388,6 +388,14 @@ Verified by `qt_gui_keep` on Linux, under Wine and on native Windows. Under
 Wine a watched directory cannot be deleted, so the test's "watched
 directory gone" step runs only where it can.
 
+## Amendment 2026-10-14: the editor preferences (P3-04e)
+
+`TEditorData`, `TEditorPreferences` and `TEditorList` are sliced from
+`WinConfiguration.h` and `.cpp`, as the custom commands are. The `.cpp`
+slice's prologue repeats that file's `NotepadName`, a static above the
+slice. The shim gains `UnicodeString::ByteType`. The shell's configuration
+keeps the list as `TWinConfiguration` does (ADR 0015 amendment).
+
 ## Amendment 2026-10-14: Open in PuTTY (P3-08)
 
 Commands > Open in PuTTY is upstream's `OpenSessionInPutty`, compiled as it

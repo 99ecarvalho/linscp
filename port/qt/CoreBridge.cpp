@@ -21,6 +21,7 @@
 #include <S3FileSystem.h>
 
 #include "PuttySlice.h"
+#include "EditorPreferences.h"
 
 namespace
 {
@@ -331,6 +332,18 @@ TEditorSettings EditorSettings()
   Result.FindMatchCase = Settings.EditorFindMatchCase;
   Result.FindWholeWord = Settings.EditorFindWholeWord;
   Result.CheckNotModified = Settings.EditorCheckNotModified;
+  Result.FontName = Utf8(Settings.EditorFontName);
+  Result.FontSize = Settings.EditorFontSize;
+  Result.FontBold = FLAGSET(Settings.EditorFontStyle, 1);
+  Result.FontItalic = FLAGSET(Settings.EditorFontStyle, 2);
+  Result.FontUnderline = FLAGSET(Settings.EditorFontStyle, 4);
+  Result.FontStrikeOut = FLAGSET(Settings.EditorFontStyle, 8);
+  // TColor is 0x00BBGGRR; 0 the default (GetWindowTextColor, GetWindowColor).
+  const auto Rgb = [](int Color) { return (Color == 0) ? -1 : (((Color & 0xff) << 16) | (Color & 0xff00) | ((Color >> 16) & 0xff)); };
+  Result.FontColor = Rgb(Settings.EditorFontColor);
+  Result.BackgroundColor = Rgb(Settings.EditorBackgroundColor);
+  Result.WarnOnLargeFile = Settings.EditorWarnOrLargeFileSize;
+  Result.LargeFileSize = Settings.EditorLargeFileSize;
   return Result;
 }
 
@@ -481,6 +494,15 @@ void SetEditorSettings(const TEditorSettings & Editor)
   Settings.EditorFindMatchCase = Editor.FindMatchCase;
   Settings.EditorFindWholeWord = Editor.FindWholeWord;
   Settings.EditorCheckNotModified = Editor.CheckNotModified;
+  Settings.EditorFontName = FromUtf8(Editor.FontName);
+  Settings.EditorFontSize = Editor.FontSize;
+  Settings.EditorFontStyle = FLAGMASK(Editor.FontBold, 1) | FLAGMASK(Editor.FontItalic, 2) |
+    FLAGMASK(Editor.FontUnderline, 4) | FLAGMASK(Editor.FontStrikeOut, 8);
+  const auto Bgr = [](int Color) { return (Color < 0) ? 0 : (((Color & 0xff) << 16) | (Color & 0xff00) | ((Color >> 16) & 0xff)); };
+  Settings.EditorFontColor = Bgr(Editor.FontColor);
+  Settings.EditorBackgroundColor = Bgr(Editor.BackgroundColor);
+  Settings.EditorWarnOrLargeFileSize = Editor.WarnOnLargeFile;
+  Settings.EditorLargeFileSize = Editor.LargeFileSize;
   try
   {
     Shell()->SetSettings(Settings);
@@ -926,6 +948,11 @@ std::string Text(TText Text)
     case TText::TagValue: Ident = TAG_VALUE; break;
     case TText::TagNotUnique: Ident = TAG_NOT_UNIQUE; break;
     case TText::TagInvalidChar: Ident = TAG_INVALID_CHAR; break;
+    case TText::EditorLargeFile: Ident = INTERNAL_EDITOR_LARGE_FILE2; break;
+    case TText::EditorAdd: Ident = EDITOR_ADD; break;
+    case TText::EditorEdit: Ident = EDITOR_EDIT; break;
+    case TText::EditorAdHoc: Ident = EDITOR_AD_HOC; break;
+    case TText::SelectExternalEditor: Ident = PREFERENCES_SELECT_EXTERNAL_EDITOR; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));
@@ -1130,3 +1157,135 @@ TInfo Info()
 }
 
 }
+
+namespace CoreBridge
+{
+
+namespace
+{
+
+TEditorData EditorDataOf(const TEditorDefinition & Editor)
+{
+  TEditorData Data;
+  Data.Editor = (Editor.Kind == TEditorDefinition::TKind::External) ? edExternal :
+    ((Editor.Kind == TEditorDefinition::TKind::Open) ? edOpen : edInternal);
+  Data.ExternalEditor = FromUtf8(Editor.Command);
+  Data.FileMask = FromUtf8(Editor.Mask);
+  Data.ExternalEditorText = Editor.Text;
+  Data.SDIExternalEditor = Editor.Sdi;
+  Data.DetectMDIExternalEditor = Editor.DetectMdi;
+  return Data;
+}
+
+TEditorDefinition DefinitionOf(const TEditorPreferences & Preferences)
+{
+  const TEditorData * Data = Preferences.Data;
+  TEditorDefinition Result;
+  Result.Kind = (Data->Editor == edExternal) ? TEditorDefinition::TKind::External :
+    ((Data->Editor == edOpen) ? TEditorDefinition::TKind::Open : TEditorDefinition::TKind::Internal);
+  Result.Command = Utf8(Data->ExternalEditor);
+  Result.Mask = Utf8(Data->FileMask.Masks);
+  Result.Text = Data->ExternalEditorText;
+  Result.Sdi = Data->SDIExternalEditor;
+  Result.DetectMdi = Data->DetectMDIExternalEditor;
+  Result.Name = Utf8(Preferences.Name);
+  return Result;
+}
+
+}  // namespace
+
+std::vector<TEditorDefinition> Editors()
+{
+  const TEditorList * List = Shell()->EditorList();
+  std::vector<TEditorDefinition> Result;
+  for (int Index = 0; Index < List->Count; Index++)
+  {
+    Result.push_back(DefinitionOf(*List->Editors[Index]));
+  }
+  return Result;
+}
+
+void SetEditors(const std::vector<TEditorDefinition> & Editors)
+{
+  try
+  {
+    std::unique_ptr<TEditorList> List(new TEditorList());
+    for (const TEditorDefinition & Editor : Editors)
+    {
+      List->Add(new TEditorPreferences(EditorDataOf(Editor)));
+    }
+    Shell()->SetEditorList(List.get());
+    Configuration->SaveExplicit();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+int FindEditor(const std::vector<TEditorDefinition> & Editors, const std::string & FileName, bool Local,
+  std::int64_t Size, double ModifiedTime)
+{
+  try
+  {
+    TFileMasks::TParams Params;
+    Params.Size = Size;
+    // TDateTime counts days from 1899-12-30; 1970 is day 25569.
+    Params.Modification = TDateTime(ModifiedTime / 86400.0 + 25569.0);
+    const UnicodeString Name = FromUtf8(FileName);
+    for (std::size_t Index = 0; Index < Editors.size(); Index++)
+    {
+      const TEditorPreferences Preferences(EditorDataOf(Editors[Index]));
+      if (Preferences.Matches(Name, Local, Params))
+      {
+        return static_cast<int>(Index);
+      }
+    }
+    return -1;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void StartExternalEditor(const std::string & Command, const std::string & FileName)
+{
+  try
+  {
+    UnicodeString ACommand = FromUtf8(Command);
+    ReformatFileNameCommand(ACommand);
+    UnicodeString Program, Params, Dir;
+    SplitCommand(ACommand, Program, Params, Dir);
+    Params = ExpandFileNameCommand(Params, FromUtf8(FileName));
+    Program = ExpandEnvironmentVariables(Program);
+    if ((Frontend() == NULL) || !Frontend()->StartProgram(Utf8(Program), Utf8(Params), std::string()))
+    {
+      throw EOSExtException(FMTLOAD(EDITOR_ERROR, (Program)));
+    }
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+std::string ExecuteFileError(const std::string & FileName)
+{
+  return Utf8(FMTLOAD(EXECUTE_FILE_ERROR, (FromUtf8(FileName))));
+}
+
+std::string EditorName(const TEditorDefinition & Editor)
+{
+  return Utf8(TEditorPreferences(EditorDataOf(Editor)).Name);
+}
+
+void AutodetectEditorOptions(TEditorDefinition & Editor)
+{
+  TEditorData Data = EditorDataOf(Editor);
+  Data.ExternalEditorOptionsAutodetect();
+  Editor.Text = Data.ExternalEditorText;
+  Editor.Sdi = Data.SDIExternalEditor;
+}
+
+}  // namespace CoreBridge

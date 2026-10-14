@@ -30,6 +30,8 @@ public:
   // the text is not valid in it (with a message). False when it could not
   // be read (the error shown).
   bool Load();
+  // The large-file question (TEditorForm::CheckFileSize): false when declined.
+  bool CheckFileSize();
   // Writes the text back in its encoding, BOM and line endings, then calls
   // OnFileChanged. False when it was not saved (or OnFileChanged declined:
   // the text stays modified).

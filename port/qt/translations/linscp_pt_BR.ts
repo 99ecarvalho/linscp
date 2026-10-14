@@ -226,6 +226,53 @@ Local: %2</translation>
     </message>
 </context>
 <context>
+    <name>EditorPreferencesDialog</name>
+    <message>
+        <source>Editor</source>
+        <translation>Editor</translation>
+    </message>
+    <message>
+        <source>&amp;Internal editor</source>
+        <translation>Editor &amp;Interno</translation>
+    </message>
+    <message>
+        <source>&amp;External editor:</source>
+        <translation>Editor &amp;Externo</translation>
+    </message>
+    <message>
+        <source>B&amp;rowse...</source>
+        <translation>P&amp;rocurar...</translation>
+    </message>
+    <message>
+        <source>&amp;Associated application</source>
+        <translation>&amp;Aplicação associada</translation>
+    </message>
+    <message>
+        <source>Editor autoselection</source>
+        <translation>Autoseleção de editor</translation>
+    </message>
+    <message>
+        <source>Use this editor for &amp;following files:</source>
+        <translation>Use este editor para os seguintes ar&amp;quivos</translation>
+    </message>
+    <message>
+        <source>External editor options (affects editing remote files only)</source>
+        <translation>Opções do editor externo (afeta apenas edição de arquivos remotos)</translation>
+    </message>
+    <message>
+        <source>Force &amp;text transfer mode for files edited in external editor</source>
+        <translation>Forçar modo de transferência de &amp;texto para arquivos editados no editor externo</translation>
+    </message>
+    <message>
+        <source>E&amp;xternal editor opens each file in separate window (process)</source>
+        <translation>O editor e&amp;xterno abre cada arquivo numa janela separada (processo)</translation>
+    </message>
+    <message>
+        <source>&amp;Remember this editor</source>
+        <translation>&amp;Recordar-se deste editor</translation>
+    </message>
+</context>
+<context>
     <name>EditorWindow</name>
     <message>
         <source>Replace</source>
@@ -1064,6 +1111,18 @@ Local: %2</translation>
         <source>Open in &amp;PuTTY</source>
         <translation>Abrir no &amp;PuTTY</translation>
     </message>
+    <message>
+        <source>Edit &amp;With</source>
+        <translation>Editar &amp;com</translation>
+    </message>
+    <message>
+        <source>Edit &amp;With...</source>
+        <translation>Editar &amp;com...</translation>
+    </message>
+    <message>
+        <source>&amp;Open</source>
+        <translation>A&amp;brir</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>
@@ -1597,6 +1656,98 @@ Local: %2</translation>
     <message>
         <source>L/R</source>
         <translation>L/R</translation>
+    </message>
+    <message>
+        <source>Editors</source>
+        <translation>Editor</translation>
+    </message>
+    <message>
+        <source>Internal editor</source>
+        <translation>Editor interno</translation>
+    </message>
+    <message>
+        <source>Editor preference</source>
+        <translation>Preferência de editor</translation>
+    </message>
+    <message>
+        <source>Editor</source>
+        <translation>Editor</translation>
+    </message>
+    <message>
+        <source>Mask</source>
+        <translation>Máscara</translation>
+    </message>
+    <message>
+        <source>Text</source>
+        <translation>Texto</translation>
+    </message>
+    <message>
+        <source>Editing options</source>
+        <translation>Opções de edição</translation>
+    </message>
+    <message>
+        <source>&amp;Check that edited remote file has not changed before saving it</source>
+        <translation>&amp;Verificar se o arquivo remoto não foi alterado antes de salvá-lo</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Sim</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Não</translation>
+    </message>
+    <message>
+        <source>Display</source>
+        <translation>Exibir</translation>
+    </message>
+    <message>
+        <source>&amp;Wrap long lines</source>
+        <translation>&amp;Quebra automática de linha</translation>
+    </message>
+    <message>
+        <source>&amp;Tabulator size:</source>
+        <translation>&amp;Tamanho da tabulação</translation>
+    </message>
+    <message>
+        <source>UTF-8</source>
+        <translation>UTF-8</translation>
+    </message>
+    <message>
+        <source>Default en&amp;coding:</source>
+        <translation>Codificação padrão</translation>
+    </message>
+    <message>
+        <source>Font</source>
+        <translation>Fonte</translation>
+    </message>
+    <message>
+        <source>&amp;Select font...</source>
+        <translation>&amp;Selecionar fonte...</translation>
+    </message>
+    <message>
+        <source>&amp;Default</source>
+        <translation>&amp;Padrão</translation>
+    </message>
+    <message>
+        <source>&amp;More colors...</source>
+        <translation>&amp;Mais cores...</translation>
+    </message>
+    <message>
+        <source>&amp;Text color</source>
+        <translation>Cor do &amp;Texto</translation>
+    </message>
+    <message>
+        <source>Default &amp;background</source>
+        <translation>&amp;Plano de fundo padrão</translation>
+    </message>
+    <message>
+        <source>Behaviour</source>
+        <translation>Comportamento</translation>
+    </message>
+    <message>
+        <source>Warn when &amp;editing files larger than:</source>
+        <translation>Emitir aviso ao &amp;editar arquivos maiores que:</translation>
     </message>
 </context>
 <context>

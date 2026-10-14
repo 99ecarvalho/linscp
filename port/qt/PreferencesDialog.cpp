@@ -3,6 +3,7 @@
 #include "TransferSettingsDialog.h"
 #include "CustomCommandDialog.h"
 #include "ShortCutDialog.h"
+#include "EditorPreferencesDialog.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -20,6 +21,11 @@
 #include <QSpinBox>
 #include <QGridLayout>
 #include <QDir>
+#include <QFontDialog>
+#include <QFrame>
+#include <QPalette>
+#include <QFontDatabase>
+#include <QMenu>
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QKeyEvent>
@@ -62,6 +68,8 @@ PreferencesDialog::PreferencesDialog(QWidget * Parent) :
   AddPage(tr("Languages"), MakeLanguagesPage());
   AddPage(tr("Panels"), MakePanelsPage(Preferences));
   AddPage(tr("File colors"), MakeFileColorsPage());
+  AddPage(tr("Editors"), MakeEditorsPage());
+  AddPage(tr("Internal editor"), MakeInternalEditorPage());
   AddPage(tr("Transfer"), MakeTransferPage());
   AddPage(tr("Background"), MakeBackgroundPage(Preferences));
   AddPage(tr("Endurance"), MakeEndurancePage(Preferences));
@@ -209,6 +217,13 @@ void PreferencesDialog::UpdateControls()
   FLogMaxSizeCombo->setEnabled(FLogging->isChecked() && FLogMaxSize->isChecked());
   FLogMaxCountSpin->setEnabled(FLogging->isChecked() && FLogMaxCount->isChecked());
   FActionsLogFile->setEnabled(FLogActions->isChecked());
+  FEditorLargeFileSize->setEnabled(FEditorWarnLargeFile->isChecked());
+  // As UpdateControls' editors.
+  const int EditorRow = FEditorsList->indexOfTopLevelItem(FEditorsList->currentItem());
+  FEditEditor->setEnabled(EditorRow >= 0);
+  FRemoveEditor->setEnabled(EditorRow >= 0);
+  FUpEditor->setEnabled(EditorRow > 0);
+  FDownEditor->setEnabled((EditorRow >= 0) && (EditorRow < FEditorsList->topLevelItemCount() - 1));
   // As UpdateControls' PuTTY part.
   bool SiteCommand = false;
   bool PasswordCommand = false;
@@ -938,6 +953,8 @@ void PreferencesDialog::Save()
   CoreBridge::SetDefaultTransferSettings(Default);
   CoreBridge::SetTransferPresets(FPresets);
   CoreBridge::SetCustomCommands(FCommands);
+  CoreBridge::SetEditorSettings(EditorSettings());
+  CoreBridge::SetEditors(FEditors);
   if (FLanguages->currentItem() != nullptr)
   {
     CoreBridge::SetPreferredLocale(Locale());
@@ -1141,4 +1158,291 @@ void PreferencesDialog::MoveCommand(int By)
   }
   std::swap(FCommands[Row], FCommands[To]);
   LoadCommands(To);
+}
+
+// Editors, as WinSCP's EditorSheet: the editors files open in, the first
+// whose mask matches; the editing options.
+QWidget * PreferencesDialog::MakeEditorsPage()
+{
+  FEditor = CoreBridge::EditorSettings();
+  FEditors = CoreBridge::Editors();
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  QGroupBox * Preference = new QGroupBox(tr("Editor preference"), Page);
+  QHBoxLayout * PreferenceLayout = new QHBoxLayout(Preference);
+  FEditorsList = new QTreeWidget(Preference);
+  FEditorsList->setRootIsDecorated(false);
+  FEditorsList->setHeaderLabels({ tr("Editor"), tr("Mask"), tr("Text") });
+  FEditorsList->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+  FEditorsList->header()->setSectionResizeMode(1, QHeaderView::Stretch);
+  FEditorsList->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+  FEditorsList->header()->setStretchLastSection(false);
+  PreferenceLayout->addWidget(FEditorsList, 1);
+  QVBoxLayout * Buttons = new QVBoxLayout();
+  QPushButton * Add = new QPushButton(tr("&Add..."), Preference);
+  FEditEditor = new QPushButton(tr("&Edit..."), Preference);
+  FUpEditor = new QPushButton(tr("&Up"), Preference);
+  FDownEditor = new QPushButton(tr("&Down"), Preference);
+  FRemoveEditor = new QPushButton(tr("&Remove"), Preference);
+  for (QPushButton * Button : { Add, FEditEditor, FUpEditor, FDownEditor, FRemoveEditor })
+  {
+    Buttons->addWidget(Button);
+  }
+  Buttons->addStretch(1);
+  PreferenceLayout->addLayout(Buttons);
+  connect(Add, &QPushButton::clicked, this, [this]() { AddEditEditor(false); });
+  connect(FEditEditor, &QPushButton::clicked, this, [this]() { AddEditEditor(true); });
+  connect(FRemoveEditor, &QPushButton::clicked, this, &PreferencesDialog::RemoveEditor);
+  connect(FUpEditor, &QPushButton::clicked, this, [this]() { MoveEditor(-1); });
+  connect(FDownEditor, &QPushButton::clicked, this, [this]() { MoveEditor(1); });
+  connect(FEditorsList, &QTreeWidget::currentItemChanged, this, &PreferencesDialog::UpdateControls);
+  connect(FEditorsList, &QTreeWidget::itemDoubleClicked, this, [this]() { AddEditEditor(true); });
+  Layout->addWidget(Preference, 1);
+  QGroupBox * Options = new QGroupBox(tr("Editing options"), Page);
+  QVBoxLayout * OptionsLayout = new QVBoxLayout(Options);
+  FEditorCheckNotModified = new QCheckBox(tr("&Check that edited remote file has not changed before saving it"), Options);
+  FEditorCheckNotModified->setChecked(FEditor.CheckNotModified);
+  OptionsLayout->addWidget(FEditorCheckNotModified);
+  Layout->addWidget(Options);
+  LoadEditors(-1);
+  return Page;
+}
+
+// As EditorListView3Data: the name, the mask, and for an external editor
+// whether it is given text.
+void PreferencesDialog::LoadEditors(int Select)
+{
+  FEditorsList->clear();
+  for (const CoreBridge::TEditorDefinition & Editor : FEditors)
+  {
+    QTreeWidgetItem * Item = new QTreeWidgetItem(FEditorsList);
+    Item->setText(0, QString::fromStdString(CoreBridge::EditorName(Editor)));
+    Item->setText(1, QString::fromStdString(Editor.Mask));
+    if (Editor.Kind == CoreBridge::TEditorDefinition::TKind::External)
+    {
+      Item->setText(2, Editor.Text ? tr("Yes") : tr("No"));
+    }
+  }
+  if ((Select >= 0) && (Select < FEditorsList->topLevelItemCount()))
+  {
+    FEditorsList->setCurrentItem(FEditorsList->topLevelItem(Select));
+  }
+  UpdateControls();
+}
+
+// As AddEditEditorButtonClick: a new one before the selected, or last.
+bool PreferencesDialog::AddEditEditor(bool Edit, const CoreBridge::TEditorDefinition * Editor)
+{
+  const int Row = FEditorsList->indexOfTopLevelItem(FEditorsList->currentItem());
+  if (Edit && (Row < 0))
+  {
+    return false;
+  }
+  CoreBridge::TEditorDefinition Result = Edit ? FEditors[Row] : CoreBridge::TEditorDefinition();
+  if (Editor != nullptr)
+  {
+    Result = *Editor;
+  }
+  else
+  {
+    EditorPreferencesDialog Dialog(Edit ? EditorPreferencesDialog::TMode::Edit : EditorPreferencesDialog::TMode::Add,
+      Result, true, this);
+    if (Dialog.exec() != QDialog::Accepted)
+    {
+      return false;
+    }
+    Result = Dialog.Editor();
+  }
+  int Index = Row;
+  if (Edit)
+  {
+    FEditors[Row] = Result;
+  }
+  else if (Row >= 0)
+  {
+    FEditors.insert(FEditors.begin() + Row, Result);
+  }
+  else
+  {
+    FEditors.push_back(Result);
+    Index = static_cast<int>(FEditors.size()) - 1;
+  }
+  LoadEditors(Index);
+  return true;
+}
+
+void PreferencesDialog::RemoveEditor()
+{
+  const int Row = FEditorsList->indexOfTopLevelItem(FEditorsList->currentItem());
+  if (Row < 0)
+  {
+    return;
+  }
+  FEditors.erase(FEditors.begin() + Row);
+  LoadEditors(qMin(Row, static_cast<int>(FEditors.size()) - 1));
+}
+
+void PreferencesDialog::MoveEditor(int By)
+{
+  const int Row = FEditorsList->indexOfTopLevelItem(FEditorsList->currentItem());
+  const int To = Row + By;
+  if ((Row < 0) || (To < 0) || (To >= static_cast<int>(FEditors.size())))
+  {
+    return;
+  }
+  std::swap(FEditors[Row], FEditors[To]);
+  LoadEditors(To);
+}
+
+// Internal editor, as WinSCP's EditorInternalSheet.
+QWidget * PreferencesDialog::MakeInternalEditorPage()
+{
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  QGroupBox * Display = new QGroupBox(tr("Display"), Page);
+  QGridLayout * DisplayLayout = new QGridLayout(Display);
+  FEditorWordWrap = new QCheckBox(tr("&Wrap long lines"), Display);
+  FEditorWordWrap->setChecked(FEditor.WordWrap);
+  DisplayLayout->addWidget(FEditorWordWrap, 0, 0, 1, 2);
+  FEditorTabSize = new QSpinBox(Display);
+  FEditorTabSize->setRange(1, 99);
+  FEditorTabSize->setValue(FEditor.TabSize);
+  QLabel * TabLabel = new QLabel(tr("&Tabulator size:"), Display);
+  TabLabel->setBuddy(FEditorTabSize);
+  DisplayLayout->addWidget(TabLabel, 1, 0);
+  DisplayLayout->addWidget(FEditorTabSize, 1, 1);
+  FEditorEncoding = new QComboBox(Display);
+  FEditorEncoding->addItem(QString::fromStdString(CoreBridge::DefaultEncodingName()), false);
+  FEditorEncoding->addItem(tr("UTF-8"), true);
+  FEditorEncoding->setCurrentIndex(FEditor.Utf8 ? 1 : 0);
+  QLabel * EncodingLabel = new QLabel(tr("Default en&coding:"), Display);
+  EncodingLabel->setBuddy(FEditorEncoding);
+  DisplayLayout->addWidget(EncodingLabel, 2, 0);
+  DisplayLayout->addWidget(FEditorEncoding, 2, 1);
+  Layout->addWidget(Display);
+
+  QGroupBox * FontGroup = new QGroupBox(tr("Font"), Page);
+  QGridLayout * FontLayout = new QGridLayout(FontGroup);
+  FEditorFontLabel = new QLabel(FontGroup);
+  FEditorFontLabel->setAutoFillBackground(true);
+  FEditorFontLabel->setFrameShape(QFrame::StyledPanel);
+  FEditorFontLabel->setMinimumHeight(48);
+  FontLayout->addWidget(FEditorFontLabel, 0, 0, 3, 1);
+  QPushButton * SelectFont = new QPushButton(tr("&Select font..."), FontGroup);
+  connect(SelectFont, &QPushButton::clicked, this, [this]()
+  {
+    bool OK = false;
+    const QFont Font = QFontDialog::getFont(&OK, FEditorFontLabel->font(), this);
+    if (OK)
+    {
+      SetEditorFont(Font);
+    }
+  });
+  // As CreateColorPalette's menus: the default, or a colour of one's own.
+  const auto ColorMenu = [this](QPushButton * Button, bool Background)
+  {
+    QMenu * Menu = new QMenu(Button);
+    Menu->addAction(tr("&Default"), this, [this, Background]()
+    {
+      SetEditorColors(Background ? FEditor.FontColor : -1, Background ? -1 : FEditor.BackgroundColor);
+    });
+    Menu->addAction(tr("&More colors..."), this, [this, Background]()
+    {
+      const int Current = Background ? FEditor.BackgroundColor : FEditor.FontColor;
+      const QColor Color = QColorDialog::getColor((Current >= 0) ? QColor(QRgb(Current)) : QColor(), this);
+      if (Color.isValid())
+      {
+        const int Rgb = static_cast<int>(Color.rgb() & 0xffffff);
+        SetEditorColors(Background ? FEditor.FontColor : Rgb, Background ? Rgb : FEditor.BackgroundColor);
+      }
+    });
+    Button->setMenu(Menu);
+  };
+  QPushButton * TextColor = new QPushButton(tr("&Text color"), FontGroup);
+  ColorMenu(TextColor, false);
+  QPushButton * Background = new QPushButton(tr("Default &background"), FontGroup);
+  ColorMenu(Background, true);
+  FontLayout->addWidget(SelectFont, 0, 1);
+  FontLayout->addWidget(TextColor, 1, 1);
+  FontLayout->addWidget(Background, 2, 1);
+  FontLayout->setColumnStretch(0, 1);
+  Layout->addWidget(FontGroup);
+
+  QGroupBox * Behaviour = new QGroupBox(tr("Behaviour"), Page);
+  QHBoxLayout * BehaviourLayout = new QHBoxLayout(Behaviour);
+  FEditorWarnLargeFile = new QCheckBox(tr("Warn when &editing files larger than:"), Behaviour);
+  FEditorWarnLargeFile->setChecked(FEditor.WarnOnLargeFile);
+  FEditorLargeFileSize = new QSpinBox(Behaviour);
+  FEditorLargeFileSize->setRange(1, 1024 * 1024);
+  FEditorLargeFileSize->setValue(FEditor.LargeFileSize);
+  FEditorLargeFileSize->setSuffix(tr(" KB"));
+  connect(FEditorWarnLargeFile, &QCheckBox::toggled, this, &PreferencesDialog::UpdateControls);
+  BehaviourLayout->addWidget(FEditorWarnLargeFile);
+  BehaviourLayout->addWidget(FEditorLargeFileSize);
+  BehaviourLayout->addStretch(1);
+  Layout->addWidget(Behaviour);
+  Layout->addStretch(1);
+  UpdateEditorFont();
+  return Page;
+}
+
+// As TPreferencesDialog::UpdateEditorFont: the font shown in it, in its
+// colours.
+void PreferencesDialog::UpdateEditorFont()
+{
+  QFont Font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+  if (!FEditor.FontName.empty())
+  {
+    Font.setFamily(QString::fromStdString(FEditor.FontName));
+  }
+  if (FEditor.FontSize > 0)
+  {
+    Font.setPointSize(FEditor.FontSize);
+  }
+  Font.setBold(FEditor.FontBold);
+  Font.setItalic(FEditor.FontItalic);
+  Font.setUnderline(FEditor.FontUnderline);
+  Font.setStrikeOut(FEditor.FontStrikeOut);
+  FEditorFontLabel->setFont(Font);
+  FEditorFontLabel->setText(QStringLiteral("%1, %2 pt").arg(Font.family()).arg(Font.pointSize()));
+  QPalette Palette = palette();
+  Palette.setColor(QPalette::Window, (FEditor.BackgroundColor >= 0) ? QColor(QRgb(FEditor.BackgroundColor)) : Palette.color(QPalette::Base));
+  Palette.setColor(QPalette::WindowText, (FEditor.FontColor >= 0) ? QColor(QRgb(FEditor.FontColor)) : Palette.color(QPalette::Text));
+  FEditorFontLabel->setPalette(Palette);
+}
+
+void PreferencesDialog::SetEditorFont(const QFont & Font)
+{
+  FEditor.FontName = Font.family().toStdString();
+  FEditor.FontSize = Font.pointSize();
+  FEditor.FontBold = Font.bold();
+  FEditor.FontItalic = Font.italic();
+  FEditor.FontUnderline = Font.underline();
+  FEditor.FontStrikeOut = Font.strikeOut();
+  UpdateEditorFont();
+}
+
+void PreferencesDialog::SetEditorColors(int FontColor, int BackgroundColor)
+{
+  FEditor.FontColor = FontColor;
+  FEditor.BackgroundColor = BackgroundColor;
+  UpdateEditorFont();
+}
+
+CoreBridge::TEditorSettings PreferencesDialog::EditorSettings() const
+{
+  CoreBridge::TEditorSettings Result = FEditor;
+  // What the editor itself keeps (the last find) as it is now.
+  const CoreBridge::TEditorSettings Current = CoreBridge::EditorSettings();
+  Result.FindText = Current.FindText;
+  Result.ReplaceText = Current.ReplaceText;
+  Result.FindMatchCase = Current.FindMatchCase;
+  Result.FindWholeWord = Current.FindWholeWord;
+  Result.CheckNotModified = FEditorCheckNotModified->isChecked();
+  Result.WordWrap = FEditorWordWrap->isChecked();
+  Result.TabSize = FEditorTabSize->value();
+  Result.Utf8 = FEditorEncoding->currentData().toBool();
+  Result.WarnOnLargeFile = FEditorWarnLargeFile->isChecked();
+  Result.LargeFileSize = FEditorLargeFileSize->value();
+  return Result;
 }

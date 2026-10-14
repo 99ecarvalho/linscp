@@ -53,6 +53,18 @@ struct TShellSettings
   UnicodeString EditorReplaceText;
   bool EditorFindMatchCase = false;
   bool EditorFindWholeWord = false;
+  // Its font (TFontConfiguration: an empty name the system's fixed one;
+  // the size in points; TFontStyles bits, fsBold 1, fsItalic 2,
+  // fsUnderline 4, fsStrikeOut 8), its text and background colours (the
+  // VCL's TColor, 0 the defaults), and the large-file warning, in KB.
+  UnicodeString EditorFontName;
+  int EditorFontSize = 0;
+  int EditorFontStyle = 0;
+  int EditorFontCharset = 1;
+  int EditorFontColor = 0;
+  int EditorBackgroundColor = 0;
+  bool EditorWarnOrLargeFileSize = true;
+  int EditorLargeFileSize = 10 * 1024;
   // EditorCheckNotModified: ask before uploading over a file changed on the
   // server since it was opened.
   bool EditorCheckNotModified = false;
@@ -83,6 +95,7 @@ struct TShellSettings
 };
 
 class TCustomCommandList;
+class TEditorList;
 
 class TShellConfiguration : public TGUIConfiguration
 {
@@ -127,6 +140,10 @@ public:
   // its defaults until changed), and their options' values
   // (CustomCommandOptions).
   const TCustomCommandList * CustomCommandList() const { return FCustomCommandList.get(); }
+  // The editors files open in, by mask, as TWinConfiguration keeps them
+  // (Interface\Editor's subkeys; WinSCP's defaults until changed).
+  const TEditorList * EditorList() const { return FEditorList.get(); }
+  void SetEditorList(const TEditorList * List);
   void SetCustomCommandList(const TCustomCommandList * List);
   TStrings * CustomCommandOptions() const { return FCustomCommandOptions.get(); }
   void SetCustomCommandOptions(TStrings * Options);
@@ -153,6 +170,8 @@ private:
   TShellSettings FSettings;
   std::unique_ptr<TBookmarks> FBookmarks;
   std::unique_ptr<TCustomCommandList> FCustomCommandList;
+  std::unique_ptr<TEditorList> FEditorList;
+  void DefaultEditorList();
   bool FCustomCommandsDefaults = true;
   std::unique_ptr<TStringList> FCustomCommandOptions;
   bool FCustomCommandOptionsModified = false;

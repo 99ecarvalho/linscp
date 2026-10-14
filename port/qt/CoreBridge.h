@@ -301,8 +301,61 @@ struct TEditorSettings
   bool FindMatchCase = false;
   bool FindWholeWord = false;
   bool CheckNotModified = false;
+  // The font: an empty name the system's fixed one; points (0: its size);
+  // bold, italic, underline, strike out. Colours as 0xRRGGBB, or -1 for the
+  // defaults.
+  std::string FontName;
+  int FontSize = 0;
+  bool FontBold = false;
+  bool FontItalic = false;
+  bool FontUnderline = false;
+  bool FontStrikeOut = false;
+  int FontColor = -1;
+  int BackgroundColor = -1;
+  // Asking before a file larger than LargeFileSize KB is opened.
+  bool WarnOnLargeFile = true;
+  int LargeFileSize = 10 * 1024;
 };
 TEditorSettings EditorSettings();
+
+// An editor files open in, as WinSCP's editor preferences
+// (TEditorPreferences): the internal editor, an external one (its command,
+// with !.! for the file, else the file appended), or the file's associated
+// application; for the files its mask matches.
+struct TEditorDefinition
+{
+  enum class TKind { Internal, External, Open };
+  TKind Kind = TKind::Internal;
+  std::string Command;
+  std::string Mask = "*.*";
+  // Transfer as text; the editor opens each file in a process of its own
+  // (SDI), or this is to be detected (MDI).
+  bool Text = false;
+  bool Sdi = false;
+  bool DetectMdi = false;
+  // As upstream names it (TEditorPreferences::Name): "Internal editor", the
+  // command's program, or "Associated application". Read only.
+  std::string Name;
+};
+// The editors, in order (WinConfiguration's EditorList); SetEditors saves.
+std::vector<TEditorDefinition> Editors();
+void SetEditors(const std::vector<TEditorDefinition> & Editors);
+// The first editor whose mask matches the file (TEditorList::Find): its
+// index, -1 for none. Local: a local file; its size and time (seconds since
+// 1970) for the masks' size and time conditions.
+int FindEditor(const std::vector<TEditorDefinition> & Editors, const std::string & FileName, bool Local,
+  std::int64_t Size, double ModifiedTime);
+// TEditorData::ExternalEditorOptionsAutodetect: the options a known editor
+// (Notepad) needs.
+void AutodetectEditorOptions(TEditorDefinition & Editor);
+// Its name, as TEditorPreferences::Name.
+std::string EditorName(const TEditorDefinition & Editor);
+// An external editor started on FileName, as CustomExecuteFile starts one:
+// the command's !.! the file, else the file appended. Throws TCoreError
+// (EDITOR_ERROR) when it does not start.
+void StartExternalEditor(const std::string & Command, const std::string & FileName);
+// EXECUTE_FILE_ERROR: the associated application did not open FileName.
+std::string ExecuteFileError(const std::string & FileName);
 // Saves them.
 void SetEditorSettings(const TEditorSettings & Settings);
 // The system's code page as core names it (DefaultEncodingName: the ANSI
@@ -573,6 +626,11 @@ enum class TText
   TagValue,       // "&Value (optional):"
   TagNotUnique,   // "Keys must be unique."
   TagInvalidChar, // "Character \"%s\" is not allowed in tags."
+  EditorLargeFile, // "**Try to open large file?**\n\nThe file ... is too large (%s). ..."
+  EditorAdd,      // "Add editor"
+  EditorEdit,     // "Edit editor"
+  EditorAdHoc,    // "Editor"
+  SelectExternalEditor, // "Select editor application."
 };
 std::string Text(TText Text);
 

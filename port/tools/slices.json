@@ -99,6 +99,42 @@
         "  TPuttyCleanupThread::Finalize();",
         "}"
       ]
+    },
+    {
+      "output": "windows/EditorPreferences.h",
+      "source": "source/windows/WinConfiguration.h",
+      "transformed": true,
+      "prologue": [
+        "#pragma once",
+        "#include \"CustomCommandsSlice.h\""
+      ],
+      "ranges": [
+        {
+          "from": "^enum TEditor \\{ edInternal, edExternal, edOpen \\};",
+          "until": "^enum TGenerateUrlCodeTarget "
+        },
+        {
+          "from": "^struct TEditorData\\s*$",
+          "until": "^struct TFileColorData\\s*$"
+        },
+        {
+          "from": "^class TEditorPreferences\\s*$",
+          "until": "^class TBookmarks;"
+        }
+      ]
+    },
+    {
+      "output": "windows/EditorPreferences.cpp",
+      "source": "source/windows/WinConfiguration.cpp",
+      "transformed": true,
+      "prologue": [
+        "#include \"CustomCommandsSlice.h\"",
+        "#include \"EditorPreferences.h\"",
+        "// WinConfiguration.cpp's own, above the slice: the default external editor's name.",
+        "static UnicodeString NotepadName(L\"notepad.exe\");"
+      ],
+      "from": "^__fastcall TEditorData::TEditorData\\(\\) :\\s*$",
+      "until": "^__fastcall TWinConfiguration::TWinConfiguration\\(\\): TCustomWinConfiguration\\(\\)"
     }
   ]
 }
