@@ -80,6 +80,10 @@ public:
   // Preferences, Panels: "use natural order numerical sorting" (on by
   // default) and "always sort directories by name".
   void SetSorting(bool Natural, bool DirectoriesByName);
+  // A panel's filter (Ctrl+Alt+F), as WinSCP's (TCustomDirView's Mask):
+  // only what matches is shown; "" shows all.
+  void SetMask(const QString & Mask);
+  QString Mask() const { return FMask; }
 
 protected:
   bool lessThan(const QModelIndex & Left, const QModelIndex & Right) const override;
@@ -91,6 +95,7 @@ private:
   bool FShowHidden = false;
   bool FNatural = true;
   bool FDirectoriesByName = false;
+  QString FMask;
   QCollator FCollator;
 };
 
@@ -140,6 +145,12 @@ QString FormatPanelBytes(std::int64_t Bytes, CoreBridge::TPreferences::TSizeForm
 // A panel's view: its selection dragged as the panel says, and drops onto it
 // reported with the directory row they fell on ("" for the panel's own
 // directory; ".." for its parent).
+// The mask dialog, as WinSCP's TSelectMaskDialog in its modes: Select and
+// Deselect (with "apply to directories"), Filter (with Clear); each with
+// Edit... (the Edit file mask dialog). False when cancelled.
+enum class TMaskDialogMode { Select, Deselect, Filter };
+bool MaskDialog(QWidget * Parent, TMaskDialogMode Mode, QString & Mask, bool * Directories = nullptr);
+
 class FileView : public QTreeView
 {
   Q_OBJECT

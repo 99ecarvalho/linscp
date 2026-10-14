@@ -225,6 +225,9 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
     ApplyPreferences();
   });
 
+  FFilterAction = ViewMenu->addAction(tr("&Filter..."), this, [this]() { Filter(); });
+  FFilterAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_F));
+
   QMenu * OptionsMenu = menuBar()->addMenu(tr("&Options"));
   QAction * PreferencesAction = OptionsMenu->addAction(tr("&Preferences..."), this, [this]() { PreferencesDialog(); });
   PreferencesAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_P));
@@ -1582,4 +1585,37 @@ bool MainWindow::DeleteFound(const std::vector<int> & Indexes, const QStringList
   FPanel->Refresh();
   UpdateActions();
   return Result;
+}
+
+bool MainWindow::Filter()
+{
+  QString Mask = FLocalActive ? FLocal->Filter() : FPanel->Filter();
+  if (Mask.isEmpty())
+  {
+    Mask = QStringLiteral("*.*");
+  }
+  if (!MaskDialog(this, TMaskDialogMode::Filter, Mask))
+  {
+    return false;
+  }
+  const QString Normalized = QString::fromStdString(CoreBridge::NormalizeMask(Mask.toStdString()));
+  try
+  {
+    // A mask that is not one: core's error, the filter as it was.
+    CoreBridge::SplitMask(Normalized.toStdString());
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+  if (FLocalActive)
+  {
+    FLocal->SetFilter(Normalized);
+  }
+  else
+  {
+    FPanel->SetFilter(Normalized);
+  }
+  return true;
 }

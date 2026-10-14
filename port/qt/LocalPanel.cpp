@@ -536,3 +536,14 @@ QStringList LocalPanel::History() const
   Result.removeAll(QString());
   return Result;
 }
+
+void LocalPanel::SetFilter(const QString & Mask)
+{
+  FSort->SetMask(Mask);
+  UpdateActions();
+}
+
+QString LocalPanel::Filter() const
+{
+  return FSort->Mask();
+}

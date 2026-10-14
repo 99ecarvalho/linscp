@@ -112,6 +112,10 @@ public:
   bool FocusRemote(const QString & Directory, const QString & Name);
   bool DownloadFound(const std::vector<int> & Indexes, const QStringList & Names);
   bool DeleteFound(const std::vector<int> & Indexes, const QStringList & Names);
+  // View > Filter (Ctrl+Alt+F), as WinSCP's: the active panel shows only
+  // what matches the mask asked for (normalized: "*.*" is none). False
+  // when cancelled.
+  bool Filter();
   // Options > Preferences: false when cancelled.
   bool PreferencesDialog();
   // The preferences applied to the window and its panels.
@@ -177,6 +181,7 @@ private:
   QAction * FDuplicateAction = nullptr;
   QAction * FOpenDirectoryAction = nullptr;
   QAction * FFindFilesAction = nullptr;
+  QAction * FFilterAction = nullptr;
   QAction * FAddBookmarkAction = nullptr;
   QAction * FMoveToAction = nullptr;
   // The editors, and for a remote file what it was downloaded as.

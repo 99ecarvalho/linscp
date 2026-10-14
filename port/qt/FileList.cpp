@@ -1,4 +1,5 @@
 #include "FileList.h"
+#include "EditMaskDialog.h"
 
 #include <algorithm>
 #include <cmath>
@@ -7,6 +8,8 @@
 #include <QCheckBox>
 #include <QDialog>
 #include <QDialogButtonBox>
+#include <QHBoxLayout>
+#include <QPushButton>
 #include <QFormLayout>
 #include <QHeaderView>
 #include <QKeyEvent>
@@ -662,25 +665,70 @@ bool FileView::SelectByMask(bool Select, const QString & Masks, bool Directories
 
 // As WinSCP's Select/Deselect dialog (forms/SelectMask.cpp), without its
 // colors and hints.
+bool MaskDialog(QWidget * Parent, TMaskDialogMode Mode, QString & Mask, bool * Directories)
+{
+  QDialog Dialog(Parent);
+  Dialog.setWindowTitle(QString::fromStdString(CoreBridge::Text(
+    (Mode == TMaskDialogMode::Select) ? CoreBridge::TText::SelectMaskSelectCaption :
+    ((Mode == TMaskDialogMode::Deselect) ? CoreBridge::TText::SelectMaskDeselectCaption : CoreBridge::TText::FilterMaskCaption))));
+  QFormLayout * Layout = new QFormLayout(&Dialog);
+  QHBoxLayout * Row = new QHBoxLayout();
+  QLineEdit * MaskEdit = new QLineEdit(Mask, &Dialog);
+  MaskEdit->setMinimumWidth(300);
+  Row->addWidget(MaskEdit, 1);
+  QPushButton * EditButton = new QPushButton(FileView::tr("&Edit..."), &Dialog);
+  QObject::connect(EditButton, &QPushButton::clicked, &Dialog, [&Dialog, MaskEdit]()
+  {
+    QString Edited = MaskEdit->text();
+    if (EditMaskDialog::Edit(Edited, &Dialog))
+    {
+      MaskEdit->setText(Edited);
+    }
+  });
+  Row->addWidget(EditButton);
+  Layout->addRow(FileView::tr("File &mask:"), Row);
+  QCheckBox * DirectoriesCheck = nullptr;
+  if ((Mode != TMaskDialogMode::Filter) && (Directories != nullptr))
+  {
+    DirectoriesCheck = new QCheckBox(FileView::tr("Apply to &directories"), &Dialog);
+    DirectoriesCheck->setChecked(*Directories);
+    Layout->addRow(DirectoriesCheck);
+  }
+  QDialogButtonBox * Box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &Dialog);
+  if (Mode == TMaskDialogMode::Filter)
+  {
+    // Clear: no filter.
+    QObject::connect(Box->addButton(FileView::tr("&Clear"), QDialogButtonBox::ResetRole), &QPushButton::clicked, &Dialog,
+      [&Dialog, MaskEdit]()
+      {
+        MaskEdit->clear();
+        Dialog.accept();
+      });
+  }
+  QObject::connect(Box, &QDialogButtonBox::accepted, &Dialog, &QDialog::accept);
+  QObject::connect(Box, &QDialogButtonBox::rejected, &Dialog, &QDialog::reject);
+  Layout->addRow(Box);
+  MaskEdit->selectAll();
+  if (Dialog.exec() != QDialog::Accepted)
+  {
+    return false;
+  }
+  Mask = MaskEdit->text();
+  if (DirectoriesCheck != nullptr)
+  {
+    *Directories = DirectoriesCheck->isChecked();
+  }
+  return true;
+}
+
 void FileView::SelectByMaskDialog(bool Select)
 {
-  QDialog Dialog(this);
-  Dialog.setWindowTitle(Select ? tr("Select") : tr("Deselect"));
-  QFormLayout * Layout = new QFormLayout(&Dialog);
-  QLineEdit * Mask = new QLineEdit(FLastMask, &Dialog);
-  Mask->setMinimumWidth(300);
-  Layout->addRow(tr("File &mask:"), Mask);
-  QCheckBox * Directories = new QCheckBox(tr("Apply to &directories"), &Dialog);
-  Directories->setChecked(FLastDirectories);
-  Layout->addRow(Directories);
-  QDialogButtonBox * Box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &Dialog);
-  connect(Box, &QDialogButtonBox::accepted, &Dialog, &QDialog::accept);
-  connect(Box, &QDialogButtonBox::rejected, &Dialog, &QDialog::reject);
-  Layout->addRow(Box);
-  if (Dialog.exec() == QDialog::Accepted)
+  QString Mask = FLastMask;
+  bool Directories = FLastDirectories;
+  if (MaskDialog(this, Select ? TMaskDialogMode::Select : TMaskDialogMode::Deselect, Mask, &Directories))
   {
-    FLastMask = Mask->text();
-    FLastDirectories = Directories->isChecked();
+    FLastMask = Mask;
+    FLastDirectories = Directories;
     SelectByMask(Select, FLastMask, FLastDirectories);
   }
 }
@@ -706,9 +754,37 @@ void DirectoriesFirst::SetShowHidden(bool Show)
   }
 }
 
+void DirectoriesFirst::SetMask(const QString & Mask)
+{
+  FMask = Mask;
+  invalidateFilter();
+}
+
 bool DirectoriesFirst::filterAcceptsRow(int Row, const QModelIndex & Parent) const
 {
-  return FShowHidden || !sourceModel()->index(Row, 0, Parent).data(FileListModel::HiddenRole).toBool();
+  const QModelIndex Index = sourceModel()->index(Row, 0, Parent);
+  if (!FShowHidden && Index.data(FileListModel::HiddenRole).toBool())
+  {
+    return false;
+  }
+  if (FMask.isEmpty() || Index.data(FileListModel::ParentRole).toBool())
+  {
+    return true;
+  }
+  const FileListModel * Model = qobject_cast<const FileListModel *>(sourceModel());
+  const CoreBridge::TRemoteEntry * Entry = (Model != nullptr) ? Model->Entry(Row) : nullptr;
+  if (Entry == nullptr)
+  {
+    return true;
+  }
+  try
+  {
+    return CoreBridge::MaskMatches(FMask.toStdString(), Entry->Name, Entry->Directory, Entry->Size, Entry->ModifiedTime, true);
+  }
+  catch (const CoreBridge::TCoreError &)
+  {
+    return true;
+  }
 }
 
 bool DirectoriesFirst::lessThan(const QModelIndex & Left, const QModelIndex & Right) const

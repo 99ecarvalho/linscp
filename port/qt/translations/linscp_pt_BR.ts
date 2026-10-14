@@ -64,6 +64,49 @@
     </message>
 </context>
 <context>
+    <name>EditMaskDialog</name>
+    <message>
+        <source>Edit file mask</source>
+        <translation>Editar máscara do arquivo</translation>
+    </message>
+    <message>
+        <source>Files masks</source>
+        <translation>Máscaras de Arquivos</translation>
+    </message>
+    <message>
+        <source>&amp;Include files:</source>
+        <translation>Incluir arquivos:</translation>
+    </message>
+    <message>
+        <source>&amp;Exclude files:</source>
+        <translation>Excluir arquivos</translation>
+    </message>
+    <message>
+        <source>Directories masks</source>
+        <translation>Máscaras de diretórios</translation>
+    </message>
+    <message>
+        <source>I&amp;nclude directories:</source>
+        <translation>Incluir pastas:</translation>
+    </message>
+    <message>
+        <source>E&amp;xclude directories:</source>
+        <translation>Excluir diretórios:</translation>
+    </message>
+    <message>
+        <source>&amp;All (do not recurse)</source>
+        <translation>Tudo (sem recursão)</translation>
+    </message>
+    <message>
+        <source>Mask</source>
+        <translation>Máscara</translation>
+    </message>
+    <message>
+        <source>&amp;Clear</source>
+        <translation>&amp;Limpar</translation>
+    </message>
+</context>
+<context>
     <name>EditorWindow</name>
     <message>
         <source>Replace</source>
@@ -304,20 +347,20 @@
 <context>
     <name>FileView</name>
     <message>
-        <source>Select</source>
-        <translation>Selecionar</translation>
-    </message>
-    <message>
-        <source>Deselect</source>
-        <translation>Desselecionar</translation>
-    </message>
-    <message>
         <source>File &amp;mask:</source>
         <translation>&amp;Máscara de arquivo:</translation>
     </message>
     <message>
         <source>Apply to &amp;directories</source>
         <translation>Aplicar aos &amp;diretórios</translation>
+    </message>
+    <message>
+        <source>&amp;Edit...</source>
+        <translation>&amp;Editar...</translation>
+    </message>
+    <message>
+        <source>&amp;Clear</source>
+        <translation>&amp;Limpar</translation>
     </message>
 </context>
 <context>
@@ -373,6 +416,10 @@
     <message>
         <source>Close</source>
         <translation>Fechar</translation>
+    </message>
+    <message>
+        <source>&amp;Edit...</source>
+        <translation>&amp;Editar...</translation>
     </message>
 </context>
 <context>
@@ -664,6 +711,10 @@
     <message>
         <source>&amp;Find Files...</source>
         <translation>&amp;Localizar arquivos...</translation>
+    </message>
+    <message>
+        <source>&amp;Filter...</source>
+        <translation>&amp;Filtrar...</translation>
     </message>
 </context>
 <context>

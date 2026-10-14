@@ -644,7 +644,7 @@ void Finalize()
 }
 
 bool MaskMatches(const std::string & Masks, const std::string & FileName, bool Directory,
-  std::int64_t Size, double ModifiedTime)
+  std::int64_t Size, double ModifiedTime, bool AllowImplicit)
 {
   try
   {
@@ -654,12 +654,83 @@ bool MaskMatches(const std::string & Masks, const std::string & FileName, bool D
     // TDateTime counts days from 1899-12-30; 1970 is day 25569.
     Params.Modification = TDateTime(ModifiedTime / 86400.0 + 25569.0);
     bool ImplicitMatch = false;
-    return Mask.Matches(FromUtf8(FileName), false, Directory, &Params, true, ImplicitMatch) && !ImplicitMatch;
+    return Mask.Matches(FromUtf8(FileName), false, Directory, &Params, true, ImplicitMatch) && (AllowImplicit || !ImplicitMatch);
   }
   catch (Exception & E)
   {
     throw CoreErrorOf(E);
   }
+}
+
+namespace
+{
+
+std::vector<std::string> LinesOf(TStrings * Strings)
+{
+  std::vector<std::string> Result;
+  for (int Index = 0; Index < Strings->Count; Index++)
+  {
+    Result.push_back(Utf8(Strings->Strings[Index]));
+  }
+  return Result;
+}
+
+TStringList * StringsOf(const std::vector<std::string> & Lines)
+{
+  TStringList * Result = new TStringList();
+  for (const std::string & Line : Lines)
+  {
+    if (!Line.empty())
+    {
+      Result->Add(FromUtf8(Line));
+    }
+  }
+  return Result;
+}
+
+}  // namespace
+
+TMaskParts SplitMask(const std::string & Mask)
+{
+  try
+  {
+    TFileMasks Masks(FromUtf8(Mask));
+    TMaskParts Result;
+    Result.IncludeFiles = LinesOf(Masks.IncludeFileMasksStr);
+    Result.ExcludeFiles = LinesOf(Masks.ExcludeFileMasksStr);
+    Result.IncludeDirectories = LinesOf(Masks.IncludeDirectoryMasksStr);
+    Result.ExcludeDirectories = LinesOf(Masks.ExcludeDirectoryMasksStr);
+    return Result;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+std::string ComposeMask(const TMaskParts & Parts)
+{
+  try
+  {
+    std::unique_ptr<TStrings> IncludeFiles(StringsOf(Parts.IncludeFiles));
+    std::unique_ptr<TStrings> ExcludeFiles(StringsOf(Parts.ExcludeFiles));
+    std::unique_ptr<TStrings> IncludeDirectories(StringsOf(Parts.IncludeDirectories));
+    std::unique_ptr<TStrings> ExcludeDirectories(StringsOf(Parts.ExcludeDirectories));
+    const UnicodeString Result = TFileMasks::ComposeMaskStr(IncludeFiles.get(), ExcludeFiles.get(),
+      IncludeDirectories.get(), ExcludeDirectories.get());
+    // As the dialog's preview: what does not parse is core's error.
+    TFileMasks Check(Result);
+    return Utf8(Result);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+std::string NormalizeMask(const std::string & Mask)
+{
+  return Utf8(TFileMasks::NormalizeMask(FromUtf8(Mask)));
 }
 
 bool MaskMatchesPath(const std::string & Masks, const std::string & Path, bool Local, bool Directory,
@@ -747,6 +818,9 @@ std::string Text(TText Text)
     case TText::FindFileAborted: Ident = FIND_FILE_ABORTED; break;
     case TText::FindFileStart: Ident = FIND_FILE_START; break;
     case TText::FindFileStop: Ident = FIND_FILE_STOP; break;
+    case TText::SelectMaskSelectCaption: Ident = SELECT_MASK_SELECT_CAPTION; break;
+    case TText::SelectMaskDeselectCaption: Ident = SELECT_MASK_DESELECT_CAPTION; break;
+    case TText::FilterMaskCaption: Ident = FILTER_MASK_CAPTION; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

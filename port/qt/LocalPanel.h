@@ -68,6 +68,10 @@ public:
   // columns mapped onto WinSCP's local panel's six).
   void SetColumnsParams(const QString & Params);
   QString ColumnsParams() const;
+  // The filter (Ctrl+Alt+F), as WinSCP's panels': a mask only what matches
+  // shows; "" none.
+  void SetFilter(const QString & Mask);
+  QString Filter() const;
   QStringList Selected() const;
   void Select(const QStringList & Names);
   QStringList Names() const;

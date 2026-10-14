@@ -506,3 +506,14 @@ QStringList RemotePanel::History() const
   Result.removeAll(QString());
   return Result;
 }
+
+void RemotePanel::SetFilter(const QString & Mask)
+{
+  FSort->SetMask(Mask);
+  UpdateActions();
+}
+
+QString RemotePanel::Filter() const
+{
+  return FSort->Mask();
+}

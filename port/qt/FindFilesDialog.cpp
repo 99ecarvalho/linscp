@@ -14,6 +14,7 @@
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
+#include "EditMaskDialog.h"
 #include "FileList.h"
 #include "MainWindow.h"
 
@@ -63,7 +64,19 @@ FindFilesDialog::FindFilesDialog(MainWindow * Window, const QString & Directory)
   FMask = new QComboBox(Filter);
   FMask->setEditable(true);
   FMask->setEditText(FileView::LastMask());
-  Fields->addRow(tr("&File mask:"), FMask);
+  QHBoxLayout * MaskRow = new QHBoxLayout();
+  MaskRow->addWidget(FMask, 1);
+  QPushButton * EditMask = new QPushButton(tr("&Edit..."), Filter);
+  connect(EditMask, &QPushButton::clicked, this, [this]()
+  {
+    QString Mask = FMask->currentText();
+    if (EditMaskDialog::Edit(Mask, this))
+    {
+      FMask->setEditText(Mask);
+    }
+  });
+  MaskRow->addWidget(EditMask);
+  Fields->addRow(tr("&File mask:"), MaskRow);
   FDirectory = new QComboBox(Filter);
   FDirectory->setEditable(true);
   FDirectory->setEditText(Directory);

@@ -45,7 +45,8 @@
 //     profiles added, foldered, renamed, ordered, removed, opened into
 //     both panels, and the switch between the two dialogs; Find files
 //     (Alt+F7): found below a directory, focused, copied, downloaded,
-//     deleted, a mask that is not one
+//     deleted, a mask that is not one; Edit file mask; the panels' filter
+//     (Ctrl+Alt+F)
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -115,6 +116,8 @@
 #include "OpenDirectoryDialog.h"
 #include "LocationProfilesDialog.h"
 #include "FindFilesDialog.h"
+#include "EditMaskDialog.h"
+#include <QPlainTextEdit>
 #include <QTemporaryDir>
 #include "EditorWindow.h"
 
@@ -2299,6 +2302,55 @@ void BookmarksTest(const char * Port, const QString & Directory)
     Check((Responder.Errors == 1) &&
       (Find->Status()->text() == QString::fromStdString(CoreBridge::Text(CoreBridge::TText::FindFileAborted))), "a mask that is not one");
     Find->close();
+
+    // Edit file mask: a mask in its parts, and back.
+    {
+      EditMaskDialog Dialog(QStringLiteral("*.txt; *.log | old/"));
+      Check((Dialog.IncludeFiles()->toPlainText() == QStringLiteral("*.txt\n*.log")) &&
+        Dialog.ExcludeDirectories()->toPlainText().contains(QStringLiteral("old")), "split into its parts");
+      Check(Dialog.Mask() == QString::fromStdString(CoreBridge::ComposeMask(CoreBridge::SplitMask("*.txt; *.log | old/"))),
+        "and put back as core does");
+      Dialog.ExcludeAllDirectoriesCheck()->setChecked(true);
+      Check(Dialog.ExcludeDirectories()->toPlainText() == QStringLiteral("*"), "all directories excluded");
+      Dialog.ExcludeAllDirectoriesCheck()->setChecked(false);
+      Check(Dialog.ExcludeDirectories()->toPlainText().contains(QStringLiteral("old")), "and back as they were");
+      Dialog.IncludeFiles()->setPlainText(QStringLiteral("*.txt>xyz"));
+      Check(!Dialog.OkButton()->isEnabled() && !Dialog.Preview()->toPlainText().isEmpty(), "not a mask: core's error, no OK");
+      Dialog.Clear();
+      Check(Dialog.OkButton()->isEnabled() && Dialog.Mask().isEmpty(), "cleared");
+    }
+
+    // The filter.
+    for (const char * Name : { "a.txt", "b.dat" })
+    {
+      QFile File(QDir(Directory).filePath(QString::fromLatin1(Name)));
+      File.open(QIODevice::WriteOnly);
+      File.write(Name);
+    }
+    QDir(Directory).mkpath(QStringLiteral("folder"));
+    Window.Local()->Refresh();
+    Window.ActivatePanel(true);
+    QString FilterMask = QStringLiteral("*.txt");
+    Responder.Custom = [&FilterMask](QWidget * Modal)
+    {
+      QDialog * Dialog = qobject_cast<QDialog *>(Modal);
+      if ((Dialog == nullptr) || (Dialog->windowTitle() != QString::fromStdString(CoreBridge::Text(CoreBridge::TText::FilterMaskCaption))))
+      {
+        return false;
+      }
+      Dialog->findChild<QLineEdit *>()->setText(FilterMask);
+      Dialog->accept();
+      return true;
+    };
+    Check(Window.Filter(), "Ctrl+Alt+F filters the panel");
+    const QStringList Filtered = Window.Local()->Names();
+    Check(Filtered.contains(QStringLiteral("a.txt")) && !Filtered.contains(QStringLiteral("b.dat")) &&
+      Filtered.contains(QStringLiteral("folder")), "what matches, and directories, show");
+    Check(Window.Local()->Filter() == QStringLiteral("*.txt"), "the panel's filter");
+    FilterMask = QStringLiteral("*.*");
+    Check(Window.Filter() && Window.Local()->Filter().isEmpty() && Window.Local()->Names().contains(QStringLiteral("b.dat")),
+      "*.* is no filter");
+    Responder.Custom = nullptr;
     Frontend.SetWindow(nullptr);
   }
   CoreBridge::Finalize();

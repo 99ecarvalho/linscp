@@ -116,6 +116,7 @@ CONTEXT_FORMS = {
     'OpenDirectoryDialog': ['OpenDirectory.dfm'],
     'LocationProfilesDialog': ['LocationProfiles.dfm'],
     'FindFilesDialog': ['FileFind.dfm'],
+    'EditMaskDialog': ['EditMask.dfm'],
 }
 
 

@@ -517,6 +517,9 @@ enum class TText
   FindFileAborted, // "Aborted."
   FindFileStart, // "&Start"
   FindFileStop, // "&Stop"
+  SelectMaskSelectCaption, // "Select"
+  SelectMaskDeselectCaption, // "Deselect"
+  FilterMaskCaption, // "Filter"
 };
 std::string Text(TText Text);
 
@@ -525,8 +528,24 @@ std::string Text(TText Text);
 // one when selecting (TCustomScpExplorerForm::DirViewMatchMask, without
 // implicit matches). ModifiedTime is in seconds since 1970. Throws
 // TCoreError when the mask is not one.
+// AllowImplicit: a directory matches a mask with no directory part, as a
+// panel's filter has it (TCustomDirView's Mask).
 bool MaskMatches(const std::string & Masks, const std::string & FileName, bool Directory,
-  std::int64_t Size, double ModifiedTime);
+  std::int64_t Size, double ModifiedTime, bool AllowImplicit = false);
+// A mask's parts, as the Edit mask dialog shows them (TFileMasks'
+// IncludeFileMasksStr and the like), one mask each; put back together as
+// TFileMasks::ComposeMaskStr. Throw TCoreError when the mask is not one.
+struct TMaskParts
+{
+  std::vector<std::string> IncludeFiles;
+  std::vector<std::string> ExcludeFiles;
+  std::vector<std::string> IncludeDirectories;
+  std::vector<std::string> ExcludeDirectories;
+};
+TMaskParts SplitMask(const std::string & Mask);
+std::string ComposeMask(const TMaskParts & Parts);
+// TFileMasks::NormalizeMask: "*.*" and the like as no mask ("").
+std::string NormalizeMask(const std::string & Mask);
 // The same against a full path (local or remote), as the panels' file
 // colors match (TCustomScpExplorerForm::DirViewGetItemColor), so masks with
 // directories work.
