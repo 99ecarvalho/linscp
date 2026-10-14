@@ -73,6 +73,8 @@ public:
   QStringList Names() const;
   // The directory shown, with '/' separators (Qt's), as the panel works in it.
   QString Path() const { return FCurrent; }
+  // The directories visited: back, this one, forward (native separators).
+  QStringList History() const;
   FileView * View() const { return FView; }
   QLineEdit * PathEdit() const { return FPath; }
   QLabel * Status() const { return FStatus; }

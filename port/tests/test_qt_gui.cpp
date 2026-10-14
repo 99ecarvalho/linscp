@@ -37,6 +37,11 @@
 //     dialog, local links made and edited (FTP makes none); Duplicate
 //     and Move To (Shift+F5, Shift+F6) within the server, through a
 //     temporary copy where the server copies nothing itself
+//   test_qt_gui bookmarks /ini=nul <port> <directory> -platform offscreen
+//     Open directory and bookmarks (Ctrl+O, Ctrl+B): the site's and the
+//     shared bookmarks added, ordered, removed and kept; a bookmark
+//     opened; a directory that cannot be opened asked for again; the
+//     local panel's too
 //   test_qt_gui session /ini=nul <port> -platform offscreen
 //     the main window opening a session (run_qt_gui.py's rclone SFTP
 //     server: user linscp, password secret), every question core asks
@@ -103,6 +108,7 @@
 #include "CreateDirectoryDialog.h"
 #include "LinkDialog.h"
 #include "RemoteTransferDialog.h"
+#include "OpenDirectoryDialog.h"
 #include <QTemporaryDir>
 #include "EditorWindow.h"
 
@@ -2028,6 +2034,137 @@ void Properties(const char * Port)
   CoreBridge::Finalize();
 }
 
+void BookmarksTest(const char * Port, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = { "secret" };
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "the session opens");
+    const std::string Key = Window.Session()->SessionKey();
+    Check(!Key.empty(), "the site has a key for its bookmarks");
+    RemotePanel * Remote = Window.Panel();
+
+    {
+      OpenDirectoryDialog Dialog(true, QStringLiteral("/sub"), Remote->History(), Key, false, false);
+      Check(Dialog.Pages()->count() == 2, "the site's and the shared bookmarks");
+      Check(Dialog.windowTitle() == QString::fromStdString(CoreBridge::Text(CoreBridge::TText::OpenDirectoryCaption)), "WinSCP's title");
+      Dialog.AddAsBookmark(0);
+      Check((Dialog.List(0)->count() == 1) && (Dialog.List(0)->item(0)->text() == QStringLiteral("/sub")), "the directory added");
+      Dialog.DirectoryCombo()->setEditText(QStringLiteral("/"));
+      Dialog.AddAsBookmark(0);
+      Check((Dialog.List(0)->count() == 2) && (Dialog.List(0)->item(0)->text() == QStringLiteral("/")),
+        "another, before the one focused");
+      Dialog.AddAsBookmark(0);
+      Check(Dialog.List(0)->count() == 2, "but not twice");
+      Dialog.List(0)->setCurrentRow(0);
+      Dialog.MoveBookmark(0, 1);
+      Check((Dialog.List(0)->item(1)->text() == QStringLiteral("/")) && (Dialog.List(0)->currentRow() == 1), "moved down");
+      Dialog.List(0)->setCurrentRow(0);
+      Check(Dialog.DirectoryCombo()->currentText() == QStringLiteral("/sub"), "choosing one fills the directory in");
+      Dialog.DirectoryCombo()->setEditText(QStringLiteral("/shared"));
+      Dialog.Pages()->setCurrentIndex(1);
+      Dialog.AddAsBookmark(1);
+      Dialog.reject();
+    }
+    std::vector<CoreBridge::TBookmarkEntry> Site = CoreBridge::Bookmarks(Key);
+    Check((Site.size() == 2) && (Site[0].Remote == "/sub") && (Site[1].Remote == "/"), "the site's kept, even cancelled");
+    std::vector<CoreBridge::TBookmarkEntry> Shared = CoreBridge::Bookmarks(std::string());
+    Check((Shared.size() == 1) && (Shared[0].Remote == "/shared"), "the shared ones too");
+    Check(CoreBridge::UseSharedBookmarks(), "and the shared page as the one last used");
+    {
+      OpenDirectoryDialog Dialog(true, QStringLiteral("/"), QStringList(), Key, false, false);
+      Dialog.List(0)->setCurrentRow(1);
+      Dialog.RemoveBookmark(0);
+      Check((Dialog.List(0)->count() == 1) && (Dialog.List(0)->item(0)->text() == QStringLiteral("/sub")), "removed");
+      OpenDirectoryDialog Local(false, QStringLiteral("/"), QStringList(), Key, false, false);
+      Check(Local.List(0)->count() == 0, "a remote bookmark is not a local one");
+      Local.reject();
+      Dialog.reject();
+    }
+    Check(CoreBridge::Bookmarks(Key).size() == 1, "and kept so");
+
+    // Ctrl+O: a bookmark opened.
+    Window.ActivatePanel(false);
+    Responder.Custom = [](QWidget * Modal)
+    {
+      OpenDirectoryDialog * Dialog = qobject_cast<OpenDirectoryDialog *>(Modal);
+      if (Dialog == nullptr)
+      {
+        return false;
+      }
+      Dialog->Pages()->setCurrentIndex(0);
+      Dialog->List(0)->setCurrentRow(0);
+      Dialog->OkButton()->click();
+      return true;
+    };
+    Check(Window.OpenDirectory() && (Remote->Path() == QStringLiteral("/sub")), "Ctrl+O opens the bookmark");
+    // A directory that cannot be opened: the error, then the dialog again.
+    int Shown = 0;
+    Responder.Custom = [&Shown](QWidget * Modal)
+    {
+      OpenDirectoryDialog * Dialog = qobject_cast<OpenDirectoryDialog *>(Modal);
+      if (Dialog == nullptr)
+      {
+        return false;
+      }
+      Shown++;
+      if (Shown == 1)
+      {
+        Dialog->DirectoryCombo()->setEditText(QStringLiteral("/missing"));
+        Dialog->OkButton()->click();
+      }
+      else
+      {
+        Dialog->reject();
+      }
+      return true;
+    };
+    Responder.Errors = 0;
+    Check(!Window.OpenDirectory() && (Shown == 2) && (Responder.Errors == 1), "asked for again after the error");
+    // Ctrl+B: asked, then the dialog with the directory added.
+    Responder.LastQuery.clear();
+    Responder.Custom = [](QWidget * Modal)
+    {
+      OpenDirectoryDialog * Dialog = qobject_cast<OpenDirectoryDialog *>(Modal);
+      if (Dialog == nullptr)
+      {
+        return false;
+      }
+      Check(Dialog->windowTitle() == QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ManageBookmarksCaption)),
+        "Manage bookmarks");
+      Dialog->reject();
+      return true;
+    };
+    Window.OpenDirectory(true);
+    Check(!Responder.LastQuery.isEmpty(), "Ctrl+B asks first");
+    Check(!CoreBridge::UseSharedBookmarks() && (CoreBridge::Bookmarks(Key).size() == 1) &&
+      (CoreBridge::Bookmarks(Key)[0].Remote == "/sub"), "into the site's bookmarks, the directory already one");
+    // The local panel's.
+    Window.ActivatePanel(true);
+    Responder.Custom = [&Directory](QWidget * Modal)
+    {
+      OpenDirectoryDialog * Dialog = qobject_cast<OpenDirectoryDialog *>(Modal);
+      if (Dialog == nullptr)
+      {
+        return false;
+      }
+      Dialog->DirectoryCombo()->setEditText(QDir::toNativeSeparators(Directory));
+      Dialog->OkButton()->click();
+      return true;
+    };
+    Check(Window.OpenDirectory() && (QDir(Window.Local()->Path()) == QDir(Directory)), "Ctrl+O on the local panel");
+    Responder.Custom = nullptr;
+    Frontend.SetWindow(nullptr);
+  }
+  CoreBridge::Finalize();
+}
+
 void Session(const char * Port)
 {
   QtFrontend Frontend;
@@ -2113,6 +2250,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 5) && (std::strcmp(argv[1], "drop") == 0))
   {
     DragAndDrop(argv[3], QString::fromLocal8Bit(argv[4]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "bookmarks") == 0))
+  {
+    BookmarksTest(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "properties") == 0))
   {

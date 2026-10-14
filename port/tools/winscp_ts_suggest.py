@@ -113,6 +113,7 @@ CONTEXT_FORMS = {
     'CreateDirectoryDialog': ['CreateDirectory.dfm'],
     'LinkDialog': ['Symlink.dfm'],
     'RemoteTransferDialog': ['RemoteTransfer.dfm'],
+    'OpenDirectoryDialog': ['OpenDirectory.dfm'],
 }
 
 

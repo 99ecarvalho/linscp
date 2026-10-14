@@ -493,3 +493,16 @@ QString RemotePanel::ColumnsParams() const
 {
   return FView->ColumnsParams(WinScpColumns, 9);
 }
+
+QStringList RemotePanel::History() const
+{
+  QStringList Result = FBack;
+  Result.append(FCurrent);
+  for (auto It = FForward.rbegin(); It != FForward.rend(); ++It)
+  {
+    Result.append(*It);
+  }
+  Result.removeDuplicates();
+  Result.removeAll(QString());
+  return Result;
+}

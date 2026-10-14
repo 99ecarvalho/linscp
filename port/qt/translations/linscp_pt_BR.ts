@@ -539,6 +539,53 @@
         <source>Mo&amp;ve To...</source>
         <translation>Mo&amp;ver para...</translation>
     </message>
+    <message>
+        <source>&amp;Go To</source>
+        <translation>&amp;Ir para</translation>
+    </message>
+    <message>
+        <source>&amp;Open Directory/Bookmark...</source>
+        <translation>&amp;Abrir Diretório/Favorito...</translation>
+    </message>
+    <message>
+        <source>&amp;Add Path to Bookmarks</source>
+        <translation>&amp;Adicionar aos Favoritos</translation>
+    </message>
+</context>
+<context>
+    <name>OpenDirectoryDialog</name>
+    <message>
+        <source>&amp;Open directory:</source>
+        <translation>A&amp;brir diretório:</translation>
+    </message>
+    <message>
+        <source>B&amp;rowse...</source>
+        <translation>P&amp;rocurar...</translation>
+    </message>
+    <message>
+        <source>Site bookmarks</source>
+        <translation>Favoritos da sessão</translation>
+    </message>
+    <message>
+        <source>Shared bookmarks</source>
+        <translation>Favoritos compartilhados</translation>
+    </message>
+    <message>
+        <source>&amp;Add</source>
+        <translation>&amp;Adicionar</translation>
+    </message>
+    <message>
+        <source>Remo&amp;ve</source>
+        <translation>&amp;Remover</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>A&amp;cima</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>A&amp;baixo</translation>
+    </message>
 </context>
 <context>
     <name>PreferencesDialog</name>

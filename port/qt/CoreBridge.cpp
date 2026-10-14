@@ -321,6 +321,88 @@ TEditorSettings EditorSettings()
   return Result;
 }
 
+std::vector<TBookmarkEntry> Bookmarks(const std::string & SessionKey)
+{
+  TBookmarks * All = Shell()->Bookmarks();
+  TBookmarkList * List = SessionKey.empty() ? All->SharedBookmarks : All->Bookmarks[FromUtf8(SessionKey)];
+  std::vector<TBookmarkEntry> Result;
+  for (int Index = 0; (List != NULL) && (Index < List->Count); Index++)
+  {
+    TBookmark * Bookmark = List->Bookmarks[Index];
+    TBookmarkEntry Entry;
+    Entry.Name = Utf8(Bookmark->Name);
+    Entry.Local = Utf8(Bookmark->Local);
+    Entry.Remote = Utf8(Bookmark->Remote);
+    Entry.Node = Utf8(Bookmark->Node);
+    Entry.ShortCut = static_cast<unsigned>(Bookmark->ShortCut);
+    Result.push_back(Entry);
+  }
+  return Result;
+}
+
+void SetBookmarks(const std::string & SessionKey, const std::vector<TBookmarkEntry> & Bookmarks)
+{
+  try
+  {
+    std::unique_ptr<TBookmarkList> List(new TBookmarkList());
+    for (const TBookmarkEntry & Entry : Bookmarks)
+    {
+      TBookmark * Bookmark = new TBookmark();
+      Bookmark->Name = FromUtf8(Entry.Name);
+      Bookmark->Local = FromUtf8(Entry.Local);
+      Bookmark->Remote = FromUtf8(Entry.Remote);
+      Bookmark->Node = FromUtf8(Entry.Node);
+      Bookmark->ShortCut = static_cast<TShortCut>(Entry.ShortCut);
+      List->Add(Bookmark);
+    }
+    if (Bookmarks.empty())
+    {
+      // Modified even when emptied, so the list is written, its removal
+      // with it (the flag is the list's own).
+      TBookmark * Placeholder = new TBookmark();
+      List->Add(Placeholder);
+      List->Delete(Placeholder);
+    }
+    TBookmarks * All = Shell()->Bookmarks();
+    if (SessionKey.empty())
+    {
+      All->SharedBookmarks = List.get();
+    }
+    else
+    {
+      All->Bookmarks[FromUtf8(SessionKey)] = List.get();
+    }
+    Configuration->SaveExplicit();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+bool UseSharedBookmarks()
+{
+  return Shell()->Settings().UseSharedBookmarks;
+}
+
+void SetUseSharedBookmarks(bool Use)
+{
+  TShellSettings Settings = Shell()->Settings();
+  if (Settings.UseSharedBookmarks != Use)
+  {
+    Settings.UseSharedBookmarks = Use;
+    try
+    {
+      Shell()->SetSettings(Settings);
+      Configuration->SaveExplicit();
+    }
+    catch (Exception & E)
+    {
+      throw CoreErrorOf(E);
+    }
+  }
+}
+
 std::string DefaultEncodingName()
 {
   return Utf8(::DefaultEncodingName());
@@ -643,6 +725,10 @@ std::string Text(TText Text)
     case TText::RemoteCopyTitle: Ident = REMOTE_COPY_TITLE; break;
     case TText::RemoteMoveTitle: Ident = REMOTE_MOVE_TITLE; break;
     case TText::RemoteTransferPrompt: Ident = REMOTE_TRANSFER_PROMPT2; break;
+    case TText::OpenDirectoryCaption: Ident = OPEN_DIRECTORY_BROWSE_CAPTION; break;
+    case TText::ManageBookmarksCaption: Ident = OPEN_DIRECTORY_ADD_BOOMARK_ACTION; break;
+    case TText::AddBookmarkConfirm: Ident = ADD_BOOKMARK_CONFIRM; break;
+    case TText::AddBookmarkShared: Ident = ADD_BOOKMARK_SHARED; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

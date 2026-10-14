@@ -1191,6 +1191,11 @@ std::string MultiFilesToOneConfirmation(const std::string & Target, bool Unix)
   return Utf8(UnformatMessage(FormatMultiFilesToOneConfirmation(FromUtf8(Target), Unix)));
 }
 
+std::string TSession::SessionKey() const
+{
+  return Active() ? Utf8(F->Terminal->SessionData->SessionKey) : std::string();
+}
+
 bool TSession::CanRemoteCopy() const
 {
   return Active() && F->Terminal->IsCapable[fcRemoteCopy];

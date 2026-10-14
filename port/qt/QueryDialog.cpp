@@ -69,7 +69,9 @@ QueryDialog::QueryDialog(const CoreBridge::TQuery & Query, QWidget * Parent) :
 
   if (Query.NeverAskAgainCheck)
   {
-    FNeverAskAgain = new QCheckBox(tr("&Never ask me again"), this);
+    FNeverAskAgain = new QCheckBox(
+      Query.NeverAskAgainTitle.empty() ? tr("&Never ask me again") : QString::fromStdString(Query.NeverAskAgainTitle), this);
+    FNeverAskAgain->setChecked(Query.NeverAskAgainCheckedInitially);
     Layout->addWidget(FNeverAskAgain);
   }
 

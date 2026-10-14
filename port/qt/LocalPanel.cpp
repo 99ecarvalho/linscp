@@ -524,3 +524,15 @@ QString LocalPanel::ColumnsParams() const
 {
   return FView->ColumnsParams(WinScpColumns, 6);
 }
+
+QStringList LocalPanel::History() const
+{
+  QStringList Result;
+  for (const QString & Directory : FBack + QStringList{ FCurrent } + QStringList(FForward.rbegin(), FForward.rend()))
+  {
+    Result.append(QDir::toNativeSeparators(Directory));
+  }
+  Result.removeDuplicates();
+  Result.removeAll(QString());
+  return Result;
+}

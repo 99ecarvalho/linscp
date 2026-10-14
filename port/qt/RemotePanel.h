@@ -71,6 +71,8 @@ public:
   void Select(const QStringList & Names);
   QStringList Names() const;
   QString Path() const;
+  // The directories visited: back, this one, forward.
+  QStringList History() const;
   FileView * View() const { return FView; }
   // The drag of the selection, for other programs too: the main window's
   // (RemoteFileDrag); without it, a drag for the panels only.

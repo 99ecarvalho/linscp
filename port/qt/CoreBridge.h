@@ -55,6 +55,11 @@ struct TQuery
   unsigned int CancelAnswer = 0;
   // Offer "Never ask me again" (upstream's qpNeverAskAgainCheck).
   bool NeverAskAgainCheck = false;
+  // Its caption, when not upstream's default, and whether it starts
+  // checked (TMessageParams' NeverAskAgainTitle and
+  // NeverAskAgainCheckedInitially).
+  std::string NeverAskAgainTitle;
+  bool NeverAskAgainCheckedInitially = false;
   // Answered by itself after Timeout milliseconds, when not 0.
   unsigned int Timeout = 0;
   unsigned int TimeoutAnswer = 0;
@@ -489,6 +494,10 @@ enum class TText
   RemoteCopyTitle,      // "Duplicate"
   RemoteMoveTitle,      // "Move"
   RemoteTransferPrompt, // "Target remote &path:"
+  OpenDirectoryCaption, // "Open directory"
+  ManageBookmarksCaption, // "Manage bookmarks"
+  AddBookmarkConfirm,   // "Add directory '%s' to bookmarks?"
+  AddBookmarkShared,    // "Add to &shared bookmarks"
 };
 std::string Text(TText Text);
 
@@ -515,6 +524,29 @@ struct TInfo
   std::string ConfigurationStorage;
 };
 TInfo Info();
+
+// --- Bookmarks (P3-06b) -------------------------------------------------------
+
+// A bookmark, as core's TBookmark: its name, local and remote directories,
+// folder (Node), and keyboard shortcut (the VCL's TShortCut: a virtual key
+// with scShift 0x2000, scCtrl 0x4000, scAlt 0x8000; 0 none).
+struct TBookmarkEntry
+{
+  std::string Name;
+  std::string Local;
+  std::string Remote;
+  std::string Node;
+  unsigned ShortCut = 0;
+};
+// A site's bookmarks, by its session key, or with an empty key the shared
+// ones, as TWinConfiguration keeps them.
+std::vector<TBookmarkEntry> Bookmarks(const std::string & SessionKey);
+// Replaces them, and saves.
+void SetBookmarks(const std::string & SessionKey, const std::vector<TBookmarkEntry> & Bookmarks);
+// Open directory's page: the shared bookmarks (WinConfiguration's
+// UseSharedBookmarks).
+bool UseSharedBookmarks();
+void SetUseSharedBookmarks(bool Use);
 
 // --- Properties (P3-06a) ------------------------------------------------------
 
@@ -904,6 +936,9 @@ public:
   void SyncQueue(TSyncChecklist & Checklist);
   // Whether the server can set times, which "synchronize timestamps" needs.
   bool CanSyncTimestamps() const;
+  // The site's key for what is kept per site (SessionData's SessionKey):
+  // its bookmarks.
+  std::string SessionKey() const;
 
   // Properties, as WinSCP's (TCustomScpExplorerForm::SetProperties): of
   // entries of the current directory, their properties loaded first where

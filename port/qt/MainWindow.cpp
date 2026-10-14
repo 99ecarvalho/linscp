@@ -42,6 +42,8 @@
 #include "PropertiesDialog.h"
 #include "LinkDialog.h"
 #include "RemoteTransferDialog.h"
+#include "OpenDirectoryDialog.h"
+#include "QueryDialog.h"
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
 
@@ -61,7 +63,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FSitesAction = FileMenu->addAction(tr("&Site Manager..."), this, &MainWindow::SiteManagerDialog);
   FSitesAction->setShortcut(QKeySequence::New);
   FOpenAction = FileMenu->addAction(tr("&Open URL..."), this, &MainWindow::OpenUrlDialog);
-  FOpenAction->setShortcut(QKeySequence::Open);
+  // Ctrl+O is Open Directory's, as WinSCP's.
   // As WinSCP: the last session closed, the window too unless kept open.
   FDisconnectAction = FileMenu->addAction(tr("&Disconnect"), this, [this]()
   {
@@ -189,6 +191,12 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FDuplicateAction = FilesMenu->addAction(tr("Du&plicate..."), this, [this]() { RemoteTransfer(false); });
   FDuplicateAction->setShortcut(QKeySequence(Qt::SHIFT | Qt::Key_F5));
   FMoveToAction = FilesMenu->addAction(tr("Mo&ve To..."), this, [this]() { RemoteTransfer(true); });
+
+  QMenu * GoMenu = menuBar()->addMenu(tr("&Go To"));
+  FOpenDirectoryAction = GoMenu->addAction(tr("&Open Directory/Bookmark..."), this, [this]() { OpenDirectory(false); });
+  FOpenDirectoryAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_O));
+  FAddBookmarkAction = GoMenu->addAction(tr("&Add Path to Bookmarks"), this, [this]() { OpenDirectory(true); });
+  FAddBookmarkAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_B));
 
   QMenu * CommandsMenu = menuBar()->addMenu(tr("&Commands"));
   FSynchronizeAction = CommandsMenu->addAction(tr("&Synchronize..."), this, [this]() { Synchronize(true); });
@@ -949,6 +957,8 @@ void MainWindow::UpdateActions()
   FPropertiesAction->setEnabled(!FBusy && FSession);
   FLinkAction->setEnabled(!FBusy);
   FDuplicateAction->setEnabled(!FBusy && FSession);
+  FOpenDirectoryAction->setEnabled(!FBusy);
+  FAddBookmarkAction->setEnabled(!FBusy);
   FMoveToAction->setEnabled(!FBusy && FSession);
   FCopyAction->setEnabled(!FBusy && FSession);
   FMoveAction->setEnabled(!FBusy && FSession);
@@ -1302,4 +1312,68 @@ bool MainWindow::RemoteTransfer(bool Move)
   FPanel->Refresh();
   UpdateActions();
   return Result;
+}
+
+bool MainWindow::OpenDirectory(bool AddBookmark)
+{
+  const bool Local = FLocalActive || !FSession;
+  if (FBusy)
+  {
+    return false;
+  }
+  bool Shared = CoreBridge::UseSharedBookmarks();
+  const QString Directory = Local ? QDir::toNativeSeparators(FLocal->Path()) : FPanel->Path();
+  if (AddBookmark)
+  {
+    // As upstream: asked first, the checkbox choosing the shared bookmarks.
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Confirmation;
+    Query.Message = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::AddBookmarkConfirm))
+      .replace(QStringLiteral("%s"), Directory).toStdString();
+    CoreBridge::TQueryButton OK;
+    OK.Answer = CoreBridge::AnswerOK;
+    OK.Caption = "OK";
+    CoreBridge::TQueryButton Cancel;
+    Cancel.Answer = CoreBridge::AnswerCancel;
+    Cancel.Caption = "Cancel";
+    Query.Buttons = { OK, Cancel };
+    Query.CancelAnswer = CoreBridge::AnswerCancel;
+    Query.NeverAskAgainCheck = true;
+    Query.NeverAskAgainTitle = CoreBridge::Text(CoreBridge::TText::AddBookmarkShared);
+    Query.NeverAskAgainCheckedInitially = Shared;
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    const CoreBridge::TQueryResult Answer = Frontend.Query(Query);
+    if (Answer.Answer != CoreBridge::AnswerOK)
+    {
+      return false;
+    }
+    Shared = Answer.NeverAskAgain;
+    try
+    {
+      CoreBridge::SetUseSharedBookmarks(Shared);
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+    }
+  }
+  QString Name = Directory;
+  while (true)
+  {
+    // Site bookmarks are the site's: with a session, on either side.
+    OpenDirectoryDialog Dialog(!Local, Name, Local ? FLocal->History() : FPanel->History(),
+      FSession ? FSession->SessionKey() : std::string(), AddBookmark, Shared, this);
+    if (Dialog.exec() != QDialog::Accepted)
+    {
+      return false;
+    }
+    Name = Dialog.Directory();
+    if (Local ? FLocal->ChangeDirectory(Name) : FPanel->ChangeDirectory(Name))
+    {
+      return true;
+    }
+    AddBookmark = false;
+    Shared = CoreBridge::UseSharedBookmarks();
+  }
 }

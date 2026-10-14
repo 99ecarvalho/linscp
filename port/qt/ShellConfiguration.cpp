@@ -24,7 +24,8 @@ private:
 
 }  // namespace
 
-TShellConfiguration::TShellConfiguration()
+TShellConfiguration::TShellConfiguration() :
+  FBookmarks(new TBookmarks())
 {
   Default();
   // Load complete locale according to the UI language.
@@ -107,6 +108,12 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"TemporaryDirectoryCleanup", FSettings.TemporaryDirectoryCleanup);
     Storage->WriteBool(L"ConfirmTemporaryDirectoryCleanup", FSettings.ConfirmTemporaryDirectoryCleanup);
     Storage->WriteBool(L"EditorCheckNotModified", FSettings.EditorCheckNotModified);
+    Storage->WriteBool(L"UseSharedBookmarks", FSettings.UseSharedBookmarks);
+  }
+  if (Storage->OpenSubKey(L"Bookmarks", true))
+  {
+    FBookmarks->Save(Storage, All);
+    Storage->CloseSubKey();
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander", true))
   {
@@ -149,6 +156,13 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
   }
 }
 
+// As TWinConfiguration::Saved.
+void __fastcall TShellConfiguration::Saved()
+{
+  TGUIConfiguration::Saved();
+  FBookmarks->ModifyAll(false);
+}
+
 void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
 {
   TGUIConfiguration::LoadData(Storage);
@@ -177,6 +191,12 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.ConfirmTemporaryDirectoryCleanup =
       Storage->ReadBool(L"ConfirmTemporaryDirectoryCleanup", FSettings.ConfirmTemporaryDirectoryCleanup);
     FSettings.EditorCheckNotModified = Storage->ReadBool(L"EditorCheckNotModified", FSettings.EditorCheckNotModified);
+    FSettings.UseSharedBookmarks = Storage->ReadBool(L"UseSharedBookmarks", FSettings.UseSharedBookmarks);
+  }
+  if (Storage->OpenSubKey(L"Bookmarks", false))
+  {
+    FBookmarks->Load(Storage);
+    Storage->CloseSubKey();
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander", false))
   {

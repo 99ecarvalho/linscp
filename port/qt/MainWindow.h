@@ -94,6 +94,10 @@ public:
   // remote panel's selection within the server, after its dialog. False
   // when nothing was done in full.
   bool RemoteTransfer(bool Move);
+  // Open Directory/Bookmark (Ctrl+O) and Add Path to Bookmarks (Ctrl+B),
+  // as WinSCP's DoOpenDirectoryDialog for the active panel: the directory
+  // chosen opened, the dialog again when it cannot be. False when none was.
+  bool OpenDirectory(bool AddBookmark = false);
   // Options > Preferences: false when cancelled.
   bool PreferencesDialog();
   // The preferences applied to the window and its panels.
@@ -150,6 +154,8 @@ private:
   QAction * FPropertiesAction = nullptr;
   QAction * FLinkAction = nullptr;
   QAction * FDuplicateAction = nullptr;
+  QAction * FOpenDirectoryAction = nullptr;
+  QAction * FAddBookmarkAction = nullptr;
   QAction * FMoveToAction = nullptr;
   // The editors, and for a remote file what it was downloaded as.
   struct TEdited
