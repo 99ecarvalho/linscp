@@ -105,6 +105,9 @@ public:
   // as WinSCP's DoOpenDirectoryDialog for the active panel: the directory
   // chosen opened, the dialog again when it cannot be. False when none was.
   bool OpenDirectory(bool AddBookmark = false);
+  // A shared bookmark's keyboard shortcut pressed: its directory opened on
+  // the active panel's side. False when none has it, or no directory there.
+  bool OpenBookmarkShortCut(unsigned ShortCut);
   // Find Files (Alt+F7, F3 with Explorer's keys): WinSCP's dialog, beside
   // the window. Its search and actions: FindFiles searches with the
   // window busy (false when it failed, its error shown); FocusRemote opens
@@ -141,6 +144,7 @@ public:
   bool EnterCustomCommand(bool Files);
   // The custom commands' menus and keys, from the list as it is now.
   void UpdateCustomCommands();
+  void UpdateBookmarkShortCuts();
   class QMenu * FileCommandsMenu() const { return FFileCommandsMenu; }
   QMenu * StaticCommandsMenu() const { return FStaticCommandsMenu; }
   // Options > Preferences: false when cancelled.
@@ -204,6 +208,7 @@ private:
   QAction * FMoveAction = nullptr;
   QAction * FSynchronizeAction = nullptr;
   QAction * FKeepUpToDateAction = nullptr;
+  std::vector<QAction *> FBookmarkActions;
   class KeepUpToDateDialog * FKeepUpToDate = nullptr;
   QAction * FEditAction = nullptr;
   QAction * FPropertiesAction = nullptr;

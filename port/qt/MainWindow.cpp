@@ -256,6 +256,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   RestoreLayout();
   connect(FPanel, &RemotePanel::Changed, this, &MainWindow::UpdateTitle);
   UpdateCustomCommands();
+  UpdateBookmarkShortCuts();
   UpdateActions();
 }
 
@@ -1430,10 +1431,70 @@ bool MainWindow::GoRemote(const QString & Directory)
   return FPanel->ChangeDirectory(Directory) || (Clean(Directory) == Clean(FPanel->Path()));
 }
 
+// The shared bookmarks' shortcuts (TCustomScpExplorerForm::KeyDown's
+// SharedBookmarks->FindByShortCut), as actions of the window.
+void MainWindow::UpdateBookmarkShortCuts()
+{
+  for (QAction * Action : FBookmarkActions)
+  {
+    delete Action;
+  }
+  FBookmarkActions.clear();
+  std::vector<CoreBridge::TBookmarkEntry> Shared;
+  try
+  {
+    Shared = CoreBridge::Bookmarks(std::string());
+  }
+  catch (const CoreBridge::TCoreError &)
+  {
+    return;
+  }
+  for (const CoreBridge::TBookmarkEntry & Bookmark : Shared)
+  {
+    const QString ShortCut = ShortCutText(Bookmark.ShortCut);
+    if (!ShortCut.isEmpty())
+    {
+      QAction * Action = new QAction(this);
+      Action->setShortcut(QKeySequence::fromString(ShortCut, QKeySequence::NativeText));
+      Action->setShortcutContext(Qt::WindowShortcut);
+      const unsigned Key = Bookmark.ShortCut;
+      connect(Action, &QAction::triggered, this, [this, Key]() { OpenBookmarkShortCut(Key); });
+      addAction(Action);
+      FBookmarkActions.push_back(Action);
+    }
+  }
+}
+
+// As OpenBookmark: the bookmark's directory on the active panel's side,
+// where it has one.
+bool MainWindow::OpenBookmarkShortCut(unsigned ShortCut)
+{
+  if (FBusy)
+  {
+    return false;
+  }
+  for (const CoreBridge::TBookmarkEntry & Bookmark : CoreBridge::Bookmarks(std::string()))
+  {
+    if (Bookmark.ShortCut == ShortCut)
+    {
+      const bool Local = FLocalActive || !FSession;
+      const QString Path = QString::fromStdString(Local ? Bookmark.Local : Bookmark.Remote);
+      return !Path.isEmpty() && (Local ? GoLocal(Path) : GoRemote(Path));
+    }
+  }
+  return false;
+}
+
 // As TScpCommanderForm::DoOpenDirectoryDialog: bookmarks or Location
 // Profiles, as the preference says, the other when the dialog switches.
 bool MainWindow::OpenDirectory(bool AddBookmark)
 {
+  // The bookmarks' shortcuts, as the dialogs leave them.
+  struct TUpdate
+  {
+    MainWindow * Window;
+    ~TUpdate() { Window->UpdateBookmarkShortCuts(); }
+  } Update{ this };
   if (FBusy)
   {
     return false;

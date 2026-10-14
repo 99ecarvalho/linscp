@@ -2312,6 +2312,16 @@ TPropertiesInfo TSession::PropertiesOf(const std::vector<std::string> & Names)
     Result.Properties.Owner = Utf8(TokenText(Common.Owner, ByID));
     Result.Properties.HasGroup = Common.Valid.Contains(vpGroup);
     Result.Properties.Group = Utf8(TokenText(Common.Group, ByID));
+    if (Common.Valid.Contains(vpTags))
+    {
+      // Key and value lines, as TPropertiesDialog::SetFileProperties reads them.
+      Result.Properties.HasTags = true;
+      std::unique_ptr<TStrings> Tags(TextToStringList(Common.Tags));
+      for (int Index = 0; Index + 1 < Tags->Count; Index += 2)
+      {
+        Result.Properties.Tags.emplace_back(Utf8(Tags->Strings[Index]), Utf8(Tags->Strings[Index + 1]));
+      }
+    }
     // TPropertiesDialog::LoadInfo.
     for (int Index = 0; Index < Files->Count; Index++)
     {
@@ -2331,6 +2341,8 @@ TPropertiesInfo TSession::PropertiesOf(const std::vector<std::string> & Names)
       }
       Result.Size += File->Size;
     }
+    // TCustomScpExplorerForm's poTags, and TPropertiesDialog's ShowTags.
+    Result.ShowTags = Terminal->IsCapable[fcTags] && (Result.Files == 1) && (Result.Directories == 0);
     if ((Files->Count == 1) && static_cast<TRemoteFile *>(Files->Objects[0])->IsSymLink)
     {
       Result.LinkTarget = Utf8(static_cast<TRemoteFile *>(Files->Objects[0])->LinkTo);
@@ -2379,6 +2391,10 @@ bool TSession::SetProperties(const std::vector<std::string> & Names, const TFile
     {
       Valid << vpGroup;
     }
+    if (Current.Valid.Contains(vpTags) && Terminal->IsCapable[fcTags])
+    {
+      Valid << vpTags;
+    }
     Current.Valid = Valid;
     Current.Recursive = false;
     TRemoteProperties New;
@@ -2403,6 +2419,18 @@ bool TSession::SetProperties(const std::vector<std::string> & Names, const TFile
       {
         New.Valid << vpOwner;
       }
+    }
+    if (Terminal->IsCapable[fcTags] && Properties.HasTags && (Files->Count == 1))
+    {
+      // As GetFileProperties: key and value lines.
+      std::unique_ptr<TStrings> Tags(new TStringList());
+      for (const auto & Tag : Properties.Tags)
+      {
+        Tags->Add(FromUtf8(Tag.first));
+        Tags->Add(FromUtf8(Tag.second));
+      }
+      New.Tags = Tags->Text;
+      New.Valid << vpTags;
     }
     New.Recursive = Properties.Recursive;
     New = TRemoteProperties::ChangedProperties(Current, New);

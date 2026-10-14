@@ -1,4 +1,5 @@
 #include "LocationProfilesDialog.h"
+#include "ShortCutDialog.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -149,10 +150,19 @@ QWidget * LocationProfilesDialog::MakePage(int Index)
   FMoveTo[Index] = new QPushButton(tr("&Move To..."), Widget);
   FUp[Index] = new QPushButton(tr("&Up"), Widget);
   FDown[Index] = new QPushButton(tr("&Down"), Widget);
-  for (QPushButton * Button : { FAdd[Index], FRemove[Index], FRename[Index], FMoveTo[Index], FUp[Index], FDown[Index] })
+  for (QPushButton * Button : { FAdd[Index], FRemove[Index], FRename[Index], FMoveTo[Index] })
   {
     Buttons->addWidget(Button);
   }
+  // The shared profiles' shortcuts, which the main window knows.
+  if (Index == 1)
+  {
+    FShortCut = new QPushButton(tr("&Shortcut..."), Widget);
+    Buttons->addWidget(FShortCut);
+    connect(FShortCut, &QPushButton::clicked, this, [this]() { ShortCutSelected(); });
+  }
+  Buttons->addWidget(FUp[Index]);
+  Buttons->addWidget(FDown[Index]);
   Buttons->addStretch(1);
   Layout->addLayout(Buttons);
   connect(FAdd[Index], &QPushButton::clicked, this, [this, Index]()
@@ -481,6 +491,34 @@ void LocationProfilesDialog::RemoveSelected(int Index, bool Confirm)
 }
 
 // As TLocationProfilesDialog::ProfilesViewEdited.
+// As TLocationProfilesDialog::ShortCutBookmarkButtonClick.
+bool LocationProfilesDialog::ShortCutSelected()
+{
+  const int Index = 1;
+  const int Selected = SelectedIndex(Index);
+  if (Selected < 0)
+  {
+    return false;
+  }
+  std::vector<unsigned> Used = CustomCommandShortCuts();
+  for (const TProfile & Profile : FProfiles[Index])
+  {
+    if (Profile.Entry.ShortCut != 0)
+    {
+      Used.push_back(Profile.Entry.ShortCut);
+    }
+  }
+  ShortCutDialog Dialog(Used, FProfiles[Index][Selected].Entry.ShortCut, this);
+  if (Dialog.exec() != QDialog::Accepted)
+  {
+    return false;
+  }
+  FProfiles[Index][Selected].Entry.ShortCut = Dialog.ShortCut();
+  LoadTree(Index, FProfiles[Index][Selected].Id);
+  UpdateControls();
+  return true;
+}
+
 bool LocationProfilesDialog::RenameSelected(int Index, const QString & Name)
 {
   const int Selected = SelectedIndex(Index);
@@ -667,6 +705,7 @@ void LocationProfilesDialog::UpdateControls()
     FUp[Index]->setEnabled(Previous);
     FDown[Index]->setEnabled(Next);
   }
+  FShortCut->setEnabled(SelectedIndex(1) >= 0);
 }
 
 bool LocationProfilesDialog::eventFilter(QObject * Object, QEvent * Event)

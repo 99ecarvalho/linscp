@@ -528,6 +528,8 @@ enum class TText
   PatternsHintK, // "!K ..."
   PatternsHintBackslash, // "!\\ ..."
   ShortCutNone, // "None"
+  ShortCutCaption, // "Select keyboard shortcut"
+  ShortCutLabel, // "&Keyboard shortcut:"
   CustomCommandsParamsTitle, // "'%s' command parameters"
   CustomCommandsParamPrompt, // "&Parameter value:"
   FindFileTitle, // "Find"
@@ -541,8 +543,23 @@ enum class TText
   SelectMaskDeselectCaption, // "Deselect"
   FilterMaskCaption, // "Filter"
   NotSupported, // "Operation not supported."
+  LicenseCaption, // "%s license"
+  TagAdd,         // "Add tag"
+  TagEdit,        // "Edit tag"
+  TagKey,         // "&Key:"
+  TagValue,       // "&Value (optional):"
+  TagNotUnique,   // "Keys must be unique."
+  TagInvalidChar, // "Character \"%s\" is not allowed in tags."
 };
 std::string Text(TText Text);
+
+// Help > About's third-party list, as TAboutDialog::GenerateThirdParty
+// writes it, in HTML: the translation in use, if any (LanguageName in place
+// of its "{language}"), then the libraries linscp has of WinSCP's. Expat's
+// license link is ExpatLicenseUrl, which the shell shows itself, as
+// WinSCP's dialog does.
+std::string ThirdPartyHtml(const std::string & LanguageName);
+extern const char ExpatLicenseUrl[];
 
 // Whether a file matches a file mask (core's TFileMasks syntax: "*.txt;
 // *.log | old/", size and time conditions...), as WinSCP's panels match
@@ -754,6 +771,9 @@ struct TFileProperties
   bool HasGroup = false;
   std::string Group;
   bool Recursive = false;
+  // S3's tags, key and value, where the protocol has them (fcTags).
+  bool HasTags = false;
+  std::vector<std::pair<std::string, std::string>> Tags;
 };
 
 // Core's file masks: whether a target's name part is a mask ("*.*", "*.bak")
@@ -796,6 +816,8 @@ struct TPropertiesInfo
   std::string LinkTarget;
   // The server's checksum algorithms; empty when it calculates none.
   std::vector<std::string> ChecksumAlgorithms;
+  // The Tags page: a single file, where the protocol has tags (poTags).
+  bool ShowTags = false;
 };
 
 // --- A session ---------------------------------------------------------------
@@ -872,6 +894,34 @@ struct TSite
   // fields above.
   bool HasRawSettings = false;
   std::string RawSettings;
+};
+
+// Cleanup application data, as WinSCP's (forms/Cleanup.cpp,
+// TCleanupDialog): what the program keeps -- its configuration, sites,
+// caches, INI file, random seed file, temporary folders -- and where.
+class TCleanupData
+{
+public:
+  struct TItem
+  {
+    std::string Caption;
+    std::string Location;
+  };
+  // As FindData. Throws TCoreError.
+  TCleanupData();
+  ~TCleanupData();
+  const std::vector<TItem> & Items() const { return FItems; }
+  // Whether there is anything to clean up: the configuration is listed
+  // regardless (cleaning it up keeps it from being saved), as WinSCP's.
+  bool AnyData() const { return FAnyData; }
+  // The item removed. Throws TCoreError.
+  void Cleanup(std::size_t Index);
+
+private:
+  struct TImpl;
+  std::unique_ptr<TImpl> F;
+  std::vector<TItem> FItems;
+  bool FAnyData = false;
 };
 
 // Import sites, as WinSCP's (forms/ImportSessions.cpp's

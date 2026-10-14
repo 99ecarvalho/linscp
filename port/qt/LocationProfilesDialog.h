@@ -39,6 +39,9 @@ public:
   bool RenameSelected(int Page, const QString & Name);
   bool MoveSelectedTo(int Page, const QString & Folder);
   void MoveSelected(int Page, int By);
+  // The shared profiles' Shortcut...: false when cancelled.
+  bool ShortCutSelected();
+  QPushButton * ShortCutButton() const { return FShortCut; }
   // Selects the profile of that name (in a folder: "folder/name").
   bool Select(int Page, const QString & Path);
   QTreeWidget * Tree(int Page) const { return FTrees[Page]; }
@@ -87,6 +90,7 @@ private:
   QPushButton * FUp[2] = {};
   QPushButton * FDown[2] = {};
   QPushButton * FOk = nullptr;
+  QPushButton * FShortCut = nullptr;
   std::vector<TProfile> FProfiles[2];
   int FNextId = 1;
   bool FChanging = false;

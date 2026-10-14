@@ -136,6 +136,7 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P3-06e | Dialogs, keep remote directory up to date (`Synchronize`): core's `TSynchronizeController` over the local panel's watcher | M | P3-03 | Split from P3-06 |
 | P3-06f | Dialogs, the rest: Save workspace, Shortcut, Cleanup application data, License, S3 tags (`TTagDialog`) | M | P3-04a | Split from P3-06; WinSCP's usage statistics dialog is its telemetry's, not ported |
 | P3-12 | Local-to-local browsing: WinSCP's local browser (a tab with local directories in both panels, no session) and its CopyLocal dialog (local copy and move, Shift+F5/F6) | M | P3-02 | Raised 2026-10-14 by the user; WinSCP has local-to-local copy only in this mode |
+| P3-13 | Session tabs and workspaces: several sessions open at once, as WinSCP's tabs (`TTerminalManager`), and workspaces, the tabs saved together (Save Workspace, `TSaveWorkspaceDialog`), opened from the site manager and saved on exit | L | P3-02 | Split from P3-06f on 2026-10-14: a workspace is the set of open tabs, which the shell does not have yet. P3-12's local browser is a tab too |
 
 ## P4 — Cleanup
 

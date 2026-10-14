@@ -14,6 +14,11 @@
 #include <HeadlessMain.h>
 #include <TextsCore.h>
 #include <TextsWin.h>
+#include <PuttyTools.h>
+
+#include <functional>
+#include <FtpFileSystem.h>
+#include <S3FileSystem.h>
 
 namespace
 {
@@ -878,6 +883,8 @@ std::string Text(TText Text)
     case TText::PatternsHintK: Ident = PATTERNS_HINT_K; break;
     case TText::PatternsHintBackslash: Ident = PATTERNS_HINT_BACKSLASH; break;
     case TText::ShortCutNone: Ident = SHORTCUT_NONE; break;
+    case TText::ShortCutCaption: Ident = SHORTCUT_CAPTION; break;
+    case TText::ShortCutLabel: Ident = SHORTCUT_LABEL; break;
     case TText::CustomCommandsParamsTitle: Ident = CUSTOM_COMMANDS_PARAMS_TITLE; break;
     case TText::CustomCommandsParamPrompt: Ident = CUSTOM_COMMANDS_PARAM_PROMPT2; break;
     case TText::FindFileTitle: Ident = FIND_FILE_TITLE; break;
@@ -891,9 +898,168 @@ std::string Text(TText Text)
     case TText::SelectMaskDeselectCaption: Ident = SELECT_MASK_DESELECT_CAPTION; break;
     case TText::FilterMaskCaption: Ident = FILTER_MASK_CAPTION; break;
     case TText::NotSupported: Ident = NOTSUPPORTED; break;
+    case TText::LicenseCaption: Ident = LICENSE_CAPTION; break;
+    case TText::TagAdd: Ident = TAG_ADD; break;
+    case TText::TagEdit: Ident = TAG_EDIT; break;
+    case TText::TagKey: Ident = TAG_KEY; break;
+    case TText::TagValue: Ident = TAG_VALUE; break;
+    case TText::TagNotUnique: Ident = TAG_NOT_UNIQUE; break;
+    case TText::TagInvalidChar: Ident = TAG_INVALID_CHAR; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));
+}
+
+const char ExpatLicenseUrl[] = "license:expat";
+
+struct TCleanupData::TImpl
+{
+  std::vector<std::function<void()>> Events;
+};
+
+TCleanupData::TCleanupData() :
+  F(new TImpl())
+{
+  try
+  {
+    const auto Add = [this](int CaptionId, const UnicodeString & Location, std::function<void()> Event)
+    {
+      FItems.push_back(TItem{ Utf8(LoadStr(CaptionId)), Utf8(Location) });
+      F->Events.push_back(std::move(Event));
+      FAnyData = true;
+    };
+    const auto Registry = [](const UnicodeString & Location)
+    {
+      return Configuration->RootKeyStr + L'\\' + Configuration->RegistryStorageKey + L'\\' + Location;
+    };
+    // Listed regardless, for its side effect (the configuration is not
+    // saved), but data only when it exists.
+    Add(CLEANUP_CONFIG, Registry(Configuration->ConfigurationSubKey), []() { Configuration->CleanupConfiguration(); });
+    FAnyData = Configuration->RegistryPathExists(Configuration->ConfigurationSubKey);
+    if (Configuration->RegistryPathExists(Configuration->StoredSessionsSubKey))
+    {
+      Add(CLEANUP_SESSIONS, Registry(Configuration->StoredSessionsSubKey), []() { StoredSessions->Cleanup(); });
+    }
+    if (Configuration->HasAnyCache())
+    {
+      Add(CLEANUP_CACHES, Registry(L"..."), []() { Configuration->CleanupCaches(); });
+    }
+    const UnicodeString IniFilePath = ExpandEnvironmentVariables(Configuration->IniFileStorageNameForReading);
+    if (FileExists(IniFilePath))
+    {
+      Add(CLEANUP_INIFILE, IniFilePath, []() { Configuration->CleanupIniFile(); });
+    }
+    if (RandomSeedExists())
+    {
+      Add(CLEANUP_SEEDFILE, Configuration->RandomSeedFileName, []() { Configuration->CleanupRandomSeedFile(); });
+    }
+    TShellConfiguration * Shell = dynamic_cast<TShellConfiguration *>(GUIConfiguration);
+    if ((Shell != NULL) && Shell->AnyTemporaryFolders())
+    {
+      Add(CLEANUP_TEMP_FOLDERS, Shell->TemporaryDir(true), [Shell]() { Shell->CleanupTemporaryFolders(); });
+    }
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+TCleanupData::~TCleanupData() = default;
+
+void TCleanupData::Cleanup(std::size_t Index)
+{
+  try
+  {
+    Configuration->Usage->Inc(L"Cleanups");
+    F->Events.at(Index)();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+namespace
+{
+
+// TAboutDialog's AddPara, CreateLink and CreateLicenseLinkLine, HTML only.
+void AddPara(UnicodeString & Text, const UnicodeString & S)
+{
+  Text += L"<p>" + S + L"</p>\n";
+}
+
+UnicodeString HtmlLink(const UnicodeString & Url, const UnicodeString & Title = UnicodeString())
+{
+  return FORMAT(L"<a href=\"%s\">%s</a>", (Url, Title.IsEmpty() ? Url : Title));
+}
+
+UnicodeString LicenseLinkLine(const UnicodeString & Url)
+{
+  return HtmlLink(Url, LoadStr(ABOUT_THIRDPARTY_LICENSE)) + L"<br>";
+}
+
+}  // namespace
+
+// The VCL components WinSCP lists after these (Toolbar2000, TBX, the file
+// manager's, JCL, PNG components) are not linscp's.
+std::string ThirdPartyHtml(const std::string & LanguageName)
+{
+  UnicodeString ThirdParty;
+  const UnicodeString Br = L"<br>";
+  if (!GUIConfiguration->UsingInternalTranslation())
+  {
+    const UnicodeString TranslatorUrl = LoadStr(TRANSLATOR_URL);
+    const UnicodeString TranslatorInfo = LoadStr(TRANSLATOR_INFO2);
+    const UnicodeString Header = ReplaceStr(LoadStr(ABOUT_TRANSLATIONS_HEADER), L"{language}", FromUtf8(LanguageName));
+    AddPara(ThirdParty,
+      Header + Br +
+      FMTLOAD(ABOUT_TRANSLATIONS_COPYRIGHT, (GUIConfiguration->AppliedLocaleCopyright())) + Br +
+      (!TranslatorInfo.IsEmpty() ? TranslatorInfo + Br : EmptyStr) +
+      (!TranslatorUrl.IsEmpty() ? HtmlLink(TranslatorUrl) : EmptyStr));
+  }
+
+  AddPara(ThirdParty, LoadStr(ABOUT_THIRDPARTY_HEADER));
+
+  AddPara(ThirdParty,
+    FMTLOAD(PUTTY_BASED_ON, (GetPuTTYVersion())) + Br +
+    LoadStr(PUTTY_COPYRIGHT) + Br +
+    LicenseLinkLine(LoadStr(PUTTY_LICENSE_URL)) +
+    HtmlLink(LoadStr(PUTTY_URL)));
+
+  UnicodeString OpenSSLVersionText = GetOpenSSLVersionText();
+  CutToChar(OpenSSLVersionText, L' ', true); // "OpenSSL"
+  const UnicodeString OpenSSLVersion = CutToChar(OpenSSLVersionText, L' ', true);
+  CutToChar(OpenSSLVersionText, L' ', true); // day
+  CutToChar(OpenSSLVersionText, L' ', true); // month
+  const UnicodeString OpenSSLYear = CutToChar(OpenSSLVersionText, L' ', true);
+  AddPara(ThirdParty,
+    FMTLOAD(OPENSSL_BASED_ON, (OpenSSLVersion)) + Br +
+    FMTLOAD(OPENSSL_COPYRIGHT2, (OpenSSLYear)) + Br +
+    HtmlLink(LoadStr(OPENSSL_URL)));
+
+  AddPara(ThirdParty,
+    LoadStr(FILEZILLA_BASED_ON2) + Br +
+    LoadStr(FILEZILLA_COPYRIGHT2) + Br +
+    HtmlLink(LoadStr(FILEZILLA_URL)));
+
+  AddPara(ThirdParty,
+    FMTLOAD(NEON_BASED_ON2, (NeonVersion())) + Br +
+    LoadStr(NEON_COPYRIGHT) + Br +
+    HtmlLink(LoadStr(NEON_URL)));
+
+  AddPara(ThirdParty,
+    FMTLOAD(S3_BASED_ON, (S3LibVersion())) + Br +
+    LoadStr(S3_COPYRIGHT) + Br +
+    LicenseLinkLine(LoadStr(S3_LICENSE_URL)) +
+    HtmlLink(LoadStr(S3_URL)));
+
+  AddPara(ThirdParty,
+    FMTLOAD(EXPAT_BASED_ON, (ExpatVersion())) + Br +
+    LicenseLinkLine(ExpatLicenseUrl) +
+    HtmlLink(LoadStr(EXPAT_URL)));
+
+  return Utf8(ThirdParty);
 }
 
 TInfo Info()

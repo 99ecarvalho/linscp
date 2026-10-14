@@ -1,5 +1,6 @@
 // Help > About: the program, its version, what it runs on, where it comes
-// from (WinSCP, which it ports), its authors and licence.
+// from (WinSCP, which it ports), its authors and licence (the License
+// dialog), and the third-party code it includes, as WinSCP's About lists it.
 #ifndef LINSCP_QT_ABOUT_DIALOG_H
 #define LINSCP_QT_ABOUT_DIALOG_H
 
@@ -8,6 +9,8 @@
 #include "CoreBridge.h"
 
 class QLabel;
+class QPushButton;
+class QTextBrowser;
 
 class AboutDialog : public QDialog
 {
@@ -20,11 +23,15 @@ public:
   QLabel * NameLabel() const { return FName; }
   QLabel * VersionLabel() const { return FVersion; }
   QLabel * WinScpLabel() const { return FWinScp; }
+  QTextBrowser * ThirdParty() const { return FThirdParty; }
+  QPushButton * LicenseButton() const { return FLicense; }
 
 private:
   QLabel * FName = nullptr;
   QLabel * FVersion = nullptr;
   QLabel * FWinScp = nullptr;
+  QTextBrowser * FThirdParty = nullptr;
+  QPushButton * FLicense = nullptr;
 };
 
 #endif

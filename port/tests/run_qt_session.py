@@ -4,10 +4,11 @@ A Qt shell test against rclone's SFTP server on loopback: test_qt_session
 (the bridge to core, a scripted frontend in Qt's place) or test_qt_gui
 session (the main window, its dialogs answered by a responder).
 
-  run_qt_session.py [--emulator wine] [--protocol sftp|ftp|sshd] test[.exe] [argument ...]
+  run_qt_session.py [--emulator wine] [--protocol sftp|ftp|sshd|s3] test[.exe] [argument ...]
 
-The server is rclone's SFTP, or the suite's own FTP server (ftp_server.py);
-user linscp, password secret either way. Or (sshd) OpenSSH's sshd, with a
+The server is rclone's SFTP, or the suite's own FTP or S3 server
+(ftp_server.py, s3_server.py, whose bucket "bucket" is the root); user (S3:
+access key) linscp, password (secret key) secret either way. Or (sshd) OpenSSH's sshd, with a
 real shell, letting the current user ({user}) in with a fresh key ({key}).
 The arguments default to /ini=nul {port} {protocol}, with the server's port
 and protocol filled in, {tmp} with a temporary directory of the test's own
@@ -25,7 +26,7 @@ import fixtures  # noqa: E402
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--emulator', default='')
-    ap.add_argument('--protocol', choices=('sftp', 'ftp', 'sshd'), default='sftp')
+    ap.add_argument('--protocol', choices=('sftp', 'ftp', 'sshd', 's3'), default='sftp')
     ap.add_argument('test')
     ap.add_argument('args', nargs=argparse.REMAINDER)
     a = ap.parse_args()
@@ -52,6 +53,10 @@ def main():
             server = fixtures.sshd(os.path.join(tmp, 'sshd'))
         elif a.protocol == 'sftp':
             server = fixtures.rclone_sftp(root, 'linscp', 'secret', os.path.join(tmp, 'keys'))
+        elif a.protocol == 's3':
+            os.makedirs(os.path.join(tmp, 's3'))
+            os.rename(root, os.path.join(tmp, 's3', 'bucket'))
+            server = fixtures.python_server('s3_server.py', os.path.join(tmp, 's3'))
         else:
             server = fixtures.python_server('ftp_server.py', root)
         with server as served:

@@ -39,6 +39,55 @@
         <source>Copyright © 2026 Eduardo Correia &amp;lt;%1&amp;gt;.</source>
         <translation>Copyright © 2026 Eduardo Correia &amp;lt;%1&amp;gt;.</translation>
     </message>
+    <message>
+        <source>Qt %1</source>
+        <translation>Qt %1</translation>
+    </message>
+    <message>
+        <source>Copyright © The Qt Company Ltd. and other contributors</source>
+        <translation>Copyright © The Qt Company Ltd. e outros colaboradores</translation>
+    </message>
+    <message>
+        <source>&amp;License...</source>
+        <translation>&amp;Licença</translation>
+    </message>
+</context>
+<context>
+    <name>CleanupDialog</name>
+    <message>
+        <source>Cleanup application data</source>
+        <translation>Limpar dados do programa</translation>
+    </message>
+    <message>
+        <source>Following list contains all application data possibly stored on this computer. Check those you want to remove.
+
+If another instance of application is running, please close it before cleaning data.
+
+Notice: Opening session and/or next execution of application will recreate some of data.</source>
+        <translation>A seguinte lista contém todos os dados do programa possívelmente armazenados neste computador. Verifique quais você deseja remover..
+
+Se em outra parte do aplicativo estiver rodando, por favor feche-o antes de apagar os dados.
+
+Nota: Abrindo a sessão e/ou próxima execução da aplicação será recriado alguns dados.</translation>
+    </message>
+    <message>
+        <source>Data</source>
+        <translation>Dado</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <translation>Local</translation>
+    </message>
+    <message>
+        <source>%1
+Location: %2</source>
+        <translation>%1
+Local: %2</translation>
+    </message>
+    <message>
+        <source>Un/check &amp;all</source>
+        <translation>(des)Marcar &amp;todos</translation>
+    </message>
 </context>
 <context>
     <name>ConsoleDialog</name>
@@ -785,6 +834,10 @@
         <source>&amp;Down</source>
         <translation>A&amp;baixo</translation>
     </message>
+    <message>
+        <source>&amp;Shortcut...</source>
+        <translation>A&amp;talho...</translation>
+    </message>
 </context>
 <context>
     <name>MainWindow</name>
@@ -1041,6 +1094,10 @@
     <message>
         <source>&amp;Location Profiles...</source>
         <translation>Padrões de &amp;Localização...</translation>
+    </message>
+    <message>
+        <source>&amp;Shortcut...</source>
+        <translation>A&amp;talho...</translation>
     </message>
 </context>
 <context>
@@ -1534,6 +1591,30 @@
     <message>
         <source>File</source>
         <translation>Arquivo</translation>
+    </message>
+    <message>
+        <source>Key</source>
+        <translation>Chave</translation>
+    </message>
+    <message>
+        <source>Value</source>
+        <translation>Valor</translation>
+    </message>
+    <message>
+        <source>&amp;Add...</source>
+        <translation>&amp;Adicionar...</translation>
+    </message>
+    <message>
+        <source>&amp;Edit...</source>
+        <translation>&amp;Editar...</translation>
+    </message>
+    <message>
+        <source>&amp;Remove</source>
+        <translation>&amp;Remover</translation>
+    </message>
+    <message>
+        <source>Tags</source>
+        <translation>Marcadores</translation>
     </message>
 </context>
 <context>
@@ -2065,6 +2146,10 @@
     <message>
         <source>&amp;Import Sites...</source>
         <translation>&amp;Importar...</translation>
+    </message>
+    <message>
+        <source>&amp;Clean Up...</source>
+        <translation>Lim&amp;par...</translation>
     </message>
 </context>
 <context>

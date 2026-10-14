@@ -11,7 +11,7 @@ add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp AboutDialog.cpp 
   PromptDialog.cpp Language.cpp SiteManager.cpp SiteAdvanced.cpp
   FileList.cpp RemotePanel.cpp LocalPanel.cpp
   TransferDialog.cpp QueuePanel.cpp SynchronizeDialog.cpp PreferencesDialog.cpp TransferSettingsDialog.cpp
-  RightsFrame.cpp PropertiesDialog.cpp CreateDirectoryDialog.cpp LinkDialog.cpp RemoteTransferDialog.cpp OpenDirectoryDialog.cpp LocationProfilesDialog.cpp FindFilesDialog.cpp EditMaskDialog.cpp ServerInfoDialog.cpp RtfText.cpp GenerateUrlDialog.cpp ConsoleDialog.cpp SiteRawDialog.cpp ImportSitesDialog.cpp CustomCommandDialog.cpp KeepUpToDateDialog.cpp CoreBridge.h)
+  RightsFrame.cpp PropertiesDialog.cpp CreateDirectoryDialog.cpp LinkDialog.cpp RemoteTransferDialog.cpp OpenDirectoryDialog.cpp LocationProfilesDialog.cpp FindFilesDialog.cpp EditMaskDialog.cpp ServerInfoDialog.cpp RtfText.cpp GenerateUrlDialog.cpp ConsoleDialog.cpp SiteRawDialog.cpp ImportSitesDialog.cpp CustomCommandDialog.cpp KeepUpToDateDialog.cpp LicenseDialog.cpp CleanupDialog.cpp TagDialog.cpp ShortCutDialog.cpp CoreBridge.h)
 set_target_properties(linscp-qt-ui PROPERTIES AUTOMOC ON)
 target_link_libraries(linscp-qt-ui PUBLIC Qt6::Widgets)
 if(NOT WIN32)
@@ -92,6 +92,11 @@ qt_add_resources(linscp-qt-ui shell_translations
 # linscp's icon: WinSCP's with an "L" on the padlock (port/tools/make_icon.py).
 qt_add_resources(linscp-qt-ui shell_icons
   PREFIX /icons BASE "${CMAKE_CURRENT_SOURCE_DIR}/icons" FILES "${CMAKE_CURRENT_SOURCE_DIR}/icons/linscp.ico")
+# The License dialog's texts: linscp's own, and Expat's as WinSCP ships it.
+set_source_files_properties("${CMAKE_SOURCE_DIR}/LICENSE" PROPERTIES QT_RESOURCE_ALIAS LICENSE)
+set_source_files_properties("${LINSCP_UPSTREAM}/source/resource/LicenseExpat.txt" PROPERTIES QT_RESOURCE_ALIAS LicenseExpat.txt)
+qt_add_resources(linscp-qt-ui shell_licenses
+  PREFIX /licenses FILES "${CMAKE_SOURCE_DIR}/LICENSE" "${LINSCP_UPSTREAM}/source/resource/LicenseExpat.txt")
 add_custom_target(update_translations
   COMMAND "${LINSCP_LUPDATE}" -no-obsolete -locations none ${_shell_sources} -ts ${_shell_ts}
   WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"

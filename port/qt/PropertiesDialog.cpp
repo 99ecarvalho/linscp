@@ -13,6 +13,7 @@
 #include <QLineEdit>
 #include <QLocale>
 #include <QPushButton>
+#include <QShortcut>
 #include <QTabWidget>
 #include <QTreeWidget>
 #include <QVBoxLayout>
@@ -20,6 +21,7 @@
 #include "FileList.h"
 #include "QtFrontend.h"
 #include "RightsFrame.h"
+#include "TagDialog.h"
 
 namespace
 {
@@ -200,6 +202,56 @@ PropertiesDialog::PropertiesDialog(CoreBridge::TSession * Session, const std::ve
     FTabs->addTab(Checksum, tr("Checksum"));
   }
 
+  // Tags, for a single file where the protocol has them (S3).
+  if (Info.ShowTags)
+  {
+    QWidget * Tags = new QWidget(FTabs);
+    QHBoxLayout * TagsLayout = new QHBoxLayout(Tags);
+    FTags = new QTreeWidget(Tags);
+    FTags->setRootIsDecorated(false);
+    FTags->setHeaderLabels({ tr("Key"), tr("Value") });
+    FTags->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    for (const auto & Tag : Info.Properties.Tags)
+    {
+      QTreeWidgetItem * Item = new QTreeWidgetItem(FTags);
+      Item->setText(0, QString::fromStdString(Tag.first));
+      Item->setText(1, QString::fromStdString(Tag.second));
+    }
+    TagsLayout->addWidget(FTags, 1);
+    QVBoxLayout * TagButtons = new QVBoxLayout();
+    FAddTag = new QPushButton(tr("&Add..."), Tags);
+    FEditTag = new QPushButton(tr("&Edit..."), Tags);
+    FRemoveTag = new QPushButton(tr("&Remove"), Tags);
+    TagButtons->addWidget(FAddTag);
+    TagButtons->addWidget(FEditTag);
+    TagButtons->addWidget(FRemoveTag);
+    TagButtons->addStretch();
+    TagsLayout->addLayout(TagButtons);
+    connect(FAddTag, &QPushButton::clicked, this, [this]() { AddEditTag(true); });
+    connect(FEditTag, &QPushButton::clicked, this, [this]() { AddEditTag(false); });
+    connect(FRemoveTag, &QPushButton::clicked, this, &PropertiesDialog::RemoveTag);
+    connect(FTags, &QTreeWidget::itemDoubleClicked, this, [this]()
+    {
+      if (FEditTag->isEnabled())
+      {
+        AddEditTag(false);
+      }
+    });
+    connect(FTags, &QTreeWidget::currentItemChanged, this, &PropertiesDialog::UpdateControls);
+    // As TagsViewKeyDown: Insert adds, Delete removes.
+    QShortcut * Insert = new QShortcut(QKeySequence(Qt::Key_Insert), FTags, nullptr, nullptr, Qt::WidgetShortcut);
+    connect(Insert, &QShortcut::activated, this, [this]() { AddEditTag(true); });
+    QShortcut * Delete = new QShortcut(QKeySequence(Qt::Key_Delete), FTags, nullptr, nullptr, Qt::WidgetShortcut);
+    connect(Delete, &QShortcut::activated, this, [this]()
+    {
+      if (FRemoveTag->isEnabled())
+      {
+        RemoveTag();
+      }
+    });
+    FTabs->addTab(Tags, tr("Tags"));
+  }
+
   QDialogButtonBox * Buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
   FOk = Buttons->button(QDialogButtonBox::Ok);
   connect(Buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
@@ -270,7 +322,62 @@ CoreBridge::TFileProperties PropertiesDialog::Properties() const
   Result.HasGroup = !FGroup->isHidden();
   Result.Group = FGroup->currentText().toStdString();
   Result.Recursive = !FRecursive->isHidden() && FRecursive->isChecked();
+  if (FTags != nullptr)
+  {
+    Result.HasTags = true;
+    for (int Index = 0; Index < FTags->topLevelItemCount(); Index++)
+    {
+      const QTreeWidgetItem * Item = FTags->topLevelItem(Index);
+      Result.Tags.emplace_back(Item->text(0).toStdString(), Item->text(1).toStdString());
+    }
+  }
   return Result;
+}
+
+// As TPropertiesDialog::AddEditTag: the key unique among the others'.
+bool PropertiesDialog::AddEditTag(bool Add)
+{
+  QTreeWidgetItem * Current = FTags->currentItem();
+  if (!Add && (Current == nullptr))
+  {
+    return false;
+  }
+  QStringList Keys;
+  for (int Index = 0; Index < FTags->topLevelItemCount(); Index++)
+  {
+    QTreeWidgetItem * Item = FTags->topLevelItem(Index);
+    if (Add || (Item != Current))
+    {
+      Keys.append(Item->text(0));
+    }
+  }
+  TagDialog Dialog(Add, Keys, Add ? QString() : Current->text(0), Add ? QString() : Current->text(1), this);
+  if (Dialog.exec() != QDialog::Accepted)
+  {
+    return false;
+  }
+  QTreeWidgetItem * Item = Add ? new QTreeWidgetItem(FTags) : Current;
+  Item->setText(0, Dialog.Key());
+  Item->setText(1, Dialog.Value());
+  FTags->setCurrentItem(Item);
+  UpdateControls();
+  return true;
+}
+
+void PropertiesDialog::RemoveTag()
+{
+  const int Index = FTags->indexOfTopLevelItem(FTags->currentItem());
+  if (Index < 0)
+  {
+    return;
+  }
+  delete FTags->takeTopLevelItem(Index);
+  const int Count = FTags->topLevelItemCount();
+  if (Count > 0)
+  {
+    FTags->setCurrentItem(FTags->topLevelItem((Index < Count) ? Index : (Count - 1)));
+  }
+  UpdateControls();
 }
 
 // As TPropertiesDialog::UpdateControls: OK once something would change.
@@ -287,7 +394,13 @@ void PropertiesDialog::UpdateControls()
      (Now.AddXToDirectories != Was.AddXToDirectories));
   const bool OwnerChanged = FInfo.CanChangeOwner && (Now.Owner != (Was.HasOwner ? Was.Owner : std::string()));
   const bool GroupChanged = FInfo.CanChangeGroup && (Now.Group != (Was.HasGroup ? Was.Group : std::string()));
-  FOk->setEnabled(RightsChanged || OwnerChanged || GroupChanged || Now.Recursive);
+  const bool TagsChanged = (FTags != nullptr) && Was.HasTags && (Now.Tags != Was.Tags);
+  FOk->setEnabled(RightsChanged || OwnerChanged || GroupChanged || TagsChanged || Now.Recursive);
+  if (FTags != nullptr)
+  {
+    FEditTag->setEnabled(FTags->currentItem() != nullptr);
+    FRemoveTag->setEnabled(FTags->currentItem() != nullptr);
+  }
 }
 
 void PropertiesDialog::ShowError(const CoreBridge::TCoreError & E)

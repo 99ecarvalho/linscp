@@ -113,6 +113,11 @@ public:
   void SetSettings(const TShellSettings & Settings);
   // As TWinConfiguration::ExpandedTemporaryDirectory.
   UnicodeString ExpandedTemporaryDirectory() const;
+  // As TWinConfiguration's: whether temporary folders of the program's
+  // are left (TemporaryDir's mask), and their removal (ExtException with
+  // those that could not be removed).
+  bool AnyTemporaryFolders();
+  void CleanupTemporaryFolders();
   // The bookmarks, kept as TWinConfiguration keeps them (its Bookmarks
   // key): per site, by session key, and shared.
   TBookmarks * Bookmarks() const { return FBookmarks.get(); }
@@ -134,6 +139,9 @@ protected:
   virtual void __fastcall DefaultLocalized();
 
 private:
+  // TWinConfiguration::DoFindTemporaryFolders: NULL when there are none.
+  TStrings * FindTemporaryFolders(bool OnlyFirst);
+
   bool FOverridden = false;
   LCID FSavedLocale = 0;
   LCID FDefaultLocale = 0;

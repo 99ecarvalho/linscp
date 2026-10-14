@@ -1,4 +1,5 @@
 #include "OpenDirectoryDialog.h"
+#include "ShortCutDialog.h"
 
 #include <QComboBox>
 #include <QDir>
@@ -157,10 +158,17 @@ QWidget * OpenDirectoryDialog::MakePage(int Page)
   FRemove[Page] = new QPushButton(tr("Remo&ve"), Widget);
   FUp[Page] = new QPushButton(tr("&Up"), Widget);
   FDown[Page] = new QPushButton(tr("&Down"), Widget);
-  for (QPushButton * Button : { FAdd[Page], FRemove[Page], FUp[Page], FDown[Page] })
+  Buttons->addWidget(FAdd[Page]);
+  Buttons->addWidget(FRemove[Page]);
+  // Shortcuts are the shared bookmarks' only, which the main window knows.
+  if (Page == 1)
   {
-    Buttons->addWidget(Button);
+    FShortCut = new QPushButton(tr("&Shortcut..."), Widget);
+    Buttons->addWidget(FShortCut);
+    connect(FShortCut, &QPushButton::clicked, this, [this]() { ShortCutBookmark(); });
   }
+  Buttons->addWidget(FUp[Page]);
+  Buttons->addWidget(FDown[Page]);
   Buttons->addStretch(1);
   Layout->addLayout(Buttons);
   connect(FAdd[Page], &QPushButton::clicked, this, [this, Page]() { AddAsBookmark(Page); });
@@ -271,6 +279,36 @@ void OpenDirectoryDialog::RemoveBookmark(int Page)
   Selected(Page);
 }
 
+// As TOpenDirectoryDialog::ShortCutBookmarkButtonClick: one the custom
+// commands and the other shared bookmarks do not use.
+bool OpenDirectoryDialog::ShortCutBookmark()
+{
+  const int Page = 1;
+  const int Row = FLists[Page]->currentRow();
+  if ((Row < 0) || (Row >= static_cast<int>(FRows[Page].size())))
+  {
+    return false;
+  }
+  CoreBridge::TBookmarkEntry & Bookmark = FBookmarks[Page][FRows[Page][Row]];
+  std::vector<unsigned> Used = CustomCommandShortCuts();
+  for (const CoreBridge::TBookmarkEntry & Other : FBookmarks[Page])
+  {
+    if (Other.ShortCut != 0)
+    {
+      Used.push_back(Other.ShortCut);
+    }
+  }
+  ShortCutDialog Dialog(Used, Bookmark.ShortCut, this);
+  if (Dialog.exec() != QDialog::Accepted)
+  {
+    return false;
+  }
+  Bookmark.ShortCut = Dialog.ShortCut();
+  LoadList(Page);
+  UpdateControls();
+  return true;
+}
+
 void OpenDirectoryDialog::MoveBookmark(int Page, int By)
 {
   const int Row = FLists[Page]->currentRow();
@@ -305,6 +343,7 @@ void OpenDirectoryDialog::UpdateControls()
     FUp[Page]->setEnabled(Row > 0);
     FDown[Page]->setEnabled((Row >= 0) && (Row < FLists[Page]->count() - 1));
   }
+  FShortCut->setEnabled(FLists[1]->currentRow() >= 0);
 }
 
 // Delete removes the focused bookmark, as BookmarksListKeyDown.

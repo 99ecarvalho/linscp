@@ -7,12 +7,14 @@ directory under the root is a bucket, files are objects and directories
 below a bucket are the "key/" markers S3 clients create for folders. Covers
 what WinSCP's libs3 asks for: listing buckets, a bucket's location, listing
 objects (v1 and v2, prefix and delimiter), HEAD, GET (with Range), PUT
-(including copies with x-amz-copy-source) and DELETE. Signatures are
+(including copies with x-amz-copy-source), DELETE, an object's ACL (the
+owner's full control, always) and its tags (?tagging, kept in memory). Signatures are
 accepted, not checked: the test is of the client, not of AWS's auth.
 
   s3_server.py --port N --root DIR
 """
 import argparse, email.utils, hashlib, http.server, os, shutil, time, urllib.parse
+from xml.etree import ElementTree
 from xml.sax.saxutils import escape
 
 NS = 'http://s3.amazonaws.com/doc/2006-03-01/'
@@ -35,6 +37,8 @@ def etag(path):
 class Handler(http.server.BaseHTTPRequestHandler):
     protocol_version = 'HTTP/1.1'
     root = '.'
+    # (bucket, key) -> the tags last put, as (key, value).
+    tags = {}
 
     def log_message(self, *args):
         pass
@@ -91,6 +95,18 @@ class Handler(http.server.BaseHTTPRequestHandler):
             if 'location' in query:
                 return self.xml(200, f'<LocationConstraint xmlns="{NS}"></LocationConstraint>')
             return self.list_objects(bucket, query)
+        if 'acl' in query:
+            # The owner's full control, the one grant: what Properties reads.
+            return self.xml(200, f'<AccessControlPolicy xmlns="{NS}"><Owner><ID>linscp</ID><DisplayName>linscp</DisplayName>'
+                                 '</Owner><AccessControlList><Grant><Grantee xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+                                 'xsi:type="CanonicalUser"><ID>linscp</ID><DisplayName>linscp</DisplayName></Grantee>'
+                                 '<Permission>FULL_CONTROL</Permission></Grant></AccessControlList></AccessControlPolicy>')
+        if 'tagging' in query:
+            if not os.path.exists(self.disk(bucket, key)):
+                return self.error(404, 'NoSuchKey', key)
+            tags = ''.join(f'<Tag><Key>{escape(k)}</Key><Value>{escape(v)}</Value></Tag>'
+                           for k, v in self.tags.get((bucket, key), []))
+            return self.xml(200, f'<Tagging xmlns="{NS}"><TagSet>{tags}</TagSet></Tagging>')
         return self.get_object(bucket, key, head=False)
 
     def do_HEAD(self):
@@ -182,6 +198,14 @@ class Handler(http.server.BaseHTTPRequestHandler):
             os.makedirs(self.disk(bucket), exist_ok=True)
             return self.send(200)
         path = self.disk(bucket, key)
+        if 'acl' in query:
+            return self.send(200)
+        if 'tagging' in query:
+            # As S3: read as tags, given back in its own namespace.
+            document = ElementTree.fromstring(data)
+            self.tags[(bucket, key)] = [(t.findtext('{*}Key') or '', t.findtext('{*}Value') or '')
+                                        for t in document.iter() if t.tag.rpartition('}')[2] == 'Tag']
+            return self.send(200)
         source = self.headers.get('x-amz-copy-source')
         if source:
             sbucket, _, skey = urllib.parse.unquote(source).lstrip('/').partition('/')

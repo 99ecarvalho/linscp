@@ -54,6 +54,8 @@ public:
   bool RawSettings(const QString * Raw = nullptr);
   // Tools > Import Sites: false when cancelled.
   bool ImportSites();
+  // Tools > Clean Up... (CleanupDialog); the sites reloaded after.
+  bool Cleanup();
   // Checks the private key as upstream does before logging in or saving, and
   // offers converting an OpenSSH one. False to stop.
   bool VerifyKey();

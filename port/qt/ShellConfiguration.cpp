@@ -5,6 +5,7 @@
 
 #include <Common.h>
 #include <HierarchicalStorage.h>
+#include <Exceptions.h>
 
 #include "FrontendCommon.h"
 #include "CustomCommandType.h"
@@ -88,6 +89,61 @@ UnicodeString TShellConfiguration::ExpandedTemporaryDirectory() const
 UnicodeString TShellConfiguration::TemporaryDir(bool Mask)
 {
   return DefaultTemporaryDir(Mask, ExpandedTemporaryDirectory());
+}
+
+TStrings * TShellConfiguration::FindTemporaryFolders(bool OnlyFirst)
+{
+  std::unique_ptr<TStrings> Result(new TStringList());
+  TSearchRecOwned SRec;
+  const UnicodeString Mask = TemporaryDir(true);
+  if (FindFirstUnchecked(Mask, faDirectory | faHidden, SRec) == 0)
+  {
+    do
+    {
+      if (SRec.IsDirectory())
+      {
+        Result->Add(SRec.GetFilePath());
+      }
+    }
+    while ((FindNextChecked(SRec) == 0) && (!OnlyFirst || (Result->Count == 0)));
+  }
+  if (Result->Count == 0)
+  {
+    Result.reset(NULL);
+  }
+  return Result.release();
+}
+
+bool TShellConfiguration::AnyTemporaryFolders()
+{
+  std::unique_ptr<TStrings> Folders(FindTemporaryFolders(true));
+  return (Folders.get() != NULL);
+}
+
+void TShellConfiguration::CleanupTemporaryFolders()
+{
+  std::unique_ptr<TStrings> Folders(FindTemporaryFolders(false));
+  if (Folders.get() == NULL)
+  {
+    return;
+  }
+  Usage->Inc(L"TemporaryDirectoryCleanups");
+  UnicodeString ErrorList;
+  for (int Index = 0; Index < Folders->Count; Index++)
+  {
+    if (!RecursiveDeleteFile(Folders->Strings[Index]))
+    {
+      if (!ErrorList.IsEmpty())
+      {
+        ErrorList += L"\n";
+      }
+      ErrorList += Folders->Strings[Index];
+    }
+  }
+  if (!ErrorList.IsEmpty())
+  {
+    throw ExtException(LoadStr(CLEANUP_TEMP_ERROR), ErrorList);
+  }
 }
 
 // TWinConfiguration's keys, in its own Interface and Interface\Commander

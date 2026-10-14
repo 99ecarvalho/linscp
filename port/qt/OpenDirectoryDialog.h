@@ -38,6 +38,9 @@ public:
   void AddAsBookmark(int Page);
   void RemoveBookmark(int Page);
   void MoveBookmark(int Page, int By);
+  // The shared bookmarks' Shortcut...: false when cancelled.
+  bool ShortCutBookmark();
+  QPushButton * ShortCutButton() const { return FShortCut; }
   QComboBox * DirectoryCombo() const { return FDirectory; }
   QTabWidget * Pages() const { return FPages; }
   QListWidget * List(int Page) const { return FLists[Page]; }
@@ -68,6 +71,7 @@ private:
   QPushButton * FUp[2] = {};
   QPushButton * FDown[2] = {};
   QPushButton * FOk = nullptr;
+  QPushButton * FShortCut = nullptr;
   // Each page's bookmarks, the other side's included; the list shows
   // those with this side's directory (FRows: their indexes here).
   std::vector<CoreBridge::TBookmarkEntry> FBookmarks[2];

@@ -2,7 +2,7 @@
 // (forms/Properties.cpp): what is selected, where, its size (calculated on
 // request for directories), where a link points, the group, owner and
 // permissions to change, recursively for directories, and the server's
-// checksums.
+// checksums, and S3's tags.
 #ifndef LINSCP_QT_PROPERTIES_DIALOG_H
 #define LINSCP_QT_PROPERTIES_DIALOG_H
 
@@ -51,6 +51,14 @@ public:
   QComboBox * ChecksumAlgorithmCombo() const { return FChecksumAlgorithm; }
   QLineEdit * ChecksumEdit() const { return FChecksum; }
   QTreeWidget * ChecksumList() const { return FChecksums; }
+  // The Tags page (S3): null without one.
+  QTreeWidget * TagList() const { return FTags; }
+  QPushButton * AddTagButton() const { return FAddTag; }
+  QPushButton * EditTagButton() const { return FEditTag; }
+  QPushButton * RemoveTagButton() const { return FRemoveTag; }
+  // The Tags page's buttons' actions. False when cancelled.
+  bool AddEditTag(bool Add);
+  void RemoveTag();
 
 private:
   void LoadStats(std::int64_t Size, int Files, int Directories, int SymLinks, bool Calculated);
@@ -74,6 +82,10 @@ private:
   QComboBox * FChecksumAlgorithm = nullptr;
   QLineEdit * FChecksum = nullptr;
   QTreeWidget * FChecksums = nullptr;
+  QTreeWidget * FTags = nullptr;
+  QPushButton * FAddTag = nullptr;
+  QPushButton * FEditTag = nullptr;
+  QPushButton * FRemoveTag = nullptr;
 };
 
 #endif

@@ -23,6 +23,7 @@
 #include "SiteAdvanced.h"
 #include "SiteRawDialog.h"
 #include "ImportSitesDialog.h"
+#include "CleanupDialog.h"
 #include <QMenu>
 #include <QToolButton>
 
@@ -162,6 +163,8 @@ SiteManager::SiteManager(QWidget * Parent) :
   QPushButton * Tools = Box->addButton(tr("&Tools"), QDialogButtonBox::ResetRole);
   QMenu * ToolsMenu = new QMenu(Tools);
   ToolsMenu->addAction(tr("&Import Sites..."), this, [this]() { ImportSites(); });
+  ToolsMenu->addSeparator();
+  ToolsMenu->addAction(tr("&Clean Up..."), this, [this]() { Cleanup(); });
   Tools->setMenu(ToolsMenu);
   connect(FLogin, &QPushButton::clicked, this, &SiteManager::accept);
   connect(FSave, &QPushButton::clicked, this, &SiteManager::Save);
@@ -460,6 +463,27 @@ bool SiteManager::ImportSites()
   // As upstream: the first imported selected.
   Fill(Dialog.Imported().empty() ? QString() : QString::fromStdString(Dialog.Imported().front()));
   return true;
+}
+
+// As TLoginDialog::CleanUpActionExecute: the sites reloaded after.
+bool SiteManager::Cleanup()
+{
+  bool Result = false;
+  try
+  {
+    CleanupDialog Dialog(this);
+    Result = Dialog.Execute();
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+  if (Result)
+  {
+    Fill(QString());
+  }
+  return Result;
 }
 
 bool SiteManager::RawSettings(const QString * Raw)

@@ -1,4 +1,5 @@
 #include "CustomCommandDialog.h"
+#include "ShortCutDialog.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -106,36 +107,16 @@ CustomCommandDialog::CustomCommandDialog(TMode Mode, const CoreBridge::TCustomCo
   FShortCut = new QComboBox(Group);
   if (Mode != TMode::AdHoc)
   {
-    // As InitializeShortCutCombo: none, Ctrl+0..9, Shift+Ctrl+Alt+A..Z,
-    // those the other commands use left out.
-    FShortCut->addItem(CoreText(CoreBridge::TText::ShortCutNone), 0u);
-    const auto Used = [&Commands, &Command](unsigned ShortCut)
+    // As InitializeShortCutCombo: those the other commands use left out.
+    std::vector<unsigned> Used;
+    for (const CoreBridge::TCustomCommandDefinition & Other : Commands)
     {
-      for (const CoreBridge::TCustomCommandDefinition & Other : Commands)
+      if ((Other.ShortCut != 0) && (Other.Name != Command.Name))
       {
-        if ((Other.ShortCut == ShortCut) && (Other.Name != Command.Name))
-        {
-          return true;
-        }
-      }
-      return false;
-    };
-    for (unsigned Key = '0'; Key <= '9'; Key++)
-    {
-      if (!Used(0x4000u | Key))
-      {
-        FShortCut->addItem(ShortCutText(0x4000u | Key), 0x4000u | Key);
+        Used.push_back(Other.ShortCut);
       }
     }
-    for (unsigned Key = 'A'; Key <= 'Z'; Key++)
-    {
-      if (!Used(0xE000u | Key))
-      {
-        FShortCut->addItem(ShortCutText(0xE000u | Key), 0xE000u | Key);
-      }
-    }
-    const int Index = FShortCut->findData(Command.ShortCut);
-    FShortCut->setCurrentIndex(qMax(Index, 0));
+    FillShortCutCombo(FShortCut, Used, Command.ShortCut);
     QFormLayout * ShortCutRow = new QFormLayout();
     ShortCutRow->addRow(tr("&Keyboard shortcut:"), FShortCut);
     GroupLayout->addLayout(ShortCutRow);

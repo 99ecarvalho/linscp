@@ -120,12 +120,16 @@
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
 #include "AboutDialog.h"
+#include "LicenseDialog.h"
+#include <QTextBrowser>
 #include "PropertiesDialog.h"
+#include "TagDialog.h"
 #include "RightsFrame.h"
 #include "CreateDirectoryDialog.h"
 #include "LinkDialog.h"
 #include "RemoteTransferDialog.h"
 #include "OpenDirectoryDialog.h"
+#include "ShortCutDialog.h"
 #include "LocationProfilesDialog.h"
 #include "FindFilesDialog.h"
 #include "EditMaskDialog.h"
@@ -136,6 +140,7 @@
 #include "CustomCommandDialog.h"
 #include <QMenu>
 #include "ImportSitesDialog.h"
+#include "CleanupDialog.h"
 #include "RtfText.h"
 #include <QTextBrowser>
 #include <QPlainTextEdit>
@@ -648,6 +653,32 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
       Check(Dialog.VerifyKey(), "an OpenSSH key is converted when asked to");
       Check(QFile::exists(Converted), "to the file chosen");
       Check(Dialog.Edited().PrivateKeyFile == Converted.toStdString(), "and the site uses it from then on");
+    }
+    {
+      // Tools > Clean Up: the INI file the sites are in, listed and removed.
+      const QString Ini = QDir(Directory).filePath(QStringLiteral("WinSCP.ini"));
+      CleanupDialog Dialog(&Window);
+      int IniItem = -1;
+      for (int Index = 0; Index < Dialog.List()->topLevelItemCount(); Index++)
+      {
+        if (QDir::fromNativeSeparators(Dialog.List()->topLevelItem(Index)->text(1)) == QDir::fromNativeSeparators(Ini))
+        {
+          IniItem = Index;
+        }
+      }
+      Check(Dialog.List()->topLevelItem(0)->text(0) == QStringLiteral("General configuration"), "the configuration listed first, as WinSCP");
+      Check(IniItem > 0, "the INI file, where it is");
+      Check(!Dialog.OkButton()->isEnabled(), "OK only once something is checked");
+      Dialog.CheckAllButton()->click();
+      Check(Dialog.OkButton()->isEnabled(), "Un/check all checks all");
+      Dialog.CheckAllButton()->click();
+      Check(!Dialog.OkButton()->isEnabled(), "and again unchecks them");
+      if (IniItem > 0)
+      {
+        Dialog.List()->topLevelItem(IniItem)->setCheckState(0, Qt::Checked);
+      }
+      QTimer::singleShot(0, &Dialog, [&Dialog]() { Dialog.OkButton()->click(); });
+      Check(Dialog.Execute() && !QFile::exists(Ini), "OK removes what is checked");
     }
     Frontend.SetWindow(nullptr);
   }
@@ -2224,6 +2255,47 @@ void BookmarksTest(const char * Port, const QString & Directory)
     }
     Check(CoreBridge::Bookmarks(Key).size() == 1, "and kept so");
 
+    // A shared bookmark's keyboard shortcut (Select keyboard shortcut).
+    {
+      OpenDirectoryDialog Dialog(true, QStringLiteral("/sub"), QStringList(), Key, false, true);
+      Dialog.Pages()->setCurrentIndex(1);
+      Dialog.AddAsBookmark(1);
+      Check(Dialog.ShortCutButton()->isEnabled(), "a shared bookmark selected: Shortcut...");
+      bool Offered = true;
+      Responder.Custom = [&Offered](QWidget * Modal)
+      {
+        ShortCutDialog * ShortCut = qobject_cast<ShortCutDialog *>(Modal);
+        if (ShortCut == nullptr)
+        {
+          return false;
+        }
+        Offered = (ShortCut->windowTitle() == QStringLiteral("Select keyboard shortcut"));
+        const int Index = ShortCut->Combo()->findData(0x4000u | '1');
+        if (Index < 0)
+        {
+          Offered = false;
+          ShortCut->reject();
+          return true;
+        }
+        ShortCut->Combo()->setCurrentIndex(Index);
+        ShortCut->accept();
+        return true;
+      };
+      Check(Dialog.ShortCutBookmark() && Offered, "Ctrl+1 chosen");
+      Responder.Custom = nullptr;
+      const QString Text = Dialog.List(1)->item(Dialog.List(1)->currentRow())->text();
+      Check(Text.startsWith(QStringLiteral("/sub")) && Text.contains(QStringLiteral("Ctrl+1")), "shown with the bookmark");
+      Dialog.List(1)->setCurrentRow(0);
+      ShortCutDialog Other({ 0x4000u | '1' }, 0);
+      Check((Other.Combo()->findData(0x4000u | '1') < 0) && (Other.Combo()->findData(0x4000u | '2') >= 0), "taken shortcuts not offered again");
+      Dialog.reject();
+    }
+    Window.ActivatePanel(false);
+    Window.Panel()->ChangeDirectory(QStringLiteral("/"));
+    Check(Window.OpenBookmarkShortCut(0x4000u | '1') && (Window.Panel()->Path() == QStringLiteral("/sub")),
+      "the shortcut opens the bookmark on the active side");
+    Window.Panel()->ChangeDirectory(QStringLiteral("/"));
+
     // Ctrl+O: a bookmark opened.
     Window.ActivatePanel(false);
     Responder.Custom = [](QWidget * Modal)
@@ -2733,6 +2805,20 @@ void Session(const char * Port)
         About.WinScpLabel()->text().contains(QString::fromStdString(Info.WinScpVersion)) && (Info.WinScpVersion != Info.Version),
         "and WinSCP's, with its site");
       Check(!QIcon(QStringLiteral(":/icons/linscp.ico")).pixmap(64, 64).isNull(), "with its icon");
+      const QString ThirdParty = About.ThirdParty()->toPlainText();
+      Check(ThirdParty.contains(QStringLiteral("PuTTY")) && ThirdParty.contains(QStringLiteral("OpenSSL")) &&
+        ThirdParty.contains(QStringLiteral("eXpat")) && ThirdParty.contains(QStringLiteral("Qt ")),
+        "WinSCP's third-party list, with Qt");
+      Check(About.ThirdParty()->toHtml().contains(QString::fromLatin1(CoreBridge::ExpatLicenseUrl)), "Expat's license linked");
+      Check(About.LicenseButton() != nullptr, "and a License button");
+    }
+    {
+      LicenseDialog Product(LicenseDialog::Product);
+      Check(Product.windowTitle() == QString::fromStdString(CoreBridge::Info().AppName) + QStringLiteral(" license") &&
+        Product.Text()->toPlainText().contains(QStringLiteral("GNU GENERAL PUBLIC LICENSE")), "the License dialog: linscp's GPL");
+      LicenseDialog Expat(LicenseDialog::Expat);
+      Check((Expat.windowTitle() == QStringLiteral("Expat license")) &&
+        Expat.Text()->toPlainText().contains(QStringLiteral("Permission is hereby granted")), "and Expat's, as WinSCP ships it");
     }
 
     Responder.Passwords.clear();
@@ -2914,6 +3000,108 @@ void KeepUpToDateTest(const char * Port, const QString & Tmp)
   CoreBridge::Finalize();
 }
 
+// S3's tags, in the Properties dialog's Tags page, against the suite's S3
+// server (its bucket "bucket").
+void Tags(const char * Port)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    CoreBridge::TSite Site;
+    Site.Protocol = CoreBridge::TSite::TProtocol::S3;
+    Site.HostName = "127.0.0.1";
+    Site.Port = QString::fromLatin1(Port).toInt();
+    Site.UserName = "linscp";
+    Site.Password = "secret";
+    // Plain HTTP, and path-style URLs, as an IP address needs.
+    Site.HasRawSettings = true;
+    Site.RawSettings = "Ftps=0\nS3UrlStyle=1";
+    Check(Window.OpenSite(Site), "an S3 session");
+    CoreBridge::TSession * Session = Window.Session();
+    Check(Window.Panel()->ChangeDirectory(QStringLiteral("/bucket")), "in the bucket");
+    try
+    {
+      CoreBridge::TPropertiesInfo Info = Session->PropertiesOf({ "hello.txt" });
+      Check(Info.ShowTags && Info.Properties.HasTags && Info.Properties.Tags.empty(), "a file has a Tags page, no tags yet");
+      Check(!Session->PropertiesOf({ "sub" }).ShowTags, "a folder none");
+      CoreBridge::TFileProperties Properties = Info.Properties;
+      Properties.Tags = { { "env", "test" }, { "owner", "linscp" } };
+      Check(Session->SetProperties({ "hello.txt" }, Properties), "tags set");
+      Info = Session->PropertiesOf({ "hello.txt" });
+      Check((Info.Properties.Tags.size() == 2) && (Info.Properties.Tags[1].first == "owner") &&
+        (Info.Properties.Tags[1].second == "linscp"), "and read back from the server");
+
+      PropertiesDialog Dialog(Session, { "hello.txt" }, QStringLiteral("/bucket"), Info, &Window);
+      Check((Dialog.TagList() != nullptr) && (Dialog.TagList()->topLevelItemCount() == 2), "the Tags page lists them");
+      Check(!Dialog.OkButton()->isEnabled() && !Dialog.EditTagButton()->isEnabled(), "nothing changed, nothing selected");
+      Dialog.TagList()->setCurrentItem(Dialog.TagList()->topLevelItem(0));
+      Check(Dialog.EditTagButton()->isEnabled() && Dialog.RemoveTagButton()->isEnabled(), "a tag selected: edit, remove");
+      Dialog.RemoveTag();
+      Check(Dialog.OkButton()->isEnabled() && (Dialog.Properties().Tags.size() == 1), "a tag removed: OK");
+      Responder.Custom = [](QWidget * Modal)
+      {
+        TagDialog * Tag = qobject_cast<TagDialog *>(Modal);
+        if (Tag == nullptr)
+        {
+          return false;
+        }
+        Check(Tag->windowTitle() == QStringLiteral("Add tag"), "WinSCP's Add tag");
+        Tag->KeyEdit()->setText(QStringLiteral("new"));
+        Tag->ValueEdit()->setText(QStringLiteral("value"));
+        Tag->OkButton()->click();
+        return true;
+      };
+      Check(Dialog.AddEditTag(true) && (Dialog.TagList()->topLevelItemCount() == 2), "a tag added");
+      Responder.Custom = nullptr;
+      Check(Session->SetProperties({ "hello.txt" }, Dialog.Properties()), "and saved");
+      Info = Session->PropertiesOf({ "hello.txt" });
+      Check((Info.Properties.Tags.size() == 2) && (Info.Properties.Tags[0].first == "owner") &&
+        (Info.Properties.Tags[1].first == "new"), "as the dialog had them");
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      std::printf("error: %s\n", E.Error.Message.c_str());
+      Check(false, "no core error");
+    }
+    {
+      // The key's checks (TTagDialog::DoValidate).
+      TagDialog Dialog(true, { QStringLiteral("env") }, QStringLiteral("env"), QString(), &Window);
+      const int Errors = Responder.Errors;
+      Dialog.accept();
+      Check((Dialog.result() != QDialog::Accepted) && (Responder.Errors == Errors + 1), "a key taken: an error, and the dialog stays");
+      Dialog.KeyEdit()->setText(QString());
+      Check(!Dialog.OkButton()->isEnabled(), "no key, no OK");
+      Dialog.KeyEdit()->setText(QStringLiteral("a!b"));
+      QString Asked;
+      Responder.Custom = [&Asked](QWidget * Modal)
+      {
+        QueryDialog * Query = qobject_cast<QueryDialog *>(Modal);
+        if (Query == nullptr)
+        {
+          return false;
+        }
+        for (const QLabel * Label : Query->findChildren<QLabel *>())
+        {
+          Asked += Label->text();
+        }
+        Query->Buttons()[1]->click();
+        return true;
+      };
+      Dialog.accept();
+      Check(Asked.contains(QStringLiteral("\"!\"")) && (Dialog.result() != QDialog::Accepted), "a character S3 does not allow: asked, and aborted");
+      Responder.Custom = nullptr;
+      Dialog.accept();
+      Check(Dialog.result() == QDialog::Accepted, "or ignored");
+    }
+  }
+  CoreBridge::Finalize();
+}
+
 int main(int argc, char ** argv)
 {
   QApplication App(argc, argv);
@@ -2963,6 +3151,10 @@ int main(int argc, char ** argv)
   {
     Commands(argv[3], QString::fromLocal8Bit(argv[4]), QString::fromLocal8Bit(argv[5]), QString::fromLocal8Bit(argv[6]),
       QString::fromLocal8Bit((argc >= 8) ? argv[7] : argv[6]));
+  }
+  else if ((argc >= 4) && (std::strcmp(argv[1], "tags") == 0))
+  {
+    Tags(argv[3]);
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "keep") == 0))
   {

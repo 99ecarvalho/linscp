@@ -124,6 +124,9 @@ CONTEXT_FORMS = {
     'ImportSitesDialog': ['ImportSessions.dfm'],
     'CustomCommandDialog': ['CustomCommand.dfm'],
     'KeepUpToDateDialog': ['Synchronize.dfm'],
+    'CleanupDialog': ['Cleanup.dfm'],
+    'LicenseDialog': ['License.dfm'],
+    'AboutDialog': ['About.dfm'],
 }
 
 

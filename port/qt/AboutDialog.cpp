@@ -1,12 +1,18 @@
 #include "AboutDialog.h"
 
+#include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QLabel>
+#include <QLocale>
 #include <QPushButton>
 #include <QStyle>
+#include <QTextBrowser>
+#include <QUrl>
 #include <QVBoxLayout>
+
+#include "LicenseDialog.h"
 
 namespace
 {
@@ -82,13 +88,46 @@ AboutDialog::AboutDialog(const CoreBridge::TInfo & Info, QWidget * Parent) :
   Body->addLayout(Texts, 1);
   Layout->addLayout(Body);
 
+  // WinSCP's third-party list, core's (CoreBridge::ThirdPartyHtml), with Qt,
+  // which the shell is built on, after it.
+  FThirdParty = new QTextBrowser(this);
+  FThirdParty->setOpenLinks(false);
+  FThirdParty->setHtml(QString::fromStdString(CoreBridge::ThirdPartyHtml(QLocale().nativeLanguageName().toStdString())) +
+    QStringLiteral("<p>%1<br>%2<br>%3</p>").arg(
+      tr("Qt %1").arg(QString::fromLatin1(qVersion())),
+      tr("Copyright © The Qt Company Ltd. and other contributors"),
+      Link(QStringLiteral("https://www.qt.io/"))));
+  FThirdParty->setMinimumHeight(160);
+  connect(FThirdParty, &QTextBrowser::anchorClicked, this, [this](const QUrl & Url)
+  {
+    // As TAboutDialog::ExpatLicenceHandler.
+    if (Url.toString() == QString::fromLatin1(CoreBridge::ExpatLicenseUrl))
+    {
+      LicenseDialog Dialog(LicenseDialog::Expat, this);
+      Dialog.exec();
+    }
+    else
+    {
+      QDesktopServices::openUrl(Url);
+    }
+  });
+  Layout->addSpacing(12);
+  Layout->addWidget(FThirdParty, 1);
+
   QDialogButtonBox * Buttons = new QDialogButtonBox(QDialogButtonBox::Ok, this);
   Buttons->button(QDialogButtonBox::Ok)->setIcon(style()->standardIcon(QStyle::SP_DialogOkButton));
   connect(Buttons, &QDialogButtonBox::accepted, this, &QDialog::accept);
+  FLicense = Buttons->addButton(tr("&License..."), QDialogButtonBox::ActionRole);
+  connect(FLicense, &QPushButton::clicked, this, [this]()
+  {
+    LicenseDialog Dialog(LicenseDialog::Product, this);
+    Dialog.exec();
+  });
   Layout->addSpacing(12);
   Layout->addWidget(Buttons);
   Layout->setContentsMargins(24, 24, 24, 16);
-  // As tall as its wrapped texts are at its width, with no gaps between.
+  // As tall as its wrapped texts are at its width, with no gaps between,
+  // and the third-party list's minimum.
   const int Width = 600;
-  resize(Width, Layout->totalHeightForWidth(Width));
+  resize(Width, Layout->totalHeightForWidth(Width) + 120);
 }
