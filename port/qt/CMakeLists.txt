@@ -25,6 +25,8 @@ target_link_libraries(linscp-qt-core PUBLIC linscp-runtime-base linscp-gui)
 # The generated GUIConfiguration.h before core's include path, which has
 # upstream's own windows/ (ADR 0014).
 target_include_directories(linscp-qt-core BEFORE PUBLIC "${LINSCP_GEN}/source/windows")
+# linscp's own version (the project's); core keeps WinSCP's.
+target_compile_definitions(linscp-qt-core PRIVATE LINSCP_VERSION="${PROJECT_VERSION}")
 
 add_executable(linscp WIN32 EXCLUDE_FROM_ALL main.cpp)
 set_target_properties(linscp PROPERTIES AUTOMOC ON)
@@ -77,10 +79,9 @@ foreach(_ts ${_shell_ts})
 endforeach()
 qt_add_resources(linscp-qt-ui shell_translations
   PREFIX /i18n BASE "${CMAKE_CURRENT_BINARY_DIR}/i18n" FILES ${_shell_qm})
-# WinSCP's application icon, from the pinned submodule as it is.
+# linscp's icon: WinSCP's with an "L" on the padlock (port/tools/make_icon.py).
 qt_add_resources(linscp-qt-ui shell_icons
-  PREFIX /icons BASE "${CMAKE_SOURCE_DIR}/3rd-party/winscp/source/resource"
-  FILES "${CMAKE_SOURCE_DIR}/3rd-party/winscp/source/resource/Application.ico")
+  PREFIX /icons BASE "${CMAKE_CURRENT_SOURCE_DIR}/icons" FILES "${CMAKE_CURRENT_SOURCE_DIR}/icons/linscp.ico")
 add_custom_target(update_translations
   COMMAND "${LINSCP_LUPDATE}" -no-obsolete -locations none ${_shell_sources} -ts ${_shell_ts}
   WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"

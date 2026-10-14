@@ -63,9 +63,9 @@ int main(int argc, char ** argv)
     {
       QTimer::singleShot(0, &Window, [&Window, &Info, &Language]()
       {
-        std::printf("%s %s, Qt %s, %s: ok (%s; core %s)\n", Info.AppName.c_str(), Info.Version.c_str(), qVersion(),
+        std::printf("%s %s, Qt %s, %s: ok (%s; core %s, WinSCP %s)\n", Info.AppName.c_str(), Info.Version.c_str(), qVersion(),
           QGuiApplication::platformName().toUtf8().constData(), Language.Locale.toUtf8().constData(),
-          Language.CoreCode.isEmpty() ? "English" : Language.CoreCode.toUtf8().constData());
+          Language.CoreCode.isEmpty() ? "English" : Language.CoreCode.toUtf8().constData(), Info.WinScpVersion.c_str());
         std::fflush(stdout);
         Window.close();
       });

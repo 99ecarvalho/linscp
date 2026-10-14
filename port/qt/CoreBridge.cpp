@@ -636,7 +636,8 @@ TInfo Info()
 {
   TInfo Result;
   Result.AppName = Utf8(AppNameString());
-  Result.Version = Utf8(Configuration->Version);
+  Result.Version = LINSCP_VERSION;
+  Result.WinScpVersion = Utf8(Configuration->Version);
   Result.ConfigurationStorage = Utf8((Configuration->Storage == stRegistry) ?
     (L"HKCU\\" + Configuration->RegistryStorageKey) : Configuration->IniFileStorageName);
   return Result;

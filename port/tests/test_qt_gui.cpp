@@ -1797,8 +1797,11 @@ void Session(const char * Port)
       const CoreBridge::TInfo Info = CoreBridge::Info();
       Check(About.NameLabel()->text() == QString::fromStdString(Info.AppName), "About names the program");
       Check(About.VersionLabel()->text().contains(QString::fromStdString(Info.Version)), "its version");
-      Check(About.WinScpLabel()->text().contains(QStringLiteral("https://winscp.net/")), "and WinSCP, with its site");
-      Check(!QIcon(QStringLiteral(":/icons/Application.ico")).pixmap(64, 64).isNull(), "with WinSCP's icon");
+
+      Check(About.WinScpLabel()->text().contains(QStringLiteral("https://winscp.net/")) &&
+        About.WinScpLabel()->text().contains(QString::fromStdString(Info.WinScpVersion)) && (Info.WinScpVersion != Info.Version),
+        "and WinSCP's, with its site");
+      Check(!QIcon(QStringLiteral(":/icons/linscp.ico")).pixmap(64, 64).isNull(), "with its icon");
     }
 
     Responder.Passwords.clear();

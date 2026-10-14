@@ -28,20 +28,16 @@
         <translation>Site: %1</translation>
     </message>
     <message>
-        <source>Configuration: %1</source>
-        <translation>Configuração: %1</translation>
-    </message>
-    <message>
-        <source>Copyright (C) 2026 Eduardo Correia &amp;lt;%1&amp;gt;.</source>
-        <translation>Copyright (C) 2026 Eduardo Correia &amp;lt;%1&amp;gt;.</translation>
-    </message>
-    <message>
         <source>WinSCP: %1.</source>
         <translation>WinSCP: %1.</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
         <translation>Este programa é software livre; você pode redistribuí-lo e/ou modificá-lo sob os termos da Licença Pública Geral GNU versão 3, como o WinSCP.</translation>
+    </message>
+    <message>
+        <source>Copyright © 2026 Eduardo Correia &amp;lt;%1&amp;gt;.</source>
+        <translation>Copyright © 2026 Eduardo Correia &amp;lt;%1&amp;gt;.</translation>
     </message>
 </context>
 <context>

@@ -491,7 +491,9 @@ bool MaskMatchesPath(const std::string & Masks, const std::string & Path, bool L
 struct TInfo
 {
   std::string AppName;
+  // linscp's version, and WinSCP's, which core is.
   std::string Version;
+  std::string WinScpVersion;
   // Where the configuration is kept: an INI file or the registry.
   std::string ConfigurationStorage;
 };

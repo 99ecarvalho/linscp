@@ -41,9 +41,9 @@ AboutDialog::AboutDialog(const CoreBridge::TInfo & Info, QWidget * Parent) :
   QVBoxLayout * Layout = new QVBoxLayout(this);
   QHBoxLayout * Body = new QHBoxLayout();
   Body->setSpacing(24);
-  // WinSCP's own icon, the program's until it has one.
+  // WinSCP's icon with an "L" on the padlock (port/tools/make_icon.py).
   QLabel * Icon = new QLabel(this);
-  Icon->setPixmap(QIcon(QStringLiteral(":/icons/Application.ico")).pixmap(64, 64));
+  Icon->setPixmap(QIcon(QStringLiteral(":/icons/linscp.ico")).pixmap(64, 64));
   Icon->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
   Body->addWidget(Icon, 0, Qt::AlignTop);
 
@@ -64,12 +64,11 @@ AboutDialog::AboutDialog(const CoreBridge::TInfo & Info, QWidget * Parent) :
   Texts->addWidget(FVersion);
   Texts->addWidget(TextLabel(tr("Using: Qt %1 (headers: %2)").arg(QString::fromLatin1(qVersion()), QStringLiteral(QT_VERSION_STR)), this));
   // Where it comes from: WinSCP, the version its core is.
-  FWinScp = TextLabel(tr("Based on WinSCP %1: %2").arg(Version.toHtmlEscaped(), Link(QString::fromLatin1(WinScpWebSite))), this);
+  FWinScp = TextLabel(tr("Based on WinSCP %1: %2").arg(QString::fromStdString(Info.WinScpVersion).toHtmlEscaped(), Link(QString::fromLatin1(WinScpWebSite))), this);
   Texts->addWidget(FWinScp);
   Texts->addWidget(TextLabel(tr("Website: %1").arg(Link(QString::fromLatin1(WebSite))), this));
-  Texts->addWidget(TextLabel(tr("Configuration: %1").arg(QString::fromStdString(Info.ConfigurationStorage).toHtmlEscaped()), this));
   QLabel * Copyright = TextLabel(
-    tr("Copyright (C) 2026 Eduardo Correia &lt;%1&gt;.").arg(QStringLiteral("ecorreia@apliant.com.br")) + QStringLiteral("<br>") +
+    tr("Copyright © 2026 Eduardo Correia &lt;%1&gt;.").arg(QStringLiteral("ecorreia@apliant.com.br")) + QStringLiteral("<br>") +
     tr("WinSCP: %1.").arg(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::WinScpCopyright)).toHtmlEscaped()), this);
   Texts->addWidget(Copyright);
   QLabel * Licence = TextLabel(
