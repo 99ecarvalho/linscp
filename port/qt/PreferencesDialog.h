@@ -147,6 +147,9 @@ private:
   QWidget * MakeSecurityPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeLoggingPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeStoragePage(const CoreBridge::TPreferences & Preferences);
+  QWidget * MakeIntegrationPage();
+  // An Integration action, after its question; the error shown.
+  bool Integrate(const QString & Question, bool (*Action)(QString & Error));
   QWidget * MakeApplicationsPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeEditorsPage();
   QWidget * MakeInternalEditorPage();

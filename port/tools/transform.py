@@ -820,7 +820,7 @@ def main():
                              'source/windows/WinConfiguration.cpp', 'source/windows/WinConfiguration.h',
                              'source/windows/SynchronizeController.cpp',
                              'source/windows/SynchronizeController.h',
-                             'source/windows/GUITools.cpp'])
+                             'source/windows/GUITools.cpp', 'source/windows/Setup.cpp'])
     ap.add_argument('--slices', default=os.path.join(os.path.dirname(os.path.abspath(__file__)), 'slices.json'),
                     help="part-file units (ADR 0014): their manifest")
     ap.add_argument('--slice-out',

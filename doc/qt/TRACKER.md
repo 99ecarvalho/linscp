@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 16 | 24 | Parity on features users depend on |
+| P3 Qt parity | 19 | 24 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **94** | **111** | |
+| **Total** | **97** | **111** | |
 
 ## Next three actions
 
@@ -237,13 +237,13 @@ up to date (P3-06e, done): Commands > Keep Remote Directory up to Date, over
 upstream's own controller. The rest of the dialogs (P3-06f, done): License and
 third-party credits, Clean Up, S3 tags, bookmark shortcuts. Shell integration
 (P3-08, done): Open in PuTTY (or a terminal), a session named on the command
-line, Explore Directory. P2-10 and P2-11 wait, at the user's request.
+line, Explore Directory. The rest of Preferences (P3-04e, done): Editors with
+external editors and the associated application, Internal editor,
+Integration, Applications, Commands. P2-10 and P2-11 wait, at the user's request.
 
-1. **P3-04e**: Preferences' Editors page with external editors and a remote
-   file opened with its associated application (ADR 0015), Integration (the
-   URL handler), Applications (PuTTY), Commands, Drag & Drop.
-2. **P3-12** and **P3-13**: the local browser, and session tabs with
-   workspaces.
+1. **P3-13**: session tabs and workspaces, then **P3-12**, the local browser
+   (a tab too).
+2. **P3-09**: accessibility; then the P3 exit gate (**P3-10**).
 3. Offer `core-log-file-name-delimiter.patch` and
    `core-local-eol-platform.patch` upstream (ADR 0006).
 
@@ -766,14 +766,14 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-01 | `.dfm` → `.ui` converter | todo | |
 | P3-02 | Commander dual-pane | done | WinSCP's Commander keys (panels, `FileView`, main window), select by core's masks (`CoreBridge::MaskMatches`), rename in place, status lines, group and link target columns with the header's menu; ctests `qt_gui_keys`, `qt_gui_panel`; native on Windows 11 too. Not yet (ADR 0012): Shift+F5/F6, the extension column, incremental search status, toolbars, kept layout (P3-04) |
 | P3-03 | Synchronization UI | done | `port/qt/SynchronizeDialog.cpp` (Synchronize dialog, comparing progress, checklist) over `TSession::Sync*` (core's `SynchronizeCollect`/`Apply`/`ToQueue`); Commands > Synchronize (Ctrl+S); ctests `qt_gui_sync`, `qt_session`/`qt_session_ftp`; native on Windows 11 too. Not yet (ADR 0012): selected files only, checksum, transfer settings, saved options (P3-04); the checklist's size calculation, move finding, custom commands; keep remote directory up to date |
-| P3-04 | Preferences | wip | split into P3-04a…e (below), each counted as its own task; done when they are |
+| P3-04 | Preferences | done | split into P3-04a…e (below), each counted as its own task; done when they are |
 | P3-04a | Preferences foundation, Languages, Panels, Commander | done | upstream's `GUIConfiguration` compiled as it is (`port/gui`, ADR 0014); `TShellConfiguration` mirroring `TWinConfiguration`'s keys; the language as upstream chooses it; Options > Preferences (Ctrl+Alt+P) with Panels, Commander and Languages, applied to the panels; ctests `qt_gui_preferences`, `qt_gui_sites`, `qt_language`; native on Windows 11 too. Not yet on these pages (ADR 0014): incremental search, panel state, full row, double-click, font, Explorer-style selection, tree, location profiles, compare criteria |
 | P3-04b | Preferences: Transfer, Background, Endurance | done | transfers use the GUI's settings (`TTransferSettings`, `port/qt/TransferSettings.cpp`); the Copy and Synchronize dialogs' Transfer settings group and dialog (`TransferSettingsDialog.cpp`); Preferences' Transfer (presets), Background, Endurance; ctests `qt_session`/`qt_session_ftp`, `qt_gui_preferences`; native on Windows 11 too. Not yet (ADR 0014): autoselection rules, parallel threshold, queue enabling and list visibility |
 | P3-04c | Preferences: Window, Explorer, File colors | done | Window (path in title, keep open), File colors (`MaskMatchesPath`), the layout kept in WinSCP's formats (`DirViewParams`, `WindowParams`, `LocalPanelWidth`, `CurrentPanel`, the queue's height); pages in WinSCP's tree order; ctests `qt_gui_preferences`, `qt_gui_panel`; native on Windows 11 too. The Explorer page is not offered (no Explorer interface); not yet: minimize to tray, single instance |
 | P3-04d | Preferences: Storage, Logging, Network, Security, Updates | done | Network, Security, Logging, Storage over core's configuration (ADR 0014); the temporary directory used; upstream's `%TEMP%`/`%APPDATA%` defaults working on POSIX (Win32 layer, `core-log-file-name-delimiter.patch`); ctests `qt_session`/`qt_session_ftp`, `win32_on_posix`, `qt_gui_preferences`; native on Windows 11 too. Updates not offered (WinSCP's own); master password, host CAs not yet |
-| P3-04e | Preferences: Editors, Integration, Applications, Commands, Drag & Drop | wip | Applications (the PuTTY command, its options as upstream enables them, "automatically open new sessions in PuTTY"; the registry key on Windows) and Commands (the custom commands edited) done. Editors and Internal editor done: upstream's editor preference list (sliced), external editors and the associated application with remote copies uploaded on change, Files > Edit With and Open, the internal editor's font, colours and large-file question (ADR 0015 amendment). Drag & Drop is dropped: its settings are the Windows shell extension's (fake file or temporary folder), which linscp does not have (ADR 0012). Next: Integration |
+| P3-04e | Preferences: Editors, Integration, Applications, Commands, Drag & Drop | done | Applications (the PuTTY command, its options as upstream enables them, "automatically open new sessions in PuTTY"; the registry key on Windows) and Commands (the custom commands edited) done. Editors and Internal editor done: upstream's editor preference list (sliced), external editors and the associated application with remote copies uploaded on change, Files > Edit With and Open, the internal editor's font, colours and large-file question (ADR 0015 amendment). Drag & Drop is dropped: its settings are the Windows shell extension's (fake file or temporary folder), which linscp does not have (ADR 0012). Integration done: on Windows upstream's protocol registration and search path (a Windows-only slice of `Setup.cpp`) and a desktop shortcut; on POSIX their XDG counterparts (a desktop entry for the protocols' URLs and its `mimeapps.list` defaults, a desktop icon, `~/.local/bin` links). Not ported: "Send to" (needs the command line's `/upload`) |
 | P3-05 | Internal editor | done | `port/qt/EditorWindow.cpp` (WinSCP's editor: find and replace, go to line, UTF-8 or the system's code page with fallback, BOM and line endings kept, status bar); Files > Edit (F4), local files in place, remote ones through `TSession::EditDownload`/`EditUpload` (temporary directory, queue upload, "check not modified"), editors closed with the session; `core-local-eol-platform.patch`; ctests `qt_gui_edit`, `qt_session`/`qt_session_ftp`; native on Windows 11 too. Not yet (ADR 0015): reload from the server, save all, window position and font, external editors (P3-04e) |
-| P3-06 | Remaining 48 dialogs, batched | wip | split into P3-06a…f (below), each counted as its own task; done when they are. Written by hand from the `.dfm`s, as P3-02…05 were, without waiting on P3-01 |
+| P3-06 | Remaining 48 dialogs, batched | done | split into P3-06a…f (below), each counted as its own task; done when they are. Written by hand from the `.dfm`s, as P3-02…05 were, without waiting on P3-01 |
 | P3-06a | Dialogs: file operations | done | Properties (F9: `PropertiesDialog`, `RightsFrame` with mixed bits, owner and group, recursion, size, checksums) over core's `TRemoteProperties`; Create folder (F7) with permissions kept in `NewDirectoryProperties`; links (Alt+F6, local ones the system's); Duplicate and Move To (Shift+F5/F6) within the server, through a temporary copy where it cannot copy; ctest `qt_gui_properties` (FTP); native on Windows 11 too. WinSCP's CopyLocal belongs to its local-to-local browsing, which the shell does not have. Not yet: local files' properties, S3 ACLs and tags, the secondary shell for checksums and copies |
 | P3-06b | Dialogs: navigation | done | Open directory and bookmarks (Ctrl+O, Ctrl+B) over core's `TBookmarks`, kept by `TShellConfiguration` under `TWinConfiguration`'s keys; Location Profiles (the Commander's preference), with folders; Find Files (Alt+F7) over core's `FilesFind`; Edit file mask; the panels' filter (Ctrl+Alt+F) and the Select dialogs' Edit...; ctests `qt_gui_bookmarks`, `qt_gui_keys`; native on Windows 11 too. Not yet: bookmarks' shortcuts (shown, not editable or bound), the Go To menu's bookmark list, opened folders kept, mask hints |
 | P3-06c | Dialogs: session tools | done | Server/Protocol Information (`TSession::ServerInfo`, space available); Generate Session URL/Code and File URL (TGenerateUrlDialog's generation ported to `GenerateCode.cpp`, its RTF shown by `RtfText.cpp`, scripts for linscp's command-line client); Open Terminal (core's `AnyCommand`, a separate shell session after WinSCP's question); Edit Raw Settings (the site manager's Advanced dropdown); Tools > Import Sites (PuTTY, KiTTY, FileZilla, OpenSSH, INI, known_hosts); ctests `qt_gui_tools`, `qt_gui_properties`, `qt_gui_sites`; native on Windows 11 too. Not yet: the transfer code from the Copy dialog, the console's window size kept, OpenSSH key conversion on import |

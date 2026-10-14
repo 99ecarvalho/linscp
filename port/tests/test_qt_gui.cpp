@@ -117,6 +117,8 @@
 #include <QTreeView>
 #include "SiteManager.h"
 #include "PreferencesDialog.h"
+#include "Integration.h"
+#include <QSettings>
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
 #include "AboutDialog.h"
@@ -1440,6 +1442,19 @@ void Keys(const QString & Directory)
 }
 
 // Options > Preferences, over upstream's configuration (ADR 0014).
+QByteArray ReadAll(const QString & FileName)
+{
+  QFile File(FileName);
+  return File.open(QIODevice::ReadOnly) ? File.readAll() : QByteArray();
+}
+
+void WriteAll(const QString & FileName, const QByteArray & Data)
+{
+  QFile File(FileName);
+  File.open(QIODevice::WriteOnly | QIODevice::Truncate);
+  File.write(Data);
+}
+
 void Preferences(const QString & Ini, const QString & Translations, const QString & Directory)
 {
   QtFrontend Frontend;
@@ -1492,7 +1507,8 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
         PreferencesDialog::tr("Languages"), PreferencesDialog::tr("Panels"), PreferencesDialog::tr("File colors"),
         PreferencesDialog::tr("Editors"), PreferencesDialog::tr("Internal editor"), PreferencesDialog::tr("Transfer"), PreferencesDialog::tr("Background"), PreferencesDialog::tr("Endurance"),
         PreferencesDialog::tr("Network"), PreferencesDialog::tr("Security"), PreferencesDialog::tr("Logging"),
-        PreferencesDialog::tr("Applications"), PreferencesDialog::tr("Commands"), PreferencesDialog::tr("Storage") }),
+        PreferencesDialog::tr("Integration"), PreferencesDialog::tr("Applications"), PreferencesDialog::tr("Commands"),
+        PreferencesDialog::tr("Storage") }),
         "the dialog's pages, in the order of WinSCP's tree");
       Check(!Dialog.LoggingCheck()->isChecked() && !Dialog.LogFileEdit()->text().isEmpty() && !Dialog.LogFileEdit()->isEnabled(),
         "logging off, its default file shown, not editable until on");
@@ -1827,6 +1843,53 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       CoreBridge::SetEditorSettings(Before);
     }
 
+    // Integration: registered as the protocols' URL handler, and not.
+    {
+#if defined(Q_OS_WIN)
+      QString Error;
+      Check(Integration::RegisterUrlHandler(Error), "registered to handle URL addresses");
+      const QString Command = QSettings(QStringLiteral("HKEY_CURRENT_USER\\Software\\Classes\\sftp\\shell\\open\\command"),
+        QSettings::NativeFormat).value(QStringLiteral("Default")).toString() +
+        QSettings(QStringLiteral("HKEY_LOCAL_MACHINE\\Software\\Classes\\sftp\\shell\\open\\command"),
+        QSettings::NativeFormat).value(QStringLiteral("Default")).toString();
+      Check(Command.contains(QFileInfo(QCoreApplication::applicationFilePath()).fileName(), Qt::CaseInsensitive) &&
+        Command.contains(QStringLiteral("/Unsafe")), "sftp:// opens the program, with /Unsafe and the URL");
+      Check(Integration::UnregisterUrlHandler(Error), "and unregistered");
+#else
+      const QDir Home(QDir(Directory).filePath(QStringLiteral("home")));
+      QDir().mkpath(Home.path());
+      const QByteArray SavedData = qgetenv("XDG_DATA_HOME");
+      const QByteArray SavedConfig = qgetenv("XDG_CONFIG_HOME");
+      qputenv("XDG_DATA_HOME", Home.filePath(QStringLiteral("data")).toLocal8Bit());
+      qputenv("XDG_CONFIG_HOME", Home.filePath(QStringLiteral("config")).toLocal8Bit());
+      QDir().mkpath(Home.filePath(QStringLiteral("config")));
+      WriteAll(Integration::MimeAppsPath(), "[Default Applications]\ntext/plain=gedit.desktop\nx-scheme-handler/sftp=other.desktop\n");
+      QString Error;
+      Check(Integration::RegisterUrlHandler(Error), "registered to handle URL addresses");
+      const QString Entry = QString::fromUtf8(ReadAll(Integration::DesktopEntryPath()));
+      Check(Entry.contains(QStringLiteral("x-scheme-handler/sftp;")) && Entry.contains(QStringLiteral("x-scheme-handler/winscp-sftp;")) &&
+        Entry.contains(QStringLiteral("/Unsafe %u")), "a desktop entry for the protocols' URLs, with /Unsafe as upstream's");
+      QString MimeApps = QString::fromUtf8(ReadAll(Integration::MimeAppsPath()));
+      Check(MimeApps.contains(QStringLiteral("x-scheme-handler/sftp=linscp.desktop")) &&
+        !MimeApps.contains(QStringLiteral("other.desktop")) && MimeApps.contains(QStringLiteral("text/plain=gedit.desktop")),
+        "the default for them, the rest kept");
+      Check(Integration::UnregisterUrlHandler(Error) && !QFileInfo::exists(Integration::DesktopEntryPath()), "unregistered");
+      MimeApps = QString::fromUtf8(ReadAll(Integration::MimeAppsPath()));
+      Check(!MimeApps.contains(QStringLiteral("linscp.desktop")) && MimeApps.contains(QStringLiteral("text/plain=gedit.desktop")),
+        "its defaults gone, the rest kept");
+      qputenv("XDG_DATA_HOME", SavedData);
+      qputenv("XDG_CONFIG_HOME", SavedConfig);
+      if (SavedData.isEmpty())
+      {
+        qunsetenv("XDG_DATA_HOME");
+      }
+      if (SavedConfig.isEmpty())
+      {
+        qunsetenv("XDG_CONFIG_HOME");
+      }
+#endif
+    }
+
     // Applications: the PuTTY command, its options as upstream enables them.
     {
       PreferencesDialog Dialog;
@@ -1880,18 +1943,6 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
   CoreBridge::Finalize();
 }
 
-QByteArray ReadAll(const QString & FileName)
-{
-  QFile File(FileName);
-  return File.open(QIODevice::ReadOnly) ? File.readAll() : QByteArray();
-}
-
-void WriteAll(const QString & FileName, const QByteArray & Data)
-{
-  QFile File(FileName);
-  File.open(QIODevice::WriteOnly | QIODevice::Truncate);
-  File.write(Data);
-}
 
 bool WaitUntil(const std::function<bool()> & Condition)
 {

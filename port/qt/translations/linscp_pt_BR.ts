@@ -695,6 +695,13 @@ Local: %2</translation>
     </message>
 </context>
 <context>
+    <name>Integration</name>
+    <message>
+        <source>SFTP, SCP, FTP, WebDAV and S3 client</source>
+        <translation>Cliente SFTP, SCP, FTP, WebDAV e S3</translation>
+    </message>
+</context>
+<context>
     <name>KeepUpToDateDialog</name>
     <message>
         <source>Directories</source>
@@ -1748,6 +1755,42 @@ Local: %2</translation>
     <message>
         <source>Warn when &amp;editing files larger than:</source>
         <translation>Emitir aviso ao &amp;editar arquivos maiores que:</translation>
+    </message>
+    <message>
+        <source>Integration</source>
+        <translation>Integração</translation>
+    </message>
+    <message>
+        <source>Windows Shell</source>
+        <translation>Ícones do Shell</translation>
+    </message>
+    <message>
+        <source>Desktop</source>
+        <translation>Área de trabalho</translation>
+    </message>
+    <message>
+        <source>Create a &amp;desktop icon</source>
+        <translation>Criar Ícone no &amp;Desktop</translation>
+    </message>
+    <message>
+        <source>Register to handle &amp;URL addresses</source>
+        <translation>Registrar para tratar endereços &amp;URL</translation>
+    </message>
+    <message>
+        <source>Register</source>
+        <translation>Registrar</translation>
+    </message>
+    <message>
+        <source>Make %1 &amp;default handler...</source>
+        <translation>Tornar o %1 o programa &amp;padrão...</translation>
+    </message>
+    <message>
+        <source>Unregister</source>
+        <translation>Desregistrar</translation>
+    </message>
+    <message>
+        <source>Add %1 to &amp;search path</source>
+        <translation>Adicionar o %1 ao caminho de &amp;pesquisa</translation>
     </message>
 </context>
 <context>

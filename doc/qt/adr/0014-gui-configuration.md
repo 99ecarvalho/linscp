@@ -396,6 +396,31 @@ slice's prologue repeats that file's `NotepadName`, a static above the
 slice. The shim gains `UnicodeString::ByteType`. The shell's configuration
 keeps the list as `TWinConfiguration` does (ADR 0015 amendment).
 
+## Amendment 2026-10-14: Integration (P3-04e)
+
+Preferences > Integration on Windows is upstream's `windows/Setup.cpp`.
+That covers the search path, and registering the program as the protocols'
+URL handler, undoing it, and opening the default apps settings. It is a
+slice compiled on Windows only, through `port/qt/SetupSlice.h`, whose
+stand-ins are:
+
+- `Application->ExeName`;
+- `ShellOpen`, through the frontend;
+- `SimpleErrorDialog`.
+
+The shim's `TRegistry` gains `HasSubKeys`. The desktop icon on Windows is a
+shortcut Qt makes (`QFile::link`), without upstream's COM code. On POSIX the
+same actions use XDG instead (`port/qt/Integration.cpp`):
+
+- a desktop entry for the protocols' `x-scheme-handler` types, with
+  upstream's `/Unsafe %u`;
+- the default for them in the user's `mimeapps.list`, the other entries
+  kept;
+- a desktop icon;
+- links in `~/.local/bin` for the search path.
+
+"Send to" is not ported: it needs the command line's `/upload`.
+
 ## Amendment 2026-10-14: Open in PuTTY (P3-08)
 
 Commands > Open in PuTTY is upstream's `OpenSessionInPutty`, compiled as it

@@ -135,6 +135,16 @@
       ],
       "from": "^__fastcall TEditorData::TEditorData\\(\\) :\\s*$",
       "until": "^__fastcall TWinConfiguration::TWinConfiguration\\(\\): TCustomWinConfiguration\\(\\)"
+    },
+    {
+      "output": "windows/SetupIntegration.cpp",
+      "source": "source/windows/Setup.cpp",
+      "transformed": true,
+      "prologue": [
+        "#include \"SetupSlice.h\""
+      ],
+      "from": "^#define KEY L\"SYSTEM\\\\\\\\CurrentControlSet",
+      "until": "^void __fastcall TemporaryDirectoryCleanup\\(\\)"
     }
   ]
 }

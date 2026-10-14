@@ -631,6 +631,12 @@ enum class TText
   EditorEdit,     // "Edit editor"
   EditorAdHoc,    // "Editor"
   SelectExternalEditor, // "Select editor application."
+  ConfirmRegisterUrl, // "Do you want to register WinSCP to handle URL addresses?"
+  ConfirmUnregisterUrl, // "Do you want to unregister WinSCP from handling all URL addresses?"
+  ConfirmAddSearchPath, // "Do you want to add application path '%s' to system search path (%%PATH%%)?"
+  CreateDesktopIconAllUsers, // "**Do you want to create desktop icon for all users?**\n \nYou must have administrator privileges for this."
+  RegisterUrlError, // "Cannot register application to handle URL addresses."
+  CreateShortcutError, // "Cannot create shortcut."
 };
 std::string Text(TText Text);
 
@@ -644,6 +650,18 @@ std::string PuttyPatternsHint();
 std::vector<std::string> PuttyRegistryStorageKeys();
 // The custom commands list's L/R column (CUSTOM_COMMAND_LOCAL/REMOTE).
 std::string CustomCommandSide(bool Local);
+
+#if defined(_WIN32)
+// Preferences > Integration on Windows, upstream's (Setup.cpp, sliced):
+// the protocols' URLs handled by the program (RegisterForDefaultProtocols)
+// or no longer; Windows' default apps settings opened, the program
+// registered first (LaunchAdvancedAssociationUI); a directory added to the
+// search path (AddSearchPath). Throw TCoreError.
+void RegisterUrlHandler();
+void UnregisterUrlHandler();
+void MakeDefaultUrlHandler();
+void AddToSearchPath(const std::string & Directory);
+#endif
 
 // Help > About's third-party list, as TAboutDialog::GenerateThirdParty
 // writes it, in HTML: the translation in use, if any (LanguageName in place

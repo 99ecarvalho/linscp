@@ -4,6 +4,8 @@
 #include "CustomCommandDialog.h"
 #include "ShortCutDialog.h"
 #include "EditorPreferencesDialog.h"
+#include "Integration.h"
+#include "QtFrontend.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -20,6 +22,7 @@
 #include <QRadioButton>
 #include <QSpinBox>
 #include <QGridLayout>
+#include <QCoreApplication>
 #include <QDir>
 #include <QFontDialog>
 #include <QFrame>
@@ -76,7 +79,8 @@ PreferencesDialog::PreferencesDialog(QWidget * Parent) :
   AddPage(tr("Network"), MakeNetworkPage(Preferences));
   AddPage(tr("Security"), MakeSecurityPage(Preferences));
   AddPage(tr("Logging"), MakeLoggingPage(Preferences));
-  // Integration's Applications, and Commands, as WinSCP's tree has them.
+  // Integration, its Applications, and Commands, as WinSCP's tree has them.
+  AddPage(tr("Integration"), MakeIntegrationPage());
   AddPage(tr("Applications"), MakeApplicationsPage(Preferences));
   AddPage(tr("Commands"), MakeCommandsPage());
   AddPage(tr("Storage"), MakeStoragePage(Preferences));
@@ -1445,4 +1449,134 @@ CoreBridge::TEditorSettings PreferencesDialog::EditorSettings() const
   Result.WarnOnLargeFile = FEditorWarnLargeFile->isChecked();
   Result.LargeFileSize = FEditorLargeFileSize->value();
   return Result;
+}
+
+namespace
+{
+
+// WinSCP's questions name it; here, the program.
+QString IntegrationText(CoreBridge::TText Text)
+{
+  return QString::fromStdString(CoreBridge::Text(Text)).replace(QStringLiteral("WinSCP"),
+    QString::fromStdString(CoreBridge::Info().AppName)).remove(QStringLiteral("**"));
+}
+
+}  // namespace
+
+// Integration, as WinSCP's IntegrationSheet (its "Windows Shell" group).
+// "Send to" is not here: it needs the command line's /upload.
+QWidget * PreferencesDialog::MakeIntegrationPage()
+{
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+#if defined(Q_OS_WIN)
+  QGroupBox * Shell = new QGroupBox(tr("Windows Shell"), Page);
+#else
+  QGroupBox * Shell = new QGroupBox(tr("Desktop"), Page);
+#endif
+  QVBoxLayout * ShellLayout = new QVBoxLayout(Shell);
+  const QString AppName = QString::fromStdString(CoreBridge::Info().AppName);
+  QPushButton * DesktopIcon = new QPushButton(tr("Create a &desktop icon"), Shell);
+  connect(DesktopIcon, &QPushButton::clicked, this, [this]()
+  {
+    bool AllUsers = false;
+#if defined(Q_OS_WIN)
+    // As IconButtonClick: for all users, or the current one.
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Confirmation;
+    Query.Message = IntegrationText(CoreBridge::TText::CreateDesktopIconAllUsers).toStdString();
+    for (unsigned Answer : { CoreBridge::AnswerYes, CoreBridge::AnswerNo, CoreBridge::AnswerCancel })
+    {
+      CoreBridge::TQueryButton Button;
+      Button.Answer = Answer;
+      Button.Caption = (Answer == CoreBridge::AnswerYes) ? "&Yes" : ((Answer == CoreBridge::AnswerNo) ? "&No" : "Cancel");
+      Query.Buttons.push_back(Button);
+    }
+    Query.CancelAnswer = CoreBridge::AnswerCancel;
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    const unsigned Answer = Frontend.Query(Query).Answer;
+    if (Answer == CoreBridge::AnswerCancel)
+    {
+      return;
+    }
+    AllUsers = (Answer == CoreBridge::AnswerYes);
+#endif
+    QString Error;
+    if (!Integration::CreateDesktopIcon(AllUsers, Error))
+    {
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      CoreBridge::TError Failure;
+      Failure.Message = Error.toStdString();
+      Frontend.ShowError(Failure);
+    }
+  });
+  QPushButton * Register = new QPushButton(tr("Register to handle &URL addresses"), Shell);
+  QMenu * RegisterMenu = new QMenu(Register);
+  RegisterMenu->addAction(tr("Register"), this, [this]()
+  {
+    Integrate(IntegrationText(CoreBridge::TText::ConfirmRegisterUrl), &Integration::RegisterUrlHandler);
+  });
+#if defined(Q_OS_WIN)
+  RegisterMenu->addAction(tr("Make %1 &default handler...").arg(AppName), this, [this]()
+  {
+    Integrate(QString(), &Integration::MakeDefaultUrlHandler);
+  });
+#endif
+  RegisterMenu->addAction(tr("Unregister"), this, [this]()
+  {
+    Integrate(IntegrationText(CoreBridge::TText::ConfirmUnregisterUrl), &Integration::UnregisterUrlHandler);
+  });
+  Register->setMenu(RegisterMenu);
+  QPushButton * SearchPath = new QPushButton(tr("Add %1 to &search path").arg(AppName), Shell);
+  connect(SearchPath, &QPushButton::clicked, this, [this]()
+  {
+#if defined(Q_OS_WIN)
+    const QString Path = QDir::toNativeSeparators(QCoreApplication::applicationDirPath()) + QLatin1Char('\\');
+#else
+    const QString Path = Integration::SearchPathDirectory();
+#endif
+    Integrate(IntegrationText(CoreBridge::TText::ConfirmAddSearchPath).replace(QStringLiteral("%s"), Path)
+      .replace(QStringLiteral("%%"), QStringLiteral("%")), &Integration::AddToSearchPath);
+  });
+  ShellLayout->addWidget(DesktopIcon);
+  ShellLayout->addWidget(Register);
+  ShellLayout->addWidget(SearchPath);
+  Layout->addWidget(Shell);
+  Layout->addStretch(1);
+  return Page;
+}
+
+bool PreferencesDialog::Integrate(const QString & Question, bool (*Action)(QString & Error))
+{
+  QtFrontend Frontend;
+  Frontend.SetWindow(this);
+  if (!Question.isEmpty())
+  {
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Confirmation;
+    Query.Message = Question.toStdString();
+    CoreBridge::TQueryButton Yes;
+    Yes.Answer = CoreBridge::AnswerYes;
+    Yes.Caption = "&Yes";
+    CoreBridge::TQueryButton No;
+    No.Answer = CoreBridge::AnswerNo;
+    No.Caption = "&No";
+    Query.Buttons = { Yes, No };
+    Query.CancelAnswer = CoreBridge::AnswerNo;
+    if (Frontend.Query(Query).Answer != CoreBridge::AnswerYes)
+    {
+      return false;
+    }
+  }
+  QString Error;
+  if (!Action(Error))
+  {
+    CoreBridge::TError Failure;
+    Failure.Message = Error.toStdString();
+    Frontend.ShowError(Failure);
+    return false;
+  }
+  return true;
 }

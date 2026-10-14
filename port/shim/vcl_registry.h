@@ -59,6 +59,8 @@ public:
   bool KeyExists(const UnicodeString & Key);
   bool ValueExists(const UnicodeString & Name);
   void GetKeyNames(TStrings * Strings);
+  // Whether the current key has subkeys.
+  bool HasSubKeys();
   void GetValueNames(TStrings * Strings);
 
   int GetDataSize(const UnicodeString & Name);

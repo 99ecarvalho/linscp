@@ -953,6 +953,12 @@ std::string Text(TText Text)
     case TText::EditorEdit: Ident = EDITOR_EDIT; break;
     case TText::EditorAdHoc: Ident = EDITOR_AD_HOC; break;
     case TText::SelectExternalEditor: Ident = PREFERENCES_SELECT_EXTERNAL_EDITOR; break;
+    case TText::ConfirmRegisterUrl: Ident = CONFIRM_REGISTER_URL2; break;
+    case TText::ConfirmUnregisterUrl: Ident = CONFIRM_UNREGISTER_URL; break;
+    case TText::ConfirmAddSearchPath: Ident = CONFIRM_ADD_SEARCH_PATH; break;
+    case TText::CreateDesktopIconAllUsers: Ident = CREATE_DESKTOP_ICON2; break;
+    case TText::RegisterUrlError: Ident = REGISTER_URL_ERROR2; break;
+    case TText::CreateShortcutError: Ident = CREATE_SHORTCUT_ERROR; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

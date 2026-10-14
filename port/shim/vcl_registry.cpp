@@ -118,6 +118,14 @@ bool TRegistry::ValueExists(const UnicodeString & Name)
                           nullptr) == ERROR_SUCCESS;
 }
 
+bool TRegistry::HasSubKeys()
+{
+  wchar_t Name[256];
+  DWORD Length = static_cast<DWORD>(sizeof(Name) / sizeof(Name[0]));
+  return (FCurrentKey != nullptr) &&
+    (RegEnumKeyExW(FCurrentKey, 0, Name, &Length, nullptr, nullptr, nullptr, nullptr) == ERROR_SUCCESS);
+}
+
 void TRegistry::GetKeyNames(TStrings * Strings)
 {
   if (Strings == nullptr)
@@ -288,6 +296,7 @@ bool TRegistry::CreateKey(const UnicodeString &) { return false; }
 bool TRegistry::DeleteKey(const UnicodeString &) { return false; }
 bool TRegistry::DeleteValue(const UnicodeString &) { return false; }
 bool TRegistry::KeyExists(const UnicodeString &) { return false; }
+bool TRegistry::HasSubKeys() { return false; }
 bool TRegistry::ValueExists(const UnicodeString &) { return false; }
 
 void TRegistry::GetKeyNames(TStrings * Strings)

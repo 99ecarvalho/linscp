@@ -11,7 +11,7 @@ add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp AboutDialog.cpp 
   PromptDialog.cpp Language.cpp SiteManager.cpp SiteAdvanced.cpp
   FileList.cpp RemotePanel.cpp LocalPanel.cpp
   TransferDialog.cpp QueuePanel.cpp SynchronizeDialog.cpp PreferencesDialog.cpp TransferSettingsDialog.cpp
-  RightsFrame.cpp PropertiesDialog.cpp CreateDirectoryDialog.cpp LinkDialog.cpp RemoteTransferDialog.cpp OpenDirectoryDialog.cpp LocationProfilesDialog.cpp FindFilesDialog.cpp EditMaskDialog.cpp ServerInfoDialog.cpp RtfText.cpp GenerateUrlDialog.cpp ConsoleDialog.cpp SiteRawDialog.cpp ImportSitesDialog.cpp CustomCommandDialog.cpp KeepUpToDateDialog.cpp LicenseDialog.cpp CleanupDialog.cpp TagDialog.cpp ShortCutDialog.cpp EditorPreferencesDialog.cpp CoreBridge.h)
+  RightsFrame.cpp PropertiesDialog.cpp CreateDirectoryDialog.cpp LinkDialog.cpp RemoteTransferDialog.cpp OpenDirectoryDialog.cpp LocationProfilesDialog.cpp FindFilesDialog.cpp EditMaskDialog.cpp ServerInfoDialog.cpp RtfText.cpp GenerateUrlDialog.cpp ConsoleDialog.cpp SiteRawDialog.cpp ImportSitesDialog.cpp CustomCommandDialog.cpp KeepUpToDateDialog.cpp LicenseDialog.cpp CleanupDialog.cpp TagDialog.cpp ShortCutDialog.cpp EditorPreferencesDialog.cpp Integration.cpp CoreBridge.h)
 set_target_properties(linscp-qt-ui PROPERTIES AUTOMOC ON)
 target_link_libraries(linscp-qt-ui PUBLIC Qt6::Widgets)
 if(NOT WIN32)
@@ -27,6 +27,12 @@ set(LINSCP_SLICE_SOURCES "${LINSCP_GEN_SLICES}/windows/CustomCommandType.cpp"
   "${LINSCP_GEN_SLICES}/windows/LocalCustomCommand.cpp" "${LINSCP_GEN_SLICES}/windows/CustomShortCuts.cpp"
   "${LINSCP_GEN_SLICES}/windows/SynchronizeController.cpp" "${LINSCP_GEN_SLICES}/windows/PuttyTools.cpp"
   "${LINSCP_GEN_SLICES}/windows/EditorPreferences.cpp")
+# Windows only: the protocols' registration and the search path (on POSIX
+# the shell's XDG integration stands in).
+if(WIN32)
+  list(APPEND LINSCP_SLICE_SOURCES "${LINSCP_GEN_SLICES}/windows/SetupIntegration.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/SetupSlice.cpp")
+endif()
 set_source_files_properties(${LINSCP_SLICE_SOURCES} PROPERTIES GENERATED TRUE)
 add_library(linscp-qt-core STATIC EXCLUDE_FROM_ALL CoreBridge.cpp QtInterface.cpp Session.cpp Sites.cpp
   Keys.cpp ShellConfiguration.cpp TransferSettings.cpp GenerateCode.cpp CustomCommandsSlice.cpp CustomCommands.cpp DiscMon.cpp PuttySlice.cpp ${LINSCP_SLICE_SOURCES})
