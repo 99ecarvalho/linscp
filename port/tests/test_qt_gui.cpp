@@ -134,6 +134,7 @@
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
 #include "SingleInstance.h"
+#include "MasterPasswordDialog.h"
 #include "AboutDialog.h"
 #include "LicenseDialog.h"
 #include <QTextBrowser>
@@ -4709,6 +4710,112 @@ void InstanceTest(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// MasterPasswordTest's other runs: a site read with the master password
+// given ("right"), refused ("cancel-save", the site then saved), or with
+// none asked for ("none"). Prints what was read.
+int MasterPasswordRead(const QString & Mode)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  int Asked = 0;
+  CoreBridge::SetMasterPasswordPrompt([&Asked, &Mode]()
+  {
+    Asked++;
+    if (Mode == QStringLiteral("right"))
+    {
+      CoreBridge::SetMasterPassword("Str0ng!Pass#1");
+      return true;
+    }
+    return false;
+  });
+  const CoreBridge::TSite Site = CoreBridge::LoadSite("Secret");
+  int Saved = -1;
+  if (Mode == QStringLiteral("cancel-save"))
+  {
+    try
+    {
+      CoreBridge::SaveSite(Site, "Secret");
+      Saved = 1;
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      Saved = E.Aborted ? 0 : 2;
+    }
+  }
+  std::printf("password=%s locked=%d asked=%d saved=%d\n", Site.Password.c_str(), Site.PasswordsLocked ? 1 : 0, Asked, Saved);
+  CoreBridge::SetMasterPasswordPrompt(nullptr);
+  CoreBridge::Finalize();
+  return 0;
+}
+
+// P3-16: the master password. Set, the stored passwords encrypted with it,
+// other runs asking for it once (or keeping a site's password they could
+// not read); cleared, plain again.
+void MasterPasswordTest(const QString & Ini)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.AcceptDialogs = true;
+    CoreBridge::TSite Site = CoreBridge::NewSite();
+    Site.Name = "Secret";
+    Site.HostName = "example.com";
+    Site.UserName = "user";
+    Site.Password = "pw1";
+    CoreBridge::SaveSite(Site);
+    const auto Read = [&Ini](const char * Mode)
+    {
+      QProcess Process;
+      Process.start(QCoreApplication::applicationFilePath(),
+        { QStringLiteral("masterpasswordread"), QStringLiteral("/ini=") + Ini, QString::fromLatin1(Mode) });
+      Process.waitForStarted();
+      WaitUntil([&Process]() { return Process.state() == QProcess::NotRunning; });
+      const QString Output = QString::fromUtf8(Process.readAllStandardOutput()).trimmed();
+      const QString Result = Output.split(QLatin1Char('\n')).last().trimmed();
+      return Result;
+    };
+    Check(!CoreBridge::UseMasterPassword() && (Read("none") == QStringLiteral("password=pw1 locked=0 asked=0 saved=-1")),
+      "no master password: read as ever");
+
+    // The dialog: a new one, twice; no current one to give yet.
+    MasterPasswordDialog Dialog(true, &Window);
+    Check(!Dialog.CurrentEdit()->isEnabled() && !Dialog.Buttons()->button(QDialogButtonBox::Ok)->isEnabled(),
+      "none set: only the new one asked, OK once given");
+    Dialog.NewEdit()->setText(QStringLiteral("a"));
+    Dialog.ConfirmEdit()->setText(QStringLiteral("a"));
+    Check(Dialog.Buttons()->button(QDialogButtonBox::Ok)->isEnabled(), "both given: OK");
+    Check((CoreBridge::MasterPasswordQuality("") < 0) && (CoreBridge::MasterPasswordQuality("abc") == 0) &&
+      (CoreBridge::MasterPasswordQuality("Str0ng!Pass#1") > 0), "a password's quality, as WinSCP's");
+
+    Check(CoreBridge::ChangeMasterPassword("Str0ng!Pass#1").empty() && CoreBridge::UseMasterPassword(), "set");
+    QString Text;
+    {
+      // Closed at once: Windows would not let core write it.
+      QFile File(Ini);
+      File.open(QIODevice::ReadOnly);
+      Text = QString::fromUtf8(File.readAll());
+    }
+    Check(Text.contains(QStringLiteral("UseMasterPassword=1")) && Text.contains(QStringLiteral("MasterPasswordVerifier=")),
+      "kept under Security, as WinSCP's");
+    Check(CoreBridge::ValidateMasterPassword("Str0ng!Pass#1") && !CoreBridge::ValidateMasterPassword("wrong"), "checked");
+    Check(CoreBridge::LoadSite("Secret").Password == "pw1", "this run still reads the site");
+    Check(Read("right") == QStringLiteral("password=pw1 locked=0 asked=1 saved=-1"), "another run asks once");
+    // Refused: the site's passwords unknown, and it is not saved without it
+    // (as WinSCP's Login dialog), so they are not lost.
+    Check(Read("cancel-save") == QStringLiteral("password= locked=1 asked=2 saved=0"), "refused: the password unknown, not saved");
+    Check(Read("right") == QStringLiteral("password=pw1 locked=0 asked=1 saved=-1"), "the site's password kept");
+
+    Check(CoreBridge::ClearMasterPassword().empty() && !CoreBridge::UseMasterPassword(), "cleared");
+    Check(Read("none") == QStringLiteral("password=pw1 locked=0 asked=0 saved=-1"), "plain again");
+  }
+  CoreBridge::Finalize();
+}
+
 void PanelPreferencesTest(const char * Port, const QString & Directory)
 {
   QtFrontend Frontend;
@@ -4885,6 +4992,15 @@ int main(int argc, char ** argv)
   else if ((argc >= 3) && (std::strcmp(argv[1], "toolbars") == 0))
   {
     ToolbarsTest();
+  }
+  else if ((argc >= 4) && (std::strcmp(argv[1], "masterpasswordread") == 0))
+  {
+    return MasterPasswordRead(QString::fromLocal8Bit(argv[3]));
+  }
+  else if ((argc >= 3) && (std::strcmp(argv[1], "masterpassword") == 0))
+  {
+    // argv[2] is /ini=<file>.
+    MasterPasswordTest(QString::fromLocal8Bit(argv[2] + 5));
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "instance") == 0))
   {

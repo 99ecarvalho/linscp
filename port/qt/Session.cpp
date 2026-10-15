@@ -36,6 +36,7 @@
 
 #include <atomic>
 #include <mutex>
+#include <set>
 #include <memory>
 
 namespace CoreBridge
@@ -45,8 +46,11 @@ class TKeepUpToDateRun;
 
 struct TSession::TImpl
 {
-  // Out of line: TKeepUpToDateRun is complete only further on.
+  // Out of line: TKeepUpToDateRun is complete only further on. Each one
+  // listed while it lives, for RecryptPasswords.
+  TImpl();
   ~TImpl();
+  static std::set<TImpl *> & Live();
 
   std::unique_ptr<TSessionData> Data;
   std::unique_ptr<TTerminal> Terminal;
@@ -1800,7 +1804,37 @@ private:
   }
 };
 
-TSession::TImpl::~TImpl() = default;
+std::set<TSession::TImpl *> & TSession::TImpl::Live()
+{
+  static std::set<TImpl *> Result;
+  return Result;
+}
+
+TSession::TImpl::TImpl()
+{
+  Live().insert(this);
+}
+
+TSession::TImpl::~TImpl()
+{
+  Live().erase(this);
+}
+
+// As TTerminalManager::RecryptPasswords: what the sessions open keep.
+void TSession::RecryptPasswords()
+{
+  for (TImpl * Impl : TImpl::Live())
+  {
+    if (Impl->Data)
+    {
+      Impl->Data->RecryptPasswords();
+    }
+    if (Impl->Terminal)
+    {
+      Impl->Terminal->RecryptPasswords();
+    }
+  }
+}
 
 void TSession::KeepUpToDateStart(const TKeepUpToDateParams & Params, const TTransferSettings * Settings,
   const std::vector<std::string> & Selected, const TKeepUpToDateEvents & Events)

@@ -11,6 +11,7 @@
 #include <Exceptions.h>
 #include <GUIConfiguration.h>
 #include <FileMasks.h>
+#include <Cryptography.h>
 #include <HeadlessMain.h>
 #include <TextsCore.h>
 #include <TextsWin.h>
@@ -839,6 +840,110 @@ bool CommandLineForAnotherInstance(bool Alternative)
   }
 }
 
+namespace
+{
+
+std::function<bool()> GMasterPasswordPrompt;
+
+TShellConfiguration * ShellConfiguration()
+{
+  return dynamic_cast<TShellConfiguration *>(GUIConfiguration);
+}
+
+// As TTerminalManager::MasterPasswordPrompt.
+void MasterPasswordPrompt()
+{
+  if (!IsGuiThread() || !GMasterPasswordPrompt || !GMasterPasswordPrompt())
+  {
+    Abort();
+  }
+}
+
+std::vector<std::string> ErrorsOf(TStrings * Errors)
+{
+  std::vector<std::string> Result;
+  for (int Index = 0; Index < Errors->Count; Index++)
+  {
+    Result.push_back(Utf8(Errors->Strings[Index]));
+  }
+  return Result;
+}
+
+}  // namespace
+
+bool UseMasterPassword()
+{
+  return ShellConfiguration()->UseMasterPassword();
+}
+
+bool ValidateMasterPassword(const std::string & Password)
+{
+  return UseMasterPassword() && ShellConfiguration()->ValidateMasterPassword(FromUtf8(Password));
+}
+
+int MasterPasswordQuality(const std::string & Password)
+{
+  return IsValidPassword(FromUtf8(Password));
+}
+
+void SetMasterPassword(const std::string & Password)
+{
+  ShellConfiguration()->SetMasterPassword(FromUtf8(Password));
+}
+
+std::vector<std::string> ChangeMasterPassword(const std::string & Password)
+{
+  try
+  {
+    std::unique_ptr<TStringList> Errors(new TStringList());
+    ShellConfiguration()->ChangeMasterPassword(FromUtf8(Password), Errors.get());
+    // As MasterPasswordChanged: the verifier saved.
+    Configuration->SaveExplicit();
+    return ErrorsOf(Errors.get());
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+std::vector<std::string> ClearMasterPassword()
+{
+  try
+  {
+    std::unique_ptr<TStringList> Errors(new TStringList());
+    ShellConfiguration()->ClearMasterPassword(Errors.get());
+    Configuration->SaveExplicit();
+    return ErrorsOf(Errors.get());
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+bool EnsureMasterPassword()
+{
+  if (!UseMasterPassword())
+  {
+    return true;
+  }
+  try
+  {
+    ShellConfiguration()->AskForMasterPasswordIfNotSet();
+    return true;
+  }
+  catch (EAbort &)
+  {
+    return false;
+  }
+}
+
+void SetMasterPasswordPrompt(std::function<bool()> Prompt)
+{
+  GMasterPasswordPrompt = std::move(Prompt);
+}
+
 void Initialize(IFrontend * AFrontend)
 {
   GFrontend = AFrontend;
@@ -846,6 +951,8 @@ void Initialize(IFrontend * AFrontend)
   try
   {
     HeadlessInitialize();
+    ShellConfiguration()->OnMasterPasswordPrompt = MasterPasswordPrompt;
+    ShellConfiguration()->OnMasterPasswordRecrypt = []() { TSession::RecryptPasswords(); };
   }
   catch (Exception & E)
   {
@@ -1132,6 +1239,18 @@ std::string Text(TText Text)
     case TText::CopyParamRule: Ident = COPY_PARAM_RULE; break;
     case TText::CopyParamNoRule: Ident = COPY_PARAM_NO_RULE; break;
     case TText::ConfigureButton: Ident = CONFIGURE_BUTTON; break;
+    case TText::MasterPasswordCaption: Ident = MASTER_PASSWORD_CAPTION; break;
+    case TText::MasterPasswordCurrent: Ident = MASTER_PASSWORD_CURRENT; break;
+    case TText::MasterPasswordNew: Ident = MASTER_PASSWORD_NEW; break;
+    case TText::MasterPasswordConfirm: Ident = MASTER_PASSWORD_CONFIRM; break;
+    case TText::MasterPasswordIncorrect: Ident = MASTER_PASSWORD_INCORRECT; break;
+    case TText::MasterPasswordDifferent: Ident = MASTER_PASSWORD_DIFFERENT; break;
+    case TText::MasterPasswordSimple: Ident = MASTER_PASSWORD_SIMPLE2; break;
+    case TText::MasterPasswordOtherInstance: Ident = MASTER_PASSWORD_OTHER_INSTANCE; break;
+    case TText::MasterPasswordSet: Ident = MASTER_PASSWORD_SET2; break;
+    case TText::MasterPasswordChanged: Ident = MASTER_PASSWORD_CHANGED; break;
+    case TText::MasterPasswordCleared: Ident = MASTER_PASSWORD_CLEARED2; break;
+    case TText::MasterPasswordRecryptErrors: Ident = MASTER_PASSWORD_RECRYPT_ERRORS; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

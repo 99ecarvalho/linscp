@@ -96,5 +96,9 @@ void SaveSiteDialog::accept()
       return;
     }
   }
+  if (SavePassword() && !CoreBridge::EnsureMasterPassword())
+  {
+    return;
+  }
   QDialog::accept();
 }

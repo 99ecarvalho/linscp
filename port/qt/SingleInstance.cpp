@@ -1,11 +1,21 @@
 #include "SingleInstance.h"
 
+#include <QCoreApplication>
 #include <QCryptographicHash>
+#include <QDir>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QProcessEnvironment>
+
+#if defined(Q_OS_WIN)
+#include <windows.h>
+#include <tlhelp32.h>
+#else
+#include <unistd.h>
+#endif
 
 namespace
 {
@@ -70,6 +80,44 @@ bool Send(const QStringList & Arguments, const QString & Suffix, QString * Error
   return true;
 }
 
+bool AnyOtherInstance()
+{
+  const QString Self = QFileInfo(QCoreApplication::applicationFilePath()).canonicalFilePath();
+#if defined(Q_OS_WIN)
+  // As AnyOtherInstanceOfSelf: a process of the same executable's name.
+  bool Result = false;
+  const QString Name = QFileInfo(Self).fileName();
+  HANDLE Snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+  if (Snapshot != INVALID_HANDLE_VALUE)
+  {
+    PROCESSENTRY32W Entry;
+    Entry.dwSize = sizeof(Entry);
+    for (BOOL More = Process32FirstW(Snapshot, &Entry); More && !Result; More = Process32NextW(Snapshot, &Entry))
+    {
+      Result = (Entry.th32ProcessID != GetCurrentProcessId()) &&
+        (QString::fromWCharArray(Entry.szExeFile).compare(Name, Qt::CaseInsensitive) == 0);
+    }
+    CloseHandle(Snapshot);
+  }
+  return Result;
+#else
+  // The user's processes running this executable.
+  const QString Own = QString::number(QCoreApplication::applicationPid());
+  for (const QString & Pid : QDir(QStringLiteral("/proc")).entryList(QDir::Dirs | QDir::NoDotAndDotDot))
+  {
+    bool Number = false;
+    Pid.toLongLong(&Number);
+    if (Number && (Pid != Own) &&
+        (QFileInfo(QStringLiteral("/proc/%1").arg(Pid)).ownerId() == static_cast<uint>(getuid())) &&
+        (QFileInfo(QStringLiteral("/proc/%1/exe").arg(Pid)).canonicalFilePath() == Self))
+    {
+      return true;
+    }
+  }
+  return false;
+#endif
+}
+
 }  // namespace SingleInstance
 
 InstanceServer::InstanceServer(std::function<bool(const QStringList &)> Handler, const QString & Suffix, QObject * Parent) :
@@ -81,10 +129,19 @@ InstanceServer::InstanceServer(std::function<bool(const QStringList &)> Handler,
   const QString Name = SingleInstance::ServerName(Suffix);
   if (!FServer->listen(Name))
   {
-    // A socket left by an instance that did not end cleanly (POSIX): none
-    // answered Send, so it is no one's.
-    QLocalServer::removeServer(Name);
-    FServer->listen(Name);
+    // Another instance's, alive: it stays the one that takes command lines.
+    QLocalSocket Probe;
+    Probe.connectToServer(Name);
+    if (Probe.waitForConnected(1000))
+    {
+      Probe.disconnectFromServer();
+    }
+    else
+    {
+      // A socket left by an instance that did not end cleanly (POSIX).
+      QLocalServer::removeServer(Name);
+      FServer->listen(Name);
+    }
   }
   connect(FServer, &QLocalServer::newConnection, this, &InstanceServer::Accept);
 }

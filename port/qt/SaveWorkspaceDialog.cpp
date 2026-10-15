@@ -87,5 +87,9 @@ void SaveWorkspaceDialog::accept()
     Frontend.ShowError(E.Error);
     return;
   }
+  if (SavePasswords() && !CoreBridge::EnsureMasterPassword())
+  {
+    return;
+  }
   QDialog::accept();
 }

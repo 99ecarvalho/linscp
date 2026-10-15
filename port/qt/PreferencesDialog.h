@@ -72,6 +72,8 @@ public:
   }
   QCheckBox * CopyParamAutoSelectNoticeCheck() const { return FCopyParamAutoSelectNotice; }
   QCheckBox * MinimizeToTrayCheck() const { return FMinimizeToTray; }
+  QCheckBox * UseMasterPasswordCheck() const { return FUseMasterPassword; }
+  QPushButton * SetMasterPasswordButton() const { return FSetMasterPassword; }
   QCheckBox * ExternalSessionInExistingInstanceCheck() const { return FExternalSessionInExistingInstance; }
   void RemoveSelected();
   void MoveSelected(int By);
@@ -197,6 +199,12 @@ private:
   QCheckBox * FEnableQueueByDefault = nullptr;
   QCheckBox * FCopyParamAutoSelectNotice = nullptr;
   QCheckBox * FMinimizeToTray = nullptr;
+  QCheckBox * FUseMasterPassword = nullptr;
+  QPushButton * FSetMasterPassword = nullptr;
+  bool CanSetMasterPassword();
+  void MasterPasswordChanged(CoreBridge::TText Message, const std::vector<std::string> & Errors);
+  void ChangeMasterPassword(CoreBridge::TText Message);
+  void UseMasterPasswordClicked();
   QCheckBox * FExternalSessionInExistingInstance = nullptr;
   CoreBridge::TTransferPresetRule FCurrentRuleData;
   bool FHasCurrentRuleData = false;

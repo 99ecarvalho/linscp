@@ -9,6 +9,7 @@
 #include <GUIConfiguration.h>
 #include <Bookmarks.h>
 
+#include <functional>
 #include <memory>
 
 // TWinConfiguration's settings the shell has, as TWinConfiguration's
@@ -195,6 +196,29 @@ public:
   // strings: not translated yet).
   UnicodeString __fastcall ExtensionStringTranslation(const UnicodeString & ExtensionId, const UnicodeString & S);
 
+  // The master password, as TWinConfiguration's: stored passwords
+  // encrypted with it (AES, StronglyRecryptPassword), decrypted as read
+  // (DecryptPassword), asking for it through OnMasterPasswordPrompt
+  // (which sets it, else aborts). Its verifier is kept under Security.
+  bool UseMasterPassword() const { return FUseMasterPassword; }
+  void SetMasterPassword(const UnicodeString & Value);
+  void ChangeMasterPassword(const UnicodeString & Value, TStrings * RecryptPasswordErrors);
+  bool ValidateMasterPassword(const UnicodeString & Value);
+  void ClearMasterPassword(TStrings * RecryptPasswordErrors);
+  void AskForMasterPassword();
+  void AskForMasterPasswordIfNotSet();
+  // Asked once at most until the session ends (as the Login dialog has it).
+  void BeginMasterPasswordSession();
+  void EndMasterPasswordSession();
+  // How often it was not given: core reads a password it could not
+  // decrypt as an empty one (TSessionData::DecryptPassword).
+  int MasterPasswordRefusals() const { return FMasterPasswordRefusals; }
+  std::function<void()> OnMasterPasswordPrompt;
+  // The passwords of sessions open, re-encrypted too (TTerminalManager's).
+  std::function<void()> OnMasterPasswordRecrypt;
+  virtual UnicodeString __fastcall DecryptPassword(RawByteString Password, UnicodeString Key);
+  virtual RawByteString __fastcall StronglyRecryptPassword(RawByteString Password, UnicodeString Key);
+
 protected:
   virtual void __fastcall SaveData(THierarchicalStorage * Storage, bool All);
   virtual void __fastcall LoadData(THierarchicalStorage * Storage);
@@ -219,6 +243,14 @@ private:
   bool FCustomCommandsDefaults = true;
   std::unique_ptr<TStringList> FCustomCommandOptions;
   bool FCustomCommandOptionsModified = false;
+  void RecryptPasswords(TStrings * RecryptPasswordErrors);
+  bool FUseMasterPassword = false;
+  UnicodeString FMasterPasswordVerifier;
+  UnicodeString FPlainMasterPasswordEncrypt;
+  UnicodeString FPlainMasterPasswordDecrypt;
+  int FMasterPasswordSession = 0;
+  bool FMasterPasswordSessionAsked = false;
+  int FMasterPasswordRefusals = 0;
 };
 
 #endif

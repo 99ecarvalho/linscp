@@ -11,6 +11,11 @@
 #include "CustomCommandType.h"
 #include "EditorPreferences.h"
 #include <TextsWin.h>
+#include <TextsCore.h>
+#include <Cryptography.h>
+#include <Security.h>
+#include <SessionData.h>
+#include <CoreMain.h>
 
 namespace
 {
@@ -261,6 +266,12 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->CloseSubKey();
     FCustomCommandOptionsModified = false;
   }
+  if (Storage->OpenSubKeyPath(L"Security", true))
+  {
+    TCloseSubKeyPath Close(Storage);
+    Storage->WriteBool(L"UseMasterPassword", FUseMasterPassword);
+    Storage->WriteString(L"MasterPasswordVerifier", FMasterPasswordVerifier);
+  }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander", true))
   {
     TCloseSubKeyPath Close(Storage);
@@ -505,6 +516,12 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     Storage->CloseSubKey();
     FCustomCommandOptionsModified = false;
   }
+  if (Storage->OpenSubKeyPath(L"Security", false))
+  {
+    TCloseSubKeyPath Close(Storage);
+    FUseMasterPassword = Storage->ReadBool(L"UseMasterPassword", FUseMasterPassword);
+    FMasterPasswordVerifier = Storage->ReadString(L"MasterPasswordVerifier", FMasterPasswordVerifier);
+  }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander", false))
   {
     TCloseSubKeyPath Close(Storage);
@@ -572,4 +589,181 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
       Storage->ReadInteger(L"HeightPixelsPerInch", FSettings.QueueViewHeightPixelsPerInch);
     FSettings.QueueViewShow = Storage->ReadInteger(L"Show", FSettings.QueueViewShow);
   }
+}
+
+// TWinConfiguration's master password, as it has it.
+RawByteString __fastcall TShellConfiguration::StronglyRecryptPassword(RawByteString Password, UnicodeString Key)
+{
+  RawByteString Dummy;
+  RawByteString Result;
+  if (GetExternalEncryptedPassword(Password, Dummy) || !FUseMasterPassword)
+  {
+    // Already strongly encrypted, or no master password to do it with.
+    Result = Password;
+  }
+  else
+  {
+    UnicodeString PasswordText = TGUIConfiguration::DecryptPassword(Password, Key);
+    if (!PasswordText.IsEmpty())
+    {
+      AskForMasterPasswordIfNotSet();
+      Password = ScramblePassword(PasswordText);
+      AES256EncyptWithMAC(Password, FPlainMasterPasswordEncrypt, Result);
+      Result = SetExternalEncryptedPassword(Result);
+    }
+  }
+  return Result;
+}
+
+UnicodeString __fastcall TShellConfiguration::DecryptPassword(RawByteString Password, UnicodeString Key)
+{
+  UnicodeString Result;
+  RawByteString Buf;
+  if (GetExternalEncryptedPassword(Password, Buf))
+  {
+    // The decrypting password, as it is the one kept while recrypting.
+    if (FPlainMasterPasswordDecrypt.IsEmpty())
+    {
+      AskForMasterPassword();
+    }
+    if (!AES256DecryptWithMAC(Buf, FPlainMasterPasswordDecrypt, Buf) || !UnscramblePassword(Buf, Result))
+    {
+      throw Exception(LoadStr(DECRYPT_PASSWORD_ERROR));
+    }
+  }
+  else
+  {
+    Result = TGUIConfiguration::DecryptPassword(Password, Key);
+  }
+  return Result;
+}
+
+void TShellConfiguration::SetMasterPassword(const UnicodeString & Value)
+{
+  // Off, a stray encrypted password (a site imported) is all it decrypts:
+  // new passwords are not encrypted with it.
+  if (!FUseMasterPassword)
+  {
+    FPlainMasterPasswordDecrypt = Value;
+  }
+  else if (DebugAlwaysTrue(ValidateMasterPassword(Value)))
+  {
+    FPlainMasterPasswordEncrypt = Value;
+    FPlainMasterPasswordDecrypt = Value;
+  }
+}
+
+void TShellConfiguration::RecryptPasswords(TStrings * RecryptPasswordErrors)
+{
+  StoredSessions->RecryptPasswords(RecryptPasswordErrors);
+  if (OnMasterPasswordRecrypt)
+  {
+    try
+    {
+      OnMasterPasswordRecrypt();
+    }
+    catch (Exception & E)
+    {
+      UnicodeString Message;
+      if (ExceptionMessage(&E, Message))
+      {
+        RecryptPasswordErrors->Add(Message);
+      }
+    }
+  }
+}
+
+void TShellConfiguration::ChangeMasterPassword(const UnicodeString & Value, TStrings * RecryptPasswordErrors)
+{
+  RawByteString Verifier;
+  AES256CreateVerifier(Value, Verifier);
+  FMasterPasswordVerifier = BytesToHex(Verifier);
+  FPlainMasterPasswordEncrypt = Value;
+  FUseMasterPassword = true;
+  // The old one decrypts while recrypting; the new one after, whatever
+  // happens.
+  try
+  {
+    RecryptPasswords(RecryptPasswordErrors);
+  }
+  catch (...)
+  {
+    FPlainMasterPasswordDecrypt = Value;
+    throw;
+  }
+  FPlainMasterPasswordDecrypt = Value;
+}
+
+bool TShellConfiguration::ValidateMasterPassword(const UnicodeString & Value)
+{
+  DebugAssert(FUseMasterPassword && !FMasterPasswordVerifier.IsEmpty());
+  return AES256Verify(Value, HexToBytes(FMasterPasswordVerifier));
+}
+
+void TShellConfiguration::ClearMasterPassword(TStrings * RecryptPasswordErrors)
+{
+  FMasterPasswordVerifier = L"";
+  FUseMasterPassword = false;
+  Shred(FPlainMasterPasswordEncrypt);
+  try
+  {
+    RecryptPasswords(RecryptPasswordErrors);
+  }
+  catch (...)
+  {
+    Shred(FPlainMasterPasswordDecrypt);
+    throw;
+  }
+  Shred(FPlainMasterPasswordDecrypt);
+}
+
+void TShellConfiguration::AskForMasterPassword()
+{
+  if (FMasterPasswordSession > 0)
+  {
+    if (FMasterPasswordSessionAsked)
+    {
+      FMasterPasswordRefusals++;
+      Abort();
+    }
+    // Before the prompt, as it may abort.
+    FMasterPasswordSessionAsked = true;
+  }
+  if (!OnMasterPasswordPrompt)
+  {
+    throw Exception(L"Master password handler not set");
+  }
+  try
+  {
+    OnMasterPasswordPrompt();
+  }
+  catch (EAbort &)
+  {
+    FMasterPasswordRefusals++;
+    throw;
+  }
+  DebugAssert(!FPlainMasterPasswordDecrypt.IsEmpty());
+}
+
+void TShellConfiguration::AskForMasterPasswordIfNotSet()
+{
+  if (FPlainMasterPasswordEncrypt.IsEmpty())
+  {
+    AskForMasterPassword();
+  }
+}
+
+void TShellConfiguration::BeginMasterPasswordSession()
+{
+  DebugAssert(FMasterPasswordSession == 0);
+  FMasterPasswordSession++;
+}
+
+void TShellConfiguration::EndMasterPasswordSession()
+{
+  if (DebugAlwaysTrue(FMasterPasswordSession > 0))
+  {
+    FMasterPasswordSession--;
+  }
+  FMasterPasswordSessionAsked = false;
 }

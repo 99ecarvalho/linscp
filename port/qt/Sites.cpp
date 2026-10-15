@@ -5,6 +5,7 @@
 #pragma hdrstop
 
 #include "BridgeVcl.h"
+#include "ShellConfiguration.h"
 
 #include <CoreMain.h>
 #include <SessionData.h>
@@ -112,7 +113,31 @@ TSite SiteOf(const TSessionData * Data)
   Site.HostName = Utf8(Data->HostName);
   Site.Port = (Data->PortNumber == DefaultPort(Data->FSProtocol, Data->Ftps)) ? 0 : Data->PortNumber;
   Site.UserName = Utf8(Data->UserName);
-  Site.Password = Utf8(Data->Password);
+  // As the Login dialog's LoadSession: the master password asked once at
+  // most; not given, the passwords stay unknown (PasswordsLocked).
+  {
+    TShellConfiguration * Shell = dynamic_cast<TShellConfiguration *>(GUIConfiguration);
+    const int Refusals = Shell->MasterPasswordRefusals();
+    Shell->BeginMasterPasswordSession();
+    try
+    {
+      Site.Password = Utf8(Data->Password);
+      Site.ProxyPassword = Utf8(Data->ProxyPassword);
+    }
+    catch (...)
+    {
+      Shell->EndMasterPasswordSession();
+      throw;
+    }
+    Shell->EndMasterPasswordSession();
+    // Core reads what it could not decrypt as empty.
+    if (Shell->MasterPasswordRefusals() != Refusals)
+    {
+      Site.Password.clear();
+      Site.ProxyPassword.clear();
+      Site.PasswordsLocked = true;
+    }
+  }
   Site.RemoteDirectory = Utf8(Data->RemoteDirectory);
   Site.LocalDirectory = Utf8(Data->LocalDirectory);
   Site.UpdateDirectories = Data->UpdateDirectories;
@@ -122,7 +147,6 @@ TSite SiteOf(const TSessionData * Data)
   Site.ProxyHost = Utf8(Data->ProxyHost);
   Site.ProxyPort = Data->ProxyPort;
   Site.ProxyUserName = Utf8(Data->ProxyUsername);
-  Site.ProxyPassword = Utf8(Data->ProxyPassword);
   Site.ProxyLocalhost = Data->ProxyLocalhost;
   Site.PrivateKeyFile = Utf8(Data->PublicKeyFile);
   Site.TryAgent = Data->TryAgent;
@@ -139,7 +163,17 @@ TSessionData * SessionDataOf(const TSite & Site, const std::string & BaseName)
 {
   std::unique_ptr<TSessionData> Data(new TSessionData(L""));
   TSessionData * Base = !BaseName.empty() ? StoredSite(BaseName) : NULL;
-  Data->Assign((Base != NULL) ? Base : StoredSessions->DefaultSettings);
+  // Passwords not known (PasswordsLocked): copied as stored, encrypted,
+  // rather than read, which would ask for the master password again and
+  // copy what it could not read as empty.
+  if (Site.PasswordsLocked && (Base != NULL))
+  {
+    Data->CopyDataNoRecrypt(Base);
+  }
+  else
+  {
+    Data->Assign((Base != NULL) ? Base : StoredSessions->DefaultSettings);
+  }
   // Raw settings edited: they replace the base's, as TSiteRawDialog's
   // Execute (the fields below set the rest).
   if (Site.HasRawSettings)
@@ -153,7 +187,11 @@ TSessionData * SessionDataOf(const TSite & Site, const std::string & BaseName)
   Data->HostName = FromUtf8(Site.HostName);
   Data->PortNumber = (Site.Port > 0) ? Site.Port : DefaultPort(Data->FSProtocol, Data->Ftps);
   Data->UserName = FromUtf8(Site.UserName);
-  Data->Password = FromUtf8(Site.Password);
+  // Unknown passwords (PasswordsLocked) stay as stored, unless typed anew.
+  if (!Site.PasswordsLocked || !Site.Password.empty())
+  {
+    Data->Password = FromUtf8(Site.Password);
+  }
   Data->RemoteDirectory = FromUtf8(Site.RemoteDirectory);
   Data->LocalDirectory = FromUtf8(Site.LocalDirectory);
   Data->UpdateDirectories = Site.UpdateDirectories;
@@ -167,7 +205,10 @@ TSessionData * SessionDataOf(const TSite & Site, const std::string & BaseName)
   Data->ProxyHost = FromUtf8(Site.ProxyHost);
   Data->ProxyPort = Site.ProxyPort;
   Data->ProxyUsername = FromUtf8(Site.ProxyUserName);
-  Data->ProxyPassword = FromUtf8(Site.ProxyPassword);
+  if (!Site.PasswordsLocked || !Site.ProxyPassword.empty())
+  {
+    Data->ProxyPassword = FromUtf8(Site.ProxyPassword);
+  }
   Data->ProxyLocalhost = Site.ProxyLocalhost;
   Data->PublicKeyFile = FromUtf8(Site.PrivateKeyFile);
   Data->TryAgent = Site.TryAgent;
@@ -359,6 +400,14 @@ void SaveSite(const TSite & Site, const std::string & BaseName)
       throw Exception(FMTLOAD(CANNOT_OVERWRITE_SPECIAL_SESSION, (Name)));
     }
     std::unique_ptr<TSessionData> Data(SessionDataOf(Site, BaseName));
+    // As AskForMasterPasswordIfNotSetAndNeededToPersistSessionData: its
+    // passwords are stored encrypted with the master password, so not
+    // without it (refused: not saved).
+    TShellConfiguration * Shell = dynamic_cast<TShellConfiguration *>(GUIConfiguration);
+    if (!Configuration->DisablePasswordStoring && Data->HasAnyPassword() && Shell->UseMasterPassword())
+    {
+      Shell->AskForMasterPasswordIfNotSet();
+    }
     StoredSessions->NewSession(Name, Data.get());
     // Modified only, explicit: as DoSaveSession.
     StoredSessions->Save(false, true);

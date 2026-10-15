@@ -70,6 +70,7 @@
 #include "SaveWorkspaceDialog.h"
 #include "CopyLocalDialog.h"
 #include "IconSet.h"
+#include "MasterPasswordDialog.h"
 #include "WindowParams.h"
 #include "PanelBands.h"
 #include "SaveSiteDialog.h"
@@ -95,6 +96,12 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FInfo(Info)
 {
   setWindowTitle(QString::fromStdString(FInfo.AppName));
+  // As TTerminalManager's OnMasterPasswordPrompt: over the window in front.
+  CoreBridge::SetMasterPasswordPrompt([this]()
+  {
+    QWidget * Parent = QApplication::activeModalWidget();
+    return MasterPasswordDialog::AskCurrent((Parent != nullptr) ? Parent : this);
+  });
 
   // The actions, placed in WinSCP's menus by BuildMenus once the panels are
   // made; each the window's too, so its key works wherever it is shown.
@@ -566,6 +573,7 @@ void MainWindow::ApplyPreferences()
 
 MainWindow::~MainWindow()
 {
+  CoreBridge::SetMasterPasswordPrompt(nullptr);
   // As WinSCP's ClipboardClear: remote files on the clipboard download
   // through this window; they go with it.
   if ((FClipboardData != nullptr) && (QApplication::clipboard()->mimeData() == FClipboardData))

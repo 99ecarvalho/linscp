@@ -2454,6 +2454,18 @@ Local: %2</translation>
         <source>Open new externally initiated sessions in &amp;existing window</source>
         <translation>Abrir novas sessões iniciadas externamente na janela &amp;existente</translation>
     </message>
+    <message>
+        <source>Master password</source>
+        <translation>Senha mestra</translation>
+    </message>
+    <message>
+        <source>&amp;Use master password</source>
+        <translation>&amp;Usar senha mestra</translation>
+    </message>
+    <message>
+        <source>&amp;Change master password...</source>
+        <translation>&amp;Modificar senha mestra...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -187,6 +187,29 @@ void SetArguments(const std::vector<std::string> & Arguments);
 // OpenInNewWindow, reverses it): not with /NewInstance, /RawConfig, a
 // command switch, or a URL of a file to download. After Initialize.
 bool CommandLineForAnotherInstance(bool Alternative);
+
+// The master password (Preferences > Security), as TWinConfiguration's:
+// whether it is in use; the one given checked against it (its verifier);
+// a password's quality (IsValidPassword: -1 none or too long, 0 too
+// simple, 1 good); the one given for this run (TMasterPasswordDialog's
+// current one, after checking it).
+bool UseMasterPassword();
+bool ValidateMasterPassword(const std::string & Password);
+int MasterPasswordQuality(const std::string & Password);
+void SetMasterPassword(const std::string & Password);
+// Set or changed, and cleared: the stored passwords, and those of sessions
+// open, encrypted again, saved. The errors of those that could not be.
+// Throw TCoreError.
+std::vector<std::string> ChangeMasterPassword(const std::string & Password);
+std::vector<std::string> ClearMasterPassword();
+// What asks for it when core needs it (a stored password read or written):
+// true once given (SetMasterPassword), false to give up. Only on the GUI
+// thread; elsewhere core gives up.
+void SetMasterPasswordPrompt(std::function<bool()> Prompt);
+// As the Save dialogs' DoValidate: passwords to be saved, the master
+// password, when in use, asked for first if not given yet; false when it
+// was not.
+bool EnsureMasterPassword();
 // Saves the configuration and stops core.
 void Finalize();
 
@@ -761,6 +784,18 @@ enum class TText
   CopyParamRule,        // "Autoselection rule:\n%s"
   CopyParamNoRule,      // "You have not specified any autoselection rule mask."
   ConfigureButton,      // "&Configure..."
+  MasterPasswordCaption, // "Master password"
+  MasterPasswordCurrent, // "&Current master password:"
+  MasterPasswordNew,    // "&New master password:"
+  MasterPasswordConfirm, // "&Re-enter master password:"
+  MasterPasswordIncorrect, // "You did not enter the correct current master password."
+  MasterPasswordDifferent, // "New and re-entered master passwords are not the same."
+  MasterPasswordSimple, // "**Your password is too simple ...**" (MASTER_PASSWORD_SIMPLE2)
+  MasterPasswordOtherInstance, // "There is other instance of WinSCP running. ..."
+  MasterPasswordSet,    // "**Master password successfully set.** ..." (MASTER_PASSWORD_SET2)
+  MasterPasswordChanged, // "Master password successfully changed."
+  MasterPasswordCleared, // "**You have deleted your master password.** ..." (MASTER_PASSWORD_CLEARED2)
+  MasterPasswordRecryptErrors, // "%s\n\nThere were some errors when encrypting passwords ..."
 };
 std::string Text(TText Text);
 
@@ -1111,6 +1146,9 @@ struct TSite
   int Port = 0;
   std::string UserName;
   std::string Password;
+  // The master password not given when the site was read: its passwords
+  // unknown, so kept as stored unless new ones are typed.
+  bool PasswordsLocked = false;
   std::string RemoteDirectory;
 
   // Directories.
@@ -1461,6 +1499,9 @@ public:
   // Arguments, when given, instead of this process's: another instance's
   // (CommandLineFromAnotherInstance), the sites reloaded first as that
   // instance may have just saved one.
+  // The passwords every session open keeps, encrypted again (the master
+  // password changed).
+  static void RecryptPasswords();
   static std::unique_ptr<TSession> FromCommandLine(bool & CanOpen, const std::vector<std::string> * Arguments = nullptr);
   static std::string CommandLineFolderOrWorkspace(const std::vector<std::string> * Arguments = nullptr);
   // A session on the same site, as it is now (TCustomScpExplorerForm's

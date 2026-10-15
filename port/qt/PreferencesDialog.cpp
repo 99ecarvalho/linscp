@@ -2,6 +2,9 @@
 #include "IconSet.h"
 #include <QApplication>
 #include "HintButton.h"
+#include "MasterPasswordDialog.h"
+#include "QtFrontend.h"
+#include "SingleInstance.h"
 
 #include "TransferSettingsDialog.h"
 #include "CustomCommandDialog.h"
@@ -612,6 +615,24 @@ QWidget * PreferencesDialog::MakeSecurityPage(const TPreferences & Preferences)
 {
   QWidget * Page = new QWidget(this);
   QVBoxLayout * Layout = new QVBoxLayout(Page);
+  // As MasterPasswordGroup: what it does is done at once, not on OK.
+  QGroupBox * Master = new QGroupBox(tr("Master password"), Page);
+  QHBoxLayout * MasterLayout = new QHBoxLayout(Master);
+  FUseMasterPassword = new QCheckBox(tr("&Use master password"), Master);
+  FUseMasterPassword->setChecked(CoreBridge::UseMasterPassword());
+  connect(FUseMasterPassword, &QCheckBox::clicked, this, &PreferencesDialog::UseMasterPasswordClicked);
+  MasterLayout->addWidget(FUseMasterPassword, 1);
+  FSetMasterPassword = new QPushButton(tr("&Change master password..."), Master);
+  FSetMasterPassword->setEnabled(CoreBridge::UseMasterPassword());
+  connect(FSetMasterPassword, &QPushButton::clicked, this, [this]()
+  {
+    if (CanSetMasterPassword())
+    {
+      ChangeMasterPassword(CoreBridge::TText::MasterPasswordChanged);
+    }
+  });
+  MasterLayout->addWidget(FSetMasterPassword);
+  Layout->addWidget(Master);
   QGroupBox * Authentication = new QGroupBox(tr("Authentication"), Page);
   QFormLayout * Form = new QFormLayout(Authentication);
   FRememberPassword = new QCheckBox(tr("Remember &password for duration of session"), Authentication);
@@ -1794,4 +1815,110 @@ int PreferencesDialog::QueueViewChoice() const
     }
   }
   return -1;
+}
+
+// As TPreferencesDialog::CanSetMasterPassword: not while another instance
+// runs, unless told so.
+bool PreferencesDialog::CanSetMasterPassword()
+{
+  while (SingleInstance::AnyOtherInstance())
+  {
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Confirmation;
+    Query.Message = CoreBridge::Text(CoreBridge::TText::MasterPasswordOtherInstance);
+    for (unsigned int Answer : { CoreBridge::AnswerRetry, CoreBridge::AnswerIgnore, CoreBridge::AnswerCancel })
+    {
+      CoreBridge::TQueryButton Button;
+      Button.Answer = Answer;
+      Button.Caption = (Answer == CoreBridge::AnswerRetry) ? "&Retry" : ((Answer == CoreBridge::AnswerIgnore) ? "&Ignore" : "Cancel");
+      Query.Buttons.push_back(Button);
+    }
+    Query.CancelAnswer = CoreBridge::AnswerCancel;
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    const unsigned int Answer = Frontend.Query(Query).Answer;
+    if (Answer == CoreBridge::AnswerIgnore)
+    {
+      return true;
+    }
+    if (Answer != CoreBridge::AnswerRetry)
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
+// As MasterPasswordChanged: what was done, and what could not be.
+void PreferencesDialog::MasterPasswordChanged(CoreBridge::TText Message, const std::vector<std::string> & Errors)
+{
+  CoreBridge::TQuery Query;
+  Query.Type = Errors.empty() ? CoreBridge::TQueryType::Information : CoreBridge::TQueryType::Warning;
+  QString Text = QString::fromStdString(CoreBridge::Text(Message));
+  if (!Errors.empty())
+  {
+    Text = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::MasterPasswordRecryptErrors)).replace(QStringLiteral("%s"), Text);
+    for (const std::string & Error : Errors)
+    {
+      Query.MoreMessages += Error + "\n";
+    }
+  }
+  Query.Message = Text.toStdString();
+  CoreBridge::TQueryButton OK;
+  OK.Answer = CoreBridge::AnswerOK;
+  OK.Caption = "OK";
+  Query.Buttons = { OK };
+  Query.CancelAnswer = CoreBridge::AnswerOK;
+  QtFrontend Frontend;
+  Frontend.SetWindow(this);
+  Frontend.Query(Query);
+}
+
+void PreferencesDialog::ChangeMasterPassword(CoreBridge::TText Message)
+{
+  std::string New;
+  if (MasterPasswordDialog::AskChange(this, New))
+  {
+    try
+    {
+      MasterPasswordChanged(Message, CoreBridge::ChangeMasterPassword(New));
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      Frontend.ShowError(E.Error);
+    }
+  }
+}
+
+// As UseMasterPasswordCheckClick: set, or cleared once the current one is
+// given; the box then says what is.
+void PreferencesDialog::UseMasterPasswordClicked()
+{
+  if (FUseMasterPassword->isChecked() != CoreBridge::UseMasterPassword())
+  {
+    if (CanSetMasterPassword())
+    {
+      if (FUseMasterPassword->isChecked())
+      {
+        ChangeMasterPassword(CoreBridge::TText::MasterPasswordSet);
+      }
+      else if (MasterPasswordDialog::AskCurrent(this))
+      {
+        try
+        {
+          MasterPasswordChanged(CoreBridge::TText::MasterPasswordCleared, CoreBridge::ClearMasterPassword());
+        }
+        catch (const CoreBridge::TCoreError & E)
+        {
+          QtFrontend Frontend;
+          Frontend.SetWindow(this);
+          Frontend.ShowError(E.Error);
+        }
+      }
+    }
+  }
+  FUseMasterPassword->setChecked(CoreBridge::UseMasterPassword());
+  FSetMasterPassword->setEnabled(CoreBridge::UseMasterPassword());
 }

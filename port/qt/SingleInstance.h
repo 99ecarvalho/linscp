@@ -22,6 +22,10 @@ QString ServerName(const QString & Suffix = QString());
 // Error, when given, says why not.
 bool Send(const QStringList & Arguments, const QString & Suffix = QString(), QString * Error = nullptr);
 
+// As AnyOtherInstanceOfSelf: another process of this program running
+// (setting the master password then may lose the passwords it saves).
+bool AnyOtherInstance();
+
 }  // namespace SingleInstance
 
 class InstanceServer : public QObject
