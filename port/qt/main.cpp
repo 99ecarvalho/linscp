@@ -58,6 +58,23 @@ int main(int argc, char ** argv)
   }
   // As upstream: core's configuration chose the language as it started.
   const TLanguage Language = SetUpLanguage(RequestedLocale(argc, argv));
+#if defined(_WIN32)
+  // The installer's maintenance tasks: done, nothing else is.
+  try
+  {
+    if (CoreBridge::CommandLineSetupTask())
+    {
+      CoreBridge::Finalize();
+      return 0;
+    }
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    Frontend.ShowError(E.Error);
+    CoreBridge::Finalize();
+    return 1;
+  }
+#endif
   // As WinMain: a session named goes to the window already running, if it
   // takes it (Shift held, as OpenInNewWindow, the other way round).
   if (!Smoke &&

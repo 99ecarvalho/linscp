@@ -809,6 +809,47 @@ void SetArguments(const std::vector<std::string> & Arguments)
   SetProgramCommandLine(CommandLine.c_str());
 }
 
+#if defined(_WIN32)
+bool CommandLineSetupTask()
+{
+  TProgramParams * Params = TProgramParams::Instance();
+  const std::string Directory = Utf8(ExtractFilePath(ParamStr(0)));
+  bool Result = true;
+  if (Params->FindSwitch(L"RegisterForDefaultProtocols") ||
+      Params->FindSwitch(L"RegisterAsUrlHandler"))
+  {
+    RegisterUrlHandler();
+  }
+  else if (Params->FindSwitch(L"UnregisterForProtocols"))
+  {
+    UnregisterUrlHandler();
+  }
+  else if (Params->FindSwitch(L"AddSearchPath"))
+  {
+    AddToSearchPath(Directory);
+  }
+  else if (Params->FindSwitch(L"RemoveSearchPath"))
+  {
+    try
+    {
+      RemoveFromSearchPath(Directory);
+    }
+    catch (const TCoreError &)
+    {
+    }
+  }
+  else
+  {
+    Result = false;
+  }
+  if (Result)
+  {
+    Configuration->DontSave();
+  }
+  return Result;
+}
+#endif
+
 bool CommandLineForAnotherInstance(bool Alternative)
 {
   try

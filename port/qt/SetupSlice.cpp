@@ -85,4 +85,16 @@ void AddToSearchPath(const std::string & Directory)
   }
 }
 
+void RemoveFromSearchPath(const std::string & Directory)
+{
+  try
+  {
+    ::RemoveSearchPath(FromUtf8(Directory));
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 }  // namespace CoreBridge

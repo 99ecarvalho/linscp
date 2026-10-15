@@ -912,6 +912,14 @@ void RegisterUrlHandler();
 void UnregisterUrlHandler();
 void MakeDefaultUrlHandler();
 void AddToSearchPath(const std::string & Directory);
+void RemoveFromSearchPath(const std::string & Directory);
+// As WinMain's maintenance tasks, which the installer runs (and its
+// uninstaller): /RegisterForDefaultProtocols, /UnregisterForProtocols,
+// /AddSearchPath, /RemoveSearchPath (its errors ignored, as it runs whether
+// or not the path was added), for the program's own directory; the
+// configuration not saved after. Whether the command line asked for one, to
+// quit after it. After Initialize. Throws TCoreError.
+bool CommandLineSetupTask();
 #endif
 
 // Help > About's third-party list, as TAboutDialog::GenerateThirdParty
