@@ -3126,7 +3126,7 @@ QString MainWindow::ActiveLocalPath() const
   return ActiveLocal()->Path();
 }
 
-void MainWindow::NewLocalTab()
+void MainWindow::NewLocalTab(const QString & Local, const QString & Other)
 {
   if (FBusy)
   {
@@ -3141,7 +3141,11 @@ void MainWindow::NewLocalTab()
   FQueue->SetSession(nullptr);
   FQueueDone = 0;
   FOtherLocal->ApplyPreferences(CoreBridge::Preferences());
-  FOtherLocal->ChangeDirectory(FLocal->Path());
+  if (!Local.isEmpty())
+  {
+    FLocal->ChangeDirectory(Local);
+  }
+  FOtherLocal->ChangeDirectory(Other.isEmpty() ? FLocal->Path() : Other);
   ShowLocalBrowser(true);
   UpdateTabs();
   UpdateTitle();
@@ -3301,7 +3305,13 @@ std::vector<CoreBridge::TSession::TWorkspaceTab> MainWindow::WorkspaceTabs() con
     CoreBridge::TSession::TWorkspaceTab Tab;
     Tab.Session = TabSession(Index);
     Tab.LocalDirectory = QDir::toNativeSeparators((Index == FActiveTab) ? FLocal->Path() : FTabs[Index].LocalPath).toStdString();
-    if (Tab.Session != nullptr)
+    if (FTabs[Index].LocalBrowser)
+    {
+      Tab.OtherLocalDirectory =
+        QDir::toNativeSeparators((Index == FActiveTab) ? FOtherLocal->Path() : FTabs[Index].OtherLocalPath).toStdString();
+      Result.push_back(Tab);
+    }
+    else if (Tab.Session != nullptr)
     {
       Result.push_back(Tab);
     }
@@ -3390,7 +3400,15 @@ bool MainWindow::OpenWorkspace(const QString & Name)
   bool Any = false;
   for (std::unique_ptr<CoreBridge::TSession> & Session : Sessions)
   {
-    Any = Open(std::move(Session)) || Any;
+    if (Session->IsLocalBrowser())
+    {
+      NewLocalTab(QString::fromStdString(Session->LocalDirectory()), QString::fromStdString(Session->OtherLocalDirectory()));
+      Any = true;
+    }
+    else
+    {
+      Any = Open(std::move(Session)) || Any;
+    }
   }
   if (Any)
   {
@@ -3581,7 +3599,7 @@ void MainWindow::BuildMenus()
   QAction * RemoteTab = Iconize(NewTab->addAction(tr("&Remote Tab..."), this, &MainWindow::SiteManagerDialog), "sites");
   RemoteTab->setShortcut(FSitesAction->shortcut());
   FSitesAction->setShortcut(QKeySequence());
-  Iconize(NewTab->addAction(tr("&Local Tab"), this, &MainWindow::NewLocalTab), "local-tab");
+  Iconize(NewTab->addAction(tr("&Local Tab"), this, [this]() { NewLocalTab(); }), "local-tab");
   Tabs->addAction(FCloseTabAction);
   Tabs->addAction(FDuplicateTabAction);
   FRenameTabAction = Tabs->addAction(tr("&Rename Tab"), this, [this]() { RenameTab(); });
@@ -4762,11 +4780,48 @@ bool MainWindow::PasteFromClipboard()
   QStringList LocalSources;
   if (ReadFileDrag(Data, Drag))
   {
+    if (!Drag.Local && RemoteTarget)
+    {
+      // As PasteFromClipBoard's foRemoteCopy: our remote files, pasted on
+      // the remote panel of the session they were copied from, duplicated
+      // into its directory (the Duplicate dialog's). linscp copies between
+      // sessions only through a local panel.
+      if ((FClipboardSession != FSession.get()) || !FSession->Active())
+      {
+        return false;
+      }
+      const QString FileMask = (Drag.Names.size() == 1) ? Drag.Names.first() : QStringLiteral("*.*");
+      RemoteTransferDialog Dialog(FSession.get(), false, Drag.Names.size() > 1, FPanel->Path(), FileMask, this);
+      if (Dialog.exec() != QDialog::Accepted)
+      {
+        return false;
+      }
+      std::vector<std::string> Paths;
+      for (const QString & Name : Drag.Names)
+      {
+        Paths.push_back((Drag.Directory + (Drag.Directory.endsWith(QLatin1Char('/')) ? QString() : QStringLiteral("/")) + Name).toStdString());
+      }
+      FBusy = true;
+      UpdateActions();
+      bool Result = false;
+      try
+      {
+        Result = FSession->RemoteCopyPaths(Paths, Dialog.Target().toStdString(), Dialog.FileMask().toStdString(), Dialog.DirectCopy());
+      }
+      catch (const CoreBridge::TCoreError & E)
+      {
+        ShowError(E);
+      }
+      FBusy = false;
+      FPanel->Refresh();
+      UpdateActions();
+      return Result;
+    }
     if (!Drag.Local)
     {
       // Our remote files: downloaded into a local panel, from the session
       // they were copied from (ClipboardDownload).
-      if (RemoteTarget || !SessionOpen(FClipboardSession) || !FClipboardSession->Active())
+      if (!SessionOpen(FClipboardSession) || !FClipboardSession->Active())
       {
         return false;
       }

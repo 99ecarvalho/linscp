@@ -283,8 +283,8 @@ registry, tray or window messages.
 | Session tools | Copy dialog's transfer code; OpenSSH key conversion on import | missing | the console's size is kept (`ConsoleWin.WindowSize`) |
 | Custom commands | local commands; extensions and their options | missing | local ones shown disabled |
 | Keep up to date | start in a new window; minimize to the tray | missing | presets are a combo, not WinSCP's split button |
-| Workspaces | local tabs saved | missing | |
-| Clipboard | remote files pasted into the remote panel (duplicate) | missing | |
+| Workspaces | local tabs saved | done | as WinSCP's (TSessionData::IsLocalBrowser: both local directories, no host), opened again as local tabs |
+| Clipboard | remote files pasted into the remote panel (duplicate) | done | into the same session's panel, through the Duplicate dialog (foRemoteCopy), from wherever they were copied; between sessions only through a local panel |
 | Save Session as Site | create desktop shortcut | done | `.lnk` through IShellLink on Windows (its arguments, as CreateDesktopSessionShortCut), a desktop entry on POSIX |
 | Done since their notes | Shift+F5/F6, kept layout, Synchronize's transfer settings, keep up to date, location profiles, compare criteria, editor font, external editors, S3 tags, bookmark shortcuts, commands list, transfer presets, open with the associated application, URL handler, folders of sites on the command line | done | |
 

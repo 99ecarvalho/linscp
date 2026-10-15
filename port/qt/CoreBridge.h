@@ -1636,10 +1636,13 @@ public:
   // each session as it is now, with its local directory; passwords only if
   // asked. HasPasswords: whether any has one to save (SaveWorkspace's
   // AnyNonStoredSessionWithPassword). Throw TCoreError.
+  // A tab: a session's, or (Session null, OtherLocalDirectory given) a
+  // local browser's, as TSessionData::IsLocalBrowser has it.
   struct TWorkspaceTab
   {
     const TSession * Session = nullptr;
     std::string LocalDirectory;
+    std::string OtherLocalDirectory;
   };
   static void SaveWorkspace(const std::string & Name, const std::vector<TWorkspaceTab> & Tabs, bool SavePasswords);
   static bool WorkspaceHasPasswords(const std::vector<TWorkspaceTab> & Tabs);
@@ -1664,6 +1667,10 @@ public:
   // The site's local directory, environment variables expanded; empty when
   // it has none.
   std::string LocalDirectory() const;
+  // A workspace's local browser tab (IsLocalBrowser: both local
+  // directories, no host): opened as a local tab, never connected.
+  bool IsLocalBrowser() const;
+  std::string OtherLocalDirectory() const;
   // The site's "remember last used directory".
   bool UpdateDirectories() const;
   // As WinSCP saves a session's directories when it ends
@@ -1703,6 +1710,9 @@ public:
   // temporary copy. Throw TCoreError; false when not done in full.
   bool CanRemoteCopy() const;
   bool RemoteMove(const std::vector<std::string> & Names, const std::string & Target, const std::string & FileMask);
+  // By full paths, wherever they are (the clipboard's).
+  bool RemoteCopyPaths(const std::vector<std::string> & Paths, const std::string & Target, const std::string & FileMask,
+    bool Direct);
   bool RemoteCopy(const std::vector<std::string> & Names, const std::string & Target, const std::string & FileMask,
     bool Direct);
   // Whether Path is a directory on the server.

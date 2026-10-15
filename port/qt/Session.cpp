@@ -424,6 +424,16 @@ std::string TSession::CurrentDirectory() const
   return Active() ? Utf8(F->Terminal->CurrentDirectory) : std::string();
 }
 
+bool TSession::IsLocalBrowser() const
+{
+  return F->Data->IsLocalBrowser && F->Data->HostName.IsEmpty();
+}
+
+std::string TSession::OtherLocalDirectory() const
+{
+  return Utf8(F->Data->OtherLocalDirectory);
+}
+
 std::string TSession::LocalDirectory() const
 {
   return Utf8(F->Data->LocalDirectoryExpanded);
@@ -2575,71 +2585,104 @@ bool TSession::RemoteMove(const std::vector<std::string> & Names, const std::str
 
 // TCustomScpExplorerForm::RemoteTransferFiles' copy: the server's, or down
 // to a temporary directory (TemporarilyDownloadFiles) and up again.
+namespace
+{
+
+// RemoteCopy's: on the server, or through a local temporary copy.
+bool RemoteCopyFiles(TTerminal * Terminal, TStrings * Files, const std::string & Target, const std::string & FileMask, bool Direct)
+{
+  if (Direct)
+  {
+    return Terminal->CopyFiles(Files, FromUtf8(Target), FromUtf8(FileMask), false);
+  }
+  const UnicodeString Root = IncludeTrailingBackslash(Configuration->TemporaryDir());
+  if (!ForceDirectories(ApiPath(Root)))
+  {
+    throw EOSExtException(FMTLOAD(CREATE_TEMP_DIR_ERROR, (Root)));
+  }
+  bool Result = false;
+  try
+  {
+    TCopyParamType DownParam = TemporaryFileCopyParam(false);
+    {
+      TTransferBracket Bracket(false, Files->Count);
+      Terminal->ExceptionOnFail = true;
+      try
+      {
+        Terminal->CopyToLocal(Files, Root, &DownParam, cpTemporary, NULL);
+      }
+      catch (...)
+      {
+        Terminal->ExceptionOnFail = false;
+        throw;
+      }
+      Terminal->ExceptionOnFail = false;
+    }
+    std::unique_ptr<TStringList> Temporary(new TStringList());
+    TSearchRecChecked Rec;
+    if (FindFirstUnchecked(Root + L"*", faAnyFile, Rec) == 0)
+    {
+      do
+      {
+        if ((Rec.Name != L".") && (Rec.Name != L".."))
+        {
+          Temporary->Add(Root + Rec.Name);
+        }
+      }
+      while (FindNextChecked(Rec) == 0);
+      FindClose(Rec);
+    }
+    if (Temporary->Count > 0)
+    {
+      TGUICopyParamType UpParam = GUIConfiguration->CurrentCopyParam;
+      UpParam.FileMask = FromUtf8(FileMask);
+      TTransferBracket Bracket(true, Temporary->Count);
+      Terminal->CopyToRemote(Temporary.get(), FromUtf8(Target), &UpParam, cpTemporary, NULL);
+    }
+    Result = true;
+  }
+  catch (...)
+  {
+    RecursiveDeleteFile(ExcludeTrailingBackslash(Root));
+    throw;
+  }
+  RecursiveDeleteFile(ExcludeTrailingBackslash(Root));
+  return Result;
+}
+
+}  // namespace
+
 bool TSession::RemoteCopy(const std::vector<std::string> & Names, const std::string & Target, const std::string & FileMask,
   bool Direct)
 {
   try
   {
     CheckActive(*this);
-    TTerminal * Terminal = F->Terminal.get();
-    std::unique_ptr<TStringList> Files = FileListOf(Terminal, Names);
-    if (Direct)
+    std::unique_ptr<TStringList> Files = FileListOf(F->Terminal.get(), Names);
+    return RemoteCopyFiles(F->Terminal.get(), Files.get(), Target, FileMask, Direct);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+bool TSession::RemoteCopyPaths(const std::vector<std::string> & Paths, const std::string & Target, const std::string & FileMask,
+  bool Direct)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TStringList> Files(new TStringList());
+    std::vector<std::unique_ptr<TRemoteFile>> Owned;
+    for (const std::string & Path : Paths)
     {
-      return Terminal->CopyFiles(Files.get(), FromUtf8(Target), FromUtf8(FileMask), false);
+      const UnicodeString APath = FromUtf8(Path);
+      Owned.emplace_back(F->Terminal->ReadFile(APath));
+      Owned.back()->FullFileName = APath;
+      Files->AddObject(APath, Owned.back().get());
     }
-    const UnicodeString Root = IncludeTrailingBackslash(Configuration->TemporaryDir());
-    if (!ForceDirectories(ApiPath(Root)))
-    {
-      throw EOSExtException(FMTLOAD(CREATE_TEMP_DIR_ERROR, (Root)));
-    }
-    bool Result = false;
-    try
-    {
-      TCopyParamType DownParam = TemporaryFileCopyParam(false);
-      {
-        TTransferBracket Bracket(false, Files->Count);
-        Terminal->ExceptionOnFail = true;
-        try
-        {
-          Terminal->CopyToLocal(Files.get(), Root, &DownParam, cpTemporary, NULL);
-        }
-        catch (...)
-        {
-          Terminal->ExceptionOnFail = false;
-          throw;
-        }
-        Terminal->ExceptionOnFail = false;
-      }
-      std::unique_ptr<TStringList> Temporary(new TStringList());
-      TSearchRecChecked Rec;
-      if (FindFirstUnchecked(Root + L"*", faAnyFile, Rec) == 0)
-      {
-        do
-        {
-          if ((Rec.Name != L".") && (Rec.Name != L".."))
-          {
-            Temporary->Add(Root + Rec.Name);
-          }
-        }
-        while (FindNextChecked(Rec) == 0);
-        FindClose(Rec);
-      }
-      if (Temporary->Count > 0)
-      {
-        TGUICopyParamType UpParam = GUIConfiguration->CurrentCopyParam;
-        UpParam.FileMask = FromUtf8(FileMask);
-        TTransferBracket Bracket(true, Temporary->Count);
-        Terminal->CopyToRemote(Temporary.get(), FromUtf8(Target), &UpParam, cpTemporary, NULL);
-      }
-      Result = true;
-    }
-    catch (...)
-    {
-      RecursiveDeleteFile(ExcludeTrailingBackslash(Root));
-      throw;
-    }
-    RecursiveDeleteFile(ExcludeTrailingBackslash(Root));
-    return Result;
+    return RemoteCopyFiles(F->Terminal.get(), Files.get(), Target, FileMask, Direct);
   }
   catch (Exception & E)
   {
@@ -3364,7 +3407,17 @@ TObjectList * WorkspaceData(const std::vector<TSession::TWorkspaceTab> & Tabs,
   std::unique_ptr<TObjectList> Result(new TObjectList());
   for (std::size_t Index = 0; Index < Tabs.size(); Index++)
   {
-    std::unique_ptr<TSessionData> Data(Clone(Tabs[Index].Session));
+    std::unique_ptr<TSessionData> Data;
+    if (Tabs[Index].Session != nullptr)
+    {
+      Data.reset(Clone(Tabs[Index].Session));
+    }
+    else
+    {
+      // As TTerminalManager::NewLocalBrowser's.
+      Data.reset(new TSessionData(UnicodeString()));
+      Data->OtherLocalDirectory = FromUtf8(Tabs[Index].OtherLocalDirectory);
+    }
     if (!Tabs[Index].LocalDirectory.empty())
     {
       Data->LocalDirectory = FromUtf8(Tabs[Index].LocalDirectory);

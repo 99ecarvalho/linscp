@@ -3977,6 +3977,20 @@ void LocalTabTest(const QString & Directory)
       (QDir(Window.OtherLocal()->Path()) == B), "each tab its own directories");
     Check(Window.SwitchTab(1) && (QDir(Window.Local()->Path()) == B) &&
       (QDir(Window.OtherLocal()->Path()) == QDir(A.filePath(QStringLiteral("sub")))), "and the other's");
+    // Kept in a workspace, as WinSCP's (both local directories, no host),
+    // and opened again as local tabs.
+    const QString Locals = QStringLiteral("Locals");
+    Check(Window.SaveWorkspace(&Locals), "a workspace of local tabs saved");
+    {
+      MainWindow Other(CoreBridge::Info());
+      Frontend.SetWindow(&Other);
+      Other.show();
+      Check(Other.OpenWorkspace(Locals) && (Other.TabCount() == 2) && Other.LocalBrowser() &&
+        (QDir(Other.Local()->Path()) == A) && (QDir(Other.OtherLocal()->Path()) == B), "opened: its local tabs");
+      Check(Other.SwitchTab(1) && (QDir(Other.Local()->Path()) == B) &&
+        (QDir(Other.OtherLocal()->Path()) == QDir(A.filePath(QStringLiteral("sub")))), "each with its directories");
+      Frontend.SetWindow(&Window);
+    }
     Check(Window.CloseTab(1) && Window.CloseTab(0) && (Window.TabCount() == 0) && Window.Panel()->isVisible() &&
       !Window.OtherLocal()->isVisible(), "the last closed, the remote panel back");
   }
@@ -4322,6 +4336,10 @@ void ClipboardTest(const char * Port, const QString & Directory)
     Window.Panel()->Select({ QStringLiteral("hello.txt") });
     Check(Window.CopyToClipboard(), "Copy to Clipboard (remote)");
     Window.Panel()->ChangeDirectory(QStringLiteral("/sub"));
+    // ... pasted on the remote panel: duplicated here (the Duplicate
+    // dialog, accepted).
+    Check(Window.PasteFromClipboard() && WaitUntil([&Root]() { return QFileInfo::exists(Root.filePath(QStringLiteral("sub/hello.txt"))); }),
+      "pasted on the remote panel: duplicated into its directory");
     Window.ActivatePanel(true);
     Check(Window.PasteFromClipboard() && QFileInfo::exists(Local.filePath(QStringLiteral("into/hello.txt"))),
       "pasted on the local panel: downloaded from where it was copied");

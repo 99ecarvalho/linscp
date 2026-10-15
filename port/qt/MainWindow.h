@@ -249,7 +249,9 @@ public:
   // tab with no session and a local directory in each panel, both on the
   // local panel's to start with. Copy and Move (F5, F6) and drags between
   // its panels copy and move local files (LocalLocalCopy).
-  void NewLocalTab();
+  // Local and Other: its panels' directories (a workspace's), else the
+  // local panel's in both.
+  void NewLocalTab(const QString & Local = QString(), const QString & Other = QString());
   // The Tabs and Commands menus' session commands, as WinSCP's (P3-14):
   // Reconnect Session (a session that lost its connection), Save Session
   // as Site (Name given: no dialog), Rename Tab (Name given: no prompt),
