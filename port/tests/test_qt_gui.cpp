@@ -4129,7 +4129,14 @@ void Tags(const char * Port, bool Acl)
       PropertiesDialog Dialog(Session, { "hello.txt" }, QStringLiteral("/bucket"), Info, &Window);
       Check((Dialog.TagList() != nullptr) && (Dialog.TagList()->topLevelItemCount() == 2), "the Tags page lists them");
       Check(!Dialog.OkButton()->isEnabled() && !Dialog.EditTagButton()->isEnabled(), "nothing changed, nothing selected");
-      Dialog.TagList()->setCurrentItem(Dialog.TagList()->topLevelItem(0));
+      // The env tag, wherever the server listed it (versitygw in any order).
+      for (int Index = 0; Index < Dialog.TagList()->topLevelItemCount(); Index++)
+      {
+        if (Dialog.TagList()->topLevelItem(Index)->text(0) == QStringLiteral("env"))
+        {
+          Dialog.TagList()->setCurrentItem(Dialog.TagList()->topLevelItem(Index));
+        }
+      }
       Check(Dialog.EditTagButton()->isEnabled() && Dialog.RemoveTagButton()->isEnabled(), "a tag selected: edit, remove");
       Dialog.RemoveTag();
       Check(Dialog.OkButton()->isEnabled() && (Dialog.Properties().Tags.size() == 1), "a tag removed: OK");
@@ -4157,7 +4164,13 @@ void Tags(const char * Port, bool Acl)
         {
           Keys.insert(Tag.first);
         }
-        Check((Info.Properties.Tags.size() == 2) && (Keys == std::set<std::string>{ "owner", "new" }), "as the dialog had them");
+        std::string Seen;
+        for (const auto & Tag : Info.Properties.Tags)
+        {
+          Seen += Tag.first + "=" + Tag.second + ";";
+        }
+        Check((Info.Properties.Tags.size() == 2) && (Keys == std::set<std::string>{ "owner", "new" }),
+          ("as the dialog had them (" + Seen + ")").c_str());
       }
       // S3's ACL, as the rights frame shows it (DisplayAsAcl): files only.
       if (!Acl)
