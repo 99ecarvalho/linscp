@@ -5387,10 +5387,16 @@ void LocalTabTest(const QString & Directory)
 // P3-09: the dialogs the other tests drive without showing them, shown
 // and audited, each page of those with pages; the audit of every other
 // window shown runs in all the tests.
-void AccessibilityTest(const char * Port)
+// With a locale, in that language (its mnemonics, labels).
+void AccessibilityTest(const char * Port, const QString & Locale, const QString & Translations)
 {
   QtFrontend Frontend;
   CoreBridge::Initialize(&Frontend);
+  if (!Locale.isEmpty())
+  {
+    CoreBridge::SetLanguage(std::string(), Translations.toStdString());
+    SetUpLanguage(Locale);
+  }
   {
     MainWindow Window(CoreBridge::Info());
     Frontend.SetWindow(&Window);
@@ -7058,7 +7064,8 @@ int main(int argc, char ** argv)
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "accessibility") == 0))
   {
-    AccessibilityTest(argv[3]);
+    AccessibilityTest(argv[3], (argc >= 6) && (argv[4][0] != '-') ? QString::fromLocal8Bit(argv[4]) : QString(),
+      (argc >= 6) && (argv[4][0] != '-') ? QString::fromLocal8Bit(argv[5]) : QString());
   }
   else if ((argc >= 6) && (std::strcmp(argv[1], "sessioncommands") == 0))
   {

@@ -1298,7 +1298,7 @@ Location: %2</source>
     </message>
     <message>
         <source>Edit &amp;With</source>
-        <translation>Правка &amp;з</translation>
+        <translation>Редагувати &amp;у програмі</translation>
     </message>
     <message>
         <source>Edit &amp;With...</source>

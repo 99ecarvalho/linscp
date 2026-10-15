@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 11 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 34 | 36 | Parity on features users depend on |
+| P3 Qt parity | 34 | 37 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Dropped for now (2026-10-15); may be reopened |
-| **Total** | **111** | **123** | |
+| **Total** | **111** | **124** | |
 
 ## Next three actions
 
@@ -628,6 +628,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | Q-11 | How should the assembly check the executable's version off Windows, where an ELF file has no version resource? The test sets `DisableVersionCheck`; the patch could skip the check off Windows or carry the version in INIT | nothing (linscp's assembly can decide alone) | — |
 | Q-12 | Rare crashes and failures under the full suite's parallel load (`ctest -j8`), not reproduced alone or in 24 loaded runs of the session tests: `qt_session_pt_BR` aborted in glibc (`pthread_mutex_lock ... e != ESRCH \|\| !robust`: the critical section's recursive mutex locked after it was destroyed or freed, likely a queue thread at teardown); `qt_session` once; `qt_gui_keep` twice at "it starts". Cause unknown | test reliability; possibly a teardown use-after-free | — |
 | ~~Q-13~~ | ~~The Explorer interface: offer it, or not?~~ — **resolved 2026-10-15**: offered (P3-21) | — | — |
+| Q-14 | Serbian (WinSCP's `SRL`, Latin script) cannot be chosen: its locale, Windows' 0x081A (sr-Latn-CS), is not among the locales Windows 11's EnumSystemLocales lists, which `port/gui/locales.inc` is made from, so `--lang=sr_Latn` gets Croatian. Upstream matches translations against the same list. Add the row by hand, or match `SRL` to sr-Latn-RS (0x241A, `SRM`)? Check what WinSCP itself does on Windows 11 | Serbian users get Croatian, the shell's `linscp_sr_Latn.ts` unused | — |
 
 ## Verified facts (re-check if the environment changes)
 
@@ -891,7 +892,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-22 | Jump list | done | done 2026-10-15: the recent sites (on connecting) and workspaces (on opening), newest first, at most 30, under WinSCP's keys (`JumpList`, `JumpListWorkspaces`), dropped when deleted or removed from the taskbar's list; shown as the taskbar's Recent Sites and Recent Workspaces (ICustomDestinationList), each a link with `/JumpList` (a site's with `/UploadIfAny`), shown again at start. ctest `qt_gui_preferences` (on Windows 11, the link in the program's `.customDestinations-ms`) |
 | P3-23 | System context menu | done | done 2026-10-15: the Windows shell's context menu of the selected local files (as WinSCP's ShellDisplayContextMenu: IContextMenu from the folder's IShellFolder, IContextMenu2 drawing Open With and Send To through a callback window, Shift for extended verbs, a rename done in place by the panel), on a right click with Panels > Local's "Use system file context menu" (shown on Windows only) and from the local file menu's System Menu (with Properties, now there for local files too). ctest `qt_gui_environment` (Windows 11's own items) |
 | P3-24 | Drag & drop shell extension | done | done 2026-10-15: WinSCP's DragExt built from the pristine source (`port/dragext`, a wrapper for mingw's GUID operators) as `DragExt64.dll`, in the deploy folder, registered by the installer unless WinSCP's own copy is; remote files dragged as WinSCP's fake file (a hidden `scp…` directory, the shared WinSCPDragExtMapping), downloaded where the copy hook says the drop was, under drag & drop's confirmation; the temporary folder's way when the extension is not there; Drag & Drop's fake-file option and status (installed, loaded, broken builds) on Windows. ctest `qt_gui_environment` (on Windows 11, the shell's copy stopped by the real hook and the file downloaded there) |
-| P3-25 | The shell in WinSCP's languages | wip | batches 1 and 2 of 4 done 2026-10-15: es, de, ja, fr, ru, pt_PT, it, nl, pl, tr; zh_CN, zh_TW, fa, vi, id, cs, ko, uk, ar, hu |
+| P3-25 | The shell in WinSCP's languages | wip | batches 1 to 3 of 4 done 2026-10-15: es, de, ja, fr, ru, pt_PT, it, nl, pl, tr; zh_CN, zh_TW, fa, vi, id, cs, ko, uk, ar, hu; el, sv, ro, da, fi, sk, he, th, sr_Latn, nb, bg, hr. Serbian is not reachable yet (Q-14) |
+| P3-26 | Mnemonic clashes in the translations | todo | |
 
 ### P4 — Cleanup
 | ID | Task | Status | Note |

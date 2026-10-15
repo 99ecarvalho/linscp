@@ -149,6 +149,7 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P3-23 | Windows: the local panel's system context menu (Panels > Local's "Use system file context menu", the shell's IContextMenu) | S | P3-19 | Raised 2026-10-15 by the user |
 | P3-24 | Windows: WinSCP's drag & drop shell extension (DragExt, its copy hook) and the fake-file drag (DDFakeFile): remote files dropped straight onto Explorer's folders, downloaded there; built from the pinned source, registered by the installer | M | P3-07 | Raised 2026-10-15 by the user |
 | P3-25 | The shell's texts in WinSCP's other languages (52 besides pt_BR): each `.ts` filled from WinSCP's own translation of the same text, the rest translated with WinSCP's terms; in batches, the most used languages first | L | P2-09 | Raised 2026-10-15 by the user |
+| P3-26 | Mnemonic clashes in the translated shell: `qt_gui_accessibility` run in each language (`accessibility ... <locale> <core's translations>`) finds from 1 (uk) to 134 (th) per language, many from WinSCP's own translations; move the shell's mnemonics apart, the audit's WinSCP allowance extended to each language's WinSCP clashes | M | P3-25 | Found 2026-10-15 while doing P3-25 |
 
 ## P4 — Cleanup
 
