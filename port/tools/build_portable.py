@@ -5,7 +5,7 @@ and an empty linscp.ini beside linscp.exe, which keeps the configuration
 there (WinSCP's portable mode: an INI file beside the executable is used;
 linscp-cli shares it). CMake's package-portable target runs it.
 
-  build_portable.py --version 0.3.0 --deploy build/deploy --out build/packages
+  build_portable.py --version 0.4.0 --deploy build/deploy --out build/packages
                     --license FILE|NAME ...
 
 Writes linscp-<version>-portable.zip (its files in a linscp-<version>

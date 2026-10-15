@@ -255,14 +255,13 @@ To and shortcuts, Keep Up To Date in a new window, S3 ACLs and more (the
 audit below); only custom command extensions are deferred.
 P2-10 and P2-11 waited, at the user's request, for P3.
 
-1. Release 0.4.0 (the user's call): the Preferences pages, extensions, the
-   Windows shell's parts, the Explorer interface.
-2. Custom command extensions on POSIX: WinSCP's own need Windows PowerShell;
-   pwsh and the assembly with console pipes (P1-23) could run them there.
-3. The upstream PRs for the carried patches (ADR 0006), waiting on WinSCP's
+1. The upstream PRs for the carried patches (ADR 0006), waiting on WinSCP's
    maintainer: winscp/winscp#79 (portability), #80 (`LogEvent`), #81 (log
    file names), #82 (local EOL), #83 (OpenSSH import paths), #84, #85 (S3);
    each patch dropped when a pin move brings it in.
+2. Custom command extensions on POSIX (the user's call): WinSCP's own need
+   Windows PowerShell; pwsh and the assembly with console pipes (P1-23)
+   could run them there.
 
 ## P3 UI gap audit (2026-10-14)
 
@@ -301,6 +300,7 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-15 | Version 0.4.0 tagged and published as a GitHub pre-release, with the CI packages | The user's call: the remaining Preferences pages (P3-19), custom command extensions (P3-20), the Windows shell's jump list, system context menu and drag & drop shell extension (P3-22…24), the Explorer interface (P3-21) |
 | 2026-10-15 | The Explorer interface is the same window and actions as the Commander's, laid out as TScpExplorerForm from the window's start; its own settings under `Interface\Explorer` | As WinSCP's: one set of commands, two layouts, the interface chosen in Preferences applying on the next start. The local panel stays, hidden, as where downloads go |
 | 2026-10-15 | linscp's installer registers WinSCP's drag & drop shell extension (`DragExt64.dll`, from the pinned source) only when no other copy is registered | It is WinSCP's own extension, its class, mapping and protocol unchanged, so one registered copy serves both programs; registering over WinSCP's would leave WinSCP without it once linscp is uninstalled |
 | 2026-10-15 | linscp offers the Explorer interface (P3-21) and the Windows shell's jump list, system context menu and drag & drop shell extension (P3-22…24); WinSCP's own services (tips, usage statistics, the donors' automatic updates) stay out for now | The user's call (Q-13) |
