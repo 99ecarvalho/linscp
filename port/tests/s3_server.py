@@ -8,7 +8,7 @@ below a bucket are the "key/" markers S3 clients create for folders. Covers
 what WinSCP's libs3 asks for: listing buckets, a bucket's location, listing
 objects (v1 and v2, prefix and delimiter), HEAD, GET (with Range), PUT
 (including copies with x-amz-copy-source), DELETE, an object's ACL (the
-owner's full control, always) and its tags (?tagging, kept in memory). Signatures are
+owner's full control until one is set) and its tags (?tagging, kept in memory). Signatures are
 accepted, not checked: the test is of the client, not of AWS's auth.
 
   s3_server.py --port N --root DIR
@@ -39,6 +39,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
     root = '.'
     # (bucket, key) -> the tags last put, as (key, value).
     tags = {}
+    acls = {}
 
     def log_message(self, *args):
         pass
@@ -96,7 +97,10 @@ class Handler(http.server.BaseHTTPRequestHandler):
                 return self.xml(200, f'<LocationConstraint xmlns="{NS}"></LocationConstraint>')
             return self.list_objects(bucket, query)
         if 'acl' in query:
-            # The owner's full control, the one grant: what Properties reads.
+            # One set (PUT ?acl), kept in memory; else the owner's full
+            # control, the one grant: what Properties reads.
+            if (bucket, key) in self.acls:
+                return self.xml(200, self.acls[(bucket, key)])
             return self.xml(200, f'<AccessControlPolicy xmlns="{NS}"><Owner><ID>linscp</ID><DisplayName>linscp</DisplayName>'
                                  '</Owner><AccessControlList><Grant><Grantee xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
                                  'xsi:type="CanonicalUser"><ID>linscp</ID><DisplayName>linscp</DisplayName></Grantee>'
@@ -199,6 +203,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             return self.send(200)
         path = self.disk(bucket, key)
         if 'acl' in query:
+            self.acls[(bucket, key)] = data.decode('utf-8')
             return self.send(200)
         if 'tagging' in query:
             # As S3: read as tags, given back in its own namespace.

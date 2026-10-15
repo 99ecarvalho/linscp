@@ -2854,6 +2854,14 @@ Local: %2</translation>
         <source>&amp;Paste</source>
         <translation>Co&amp;lar</translation>
     </message>
+    <message>
+        <source>R ACL</source>
+        <translation>R ACL</translation>
+    </message>
+    <message>
+        <source>W ACL</source>
+        <translation>W ACL</translation>
+    </message>
 </context>
 <context>
     <name>ServerInfoDialog</name>

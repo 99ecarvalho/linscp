@@ -874,6 +874,11 @@ enum class TText
   ImportConvertedKeys,  // "%d key file(s) in %d imported session(s) were converted or replaced ..."
   SaveSiteShortcut,     // "&Create desktop shortcut"
   CopyParamGenerateCode, // "Generate &Code..."
+  PropertiesAcl,        // "ACL:"
+  PropertiesS3Users,    // "&Users"
+  PropertiesS3Everyone, // "&Everyone"
+  PropertiesS3ReadAclHint, // "Read ACL"
+  PropertiesS3WriteAclHint, // "Write ACL"
 };
 std::string Text(TText Text);
 
@@ -1158,6 +1163,9 @@ struct TPropertiesInfo
   // What the files have in common.
   TFileProperties Properties;
   bool CanChangeRights = false;
+  // S3's: the rights are its ACL (cpAcl, TRightsFrame::DisplayAsAcl), for
+  // files only.
+  bool Acl = false;
   bool CanChangeOwner = false;
   bool CanChangeGroup = false;
   // The owners and groups to offer.

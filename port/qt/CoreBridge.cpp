@@ -1518,6 +1518,11 @@ std::string Text(TText Text)
     case TText::SaveSiteShortcut: Ident = SAVE_SITE_WORKSPACE_SHORTCUT; break;
     case TText::ImportConvertedKeys: Ident = IMPORT_CONVERTED_KEYS; break;
     case TText::CopyParamGenerateCode: Ident = COPY_PARAM_GENERATE_CODE; break;
+    case TText::PropertiesAcl: Ident = PROPERTIES_ACL; break;
+    case TText::PropertiesS3Users: Ident = PROPERTIES_S3_USERS; break;
+    case TText::PropertiesS3Everyone: Ident = PROPERTIES_S3_EVERYONE; break;
+    case TText::PropertiesS3ReadAclHint: Ident = PROPERTIES_S3_R_ACL_HINT; break;
+    case TText::PropertiesS3WriteAclHint: Ident = PROPERTIES_S3_W_ACL_HINT; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

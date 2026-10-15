@@ -3738,6 +3738,24 @@ void Tags(const char * Port)
       Info = Session->PropertiesOf({ "hello.txt" });
       Check((Info.Properties.Tags.size() == 2) && (Info.Properties.Tags[0].first == "owner") &&
         (Info.Properties.Tags[1].first == "new"), "as the dialog had them");
+      // S3's ACL, as the rights frame shows it (DisplayAsAcl): files only.
+      {
+        CoreBridge::TPropertiesInfo Info = Session->PropertiesOf({ "hello.txt" });
+        Check(Info.Acl && Info.CanChangeRights && Info.Properties.HasRights, "a file's ACL");
+        Check(!Session->PropertiesOf({ "sub" }).Acl, "a folder's none");
+        // The owner's full control: read, read ACL and write ACL.
+        Check((Info.Properties.Rights.Set & 0400) && (Info.Properties.Rights.Set & 0100) && !(Info.Properties.Rights.Set & 04),
+          "the owner's full control, nothing for everyone");
+        PropertiesDialog Dialog(Session, { "hello.txt" }, QStringLiteral("/bucket"), Info, &Window);
+        RightsFrame * Rights = Dialog.Rights();
+        Check(Rights->Acl() && Rights->Check(4)->isHidden() && (Rights->Check(5)->text() == QStringLiteral("R ACL")) &&
+          (Rights->Check(0)->text() == QStringLiteral("W ACL")), "shown as WinSCP's: R, R ACL, W ACL");
+        // Everyone may read it.
+        Rights->Check(9)->setCheckState(Qt::Checked);
+        Check(Session->SetProperties({ "hello.txt" }, Dialog.Properties()), "the ACL set");
+        Info = Session->PropertiesOf({ "hello.txt" });
+        Check((Info.Properties.Rights.Set & 04) && (Info.Properties.Rights.Set & 0400), "read back: everyone reads it too");
+      }
     }
     catch (const CoreBridge::TCoreError & E)
     {

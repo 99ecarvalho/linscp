@@ -23,6 +23,9 @@ public:
   CoreBridge::TRightsState Rights() const;
   // Bits may be left mixed: several files.
   void SetAllowUndef(bool Allow);
+  // As DisplayAsAcl: S3's ACL, its rows Owner, Users and Everyone, each with
+  // read, read ACL and write ACL (the write, octal and add-X ones hidden).
+  void DisplayAsAcl();
   bool AllowUndef() const { return FAllowUndef; }
   // "Add X to directories", shown when there are directories.
   void SetAllowAddXToDirectories(bool Allow);
@@ -35,6 +38,7 @@ public:
   // TRight order (set UID, set GID, sticky, then owner, group, others'
   // read, write, execute).
   QCheckBox * Check(int Right) const { return FChecks[Right]; }
+  bool Acl() const { return FAcl; }
   QLineEdit * OctalEdit() const { return FOctal; }
   void NoRights();
   void DefaultRights();
@@ -51,6 +55,9 @@ protected:
   void contextMenuEvent(QContextMenuEvent * Event) override;
 
 private:
+  bool FAcl = false;
+  class QPushButton * FGroupButtons[3] = {};
+  class QLabel * FOctalLabel = nullptr;
   void UpdateControls();
   void OctalEdited();
 

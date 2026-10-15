@@ -35,6 +35,7 @@ RightsFrame::RightsFrame(QWidget * Parent) :
   {
     // The group's name cycles its row, as WinSCP's buttons do.
     QPushButton * Button = new QPushButton(Groups[Group], this);
+    FGroupButtons[Group] = Button;
     Button->setFlat(true);
     Button->setFocusPolicy(Qt::NoFocus);
     Layout->addWidget(Button, Group, 0);
@@ -61,6 +62,7 @@ RightsFrame::RightsFrame(QWidget * Parent) :
     Layout->addWidget(Special, Group, 4);
   }
   QLabel * OctalLabel = new QLabel(tr("O&ctal:"), this);
+  FOctalLabel = OctalLabel;
   FOctal = new QLineEdit(this);
   FOctal->setMaxLength(4);
   FOctal->setValidator(new QRegularExpressionValidator(QRegularExpression(QStringLiteral("[0-7]{0,4}")), FOctal));
@@ -261,4 +263,24 @@ void RightsFrame::contextMenuEvent(QContextMenuEvent * Event)
   Menu.addAction(tr("Copy as &Octal"), this, &RightsFrame::CopyAsOctal)->setEnabled(!FOctal->text().isEmpty());
   Menu.addAction(tr("&Paste"), this, &RightsFrame::Paste);
   Menu.exec(Event->globalPos());
+}
+
+void RightsFrame::DisplayAsAcl()
+{
+  FAcl = true;
+  SetAllowAddXToDirectories(false);
+  FOctalLabel->setVisible(false);
+  FOctal->setVisible(false);
+  FGroupButtons[1]->setText(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::PropertiesS3Users)));
+  FGroupButtons[2]->setText(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::PropertiesS3Everyone)));
+  for (int Group = 0; Group < 3; Group++)
+  {
+    FChecks[3 + Group * 3 + 1]->setVisible(false);
+    QCheckBox * ReadAcl = FChecks[3 + Group * 3 + 2];
+    ReadAcl->setText(tr("R ACL"));
+    ReadAcl->setToolTip(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::PropertiesS3ReadAclHint)));
+    QCheckBox * WriteAcl = FChecks[Group];
+    WriteAcl->setText(tr("W ACL"));
+    WriteAcl->setToolTip(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::PropertiesS3WriteAclHint)));
+  }
 }

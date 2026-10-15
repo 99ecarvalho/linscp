@@ -142,11 +142,15 @@ PropertiesDialog::PropertiesDialog(CoreBridge::TSession * Session, const std::ve
   FRights = new RightsFrame(Common);
   FRights->SetAllowUndef(FMultiple);
   FRights->SetAllowAddXToDirectories(Info.Directories > 0);
+  if (Info.Acl)
+  {
+    FRights->DisplayAsAcl();
+  }
   if (Current.HasRights)
   {
     FRights->SetRights(Current.Rights);
     FRights->SetAddXToDirectories(Current.AddXToDirectories);
-    Change->addRow(tr("Permissions:"), FRights);
+    Change->addRow(Info.Acl ? CoreText(CoreBridge::TText::PropertiesAcl) : tr("Permissions:"), FRights);
   }
   else
   {

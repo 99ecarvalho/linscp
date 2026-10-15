@@ -3294,6 +3294,9 @@ TPropertiesInfo TSession::PropertiesOf(const std::vector<std::string> & Names)
     Result.CanChangeGroup = Terminal->IsCapable[fcGroupChanging];
     Result.CanChangeOwner = Terminal->IsCapable[fcOwnerChanging];
     Result.CanChangeRights = Terminal->IsCapable[fcModeChanging];
+    // As SetProperties: an ACL for files, none with a directory selected.
+    Result.Acl = Terminal->IsCapable[fcAclChangingFiles];
+    const bool AnyDirectory = TRemoteFileList::AnyDirectory(Files.get());
     // As upstream: the server's lists, and what the directory's first
     // hundred files and the selection have.
     std::unique_ptr<TRemoteTokenList> Groups(Result.CanChangeGroup ? Terminal->Groups->Duplicate() : new TRemoteTokenList());
@@ -3326,7 +3329,12 @@ TPropertiesInfo TSession::PropertiesOf(const std::vector<std::string> & Names)
       }
     }
     const TRemoteProperties Common = TRemoteProperties::CommonProperties(Files.get());
-    Result.Properties.HasRights = Common.Valid.Contains(vpRights);
+    Result.Properties.HasRights = Common.Valid.Contains(vpRights) && !(Result.Acl && AnyDirectory);
+    if (Result.Acl)
+    {
+      Result.CanChangeRights = !AnyDirectory;
+      Result.Acl = !AnyDirectory;
+    }
     if (Result.Properties.HasRights)
     {
       Result.Properties.Rights = RightsStateOf(Common.Rights);
@@ -3402,7 +3410,10 @@ bool TSession::SetProperties(const std::vector<std::string> & Names, const TFile
     TRemoteProperties Current = TRemoteProperties::CommonProperties(Files.get());
     // What the dialog could change (TPropertiesDialog::SetFileProperties).
     TValidProperties Valid;
-    if (Current.Valid.Contains(vpRights) && Terminal->IsCapable[fcModeChanging])
+    // cpMode, or (a file's) S3's ACL (cpAcl).
+    const bool CanRights = Terminal->IsCapable[fcModeChanging] ||
+      (Terminal->IsCapable[fcAclChangingFiles] && !TRemoteFileList::AnyDirectory(Files.get()));
+    if (Current.Valid.Contains(vpRights) && CanRights)
     {
       Valid << vpRights;
     }
@@ -3421,7 +3432,7 @@ bool TSession::SetProperties(const std::vector<std::string> & Names, const TFile
     Current.Valid = Valid;
     Current.Recursive = false;
     TRemoteProperties New;
-    if (Terminal->IsCapable[fcModeChanging] && Properties.HasRights)
+    if (CanRights && Properties.HasRights)
     {
       New.Valid << vpRights;
       New.Rights = RightsOf(Properties.Rights);
