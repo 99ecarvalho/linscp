@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 10 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 26 | 28 | Parity on features users depend on |
+| P3 Qt parity | 26 | 29 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Dropped for now (2026-10-15); may be reopened |
-| **Total** | **102** | **115** | |
+| **Total** | **102** | **116** | |
 
 ## Next three actions
 
@@ -300,6 +300,7 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-15 | P3-18 added: a devcontainer with real test servers for every protocol (FTP/FTPS and S3 included), the suites run against them; done after P3-15 | The user's call. The suite's FTP and S3 servers are pyftpdlib and moto, written for tests; real servers catch what they do not |
 | 2026-10-15 | P4 (cleanup) dropped for now, all four tasks; it may be reopened | The user's call: retiring the VCL frontend and collapsing the dual-target code would make linscp unmergeable upstream, which stays the goal (ADR 0006); the C++Builder build keeps working |
 | 2026-10-15 | Version 0.2.0 tagged and published as a GitHub pre-release, with the four packages CI builds | The user's call; P2-11 (the exit gate) is still to be driven by the user |
 | 2026-10-15 | Every carried core patch offered upstream: the twelve portability ones as one PR of independent commits (winscp/winscp#79), the `LogEvent` link fix and the three POSIX behaviour fixes as their own (#80 to #83), written in upstream's style rather than our line-count-preserving form | The user's call; one portability PR with a short justification, bugs and behaviour separately so each can be judged alone |
@@ -855,6 +856,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-15 | The rest of the Commander's commands | wip | backlog, not gating P3; started 2026-10-15. Done: Commands > Queue's commands (TQueueController's operations: show query/error/prompt, execute now, suspend, resume, cancel, move up/down, all; Go To), also the queue list's context menu; the panels' Type column (the shell's type names on Windows, MIME descriptions elsewhere), Sort submenu, Columns' Name, Size Automatically and Reset Layout; Mark > Restore Selection. Left: View (thumbnails), Change Drive, New > Link, Download's submenu, Locking, the command line, Options > Tabs/Command Line/Queue items, toolbars' Update Button and Hot Keys, panels' Status Bar, tab colours and the default new tab, Help's web pages and tips |
 | P3-16 | Verified UI gaps | done | the audit below, every gap closed but extensions (deferred, 2026-10-15) |
 | P3-17 | Icon sets | done | Lucide (ISC), Tabler (MIT), Fluent UI (MIT) imported to `assets/icons/` (`port/tools/import_icons.py`, 62 roles after WinSCP's glyphs), embedded and drawn by `port/qt/IconSet.cpp` in the palette's text colour (light and dark themes); Preferences > Window > Icon set (Fluent by default on Windows, Lucide elsewhere; the desktop's theme on POSIX only; none), on the menus and the panels' toolbars; About credits each set with its license; Qt Svg added on both platforms (`qt6-svg-dev`, MSYS2 `qt6-svg` in `msys2-qt.lock`); ctest `qt_gui_icons`; native on Windows 11 too. WinSCP's toolbars: the main bands (Commands, Preferences with the queue's, Transfer Settings with the presets, and hidden by default Sessions and Tabs, Sort, Custom Commands) and each panel's five (Path, History, Navigation, Files, Selection; PanelBands.h), Options > Toolbars (each band, lock, selective text labels, icon size) and Left/Right Panel, kept as WinSCP's `ToolbarsLayout2`, `LockToolbars`, `SelectiveToolbarText`, `LargerToolbar`; ctest `qt_gui_toolbars` |
+| P3-18 | Test devcontainer with real servers | todo | deferred (the user, 2026-10-15): real FTP/FTPS and S3 servers, which the suite only has as pyftpdlib and moto, beside SFTP, SCP and WebDAV; the suites run against them |
 
 ### P4 — Cleanup
 | ID | Task | Status | Note |
