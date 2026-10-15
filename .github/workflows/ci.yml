@@ -123,6 +123,9 @@ jobs:
     runs-on: ubuntu-latest
     container: debian:trixie
     timeout-minutes: 120
+    # The container's HOME is not root's own, where Wine refuses its prefix.
+    env:
+      WINEPREFIX: /root/wine
     strategy:
       fail-fast: false
       matrix:
