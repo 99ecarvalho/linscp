@@ -283,7 +283,7 @@ registry, tray or window messages.
 | Navigation | Go To's bookmark list; Location Profiles' opened folders kept; mask hints | done | the Open Directory button's menu (`CreateOpenDirMenu`); `NodeOpened`; the mask hint buttons (Select, Filter, Edit mask, Find files, Transfer settings) |
 | Session tools | Copy dialog's transfer code; OpenSSH key conversion on import | done | the Copy dialog's Generate Code (DoGenerateTransferCodeDialog: script and .NET code, no URL page); an OpenSSH import's keys offered for conversion first (TImportSessionsDialog::Execute), its paths kept POSIX ones on POSIX (`core-openssh-import-posix-paths.patch`); the console's size is kept (`ConsoleWin.WindowSize`) |
 | Custom commands | local commands; extensions and their options | missing | local ones shown disabled |
-| Keep up to date | start in a new window; minimize to the tray | missing | presets are a combo, not WinSCP's split button |
+| Keep up to date | start in a new window; minimize to the tray | partial | Minimize a split button with Minimize to System Tray (where the desktop has a tray), the dialog going to the tray with the window; start in a new window missing; presets are a combo, not WinSCP's split button |
 | Workspaces | local tabs saved | done | as WinSCP's (TSessionData::IsLocalBrowser: both local directories, no host), opened again as local tabs |
 | Clipboard | remote files pasted into the remote panel (duplicate) | done | into the same session's panel, through the Duplicate dialog (foRemoteCopy), from wherever they were copied; between sessions only through a local panel |
 | Save Session as Site | create desktop shortcut | done | `.lnk` through IShellLink on Windows (its arguments, as CreateDesktopSessionShortCut), a desktop entry on POSIX |

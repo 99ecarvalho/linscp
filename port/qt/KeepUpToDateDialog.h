@@ -8,6 +8,8 @@
 
 #include <QDialog>
 
+#include <functional>
+
 #include <string>
 #include <vector>
 
@@ -57,11 +59,16 @@ public:
   QPushButton * CloseButton() const { return FClose; }
   QTreeWidget * Log() const { return FLog; }
   TransferSettingsBox * TransferSettings() const { return FTransferSettings; }
+  // As GlobalMinimize: the application minimized, to the tray when asked
+  // (MinimizetoTray1Click) or Preferences say so. The window's to do.
+  std::function<void(bool ToTray)> OnMinimize;
+  class QToolButton * MinimizeButton() const { return FMinimize; }
 
 protected:
   void reject() override;
 
 private:
+  void Minimize(bool ToTray);
   void UpdateControls();
   void AddLog(CoreBridge::TKeepUpToDateLog Entry, const QString & Message, const QString & MoreMessages);
   void Abort(bool Close);
@@ -85,7 +92,7 @@ private:
   TransferSettingsBox * FTransferSettings = nullptr;
   QPushButton * FStart = nullptr;
   QPushButton * FStop = nullptr;
-  QPushButton * FMinimize = nullptr;
+  class QToolButton * FMinimize = nullptr;
   QPushButton * FClose = nullptr;
   QTreeWidget * FLog = nullptr;
   QTimer * FTimer = nullptr;

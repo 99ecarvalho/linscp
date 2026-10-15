@@ -4759,6 +4759,25 @@ void InstanceTest(const char * Port, const QString & Directory)
     }
     Window.RestoreFromTray();
     Check(Window.isVisible(), "restored");
+    // As Keep Up To Date's Minimize to System Tray: what is open over the
+    // window goes with it, and comes back.
+    {
+      QDialog Over(&Window);
+      Over.show();
+      Window.MinimizeApplication(true);
+      if (QSystemTrayIcon::isSystemTrayAvailable())
+      {
+        Check(!Over.isVisible() && !Window.isVisible(), "the dialog over it to the tray too");
+        Window.RestoreFromTray();
+        Check(Over.isVisible() && Window.isVisible(), "and back");
+      }
+      else
+      {
+        Check(Window.isMinimized() || !Window.isVisible() || (QGuiApplication::platformName() == QStringLiteral("offscreen")),
+          "no tray: minimized");
+        Window.showNormal();
+      }
+    }
   }
   CoreBridge::Finalize();
 }

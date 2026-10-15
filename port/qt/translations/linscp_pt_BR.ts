@@ -881,6 +881,10 @@ Local: %2</translation>
         <source>Keep remote directory up to date</source>
         <translation>Manter diretório remoto atualizado</translation>
     </message>
+    <message>
+        <source>Minimize to System &amp;Tray</source>
+        <translation>Minimizar para a &amp;bandeja do sistema</translation>
+    </message>
 </context>
 <context>
     <name>LinkDialog</name>

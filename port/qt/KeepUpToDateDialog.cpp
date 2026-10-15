@@ -10,10 +10,13 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QLocale>
+#include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSystemTrayIcon>
 #include <QTime>
 #include <QTimer>
+#include <QToolButton>
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
@@ -96,7 +99,20 @@ KeepUpToDateDialog::KeepUpToDateDialog(CoreBridge::TSession & Session, const Cor
   Buttons->addStretch();
   FStart = new QPushButton(tr("&Start"), this);
   FStop = new QPushButton(tr("&Stop"), this);
-  FMinimize = new QPushButton(tr("&Minimize"), this);
+  // As MinimizeButton: split, Minimize to System Tray its menu's, unless
+  // Preferences minimize to the tray anyway (or the desktop has none).
+  FMinimize = new QToolButton(this);
+  FMinimize->setText(tr("&Minimize"));
+  FMinimize->setToolButtonStyle(Qt::ToolButtonTextOnly);
+  FMinimize->setSizePolicy(FStart->sizePolicy());
+  if (!CoreBridge::Preferences().MinimizeToTray && QSystemTrayIcon::isSystemTrayAvailable())
+  {
+    QMenu * MinimizeMenu = new QMenu(FMinimize);
+    MinimizeMenu->addAction(tr("&Minimize"), this, [this]() { Minimize(false); });
+    MinimizeMenu->addAction(tr("Minimize to System &Tray"), this, [this]() { Minimize(true); });
+    FMinimize->setMenu(MinimizeMenu);
+    FMinimize->setPopupMode(QToolButton::MenuButtonPopup);
+  }
   FClose = new QPushButton(tr("Close"), this);
   Buttons->addWidget(FStart);
   Buttons->addWidget(FStop);
@@ -105,13 +121,7 @@ KeepUpToDateDialog::KeepUpToDateDialog(CoreBridge::TSession & Session, const Cor
   Layout->addLayout(Buttons);
   connect(FStart, &QPushButton::clicked, this, [this]() { Start(); });
   connect(FStop, &QPushButton::clicked, this, &KeepUpToDateDialog::Stop);
-  connect(FMinimize, &QPushButton::clicked, this, [this]()
-  {
-    // As TSynchronizeDialog::GlobalMinimize: the application.
-    QWidget * Main = (parentWidget() != nullptr) ? parentWidget()->window() : this;
-    Main->showMinimized();
-    showMinimized();
-  });
+  connect(FMinimize, &QToolButton::clicked, this, [this]() { Minimize(false); });
   connect(FClose, &QPushButton::clicked, this, &QDialog::reject);
 
   FLog = new QTreeWidget(this);
@@ -379,4 +389,17 @@ void KeepUpToDateDialog::LogDoubleClicked(QTreeWidgetItem * Item)
     }
     Box.exec();
   }
+}
+
+void KeepUpToDateDialog::Minimize(bool ToTray)
+{
+  if (OnMinimize)
+  {
+    OnMinimize(ToTray);
+    return;
+  }
+  // As TSynchronizeDialog::GlobalMinimize: the application.
+  QWidget * Main = (parentWidget() != nullptr) ? parentWidget()->window() : this;
+  Main->showMinimized();
+  showMinimized();
 }

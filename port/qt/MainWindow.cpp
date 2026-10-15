@@ -695,6 +695,24 @@ void MainWindow::changeEvent(QEvent * Event)
   }
 }
 
+// As ApplicationMinimize: the window and what is open over it.
+void MainWindow::MinimizeApplication(bool ToTray)
+{
+  if ((ToTray || CoreBridge::Preferences().MinimizeToTray) && QSystemTrayIcon::isSystemTrayAvailable())
+  {
+    MinimizeToTray();
+    return;
+  }
+  for (QWidget * Widget : QApplication::topLevelWidgets())
+  {
+    if (Widget->isVisible() && (Widget != this))
+    {
+      Widget->showMinimized();
+    }
+  }
+  showMinimized();
+}
+
 void MainWindow::MinimizeToTray()
 {
   if (!QSystemTrayIcon::isSystemTrayAvailable())
@@ -717,6 +735,16 @@ void MainWindow::MinimizeToTray()
   FTrayIcon->setIcon(Icon.isNull() ? style()->standardIcon(QStyle::SP_DriveNetIcon) : Icon);
   FTrayIcon->setToolTip(windowTitle());
   FTrayIcon->show();
+  // The dialogs open over it go with it (Keep Up To Date's, minimized).
+  FTrayHidden.clear();
+  for (QWidget * Widget : QApplication::topLevelWidgets())
+  {
+    if (Widget->isVisible() && (Widget != this) && (qobject_cast<QMenu *>(Widget) == nullptr))
+    {
+      FTrayHidden.append(Widget);
+      Widget->hide();
+    }
+  }
   hide();
 }
 
@@ -729,6 +757,15 @@ void MainWindow::RestoreFromTray()
   FTrayIcon->hide();
   setWindowState(windowState() & ~Qt::WindowMinimized);
   show();
+  for (const QPointer<QWidget> & Widget : FTrayHidden)
+  {
+    if (Widget != nullptr)
+    {
+      Widget->setWindowState(Widget->windowState() & ~Qt::WindowMinimized);
+      Widget->show();
+    }
+  }
+  FTrayHidden.clear();
   raise();
   activateWindow();
 }
@@ -1517,6 +1554,7 @@ bool MainWindow::KeepUpToDate()
   bool Result;
   {
     KeepUpToDateDialog Dialog(*FSession, Params, Selected, this);
+    Dialog.OnMinimize = [this](bool ToTray) { MinimizeApplication(ToTray); };
     FKeepUpToDate = &Dialog;
     Dialog.exec();
     FKeepUpToDate = nullptr;

@@ -226,6 +226,9 @@ public:
   // window hidden, the tray's icon (its tip the window's title) bringing
   // it back. Where the desktop has no tray, minimized as ever.
   void MinimizeToTray();
+  // As ApplicationMinimize (Keep Up To Date's Minimize): to the tray when
+  // asked, or Preferences say so.
+  void MinimizeApplication(bool ToTray);
   void RestoreFromTray();
   class QSystemTrayIcon * TrayIcon() const { return FTrayIcon; }
   QAction * ProcessQueueAction() const { return FProcessQueueAction; }
@@ -386,6 +389,7 @@ private:
   QAction * FNewFileAction = nullptr;
   QAction * FProcessQueueAction = nullptr;
   QSystemTrayIcon * FTrayIcon = nullptr;
+  QList<QPointer<QWidget>> FTrayHidden;
   // TransferPresetAutoSelect's: the preset chosen by hand, the one last
   // autoselected.
   QString FCopyParamDefault;
