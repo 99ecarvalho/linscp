@@ -1833,6 +1833,22 @@ public:
   // (Aborted when the prompts were cancelled).
   std::vector<std::string> RunCustomCommand(const TCustomCommandDefinition & Command,
     const std::vector<std::string> & Names, const TCustomCommandPrompts & Prompts);
+  // A local custom command, as TCustomScpExplorerForm::LocalCustomCommand:
+  // on the remote files Names (of the current directory; downloaded to a
+  // temporary directory first, what the program changed uploaded back,
+  // unless the command takes them remote), with LocalFiles for its !^!
+  // pattern; or, LocalSide, on LocalFiles alone (Session may be null then).
+  // LocalDirectory: the local panel's. Run starts each program
+  // (CommandLine completed; Wait for it, and with Output, its output and
+  // exit code); false when it could not. What it printed, when the
+  // command copies or shows it. Throws TCoreError.
+  struct TLocalRunner
+  {
+    std::function<bool(const std::string & CommandLine, bool Wait, std::string * Output, int & ExitCode)> Run;
+  };
+  static std::string RunLocalCustomCommand(TSession * Session, const TCustomCommandDefinition & Command,
+    const std::vector<std::string> & Names, const std::vector<std::string> & LocalFiles, bool LocalSide,
+    const std::string & LocalDirectory, const TCustomCommandPrompts & Prompts, const TLocalRunner & Runner);
   // Commands > Open in PuTTY, as WinSCP's: the session as it is now, in
   // the program Preferences > Integration > Applications names
   // (GUIConfiguration's PuttyPath), PuTTY's own options added unless its

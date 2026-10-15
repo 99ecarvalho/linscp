@@ -362,6 +362,8 @@ private:
   void ShowError(const CoreBridge::TCoreError & E);
   void UpdateActions();
   void TransferPresetAutoSelect();
+  bool RunLocalCustomCommand(const CoreBridge::TCustomCommandDefinition & Command);
+  CoreBridge::TSession::TLocalRunner LocalRunner();
   void StandaloneUpload(const std::vector<std::string> & Files, bool UseDefaults);
   void StandaloneKeepUpToDate(const CoreBridge::TKeepUpToDateParams & Params, bool UseDefaults);
   CoreBridge::TTransferPresetRule TransferPresetAutoSelectData() const;

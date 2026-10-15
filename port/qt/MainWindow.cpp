@@ -20,6 +20,7 @@
 #include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QDir>
+#include <QEventLoop>
 #include <QFileInfo>
 #include <QMimeData>
 #include <QUrl>
@@ -1550,6 +1551,68 @@ CoreBridge::TCustomCommandPrompts MainWindow::CommandPrompts()
   return Prompts;
 }
 
+// What runs a local custom command's programs: on Windows the command line
+// as CreateProcess takes it (ExecuteShellCheckedAndWait,
+// ExecuteProcessAndReadOutput), elsewhere through the shell. Waited for with
+// the window's events going on.
+CoreBridge::TSession::TLocalRunner MainWindow::LocalRunner()
+{
+  CoreBridge::TSession::TLocalRunner Result;
+  Result.Run = [](const std::string & CommandLine, bool Wait, std::string * Output, int & ExitCode)
+  {
+    const QString Line = QString::fromStdString(CommandLine).trimmed();
+    QProcess Process;
+#if defined(Q_OS_WIN)
+    // The program, quoted or up to the first space; the rest as it is.
+    QString Program;
+    QString Arguments;
+    if (Line.startsWith(QLatin1Char('"')))
+    {
+      const int End = Line.indexOf(QLatin1Char('"'), 1);
+      Program = (End > 0) ? Line.mid(1, End - 1) : Line.mid(1);
+      Arguments = (End > 0) ? Line.mid(End + 1).trimmed() : QString();
+    }
+    else
+    {
+      const int Space = Line.indexOf(QLatin1Char(' '));
+      Program = (Space > 0) ? Line.left(Space) : Line;
+      Arguments = (Space > 0) ? Line.mid(Space + 1).trimmed() : QString();
+    }
+    Process.setProgram(Program);
+    Process.setNativeArguments(Arguments);
+#else
+    Process.setProgram(QStringLiteral("/bin/sh"));
+    Process.setArguments({ QStringLiteral("-c"), Line });
+#endif
+    if (!Wait)
+    {
+      return Process.startDetached();
+    }
+    if (Output != nullptr)
+    {
+      Process.setProcessChannelMode(QProcess::MergedChannels);
+    }
+    Process.start();
+    if (!Process.waitForStarted(-1))
+    {
+      return false;
+    }
+    QEventLoop Loop;
+    QObject::connect(&Process, &QProcess::finished, &Loop, &QEventLoop::quit);
+    if (Process.state() != QProcess::NotRunning)
+    {
+      Loop.exec(QEventLoop::ExcludeUserInputEvents);
+    }
+    if (Output != nullptr)
+    {
+      *Output = QString::fromLocal8Bit(Process.readAll()).toStdString();
+    }
+    ExitCode = (Process.exitStatus() == QProcess::NormalExit) ? Process.exitCode() : -1;
+    return true;
+  };
+  return Result;
+}
+
 // Commands > Open in PuTTY, as TCustomScpExplorerForm's PuttyAction.
 bool MainWindow::OpenInPutty()
 {
@@ -3040,8 +3103,6 @@ void MainWindow::UpdateCustomCommands()
     {
       Action->setShortcut(QKeySequence::fromString(ShortCut, QKeySequence::NativeText));
     }
-    // Local commands (on downloaded files) are not ported yet.
-    Action->setEnabled(!Command.Local);
     connect(Action, &QAction::triggered, this, [this, Command]() { RunCustomCommand(Command); });
   }
   for (QMenu * Menu : { FFileCommandsMenu, FStaticCommandsMenu })
@@ -3079,6 +3140,10 @@ void MainWindow::UpdateCustomCommands()
 
 bool MainWindow::RunCustomCommand(const CoreBridge::TCustomCommandDefinition & Command)
 {
+  if (Command.Local)
+  {
+    return RunLocalCustomCommand(Command);
+  }
   if (FBusy || !FSession)
   {
     return false;
@@ -3145,6 +3210,95 @@ bool MainWindow::RunCustomCommand(const CoreBridge::TCustomCommandDefinition & C
       OK.Answer = CoreBridge::AnswerOK;
       OK.Caption = "OK";
       Query.Buttons = { OK };
+      Query.CancelAnswer = CoreBridge::AnswerOK;
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      Frontend.Query(Query);
+    }
+  }
+  return Result;
+}
+
+// As TCustomScpExplorerForm::LocalCustomCommand: on the active panel's
+// files (the remote ones downloaded for it), the local panel's for !^!.
+bool MainWindow::RunLocalCustomCommand(const CoreBridge::TCustomCommandDefinition & Command)
+{
+  if (FBusy)
+  {
+    return false;
+  }
+  LocalPanel * Panel = SideLocal(FLocalActive);
+  const bool LocalSide = (Panel != nullptr);
+  if (!LocalSide && !(FSession && FSession->Active()))
+  {
+    return false;
+  }
+  LocalPanel * Files = LocalSide ? Panel : FLocal;
+  std::vector<std::string> LocalFiles;
+  for (const QString & Name : Files->Selected())
+  {
+    LocalFiles.push_back(QDir::toNativeSeparators(QDir(Files->Path()).filePath(Name)).toStdString());
+  }
+  std::vector<std::string> Names;
+  if (!LocalSide)
+  {
+    QStringList Selected = FPanel->Selected();
+    if (Selected.isEmpty() && (FPanel->View()->CurrentEntry() != nullptr))
+    {
+      Selected.append(QString::fromStdString(FPanel->View()->CurrentEntry()->Name));
+    }
+    for (const QString & Name : Selected)
+    {
+      Names.push_back(Name.toStdString());
+    }
+  }
+  const CoreBridge::TCustomCommandCheck Check = CoreBridge::CheckCustomCommand(Command.Command, false);
+  if (Check.FileCommand && (LocalSide ? LocalFiles.empty() : Names.empty()))
+  {
+    return false;
+  }
+  FBusy = true;
+  UpdateActions();
+  bool Result = false;
+  std::string Output;
+  try
+  {
+    Output = CoreBridge::TSession::RunLocalCustomCommand(FSession.get(), Command, Names, LocalFiles, LocalSide,
+      QDir::toNativeSeparators(FLocal->Path()).toStdString(), CommandPrompts(), LocalRunner());
+    Result = true;
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  if (FSession && FSession->Active())
+  {
+    FPanel->Refresh();
+  }
+  Files->Refresh();
+  UpdateActions();
+  if (Result)
+  {
+    const QString Text = QString::fromStdString(Output);
+    // Even empty output to the clipboard, as WinSCP; no empty message box.
+    if (Command.CopyResults)
+    {
+      QApplication::clipboard()->setText(Text);
+    }
+    if (Command.ShowResultsInMessageBox && !Text.isEmpty())
+    {
+      CoreBridge::TQuery Query;
+      Query.Type = CoreBridge::TQueryType::Information;
+      Query.Message = Text.toStdString();
+      CoreBridge::TQueryButton OK;
+      OK.Answer = CoreBridge::AnswerOK;
+      OK.Caption = "OK";
+      CoreBridge::TQueryButton Copy;
+      Copy.Answer = CoreBridge::AnswerRetry;
+      Copy.Caption = "&Copy";
+      Copy.OnSubmit = [Text]() { QApplication::clipboard()->setText(Text); return 0u; };
+      Query.Buttons = { OK, Copy };
       Query.CancelAnswer = CoreBridge::AnswerOK;
       QtFrontend Frontend;
       Frontend.SetWindow(this);

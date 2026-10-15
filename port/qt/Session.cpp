@@ -35,6 +35,7 @@
 #include <TextsWin.h>
 
 #include <atomic>
+#include <map>
 #include <mutex>
 #include <set>
 #include <memory>
@@ -2396,6 +2397,354 @@ bool TSession::CanRunShellCommands() const
 }
 
 // TCustomScpExplorerForm::CustomCommand and RemoteCustomCommand.
+namespace
+{
+
+// TTerminal::MakeLocalFileList's, for the local files' commands, which
+// have no terminal.
+class TLocalFileLister
+{
+public:
+  void __fastcall Add(const UnicodeString & FileName, const TSearchRecSmart & Rec, void * Param)
+  {
+    TMakeLocalFileListParams & Params = *static_cast<TMakeLocalFileListParams *>(Param);
+    if (Rec.IsDirectory() && Params.Recursive)
+    {
+      ProcessLocalDirectory(FileName, CLOSURE_OF(this, Add), &Params);
+    }
+    if (!Rec.IsDirectory() || Params.IncludeDirs)
+    {
+      Params.FileList->Add(FileName);
+      if (Params.FileTimes != NULL)
+      {
+        Params.FileTimes->push_back(const_cast<TSearchRecSmart &>(Rec).TimeStamp);
+      }
+    }
+  }
+};
+
+// ExecuteProcessChecked and ExecuteProcessCheckedAndWait, through the
+// shell's runner: started (and waited for), or with Output, its output read
+// and a failure's exit code an error, as DoExecuteProcessAndReadOutput.
+void ExecuteLocalCommand(const TSession::TLocalRunner & Runner, const UnicodeString & Command, bool Wait,
+  UnicodeString * Output)
+{
+  std::string Text;
+  int ExitCode = 0;
+  const bool Waited = Wait || (Output != NULL);
+  if (!Runner.Run || !Runner.Run(Utf8(Command), Waited, (Output != NULL) ? &Text : NULL, ExitCode))
+  {
+    throw EOSExtException(FMTLOAD(EXECUTE_APP_ERROR, (Command)));
+  }
+  if (Output != NULL)
+  {
+    const UnicodeString Printed = FromUtf8(Text);
+    if (ExitCode != 0)
+    {
+      UnicodeString Buf = Printed;
+      UnicodeString Buf2;
+      if (ExtractMainInstructions(Buf, Buf2))
+      {
+        throw ExtException(Printed, EmptyStr, EmptyStr);
+      }
+      throw ExtException(MainInstructions(FMTLOAD(COMMAND_FAILED_CODEONLY, (ExitCode))), Printed, EmptyStr);
+    }
+    *Output += Printed;
+  }
+}
+
+}  // namespace
+
+std::string TSession::RunLocalCustomCommand(TSession * Session, const TCustomCommandDefinition & Definition,
+  const std::vector<std::string> & Names, const std::vector<std::string> & LocalFiles, bool LocalSide,
+  const std::string & LocalDirectory, const TCustomCommandPrompts & Prompts, const TLocalRunner & Runner)
+{
+  try
+  {
+    TTerminal * Terminal = ((Session != nullptr) && Session->Active()) ? Session->F->Terminal.get() : NULL;
+    if ((Terminal == NULL) && !LocalSide)
+    {
+      NotSupported();
+    }
+    std::unique_ptr<TSessionData> SessionData((Terminal != NULL) ? SessionDataForCode(Terminal) : NULL);
+    TCustomCommandData Data = (SessionData.get() != NULL) ? TCustomCommandData(SessionData.get()) : TCustomCommandData();
+    const UnicodeString RemotePath = (Terminal != NULL) ? Terminal->CurrentDirectory : UnicodeString();
+    const UnicodeString LocalPath = FromUtf8(LocalDirectory);
+    const int Params = ParamsOf(Definition);
+    UnicodeString CommandCommand = FromUtf8(Definition.Command);
+    const TCustomCommandType * Listed = WinConfiguration->CustomCommandList()->Find(FromUtf8(Definition.Name));
+    if ((Listed != NULL) && (Listed->Command == CommandCommand))
+    {
+      CommandCommand = Listed->GetCommandWithExpandedOptions(WinConfiguration->CustomCommandOptions(),
+        (Terminal != NULL) ? Terminal->SessionData->SessionKey : UnicodeString());
+    }
+    TLocalCustomCommand LocalCustomCommand(Data, RemotePath, LocalPath);
+    TBridgeInteractiveCustomCommand InteractiveCustomCommand(&LocalCustomCommand, FromUtf8(Definition.Name), Prompts);
+    const UnicodeString Command = InteractiveCustomCommand.Complete(CommandCommand, false);
+    const bool FileListCommand = LocalCustomCommand.IsFileListCommand(Command);
+    const bool LocalFileCommand = LocalCustomCommand.HasLocalFileName(Command);
+
+    UnicodeString OutputText;
+    UnicodeString * Output = (FLAGSET(Params, ccShowResultsInMsgBox) || FLAGSET(Params, ccCopyResults)) ? &OutputText : NULL;
+
+    std::unique_ptr<TStringList> LocalFileList(new TStringList());
+    for (const std::string & File : LocalFiles)
+    {
+      LocalFileList->Add(FromUtf8(File));
+    }
+
+    if (!LocalCustomCommand.IsFileCommand(Command))
+    {
+      ExecuteLocalCommand(Runner, LocalCustomCommand.Complete(Command, true), false, Output);
+    }
+    // Remote files (LocalCustomCommandPure).
+    else if (!LocalSide || LocalFileCommand)
+    {
+      if (Terminal == NULL)
+      {
+        NotSupported();
+      }
+      std::unique_ptr<TStringList> FileList = FileListOf(Terminal, Names);
+      if (LocalFileCommand)
+      {
+        if (FileListCommand)
+        {
+          if (LocalFileList->Count != 1)
+          {
+            throw Exception(LoadStr(CUSTOM_COMMAND_SELECTED_UNMATCH1));
+          }
+        }
+        else if ((LocalFileList->Count != 1) && (FileList->Count != 1) && (LocalFileList->Count != FileList->Count))
+        {
+          throw Exception(LoadStr(CUSTOM_COMMAND_SELECTED_UNMATCH));
+        }
+      }
+
+      const bool RemoteFiles = FLAGSET(Params, ccRemoteFiles);
+      UnicodeString TempDir;
+      if (!RemoteFiles)
+      {
+        // TemporarilyDownloadFiles, its simple temporary directory.
+        TempDir = IncludeTrailingBackslash(Configuration->TemporaryDir());
+        if (!ForceDirectories(ApiPath(TempDir)))
+        {
+          throw EOSExtException(FMTLOAD(CREATE_TEMP_DIR_ERROR, (TempDir)));
+        }
+        TCopyParamType CopyParam = TemporaryFileCopyParam(false);
+        Terminal->ExceptionOnFail = true;
+        try
+        {
+          TTransferBracket Bracket(false, FileList->Count);
+          Terminal->CopyToLocal(FileList.get(), TempDir, &CopyParam, cpNoConfirmation | cpTemporary, NULL);
+        }
+        catch (...)
+        {
+          Terminal->ExceptionOnFail = false;
+          RecursiveDeleteFile(ExcludeTrailingBackslash(TempDir));
+          throw;
+        }
+        Terminal->ExceptionOnFail = false;
+      }
+
+      try
+      {
+        std::unique_ptr<TStringList> OwnRemoteFileList;
+        std::unique_ptr<TStringList> OwnRemoteFileListFull;
+        TStrings * RemoteFileList = FileList.get();
+        TStrings * RemoteFileListFull = NULL;
+        TDateTimes RemoteFileTimes;
+        if (!RemoteFiles)
+        {
+          OwnRemoteFileList.reset(new TStringList());
+          RemoteFileList = OwnRemoteFileList.get();
+          TMakeLocalFileListParams MakeFileListParam;
+          MakeFileListParam.FileList = RemoteFileList;
+          MakeFileListParam.FileTimes = &RemoteFileTimes;
+          MakeFileListParam.IncludeDirs = FLAGSET(Params, ccApplyToDirectories);
+          MakeFileListParam.Recursive = FLAGSET(Params, ccRecursive) && !FileListCommand;
+          ProcessLocalDirectory(TempDir, CLOSURE_OF(Terminal, MakeLocalFileList), &MakeFileListParam);
+          if (!MakeFileListParam.Recursive)
+          {
+            RemoteFileTimes.clear();
+            OwnRemoteFileListFull.reset(new TStringList());
+            RemoteFileListFull = OwnRemoteFileListFull.get();
+            MakeFileListParam.FileList = RemoteFileListFull;
+            MakeFileListParam.Recursive = true;
+            MakeFileListParam.IncludeDirs = false;
+            ProcessLocalDirectory(TempDir, CLOSURE_OF(Terminal, MakeLocalFileList), &MakeFileListParam);
+          }
+          else
+          {
+            RemoteFileListFull = RemoteFileList;
+          }
+        }
+
+        const bool NonBlocking = FileListCommand && RemoteFiles && (Output == NULL);
+        if (FileListCommand)
+        {
+          // MakeFileList does not delimit filenames.
+          const UnicodeString List = MakeFileList(RemoteFileList);
+          const UnicodeString LocalFile = LocalFileCommand ? LocalFileList->Strings[0] : UnicodeString();
+          TLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, L"", LocalFile, List);
+          ExecuteLocalCommand(Runner, CustomCommand.Complete(Command, true), !NonBlocking, Output);
+        }
+        else if (LocalFileCommand)
+        {
+          if (LocalFileList->Count == 1)
+          {
+            for (int Index = 0; Index < RemoteFileList->Count; Index++)
+            {
+              TLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, RemoteFileList->Strings[Index],
+                LocalFileList->Strings[0], L"");
+              ExecuteLocalCommand(Runner, CustomCommand.Complete(Command, true), true, Output);
+            }
+          }
+          else if (RemoteFileList->Count == 1)
+          {
+            for (int Index = 0; Index < LocalFileList->Count; Index++)
+            {
+              TLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, RemoteFileList->Strings[0],
+                LocalFileList->Strings[Index], L"");
+              ExecuteLocalCommand(Runner, CustomCommand.Complete(Command, true), true, Output);
+            }
+          }
+          else
+          {
+            if (LocalFileList->Count != RemoteFileList->Count)
+            {
+              throw Exception(LoadStr(CUSTOM_COMMAND_PAIRS_DOWNLOAD_FAILED));
+            }
+            for (int Index = 0; Index < LocalFileList->Count; Index++)
+            {
+              TLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, RemoteFileList->Strings[Index],
+                LocalFileList->Strings[Index], L"");
+              ExecuteLocalCommand(Runner, CustomCommand.Complete(Command, true), true, Output);
+            }
+          }
+        }
+        else
+        {
+          for (int Index = 0; Index < RemoteFileList->Count; Index++)
+          {
+            TLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, RemoteFileList->Strings[Index], L"", L"");
+            ExecuteLocalCommand(Runner, CustomCommand.Complete(Command, true), true, Output);
+          }
+        }
+
+        // What the program changed, uploaded back where it came from.
+        if (!RemoteFiles)
+        {
+          TCopyParamType CopyParam = TemporaryFileCopyParam(false);
+          std::map<UnicodeString, UnicodeString> TempNameMap;
+          for (int Index = 0; Index < RemoteFileListFull->Count; Index++)
+          {
+            const UnicodeString FileName = RemoteFileListFull->Strings[Index];
+            TSearchRecSmart SearchRec;
+            if (SameText(TempDir, FileName.SubString(1, TempDir.Length())) &&
+                FileSearchRec(FileName, SearchRec) && !SearchRec.IsDirectory() &&
+                (SearchRec.GetLastWriteTime() != RemoteFileTimes[Index]))
+            {
+              if (TempNameMap.empty())
+              {
+                for (int Index2 = 0; Index2 < FileList->Count; Index2++)
+                {
+                  const UnicodeString RemoteFilePath = Terminal->AbsolutePath(FileList->Strings[Index2], true);
+                  const UnicodeString TempName =
+                    Terminal->ChangeFileName(&CopyParam, UnixExtractFileName(RemoteFilePath), osRemote, false);
+                  TempNameMap.insert(std::make_pair(TempName.UpperCase(), RemoteFilePath));
+                }
+              }
+              UnicodeString RelPath = MidStr(FileName, TempDir.Length() + 1);
+              const UnicodeString TempName = CutToChar(RelPath, PathDelim, false).UpperCase();
+              const auto TempNameI = TempNameMap.find(TempName);
+              if (TempNameI != TempNameMap.end())
+              {
+                TCopyParamType UpParam = TemporaryFileCopyParam(false);
+                UpParam.FileMask = L"";
+                std::unique_ptr<TStrings> TemporaryFilesList(new TStringList());
+                TemporaryFilesList->Add(FileName);
+                const UnicodeString RemoteDir = UnixExtractFileDir(UnixCombinePathsSmart(TempNameI->second, ToUnixPath(RelPath)));
+                TTransferBracket Bracket(true, 1);
+                // As FAutoOperation has it upstream: no overwrite question.
+                Terminal->CopyToRemote(TemporaryFilesList.get(), RemoteDir, &UpParam, cpNoConfirmation | cpTemporary, NULL);
+              }
+            }
+          }
+        }
+      }
+      catch (...)
+      {
+        if (!RemoteFiles)
+        {
+          RecursiveDeleteFile(ExcludeTrailingBackslash(TempDir));
+        }
+        throw;
+      }
+      if (!RemoteFiles)
+      {
+        RecursiveDeleteFile(ExcludeTrailingBackslash(TempDir));
+      }
+    }
+    // Local files (LocalCustomCommandWithLocalFiles).
+    else
+    {
+      std::unique_ptr<TStringList> Files(new TStringList());
+      for (int Index = 0; Index < LocalFileList->Count; Index++)
+      {
+        const UnicodeString FileName = LocalFileList->Strings[Index];
+        if (::DirectoryExists(ApiPath(FileName)))
+        {
+          if (FLAGSET(Params, ccApplyToDirectories))
+          {
+            Files->Add(FileName);
+          }
+          if (FLAGSET(Params, ccRecursive))
+          {
+            TMakeLocalFileListParams MakeFileListParam;
+            MakeFileListParam.FileList = Files.get();
+            MakeFileListParam.FileTimes = NULL;
+            MakeFileListParam.IncludeDirs = FLAGSET(Params, ccApplyToDirectories);
+            MakeFileListParam.Recursive = true;
+            TLocalFileLister Lister;
+            ProcessLocalDirectory(FileName, CLOSURE_OF(&Lister, Add), &MakeFileListParam);
+          }
+        }
+        else
+        {
+          Files->Add(FileName);
+        }
+      }
+      if (FileListCommand)
+      {
+        TLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, L"", L"", MakeFileList(Files.get()));
+        ExecuteLocalCommand(Runner, CustomCommand.Complete(Command, true), false, Output);
+      }
+      else
+      {
+        for (int Index = 0; Index < Files->Count; Index++)
+        {
+          TLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, Files->Strings[Index], L"", L"");
+          ExecuteLocalCommand(Runner, CustomCommand.Complete(Command, true), true, Output);
+        }
+      }
+    }
+
+    UnicodeString Result = (Output != NULL) ? *Output : UnicodeString();
+    // A single line's trailing line break dropped, as WinSCP's.
+    const UnicodeString LineBreak(sLineBreak);
+    const int P = Result.Pos(LineBreak);
+    if ((P > 0) && (P == Result.Length() - LineBreak.Length() + 1))
+    {
+      Result.SetLength(P - 1);
+    }
+    return Utf8(Result);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 std::vector<std::string> TSession::RunCustomCommand(const TCustomCommandDefinition & Definition,
   const std::vector<std::string> & Names, const TCustomCommandPrompts & Prompts)
 {

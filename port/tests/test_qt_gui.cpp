@@ -4811,6 +4811,105 @@ void InstanceTest(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// P3-16: local custom commands: on a remote file (downloaded for it, what
+// the program changed uploaded back), their output copied, on local files.
+// Run through the shell on POSIX, as a command line (cmd's) on Windows.
+void LocalCommandsTest(const char * Port, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    const QDir Dir(Directory);
+    QDir().mkpath(Dir.path());
+    const QDir Root(Dir.filePath(QStringLiteral("../root")));
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = std::deque<QString>(4, QStringLiteral("secret"));
+    Responder.AcceptDialogs = true;
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "(connected)");
+    Window.Local()->ChangeDirectory(Directory);
+    const auto Read = [](const QString & Path)
+    {
+      QFile File(Path);
+      File.open(QIODevice::ReadOnly);
+      return QString::fromUtf8(File.readAll()).trimmed();
+    };
+    const QString Seen = QDir::toNativeSeparators(Dir.filePath(QStringLiteral("seen.txt")));
+    CoreBridge::TCustomCommandDefinition Command;
+    Command.Name = "Look";
+    Command.Local = true;
+#if defined(Q_OS_WIN)
+    Command.Command = QStringLiteral("cmd /c type \"!\" > \"%1\"").arg(Seen).toStdString();
+#else
+    Command.Command = QStringLiteral("cat \"!\" > \"%1\"").arg(Seen).toStdString();
+#endif
+    // A remote file made through the session (rclone's server lists only
+    // those reliably).
+    {
+      QFile File(Dir.filePath(QStringLiteral("work.txt")));
+      File.open(QIODevice::WriteOnly);
+      File.write("work\n");
+    }
+    Window.Local()->Refresh();
+    Check(Window.Upload({ QStringLiteral("work.txt") }, QStringLiteral("/"), false), "(a remote file)");
+    QFile::remove(Dir.filePath(QStringLiteral("work.txt")));
+    Window.Local()->Refresh();
+    Window.ActivatePanel(false);
+    Window.Panel()->Refresh();
+    Window.Panel()->Select({ QStringLiteral("work.txt") });
+    Check(Window.RunCustomCommand(Command) && (Read(Seen) == QStringLiteral("work")),
+      "on a remote file: run on its downloaded copy");
+    Command.Name = "Change";
+#if defined(Q_OS_WIN)
+    Command.Command = "cmd /c echo changed> \"!\"";
+#else
+    Command.Command = "echo changed > \"!\"";
+#endif
+    Check(Window.RunCustomCommand(Command) &&
+      WaitUntil([&Read, &Root]() { return Read(Root.filePath(QStringLiteral("work.txt"))) == QStringLiteral("changed"); }),
+      "what it changed uploaded back");
+    Command.Name = "Say";
+    Command.Command = "echo said";
+#if defined(Q_OS_WIN)
+    Command.Command = "cmd /c echo said";
+#endif
+    Command.CopyResults = true;
+    Check(Window.RunCustomCommand(Command) && (QApplication::clipboard()->text().trimmed() == QStringLiteral("said")),
+      "a command's output copied");
+    Command.CopyResults = false;
+    // On the local panel's files.
+    {
+      QFile File(Dir.filePath(QStringLiteral("mine.txt")));
+      File.open(QIODevice::WriteOnly);
+      File.write("mine");
+    }
+    Window.Local()->Refresh();
+    Window.ActivatePanel(true);
+    Window.Local()->Select({ QStringLiteral("mine.txt") });
+    Command.Name = "Look";
+#if defined(Q_OS_WIN)
+    Command.Command = QStringLiteral("cmd /c type \"!\" > \"%1\"").arg(Seen).toStdString();
+#else
+    Command.Command = QStringLiteral("cat \"!\" > \"%1\"").arg(Seen).toStdString();
+#endif
+    Check(Window.RunCustomCommand(Command) && (Read(Seen) == QStringLiteral("mine")), "on a local file");
+    // A failing one, its output asked for: its exit code an error.
+    Command.Name = "Fail";
+    Command.CopyResults = true;
+#if defined(Q_OS_WIN)
+    Command.Command = "cmd /c exit 3";
+#else
+    Command.Command = "exit 3";
+#endif
+    const int Errors = Responder.Errors;
+    Check(!Window.RunCustomCommand(Command) && (Responder.Errors > Errors), "a failure's exit code an error");
+  }
+  CoreBridge::Finalize();
+}
+
 // P3-16: OpenSSH's sites imported, their OpenSSH keys offered for
 // conversion to PuTTY's format first (POSIX: core finds ~/.ssh through
 // HOME; Windows' profile folder cannot be moved for a test).
@@ -5294,6 +5393,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 4) && (std::strcmp(argv[1], "masterpasswordread") == 0))
   {
     return MasterPasswordRead(QString::fromLocal8Bit(argv[3]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "localcommands") == 0))
+  {
+    LocalCommandsTest(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "importkeys") == 0))
   {
