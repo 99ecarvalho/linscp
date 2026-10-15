@@ -8,6 +8,13 @@
 #include "SingleInstance.h"
 
 #include "TransferSettingsDialog.h"
+#include "ExtensionOptionsDialog.h"
+#include <QToolButton>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QEventLoop>
+#include <QRegularExpression>
 #include "CustomCommandDialog.h"
 #include "ShortCutDialog.h"
 #include "EditorPreferencesDialog.h"
@@ -414,11 +421,19 @@ void PreferencesDialog::UpdateControls()
     FPuttyRegistryStorageKey->setEnabled(AnyPuttyPath && !SiteCommand);
     FPuttyRegistryStorageKeyLabel->setEnabled(FPuttyRegistryStorageKey->isEnabled());
   }
+  // As UpdateControls' commands: Edit for a custom command, Configure (in its
+  // place) for an extension; up and down within its own list.
   const int CommandRow = FCommandsList->indexOfTopLevelItem(FCommandsList->currentItem());
-  FEditCommand->setEnabled(CommandRow >= 0);
+  const int Extension = ExtensionIndex(CommandRow);
+  const int CustomCount = static_cast<int>(FCommands.size());
+  FEditCommand->setEnabled((CommandRow >= 0) && (Extension < 0));
+  FEditCommand->setVisible(Extension < 0);
+  FConfigureCommand->setVisible(Extension >= 0);
+  FConfigureCommand->setEnabled(Extension >= 0);
   FRemoveCommand->setEnabled(CommandRow >= 0);
-  FUpCommand->setEnabled(CommandRow > 0);
-  FDownCommand->setEnabled((CommandRow >= 0) && (CommandRow < FCommandsList->topLevelItemCount() - 1));
+  FUpCommand->setEnabled((CommandRow >= 0) && ((Extension >= 0) ? (Extension > 0) : (CommandRow > 0)));
+  FDownCommand->setEnabled((CommandRow >= 0) &&
+    ((Extension >= 0) ? (CommandRow < FCommandsList->topLevelItemCount() - 1) : (CommandRow < CustomCount - 1)));
   FCustomIpEdit->setEnabled(FCustomIp->isChecked());
   FPortMin->setEnabled(FPortLimit->isChecked());
   FPortMax->setEnabled(FPortLimit->isChecked());
@@ -1358,6 +1373,7 @@ void PreferencesDialog::Save()
   CoreBridge::SetTransferPresets(FPresets);
   CoreBridge::SetSshHostCAs(FHostCAList, FHostCAsFromPuTTY->isChecked());
   CoreBridge::SetCustomCommands(FCommands);
+  FExtensions->Commit();
   CoreBridge::SetEditorSettings(EditorSettings());
   CoreBridge::SetEditors(FEditors);
   if (FLanguages->currentItem() != nullptr)
@@ -1427,6 +1443,7 @@ QWidget * PreferencesDialog::MakeApplicationsPage(const TPreferences & Preferenc
 QWidget * PreferencesDialog::MakeCommandsPage()
 {
   FCommands = CoreBridge::CustomCommands();
+  FExtensions = std::make_unique<CoreBridge::TExtensionsEdit>();
   QWidget * Page = new QWidget(this);
   QVBoxLayout * Layout = new QVBoxLayout(Page);
   QGroupBox * Group = new QGroupBox(tr("Custom commands"), Page);
@@ -1442,24 +1459,57 @@ QWidget * PreferencesDialog::MakeCommandsPage()
   FCommandsList->header()->setStretchLastSection(false);
   GroupLayout->addWidget(FCommandsList, 1);
   QVBoxLayout * Buttons = new QVBoxLayout();
-  QPushButton * Add = new QPushButton(tr("&Add..."), Group);
+  // As WinSCP's split Add button: what the selection is a list of, or
+  // either from its menu.
+  FAddCommand = new QToolButton(Group);
+  FAddCommand->setText(tr("&Add..."));
+  FAddCommand->setPopupMode(QToolButton::MenuButtonPopup);
+  FAddCommand->setToolButtonStyle(Qt::ToolButtonTextOnly);
+  FAddCommand->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+  QMenu * AddMenu = new QMenu(FAddCommand);
+  AddMenu->addAction(tr("Add &Custom Command..."), this, [this]() { AddEditCommand(false); });
+  AddMenu->addAction(tr("Add &Extension..."), this, [this]() { AddExtension(); });
+  FAddCommand->setMenu(AddMenu);
   FEditCommand = new QPushButton(tr("&Edit..."), Group);
+  FConfigureCommand = new QPushButton(tr("&Configure..."), Group);
   FRemoveCommand = new QPushButton(tr("&Remove"), Group);
   FUpCommand = new QPushButton(tr("&Up"), Group);
   FDownCommand = new QPushButton(tr("&Down"), Group);
-  for (QPushButton * Button : { Add, FEditCommand, FRemoveCommand, FUpCommand, FDownCommand })
+  Buttons->addWidget(FAddCommand);
+  for (QPushButton * Button : { FEditCommand, FConfigureCommand, FRemoveCommand, FUpCommand, FDownCommand })
   {
     Buttons->addWidget(Button);
   }
   Buttons->addStretch(1);
   GroupLayout->addLayout(Buttons);
-  connect(Add, &QPushButton::clicked, this, [this]() { AddEditCommand(false); });
+  connect(FAddCommand, &QToolButton::clicked, this, [this]()
+  {
+    if (ExtensionIndex(FCommandsList->indexOfTopLevelItem(FCommandsList->currentItem())) >= 0)
+    {
+      AddExtension();
+    }
+    else
+    {
+      AddEditCommand(false);
+    }
+  });
   connect(FEditCommand, &QPushButton::clicked, this, [this]() { AddEditCommand(true); });
+  connect(FConfigureCommand, &QPushButton::clicked, this, [this]() { ConfigureCommand(); });
   connect(FRemoveCommand, &QPushButton::clicked, this, &PreferencesDialog::RemoveCommand);
   connect(FUpCommand, &QPushButton::clicked, this, [this]() { MoveCommand(-1); });
   connect(FDownCommand, &QPushButton::clicked, this, [this]() { MoveCommand(1); });
   connect(FCommandsList, &QTreeWidget::currentItemChanged, this, &PreferencesDialog::UpdateControls);
-  connect(FCommandsList, &QTreeWidget::itemDoubleClicked, this, [this]() { AddEditCommand(true); });
+  connect(FCommandsList, &QTreeWidget::itemDoubleClicked, this, [this]()
+  {
+    if (!FEditCommand->isHidden())
+    {
+      AddEditCommand(true);
+    }
+    else
+    {
+      ConfigureCommand();
+    }
+  });
   // As CustomCommandsViewKeyDown: Insert adds, Delete removes.
   QShortcut * Insert = new QShortcut(QKeySequence(Qt::Key_Insert), FCommandsList, nullptr, nullptr, Qt::WidgetShortcut);
   connect(Insert, &QShortcut::activated, this, [this]() { AddEditCommand(false); });
@@ -1476,16 +1526,33 @@ QWidget * PreferencesDialog::MakeCommandsPage()
   return Page;
 }
 
-// As CustomCommandsViewData.
+int PreferencesDialog::ExtensionIndex(int Row) const
+{
+  const int CustomCount = static_cast<int>(FCommands.size());
+  return (Row >= CustomCount) ? (Row - CustomCount) : -1;
+}
+
+// As CustomCommandsViewData: the custom commands, then the extensions (an
+// extension's description its hint).
 void PreferencesDialog::LoadCommands(int Select)
 {
   FCommandsList->clear();
-  for (const CoreBridge::TCustomCommandDefinition & Command : FCommands)
+  std::vector<CoreBridge::TCustomCommandDefinition> All = FCommands;
+  for (const CoreBridge::TCustomCommandDefinition & Extension : FExtensions->Items())
+  {
+    All.push_back(Extension);
+  }
+  for (const CoreBridge::TCustomCommandDefinition & Command : All)
   {
     QTreeWidgetItem * Item = new QTreeWidgetItem(FCommandsList);
-    Item->setText(0, QString::fromStdString(Command.Name).remove(QLatin1Char('&')));
+    Item->setText(0, QString::fromStdString(Command.Name).remove(QRegularExpression(QStringLiteral("&(?!&)")))
+      .replace(QStringLiteral("&&"), QStringLiteral("&")));
     Item->setText(1, QString::fromStdString(Command.Command));
     Item->setText(2, QString::fromStdString(CoreBridge::CustomCommandSide(Command.Local)));
+    if (!Command.Description.empty())
+    {
+      Item->setToolTip(0, QString::fromStdString(Command.Description));
+    }
   }
   if ((Select >= 0) && (Select < FCommandsList->topLevelItemCount()))
   {
@@ -1552,13 +1619,33 @@ void PreferencesDialog::RemoveCommand()
   {
     return;
   }
-  FCommands.erase(FCommands.begin() + Row);
-  LoadCommands(qMin(Row, static_cast<int>(FCommands.size()) - 1));
+  const int Extension = ExtensionIndex(Row);
+  if (Extension >= 0)
+  {
+    FExtensions->Remove(Extension);
+  }
+  else
+  {
+    FCommands.erase(FCommands.begin() + Row);
+  }
+  LoadCommands(qMin(Row, FCommandsList->topLevelItemCount() - 2));
 }
 
 void PreferencesDialog::MoveCommand(int By)
 {
   const int Row = FCommandsList->indexOfTopLevelItem(FCommandsList->currentItem());
+  const int Extension = ExtensionIndex(Row);
+  if (Extension >= 0)
+  {
+    const int To = Extension + By;
+    if ((To < 0) || (To >= static_cast<int>(FExtensions->Items().size())))
+    {
+      return;
+    }
+    FExtensions->Move(Extension, To);
+    LoadCommands(Row + By);
+    return;
+  }
   const int To = Row + By;
   if ((Row < 0) || (To < 0) || (To >= static_cast<int>(FCommands.size())))
   {
@@ -1566,6 +1653,186 @@ void PreferencesDialog::MoveCommand(int By)
   }
   std::swap(FCommands[Row], FCommands[To]);
   LoadCommands(To);
+}
+
+// As TPreferencesDialog::AddExtension: a path, or a URL downloaded (asking
+// winscp.net for one that suits), added before the selected extension, or
+// last; one not from a trusted source only when confirmed.
+bool PreferencesDialog::AddExtension(const QString * APath)
+{
+  QString Path;
+  if (APath != nullptr)
+  {
+    Path = *APath;
+  }
+  else
+  {
+    QDialog Dialog(this);
+    Dialog.setWindowTitle(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::AddExtensionCaption)));
+    QVBoxLayout * Layout = new QVBoxLayout(&Dialog);
+    QLabel * Prompt = new QLabel(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::AddExtensionPrompt)), &Dialog);
+    QComboBox * Edit = new QComboBox(&Dialog);
+    Edit->setEditable(true);
+    Edit->setInsertPolicy(QComboBox::NoInsert);
+    Edit->setMinimumWidth(444);
+    for (const std::string & Item : CoreBridge::History("ExtensionPath"))
+    {
+      Edit->addItem(QString::fromStdString(Item));
+    }
+    Edit->setEditText(QString());
+    Prompt->setBuddy(Edit);
+    QPushButton * Browse = new QPushButton(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ExtensionOptionsBrowse)), &Dialog);
+    connect(Browse, &QPushButton::clicked, &Dialog, [&Dialog, Edit]()
+    {
+      const QString File = QFileDialog::getOpenFileName(&Dialog, QString(), QString(),
+        QStringLiteral("WinSCP extensions (*.WinSCPextension*);;All files (*)"));
+      if (!File.isEmpty())
+      {
+        Edit->setEditText(QDir::toNativeSeparators(File));
+      }
+    });
+    QHBoxLayout * Row = new QHBoxLayout();
+    Row->addWidget(Edit, 1);
+    Row->addWidget(Browse);
+    Layout->addWidget(Prompt);
+    Layout->addLayout(Row);
+    QDialogButtonBox * Box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &Dialog);
+    connect(Box, &QDialogButtonBox::accepted, &Dialog, &QDialog::accept);
+    connect(Box, &QDialogButtonBox::rejected, &Dialog, &QDialog::reject);
+    Layout->addWidget(Box);
+    if (Dialog.exec() != QDialog::Accepted)
+    {
+      return false;
+    }
+    Path = Edit->currentText().trimmed();
+    if (Path.isEmpty())
+    {
+      return false;
+    }
+    CoreBridge::AddToHistory("ExtensionPath", Path.toStdString());
+  }
+  const int Row = FCommandsList->indexOfTopLevelItem(FCommandsList->currentItem());
+  const int Before = ExtensionIndex(Row);
+  auto ConfirmUntrusted = [this]()
+  {
+    return QMessageBox::warning(this, QString::fromStdString(CoreBridge::Text(CoreBridge::TText::AddExtensionCaption)),
+      QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ExtensionUntrusted)),
+      QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Ok;
+  };
+  try
+  {
+    int Index = -1;
+    const bool Url = Path.startsWith(QStringLiteral("http://"), Qt::CaseInsensitive) ||
+      Path.startsWith(QStringLiteral("https://"), Qt::CaseInsensitive);
+    bool Latest = true;
+    if (Url)
+    {
+      // As THttp's Get, with AddExtension's Accept header; winscp.net's
+      // headers name the extension and say whether it is trusted.
+      bool WinScpUrl = false;
+      const QUrl Address(QString::fromStdString(CoreBridge::ExtensionDownloadUrl(Path.toStdString(), WinScpUrl)));
+      QNetworkAccessManager Manager;
+      QNetworkRequest Request(Address);
+      Request.setRawHeader("Accept", "text/winscpextension,text/plain");
+      Request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+      QNetworkReply * Reply = Manager.get(Request);
+      QEventLoop Loop;
+      connect(Reply, &QNetworkReply::finished, &Loop, &QEventLoop::quit);
+      QApplication::setOverrideCursor(Qt::BusyCursor);
+      Loop.exec();
+      QApplication::restoreOverrideCursor();
+      Reply->deleteLater();
+      if (Reply->error() != QNetworkReply::NoError)
+      {
+        QMessageBox::warning(this, QString::fromStdString(CoreBridge::Text(CoreBridge::TText::AddExtensionCaption)),
+          Reply->errorString());
+        return false;
+      }
+      const bool Trusted = WinScpUrl && (QString::fromLatin1(Reply->rawHeader("WinSCP-Extension-Trusted")).toInt() != 0);
+      Latest = Reply->rawHeader("WinSCP-Extension-Skipped").trimmed().isEmpty();
+      Index = FExtensions->AddFromUrl(Path.toStdString(), QString::fromUtf8(Reply->readAll()).toStdString(),
+        QString::fromLatin1(Reply->rawHeader("WinSCP-Extension-Id")).toStdString(), Trusted, Before, ConfirmUntrusted);
+    }
+    else
+    {
+      Index = FExtensions->AddFromFile(QDir::fromNativeSeparators(Path).toStdString(), Before, ConfirmUntrusted);
+    }
+    if (Index < 0)
+    {
+      return false;
+    }
+    LoadCommands(static_cast<int>(FCommands.size()) + Index);
+    if (!Latest)
+    {
+      QMessageBox::information(this, QString::fromStdString(CoreBridge::Text(CoreBridge::TText::AddExtensionCaption)),
+        QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ExtensionNotLatest)));
+    }
+    return true;
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    Frontend.ShowError(E.Error);
+    return false;
+  }
+}
+
+// As TPreferencesDialog::ConfigureCommand: the extension's Preferences
+// options (the site's for those kept per site) and its keyboard shortcut.
+bool PreferencesDialog::ConfigureCommand(const std::vector<std::string> * Values, const unsigned * AShortCut)
+{
+  const int Row = FCommandsList->indexOfTopLevelItem(FCommandsList->currentItem());
+  const int Extension = ExtensionIndex(Row);
+  if (Extension < 0)
+  {
+    return false;
+  }
+  const CoreBridge::TCustomCommandDefinition Command = FExtensions->Items()[Extension];
+  // TCustomCommandType's ofConfig.
+  const unsigned Flags = 2;
+  if (Command.SiteOptions && FSessionKey.empty())
+  {
+    QMessageBox::warning(this, windowTitle(), QString::fromStdString(CoreBridge::Text(CoreBridge::TText::NoSiteForCommand)));
+    return false;
+  }
+  std::vector<std::string> NewValues;
+  unsigned ShortCut = Command.ShortCut;
+  if (Values != nullptr)
+  {
+    NewValues = *Values;
+    ShortCut = (AShortCut != nullptr) ? *AShortCut : ShortCut;
+  }
+  else
+  {
+    std::vector<unsigned> Used;
+    for (const CoreBridge::TCustomCommandDefinition & Other : FCommands)
+    {
+      if (Other.ShortCut != 0)
+      {
+        Used.push_back(Other.ShortCut);
+      }
+    }
+    for (const CoreBridge::TCustomCommandDefinition & Other : FExtensions->Items())
+    {
+      if ((Other.ShortCut != 0) && (Other.Id != Command.Id))
+      {
+        Used.push_back(Other.ShortCut);
+      }
+    }
+    ExtensionOptionsDialog Dialog(QString::fromStdString(Command.Name), FExtensions->Options(Extension, Flags, FSessionKey),
+      this, &ShortCut, Used, QString::fromStdString(!Command.OptionsPage.empty() ? Command.OptionsPage : Command.HomePage));
+    if (Dialog.exec() != QDialog::Accepted)
+    {
+      return false;
+    }
+    NewValues = Dialog.Values();
+    ShortCut = Dialog.ShortCut();
+  }
+  FExtensions->SetOptions(Extension, Flags, FSessionKey, NewValues);
+  FExtensions->SetShortCut(Extension, ShortCut);
+  LoadCommands(Row);
+  return true;
 }
 
 // Editors, as WinSCP's EditorSheet: the editors files open in, the first

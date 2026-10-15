@@ -110,6 +110,7 @@
 #include "LocalPanel.h"
 #include "QueryDialog.h"
 #include "Theme.h"
+#include "ExtensionOptionsDialog.h"
 #include "QueuePanel.h"
 #include "TransferDialog.h"
 
@@ -4048,6 +4049,213 @@ void EnvironmentTest(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// Custom command extensions (P3-20): added from a file, configured, run with
+// their options, in the menus, removed.
+void ExtensionsTest(const char * Port, const QString & Directory)
+{
+  const QDir Dir(Directory);
+#if !defined(_WIN32)
+  // The user's extensions folder, the configuration's: the test's own.
+  qputenv("XDG_CONFIG_HOME", Dir.filePath(QStringLiteral("config")).toLocal8Bit());
+#endif
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = { "secret" };
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "the session opens");
+    const auto Write = [&Dir](const QString & Name, const QByteArray & Text)
+    {
+      QFile File(Dir.filePath(Name));
+      File.open(QIODevice::WriteOnly);
+      File.write(Text);
+      return Dir.filePath(Name);
+    };
+    // A local extension on the selected file: its run option (the greeting)
+    // asked, its Preferences one (loud) and a list kept.
+#if defined(_WIN32)
+    const QString Extension = Write(QStringLiteral("hello.WinSCPextension.cmd"),
+      "@echo off\r\n"
+      "rem @name &Say Hello...\r\n"
+      "rem @command cmd.exe /c echo %Greeting% %Loud%> \"!.out\"\r\n"
+#else
+    const QString Extension = Write(QStringLiteral("hello.WinSCPextension.sh"),
+      "#!/bin/sh\n"
+      "# @name &Say Hello...\n"
+      "# @command /bin/sh -c 'echo \"$0 $1\" > \"$2.out\"' \"%Greeting%\" \"%Loud%\" \"!\"\n"
+#endif
+      "# @description Writes a greeting beside the file\n"
+      "# @side Local\n"
+      "# @option Greeting -run textbox \"&Greeting:\" \"Hello\"\n"
+      "# @option Loud -config checkbox \"&Loud\" \"\" \"-loud\" \"\"\n"
+      "# @option - -config label \"Says hello.\"\n"
+      "# @option Mode -config dropdownlist \"&Mode:\" \"plain\" \"plain=Plain\" \"fancy=Fancy\"\n");
+    Write(QStringLiteral("a.txt"), "a");
+    {
+      PreferencesDialog Dialog(&Window);
+      Dialog.ShowPage(PreferencesDialog::tr("Commands"));
+      const int Customs = static_cast<int>(Dialog.Commands().size());
+      Check(Dialog.AddExtension(&Extension), "an extension added from its file");
+      Check((Dialog.CommandsList()->topLevelItemCount() == Customs + 1) &&
+        (Dialog.CommandsList()->currentItem()->text(0) == QStringLiteral("Say Hello...")) &&
+        (Dialog.CommandsList()->currentItem()->toolTip(0) == QStringLiteral("Writes a greeting beside the file")),
+        "listed after the custom commands, its description its hint");
+      Check(!Dialog.ConfigureCommandButton()->isHidden() && Dialog.ConfigureCommandButton()->isEnabled(),
+        "Configure in Edit's place");
+      const std::vector<CoreBridge::TExtensionOption> Options = Dialog.ExtensionsEdit()->Options(0, 2, std::string());
+      Check((Options.size() == 3) && (Options[0].Kind == CoreBridge::TExtensionOption::TKind::CheckBox) &&
+        (Options[1].Kind == CoreBridge::TExtensionOption::TKind::Label) &&
+        (Options[2].Kind == CoreBridge::TExtensionOption::TKind::DropDownList) && (Options[2].Value == "plain") &&
+        (Options[2].Items.size() == 2) && (Options[2].Items[1].second == "Fancy"), "its Preferences options, with their defaults");
+      {
+        ExtensionOptionsDialog Configure(QStringLiteral("&Say Hello..."), Options, &Dialog);
+        QCheckBox * Loud = qobject_cast<QCheckBox *>(Configure.Control(0));
+        QComboBox * Mode = qobject_cast<QComboBox *>(Configure.Control(2));
+        Check((Configure.windowTitle() == QStringLiteral("Say Hello")) && (Loud != nullptr) && !Loud->isChecked() &&
+          (Mode != nullptr) && (Mode->currentText() == QStringLiteral("Plain")), "the options dialog, its controls");
+        Loud->setChecked(true);
+        Mode->setCurrentIndex(1);
+        Check(Configure.Values() == std::vector<std::string>({ "-loud", "", "fancy" }), "and their values, a list's its item's value");
+      }
+      const std::vector<std::string> Values = { "-loud", "", "fancy" };
+      Check(Dialog.ConfigureCommand(&Values), "configured");
+      Check(Dialog.ExtensionsEdit()->Options(0, 2, std::string())[2].Value == "fancy", "the values kept");
+      // The same again, and one whose requirements are not met: refused.
+      const int Errors = Responder.Errors;
+      Check(!Dialog.AddExtension(&Extension) && (Responder.Errors == Errors + 1), "not twice");
+      const QString Unmet = Write(QStringLiteral("unmet.WinSCPextension.txt"),
+        "# @name Never\n# @command echo\n# @require pwsh 999\n");
+      Check(!Dialog.AddExtension(&Unmet) && (Responder.Errors == Errors + 2), "nor with its requirements unmet");
+      Dialog.Save();
+    }
+    const std::vector<CoreBridge::TCustomCommandDefinition> Extensions = CoreBridge::Extensions();
+    Check((Extensions.size() == 1) && (QString::fromStdString(Extensions[0].Id).startsWith(QStringLiteral("userext"))) &&
+      Extensions[0].RunOptions && Extensions[0].ConfigOptions && Extensions[0].Local, "saved, the user's");
+    const QString Installed = QString::fromStdString(Extensions.empty() ? std::string() : Extensions[0].FileName);
+    Check(QFileInfo::exists(Installed) && (QFileInfo(Installed).absolutePath() != QFileInfo(Extension).absolutePath()),
+      "copied into the user's extensions folder");
+    // In the Commands menus, after the custom commands.
+    Window.UpdateCustomCommands();
+    bool Listed = false;
+    for (QAction * Action : Window.findChildren<QAction *>())
+    {
+      Listed = Listed || (Action->text() == QStringLiteral("&Say Hello..."));
+    }
+    Check(Listed, "in the menus");
+    // Run: its run option asked (and kept), the others' values in it.
+    Window.Local()->ChangeDirectory(Directory);
+    Window.ActivatePanel(true);
+    Window.Local()->Select({ QStringLiteral("a.txt") });
+    int Asked = 0;
+    Responder.Custom = [&Asked](QWidget * Modal)
+    {
+      ExtensionOptionsDialog * Options = qobject_cast<ExtensionOptionsDialog *>(Modal);
+      if (Options == nullptr)
+      {
+        return false;
+      }
+      Asked++;
+      qobject_cast<QComboBox *>(Options->Control(0))->setEditText(QStringLiteral("Hi"));
+      Options->accept();
+      return true;
+    };
+    Check(!Extensions.empty() && Window.RunCustomCommand(Extensions[0]) && (Asked == 1), "run, its option asked");
+    Responder.Custom = nullptr;
+    QFile Out(Dir.filePath(QStringLiteral("a.txt.out")));
+    Check(Out.open(QIODevice::ReadOnly) && QString::fromLocal8Bit(Out.readAll()).trimmed().startsWith(QStringLiteral("Hi -loud")),
+      "with the options' values");
+    Check(CoreBridge::TSession::ExtensionRunOptions(nullptr, Extensions[0], std::string())[0].Value == "Hi",
+      "the run option kept for next time");
+    // Removed: its file too.
+    {
+      PreferencesDialog Dialog(&Window);
+      Dialog.CommandsList()->setCurrentItem(Dialog.CommandsList()->topLevelItem(Dialog.CommandsList()->topLevelItemCount() - 1));
+      Dialog.RemoveCommand();
+      Dialog.Save();
+    }
+    Check(CoreBridge::Extensions().empty() && !QFileInfo::exists(Installed), "removed, its file deleted");
+
+#if defined(_WIN32)
+    // As WinSCP's own extensions: PowerShell over WinSCP's .NET assembly,
+    // loaded from %WINSCP_PATH% (the package's dotnet folder, which the
+    // shell points it to), the session given as its URL (!E). Native
+    // Windows only (Wine has no PowerShell), with the deploy folder's
+    // assembly beside the tests (port/tools/vm_tests.py).
+    const QDir Program(QCoreApplication::applicationDirPath());
+    const bool Wine = (GetProcAddress(GetModuleHandleW(L"ntdll.dll"), "wine_get_version") != nullptr);
+    if (!Wine && Program.exists(QStringLiteral("dotnet/WinSCPnet.dll")))
+    {
+      qputenv("WINSCP_PATH", QDir::toNativeSeparators(Program.filePath(QStringLiteral("dotnet"))).toLocal8Bit());
+      const QString Listing = QDir::toNativeSeparators(Dir.filePath(QStringLiteral("listing.txt")));
+      const QString PowerShell = Write(QStringLiteral("list.WinSCPextension.ps1"),
+        "# @name &List Remote\n"
+        "# @command powershell.exe -ExecutionPolicy Bypass -File \"%EXTENSION_PATH%\" -sessionUrl \"!E\" -out \"%Out%\"\n"
+        "# @require WinSCP 5.15\n"
+        "# @require .NET 4.0\n"
+        "# @require PowerShell 3.0\n"
+        "# @option Out -config file \"&Output:\" \"\"\n"
+        "param ($sessionUrl, $out)\n"
+        "$assemblyPath = if ($env:WINSCP_PATH) { $env:WINSCP_PATH } else { $PSScriptRoot }\n"
+        "Add-Type -Path (Join-Path $assemblyPath \"WinSCPnet.dll\")\n"
+        "$options = New-Object WinSCP.SessionOptions\n"
+        "$options.ParseUrl($sessionUrl)\n"
+        "$options.GiveUpSecurityAndAcceptAnySshHostKey = $true\n"
+        "$session = New-Object WinSCP.Session\n"
+        "try { $session.Open($options); ($session.ListDirectory('/').Files | ForEach-Object { $_.Name }) -join ',' | Out-File $out }\n"
+        "catch { 'ERROR ' + $_.Exception.Message | Out-File $out }\n"
+        "finally { $session.Dispose() }\n");
+      {
+        PreferencesDialog Dialog(&Window);
+        Check(Dialog.AddExtension(&PowerShell), "a PowerShell extension, its requirements met");
+        const std::vector<std::string> Values = { Listing.toStdString() };
+        Check(Dialog.ConfigureCommand(&Values), "its output configured");
+        Dialog.Save();
+      }
+      const std::vector<CoreBridge::TCustomCommandDefinition> Added = CoreBridge::Extensions();
+      if (!Added.empty())
+      {
+        std::printf("powershell extension at %s (%s): %s\n", Added[0].FileName.c_str(),
+          QFileInfo::exists(QString::fromStdString(Added[0].FileName)) ? "there" : "missing", Added[0].Command.c_str());
+      }
+      Check((Added.size() == 1) && Window.RunCustomCommand(Added[0]), "run");
+      // Started, not waited for (as WinSCP's local commands without files to
+      // upload back): its output, once there.
+      QElapsedTimer Waited;
+      Waited.start();
+      while ((QFileInfo(Listing).size() == 0) && (Waited.elapsed() < 120000))
+      {
+        QTest::qWait(250);
+      }
+      QTest::qWait(500);
+      QFile Result(Listing);
+      QString Names;
+      // (powershell.exe's Out-File: UTF-16.)
+      if (Result.open(QIODevice::ReadOnly))
+      {
+        const QByteArray Bytes = Result.readAll();
+        Names = (Bytes.startsWith("\xff\xfe") ?
+          QString::fromUtf16(reinterpret_cast<const char16_t *>(Bytes.constData() + 2), (Bytes.size() - 2) / 2) :
+          QString::fromUtf8(Bytes)).trimmed();
+      }
+      std::printf("powershell extension: %s\n", Names.toUtf8().constData());
+      Check(Names.split(QLatin1Char(',')).contains(QStringLiteral("hello.txt")),
+        "it listed the server through WinSCP's assembly driving linscp");
+      {
+        PreferencesDialog Dialog(&Window);
+        Dialog.CommandsList()->setCurrentItem(Dialog.CommandsList()->topLevelItem(Dialog.CommandsList()->topLevelItemCount() - 1));
+        Dialog.RemoveCommand();
+        Dialog.Save();
+      }
+    }
+#endif
+  }
+  CoreBridge::Finalize();
+}
+
 void Session(const char * Port)
 {
   QtFrontend Frontend;
@@ -6510,6 +6718,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 3) && (std::strcmp(argv[1], "toolbars") == 0))
   {
     ToolbarsTest();
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "extensions") == 0))
+  {
+    ExtensionsTest(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "options") == 0))
   {

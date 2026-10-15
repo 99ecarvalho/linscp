@@ -258,9 +258,24 @@ public:
   void SetCustomCommandList(const TCustomCommandList * List);
   TStrings * CustomCommandOptions() const { return FCustomCommandOptions.get(); }
   void SetCustomCommandOptions(TStrings * Options);
-  // TWinConfiguration's, for the custom commands' slice (extensions'
-  // strings: not translated yet).
+  // TWinConfiguration's, for the custom commands' slice: an extension's
+  // string in the user interface's language, from its translation's
+  // EXTENSION_STRINGS.
   UnicodeString __fastcall ExtensionStringTranslation(const UnicodeString & ExtensionId, const UnicodeString & S);
+  // The extensions, as TWinConfiguration has them: each *.WinSCPextension.*
+  // file of the program's own folder ("common"), its Extensions folder
+  // ("commonext"; on POSIX share/linscp/Extensions beside bin) and the
+  // user's ("userext", in the configuration's folder), the deleted ones
+  // that could not be removed skipped, in the order kept, with their keys
+  // (ExtensionsDeleted, ExtensionsOrder, ExtensionsShortCuts).
+  const TCustomCommandList * ExtensionList() const { return FExtensionList.get(); }
+  void SetExtensionList(const TCustomCommandList * List);
+  void LoadExtensionList();
+  UnicodeString GetUserExtensionsPath();
+  TStrings * GetExtensionsPaths();
+  UnicodeString GetExtensionId(const UnicodeString & ExtensionPath);
+  UnicodeString GetProvisionaryExtensionId(const UnicodeString & FileName);
+  UnicodeString UniqueExtensionName(const UnicodeString & ExtensionName, int Counter);
 
   // The master password, as TWinConfiguration's: stored passwords
   // encrypted with it (AES, StronglyRecryptPassword), decrypted as read
@@ -305,6 +320,13 @@ private:
   TShellSettings FSettings;
   std::unique_ptr<TBookmarks> FBookmarks;
   std::unique_ptr<TCustomCommandList> FCustomCommandList;
+  std::unique_ptr<TCustomCommandList> FExtensionList;
+  UnicodeString FExtensionsDeleted;
+  UnicodeString FExtensionsOrder;
+  UnicodeString FExtensionsShortCuts;
+  std::unique_ptr<TStringList> FExtensionTranslations;
+  void LoadExtensionTranslations();
+  void DoLoadExtensionList(const UnicodeString & Path, const UnicodeString & PathId, TStringList * DeletedExtensions);
   std::unique_ptr<TEditorList> FEditorList;
   void DefaultEditorList();
   bool FCustomCommandsDefaults = true;

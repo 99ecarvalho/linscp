@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
-Build WinSCP's .NET assembly (WinSCPnet.dll, netstandard2.0) from the pinned
-submodule, with linscp's assembly patches applied to a copy of its dotnet/.
+Build WinSCP's .NET assembly (WinSCPnet.dll, netstandard2.0, or net40 as
+WinSCP ships it for Windows PowerShell) from the pinned submodule, with
+linscp's assembly patches applied to a copy of its dotnet/.
 
   build_winscpnet.py --dotnet DOTNET --upstream 3rd-party/winscp --dest DIR
+                     [--framework netstandard2.0|net40]
 
 The patches are port/patches/dotnet/*.patch, in name order, applied with
 `git apply` (no fuzz: a patch upstream has moved past fails the build and
@@ -20,6 +22,7 @@ def main():
     ap.add_argument('--dotnet', required=True)
     ap.add_argument('--upstream', required=True)
     ap.add_argument('--dest', required=True)
+    ap.add_argument('--framework', default='netstandard2.0', choices=('netstandard2.0', 'net40'))
     a = ap.parse_args()
     if not os.path.isfile(a.dotnet):
         print(f'SKIP: no dotnet at {a.dotnet} (port/tools/fetch_dotnet.py fetches one)')
@@ -41,7 +44,7 @@ def main():
             return 1
     out = os.path.join(a.dest, 'bin')
     build = subprocess.run([a.dotnet, 'build', os.path.join(source, 'dotnet', 'WinSCPnet.csproj'),
-                            '-f', 'netstandard2.0', '-c', 'Release', '-o', out, '-nologo'],
+                            '-f', a.framework, '-c', 'Release', '-o', out, '-nologo'],
                            capture_output=True, text=True)
     if build.returncode != 0:
         print(build.stdout[-4000:] + build.stderr[-2000:])

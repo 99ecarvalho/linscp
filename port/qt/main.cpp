@@ -3,6 +3,7 @@
 // the main window, reports what it runs on and quits once the event loop has
 // run: ctest gui_smoke.
 #include <QApplication>
+#include <QDir>
 #include <QMessageBox>
 #include <QStatusBar>
 #include <QTimer>
@@ -27,6 +28,16 @@ int main(int argc, char ** argv)
   }
 
   QApplication App(argc, argv);
+  // As WinSCP.cpp: WINSCP_PATH for what custom commands run, where WinSCP's
+  // PowerShell extensions load its .NET assembly from -- linscp's dotnet
+  // folder, when the package has it (the assembly starts the WinSCP.exe
+  // beside it), else the program's own.
+  {
+    const QDir Program(QCoreApplication::applicationDirPath());
+    const QString Path = Program.exists(QStringLiteral("dotnet/WinSCPnet.dll")) ? Program.filePath(QStringLiteral("dotnet")) :
+      Program.path();
+    qputenv("WINSCP_PATH", QDir::toNativeSeparators(Path).toLocal8Bit());
+  }
   // Core sees what Qt leaves of the command line: its own switches and the
   // session to open, as WinSCP.exe's.
   {

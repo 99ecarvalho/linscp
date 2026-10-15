@@ -73,6 +73,7 @@ UnicodeString PosixPuttyPath()
 TShellConfiguration::TShellConfiguration() :
   FBookmarks(new TBookmarks()),
   FCustomCommandList(new TCustomCommandList()),
+  FExtensionList(new TCustomCommandList()),
   FEditorList(new TEditorList()),
   FCustomCommandOptions(new TStringList())
 {
@@ -281,6 +282,9 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteInteger(L"GenerateUrlCodeTarget", FSettings.GenerateUrlCodeTarget);
     Storage->WriteInteger(L"GenerateUrlScriptFormat", FSettings.GenerateUrlScriptFormat);
     Storage->WriteInteger(L"GenerateUrlAssemblyLanguage", FSettings.GenerateUrlAssemblyLanguage);
+    Storage->WriteString(L"ExtensionsDeleted", FExtensionsDeleted);
+    Storage->WriteString(L"ExtensionsOrder", FExtensionsOrder);
+    Storage->WriteString(L"ExtensionsShortCuts", FExtensionsShortCuts);
     Storage->WriteBool(L"ConfirmTransferring", FSettings.ConfirmTransferring);
     Storage->WriteBool(L"ConfirmDeleting", FSettings.ConfirmDeleting);
     Storage->WriteBool(L"ConfirmRecycling", FSettings.ConfirmRecycling);
@@ -524,10 +528,252 @@ void TShellConfiguration::SetCustomCommandOptions(TStrings * Options)
   }
 }
 
-UnicodeString __fastcall TShellConfiguration::ExtensionStringTranslation(const UnicodeString & /*ExtensionId*/,
+// As TWinConfiguration's extensions' part, but for its usage statistics.
+
+namespace
+{
+
+void ParseExtensionList(TStrings * Strings, UnicodeString S)
+{
+  while (!S.IsEmpty())
+  {
+    Strings->Add(CutToChar(S, L'|', false));
+  }
+}
+
+const UnicodeString ExtensionsSubFolder(L"Extensions");
+const UnicodeString ExtensionsCommonPathId(L"common");
+const UnicodeString ExtensionsCommonExtPathId(L"commonext");
+const UnicodeString ExtensionsUserExtPathId(L"userext");
+
+UnicodeString ExtractExtensionBaseName(const UnicodeString & FileName)
+{
+  UnicodeString S = ExtractFileName(FileName);
+  // All the extensions trimmed, not only the last.
+  return CutToChar(S, L'.', true);
+}
+
+}  // namespace
+
+void TShellConfiguration::LoadExtensionTranslations()
+{
+  FExtensionTranslations.reset(new TStringList());
+  FExtensionTranslations->OwnsObjects = true;
+  int Index = EXTENSION_STRINGS;
+  UnicodeString S;
+  while (!((S = LoadStr(Index)).IsEmpty()))
+  {
+    UnicodeString ExtensionName = CutToChar(S, L'.', false);
+    UnicodeString Original = CutToChar(S, L'=', false);
+    int ExtensionIndex = FExtensionTranslations->IndexOf(ExtensionName);
+    if (ExtensionIndex < 0)
+    {
+      ExtensionIndex = FExtensionTranslations->AddObject(ExtensionName, new TStringList());
+    }
+    static_cast<TStringList *>(FExtensionTranslations->Objects[ExtensionIndex])->Values[Original] = S;
+    Index++;
+  }
+}
+
+UnicodeString __fastcall TShellConfiguration::ExtensionStringTranslation(const UnicodeString & ExtensionId,
   const UnicodeString & S)
 {
-  return S;
+  UnicodeString Result = S;
+  if (!ExtensionId.IsEmpty() && (FExtensionTranslations.get() != NULL))
+  {
+    UnicodeString ExtensionName = ExtractFileName(ExtensionId);
+    int ExtensionIndex;
+    bool Retry;
+    do
+    {
+      ExtensionIndex = FExtensionTranslations->IndexOf(ExtensionName);
+      // Without the trailing digits UniqueExtensionName may have added.
+      Retry = (ExtensionIndex < 0) && !ExtensionName.IsEmpty() && IsDigit(ExtensionName[ExtensionName.Length()]);
+      if (Retry)
+      {
+        ExtensionName.SetLength(ExtensionName.Length() - 1);
+      }
+    }
+    while (Retry);
+    if (ExtensionIndex >= 0)
+    {
+      TStrings * Translation = static_cast<TStrings *>(FExtensionTranslations->Objects[ExtensionIndex]);
+      const int StringIndex = Translation->IndexOfName(S);
+      if (StringIndex >= 0)
+      {
+        Result = Translation->ValueFromIndex[StringIndex];
+      }
+    }
+  }
+  return Result;
+}
+
+UnicodeString TShellConfiguration::GetProvisionaryExtensionId(const UnicodeString & FileName)
+{
+  return IncludeTrailingBackslash(ExtensionsUserExtPathId) + ExtractExtensionBaseName(FileName);
+}
+
+UnicodeString TShellConfiguration::GetUserExtensionsPath()
+{
+  return IncludeTrailingBackslash(IncludeTrailingBackslash(GetShellFolderPath(CSIDL_APPDATA)) + AppNameString()) +
+    ExtensionsSubFolder;
+}
+
+TStrings * TShellConfiguration::GetExtensionsPaths()
+{
+  std::unique_ptr<TStrings> Result(new TStringList());
+  const UnicodeString ExeParentPath = ExcludeTrailingBackslash(ExtractFilePath(ModuleFileName()));
+  Result->Values[ExtensionsCommonPathId] = ExeParentPath;
+#if defined(_WIN32)
+  Result->Values[ExtensionsCommonExtPathId] = IncludeTrailingBackslash(ExeParentPath) + ExtensionsSubFolder;
+#else
+  // Installed, the program is in bin and its data in share/linscp.
+  Result->Values[ExtensionsCommonExtPathId] =
+    IncludeTrailingBackslash(ExtractFilePath(ExeParentPath)) + L"share/linscp/" + ExtensionsSubFolder;
+#endif
+  Result->Values[ExtensionsUserExtPathId] = GetUserExtensionsPath();
+  return Result.release();
+}
+
+UnicodeString TShellConfiguration::GetExtensionId(const UnicodeString & ExtensionPath)
+{
+  const UnicodeString Path = ExcludeTrailingBackslash(ExtractFilePath(ExtensionPath));
+  const UnicodeString NameId = TCustomCommandType::GetExtensionId(ExtractFileName(ExtensionPath));
+  if (!NameId.IsEmpty())
+  {
+    std::unique_ptr<TStrings> ExtensionsPaths(GetExtensionsPaths());
+    for (int Index = 0; Index < ExtensionsPaths->Count; Index++)
+    {
+      if (IsPathToSameFile(Path, ExtensionsPaths->ValueFromIndex[Index]))
+      {
+        return IncludeTrailingBackslash(ExtensionsPaths->Names[Index]) + NameId;
+      }
+    }
+  }
+  return UnicodeString();
+}
+
+UnicodeString TShellConfiguration::UniqueExtensionName(const UnicodeString & ExtensionName, int Counter)
+{
+  // ExtensionStringTranslation removes the digits again.
+  return ExtensionName + IntToStr(Counter);
+}
+
+void TShellConfiguration::DoLoadExtensionList(
+  const UnicodeString & Path, const UnicodeString & PathId, TStringList * DeletedExtensions)
+{
+  TSearchRecOwned SearchRec;
+  const int FindAttrs = faReadOnly | faArchive;
+  if (FindFirstUnchecked(IncludeTrailingBackslash(Path) + L"*.*", FindAttrs, SearchRec) == 0)
+  {
+    do
+    {
+      UnicodeString Id = TCustomCommandType::GetExtensionId(SearchRec.Name);
+      if (!Id.IsEmpty())
+      {
+        Id = IncludeTrailingBackslash(PathId) + Id;
+        if (DeletedExtensions->IndexOf(Id) >= 0)
+        {
+          // The list made again, without what no longer exists.
+          AddToList(FExtensionsDeleted, Id, L"|");
+        }
+        else
+        {
+          std::unique_ptr<TCustomCommandType> CustomCommand(new TCustomCommandType());
+          CustomCommand->Id = Id;
+          try
+          {
+            CustomCommand->LoadExtension(SearchRec.GetFilePath());
+            FExtensionList->Add(CustomCommand.release());
+          }
+          catch (...)
+          {
+            // An invalid extension file, or one whose requirements are not met.
+          }
+        }
+      }
+    }
+    while (FindNextChecked(SearchRec) == 0);
+  }
+}
+
+void TShellConfiguration::LoadExtensionList()
+{
+  LoadExtensionTranslations();
+  FExtensionList->Clear();
+  std::unique_ptr<TStringList> DeletedExtensions(CreateSortedStringList());
+  ParseExtensionList(DeletedExtensions.get(), FExtensionsDeleted);
+  FExtensionsDeleted = L"";
+  std::unique_ptr<TStrings> ExtensionsPaths(GetExtensionsPaths());
+  for (int Index = 0; Index < ExtensionsPaths->Count; Index++)
+  {
+    DoLoadExtensionList(ExtensionsPaths->ValueFromIndex[Index], ExtensionsPaths->Names[Index], DeletedExtensions.get());
+  }
+  std::unique_ptr<TStringList> OrderedExtensions(new TStringList());
+  ParseExtensionList(OrderedExtensions.get(), FExtensionsOrder);
+  FExtensionList->SortBy(OrderedExtensions.get());
+  UnicodeString ShortCuts = FExtensionsShortCuts;
+  while (!ShortCuts.IsEmpty())
+  {
+    UnicodeString S = CutToChar(ShortCuts, L'|', false);
+    const TShortCut ShortCut = static_cast<TShortCut>(StrToIntDef(CutToChar(S, L'=', false), 0));
+    for (int Index = 0; Index < FExtensionList->Count; Index++)
+    {
+      if (FExtensionList->Commands[Index]->Id == S)
+      {
+        const_cast<TCustomCommandType *>(FExtensionList->Commands[Index])->ShortCut = ShortCut;
+      }
+    }
+  }
+}
+
+// As TWinConfiguration::SetExtensionList: the removed ones' files deleted
+// (those that cannot be, noted as deleted), the order and the keys kept.
+void TShellConfiguration::SetExtensionList(const TCustomCommandList * List)
+{
+  if (!FExtensionList->Equals(List))
+  {
+    std::unique_ptr<TStringList> DeletedExtensions(CreateSortedStringList());
+    ParseExtensionList(DeletedExtensions.get(), FExtensionsDeleted);
+    for (int Index = 0; Index < FExtensionList->Count; Index++)
+    {
+      const TCustomCommandType * CustomCommand = FExtensionList->Commands[Index];
+      if (List->FindIndexByFileName(CustomCommand->FileName) < 0)
+      {
+        if (FileExists(ApiPath(CustomCommand->FileName)) && !DeleteFile(ApiPath(CustomCommand->FileName)))
+        {
+          DeletedExtensions->Add(CustomCommand->Id);
+        }
+      }
+    }
+    FExtensionsOrder = L"";
+    for (int Index = 0; Index < List->Count; Index++)
+    {
+      const TCustomCommandType * CustomCommand = List->Commands[Index];
+      AddToList(FExtensionsOrder, CustomCommand->Id, L"|");
+      const int DeletedIndex = DeletedExtensions->IndexOf(CustomCommand->Id);
+      if (DeletedIndex >= 0)
+      {
+        DeletedExtensions->Delete(DeletedIndex);
+      }
+    }
+    FExtensionList->Assign(List);
+    FExtensionsDeleted = L"";
+    for (int Index = 0; Index < DeletedExtensions->Count; Index++)
+    {
+      AddToList(FExtensionsDeleted, DeletedExtensions->Strings[Index], L"|");
+    }
+    FExtensionsShortCuts = L"";
+    for (int Index = 0; Index < List->Count; Index++)
+    {
+      const TCustomCommandType * Extension = List->Commands[Index];
+      if (Extension->HasCustomShortCut())
+      {
+        AddToList(FExtensionsShortCuts, FORMAT(L"%d=%s", (Extension->ShortCut, Extension->Id)), L"|");
+      }
+    }
+    Changed();
+  }
 }
 
 void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
@@ -612,6 +858,9 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.GenerateUrlScriptFormat = Storage->ReadInteger(L"GenerateUrlScriptFormat", FSettings.GenerateUrlScriptFormat);
     FSettings.GenerateUrlAssemblyLanguage =
       Storage->ReadInteger(L"GenerateUrlAssemblyLanguage", FSettings.GenerateUrlAssemblyLanguage);
+    FExtensionsDeleted = Storage->ReadString(L"ExtensionsDeleted", FExtensionsDeleted);
+    FExtensionsOrder = Storage->ReadString(L"ExtensionsOrder", FExtensionsOrder);
+    FExtensionsShortCuts = Storage->ReadString(L"ExtensionsShortCuts", FExtensionsShortCuts);
     FSettings.ConfirmTransferring = Storage->ReadBool(L"ConfirmTransferring", FSettings.ConfirmTransferring);
     FSettings.ConfirmDeleting = Storage->ReadBool(L"ConfirmDeleting", FSettings.ConfirmDeleting);
     FSettings.ConfirmRecycling = Storage->ReadBool(L"ConfirmRecycling", FSettings.ConfirmRecycling);
@@ -758,6 +1007,9 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.QueueViewToolBar = Storage->ReadBool(L"ToolBar", FSettings.QueueViewToolBar);
     FSettings.QueueViewFileList = Storage->ReadBool(L"FileList", FSettings.QueueViewFileList);
   }
+  // As TWinConfiguration::LoadData: once ExtensionsDeleted, ExtensionsOrder
+  // and ExtensionsShortCuts are read.
+  LoadExtensionList();
 }
 
 // TWinConfiguration's master password, as it has it.

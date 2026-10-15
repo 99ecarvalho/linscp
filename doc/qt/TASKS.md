@@ -143,6 +143,7 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P3-17 | Icons: bundled freely licensed sets (WinSCP's are not reusable, its license.txt part B) in `assets/icons/<set>/`, one chosen in Preferences, with the desktop's theme on POSIX; on the menus and the toolbars | M | P3-14 | Raised 2026-10-14 by the user |
 | P3-18 | A test devcontainer with real servers for every protocol: OpenSSH (SFTP, SCP), FTP with FTPES and implicit FTPS (e.g. vsftpd or ProFTPD), WebDAV over HTTP and HTTPS (e.g. Apache mod_dav), and S3 (e.g. MinIO), alongside today's in-repo pyftpdlib and moto ones; the protocol, CLI, GUI and golden suites run against them, locally and in CI | L | P1-19 | Raised 2026-10-15 by the user; deferred, P3-15 first |
 | P3-19 | The Preferences pages left out so far: Environment (confirmations, notifications), Interface (the theme), the panels' Remote and Local, Drag & Drop, Updates; each setting doing what it does in WinSCP | M | P3-04 | Raised 2026-10-15 by the user |
+| P3-20 | Custom command extensions (WinSCP's .WinSCPextension files): found in the program's and the user's extension folders, added from a file or URL, their options (Preferences' and each run's), in the menus and run; WinSCP's PowerShell extensions running over WinSCP's .NET assembly, which the Windows packages carry | M | P3-06d | Deferred from P3-16 (2026-10-15); raised again 2026-10-15 by the user |
 
 ## P4 — Cleanup
 

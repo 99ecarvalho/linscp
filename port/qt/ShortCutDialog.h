@@ -17,7 +17,7 @@ class QComboBox;
 // is not offered (SetShortCutCombo).
 void FillShortCutCombo(QComboBox * Combo, const std::vector<unsigned> & Used, unsigned Current);
 
-// The shortcuts in use: the custom commands' (WinConfiguration's
+// The shortcuts in use: the custom commands' and the extensions' (WinConfiguration's
 // CustomCommandShortCuts).
 std::vector<unsigned> CustomCommandShortCuts();
 

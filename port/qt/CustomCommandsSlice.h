@@ -26,8 +26,8 @@ extern TShellConfiguration * WinConfiguration;
 TShortCut __fastcall NormalizeCustomShortCut(TShortCut ShortCut);
 bool __fastcall IsCustomShortCut(TShortCut ShortCut);
 // windows/Setup.cpp's, which extensions' "Require" lines check: the .NET
-// and PowerShell versions installed. linscp's (CustomCommandsSlice.cpp)
-// find none yet.
+// and PowerShell versions installed, as linscp finds them
+// (CustomCommandsSlice.cpp).
 UnicodeString GetNetVersionStr();
 UnicodeString GetNetCoreVersionStr();
 UnicodeString GetPowerShellVersionStr();

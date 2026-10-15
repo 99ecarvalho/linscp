@@ -141,6 +141,13 @@ cmake --build build/release --target package-appimage   # linscp-<version>-x86_6
   icon, the Send To upload shortcut, the URL handler and the search path, as
   WinSCP's installer does.
 
+  With the .NET SDK at `build/win-release/tools/dotnet`
+  (`python3 port/tools/fetch_dotnet.py --dest build/win-release/tools/dotnet`;
+  or `-DLINSCP_HOST_DOTNET=<dotnet>`), the Windows packages also carry
+  WinSCP's .NET assembly in a `dotnet` folder, with `linscp-cli` as the
+  `WinSCP.exe` it starts: WinSCP's own PowerShell extensions (Preferences >
+  Commands > Add Extension) then run with linscp.
+
 - **Portable**, as WinSCP's portable mode: the configuration is kept in an
   INI file beside the program instead of the user's.
   - Windows: `cmake --build build/win-release --target package-portable`

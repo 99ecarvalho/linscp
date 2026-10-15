@@ -83,6 +83,7 @@
 #include "CopyLocalDialog.h"
 #include "IconSet.h"
 #include "Theme.h"
+#include "ExtensionOptionsDialog.h"
 #include "Integration.h"
 #include "MasterPasswordDialog.h"
 #include "WindowParams.h"
@@ -689,6 +690,8 @@ bool MainWindow::PreferencesDialog(const QString & Page)
   {
     // A preset's Current button: what autoselection would match now.
     Dialog.SetCurrentRuleData(TransferPresetAutoSelectData());
+    // Extensions' options kept per site: this session's.
+    Dialog.SetSessionKey(FSession->SessionKey());
   }
   if (!Page.isEmpty())
   {
@@ -4291,7 +4294,13 @@ void MainWindow::UpdateCustomCommands()
   {
     Menu->clear();
   }
-  for (const CoreBridge::TCustomCommandDefinition & Command : CoreBridge::CustomCommands())
+  // The custom commands, then the extensions, as CreateCustomCommandsMenu.
+  std::vector<CoreBridge::TCustomCommandDefinition> Commands = CoreBridge::CustomCommands();
+  for (const CoreBridge::TCustomCommandDefinition & Extension : CoreBridge::Extensions())
+  {
+    Commands.push_back(Extension);
+  }
+  for (const CoreBridge::TCustomCommandDefinition & Command : Commands)
   {
     const bool FileCommand = CoreBridge::CheckCustomCommand(Command.Command, !Command.Local).FileCommand;
     QAction * Action = (FileCommand ? FFileCommandsMenu : FStaticCommandsMenu)->addAction(QString::fromStdString(Command.Name));
@@ -4335,8 +4344,37 @@ void MainWindow::UpdateCustomCommands()
   }
 }
 
+// As CustomCommand's options part: an extension's options asked as it runs,
+// kept for the next time. False when cancelled.
+bool MainWindow::AskExtensionRunOptions(const CoreBridge::TCustomCommandDefinition & Command)
+{
+  try
+  {
+    const std::vector<CoreBridge::TExtensionOption> Options =
+      CoreBridge::TSession::ExtensionRunOptions(LocalBrowser() ? nullptr : FSession.get(), Command,
+        QDir::toNativeSeparators(FLocal->Path()).toStdString());
+    ExtensionOptionsDialog Dialog(QString::fromStdString(Command.Name), Options, this, nullptr, {},
+      QString::fromStdString(!Command.OptionsPage.empty() ? Command.OptionsPage : Command.HomePage));
+    if (Dialog.exec() != QDialog::Accepted)
+    {
+      return false;
+    }
+    CoreBridge::TSession::SetExtensionRunOptions(LocalBrowser() ? nullptr : FSession.get(), Command, Dialog.Values());
+    return true;
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+}
+
 bool MainWindow::RunCustomCommand(const CoreBridge::TCustomCommandDefinition & Command)
 {
+  if (!Command.Id.empty() && Command.RunOptions && !FBusy && !AskExtensionRunOptions(Command))
+  {
+    return false;
+  }
   if (Command.Local)
   {
     return RunLocalCustomCommand(Command);

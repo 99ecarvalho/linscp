@@ -900,6 +900,15 @@ enum class TText
   ErrorListNumber,      // "Error %d of %d:\n%s"
   PreviousButton,       // "&Previous"
   NextButton,           // "&Next"
+  ExtensionOptionsBrowse, // "Browse..."
+  ExtensionOptionsBrowseTitle, // "Select '%s'"
+  ExtensionShortCut,    // "&Keyboard shortcut:"
+  ExtensionGeneralGroup, // "General"
+  AddExtensionCaption,  // "Add Extension"
+  AddExtensionPrompt,   // "Enter URL or path to the &extension:"
+  ExtensionUntrusted,   // "The extension does not come from a trusted source. ..."
+  ExtensionNotLatest,   // "Using the last compatible and trusted version ..." (unformatted)
+  NoSiteForCommand,     // "No session is opened ... site-specific options ..." (unformatted)
   NewFileName, // "New file"
   EditFileCaption, // "Edit file"
   EditFilePrompt, // "&Enter file name:"
@@ -1144,13 +1153,85 @@ struct TCustomCommandDefinition
   int OtherParams = 0;
   // The VCL's TShortCut (0 none).
   unsigned ShortCut = 0;
-  // From an extension (its options, if any, are not offered yet).
+  // An extension's (WinSCP's .WinSCPextension files): its id ("userext\Name";
+  // empty for a custom command), file, description and pages, and whether
+  // it has options set in Preferences (ofConfig), asked on each run
+  // (ofRun), or kept per site (ofSite).
   std::string Id;
+  std::string FileName;
+  std::string Description;
+  std::string HomePage;
+  std::string OptionsPage;
+  bool ConfigOptions = false;
+  bool RunOptions = false;
+  bool SiteOptions = false;
 };
 // Commands > Custom Commands: the list, as WinConfiguration keeps it (its
 // defaults until changed); SetCustomCommands replaces and saves it.
 std::vector<TCustomCommandDefinition> CustomCommands();
 void SetCustomCommands(const std::vector<TCustomCommandDefinition> & Commands);
+// The extensions, as WinConfiguration loads them (TWinConfiguration's
+// ExtensionList), after the custom commands in the menus and Preferences.
+std::vector<TCustomCommandDefinition> Extensions();
+// An extension option, as its "@option" line has it (TCustomCommandType's
+// TOption) and its value now: the stored one (CustomCommandOptions, per
+// site for ofSite ones), its default, or the default with its patterns
+// filled in for the session.
+struct TExtensionOption
+{
+  enum class TKind { Unknown, Label, Link, Separator, Group, TextBox, File, DropDownList, ComboBox, CheckBox };
+  TKind Kind = TKind::Unknown;
+  std::string Caption;
+  std::string Default;
+  // A list's items: the value and what it shows (translated); a check box's
+  // two values, checked first.
+  std::vector<std::pair<std::string, std::string>> Items;
+  std::string FileCaption;
+  std::string FileFilter;
+  std::string FileInitial;
+  std::string FileExt;
+  // A value is kept (not a label, link, group or separator).
+  bool Control = false;
+  std::string Value;
+  // Where a text or file box keeps what was typed in it (History's name,
+  // WinSCP's "CustomCommandOption_" one).
+  std::string HistoryKey;
+};
+// Preferences' extensions while the dialog edits them (TPreferencesDialog's
+// FExtensionList, FCustomCommandOptions and FAddedExtensions): the files
+// added go when not committed, as Cancel has it.
+class TExtensionsEdit
+{
+public:
+  TExtensionsEdit();
+  ~TExtensionsEdit();
+  std::vector<TCustomCommandDefinition> Items() const;
+  // As AddExtension: a file's extension, or what a URL gave (its lines,
+  // with the WinSCP-Extension-Id header's name, if any; Trusted when the
+  // server said so). Untrusted asks first (false: not added). Copied into
+  // the user's extensions folder, unless it is already in one of the
+  // extension folders; the index added at (before Before, or last); throws
+  // TCoreError (not an extension, already there, its requirements unmet).
+  int AddFromFile(const std::string & Path, int Before, const std::function<bool()> & ConfirmUntrusted);
+  int AddFromUrl(const std::string & Url, const std::string & Contents, const std::string & IdHeader, bool Trusted,
+    int Before, const std::function<bool()> & ConfirmUntrusted);
+  void Remove(int Index);
+  void Move(int Index, int To);
+  void SetShortCut(int Index, unsigned ShortCut);
+  // Its options with these flags (TCustomCommandType's ofRun 1, ofConfig 2,
+  // ofSite 4), for the site (the session key; empty, none), and their
+  // values set (one per option given, in that order).
+  std::vector<TExtensionOption> Options(int Index, unsigned Flags, const std::string & Site) const;
+  void SetOptions(int Index, unsigned Flags, const std::string & Site, const std::vector<std::string> & Values);
+  // Saved (SetExtensionList, SetCustomCommandOptions).
+  void Commit();
+private:
+  struct TImpl;
+  std::unique_ptr<TImpl> F;
+};
+// Whether a URL is one WinSCP's Add Extension asks the version details of
+// (winscp.net's), and that URL with them (IsWinSCPUrl, ProgramUrl).
+std::string ExtensionDownloadUrl(const std::string & Url, bool & WinScpUrl);
 // What the Custom command dialog checks of a command, as
 // TCustomCommandDialog's UpdateControls and FormCloseQuery: whether it works
 // on files, which choices apply, and core's error when it is not a command.
@@ -2021,6 +2102,15 @@ public:
   static std::string RunLocalCustomCommand(TSession * Session, const TCustomCommandDefinition & Command,
     const std::vector<std::string> & Names, const std::vector<std::string> & LocalFiles, bool LocalSide,
     const std::string & LocalDirectory, const TCustomCommandPrompts & Prompts, const TLocalRunner & Runner);
+  // An extension's options asked as it runs (ofRun), their defaults'
+  // patterns filled in for the session (none: a local tab), as
+  // CustomCommand's TCustomCommandOptionsDialog has them; and their values
+  // kept. The site's key: the session's (empty without one). Throw
+  // TCoreError (an ofSite option without a site).
+  static std::vector<TExtensionOption> ExtensionRunOptions(TSession * Session, const TCustomCommandDefinition & Command,
+    const std::string & LocalDirectory);
+  static void SetExtensionRunOptions(TSession * Session, const TCustomCommandDefinition & Command,
+    const std::vector<std::string> & Values);
   // Commands > Open in PuTTY, as WinSCP's: the session as it is now, in
   // the program Preferences > Integration > Applications names
   // (GUIConfiguration's PuttyPath), PuTTY's own options added unless its

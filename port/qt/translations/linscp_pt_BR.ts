@@ -3313,6 +3313,18 @@ Local: %2</translation>
         <source>Drag &amp;&amp; Drop downloads</source>
         <translation>Downloads de Arrastar e soltar</translation>
     </message>
+    <message>
+        <source>Add &amp;Custom Command...</source>
+        <translation>Adicionar comando personalizado...</translation>
+    </message>
+    <message>
+        <source>Add &amp;Extension...</source>
+        <translation>Adicionar extensão...</translation>
+    </message>
+    <message>
+        <source>&amp;Configure...</source>
+        <translation>&amp;Configurar...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

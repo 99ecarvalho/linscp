@@ -53,11 +53,14 @@ void FillShortCutCombo(QComboBox * Combo, const std::vector<unsigned> & Used, un
 std::vector<unsigned> CustomCommandShortCuts()
 {
   std::vector<unsigned> Result;
-  for (const CoreBridge::TCustomCommandDefinition & Command : CoreBridge::CustomCommands())
+  for (const auto & List : { CoreBridge::CustomCommands(), CoreBridge::Extensions() })
   {
-    if (Command.ShortCut != 0)
+    for (const CoreBridge::TCustomCommandDefinition & Command : List)
     {
-      Result.push_back(Command.ShortCut);
+      if (Command.ShortCut != 0)
+      {
+        Result.push_back(Command.ShortCut);
+      }
     }
   }
   return Result;

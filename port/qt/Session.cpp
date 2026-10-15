@@ -29,6 +29,7 @@
 #include "CustomCommandType.h"
 #include "DiscMon.hpp"
 #include "BridgeCustomCommand.h"
+#include "ExtensionsBridge.h"
 #include "PuttySlice.h"
 #include "ProgParams.h"
 
@@ -2918,6 +2919,69 @@ void ExecuteLocalCommand(const TSession::TLocalRunner & Runner, const UnicodeStr
 
 }  // namespace
 
+// As CustomCommand's options part: the command made for the session (a
+// remote one's TRemoteCustomCommand, a local one's TLocalCustomCommand)
+// fills in the options' patterns.
+std::vector<TExtensionOption> TSession::ExtensionRunOptions(TSession * Session, const TCustomCommandDefinition & Definition,
+  const std::string & LocalDirectory)
+{
+  try
+  {
+    const TCustomCommandType * Command = FindListedCommand(Definition);
+    if (Command == NULL)
+    {
+      return std::vector<TExtensionOption>();
+    }
+    TTerminal * Terminal = ((Session != nullptr) && Session->Active()) ? Session->F->Terminal.get() : NULL;
+    const UnicodeString Site = (Terminal != NULL) ? Terminal->SessionData->SessionKey : UnicodeString();
+    if (Command->AnyOptionWithFlag(TCustomCommandType::ofSite) && Site.IsEmpty())
+    {
+      throw Exception(LoadStr(NO_SITE_FOR_COMMAND));
+    }
+    std::unique_ptr<TSessionData> SessionData((Terminal != NULL) ? SessionDataForCode(Terminal) : NULL);
+    TCustomCommandData Data = (SessionData.get() != NULL) ? TCustomCommandData(SessionData.get()) : TCustomCommandData();
+    const UnicodeString RemotePath = (Terminal != NULL) ? Terminal->CurrentDirectory : UnicodeString();
+    std::unique_ptr<TCustomCommand> ForOptions;
+    if (FLAGCLEAR(Command->Params, ccLocal))
+    {
+      ForOptions.reset(new TRemoteCustomCommand(Data, RemotePath));
+    }
+    else
+    {
+      ForOptions.reset(new TLocalCustomCommand(Data, RemotePath, FromUtf8(LocalDirectory)));
+    }
+    return ExtensionOptionsOf(Command, WinConfiguration->CustomCommandOptions(), TCustomCommandType::ofRun, Site,
+      ForOptions.get());
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void TSession::SetExtensionRunOptions(TSession * Session, const TCustomCommandDefinition & Definition,
+  const std::vector<std::string> & Values)
+{
+  try
+  {
+    const TCustomCommandType * Command = FindListedCommand(Definition);
+    if (Command != NULL)
+    {
+      TTerminal * Terminal = ((Session != nullptr) && Session->Active()) ? Session->F->Terminal.get() : NULL;
+      std::unique_ptr<TStringList> Options(new TStringList());
+      Options->Assign(WinConfiguration->CustomCommandOptions());
+      SetExtensionOptionsOf(Command, Options.get(), TCustomCommandType::ofRun,
+        (Terminal != NULL) ? Terminal->SessionData->SessionKey : UnicodeString(), Values);
+      WinConfiguration->SetCustomCommandOptions(Options.get());
+      Configuration->SaveExplicit();
+    }
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 std::string TSession::RunLocalCustomCommand(TSession * Session, const TCustomCommandDefinition & Definition,
   const std::vector<std::string> & Names, const std::vector<std::string> & LocalFiles, bool LocalSide,
   const std::string & LocalDirectory, const TCustomCommandPrompts & Prompts, const TLocalRunner & Runner)
@@ -2935,8 +2999,8 @@ std::string TSession::RunLocalCustomCommand(TSession * Session, const TCustomCom
     const UnicodeString LocalPath = FromUtf8(LocalDirectory);
     const int Params = ParamsOf(Definition);
     UnicodeString CommandCommand = FromUtf8(Definition.Command);
-    const TCustomCommandType * Listed = WinConfiguration->CustomCommandList()->Find(FromUtf8(Definition.Name));
-    if ((Listed != NULL) && (Listed->Command == CommandCommand))
+    const TCustomCommandType * Listed = FindListedCommand(Definition);
+    if (Listed != NULL)
     {
       CommandCommand = Listed->GetCommandWithExpandedOptions(WinConfiguration->CustomCommandOptions(),
         (Terminal != NULL) ? Terminal->SessionData->SessionKey : UnicodeString());
@@ -3247,8 +3311,8 @@ std::vector<std::string> TSession::RunCustomCommand(const TCustomCommandDefiniti
     const UnicodeString Site = Terminal->SessionData->SessionKey;
     // An extension's options in it, as GetCommandWithExpandedOptions.
     UnicodeString CommandCommand = FromUtf8(Definition.Command);
-    const TCustomCommandType * Listed = WinConfiguration->CustomCommandList()->Find(FromUtf8(Definition.Name));
-    if ((Listed != NULL) && (Listed->Command == CommandCommand))
+    const TCustomCommandType * Listed = FindListedCommand(Definition);
+    if (Listed != NULL)
     {
       CommandCommand = Listed->GetCommandWithExpandedOptions(WinConfiguration->CustomCommandOptions(), Site);
     }

@@ -5,13 +5,17 @@ plugins the shell needs, and every DLL they load from the Qt prefix -- found
 by following their imports, so nothing the programs do not use comes along.
 
   deploy_windows.py --objdump llvm-objdump --qt-prefix PREFIX --dest DIR
-                    [--translations DIR] program.exe ...
+                    [--translations DIR] [--winscpnet WinSCPnet.dll --cli linscp-cli.exe]
+                    program.exe ...
 
 PREFIX is MSYS2's clang64 tree (port/tools/fetch_msys2_qt.py); its bin holds
 Qt, its dependencies and the C++ runtime (ADR 0011). Qt finds the plugins in
 the folders beside the executable. DLLs not in PREFIX are the system's.
 Translations/ gets core's translations (--translations: gen_translations.py's
 output) and Qt's own (qtbase_*.qm from PREFIX), where the shell looks for both.
+With --winscpnet, dotnet/ gets WinSCP's .NET assembly (net40) and the client
+as the WinSCP.exe it starts, with the client's DLLs: what WinSCP's
+PowerShell extensions load from %WINSCP_PATH%, which the shell points there.
 """
 import argparse, glob, os, shutil, sys
 
@@ -37,6 +41,8 @@ def main():
     ap.add_argument('--qt-prefix', required=True)
     ap.add_argument('--dest', required=True)
     ap.add_argument('--translations')
+    ap.add_argument('--winscpnet')
+    ap.add_argument('--cli')
     ap.add_argument('programs', nargs='+')
     a = ap.parse_args()
     bin_dir = os.path.join(a.qt_prefix, 'bin')
@@ -76,8 +82,18 @@ def main():
                 copied.add(dll)
                 shutil.copy2(available[dll], a.dest)
                 todo.append(available[dll])
+    if a.winscpnet:
+        # The assembly looks for winscp.exe beside itself.
+        dotnet = os.path.join(a.dest, 'dotnet')
+        os.makedirs(dotnet)
+        shutil.copy2(a.winscpnet, dotnet)
+        shutil.copy2(a.cli, os.path.join(dotnet, 'WinSCP.exe'))
+        _, imports = table(a.objdump, a.cli)
+        for dll in imports:
+            if dll in available:
+                shutil.copy2(available[dll], dotnet)
     print(f'{a.dest}: {len(a.programs)} programs, {len(PLUGINS)} plugins, {len(copied)} DLLs, '
-          f'{len(sources)} translations')
+          f'{len(sources)} translations' + (', the .NET assembly' if a.winscpnet else ''))
     return 0
 
 

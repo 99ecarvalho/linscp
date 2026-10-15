@@ -1619,6 +1619,15 @@ std::string Text(TText Text)
     case TText::ErrorListNumber: Ident = ERROR_LIST_NUMBER; break;
     case TText::PreviousButton: Ident = PREV_BUTTON; break;
     case TText::NextButton: Ident = NEXT_BUTTON; break;
+    case TText::ExtensionOptionsBrowse: Ident = EXTENSION_OPTIONS_BROWSE; break;
+    case TText::ExtensionOptionsBrowseTitle: Ident = EXTENSION_OPTIONS_BROWSE_TITLE; break;
+    case TText::ExtensionShortCut: Ident = EXTENSION_SHORTCUT; break;
+    case TText::ExtensionGeneralGroup: Ident = EXTENSION_GENERAL_GROUP; break;
+    case TText::AddExtensionCaption: Ident = ADD_EXTENSION_CAPTION; break;
+    case TText::AddExtensionPrompt: Ident = ADD_EXTENSION_PROMPT; break;
+    case TText::ExtensionUntrusted: Ident = EXTENSION_UNTRUSTED; break;
+    case TText::ExtensionNotLatest: return Utf8(UnformatMessage(LoadStr(EXTENSION_NOT_LATEST)));
+    case TText::NoSiteForCommand: return Utf8(UnformatMessage(LoadStr(NO_SITE_FOR_COMMAND)));
     case TText::NewFileName: Ident = NEW_FILE; break;
     case TText::EditFileCaption: Ident = EDIT_FILE_CAPTION; break;
     case TText::EditFilePrompt: Ident = EDIT_FILE_PROMPT; break;

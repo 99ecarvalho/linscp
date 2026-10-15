@@ -9,6 +9,7 @@
 #include <QDialog>
 #include <QFont>
 
+#include <memory>
 #include <vector>
 
 #include "CoreBridge.h"
@@ -183,6 +184,18 @@ public:
   bool AddEditCommand(bool Edit, const CoreBridge::TCustomCommandDefinition * Command = nullptr);
   void RemoveCommand();
   void MoveCommand(int By);
+  // The extensions, after the custom commands in the list (Commands' rows
+  // from Commands().size() on), as WinSCP's: Add Extension (a path or a
+  // URL; with Path given, that instead of asking), Configure (the
+  // extension's Preferences options and its keyboard shortcut; with
+  // Values given, those instead of the dialog).
+  CoreBridge::TExtensionsEdit * ExtensionsEdit() const { return FExtensions.get(); }
+  bool AddExtension(const QString * Path = nullptr);
+  bool ConfigureCommand(const std::vector<std::string> * Values = nullptr, const unsigned * ShortCut = nullptr);
+  // The session's site, for the options kept per site (ofSite).
+  void SetSessionKey(const std::string & Key) { FSessionKey = Key; }
+  class QToolButton * AddCommandButton() const { return FAddCommand; }
+  QPushButton * ConfigureCommandButton() const { return FConfigureCommand; }
 
 private:
   void AddPage(const QString & Name, QWidget * Page, bool Subpage = false);
@@ -396,6 +409,12 @@ private:
   std::vector<CoreBridge::TCustomCommandDefinition> FCommands;
   QTreeWidget * FCommandsList = nullptr;
   QPushButton * FEditCommand = nullptr;
+  QPushButton * FConfigureCommand = nullptr;
+  class QToolButton * FAddCommand = nullptr;
+  std::unique_ptr<CoreBridge::TExtensionsEdit> FExtensions;
+  std::string FSessionKey;
+  // A row's extension's index; -1 for a custom command's.
+  int ExtensionIndex(int Row) const;
   QPushButton * FRemoveCommand = nullptr;
   QPushButton * FUpCommand = nullptr;
   QPushButton * FDownCommand = nullptr;

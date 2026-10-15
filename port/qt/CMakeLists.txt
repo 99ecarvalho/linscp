@@ -12,7 +12,7 @@ add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp AboutDialog.cpp 
   FileList.cpp RemotePanel.cpp LocalPanel.cpp
   TransferDialog.cpp QueuePanel.cpp SynchronizeDialog.cpp PreferencesDialog.cpp TransferSettingsDialog.cpp
   RightsFrame.cpp PropertiesDialog.cpp CreateDirectoryDialog.cpp LinkDialog.cpp RemoteTransferDialog.cpp OpenDirectoryDialog.cpp LocationProfilesDialog.cpp FindFilesDialog.cpp EditMaskDialog.cpp ServerInfoDialog.cpp RtfText.cpp GenerateUrlDialog.cpp ConsoleDialog.cpp SiteRawDialog.cpp ImportSitesDialog.cpp CustomCommandDialog.cpp KeepUpToDateDialog.cpp LicenseDialog.cpp CleanupDialog.cpp TagDialog.cpp ShortCutDialog.cpp EditorPreferencesDialog.cpp Integration.cpp SaveWorkspaceDialog.cpp
-  CopyLocalDialog.cpp KeyVerify.cpp SaveSiteDialog.cpp IconSet.cpp PanelBands.cpp WindowParams.cpp HintButton.cpp SingleInstance.cpp MasterPasswordDialog.cpp SshHostCADialog.cpp DirectoryTree.cpp Theme.cpp CoreBridge.h)
+  CopyLocalDialog.cpp KeyVerify.cpp SaveSiteDialog.cpp IconSet.cpp PanelBands.cpp WindowParams.cpp HintButton.cpp SingleInstance.cpp MasterPasswordDialog.cpp SshHostCADialog.cpp DirectoryTree.cpp Theme.cpp ExtensionOptionsDialog.cpp CoreBridge.h)
 set_target_properties(linscp-qt-ui PROPERTIES AUTOMOC ON)
 target_link_libraries(linscp-qt-ui PUBLIC Qt6::Widgets Qt6::Svg Qt6::Network)
 if(WIN32)
@@ -133,13 +133,35 @@ set(LINSCP_SHELL_TS ${_shell_ts} PARENT_SCOPE)
 
 # A folder that runs on Windows as it is (port/tools/deploy_windows.py):
 #   cmake --build <build> --target deploy   ->   <build>/deploy
+# With the build host's .NET SDK (port/tools/fetch_dotnet.py), WinSCP's .NET
+# assembly too, for WinSCP's PowerShell extensions (the dotnet folder).
 if(WIN32 AND LINSCP_QT_PREFIX)
+  set(LINSCP_HOST_DOTNET "${CMAKE_BINARY_DIR}/tools/dotnet/dotnet" CACHE FILEPATH
+      "the build host's .NET SDK, to build WinSCP's .NET assembly into the deploy folder")
+  set(_deploy_winscpnet)
+  set(_deploy_depends linscp linscp-cli core-translations)
+  if(EXISTS "${LINSCP_HOST_DOTNET}")
+    set(_winscpnet "${CMAKE_BINARY_DIR}/winscpnet-net40/bin/WinSCPnet.dll")
+    add_custom_command(OUTPUT "${_winscpnet}"
+      COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/build_winscpnet.py"
+              --dotnet "${LINSCP_HOST_DOTNET}" --upstream "${CMAKE_SOURCE_DIR}/3rd-party/winscp"
+              --dest "${CMAKE_BINARY_DIR}/winscpnet-net40" --framework net40
+      DEPENDS "${CMAKE_SOURCE_DIR}/port/tools/build_winscpnet.py"
+      COMMENT "Building WinSCP's .NET assembly (net40)"
+      VERBATIM)
+    add_custom_target(winscpnet-net40 DEPENDS "${_winscpnet}")
+    set(_deploy_winscpnet --winscpnet "${_winscpnet}" --cli "$<TARGET_FILE:linscp-cli>")
+    list(APPEND _deploy_depends winscpnet-net40)
+  else()
+    message(STATUS "No .NET SDK at ${LINSCP_HOST_DOTNET}: the deploy folder goes without WinSCP's .NET assembly")
+  endif()
   add_custom_target(deploy
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/deploy_windows.py"
             --objdump "${LINSCP_TARGET_OBJDUMP}" --qt-prefix "${LINSCP_QT_PREFIX}"
             --dest "${CMAKE_BINARY_DIR}/deploy" --translations "${_translations_dir}"
+            ${_deploy_winscpnet}
             "$<TARGET_FILE:linscp>" "$<TARGET_FILE:linscp-cli>"
-    DEPENDS linscp linscp-cli core-translations
+    DEPENDS ${_deploy_depends}
     COMMENT "Assembling a runnable Windows folder in ${CMAKE_BINARY_DIR}/deploy"
     VERBATIM)
 endif()
