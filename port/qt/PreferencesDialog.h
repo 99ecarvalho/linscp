@@ -71,6 +71,8 @@ public:
     FHasCurrentRuleData = true;
   }
   QCheckBox * CopyParamAutoSelectNoticeCheck() const { return FCopyParamAutoSelectNotice; }
+  QCheckBox * MinimizeToTrayCheck() const { return FMinimizeToTray; }
+  QCheckBox * ExternalSessionInExistingInstanceCheck() const { return FExternalSessionInExistingInstance; }
   void RemoveSelected();
   void MoveSelected(int By);
   class QSpinBox * QueueTransfersLimitSpin() const { return FQueueTransfersLimit; }
@@ -194,6 +196,8 @@ private:
   QSpinBox * FParallelThreshold = nullptr;
   QCheckBox * FEnableQueueByDefault = nullptr;
   QCheckBox * FCopyParamAutoSelectNotice = nullptr;
+  QCheckBox * FMinimizeToTray = nullptr;
+  QCheckBox * FExternalSessionInExistingInstance = nullptr;
   CoreBridge::TTransferPresetRule FCurrentRuleData;
   bool FHasCurrentRuleData = false;
   QRadioButton * FQueueView[3] = {};

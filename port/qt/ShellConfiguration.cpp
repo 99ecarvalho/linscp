@@ -200,6 +200,8 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"PreservePanelState", FSettings.PreservePanelState);
     Storage->WriteBool(L"EnableQueueByDefault", FSettings.EnableQueueByDefault);
     Storage->WriteBool(L"CopyParamAutoSelectNotice", FSettings.CopyParamAutoSelectNotice);
+    Storage->WriteBool(L"MinimizeToTray", FSettings.MinimizeToTray);
+    Storage->WriteBool(L"ExternalSessionInExistingInstance", FSettings.ExternalSessionInExistingInstance);
     Storage->WriteBool(L"FullRowSelect", FSettings.FullRowSelect);
     Storage->WriteInteger(L"CopyOnDoubleClick", FSettings.DoubleClickAction);
     Storage->WriteBool(L"CopyOnDoubleClickConfirmation", FSettings.CopyOnDoubleClickConfirmation);
@@ -445,6 +447,9 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.PreservePanelState = Storage->ReadBool(L"PreservePanelState", FSettings.PreservePanelState);
     FSettings.EnableQueueByDefault = Storage->ReadBool(L"EnableQueueByDefault", FSettings.EnableQueueByDefault);
     FSettings.CopyParamAutoSelectNotice = Storage->ReadBool(L"CopyParamAutoSelectNotice", FSettings.CopyParamAutoSelectNotice);
+    FSettings.MinimizeToTray = Storage->ReadBool(L"MinimizeToTray", FSettings.MinimizeToTray);
+    FSettings.ExternalSessionInExistingInstance =
+      Storage->ReadBool(L"ExternalSessionInExistingInstance", FSettings.ExternalSessionInExistingInstance);
     FSettings.FullRowSelect = Storage->ReadBool(L"FullRowSelect", FSettings.FullRowSelect);
     FSettings.DoubleClickAction = Storage->ReadInteger(L"CopyOnDoubleClick", FSettings.DoubleClickAction);
     FSettings.CopyOnDoubleClickConfirmation =

@@ -218,6 +218,16 @@ public:
   void ActivatePanel(bool Local);
   bool LocalActive() const { return FLocalActive; }
   CoreBridge::TSession * Session() const { return FSession.get(); }
+  // As TCustomScpExplorerForm::CommandLineFromAnotherInstance: the session a
+  // command line given to another instance names, opened here, unless the
+  // window is busy (false: that instance opens it itself).
+  bool CommandLineFromAnotherInstance(const QStringList & Arguments);
+  // As ApplicationMinimize and ApplicationRestore with MinimizeToTray: the
+  // window hidden, the tray's icon (its tip the window's title) bringing
+  // it back. Where the desktop has no tray, minimized as ever.
+  void MinimizeToTray();
+  void RestoreFromTray();
+  class QSystemTrayIcon * TrayIcon() const { return FTrayIcon; }
   QAction * ProcessQueueAction() const { return FProcessQueueAction; }
   // Session tabs, as WinSCP's (TTerminalManager's sessions, its
   // SessionsPageControl): opening a session adds one, Disconnect closes the
@@ -323,6 +333,8 @@ private slots:
 protected:
   // Closing ends the session as Disconnect does, its directories kept.
   void closeEvent(QCloseEvent * Event) override;
+  // Minimized: to the tray, as Preferences > Window says.
+  void changeEvent(QEvent * Event) override;
 
 private:
   bool Open(std::unique_ptr<CoreBridge::TSession> Session);
@@ -370,6 +382,7 @@ private:
   QAction * FDirectorySizesAction = nullptr;
   QAction * FNewFileAction = nullptr;
   QAction * FProcessQueueAction = nullptr;
+  QSystemTrayIcon * FTrayIcon = nullptr;
   // TransferPresetAutoSelect's: the preset chosen by hand, the one last
   // autoselected.
   QString FCopyParamDefault;

@@ -19,8 +19,10 @@
 #include <functional>
 #include <FtpFileSystem.h>
 #include <S3FileSystem.h>
+#include <SessionData.h>
 
 #include "PuttySlice.h"
+#include "ProgParams.h"
 #include "EditorPreferences.h"
 
 namespace
@@ -283,6 +285,8 @@ TPreferences Preferences()
   Result.QueueAutoPopup = GUIConfiguration->QueueAutoPopup;
   Result.EnableQueueByDefault = Settings.EnableQueueByDefault;
   Result.CopyParamAutoSelectNotice = Settings.CopyParamAutoSelectNotice;
+  Result.MinimizeToTray = Settings.MinimizeToTray;
+  Result.ExternalSessionInExistingInstance = Settings.ExternalSessionInExistingInstance;
   Result.ParallelTransferThreshold = Configuration->ParallelTransferThreshold;
   Result.SessionReopenAuto = Configuration->SessionReopenAuto / MSecsPerSec;
   Result.SessionReopenAutoIdleOn = GUIConfiguration->SessionReopenAutoIdleOn && (GUIConfiguration->SessionReopenAutoIdle > 0);
@@ -585,6 +589,8 @@ void SetPreferences(const TPreferences & Preferences)
   Settings.RenameWholeName = Preferences.RenameWholeName;
   Settings.EnableQueueByDefault = Preferences.EnableQueueByDefault;
   Settings.CopyParamAutoSelectNotice = Preferences.CopyParamAutoSelectNotice;
+  Settings.MinimizeToTray = Preferences.MinimizeToTray;
+  Settings.ExternalSessionInExistingInstance = Preferences.ExternalSessionInExistingInstance;
   Settings.PanelSearch = static_cast<int>(Preferences.PanelSearch);
   Settings.PreservePanelState = Preferences.PreservePanelState;
   Settings.FullRowSelect = Preferences.FullRowSelect;
@@ -788,6 +794,49 @@ void SetArguments(const std::vector<std::string> & Arguments)
     CommandLine += L" " + ShellQuoteStr(FromUtf8(Argument));
   }
   SetProgramCommandLine(CommandLine.c_str());
+}
+
+bool CommandLineForAnotherInstance(bool Alternative)
+{
+  try
+  {
+    TProgramParams * Params = TProgramParams::Instance();
+    if ((Params->ParamCount == 0) || Params->FindSwitch(L"NewInstance") || Params->FindSwitch(L"RawConfig"))
+    {
+      return false;
+    }
+    for (const wchar_t * Command : { L"Upload", L"UploadIfAny", L"Synchronize", L"KeepUpToDate", L"Edit", L"Refresh" })
+    {
+      if (Params->FindSwitch(Command))
+      {
+        return false;
+      }
+    }
+    if (dynamic_cast<TShellConfiguration *>(GUIConfiguration)->Settings().ExternalSessionInExistingInstance == Alternative)
+    {
+      return false;
+    }
+    // ParseUrl with pufParseOnly, on a copy as it consumes /rawsettings.
+    const UnicodeString SessionName = Params->Param[1];
+    if (SessionName.Pos(L"/") > 0)
+    {
+      TOptions Options(*Params);
+      int ParsedInfo = 0;
+      UnicodeString DownloadFile;
+      std::unique_ptr<TSessionData> Data(StoredSessions->ParseUrl(SessionName, &Options, ParsedInfo, &DownloadFile, NULL,
+        pufAllowStoredSiteWithProtocol | pufParseOnly));
+      if (!DownloadFile.IsEmpty())
+      {
+        return false;
+      }
+    }
+    return true;
+  }
+  catch (Exception &)
+  {
+    // This instance then makes sense of it, and reports what is wrong.
+    return false;
+  }
 }
 
 void Initialize(IFrontend * AFrontend)

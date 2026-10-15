@@ -181,6 +181,12 @@ void Initialize(IFrontend * Frontend);
 // (switches, and the session to open), instead of the process's: what Qt
 // leaves of them. Before Initialize.
 void SetArguments(const std::vector<std::string> & Arguments);
+// As WinMain's TrySendToAnotherInstance: whether the command line names a
+// session for a running instance's window to open instead (Preferences >
+// Window's ExternalSessionInExistingInstance; Alternative, as WinSCP's
+// OpenInNewWindow, reverses it): not with /NewInstance, /RawConfig, a
+// command switch, or a URL of a file to download. After Initialize.
+bool CommandLineForAnotherInstance(bool Alternative);
 // Saves the configuration and stops core.
 void Finalize();
 
@@ -461,6 +467,11 @@ struct TPreferences
   int ParallelTransferThreshold = -1;
   // Transfer: announce an autoselected preset (CopyParamAutoSelectNotice).
   bool CopyParamAutoSelectNotice = true;
+  // Window: minimized, to the tray (WinSCP's MinimizeToTray), where the
+  // desktop has one; a session named on the command line opened by the
+  // window already running (ExternalSessionInExistingInstance).
+  bool MinimizeToTray = false;
+  bool ExternalSessionInExistingInstance = true;
   // Endurance: reconnect a session that breaks during a transfer, while
   // idle or inactive, or stalls, after so many seconds (0: not), and keep
   // trying for so many (0: for ever).
@@ -1447,8 +1458,11 @@ public:
   // dialog with it. A folder of sites or a workspace is none: its name is
   // CommandLineFolderOrWorkspace's (else empty), opened with Workspace.
   // Throws TCoreError.
-  static std::unique_ptr<TSession> FromCommandLine(bool & CanOpen);
-  static std::string CommandLineFolderOrWorkspace();
+  // Arguments, when given, instead of this process's: another instance's
+  // (CommandLineFromAnotherInstance), the sites reloaded first as that
+  // instance may have just saved one.
+  static std::unique_ptr<TSession> FromCommandLine(bool & CanOpen, const std::vector<std::string> * Arguments = nullptr);
+  static std::string CommandLineFolderOrWorkspace(const std::vector<std::string> * Arguments = nullptr);
   // A session on the same site, as it is now (TCustomScpExplorerForm's
   // DuplicateTab: CloneCurrentSessionData), not opened yet. Throws
   // TCoreError.

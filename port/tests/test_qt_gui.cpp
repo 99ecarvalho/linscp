@@ -64,6 +64,8 @@
 //     server: user linscp, password secret), every question core asks
 //     answered by a responder that acts on the modal dialog in front
 #include <QApplication>
+#include <QSystemTrayIcon>
+#include <QProcess>
 #include <QCheckBox>
 #include <QLabel>
 #include <QLineEdit>
@@ -131,6 +133,7 @@
 #include <QSettings>
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
+#include "SingleInstance.h"
 #include "AboutDialog.h"
 #include "LicenseDialog.h"
 #include <QTextBrowser>
@@ -4642,6 +4645,70 @@ void PresetRulesTest(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// P3-16: Window's single instance and tray. A second process (this one's
+// "instancesend") hands a session URL to the window's server: opened in a
+// tab; refused while the window is hidden, that process then opening it.
+void InstanceTest(const char * Port, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = std::deque<QString>(4, QStringLiteral("secret"));
+    Responder.AcceptDialogs = true;
+    // Its own name, apart from a linscp the user runs.
+    const QString Suffix = QDir(Directory).absolutePath();
+    InstanceServer Server([&Window](const QStringList & Arguments) { return Window.CommandLineFromAnotherInstance(Arguments); },
+      Suffix);
+    Check(Server.Listening(), "the window's server listens");
+    const QString Url = QStringLiteral("sftp://linscp@127.0.0.1:%1/sub/").arg(QString::fromLatin1(Port));
+    const auto SendFrom = [&Suffix, &Url]()
+    {
+      QProcess Process;
+      Process.start(QCoreApplication::applicationFilePath(), { QStringLiteral("instancesend"), Suffix, Url });
+      Process.waitForStarted();
+      WaitUntil([&Process]() { return Process.state() == QProcess::NotRunning; });
+      const int Code = (Process.exitStatus() == QProcess::NormalExit) ? Process.exitCode() : -1;
+      if (Code != 0)
+      {
+        std::printf("instancesend: %d, %s\n", Code, Process.readAllStandardError().constData());
+      }
+      return Code;
+    };
+    Check(SendFrom() == 0, "a second instance's command line taken");
+    Check(WaitUntil([&Window]() { return (Window.TabCount() == 1) && (Window.Panel()->Path() == QStringLiteral("/sub")); }),
+      "its session opened here");
+    Window.hide();
+    Check(SendFrom() == 3, "refused while the window is hidden");
+    Window.show();
+
+    // The tray: where the platform has one, the window hidden in it.
+    CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+    Preferences.MinimizeToTray = true;
+    CoreBridge::SetPreferences(Preferences);
+    Window.MinimizeToTray();
+    std::printf("tray: %s\n", QSystemTrayIcon::isSystemTrayAvailable() ? "available" : "none");
+    if (QSystemTrayIcon::isSystemTrayAvailable())
+    {
+      Check(!Window.isVisible() && Window.TrayIcon()->isVisible() && (Window.TrayIcon()->toolTip() == Window.windowTitle()),
+        "minimized to the tray, the title its tip");
+      Check(SendFrom() == 0, "the tray's window takes command lines too");
+      Check(WaitUntil([&Window]() { return Window.isVisible() && (Window.TabCount() == 2); }), "and comes back from the tray");
+    }
+    else
+    {
+      Check(Window.isVisible() && (Window.TrayIcon() == nullptr), "no tray: the window stays");
+    }
+    Window.RestoreFromTray();
+    Check(Window.isVisible(), "restored");
+  }
+  CoreBridge::Finalize();
+}
+
 void PanelPreferencesTest(const char * Port, const QString & Directory)
 {
   QtFrontend Frontend;
@@ -4771,6 +4838,17 @@ void Menus()
 int main(int argc, char ** argv)
 {
   QApplication App(argc, argv);
+  if ((argc >= 4) && (std::strcmp(argv[1], "instancesend") == 0))
+  {
+    // InstanceTest's second instance: 0 when the window took the URL.
+    QString Error;
+    if (SingleInstance::Send({ QString::fromLocal8Bit(argv[3]) }, QString::fromLocal8Bit(argv[2]), &Error))
+    {
+      return 0;
+    }
+    std::fprintf(stderr, "%s\n", Error.toUtf8().constData());
+    return 3;
+  }
   std::setvbuf(stdout, nullptr, _IONBF, 0);
   // Every window shown, audited (P3-09).
   AccessibilityAudit Audit(Failures);
@@ -4807,6 +4885,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 3) && (std::strcmp(argv[1], "toolbars") == 0))
   {
     ToolbarsTest();
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "instance") == 0))
+  {
+    InstanceTest(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "presetrules") == 0))
   {

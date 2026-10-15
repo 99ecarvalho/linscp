@@ -227,9 +227,31 @@ TSession::TSession() :
 }
 
 // As GetFolderOrWorkspaceName.
-std::string TSession::CommandLineFolderOrWorkspace()
+namespace
 {
-  TProgramParams * Params = TProgramParams::Instance();
+
+// The process's parameters, or ones given (as another instance's).
+TProgramParams * ProgramParamsOf(const std::vector<std::string> * Arguments, std::unique_ptr<TProgramParams> & Owner)
+{
+  if (Arguments == nullptr)
+  {
+    return TProgramParams::Instance();
+  }
+  UnicodeString CommandLine = ShellQuoteStr(ParamStr(0));
+  for (const std::string & Argument : *Arguments)
+  {
+    CommandLine += L" " + ShellQuoteStr(FromUtf8(Argument));
+  }
+  Owner.reset(new TProgramParams(CommandLine));
+  return Owner.get();
+}
+
+}  // namespace
+
+std::string TSession::CommandLineFolderOrWorkspace(const std::vector<std::string> * Arguments)
+{
+  std::unique_ptr<TProgramParams> Owner;
+  TProgramParams * Params = ProgramParamsOf(Arguments, Owner);
   if (Params->ParamCount == 0)
   {
     return std::string();
@@ -239,12 +261,17 @@ std::string TSession::CommandLineFolderOrWorkspace()
     Utf8(Name) : std::string();
 }
 
-std::unique_ptr<TSession> TSession::FromCommandLine(bool & CanOpen)
+std::unique_ptr<TSession> TSession::FromCommandLine(bool & CanOpen, const std::vector<std::string> * Arguments)
 {
   CanOpen = false;
   try
   {
-    TProgramParams * Params = TProgramParams::Instance();
+    std::unique_ptr<TProgramParams> Owner;
+    TProgramParams * Params = ProgramParamsOf(Arguments, Owner);
+    if (Arguments != nullptr)
+    {
+      StoredSessions->Reload();
+    }
     if (Params->ParamCount == 0)
     {
       return nullptr;

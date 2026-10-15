@@ -162,13 +162,14 @@ if(CMAKE_CROSSCOMPILING AND NOT QT_HOST_PATH)
   endif()
 endif()
 if(_qt_host_ok)
-  # Svg: the icon sets (assets/icons), drawn from their SVGs.
-  find_package(Qt6 6.8 QUIET COMPONENTS Widgets Svg)
+  # Svg: the icon sets (assets/icons), drawn from their SVGs. Network: the
+  # local socket a running instance takes command lines on.
+  find_package(Qt6 6.8 QUIET COMPONENTS Widgets Svg Network)
 endif()
 if(Qt6_FOUND)
   add_subdirectory(port/qt)
 else()
-  message(STATUS "linscp: no Qt 6.8 Widgets and Svg found (qt6-base-dev, qt6-svg-dev), the Qt shell is not built")
+  message(STATUS "linscp: no Qt 6.8 Widgets, Svg and Network found (qt6-base-dev, qt6-svg-dev), the Qt shell is not built")
 endif()
 
 include(CTest)

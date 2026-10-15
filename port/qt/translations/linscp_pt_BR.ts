@@ -2446,6 +2446,14 @@ Local: %2</translation>
         <source>&amp;Announce when transfer settings preset is autoselected</source>
         <translation>&amp;Avisar quando as configurações de transferências padrões forem autoselecionadas</translation>
     </message>
+    <message>
+        <source>&amp;Minimize main window to taskbar status area (system tray)</source>
+        <translation>&amp;Minimizar janela principal para a bandeja</translation>
+    </message>
+    <message>
+        <source>Open new externally initiated sessions in &amp;existing window</source>
+        <translation>Abrir novas sessões iniciadas externamente na janela &amp;existente</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

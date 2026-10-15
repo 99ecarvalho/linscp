@@ -271,7 +271,7 @@ registry, tray or window messages.
 | Preferences > Panels | incremental search; preserve panel state; full row; double-click action; panel font; Explorer-style selection; tree | partial | all but the tree done (WinSCP's keys; Explorer-style selection's default, Mouse only, keeps the arrows off the selection and commands take the focused file); the directory tree view is missing |
 | Preferences > Transfer | presets' autoselection rules (edited, matched) | done | the preset dialog's rule group with Current; matched on each panel load and tab switch (`TransferPresetAutoSelect`), back to the preset chosen by hand; announced as `CopyParamAutoSelectNotice` says, else noted in the status bar |
 | Preferences > Background | parallel threshold; enable queue by default; queue list visibility on the page; Process Queue | done | core's `ParallelTransferThreshold` (KB, -1 off, 100 MB offered); `EnableQueueByDefault` sets each session's `TTerminalQueue::Enabled`; Commands > Queue > Process Queue toggles it |
-| Preferences > Window | minimize to tray; single instance | missing | Win-only in WinSCP; QSystemTrayIcon, QLocalServer |
+| Preferences > Window | minimize to tray; single instance | done | `MinimizeToTray` through QSystemTrayIcon, offered only where the desktop has a tray (GNOME needs an extension); `ExternalSessionInExistingInstance` over a per-user QLocalServer in place of WM_COPYDATA, Shift reversing it, never with /NewInstance, /RawConfig, a command or a download URL |
 | Preferences > Security | master password | missing | |
 | Preferences > SSH | host CAs | missing | |
 | Preferences > Integration | "Send to" | missing | Win-only (Explorer's Send To) |

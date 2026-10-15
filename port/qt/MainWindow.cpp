@@ -35,6 +35,7 @@
 #include <QSplitter>
 #include <QScreen>
 #include <QStyle>
+#include <QSystemTrayIcon>
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
@@ -619,10 +620,115 @@ void MainWindow::closeEvent(QCloseEvent * Event)
   QMainWindow::closeEvent(Event);
 }
 
+bool MainWindow::CommandLineFromAnotherInstance(const QStringList & Arguments)
+{
+  // As CanCommandLineFromAnotherInstance (the tray's hidden window counts
+  // as shown, as WinSCP's).
+  if ((!isVisible() && !((FTrayIcon != nullptr) && FTrayIcon->isVisible())) || FBusy || (QApplication::activeModalWidget() != nullptr))
+  {
+    return false;
+  }
+  // After answering: the other instance waits for no session to open.
+  QTimer::singleShot(0, this, [this, Arguments]()
+  {
+    RestoreFromTray();
+    if (isMinimized())
+    {
+      showNormal();
+    }
+    raise();
+    activateWindow();
+    std::vector<std::string> Strings;
+    for (const QString & Argument : Arguments)
+    {
+      Strings.push_back(Argument.toStdString());
+    }
+    bool CanOpen = false;
+    std::unique_ptr<CoreBridge::TSession> Session;
+    try
+    {
+      Session = CoreBridge::TSession::FromCommandLine(CanOpen, &Strings);
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+      return;
+    }
+    const QString Named = QString::fromStdString(CoreBridge::TSession::CommandLineFolderOrWorkspace(&Strings));
+    if (!Session && !Named.isEmpty())
+    {
+      OpenWorkspace(Named);
+    }
+    else if (Session && CanOpen)
+    {
+      Open(std::move(Session));
+    }
+    else
+    {
+      SiteManagerDialog();
+    }
+  });
+  return true;
+}
+
+void MainWindow::changeEvent(QEvent * Event)
+{
+  QMainWindow::changeEvent(Event);
+  if ((Event->type() == QEvent::WindowStateChange) && isMinimized() && CoreBridge::Preferences().MinimizeToTray &&
+      QSystemTrayIcon::isSystemTrayAvailable())
+  {
+    // Once the minimizing is done.
+    QTimer::singleShot(0, this, &MainWindow::MinimizeToTray);
+  }
+}
+
+void MainWindow::MinimizeToTray()
+{
+  if (!QSystemTrayIcon::isSystemTrayAvailable())
+  {
+    return;
+  }
+  if (FTrayIcon == nullptr)
+  {
+    FTrayIcon = new QSystemTrayIcon(this);
+    connect(FTrayIcon, &QSystemTrayIcon::activated, this, [this](QSystemTrayIcon::ActivationReason Reason)
+    {
+      if ((Reason == QSystemTrayIcon::Trigger) || (Reason == QSystemTrayIcon::DoubleClick))
+      {
+        RestoreFromTray();
+      }
+    });
+  }
+  // linscp has no icon of its own: the set's, else the style's.
+  QIcon Icon = IconSet::Icon(QStringLiteral("sites"));
+  FTrayIcon->setIcon(Icon.isNull() ? style()->standardIcon(QStyle::SP_DriveNetIcon) : Icon);
+  FTrayIcon->setToolTip(windowTitle());
+  FTrayIcon->show();
+  hide();
+}
+
+void MainWindow::RestoreFromTray()
+{
+  if ((FTrayIcon == nullptr) || !FTrayIcon->isVisible())
+  {
+    return;
+  }
+  FTrayIcon->hide();
+  setWindowState(windowState() & ~Qt::WindowMinimized);
+  show();
+  raise();
+  activateWindow();
+}
+
 void MainWindow::ShowError(const CoreBridge::TCoreError & E)
 {
   if (!E.Aborted)
   {
+    // As ShowExtendedException: the tray's balloon too, while there.
+    if ((FTrayIcon != nullptr) && FTrayIcon->isVisible())
+    {
+      FTrayIcon->showMessage(windowTitle(), QString::fromStdString(E.Error.Message), QSystemTrayIcon::Critical);
+    }
     QtFrontend Frontend;
     Frontend.SetWindow(this);
     Frontend.ShowError(E.Error);

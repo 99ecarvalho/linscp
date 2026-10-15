@@ -9,12 +9,14 @@
 
 #include <cstdio>
 #include <cstring>
+#include <memory>
 #include <stdexcept>
 
 #include "CoreBridge.h"
 #include "Language.h"
 #include "MainWindow.h"
 #include "QtFrontend.h"
+#include "SingleInstance.h"
 
 int main(int argc, char ** argv)
 {
@@ -56,6 +58,15 @@ int main(int argc, char ** argv)
   }
   // As upstream: core's configuration chose the language as it started.
   const TLanguage Language = SetUpLanguage(RequestedLocale(argc, argv));
+  // As WinMain: a session named goes to the window already running, if it
+  // takes it (Shift held, as OpenInNewWindow, the other way round).
+  if (!Smoke &&
+      CoreBridge::CommandLineForAnotherInstance(QGuiApplication::queryKeyboardModifiers().testFlag(Qt::ShiftModifier)) &&
+      SingleInstance::Send(App.arguments().mid(1)))
+  {
+    CoreBridge::Finalize();
+    return 0;
+  }
 
   int Result;
   {
@@ -64,8 +75,13 @@ int main(int argc, char ** argv)
     Frontend.SetWindow(&Window);
     Frontend.SetStatus([&Window](const QString & Text) { Window.statusBar()->showMessage(Text); });
     Window.show();
+    std::unique_ptr<InstanceServer> Server;
     if (!Smoke)
     {
+      Server.reset(new InstanceServer([&Window](const QStringList & Arguments)
+      {
+        return Window.CommandLineFromAnotherInstance(Arguments);
+      }));
       // As WinSCP starts: the session the command line names, else its
       // Login dialog, the site manager.
       QTimer::singleShot(0, &Window, [&Window]() { Window.StartUp(); });

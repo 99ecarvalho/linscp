@@ -39,6 +39,7 @@
 #include <QShortcut>
 #include <QTreeWidget>
 #include <QStackedWidget>
+#include <QSystemTrayIcon>
 #include <QVBoxLayout>
 
 #include <algorithm>
@@ -387,6 +388,15 @@ QWidget * PreferencesDialog::MakeWindowPage(const TPreferences & Preferences)
   Layout->addWidget(Path);
   QGroupBox * Misc = new QGroupBox(tr("Miscellaneous"), Page);
   QVBoxLayout * MiscLayout = new QVBoxLayout(Misc);
+  // A tray only where the desktop has one (most Linux desktops do, GNOME's
+  // only with an extension).
+  FMinimizeToTray = new QCheckBox(tr("&Minimize main window to taskbar status area (system tray)"), Misc);
+  FMinimizeToTray->setChecked(Preferences.MinimizeToTray);
+  FMinimizeToTray->setEnabled(QSystemTrayIcon::isSystemTrayAvailable() || Preferences.MinimizeToTray);
+  MiscLayout->addWidget(FMinimizeToTray);
+  FExternalSessionInExistingInstance = new QCheckBox(tr("Open new externally initiated sessions in &existing window"), Misc);
+  FExternalSessionInExistingInstance->setChecked(Preferences.ExternalSessionInExistingInstance);
+  MiscLayout->addWidget(FExternalSessionInExistingInstance);
   FKeepOpen = new QCheckBox(tr("&Keep main window open when the last session is closed"), Misc);
   FKeepOpen->setChecked(Preferences.KeepOpenWhenNoSession);
   MiscLayout->addWidget(FKeepOpen);
@@ -1080,6 +1090,8 @@ TPreferences PreferencesDialog::Preferences() const
   Result.PathInCaption = FPathFull->isChecked() ? TPreferences::TPathInCaption::Full :
     (FPathNone->isChecked() ? TPreferences::TPathInCaption::None : TPreferences::TPathInCaption::Short);
   Result.KeepOpenWhenNoSession = FKeepOpen->isChecked();
+  Result.MinimizeToTray = FMinimizeToTray->isChecked();
+  Result.ExternalSessionInExistingInstance = FExternalSessionInExistingInstance->isChecked();
   Result.FileColors = FFileColors;
   // As TPreferencesDialog::SaveConfiguration.
   Result.Logging = FLogging->isChecked();
