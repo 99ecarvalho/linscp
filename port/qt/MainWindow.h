@@ -64,6 +64,17 @@ public:
   void CheckForUpdates();
   QUrl UpdatesUrl;
   std::function<void(const QString & Latest, bool Newer, const QString & Error)> OnUpdatesChecked;
+  // Options > Queue > Once Empty (NonVisual's Queue...OnceEmptyAction): what
+  // is done once the active session's queue empties, then Stay Idle again,
+  // as TCustomScpExplorerForm::QueueListUpdate and the UserInterface's
+  // CloseOnCompletion handling do it: the session closed and the user told;
+  // the computer put to sleep, or shut down; then, unless shutting down and
+  // as ConfirmExitOnCompletion asks, the application closed.
+  enum class TOnceEmpty { Idle, Disconnect, Suspend, ShutDown };
+  TOnceEmpty OnceEmpty() const { return FOnceEmpty; }
+  void SetOnceEmpty(TOnceEmpty Operation);
+  // What sleeps or shuts down the computer instead (tests); false: refused.
+  std::function<bool(TOnceEmpty)> PowerAction;
   // -1, 0 or 1 as version A is older, the same or newer than B ("v0.2.0",
   // "0.10.1-rc1": the numbers compared, a leading v and a -suffix ignored).
   static int CompareVersions(const QString & A, const QString & B);
@@ -421,6 +432,12 @@ private:
   QAction * FTabsAction = nullptr;
   QAction * FQueueToolbarAction = nullptr;
   bool FTabsShown = true;
+  TOnceEmpty FOnceEmpty = TOnceEmpty::Idle;
+  QAction * FOnceEmptyActions[4] = {};
+  // The active session's queue as last seen: busy, and whose.
+  const void * FQueueSession = nullptr;
+  bool FQueueBusy = false;
+  void QueueEmptied();
   // An Options choice saved at once (the rest of the layout as stored).
   void StoreLayoutChoice(const std::function<void(CoreBridge::TLayout &)> & Change);
   QAction * FRemoteTreeAction = nullptr;

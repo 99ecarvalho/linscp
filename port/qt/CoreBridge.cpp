@@ -713,6 +713,7 @@ TLayout Layout()
   Result.LocalStatusBar = Settings.LocalPanelStatusBar;
   Result.RemoteStatusBar = Settings.RemotePanelStatusBar;
   Result.QueueToolbar = Settings.QueueViewToolBar;
+  Result.ConfirmExitOnCompletion = Settings.ConfirmExitOnCompletion;
   Result.LockToolbars = Settings.LockToolbars;
   Result.SelectiveToolbarText = Settings.SelectiveToolbarText;
   Result.LargerToolbar = Settings.LargerToolbar;
@@ -743,6 +744,7 @@ void SetLayout(const TLayout & Layout)
   Settings.LocalPanelStatusBar = Layout.LocalStatusBar;
   Settings.RemotePanelStatusBar = Layout.RemoteStatusBar;
   Settings.QueueViewToolBar = Layout.QueueToolbar;
+  Settings.ConfirmExitOnCompletion = Layout.ConfirmExitOnCompletion;
   Settings.LockToolbars = Layout.LockToolbars;
   Settings.SelectiveToolbarText = Layout.SelectiveToolbarText;
   Settings.LargerToolbar = Layout.LargerToolbar;
@@ -1584,6 +1586,9 @@ std::string Text(TText Text)
     case TText::PropertiesS3Everyone: Ident = PROPERTIES_S3_EVERYONE; break;
     case TText::PropertiesS3ReadAclHint: Ident = PROPERTIES_S3_R_ACL_HINT; break;
     case TText::PropertiesS3WriteAclHint: Ident = PROPERTIES_S3_W_ACL_HINT; break;
+    case TText::ClosedOnQueueEmpty: Ident = CLOSED_ON_QUEUE_EMPTY; break;
+    case TText::ExitOnCompletion: Ident = EXIT_ON_COMPLETION; break;
+    case TText::DisconnectOnCompletion: Ident = DISCONNECT_ON_COMPLETION; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

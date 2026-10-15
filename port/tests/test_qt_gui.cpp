@@ -1006,6 +1006,32 @@ void Transfer(const char * Port, const QString & Directory)
     Check(!Whole, "and no whole file behind");
     Responder.CancelTransfers = false;
     Check(Frontend.Transfer() == nullptr, "and the window closes");
+
+    // P3-15: Options > Queue > Once Empty, Sleep Computer: once the queue
+    // empties, the session closed, the computer asleep (here a hook), then
+    // the window closed (ConfirmExitOnCompletion off: not asked), and Stay
+    // Idle chosen again.
+    {
+      CoreBridge::TLayout Layout = CoreBridge::Layout();
+      Layout.ConfirmExitOnCompletion = false;
+      CoreBridge::SetLayout(Layout);
+      std::vector<MainWindow::TOnceEmpty> Powered;
+      Window.PowerAction = [&Powered](MainWindow::TOnceEmpty What) { Powered.push_back(What); return true; };
+      {
+        QFile File(Dir.filePath(QStringLiteral("once.txt")));
+        File.open(QIODevice::WriteOnly);
+        File.write("once empty\n");
+      }
+      Local->Refresh();
+      Local->Select({ QStringLiteral("once.txt") });
+      Window.ActivatePanel(true);
+      Window.SetOnceEmpty(MainWindow::TOnceEmpty::Suspend);
+      Check(Window.TransferSelected(false, false, true), "an upload is queued, to sleep once done");
+      Check(WaitFor([&Powered]() { return !Powered.empty(); }), "once the queue empties, the computer sleeps");
+      Check((Powered == std::vector<MainWindow::TOnceEmpty>{ MainWindow::TOnceEmpty::Suspend }) &&
+        (Window.Session() == nullptr) && !Window.isVisible() && (Window.OnceEmpty() == MainWindow::TOnceEmpty::Idle),
+        "after the session closed, then the window, Stay Idle again");
+    }
     Frontend.SetWindow(nullptr);
   }
   CoreBridge::Finalize();

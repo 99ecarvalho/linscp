@@ -1875,6 +1875,42 @@ Local: %2</translation>
         <source>Hide/show panel status bar</source>
         <translation>Ocultar/mostrar a barra de status do painel</translation>
     </message>
+    <message>
+        <source>&amp;Once Empty</source>
+        <translation>&amp;Quando a fila esvaziar</translation>
+    </message>
+    <message>
+        <source>Toggle action to perform once the queue list is empty</source>
+        <translation>Alternar a ação a executar quando a fila estiver vazia</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Ficar em espera</translation>
+    </message>
+    <message>
+        <source>Stay idle once the queue is empty</source>
+        <translation>Ficar em espera quando a fila estiver vazia</translation>
+    </message>
+    <message>
+        <source>Disconnect the session once the queue is empty</source>
+        <translation>Desconectar a sessão quando a fila estiver vazia</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>&amp;Suspender Computador</translation>
+    </message>
+    <message>
+        <source>Put the computer into sleep mode once the queue is empty</source>
+        <translation>Suspender o computador quando a fila estiver vazia</translation>
+    </message>
+    <message>
+        <source>S&amp;hut Down Computer</source>
+        <translation>Des&amp;ligar o computador</translation>
+    </message>
+    <message>
+        <source>Shut down the computer once the queue is empty</source>
+        <translation>Desligar o computador quando a fila estiver vazia</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>
@@ -2809,6 +2845,17 @@ Local: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Não mostrar essa mensagem novamente</translation>
+    </message>
+</context>
+<context>
+    <name>QMessageBox</name>
+    <message>
+        <source>&amp;Yes</source>
+        <translation>&amp;Sim</translation>
+    </message>
+    <message>
+        <source>&amp;No</source>
+        <translation>&amp;Não</translation>
     </message>
 </context>
 <context>

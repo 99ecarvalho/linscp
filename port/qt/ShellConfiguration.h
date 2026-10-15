@@ -140,6 +140,8 @@ struct TShellSettings
   bool LocalPanelStatusBar = true;
   bool RemotePanelStatusBar = true;
   bool QueueViewToolBar = true;
+  // Interface's ConfirmExitOnCompletion (TCustomWinConfiguration's).
+  bool ConfirmExitOnCompletion = true;
   // The toolbars (Interface: LockToolbars, SelectiveToolbarText,
   // LargerToolbar; ScpCommander.ToolbarsLayout, its key ToolbarsLayout2).
   bool LockToolbars = false;

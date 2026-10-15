@@ -1331,6 +1331,104 @@ void MainWindow::QueueIdle()
   }
   UpdateQueueView();
   CleanUpEdited();
+  // As QueueListUpdate: once the active session's queue empties.
+  if (FSession)
+  {
+    const bool Busy = !FSession->QueueEmpty();
+    const bool Emptied = (FQueueSession == FSession.get()) && FQueueBusy && !Busy;
+    FQueueSession = FSession.get();
+    FQueueBusy = Busy;
+    if (Emptied)
+    {
+      QueueEmptied();
+    }
+  }
+}
+
+void MainWindow::SetOnceEmpty(TOnceEmpty Operation)
+{
+  FOnceEmpty = Operation;
+  FOnceEmptyActions[static_cast<int>(Operation)]->setChecked(true);
+}
+
+void MainWindow::QueueEmptied()
+{
+  const TOnceEmpty Operation = FOnceEmpty;
+  SetOnceEmpty(TOnceEmpty::Idle);
+  if ((Operation == TOnceEmpty::Idle) || FBusy)
+  {
+    return;
+  }
+  // As TTerminal::CloseOnCompletion: the session closed.
+  const QString Closed = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ClosedOnQueueEmpty));
+  FQueueSession = nullptr;
+  Disconnect();
+  statusBar()->showMessage(Closed);
+  const auto Power = [this](TOnceEmpty What)
+  {
+    QString Error;
+    const bool Done = PowerAction ? PowerAction(What) :
+      ((What == TOnceEmpty::Suspend) ? Integration::SuspendComputer(Error) : Integration::ShutDownComputer(Error));
+    if (!Done && !Error.isEmpty())
+    {
+      QMessageBox::warning(this, windowTitle(), Error);
+    }
+    return Done;
+  };
+  if (Operation == TOnceEmpty::ShutDown)
+  {
+    // As TerminateApplication, then ShutDownWindows: no question asked.
+    close();
+    Power(TOnceEmpty::ShutDown);
+    return;
+  }
+  if (Operation == TOnceEmpty::Suspend)
+  {
+    // Asleep first, so that the question waits for the user's return.
+    Power(TOnceEmpty::Suspend);
+  }
+  CoreBridge::TLayout Layout = CoreBridge::Layout();
+  bool Exit = true;
+  if (Layout.ConfirmExitOnCompletion)
+  {
+    // EXIT_ON_COMPLETION, or DISCONNECT_ON_COMPLETION with other sessions
+    // open, after the message ("%s" its place).
+    const int Others = static_cast<int>(FTabs.size());
+    QString Question = (Others > 0) ?
+      QString::fromStdString(CoreBridge::Text(CoreBridge::TText::DisconnectOnCompletion)).replace(QStringLiteral("%%s"), QStringLiteral("%s"))
+        .replace(QStringLiteral("%d"), QString::number(Others)) :
+      QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ExitOnCompletion));
+    Question.replace(QStringLiteral("%s"), Closed);
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Information;
+    Query.Message = Question.toStdString();
+    CoreBridge::TQueryButton Yes;
+    Yes.Answer = CoreBridge::AnswerYes;
+    Yes.Caption = QMessageBox::tr("&Yes").toStdString();
+    CoreBridge::TQueryButton No;
+    No.Answer = CoreBridge::AnswerNo;
+    No.Caption = QMessageBox::tr("&No").toStdString();
+    Query.Buttons = { Yes, No };
+    Query.CancelAnswer = CoreBridge::AnswerNo;
+    Query.NeverAskAgainCheck = true;
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    const CoreBridge::TQueryResult Answer = Frontend.Query(Query);
+    if (Answer.NeverAskAgain)
+    {
+      // As qaNeverAskAgain: yes, and not asked again.
+      Layout.ConfirmExitOnCompletion = false;
+      StoreLayoutChoice([](CoreBridge::TLayout & Stored) { Stored.ConfirmExitOnCompletion = false; });
+    }
+    else
+    {
+      Exit = (Answer.Answer == CoreBridge::AnswerYes);
+    }
+  }
+  if (Exit)
+  {
+    close();
+  }
 }
 
 bool MainWindow::TransferSelected(bool Move, bool Confirm, bool Background)
@@ -4303,6 +4401,39 @@ void MainWindow::BuildMenus()
   QueueMenu->addAction(tr("&Reset Columns Layout"), this, [this]() { FQueue->ResetColumnsLayout(); })
     ->setStatusTip(tr("Reset to the default layout of list columns"));
   QueueMenu->addSeparator();
+  QMenu * OnceEmpty = QueueMenu->addMenu(tr("&Once Empty"));
+  OnceEmpty->menuAction()->setStatusTip(tr("Toggle action to perform once the queue list is empty"));
+  QActionGroup * OnceEmptyGroup = new QActionGroup(OnceEmpty);
+  const struct
+  {
+    TOnceEmpty Operation;
+    QString Text;
+    QString Hint;
+  } OnceEmptyChoices[] = {
+    { TOnceEmpty::Idle, tr("&Stay Idle"), tr("Stay idle once the queue is empty") },
+    { TOnceEmpty::Disconnect, tr("&Disconnect Session"), tr("Disconnect the session once the queue is empty") },
+    { TOnceEmpty::Suspend, tr("Slee&p Computer"), tr("Put the computer into sleep mode once the queue is empty") },
+    { TOnceEmpty::ShutDown, tr("S&hut Down Computer"), tr("Shut down the computer once the queue is empty") } };
+  for (const auto & Choice : OnceEmptyChoices)
+  {
+    QAction * Action = OnceEmpty->addAction(Choice.Text);
+    Action->setCheckable(true);
+    Action->setStatusTip(Choice.Hint);
+    OnceEmptyGroup->addAction(Action);
+    const TOnceEmpty Operation = Choice.Operation;
+    connect(Action, &QAction::triggered, this, [this, Operation]() { SetOnceEmpty(Operation); });
+    FOnceEmptyActions[static_cast<int>(Operation)] = Action;
+  }
+  FOnceEmptyActions[0]->setChecked(true);
+  // As AllowQueueOperation(qoOnceEmpty): while anything is queued.
+  connect(QueueMenu, &QMenu::aboutToShow, this, [this]()
+  {
+    const bool Queued = FSession && FSession->Active() && !FSession->QueueEmpty();
+    for (QAction * Action : FOnceEmptyActions)
+    {
+      Action->setEnabled(Queued);
+    }
+  });
   // As QueuePreferencesAction: Preferences' Background page.
   QueueMenu->addAction(tr("&Customize..."), this, [this]() { PreferencesDialog(::PreferencesDialog::tr("Background")); })
     ->setStatusTip(tr("Customize queue list"));

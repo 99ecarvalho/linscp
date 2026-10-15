@@ -19,6 +19,8 @@ finish-args:
   # Minimize to tray (StatusNotifierItem) and local files' Properties.
   - --talk-name=org.kde.StatusNotifierWatcher
   - --talk-name=org.freedesktop.FileManager1
+  # Options > Queue > Once Empty's Sleep Computer and Shut Down Computer.
+  - --system-talk-name=org.freedesktop.login1
 build-options:
   append-path: /usr/lib/sdk/llvm21/bin
   prepend-ld-library-path: /usr/lib/sdk/llvm21/lib

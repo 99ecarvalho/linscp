@@ -45,6 +45,13 @@ bool ShowLocalProperties(const QStringList & Paths, QString & Error);
 // file need not exist): the Windows shell's type name; elsewhere the
 // freedesktop MIME type's description, by extension. Cached by extension.
 QString FileTypeName(const QString & Name, bool Directory);
+// Options > Queue > Once Empty's Sleep Computer and Shut Down Computer, as
+// WinSCP's SuspendWindows and ShutDownWindows (Tools.cpp): on Windows the
+// same calls, the shutdown privilege acquired first; elsewhere logind's
+// Suspend and PowerOff (org.freedesktop.login1, interactive, so that polkit
+// may ask). False with Error set when refused.
+bool SuspendComputer(QString & Error);
+bool ShutDownComputer(QString & Error);
 
 // As the Login dialog's DesktopIconActionExecute and Preferences'
 // IconButtonClick: Question asked (empty: none), then the shortcut, its

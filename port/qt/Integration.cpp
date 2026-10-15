@@ -589,4 +589,93 @@ QString FileTypeName(const QString & Name, bool Directory)
   return Result;
 }
 
+#if defined(Q_OS_WIN)
+namespace
+{
+
+bool AcquireShutDownPrivileges(QString & Error)
+{
+  HANDLE Token;
+  if (!OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &Token))
+  {
+    Error = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::NotSupported));
+    return false;
+  }
+  TOKEN_PRIVILEGES Privileges = {};
+  LookupPrivilegeValueW(nullptr, SE_SHUTDOWN_NAME, &Privileges.Privileges[0].Luid);
+  Privileges.PrivilegeCount = 1;
+  Privileges.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+  const bool Result = AdjustTokenPrivileges(Token, FALSE, &Privileges, 0, nullptr, nullptr) && (GetLastError() == ERROR_SUCCESS);
+  CloseHandle(Token);
+  if (!Result)
+  {
+    Error = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::NotSupported));
+  }
+  return Result;
+}
+
+}  // namespace
+#else
+namespace
+{
+
+bool CallLogind(const QString & Method, QString & Error)
+{
+  QDBusMessage Call = QDBusMessage::createMethodCall(QStringLiteral("org.freedesktop.login1"),
+    QStringLiteral("/org/freedesktop/login1"), QStringLiteral("org.freedesktop.login1.Manager"), Method);
+  Call << true;
+  const QDBusMessage Reply = QDBusConnection::systemBus().call(Call, QDBus::Block, 30000);
+  if (Reply.type() == QDBusMessage::ErrorMessage)
+  {
+    Error = Reply.errorMessage();
+    return false;
+  }
+  return true;
+}
+
+}  // namespace
+#endif
+
+bool SuspendComputer(QString & Error)
+{
+#if defined(Q_OS_WIN)
+  if (!AcquireShutDownPrivileges(Error))
+  {
+    return false;
+  }
+  // powrprof's, loaded where it is called, as nothing else needs it.
+  using TSetSuspendState = BOOLEAN (WINAPI *)(BOOLEAN, BOOLEAN, BOOLEAN);
+  HMODULE PowrProf = LoadLibraryW(L"powrprof.dll");
+  TSetSuspendState SetSuspendState = (PowrProf != nullptr) ?
+    reinterpret_cast<TSetSuspendState>(reinterpret_cast<void *>(GetProcAddress(PowrProf, "SetSuspendState"))) : nullptr;
+  const bool Result = (SetSuspendState != nullptr) && SetSuspendState(FALSE, FALSE, FALSE);
+  if (!Result)
+  {
+    Error = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::NotSupported));
+  }
+  return Result;
+#else
+  return CallLogind(QStringLiteral("Suspend"), Error);
+#endif
+}
+
+bool ShutDownComputer(QString & Error)
+{
+#if defined(Q_OS_WIN)
+  if (!AcquireShutDownPrivileges(Error))
+  {
+    return false;
+  }
+  if (!ExitWindowsEx(EWX_SHUTDOWN | EWX_POWEROFF,
+        SHTDN_REASON_MAJOR_OTHER | SHTDN_REASON_MINOR_OTHER | SHTDN_REASON_FLAG_PLANNED))
+  {
+    Error = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::NotSupported));
+    return false;
+  }
+  return true;
+#else
+  return CallLogind(QStringLiteral("PowerOff"), Error);
+#endif
+}
+
 }  // namespace Integration

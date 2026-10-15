@@ -655,6 +655,9 @@ struct TLayout
   bool LocalStatusBar = true;
   bool RemoteStatusBar = true;
   bool QueueToolbar = true;
+  // Whether to ask before the application exits once a queue's operation
+  // completes (Interface's ConfirmExitOnCompletion).
+  bool ConfirmExitOnCompletion = true;
   // Options > Toolbars: locked, selective text labels, the icons' size
   // (LargerToolbar: 0 normal, 1 large, 2 very large); which bands show, as
   // WinSCP's ToolbarsLayout ("Name=<1 shown, 0 not>:<dock>:<row>+<pos>,"
@@ -895,6 +898,9 @@ enum class TText
   PropertiesS3Everyone, // "&Everyone"
   PropertiesS3ReadAclHint, // "Read ACL"
   PropertiesS3WriteAclHint, // "Write ACL"
+  ClosedOnQueueEmpty,   // "All background transfers were finished. Connection was closed."
+  ExitOnCompletion,     // "%s\n\nDo you want to close application?"
+  DisconnectOnCompletion, // "%%s\n\nDo you want to terminate %d remaining session(s) and close the application?"
 };
 std::string Text(TText Text);
 
