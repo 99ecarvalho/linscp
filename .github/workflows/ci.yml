@@ -114,3 +114,110 @@ jobs:
           name: testlogs-${{ matrix.name }}
           path: build/Testing/Temporary/
           if-no-files-found: ignore
+
+  # The packages, from a release build (LINSCP_RELEASE: no "Dev Build"
+  # marking): the .deb and the AppImage, for the distribution built on; the
+  # Windows installer, compiled by the pinned Inno Setup under Wine.
+  packages:
+    name: packages-${{ matrix.name }}
+    runs-on: ubuntu-latest
+    container: debian:trixie
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: linux
+            configure: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+            targets: package-deb package-appimage
+            packages: dpkg-dev file qt6-svg-plugins
+            artifacts: |
+              build/packages/*.deb
+              build/packages/*.AppImage
+          - name: windows
+            configure: -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-llvm-mingw.cmake
+            targets: installer
+            packages: wine wine64 zstd
+            artifacts: build/packages/*-setup.exe
+    steps:
+      - name: Install the toolchain
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            ca-certificates git clang lld llvm cmake ninja-build make perl python3 \
+            cpio curl unzip xz-utils libssl-dev zlib1g-dev \
+            binutils-mingw-w64-x86-64 \
+            qt6-base-dev qt6-svg-dev qt6-wayland qt6-l10n-tools qt6-translations-l10n \
+            ${{ matrix.packages }}
+
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Restore llvm-mingw
+        uses: actions/cache@v4
+        with:
+          path: build/tools/llvm-mingw-*
+          key: llvm-mingw-${{ hashFiles('port/tools/fetch_llvm_mingw.py') }}
+      - name: Restore MSYS2's Qt
+        if: matrix.name == 'windows'
+        uses: actions/cache@v4
+        with:
+          path: build/tools/msys2-qt
+          key: msys2-qt-${{ hashFiles('port/qt/msys2-qt.lock') }}
+
+      - name: Fetch llvm-mingw
+        run: python3 port/tools/fetch_llvm_mingw.py --dest build/tools
+
+      - name: Fetch MSYS2's Qt
+        if: matrix.name == 'windows'
+        run: python3 port/tools/fetch_msys2_qt.py --dest build/tools/msys2-qt
+
+      - name: Configure
+        run: >-
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DLINSCP_RELEASE=ON
+          -DBUILD_TESTING=OFF ${{ matrix.configure }}
+
+      # The Inno Setup installers make windows even when silent; the null
+      # display driver needs no display.
+      - name: Prepare Wine
+        if: matrix.name == 'windows'
+        run: wine reg add 'HKCU\Software\Wine\Drivers' /v Graphics /d null /f
+        env:
+          WINEDEBUG: -all
+
+      - name: Build the packages
+        run: cmake --build build --target ${{ matrix.targets }}
+        env:
+          WINEDEBUG: -all
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linscp-${{ matrix.name }}
+          path: ${{ matrix.artifacts }}
+          if-no-files-found: error
+
+  # The Flatpak, in Flathub's builder image (flatpak-builder needs the
+  # privileges to sandbox its builds).
+  flatpak:
+    name: packages-flatpak
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.10
+      options: --privileged
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Build the bundle
+        run: |
+          flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          python3 port/tools/build_flatpak.py --out build/packages
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linscp-flatpak
+          path: build/packages/*.flatpak
+          if-no-files-found: error

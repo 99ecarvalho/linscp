@@ -255,11 +255,12 @@ To and shortcuts, Keep Up To Date in a new window, S3 ACLs and more (the
 audit below); only custom command extensions are deferred.
 P2-10 and P2-11 waited, at the user's request, for P3.
 
-1. **P2-10**: packaging, then the P2 exit gate (**P2-11**); both waited for P3.
+1. **P2-10**: packaging (wip: the four packages build and run; CI's packaging
+   jobs to go green), then the P2 exit gate (**P2-11**).
 2. **P4-01**: retire the VCL frontend (its gate, P3-10, is passed).
 3. Offer `core-log-file-name-delimiter.patch`,
-   `core-local-eol-platform.patch` and `core-openssh-import-posix-paths.patch`
-   upstream (ADR 0006).
+   `core-local-eol-platform.patch`, `core-openssh-import-posix-paths.patch`
+   and `core-terminal-logevent-not-inline.patch` upstream (ADR 0006).
 
 ## P3 UI gap audit (2026-10-14)
 
@@ -298,6 +299,10 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-15 | Packages: a .deb, an AppImage and a Flatpak on Linux, an Inno Setup installer on Windows laid out as WinSCP's (all-users or current-user, translations a component, desktop icon, Send To, URL handler and search path as tasks the program does: `/RegisterForDefaultProtocols`, `/AddSearchPath` and their reverses on uninstall); app id `io.github._99ecarvalho.linscp` | The user's choice of formats; D-Bus names cannot have a segment starting with a digit, hence the underscore; the installer is linscp's own script, not a copy of WinSCP's |
+| 2026-10-15 | Inno Setup pinned at 6.7.3 (`port/tools/fetch_innosetup.py`, SHA-256), installed portable and run under Wine, locally and in CI | WinSCP's installer is Inno Setup 6; a pinned compiler keeps the installer reproducible without a Windows build machine |
+| 2026-10-15 | `-fno-builtin-wcslen` on POSIX | clang 21 (the Flatpak SDK's) turns the shim's 2-byte length loops into calls to glibc's 4-byte `wcslen`; static initializers then looped over overlong strings. Windows' `wcslen` is 2-byte |
+| 2026-10-15 | `core-terminal-logevent-not-inline.patch` carried, to offer upstream | `TTerminal::LogEvent` is defined `inline` in Terminal.cpp but called from other units; optimized builds (the packages' Release) do not emit it and fail to link |
 | 2026-10-15 | linscp's application icon is its own (`assets/app/linscp.svg`: an original tile around Lucide's ISC `folder-sync`), not WinSCP's with an "L" | WinSCP's license.txt part B forbids reusing its images or modifications of them in other software, which packaging would have done |
 | 2026-10-15 | WinSCP pin moved to 6.7.1 (`e19a9a3e`); `core-script-rmdir-full-path.patch` and `putty-random-add-noise-section.patch` dropped, `putty-aes-ni-non-win64-clang.patch` cut to its `MM_SETR_EPI8` half, `get_remote_username` no longer an override | Upstream merged linscp's #69, #70, #71, #72, #74, #76 and #77 and removed core's own `get_remote_username`; 16 closure sites moved by lines only |
 | 2026-10-15 | Custom command extensions (.WinSCPextension) deferred; P3-16 closed without them | The user's call: WinSCP's extensions are PowerShell scripts over WinSCP's .NET assembly, which drives winscp.com, not linscp, so most would not run; packaging (P2-10) goes first |
@@ -812,7 +817,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P2-07 | Transfer + queue UI | done | foreground: `TSession::Upload`/`Download`, `TransferDialog`, F5/F6; background: `TSession::Queue*` over `TTerminalQueue`, `QueuePanel`; ctests `qt_gui_transfer`, `qt_session`/`qt_session_ftp`; native on Windows 11 too |
 | P2-08 | Local file panel | done | `port/qt/LocalPanel.cpp` over the shared `FileList` model; Commander layout; ctest `qt_gui_local`; native on Windows 11 too |
 | P2-09 | i18n pipeline | done | ADR 0013, `doc/qt/translations.md`: core via `gen_translations.py` and shim translation modules (55 languages), the shell via Qt Linguist (`linscp_pt_BR.ts`), Qt's own; ctests `qt_session_pt_BR`, `qt_language`, `translations_current`; native on Windows 11 too |
-| P2-10 | Packaging | todo | |
+| P2-10 | Packaging | wip | `port/packaging`: install rules and a .deb (CPack, `package-deb`), an AppImage (`build_appimage.py`, `package-appimage`), a Flatpak (`build_flatpak.py`, KDE 6.10 runtime) and the Windows installer (`windows/linscp.iss`, Inno Setup 6.7.3 under Wine, `installer`), each tested installed (the installer on Windows 11, tasks and uninstall); CI's `packages` jobs pending a green run |
 | P2-11 | P2 exit gate | todo | |
 
 ### P3 — Qt parity

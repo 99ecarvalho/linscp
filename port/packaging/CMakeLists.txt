@@ -9,7 +9,25 @@
 #   <prefix>/bin/{linscp, linscp-cli}  symlinks to them;
 #   <prefix>/share/{applications, icons/hicolor, metainfo, doc/linscp}.
 
-set(LINSCP_APP_ID "io.github.99ecarvalho.linscp")
+set(LINSCP_APP_ID "io.github._99ecarvalho.linscp")
+
+# The licenses every package carries, as <file>|<name>: linscp's, WinSCP's,
+# and those of what it is built from.
+set(_licenses
+  "${CMAKE_SOURCE_DIR}/LICENSE|LICENSE"
+  "${CMAKE_SOURCE_DIR}/README.md|README.md"
+  "${LINSCP_UPSTREAM}/license.txt|WinSCP-license.txt"
+  "${CMAKE_SOURCE_DIR}/3rd-party/putty/LICENCE|PuTTY-LICENCE"
+  "${CMAKE_SOURCE_DIR}/3rd-party/openssl/LICENSE.txt|OpenSSL-LICENSE.txt"
+  "${LINSCP_UPSTREAM}/libs/expat/COPYING|expat-COPYING"
+  # (WinSCP's trimmed neon keeps no COPYING: its README states the LGPL.)
+  "${LINSCP_UPSTREAM}/libs/neon/README.md|neon-README.md"
+  "${LINSCP_UPSTREAM}/libs/libs3/LICENSE|libs3-LICENSE"
+  "${LINSCP_UPSTREAM}/libs/libs3/COPYING-LGPLv3|libs3-COPYING-LGPLv3"
+  "${CMAKE_SOURCE_DIR}/assets/icons/lucide/LICENSE|icons-lucide-LICENSE"
+  "${CMAKE_SOURCE_DIR}/assets/icons/tabler/LICENSE|icons-tabler-LICENSE"
+  "${CMAKE_SOURCE_DIR}/assets/icons/fluent/LICENSE|icons-fluent-LICENSE"
+  "${CMAKE_SOURCE_DIR}/assets/app/SOURCES.md|icon-SOURCES.md")
 
 if(NOT WIN32)
   include(GNUInstallDirs)
@@ -31,21 +49,14 @@ if(NOT WIN32)
   endforeach()
   install(FILES "${CMAKE_SOURCE_DIR}/assets/app/linscp.svg"
     DESTINATION "${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps" RENAME "${LINSCP_APP_ID}.svg")
-  # The licenses: linscp's, WinSCP's, and what it is built from.
+  # The licenses.
   set(_doc "${CMAKE_INSTALL_DATADIR}/doc/linscp")
-  install(FILES "${CMAKE_SOURCE_DIR}/LICENSE" "${CMAKE_SOURCE_DIR}/README.md" DESTINATION "${_doc}")
-  install(FILES "${LINSCP_UPSTREAM}/license.txt" DESTINATION "${_doc}" RENAME "WinSCP-license.txt")
-  install(FILES "${CMAKE_SOURCE_DIR}/3rd-party/putty/LICENCE" DESTINATION "${_doc}" RENAME "PuTTY-LICENCE")
-  install(FILES "${CMAKE_SOURCE_DIR}/3rd-party/openssl/LICENSE.txt" DESTINATION "${_doc}" RENAME "OpenSSL-LICENSE.txt")
-  install(FILES "${LINSCP_UPSTREAM}/libs/expat/COPYING" DESTINATION "${_doc}" RENAME "expat-COPYING")
-  # (WinSCP's trimmed neon keeps no COPYING: its README states the LGPL.)
-  install(FILES "${LINSCP_UPSTREAM}/libs/neon/README.md" DESTINATION "${_doc}" RENAME "neon-README.md")
-  install(FILES "${LINSCP_UPSTREAM}/libs/libs3/LICENSE" DESTINATION "${_doc}" RENAME "libs3-LICENSE")
-  install(FILES "${LINSCP_UPSTREAM}/libs/libs3/COPYING-LGPLv3" DESTINATION "${_doc}" RENAME "libs3-COPYING-LGPLv3")
-  foreach(_set lucide tabler fluent)
-    install(FILES "${CMAKE_SOURCE_DIR}/assets/icons/${_set}/LICENSE" DESTINATION "${_doc}" RENAME "icons-${_set}-LICENSE")
+  foreach(_license ${_licenses})
+    string(REPLACE "|" ";" _license "${_license}")
+    list(GET _license 0 _from)
+    list(GET _license 1 _name)
+    install(FILES "${_from}" DESTINATION "${_doc}" RENAME "${_name}")
   endforeach()
-  install(FILES "${CMAKE_SOURCE_DIR}/assets/app/SOURCES.md" DESTINATION "${_doc}" RENAME "icon-SOURCES.md")
 
   # The .deb: CPack's, its dependencies read from the binaries by
   # dpkg-shlibdeps, so it is for the distribution it is built on.
@@ -77,5 +88,23 @@ if(NOT WIN32)
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/build_appimage.py" --build "${CMAKE_BINARY_DIR}"
     DEPENDS linscp linscp-cli core-translations
     COMMENT "Building the AppImage in ${CMAKE_BINARY_DIR}/packages"
+    VERBATIM)
+endif()
+
+# The Windows installer (port/tools/build_installer.py): the deploy folder
+# and the licenses, compiled by the pinned Inno Setup under Wine.
+#   cmake --build <build> --target installer
+if(WIN32 AND TARGET deploy)
+  set(_license_args)
+  foreach(_license ${_licenses})
+    list(APPEND _license_args --license "${_license}")
+  endforeach()
+  add_custom_target(installer
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/build_installer.py"
+            --script "${CMAKE_CURRENT_SOURCE_DIR}/windows/linscp.iss" --version "${PROJECT_VERSION}"
+            --deploy "${CMAKE_BINARY_DIR}/deploy" --work "${CMAKE_BINARY_DIR}/installer"
+            --tools "${CMAKE_BINARY_DIR}/tools" --out "${CMAKE_BINARY_DIR}/packages" ${_license_args}
+    DEPENDS deploy
+    COMMENT "Building the installer in ${CMAKE_BINARY_DIR}/packages"
     VERBATIM)
 endif()
