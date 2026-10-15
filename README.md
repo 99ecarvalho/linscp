@@ -9,6 +9,23 @@ one codebase**.
 > [doc/qt/TRACKER.md](doc/qt/TRACKER.md) for what is done and what is left.
 > Not affiliated with or endorsed by the WinSCP project.
 
+## Screenshots
+
+The Commander interface: local files on the left, the remote server on the right.
+
+![The Commander interface](doc/screenshots/commander.png)
+
+The Explorer interface: only the remote panel, with the folder tree beside it.
+
+![The Explorer interface](doc/screenshots/explorer.png)
+
+| The Site Manager | Preferences |
+|---|---|
+| ![The Site Manager](doc/screenshots/site-manager.png) | ![Preferences, the Panels page](doc/screenshots/preferences.png) |
+
+These were taken on Linux with the light theme. To retake them, run
+`port/tests/run_qt_session.py build/linux/port/tests/test_qt_gui screenshots /ini=nul {port} {tmp}/local $PWD/doc/screenshots -platform offscreen`.
+
 ## Why
 
 WinSCP's protocol core — SFTP, SCP, FTP/FTPS, WebDAV and S3 — is mature, widely

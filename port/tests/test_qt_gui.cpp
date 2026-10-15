@@ -4481,6 +4481,123 @@ void ExplorerTest(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// The README's screenshots (doc/screenshots): the Commander and the
+// Explorer on a session with plausible files, the Site Manager, Preferences;
+// the light theme, at a fixed size. Not a ctest: run by hand,
+//   run_qt_session.py test_qt_gui screenshots /ini=nul {port} {tmp}/local <out> -platform offscreen
+void Screenshots(const char * Port, const QString & Directory, const QString & Out)
+{
+  QDir().mkpath(Out);
+  const QDir Root(QDir(Directory).filePath(QStringLiteral("../root")));
+  // The local files in a short fixed folder, so the path bar reads tidily.
+  const QDir Local(QDir::temp().filePath(QStringLiteral("demo")));
+  QDir(Local).removeRecursively();
+  // Plausible files, with a spread of sizes and times.
+  int Age = 0;
+  const auto Make = [&Age](const QDir & Dir, const QString & Name, int Size)
+  {
+    QDir().mkpath(QFileInfo(Dir.filePath(Name)).path());
+    QFile File(Dir.filePath(Name));
+    File.open(QIODevice::WriteOnly);
+    File.write(QByteArray(Size, 'x'));
+    File.flush();
+    File.setFileTime(QDateTime::currentDateTime().addDays(-(Age += 3)).addSecs(-Age * 3517), QFileDevice::FileModificationTime);
+  };
+  for (const QString & Folder : { QStringLiteral("public_html/css"), QStringLiteral("public_html/js"), QStringLiteral("public_html/images"),
+         QStringLiteral("backups"), QStringLiteral("logs"), QStringLiteral("config") })
+  {
+    QDir().mkpath(Root.filePath(Folder));
+  }
+  Make(Root, QStringLiteral("public_html/index.html"), 8421);
+  Make(Root, QStringLiteral("public_html/about.html"), 5310);
+  Make(Root, QStringLiteral("public_html/contact.php"), 3077);
+  Make(Root, QStringLiteral("public_html/favicon.ico"), 15086);
+  Make(Root, QStringLiteral("public_html/robots.txt"), 68);
+  Make(Root, QStringLiteral("public_html/sitemap.xml"), 2290);
+  Make(Root, QStringLiteral("public_html/.htaccess"), 412);
+  Make(Root, QStringLiteral("backups/site-2026-10-01.tar.gz"), 4812733);
+  Make(Root, QStringLiteral("logs/access.log"), 1288104);
+  Make(Root, QStringLiteral("logs/error.log"), 23011);
+  Make(Root, QStringLiteral("README.md"), 1934);
+  Make(Root, QStringLiteral("deploy.sh"), 877);
+  for (const QString & Folder : { QStringLiteral("website/css"), QStringLiteral("website/js"), QStringLiteral("website/images"),
+         QStringLiteral("Documents"), QStringLiteral("Downloads") })
+  {
+    QDir().mkpath(Local.filePath(Folder));
+  }
+  Make(Local, QStringLiteral("website/index.html"), 8433);
+  Make(Local, QStringLiteral("website/about.html"), 5310);
+  Make(Local, QStringLiteral("website/contact.php"), 3102);
+  Make(Local, QStringLiteral("website/favicon.ico"), 15086);
+  Make(Local, QStringLiteral("website/robots.txt"), 68);
+  Make(Local, QStringLiteral("website/sitemap.xml"), 2290);
+  Make(Local, QStringLiteral("notes.txt"), 2201);
+  Make(Local, QStringLiteral("report.pdf"), 318220);
+
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  Theme::Apply(CoreBridge::TPreferences::TAutoSwitch::Off);
+  // Sites in folders, for the Site Manager.
+  for (const auto & Each : { std::make_pair("Work/Web server", "www.example.com"), std::make_pair("Work/Backup storage", "backup.example.com"),
+         std::make_pair("Work/Staging", "staging.example.com"), std::make_pair("Personal/Home NAS", "nas.local"),
+         std::make_pair("Personal/Raspberry Pi", "raspberrypi.local") })
+  {
+    CoreBridge::TSite Site;
+    Site.Name = Each.first;
+    Site.HostName = Each.second;
+    Site.UserName = "admin";
+    CoreBridge::SaveSite(Site);
+  }
+  const auto Shot = [&Out](QWidget * Widget, const QString & Name)
+  {
+    QTest::qWait(400);
+    Widget->grab().save(QDir(Out).filePath(Name));
+    std::printf("%s\n", qPrintable(QDir(Out).filePath(Name)));
+  };
+  for (const bool Explorer : { false, true })
+  {
+    CoreBridge::ChangePreferences([Explorer](CoreBridge::TPreferences & P) { P.ExplorerInterface = Explorer; });
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.resize(1200, 760);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = { "secret" };
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/public_html/").arg(QString::fromLatin1(Port))), "the session opens");
+    if (Explorer)
+    {
+      Window.ViewStyleAction(3)->trigger();
+      Window.Panel()->Select({ QStringLiteral("index.html") });
+      Shot(&Window, QStringLiteral("explorer.png"));
+    }
+    else
+    {
+      Window.Local()->ChangeDirectory(Local.filePath(QStringLiteral("website")));
+      Window.Panel()->Select({ QStringLiteral("about.html"), QStringLiteral("contact.php") });
+      Window.ActivatePanel(false);
+      Shot(&Window, QStringLiteral("commander.png"));
+      {
+        SiteManager Sites(&Window);
+        Sites.resize(820, 560);
+        Sites.show();
+        Sites.SelectSite(QStringLiteral("Work/Web server"));
+        Shot(&Sites, QStringLiteral("site-manager.png"));
+      }
+      {
+        PreferencesDialog Dialog(&Window);
+        Dialog.show();
+        Dialog.ShowPage(PreferencesDialog::tr("Panels"));
+        Shot(&Dialog, QStringLiteral("preferences.png"));
+      }
+    }
+    Window.close();
+  }
+  CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.ExplorerInterface = false; });
+  CoreBridge::Finalize();
+  QDir(Local).removeRecursively();
+}
+
 void Session(const char * Port)
 {
   QtFrontend Frontend;
@@ -7042,6 +7159,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 4) && (std::strcmp(argv[1], "keys") == 0))
   {
     Keys(QString::fromLocal8Bit(argv[3]));
+  }
+  else if ((argc >= 6) && (std::strcmp(argv[1], "screenshots") == 0))
+  {
+    Screenshots(argv[3], QString::fromLocal8Bit(argv[4]), QString::fromLocal8Bit(argv[5]));
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "explorer") == 0))
   {
