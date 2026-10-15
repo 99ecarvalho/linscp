@@ -66,6 +66,17 @@ UnicodeString DefaultTemporaryDir(bool Mask, const UnicodeString & Base)
 UnicodeString PosixIniFileName()
 {
   const UnicodeString FileName = L"WinSCP.ini";
+  // An AppImage's executable is in its read-only image: the one beside the
+  // .AppImage file itself makes it portable ($APPIMAGE, its path).
+  const UnicodeString AppImage = GetEnvironmentVariable(L"APPIMAGE");
+  if (!AppImage.IsEmpty())
+  {
+    const UnicodeString Beside = IncludeTrailingBackslash(ExtractFilePath(AppImage)) + FileName;
+    if (FileExists(ApiPath(Beside)))
+    {
+      return Beside;
+    }
+  }
   const UnicodeString Portable = IncludeTrailingBackslash(ExtractFilePath(ParamStr(0))) + FileName;
   if (FileExists(ApiPath(Portable)))
   {
@@ -103,6 +114,18 @@ TConfiguration * SetUpConfigurationStorage(TConfiguration * Result)
   else
   {
     Result->SetExplicitIniFileStorageName(PosixIniFileName());
+  }
+#else
+  else
+  {
+    // The portable package's (linscp.ini beside linscp.exe, as WinSCP's
+    // automatic one): the other programs beside it share it, as
+    // WinSCP.com shares WinSCP.exe's.
+    const UnicodeString Shared = IncludeTrailingBackslash(ExtractFilePath(ParamStr(0))) + L"linscp.ini";
+    if (!SameText(Shared, ChangeFileExt(ParamStr(0), L".ini")) && FileExists(ApiPath(Shared)))
+    {
+      Result->SetExplicitIniFileStorageName(Shared);
+    }
   }
 #endif
   if (!Params->FindSwitch(L"Unsafe"))

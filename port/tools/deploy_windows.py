@@ -22,6 +22,12 @@ PLUGINS = [
     'platforms/qwindows.dll',          # the window system
     'styles/qmodernwindowsstyle.dll',  # native look (Windows 10/11)
     'imageformats/qico.dll',           # .ico icons
+    # View > Thumbnails' previews (PNG and BMP are Qt's own).
+    'imageformats/qjpeg.dll',
+    'imageformats/qgif.dll',
+    'imageformats/qsvg.dll',
+    # HTTPS (Help > Check for Updates): Windows' own TLS, Schannel.
+    'tls/qschannelbackend.dll',
 ]
 
 

@@ -141,6 +141,14 @@ cmake --build build/release --target package-appimage   # linscp-<version>-x86_6
   icon, the Send To upload shortcut, the URL handler and the search path, as
   WinSCP's installer does.
 
+- **Portable**, as WinSCP's portable mode: the configuration is kept in an
+  INI file beside the program instead of the user's.
+  - Windows: `cmake --build build/win-release --target package-portable`
+    gives `linscp-<version>-portable.zip`, the program and an empty
+    `linscp.ini` (which `linscp-cli` shares).
+  - Linux: the AppImage, with a `WinSCP.ini` (empty to start with) beside
+    the `.AppImage` file.
+
 ## Licence
 
 GPL v3 — see [LICENSE](LICENSE). WinSCP is GPL v3; PuTTY and the FileZilla FTP

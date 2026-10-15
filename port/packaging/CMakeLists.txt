@@ -107,4 +107,12 @@ if(WIN32 AND TARGET deploy)
     DEPENDS deploy
     COMMENT "Building the installer in ${CMAKE_BINARY_DIR}/packages"
     VERBATIM)
+  # The portable package (port/tools/build_portable.py): the same folder,
+  # zipped, its configuration kept beside it.
+  add_custom_target(package-portable
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/build_portable.py" --version "${PROJECT_VERSION}"
+            --deploy "${CMAKE_BINARY_DIR}/deploy" --out "${CMAKE_BINARY_DIR}/packages" ${_license_args}
+    DEPENDS deploy
+    COMMENT "Building the portable package in ${CMAKE_BINARY_DIR}/packages"
+    VERBATIM)
 endif()
