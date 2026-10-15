@@ -16,3 +16,4 @@ mfc-cstring-const-search.patch
 gui-configuration-property-subscript.patch
 core-log-file-name-delimiter.patch
 core-local-eol-platform.patch
+core-openssh-import-posix-paths.patch

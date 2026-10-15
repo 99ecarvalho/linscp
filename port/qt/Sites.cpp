@@ -649,6 +649,28 @@ void TImportSites::LoadKnownHosts(const std::string & Text)
   F->Errors[KnownHosts] = Error;
 }
 
+std::pair<std::string, std::string> TImportSites::KeyFiles(int Source, int Index) const
+{
+  TStoredSessionList * List = ((Source >= 0) && (Source < SourceCount)) ? F->Lists[Source].get() : NULL;
+  if ((List == NULL) || (Index < 0) || (Index >= List->Count))
+  {
+    return {};
+  }
+  const TSessionData * Data = List->Sessions[Index];
+  return { Utf8(Data->PublicKeyFile), Utf8(Data->TunnelPublicKeyFile) };
+}
+
+void TImportSites::SetKeyFiles(int Source, int Index, const std::pair<std::string, std::string> & Files)
+{
+  TStoredSessionList * List = ((Source >= 0) && (Source < SourceCount)) ? F->Lists[Source].get() : NULL;
+  if ((List != NULL) && (Index >= 0) && (Index < List->Count))
+  {
+    TSessionData * Data = List->Sessions[Index];
+    Data->PublicKeyFile = FromUtf8(Files.first);
+    Data->TunnelPublicKeyFile = FromUtf8(Files.second);
+  }
+}
+
 std::vector<std::string> TImportSites::Import(int Source)
 {
   try

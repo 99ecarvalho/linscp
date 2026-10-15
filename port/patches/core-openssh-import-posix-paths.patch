@@ -1,0 +1,15 @@
+Keep an OpenSSH config's paths POSIX ones on POSIX.
+
+ConvertPathFromOpenssh turns the forward slashes of an OpenSSH config's
+paths into backslashes (GetNormalizedPath), as Windows' dialogs want them.
+On POSIX that breaks the path: an imported site's IdentityFile
+~/.ssh/id_ed25519 became \home\user\.ssh\id_ed25519, a file that does not
+exist. The platform's delimiter tells the two apart in one expression both
+compilers take: a backslash on Windows, so upstream's behaviour is
+unchanged. Line counts are unchanged.
+
+--- a/source/core/SessionData.cpp
++++ b/source/core/SessionData.cpp
+@@ -1681,1 +1681,1 @@
+-  UnicodeString Result = GetNormalizedPath(Path);
++  UnicodeString Result = (PathDelim == L'\\') ? GetNormalizedPath(Path) : ExcludeTrailingBackslash(Path);

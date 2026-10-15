@@ -1516,6 +1516,7 @@ std::string Text(TText Text)
     case TText::ConfirmCreateShortcutWorkspace: Ident = CONFIRM_CREATE_SHORTCUT_WORKSPACE; break;
     case TText::ConfirmCreateSendTo: Ident = CONFIRM_CREATE_SENDTO; break;
     case TText::SaveSiteShortcut: Ident = SAVE_SITE_WORKSPACE_SHORTCUT; break;
+    case TText::ImportConvertedKeys: Ident = IMPORT_CONVERTED_KEYS; break;
     case TText::CopyParamGenerateCode: Ident = COPY_PARAM_GENERATE_CODE; break;
     default: return std::string();
   }

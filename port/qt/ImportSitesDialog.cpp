@@ -6,12 +6,16 @@
 #include <QDialogButtonBox>
 #include <QDir>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QListWidget>
+#include <QMap>
 #include <QPushButton>
+#include <QSet>
 #include <QVBoxLayout>
 
+#include "KeyVerify.h"
 #include "QtFrontend.h"
 
 using TImportSites = CoreBridge::TImportSites;
@@ -171,6 +175,10 @@ void ImportSitesDialog::accept()
     return;
   }
   SaveSelection();
+  if (FSource->currentIndex() == CoreBridge::TImportSites::OpenSsh)
+  {
+    ConvertKeys();
+  }
   try
   {
     FImported = FSites->Import(FSource->currentIndex());
@@ -183,4 +191,113 @@ void ImportSitesDialog::accept()
     return;
   }
   QDialog::accept();
+}
+
+// As TImportSessionsDialog::ConvertKeyFile: an OpenSSH key offered for
+// conversion once (the same file, the same answer), a converted one
+// beside it reused. True when the site's file changed.
+bool ImportSitesDialog::ConvertKeyFile(QString & KeyFile, QMap<QString, QString> & Converted, QSet<QString> & NotConverted)
+{
+  if (KeyFile.isEmpty() || !QFileInfo::exists(KeyFile))
+  {
+    return false;
+  }
+  const QString Canonical = QFileInfo(KeyFile).canonicalFilePath();
+  if (Converted.contains(Canonical))
+  {
+    KeyFile = Converted.value(Canonical);
+    return true;
+  }
+  if (NotConverted.contains(Canonical))
+  {
+    return false;
+  }
+  const CoreBridge::TKeyCheck Check = CoreBridge::CheckKey(KeyFile.toStdString());
+  QString FileName = KeyFile;
+  bool Result = false;
+  const QString Suggested = QString::fromStdString(Check.ConvertedFileName);
+  if ((Check.Status == CoreBridge::TKeyCheck::TStatus::Convertible) && !Suggested.isEmpty() && QFileInfo::exists(Suggested))
+  {
+    FileName = Suggested;
+    Result = true;
+  }
+  else if (Check.Status != CoreBridge::TKeyCheck::TStatus::Usable)
+  {
+    const auto Chooser = [this](const QString & Suggested)
+    {
+      return FKeyFileChooser ? FKeyFileChooser(Suggested) : ChooseConvertedKeyFile(this, Suggested);
+    };
+    if (!VerifyAndConvertKey(this, FileName, true, Chooser))
+    {
+      NotConverted.insert(Canonical);
+      return false;
+    }
+    Result = (FileName != KeyFile);
+  }
+  if (Result)
+  {
+    KeyFile = FileName;
+    Converted.insert(Canonical, FileName);
+  }
+  return Result;
+}
+
+// As Execute, for the OpenSSH import: each checked site's keys, then
+// what was converted said.
+void ImportSitesDialog::ConvertKeys()
+{
+  const int Source = CoreBridge::TImportSites::OpenSsh;
+  QMap<QString, QString> Converted;
+  QSet<QString> NotConverted;
+  std::string Sessions;
+  int SessionCount = 0;
+  const auto Sites = FSites->Sites(Source);
+  for (int Index = 0; Index < static_cast<int>(Sites.size()); Index++)
+  {
+    if (!FSites->Selected(Source, Index))
+    {
+      continue;
+    }
+    std::pair<std::string, std::string> Files = FSites->KeyFiles(Source, Index);
+    QString Key = QString::fromStdString(Files.first);
+    QString Tunnel = QString::fromStdString(Files.second);
+    QStringList Keys;
+    if (ConvertKeyFile(Key, Converted, NotConverted))
+    {
+      Files.first = Key.toStdString();
+      Keys.append(Key);
+    }
+    if (ConvertKeyFile(Tunnel, Converted, NotConverted))
+    {
+      Files.second = Tunnel.toStdString();
+      if (!Keys.contains(Tunnel))
+      {
+        Keys.append(Tunnel);
+      }
+    }
+    if (!Keys.isEmpty())
+    {
+      FSites->SetKeyFiles(Source, Index, Files);
+      Sessions += QStringLiteral("%1 (%2)\n").arg(QString::fromStdString(Sites[Index].first), Keys.join(QStringLiteral(", "))).toStdString();
+      SessionCount++;
+    }
+  }
+  if (SessionCount > 0)
+  {
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Information;
+    QString Message = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ImportConvertedKeys));
+    Message.replace(Message.indexOf(QStringLiteral("%d")), 2, QString::number(Converted.size()));
+    Message.replace(Message.indexOf(QStringLiteral("%d")), 2, QString::number(SessionCount));
+    Query.Message = Message.toStdString();
+    Query.MoreMessages = Sessions;
+    CoreBridge::TQueryButton OK;
+    OK.Answer = CoreBridge::AnswerOK;
+    OK.Caption = "OK";
+    Query.Buttons = { OK };
+    Query.CancelAnswer = CoreBridge::AnswerOK;
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    Frontend.Query(Query);
+  }
 }

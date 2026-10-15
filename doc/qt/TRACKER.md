@@ -252,8 +252,9 @@ P2-10 and P2-11 waited, at the user's request, for P3.
 
 1. **P2-10**: packaging, then the P2 exit gate (**P2-11**); both waited for P3.
 2. **P4-01**: retire the VCL frontend (its gate, P3-10, is passed).
-3. Offer `core-log-file-name-delimiter.patch` and
-   `core-local-eol-platform.patch` upstream (ADR 0006).
+3. Offer `core-log-file-name-delimiter.patch`,
+   `core-local-eol-platform.patch` and `core-openssh-import-posix-paths.patch`
+   upstream (ADR 0006).
 
 ## P3 UI gap audit (2026-10-14)
 
@@ -280,7 +281,7 @@ registry, tray or window messages.
 | Properties | S3 ACLs | missing | |
 | Properties | checksums through the secondary shell | missing | copies go through a temporary copy instead |
 | Navigation | Go To's bookmark list; Location Profiles' opened folders kept; mask hints | done | the Open Directory button's menu (`CreateOpenDirMenu`); `NodeOpened`; the mask hint buttons (Select, Filter, Edit mask, Find files, Transfer settings) |
-| Session tools | Copy dialog's transfer code; OpenSSH key conversion on import | partial | the Copy dialog's Generate Code (DoGenerateTransferCodeDialog: script and .NET code, no URL page); the console's size is kept (`ConsoleWin.WindowSize`); OpenSSH key conversion on import missing |
+| Session tools | Copy dialog's transfer code; OpenSSH key conversion on import | done | the Copy dialog's Generate Code (DoGenerateTransferCodeDialog: script and .NET code, no URL page); an OpenSSH import's keys offered for conversion first (TImportSessionsDialog::Execute), its paths kept POSIX ones on POSIX (`core-openssh-import-posix-paths.patch`); the console's size is kept (`ConsoleWin.WindowSize`) |
 | Custom commands | local commands; extensions and their options | missing | local ones shown disabled |
 | Keep up to date | start in a new window; minimize to the tray | missing | presets are a combo, not WinSCP's split button |
 | Workspaces | local tabs saved | done | as WinSCP's (TSessionData::IsLocalBrowser: both local directories, no host), opened again as local tabs |

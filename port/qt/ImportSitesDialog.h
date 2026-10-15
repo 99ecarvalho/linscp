@@ -6,7 +6,10 @@
 #define LINSCP_QT_IMPORT_SITES_DIALOG_H
 
 #include <QDialog>
+#include <QMap>
+#include <QSet>
 
+#include <functional>
 #include <memory>
 
 #include "CoreBridge.h"
@@ -36,9 +39,15 @@ public:
   QLabel * ErrorLabel() const { return FError; }
   QPushButton * OkButton() const { return FOk; }
 
+  // Where a converted key goes (tests); the file dialog by default.
+  void SetKeyFileChooser(std::function<QString(const QString & Suggested)> Chooser) { FKeyFileChooser = std::move(Chooser); }
+
 private:
+  std::function<QString(const QString & Suggested)> FKeyFileChooser;
   void LoadSites();
   void SaveSelection();
+  bool ConvertKeyFile(QString & KeyFile, QMap<QString, QString> & Converted, QSet<QString> & NotConverted);
+  void ConvertKeys();
   void UpdateControls();
 
   std::unique_ptr<CoreBridge::TImportSites> FSites;

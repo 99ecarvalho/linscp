@@ -871,6 +871,7 @@ enum class TText
   ConfirmCreateShortcutFolder, // "Create desktop shortcut for site folder '%s'?"
   ConfirmCreateShortcutWorkspace, // "Create desktop shortcut for workspace '%s'?"
   ConfirmCreateSendTo,  // "Create Explorer's 'send to' shortcut for site '%s'?"
+  ImportConvertedKeys,  // "%d key file(s) in %d imported session(s) were converted or replaced ..."
   SaveSiteShortcut,     // "&Create desktop shortcut"
   CopyParamGenerateCode, // "Generate &Code..."
 };
@@ -1309,6 +1310,11 @@ public:
   // TImportSessionsDialog::Execute and DoImportSessionsDialog; the names
   // given them. Throws TCoreError.
   std::vector<std::string> Import(int Source);
+  // A site's key files (PublicKeyFile, TunnelPublicKeyFile), for the
+  // OpenSSH import's conversion to PuTTY's format before it is imported
+  // (TImportSessionsDialog::Execute's ConvertKeyFile).
+  std::pair<std::string, std::string> KeyFiles(int Source, int Index) const;
+  void SetKeyFiles(int Source, int Index, const std::pair<std::string, std::string> & Files);
 
 private:
   struct TImpl;

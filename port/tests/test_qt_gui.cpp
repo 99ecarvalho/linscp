@@ -4763,6 +4763,49 @@ void InstanceTest(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// P3-16: OpenSSH's sites imported, their OpenSSH keys offered for
+// conversion to PuTTY's format first (POSIX: core finds ~/.ssh through
+// HOME; Windows' profile folder cannot be moved for a test).
+int ImportKeysTest(const QString & Key, const QString & Directory)
+{
+#if defined(Q_OS_WIN)
+  Q_UNUSED(Key);
+  Q_UNUSED(Directory);
+  return 77;
+#else
+  const QDir Dir(Directory);
+  QDir().mkpath(Dir.filePath(QStringLiteral("home/.ssh")));
+  {
+    QFile Config(Dir.filePath(QStringLiteral("home/.ssh/config")));
+    Config.open(QIODevice::WriteOnly);
+    Config.write(QStringLiteral("Host keyhost\n  HostName k.example\n  User bob\n  IdentityFile %1\n").arg(Key).toUtf8());
+  }
+  qputenv("HOME", Dir.filePath(QStringLiteral("home")).toLocal8Bit());
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.AcceptDialogs = true;
+    const QString Converted = Dir.filePath(QStringLiteral("converted.ppk"));
+    ImportSitesDialog Import(&Window);
+    Import.SetKeyFileChooser([&Converted](const QString &) { return Converted; });
+    Import.SourceCombo()->setCurrentIndex(CoreBridge::TImportSites::OpenSsh);
+    Check((Import.List()->count() == 1) && (Import.List()->item(0)->text() == QStringLiteral("keyhost")), "the config's host");
+    Import.OkButton()->click();
+    Check(Import.Imported().size() == 1, "imported");
+    const CoreBridge::TSite Site = CoreBridge::LoadSite(Import.Imported().front());
+    Check((QString::fromStdString(Site.PrivateKeyFile) == Converted) && QFileInfo::exists(Converted),
+      "its OpenSSH key converted first, the site given the converted one");
+  }
+  CoreBridge::Finalize();
+  return 0;
+#endif
+}
+
 // P3-16: shortcuts to the program: a site's (its URL, /desktop), the Send
 // To one (/upload). Made in folders of the test's own: the desktop's
 // (POSIX, through XDG's user-dirs.dirs) and Send To's (Windows, APPDATA).
@@ -5203,6 +5246,14 @@ int main(int argc, char ** argv)
   else if ((argc >= 4) && (std::strcmp(argv[1], "masterpasswordread") == 0))
   {
     return MasterPasswordRead(QString::fromLocal8Bit(argv[3]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "importkeys") == 0))
+  {
+    const int Result = ImportKeysTest(QString::fromLocal8Bit(argv[3]), QString::fromLocal8Bit(argv[4]));
+    if (Result != 0)
+    {
+      return Result;
+    }
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "shortcuts") == 0))
   {
