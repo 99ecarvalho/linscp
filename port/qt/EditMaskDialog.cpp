@@ -1,4 +1,5 @@
 #include "EditMaskDialog.h"
+#include "HintButton.h"
 
 #include <QCheckBox>
 #include <QDialogButtonBox>
@@ -87,6 +88,9 @@ EditMaskDialog::EditMaskDialog(const QString & Mask, QWidget * Parent) :
   FPreview->setReadOnly(true);
   FPreview->setMaximumHeight(FPreview->fontMetrics().lineSpacing() * 4);
   MaskLayout->addWidget(FPreview);
+  MaskLayout->addWidget(MakeMaskHintButton(tr("mask hints"),
+    { CoreBridge::TText::MaskHint, CoreBridge::TText::FileMaskExHint, CoreBridge::TText::PathMaskHint }, MaskGroup),
+    0, Qt::AlignLeft);
   Layout->addWidget(MaskGroup);
   QDialogButtonBox * Buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
   FOk = Buttons->button(QDialogButtonBox::Ok);

@@ -1,4 +1,5 @@
 #include "EditorWindow.h"
+#include "WindowParams.h"
 
 #include <QActionGroup>
 #include <QCheckBox>
@@ -134,6 +135,8 @@ bool Decode(const QByteArray & Data, bool Utf8, QString & Text)
 
 }  // namespace
 
+int EditorWindow::GInstances = 0;
+
 EditorWindow::EditorWindow(const QString & FileName, const QString & Caption, const QString & AppName, QWidget * Parent) :
   QMainWindow(Parent),
   FFileName(FileName),
@@ -185,6 +188,19 @@ EditorWindow::EditorWindow(const QString & FileName, const QString & Caption, co
   QMenu * FileMenu = menuBar()->addMenu(tr("&File"));
   QAction * SaveAction = FileMenu->addAction(tr("&Save"), this, [this]() { Save(); });
   SaveAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
+  // As SaveAllAction2 (Shift+Ctrl+S): every editor's.
+  QAction * SaveAllAction = FileMenu->addAction(tr("Save &All"), this, [this]()
+  {
+    if (OnSaveAll)
+    {
+      OnSaveAll();
+    }
+    else
+    {
+      Save();
+    }
+  });
+  SaveAllAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S));
   QAction * ReloadAction = FileMenu->addAction(tr("&Reload"), this, [this]() { Reload(); });
   ReloadAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_R));
   FileMenu->addSeparator();
@@ -256,9 +272,37 @@ EditorWindow::EditorWindow(const QString & FileName, const QString & Caption, co
   connect(FEditor, &QPlainTextEdit::modificationChanged, this, &EditorWindow::UpdateStatus);
   UpdateTitle();
   resize(800, 600);
+  // As TEditorForm::CreateParams: the first editor where the last first one
+  // was left; the others where the system puts them.
+  FInstance = GInstances++;
+  if (FInstance == 0)
+  {
+    RestoreWindowParams(this, QString::fromStdString(CoreBridge::EditorSettings().WindowParams));
+  }
+  FWindowParams = StoreWindowParams(this);
 }
 
-EditorWindow::~EditorWindow() = default;
+// As ~TEditorForm: the first one's place kept, unless never moved.
+EditorWindow::~EditorWindow()
+{
+  GInstances--;
+  if (FInstance == 0)
+  {
+    const QString Params = StoreWindowParams(this);
+    if (Params != FWindowParams)
+    {
+      CoreBridge::TEditorSettings Settings = CoreBridge::EditorSettings();
+      Settings.WindowParams = Params.toStdString();
+      try
+      {
+        CoreBridge::SetEditorSettings(Settings);
+      }
+      catch (const CoreBridge::TCoreError &)
+      {
+      }
+    }
+  }
+}
 
 QString EditorWindow::EncodingName(bool Utf8) const
 {
@@ -421,6 +465,10 @@ bool EditorWindow::Reload()
   if (Modified() &&
       (QMessageBox::question(this, windowTitle(), tr("File was modified. Changes will be lost, if file is reloaded. Continue?"),
          QMessageBox::Ok | QMessageBox::Cancel) != QMessageBox::Ok))
+  {
+    return false;
+  }
+  if (OnFileReload && !OnFileReload())
   {
     return false;
   }

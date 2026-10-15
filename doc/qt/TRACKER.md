@@ -263,7 +263,7 @@ registry, tray or window messages.
 
 | Area | Gap | Status | Note |
 |---|---|---|---|
-| Panels | extension column | missing | WinSCP's `uvExt` |
+| Panels | extension column | done | `uvExt`, `dvExt`: hidden by default, the header's menu, kept in the layout |
 | Panels | incremental search with its status | missing | |
 | Main window | WinSCP's toolbars (Commands, Sort, Preferences, Transfer, Custom commands) | done | 2026-10-14, with P3-17's icons |
 | Synchronize | selected files only; by checksum; "use same options next time" saved | missing | options kept for the run only |
@@ -275,12 +275,12 @@ registry, tray or window messages.
 | Preferences > Security | master password | missing | |
 | Preferences > SSH | host CAs | missing | |
 | Preferences > Integration | "Send to" | missing | Win-only (Explorer's Send To) |
-| Editor | reload from the server; save all; window position kept | missing | |
+| Editor | reload from the server; save all; window position kept | done | Reload downloads again (`ExecutedFileReload`); Save All (Shift+Ctrl+S); the first editor's place as `Editor.WindowParams` |
 | Properties | local files' | missing | WinSCP shows the shell's (Win-only) |
 | Properties | S3 ACLs | missing | |
 | Properties | checksums through the secondary shell | missing | copies go through a temporary copy instead |
-| Navigation | Go To's bookmark list; Location Profiles' opened folders kept; mask hints | missing | |
-| Session tools | Copy dialog's transfer code; console's size kept; OpenSSH key conversion on import | missing | |
+| Navigation | Go To's bookmark list; Location Profiles' opened folders kept; mask hints | done | the Open Directory button's menu (`CreateOpenDirMenu`); `NodeOpened`; the mask hint buttons (Select, Filter, Edit mask, Find files, Transfer settings) |
+| Session tools | Copy dialog's transfer code; OpenSSH key conversion on import | missing | the console's size is kept (`ConsoleWin.WindowSize`) |
 | Custom commands | local commands; extensions and their options | missing | local ones shown disabled |
 | Keep up to date | start in a new window; minimize to the tray | missing | presets are a combo, not WinSCP's split button |
 | Workspaces | local tabs saved | missing | |

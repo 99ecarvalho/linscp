@@ -69,6 +69,7 @@
 #include "SaveWorkspaceDialog.h"
 #include "CopyLocalDialog.h"
 #include "IconSet.h"
+#include "WindowParams.h"
 #include "PanelBands.h"
 #include "SaveSiteDialog.h"
 #include "KeyVerify.h"
@@ -424,30 +425,9 @@ void MainWindow::RestoreLayout()
 {
   const CoreBridge::TLayout Layout = CoreBridge::Layout();
   const int Dpi = logicalDpiX();
-  const QStringList Window = QString::fromStdString(Layout.WindowParams).split(QLatin1Char(';'));
   QScreen * Screen = this->screen();
   const QRect Area = (Screen != nullptr) ? Screen->availableGeometry() : QRect(0, 0, 1280, 800);
-  if (Window.size() >= 6)
-  {
-    // left;top;right;bottom;state;ppi, on the window's monitor, at the
-    // pixels per inch saved; -1;-1;width;height when never placed.
-    const int Saved = (Window[5].toInt() > 0) ? Window[5].toInt() : Dpi;
-    const auto Scale = [Dpi, Saved](int Value) { return Value * Dpi / Saved; };
-    if (Window[0].toInt() == -1)
-    {
-      resize(Scale(Window[2].toInt()), Scale(Window[3].toInt()));
-    }
-    else
-    {
-      setGeometry(QRect(QPoint(Area.left() + Scale(Window[0].toInt()), Area.top() + Scale(Window[1].toInt())),
-        QPoint(Area.left() + Scale(Window[2].toInt()) - 1, Area.top() + Scale(Window[3].toInt()) - 1)));
-    }
-    if (Window[4].toInt() == 2)
-    {
-      setWindowState(windowState() | Qt::WindowMaximized);
-    }
-  }
-  else
+  if (!RestoreWindowParams(this, QString::fromStdString(Layout.WindowParams)))
   {
     // TWinConfiguration::Default's: the work area, less a margin, at most
     // 1090 by 700.
@@ -473,14 +453,7 @@ void MainWindow::SaveLayout()
 {
   CoreBridge::TLayout Layout = CoreBridge::Layout();
   const int Dpi = logicalDpiX();
-  QScreen * Screen = this->screen();
-  const QRect Area = (Screen != nullptr) ? Screen->availableGeometry() : QRect();
-  // StoreForm: relative to the monitor; normal bounds even when maximized.
-  const QRect Bounds = isMaximized() ? normalGeometry() : geometry();
-  Layout.WindowParams = QStringLiteral("%1;%2;%3;%4;%5;%6")
-    .arg(Bounds.left() - Area.left()).arg(Bounds.top() - Area.top())
-    .arg(Bounds.right() + 1 - Area.left()).arg(Bounds.bottom() + 1 - Area.top())
-    .arg(isMaximized() ? 2 : 0).arg(Dpi).toStdString();
+  Layout.WindowParams = StoreWindowParams(this).toStdString();
   const QList<int> Sizes = FPanels->sizes();
   const int LocalWidth = Sizes.value(FPanels->indexOf(FLocal));
   const int Total = std::max(1, LocalWidth + Sizes.value(FPanels->indexOf(FOtherLocal->isVisible() ? static_cast<QWidget *>(FOtherLocal) :
@@ -1826,6 +1799,14 @@ void MainWindow::CheckExternalEdited()
 EditorWindow * MainWindow::ShowEditor(EditorWindow * Editor)
 {
   Editor->setAttribute(Qt::WA_DeleteOnClose);
+  // As the explorer's OnSaveAll: every editor's.
+  Editor->OnSaveAll = [this]()
+  {
+    for (EditorWindow * Any : Editors())
+    {
+      Any->Save();
+    }
+  };
   if (!Editor->Load())
   {
     delete Editor;
@@ -1894,6 +1875,29 @@ EditorWindow * MainWindow::EditRemote(const QString & Name, bool New)
   EditorWindow * Editor = new EditorWindow(QString::fromStdString(File->LocalFile), RemotePath, QString::fromStdString(FInfo.AppName));
   CoreBridge::TSession * Session = FSession.get();
   Editor->OnFileChanged = [this, File, Session]() { return EditUpload(Session, *File); };
+  // As ExecutedFileReload: from the server again, its session's.
+  Editor->OnFileReload = [this, File, Session, Name]()
+  {
+    if (!SessionOpen(Session) || !Session->Active())
+    {
+      CoreBridge::TError Error;
+      Error.Message = tr("Cannot reload '%1': its session is closed.").arg(Name).toStdString();
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      Frontend.ShowError(Error);
+      return false;
+    }
+    try
+    {
+      Session->EditReload(*File);
+      return true;
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+      return false;
+    }
+  };
   // Its temporary directory goes once it is closed and uploaded.
   connect(Editor, &QObject::destroyed, this, [this, File]()
   {
@@ -4639,11 +4643,16 @@ void MainWindow::BuildToolbars(QMenu * Options)
   // As QueueToggleShowAction: the queue shown or not, its menu the choices.
   QAction * Queue = new QAction(tr("&Queue"), this);
   Iconize(Queue, "queue");
+  // (Options > Queue's choices, made after the bands: listed as it opens.)
   QMenu * QueueMenu = new QMenu(this);
-  for (int Show = 0; Show < 3; Show++)
+  connect(QueueMenu, &QMenu::aboutToShow, this, [this, QueueMenu]()
   {
-    QueueMenu->addAction(FQueueShowActions[Show]);
-  }
+    QueueMenu->clear();
+    for (int Show = 0; Show < 3; Show++)
+    {
+      QueueMenu->addAction(FQueueShowActions[Show]);
+    }
+  });
   Queue->setMenu(QueueMenu);
   connect(Queue, &QAction::triggered, this, [this]()
   {
@@ -4749,7 +4758,18 @@ void MainWindow::BuildToolbars(QMenu * Options)
     auto BandOf = [&Side](TPanelBand Which) { return (Side.Local != nullptr) ? Side.Local->Band(Which) : Side.Remote->Band(Which); };
     const bool Left = Side.Left;
     QToolBar * Path = BandOf(TPanelBand::Path);
-    BandAction(Path, SideAction(Left, FOpenDirectoryAction, tr("&Open Directory/Bookmark..."), "open-directory"));
+    QAction * OpenDirectory = SideAction(Left, FOpenDirectoryAction, tr("&Open Directory/Bookmark..."), "open-directory");
+    QMenu * OpenDirMenu = new QMenu(this);
+    connect(OpenDirMenu, &QMenu::aboutToShow, this, [this, OpenDirMenu, Left, OpenDirectory]()
+    {
+      FillOpenDirMenu(OpenDirMenu, Left, OpenDirectory);
+    });
+    OpenDirectory->setMenu(OpenDirMenu);
+    BandAction(Path, OpenDirectory);
+    if (QToolButton * Button = qobject_cast<QToolButton *>(Path->widgetForAction(OpenDirectory)))
+    {
+      Button->setPopupMode(QToolButton::MenuButtonPopup);
+    }
     BandAction(Path, SideAction(Left, FFilterAction, tr("&Filter..."), "filter"));
     if (Side.Remote != nullptr)
     {
@@ -5019,4 +5039,101 @@ void MainWindow::UpdateSortActions()
   {
     FSortActions[Index + 1]->setChecked(Header->sortIndicatorSection() == Columns[Index]);
   }
+}
+
+void MainWindow::FillOpenDirMenu(QMenu * Menu, bool Left, QAction * OpenAction)
+{
+  Menu->clear();
+  Menu->addAction(OpenAction);
+  Menu->setDefaultAction(OpenAction);
+  Menu->addSeparator();
+  // (A local tab's right side is local too.)
+  const bool LocalSide = Left || LocalBrowser();
+  const bool Profiles = CoreBridge::Preferences().UseLocationProfiles && FSession;
+  auto Go = [this, Left, LocalSide, Profiles](const CoreBridge::TBookmarkEntry & Bookmark)
+  {
+    ActivatePanel(Left);
+    // As OpenBookmark: a profile's both directories, else the side's.
+    if (Profiles)
+    {
+      if (!Bookmark.Local.empty())
+      {
+        GoLocal(QString::fromStdString(Bookmark.Local));
+      }
+      if (!Bookmark.Remote.empty() && !LocalBrowser())
+      {
+        GoRemote(QString::fromStdString(Bookmark.Remote));
+      }
+    }
+    else
+    {
+      const std::string & Directory = LocalSide ? Bookmark.Local : Bookmark.Remote;
+      LocalSide ? GoLocal(QString::fromStdString(Directory)) : GoRemote(QString::fromStdString(Directory));
+    }
+  };
+  std::vector<std::vector<CoreBridge::TBookmarkEntry>> Lists;
+  if (FSession)
+  {
+    Lists.push_back(CoreBridge::Bookmarks(FSession->SessionKey()));
+  }
+  Lists.push_back(CoreBridge::Bookmarks(std::string()));
+  for (const std::vector<CoreBridge::TBookmarkEntry> & List : Lists)
+  {
+    bool Any = false;
+    if (!Profiles)
+    {
+      // The side's directories, each once.
+      QStringList Seen;
+      for (const CoreBridge::TBookmarkEntry & Bookmark : List)
+      {
+        const QString Directory = QString::fromStdString(LocalSide ? Bookmark.Local : Bookmark.Remote);
+        if (!Directory.isEmpty() && !Seen.contains(Directory))
+        {
+          Seen.append(Directory);
+          QString Caption = Directory;
+          Menu->addAction(Caption.replace(QLatin1Char('&'), QStringLiteral("&&")), this, [Go, Bookmark]() { Go(Bookmark); });
+          Any = true;
+        }
+      }
+    }
+    else
+    {
+      // Profiles in their folders, as the dialog has them.
+      QMap<QString, QMenu *> Folders;
+      for (const CoreBridge::TBookmarkEntry & Bookmark : List)
+      {
+        const QString Node = QString::fromStdString(Bookmark.Node);
+        if (!Node.isEmpty() && !Folders.contains(Node))
+        {
+          Folders[Node] = nullptr;
+        }
+      }
+      for (auto It = Folders.begin(); It != Folders.end(); ++It)
+      {
+        It.value() = Menu->addMenu(IconSet::Icon(QStringLiteral("open-directory")), It.key());
+      }
+      for (const CoreBridge::TBookmarkEntry & Bookmark : List)
+      {
+        const QString Node = QString::fromStdString(Bookmark.Node);
+        QMenu * Parent = Node.isEmpty() ? Menu : Folders[Node];
+        QString Caption = QString::fromStdString(Bookmark.Name);
+        QAction * Item = Parent->addAction(Caption.replace(QLatin1Char('&'), QStringLiteral("&&")), this,
+          [Go, Bookmark]() { Go(Bookmark); });
+        if (Bookmark.ShortCut != 0)
+        {
+          Item->setShortcut(QKeySequence::fromString(ShortCutText(Bookmark.ShortCut), QKeySequence::NativeText));
+        }
+        Any = true;
+      }
+    }
+    if (Any)
+    {
+      Menu->addSeparator();
+    }
+  }
+  Menu->addAction(IconSet::Icon(QStringLiteral("bookmark")), tr("&Add Path to Bookmarks"), this, [this, Left]()
+  {
+    ActivatePanel(Left);
+    OpenDirectory(true);
+  });
 }

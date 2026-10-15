@@ -277,6 +277,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
   if (Storage->OpenSubKeyPath(L"Interface\\Editor", true))
   {
     TCloseSubKeyPath Close(Storage);
+    Storage->WriteString(L"WindowParams", FSettings.EditorWindowParams);
     Storage->WriteBool(L"WordWrap", FSettings.EditorWordWrap);
     Storage->WriteInteger(L"TabSize", FSettings.EditorTabSize);
     Storage->WriteInteger(L"Encoding", FSettings.EditorEncoding);
@@ -297,6 +298,11 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteInteger(L"BackgroundColor", FSettings.EditorBackgroundColor);
     Storage->WriteBool(L"WarnOrLargeFileSize", FSettings.EditorWarnOrLargeFileSize);
     Storage->WriteInteger(L"LargeFileSize", FSettings.EditorLargeFileSize);
+  }
+  if (Storage->OpenSubKeyPath(L"Interface\\ConsoleWin", true))
+  {
+    TCloseSubKeyPath Close(Storage);
+    Storage->WriteString(L"WindowSize", FSettings.ConsoleWindowSize);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\QueueView", true))
   {
@@ -497,6 +503,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
   if (Storage->OpenSubKeyPath(L"Interface\\Editor", false))
   {
     TCloseSubKeyPath Close(Storage);
+    FSettings.EditorWindowParams = Storage->ReadString(L"WindowParams", FSettings.EditorWindowParams);
     FSettings.EditorWordWrap = Storage->ReadBool(L"WordWrap", FSettings.EditorWordWrap);
     FSettings.EditorTabSize = Storage->ReadInteger(L"TabSize", FSettings.EditorTabSize);
     FSettings.EditorEncoding = Storage->ReadInteger(L"Encoding", FSettings.EditorEncoding);
@@ -521,6 +528,11 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.EditorBackgroundColor = Storage->ReadInteger(L"BackgroundColor", FSettings.EditorBackgroundColor);
     FSettings.EditorWarnOrLargeFileSize = Storage->ReadBool(L"WarnOrLargeFileSize", FSettings.EditorWarnOrLargeFileSize);
     FSettings.EditorLargeFileSize = Storage->ReadInteger(L"LargeFileSize", FSettings.EditorLargeFileSize);
+  }
+  if (Storage->OpenSubKeyPath(L"Interface\\ConsoleWin", false))
+  {
+    TCloseSubKeyPath Close(Storage);
+    FSettings.ConsoleWindowSize = Storage->ReadString(L"WindowSize", FSettings.ConsoleWindowSize);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\QueueView", false))
   {

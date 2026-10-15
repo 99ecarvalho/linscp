@@ -497,7 +497,7 @@ void RemotePanel::ApplyPreferences(const CoreBridge::TPreferences & Preferences)
 }
 
 // WinSCP's columns: name, size, changed, rights, owner, group, extension, link target, type (TUnixDirView).
-static const std::vector<int> WinScpColumns = { 0, 1, 2, 3, 4, 5, 7 };
+static const std::vector<int> WinScpColumns = { 0, 1, 2, 3, 4, 5, 7, 6 };
 
 void RemotePanel::SetColumnsParams(const QString & Params)
 {

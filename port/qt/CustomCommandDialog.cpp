@@ -1,4 +1,5 @@
 #include "CustomCommandDialog.h"
+#include "HintButton.h"
 #include "ShortCutDialog.h"
 
 #include <QCheckBox>
@@ -105,14 +106,7 @@ CustomCommandDialog::CustomCommandDialog(TMode Mode, const CoreBridge::TCustomCo
   }
   // WinSCP's hint label, as a button so the keyboard reaches it: the
   // patterns shown when pressed, as on hover.
-  QPushButton * Hint = new QPushButton(tr("&patterns"), Group);
-  Hint->setFlat(true);
-  Hint->setToolTip(PatternsHint());
-  connect(Hint, &QPushButton::clicked, this, [this, Hint]()
-  {
-    QToolTip::showText(Hint->mapToGlobal(QPoint(0, Hint->height())), PatternsHint(), Hint);
-  });
-  GroupLayout->addWidget(Hint, 0, Qt::AlignLeft);
+  GroupLayout->addWidget(MakeHintButton(tr("&patterns"), PatternsHint(), Group), 0, Qt::AlignLeft);
   FShortCut = new QComboBox(Group);
   if (Mode != TMode::AdHoc)
   {

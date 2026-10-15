@@ -1,5 +1,6 @@
 #include "PreferencesDialog.h"
 #include "IconSet.h"
+#include "HintButton.h"
 
 #include "TransferSettingsDialog.h"
 #include "CustomCommandDialog.h"
@@ -1020,13 +1021,7 @@ QWidget * PreferencesDialog::MakeApplicationsPage(const TPreferences & Preferenc
   });
   // WinSCP's hint label, as a button so the keyboard reaches it: the
   // patterns shown when pressed, as on hover.
-  QPushButton * Patterns = new QPushButton(tr("&patterns"), Group);
-  Patterns->setFlat(true);
-  Patterns->setToolTip(QString::fromStdString(CoreBridge::PuttyPatternsHint()));
-  connect(Patterns, &QPushButton::clicked, this, [Patterns]()
-  {
-    QToolTip::showText(Patterns->mapToGlobal(QPoint(0, Patterns->height())), Patterns->toolTip(), Patterns);
-  });
+  QPushButton * Patterns = MakeHintButton(tr("&patterns"), QString::fromStdString(CoreBridge::PuttyPatternsHint()), Group);
   GroupLayout->addWidget(PathLabel, 0, 0, 1, 2);
   GroupLayout->addWidget(FPuttyPath, 1, 0);
   GroupLayout->addWidget(Browse, 1, 1);

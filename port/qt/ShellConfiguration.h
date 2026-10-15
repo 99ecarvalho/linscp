@@ -54,6 +54,7 @@ struct TShellSettings
   // The internal editor (Interface\Editor): word wrap, tab size, the
   // encoding (CP_UTF8, or 0 for the system's code page), and the last find
   // and replace.
+  UnicodeString EditorWindowParams;
   bool EditorWordWrap = false;
   int EditorTabSize = 8;
   int EditorEncoding = 65001;
@@ -112,6 +113,8 @@ struct TShellSettings
   bool SelectiveToolbarText = true;
   int LargerToolbar = 1;
   UnicodeString CommanderToolbarsLayout;
+  // ConsoleWin.WindowSize: "width,height,ppi".
+  UnicodeString ConsoleWindowSize = L"570,430,96";
 };
 
 class TCustomCommandList;

@@ -1,4 +1,5 @@
 #include "ConsoleDialog.h"
+#include "WindowParams.h"
 
 #include <QApplication>
 #include <QComboBox>
@@ -55,8 +56,30 @@ ConsoleDialog::ConsoleDialog(CoreBridge::TSession * Session, QWidget * Parent) :
   connect(FExecute, &QPushButton::clicked, this, [this]() { Execute(FCommand->currentText()); });
   connect(FCommand->lineEdit(), &QLineEdit::returnPressed, this, [this]() { Execute(FCommand->currentText()); });
   connect(FCommand, &QComboBox::editTextChanged, this, &ConsoleDialog::UpdateControls);
-  resize(640, 420);
+  // As FormShow: the size kept (RestoreFormSize); kept again on closing,
+  // when changed.
+  if (!RestoreWindowSize(this, QString::fromStdString(CoreBridge::Layout().ConsoleWindowSize)))
+  {
+    resize(570, 430);
+  }
+  FAutoSize = size();
   UpdateControls();
+}
+
+ConsoleDialog::~ConsoleDialog()
+{
+  if (size() != FAutoSize)
+  {
+    CoreBridge::TLayout Layout = CoreBridge::Layout();
+    Layout.ConsoleWindowSize = StoreWindowSize(this).toStdString();
+    try
+    {
+      CoreBridge::SetLayout(Layout);
+    }
+    catch (const CoreBridge::TCoreError &)
+    {
+    }
+  }
 }
 
 // As TConsoleDialog::UpdateControls: no command while one runs.

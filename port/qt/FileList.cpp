@@ -1,4 +1,5 @@
 #include "FileList.h"
+#include "HintButton.h"
 #include "EditMaskDialog.h"
 
 #include <algorithm>
@@ -379,6 +380,7 @@ void FileView::SetupColumns()
 {
   setColumnHidden(FileListModel::GroupColumn, true);
   setColumnHidden(FileListModel::LinkTargetColumn, true);
+  setColumnHidden(FileListModel::ExtColumn, true);
   header()->setContextMenuPolicy(Qt::CustomContextMenu);
   connect(header(), &QWidget::customContextMenuRequested, this, [this](const QPoint & Pos)
   {
@@ -515,6 +517,11 @@ QMenu * FileView::ColumnsMenu(bool MenuCaptions)
   QMenu * Menu = new QMenu(this);
   for (int Column = FileListModel::NameColumn + 1; Column < model()->columnCount(); Column++)
   {
+    // The main menu's Columns has no extension, as WinSCP's (its header's has).
+    if (MenuCaptions && (Column == FileListModel::ExtColumn))
+    {
+      continue;
+    }
     const QString Header = model()->headerData(Column, Qt::Horizontal).toString();
     QString Caption = Header;
     // As the main menu's Columns (NonVisual.dfm's ShowHide...ColumnAction).
@@ -688,7 +695,7 @@ bool FileView::SelectByMask(bool Select, const QString & Masks, bool Directories
 }
 
 // As WinSCP's Select/Deselect dialog (forms/SelectMask.cpp), without its
-// colors and hints.
+// colors; its mask hints.
 bool MaskDialog(QWidget * Parent, TMaskDialogMode Mode, QString & Mask, bool * Directories)
 {
   QDialog Dialog(Parent);
@@ -713,6 +720,8 @@ bool MaskDialog(QWidget * Parent, TMaskDialogMode Mode, QString & Mask, bool * D
   QLabel * MaskLabel = new QLabel(FileView::tr("File &mask:"), &Dialog);
   MaskLabel->setBuddy(MaskEdit);
   Layout->addRow(MaskLabel, Row);
+  Layout->addRow(QString(), MakeMaskHintButton(FileView::tr("mask hi&nts"),
+    { CoreBridge::TText::MaskHint, CoreBridge::TText::FileMaskExHint, CoreBridge::TText::CombiningMasksHint }, &Dialog));
   QCheckBox * DirectoriesCheck = nullptr;
   if ((Mode != TMaskDialogMode::Filter) && (Directories != nullptr))
   {
@@ -919,6 +928,19 @@ bool FileListModel::SetDirectorySize(const QString & Name, std::int64_t Size)
   return false;
 }
 
+// The Ext column's: a file's extension, without its dot (ExtractFileExt's
+// shown as WinSCP's panels show it); a directory has none.
+static QString Extension(const CoreBridge::TRemoteEntry & Entry)
+{
+  if (Entry.Directory)
+  {
+    return QString();
+  }
+  const QString Name = QString::fromStdString(Entry.Name);
+  const int Dot = Name.lastIndexOf(QLatin1Char('.'));
+  return (Dot > 0) ? Name.mid(Dot + 1) : QString();
+}
+
 const CoreBridge::TRemoteEntry * FileListModel::Entry(int Row) const
 {
   const int Index = Row - (FWithParent ? 1 : 0);
@@ -1004,6 +1026,7 @@ QVariant FileListModel::data(const QModelIndex & Index, int Role) const
         case OwnerColumn: return QString::fromStdString(E->Owner);
         case GroupColumn: return QString::fromStdString(E->Group);
         case LinkTargetColumn: return QString::fromStdString(E->LinkTarget);
+        case ExtColumn: return Extension(*E);
       }
       break;
     case Qt::ForegroundRole:
@@ -1039,6 +1062,7 @@ QVariant FileListModel::data(const QModelIndex & Index, int Role) const
         case OwnerColumn: return QString::fromStdString(E->Owner);
         case GroupColumn: return QString::fromStdString(E->Group);
         case LinkTargetColumn: return QString::fromStdString(E->LinkTarget);
+        case ExtColumn: return Extension(*E);
         default: return QString::fromStdString(E->Name);
       }
   }
@@ -1060,6 +1084,7 @@ QVariant FileListModel::headerData(int Section, Qt::Orientation Orientation, int
     case OwnerColumn: return tr("Owner");
     case GroupColumn: return tr("Group");
     case LinkTargetColumn: return tr("Link target");
+    case ExtColumn: return tr("Ext");
   }
   return QVariant();
 }

@@ -105,6 +105,10 @@ LocationProfilesDialog::LocationProfilesDialog(const QString & LocalDirectory, c
 
   for (int Index = 0; Index < 2; Index++)
   {
+    for (const std::string & Node : CoreBridge::BookmarkOpenedNodes((Index == 0) ? SessionKey : std::string()))
+    {
+      FOpened[Index].append(QString::fromStdString(Node));
+    }
     for (const CoreBridge::TBookmarkEntry & Entry : CoreBridge::Bookmarks((Index == 0) ? SessionKey : std::string()))
     {
       FProfiles[Index].push_back({ Entry, FNextId++ });
@@ -227,6 +231,18 @@ QWidget * LocationProfilesDialog::MakePage(int Index)
       Selected(Index);
     }
   });
+  // As ProfilesViewCollapsed and ...Expanded: kept as the user leaves them.
+  connect(FTrees[Index], &QTreeWidget::itemExpanded, this, [this, Index](QTreeWidgetItem * Item)
+  {
+    if (!FOpened[Index].contains(Item->text(0)))
+    {
+      FOpened[Index].append(Item->text(0));
+    }
+  });
+  connect(FTrees[Index], &QTreeWidget::itemCollapsed, this, [this, Index](QTreeWidgetItem * Item)
+  {
+    FOpened[Index].removeAll(Item->text(0));
+  });
   connect(FTrees[Index], &QTreeWidget::itemDoubleClicked, this, [this, Index](QTreeWidgetItem * Item)
   {
     if (FOk->isEnabled() && (Item != nullptr) && (Item->data(0, IdRole).toInt() != 0))
@@ -292,9 +308,10 @@ void LocationProfilesDialog::LoadTree(int Index, int SelectId, const QString & S
       Select = Item;
     }
   }
+  // As LoadBookmarks: each folder as it was left (NodeOpened).
   for (QTreeWidgetItem * Item : FolderItems)
   {
-    Item->setExpanded(true);
+    Item->setExpanded(FOpened[Index].contains(Item->text(0)));
     if ((SelectId == 0) && !SelectFolder.isEmpty() && (Item->text(0) == SelectFolder))
     {
       Select = Item;
@@ -749,13 +766,21 @@ QString LocationProfilesDialog::RemoteDirectory() const
 
 void LocationProfilesDialog::done(int Result)
 {
+  for (int Index = 0; Index < 2; Index++)
+  {
+    FOpenedNodes[Index].clear();
+    for (const QString & Node : FOpened[Index])
+    {
+      FOpenedNodes[Index].push_back(Node.toStdString());
+    }
+  }
   try
   {
     if (!FSessionKey.empty())
     {
-      CoreBridge::SetBookmarks(FSessionKey, Profiles(0));
+      CoreBridge::SetBookmarks(FSessionKey, Profiles(0), &FOpenedNodes[0]);
     }
-    CoreBridge::SetBookmarks(std::string(), Profiles(1));
+    CoreBridge::SetBookmarks(std::string(), Profiles(1), &FOpenedNodes[1]);
     CoreBridge::SetUseSharedBookmarks(Page() == 1);
     if (FSwitched)
     {

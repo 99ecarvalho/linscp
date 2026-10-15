@@ -2258,6 +2258,47 @@ void Editing(const char * Port, const QString & Directory)
       Frontend.SetStartProgram(nullptr);
       CoreBridge::SetEditors(Defaults);
     }
+
+    // P3-16: Reload from the server; Save All; the first editor's place kept.
+    {
+      const QDir Root(Dir.filePath(QStringLiteral("../root")));
+      Check(Window.CloseEditors(false), "(no editors open)");
+      Remote->ChangeDirectory(QStringLiteral("/"));
+      Remote->Select({ QStringLiteral("hello.txt") });
+      Window.ActivatePanel(false);
+      EditorWindow * First = Window.EditCurrent();
+      Check(First != nullptr, "(a remote file edited)");
+      if (First != nullptr)
+      {
+        WriteAll(Root.filePath(QStringLiteral("hello.txt")), "changed on the server\n");
+        Check(First->Reload() && First->Editor()->toPlainText().contains(QStringLiteral("changed on the server")),
+          "Reload: from the server again");
+        WriteAll(Dir.filePath(QStringLiteral("saveall.txt")), "local\n");
+        EditorWindow * Second = Window.EditLocal(Dir.filePath(QStringLiteral("saveall.txt")));
+        Check(Second != nullptr, "(a local one too)");
+        if (Second != nullptr)
+        {
+          First->Editor()->moveCursor(QTextCursor::End);
+          First->Editor()->insertPlainText(QStringLiteral("remote edit\n"));
+          Second->Editor()->moveCursor(QTextCursor::End);
+          Second->Editor()->insertPlainText(QStringLiteral("local edit\n"));
+          First->OnSaveAll();
+          Check(!First->Modified() && !Second->Modified() &&
+            ReadAll(Dir.filePath(QStringLiteral("saveall.txt"))).contains("local edit"), "Save All saves every editor");
+          Check(WaitUntil([&Window]() { return Window.Session()->QueueEmpty(); }) &&
+            WaitUntil([&Root]() { return ReadAll(Root.filePath(QStringLiteral("hello.txt"))).contains("remote edit"); }),
+            "the remote one uploaded");
+        }
+        First->resize(655, 455);
+        Check(Window.CloseEditors(false), "(closed)");
+        QApplication::processEvents();
+        const QStringList Kept = QString::fromStdString(CoreBridge::EditorSettings().WindowParams).split(QLatin1Char(';'));
+        Check((Kept.size() >= 6) && (Kept[2].toInt() - Kept[0].toInt() == 655), "the first editor's place kept");
+        EditorWindow * Next = Window.EditLocal(Dir.filePath(QStringLiteral("saveall.txt")));
+        Check((Next != nullptr) && (Next->width() == 655) && (Next->height() == 455), "the next first one opens there");
+        Window.CloseEditors(false);
+      }
+    }
     Frontend.SetWindow(nullptr);
   }
   CoreBridge::Finalize();
@@ -2511,6 +2552,14 @@ void Properties(const char * Port)
         "another");
       Console.Execute(QStringLiteral("PWD"));
       Check(Console.CommandCombo()->count() == 2, "the commands kept, each once");
+      Check(Console.size() == QSize(570, 430), "WinSCP's default size");
+      Console.resize(611, 433);
+    }
+    Check(QString::fromStdString(CoreBridge::Layout().ConsoleWindowSize).startsWith(QStringLiteral("611,433,")),
+      "its size kept, as WinSCP's ConsoleWin.WindowSize");
+    {
+      ConsoleDialog Console(Session);
+      Check(Console.size() == QSize(611, 433), "and opened at it");
     }
     Responder.Custom = [](QWidget * Modal)
     {
@@ -2742,6 +2791,26 @@ void BookmarksTest(const char * Port, const QString & Directory)
     };
     Check((FindProfile("work") != nullptr) && (FindProfile("work")->Node == "clients") &&
       (FindProfile("work")->Remote == "/sub") && !FindProfile("work")->Local.empty(), "kept with both directories and the folder");
+    // P3-16: a folder left expanded is expanded next time (NodeOpened).
+    {
+      LocationProfilesDialog Dialog(QDir::toNativeSeparators(Directory), QStringLiteral("/sub"), QStringList(), QStringList(),
+        true, Key, false);
+      QTreeWidgetItem * Folder = Dialog.Tree(0)->topLevelItem(0);
+      Check((Folder != nullptr) && !Folder->isExpanded(), "a folder collapsed, as left");
+      if (Folder != nullptr)
+      {
+        Folder->setExpanded(true);
+      }
+      Dialog.reject();
+    }
+    {
+      LocationProfilesDialog Dialog(QDir::toNativeSeparators(Directory), QStringLiteral("/sub"), QStringList(), QStringList(),
+        true, Key, false);
+      Check((Dialog.Tree(0)->topLevelItem(0) != nullptr) && Dialog.Tree(0)->topLevelItem(0)->isExpanded(),
+        "expanded next time, as left");
+      Dialog.reject();
+    }
+    Profiles = CoreBridge::Bookmarks(Key);
     CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
     Preferences.UseLocationProfiles = true;
     CoreBridge::SetPreferences(Preferences);
@@ -2880,6 +2949,33 @@ void BookmarksTest(const char * Port, const QString & Directory)
     Check(Window.Filter() && Window.Local()->Filter().isEmpty() && Window.Local()->Names().contains(QStringLiteral("b.dat")),
       "*.* is no filter");
     Responder.Custom = nullptr;
+
+    // P3-16: the Open Directory button's menu, the side's bookmarks.
+    {
+      const QString Target = QDir(Directory).filePath(QStringLiteral("folder"));
+      QDir().mkpath(Target);
+      CoreBridge::TBookmarkEntry Mark;
+      Mark.Name = "menu mark";
+      Mark.Local = QDir::toNativeSeparators(Target).toStdString();
+      CoreBridge::SetBookmarks(std::string(), { Mark });
+      QAction * Open = Window.Local()->Band(TPanelBand::Path)->actions().value(0);
+      Check((Open != nullptr) && (Open->menu() != nullptr), "the Open Directory button has its menu");
+      if ((Open != nullptr) && (Open->menu() != nullptr))
+      {
+        emit Open->menu()->aboutToShow();
+        QAction * Item = nullptr;
+        for (QAction * Action : Open->menu()->actions())
+        {
+          Item = (Action->text() == QDir::toNativeSeparators(Target)) ? Action : Item;
+        }
+        Check(Item != nullptr, "listing the side's bookmarked directory");
+        if (Item != nullptr)
+        {
+          Item->trigger();
+          Check(QDir(Window.Local()->Path()) == QDir(Target), "which it goes to");
+        }
+      }
+    }
     Frontend.SetWindow(nullptr);
   }
   CoreBridge::Finalize();
@@ -4278,6 +4374,19 @@ void ToolbarsTest()
       qobject_cast<QToolButton *>(Bar(QStringLiteral("Commands"))->widgetForAction(Synchronize)) : nullptr;
     Check((Button != nullptr) && (Button->toolButtonStyle() == Qt::ToolButtonTextBesideIcon), "selective text labels");
     Check(Bar(QStringLiteral("Commands"))->iconSize() == QSize(20, 20), "WinSCP's default icon size, Large");
+    // The Preferences band's Queue button: its menu, Options > Queue's choices.
+    QAction * QueueButton = nullptr;
+    for (QAction * Action : Bar(QStringLiteral("Preferences"))->actions())
+    {
+      QueueButton = (Action->text() == MainWindow::tr("&Queue")) ? Action : QueueButton;
+    }
+    Check((QueueButton != nullptr) && (QueueButton->menu() != nullptr), "the Queue button has its menu");
+    if ((QueueButton != nullptr) && (QueueButton->menu() != nullptr))
+    {
+      emit QueueButton->menu()->aboutToShow();
+      Check((QueueButton->menu()->actions().size() == 3) && !QueueButton->menu()->actions().contains(nullptr),
+        "show, hide when empty, hide");
+    }
 
     // Toggled from Options: the Sort band shown, the left File band hidden.
     QAction * SortToggle = nullptr;

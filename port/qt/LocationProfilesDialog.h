@@ -92,6 +92,9 @@ private:
   QPushButton * FOk = nullptr;
   QPushButton * FShortCut = nullptr;
   std::vector<TProfile> FProfiles[2];
+  // The folders expanded, by page (NodeOpened).
+  QStringList FOpened[2];
+  std::vector<std::string> FOpenedNodes[2];
   int FNextId = 1;
   bool FChanging = false;
   bool FSwitched = false;

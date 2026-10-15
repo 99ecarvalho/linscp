@@ -1,4 +1,5 @@
 #include "TransferSettingsDialog.h"
+#include "HintButton.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -106,6 +107,9 @@ TransferSettingsFrame::TransferSettingsFrame(QWidget * Parent) :
   QFormLayout * OtherLayout = new QFormLayout(Other);
   FIncludeFileMask = new QLineEdit(Other);
   OtherLayout->addRow(tr("File &mask:"), FIncludeFileMask);
+  OtherLayout->addRow(QString(), MakeMaskHintButton(tr("mask hints"),
+    { CoreBridge::TText::MaskHint, CoreBridge::TText::FileMaskExHint, CoreBridge::TText::CombiningMasksHint,
+      CoreBridge::TText::PathMaskHint, CoreBridge::TText::DirectoryMaskHint }, Other));
   FNewerOnly = new QCheckBox(tr("&New and updated files only"), Other);
   FExcludeHiddenFiles = new QCheckBox(tr("Exclude h&idden files"), Other);
   FExcludeEmptyDirectories = new QCheckBox(tr("E&xclude empty directories"), Other);

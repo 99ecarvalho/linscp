@@ -528,7 +528,7 @@ void LocalPanel::ApplyPreferences(const CoreBridge::TPreferences & Preferences)
 }
 
 // WinSCP's columns: name, size, type, changed, attributes, extension (TDirView); owner, group and link target are not among them.
-static const std::vector<int> WinScpColumns = { 0, 1, 3, 4, -1, -1, -1 };
+static const std::vector<int> WinScpColumns = { 0, 1, 3, 4, -1, -1, -1, 5 };
 
 void LocalPanel::SetColumnsParams(const QString & Params)
 {

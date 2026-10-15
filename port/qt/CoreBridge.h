@@ -292,6 +292,9 @@ private:
 // EditorCheckNotModified.
 struct TEditorSettings
 {
+  // Where the first editor opens (TEditorConfiguration's WindowParams, as
+  // StoreForm writes it); empty: the system's place.
+  std::string WindowParams;
   bool WordWrap = false;
   int TabSize = 8;
   // CP_UTF8 (WinSCP's default), else the system's code page.
@@ -508,6 +511,8 @@ struct TLayout
   bool SelectiveToolbarText = true;
   int LargerToolbar = 1;
   std::string ToolbarsLayout;
+  // The console's size (ConsoleWin.WindowSize: "width,height,ppi").
+  std::string ConsoleWindowSize;
 };
 TLayout Layout();
 // Saves it.
@@ -663,6 +668,11 @@ enum class TText
   EditFilePrompt, // "&Enter file name:"
   CreateFileError, // "Can't create file '%s'."
   UnsafeSession, // "**Use potentially unsafe session settings?**..."
+  MaskHint, // "* matches any number of characters. ..." (MASK_HINT2)
+  FileMaskExHint, // ">size matches file larger than size ..."
+  CombiningMasksHint, // "Masks are separated by semicolon or comma. ..."
+  PathMaskHint, // "Mask can be extended with path mask. ..." (PATH_MASK_HINT2)
+  DirectoryMaskHint, // "Mask ending with slash selects directories."
   NotSupported, // "Operation not supported."
   LicenseCaption, // "%s license"
   TagAdd,         // "Add tag"
@@ -896,7 +906,11 @@ struct TBookmarkEntry
 // ones, as TWinConfiguration keeps them.
 std::vector<TBookmarkEntry> Bookmarks(const std::string & SessionKey);
 // Replaces them, and saves.
-void SetBookmarks(const std::string & SessionKey, const std::vector<TBookmarkEntry> & Bookmarks);
+// OpenedNodes: the folders the Location Profiles dialog leaves expanded
+// (TBookmarkList::NodeOpened); none given, those kept as they were.
+void SetBookmarks(const std::string & SessionKey, const std::vector<TBookmarkEntry> & Bookmarks,
+  const std::vector<std::string> * OpenedNodes = nullptr);
+std::vector<std::string> BookmarkOpenedNodes(const std::string & SessionKey);
 // Ask before a separate shell session opens (GUIConfiguration's
 // ConfirmCommandSession).
 bool ConfirmCommandSession();
@@ -1631,6 +1645,10 @@ public:
   // Exists: there is such a file in the current directory already (edit
   // that instead). Throws TCoreError.
   TEditedFile EditNew(const std::string & Name);
+  // The editor's Reload, as TCustomScpExplorerForm::ExecutedFileReload: the
+  // file downloaded again over its copy, its source timestamp the server's
+  // now. Throws TCoreError.
+  void EditReload(TEditedFile & File);
   bool FileExists(const std::string & Name);
   // Its changed copy uploaded back over the original: through the queue
   // where the protocol has background transfers (as TEditorUploadQueueItem,

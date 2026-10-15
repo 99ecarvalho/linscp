@@ -65,6 +65,10 @@ public:
   // Called after the file is written: the main window's upload. False
   // keeps the text modified.
   std::function<bool()> OnFileChanged;
+  // Reload's, before the file is read again: a remote file downloaded again
+  // (false: not reloaded). Save All's: every editor saved.
+  std::function<bool()> OnFileReload;
+  std::function<void()> OnSaveAll;
 
   QPlainTextEdit * Editor() const { return FEditor; }
   QString FileName() const { return FFileName; }
@@ -80,6 +84,10 @@ protected:
   void closeEvent(QCloseEvent * Event) override;
 
 private:
+  // TEditorForm's FInstances, FInstance, FWindowParams.
+  static int GInstances;
+  int FInstance = 0;
+  QString FWindowParams;
   bool LoadAs(bool Utf8, bool Primary);
   void StartFind(bool Replace);
   void UpdateStatus();

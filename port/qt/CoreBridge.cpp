@@ -327,6 +327,7 @@ TEditorSettings EditorSettings()
 {
   const TShellSettings & Settings = Shell()->Settings();
   TEditorSettings Result;
+  Result.WindowParams = Utf8(Settings.EditorWindowParams);
   Result.WordWrap = Settings.EditorWordWrap;
   Result.TabSize = Settings.EditorTabSize;
   Result.Utf8 = (Settings.EditorEncoding == CP_UTF8);
@@ -369,10 +370,29 @@ std::vector<TBookmarkEntry> Bookmarks(const std::string & SessionKey)
   return Result;
 }
 
-void SetBookmarks(const std::string & SessionKey, const std::vector<TBookmarkEntry> & Bookmarks)
+std::vector<std::string> BookmarkOpenedNodes(const std::string & SessionKey)
+{
+  TBookmarks * All = Shell()->Bookmarks();
+  TBookmarkList * List = SessionKey.empty() ? All->SharedBookmarks : All->Bookmarks[FromUtf8(SessionKey)];
+  std::vector<std::string> Result;
+  for (int Index = 0; (List != NULL) && (Index < List->Count); Index++)
+  {
+    const UnicodeString Node = List->Bookmarks[Index]->Node;
+    if (!Node.IsEmpty() && List->NodeOpened[Node] &&
+        (std::find(Result.begin(), Result.end(), Utf8(Node)) == Result.end()))
+    {
+      Result.push_back(Utf8(Node));
+    }
+  }
+  return Result;
+}
+
+void SetBookmarks(const std::string & SessionKey, const std::vector<TBookmarkEntry> & Bookmarks,
+  const std::vector<std::string> * OpenedNodes)
 {
   try
   {
+    const std::vector<std::string> Opened = (OpenedNodes != nullptr) ? *OpenedNodes : BookmarkOpenedNodes(SessionKey);
     std::unique_ptr<TBookmarkList> List(new TBookmarkList());
     for (const TBookmarkEntry & Entry : Bookmarks)
     {
@@ -383,6 +403,10 @@ void SetBookmarks(const std::string & SessionKey, const std::vector<TBookmarkEnt
       Bookmark->Node = FromUtf8(Entry.Node);
       Bookmark->ShortCut = static_cast<TShortCut>(Entry.ShortCut);
       List->Add(Bookmark);
+    }
+    for (const std::string & Node : Opened)
+    {
+      List->NodeOpened[FromUtf8(Node)] = true;
     }
     if (Bookmarks.empty())
     {
@@ -489,6 +513,7 @@ std::string DefaultEncodingName()
 void SetEditorSettings(const TEditorSettings & Editor)
 {
   TShellSettings Settings = Shell()->Settings();
+  Settings.EditorWindowParams = FromUtf8(Editor.WindowParams);
   Settings.EditorWordWrap = Editor.WordWrap;
   Settings.EditorTabSize = Editor.TabSize;
   Settings.EditorEncoding = Editor.Utf8 ? CP_UTF8 : CP_ACP;
@@ -647,6 +672,7 @@ TLayout Layout()
   Result.SelectiveToolbarText = Settings.SelectiveToolbarText;
   Result.LargerToolbar = Settings.LargerToolbar;
   Result.ToolbarsLayout = Utf8(Settings.CommanderToolbarsLayout);
+  Result.ConsoleWindowSize = Utf8(Settings.ConsoleWindowSize);
   return Result;
 }
 
@@ -666,6 +692,7 @@ void SetLayout(const TLayout & Layout)
   Settings.SelectiveToolbarText = Layout.SelectiveToolbarText;
   Settings.LargerToolbar = Layout.LargerToolbar;
   Settings.CommanderToolbarsLayout = FromUtf8(Layout.ToolbarsLayout);
+  Settings.ConsoleWindowSize = FromUtf8(Layout.ConsoleWindowSize);
   try
   {
     Shell()->SetSettings(Settings);
@@ -990,6 +1017,11 @@ std::string Text(TText Text)
     case TText::EditFilePrompt: Ident = EDIT_FILE_PROMPT; break;
     case TText::CreateFileError: Ident = CREATE_FILE_ERROR; break;
     case TText::UnsafeSession: Ident = UNSAFE_SESSION; break;
+    case TText::MaskHint: Ident = MASK_HINT2; break;
+    case TText::FileMaskExHint: Ident = FILE_MASK_EX_HINT; break;
+    case TText::CombiningMasksHint: Ident = COMBINING_MASKS_HINT; break;
+    case TText::PathMaskHint: Ident = PATH_MASK_HINT2; break;
+    case TText::DirectoryMaskHint: Ident = DIRECTORY_MASK_HINT; break;
     case TText::NotSupported: Ident = NOTSUPPORTED; break;
     case TText::LicenseCaption: Ident = LICENSE_CAPTION; break;
     case TText::TagAdd: Ident = TAG_ADD; break;

@@ -27,7 +27,9 @@ class FileListModel : public QAbstractTableModel
   Q_OBJECT
 
 public:
-  enum { NameColumn, SizeColumn, ModifiedColumn, RightsColumn, OwnerColumn, GroupColumn, LinkTargetColumn, ColumnCount };
+  // ExtColumn: WinSCP's extension column (uvExt, dvExt), hidden by default.
+  enum { NameColumn, SizeColumn, ModifiedColumn, RightsColumn, OwnerColumn, GroupColumn, LinkTargetColumn, ExtColumn,
+    ColumnCount };
   // What the sort proxy compares; directories first is the proxy's.
   enum { SortRole = Qt::UserRole, DirectoryRole, ParentRole, HiddenRole };
 

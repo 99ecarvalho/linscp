@@ -255,6 +255,10 @@ Local: %2</translation>
         <source>&amp;Clear</source>
         <translation>&amp;Limpar</translation>
     </message>
+    <message>
+        <source>mask hints</source>
+        <translation>dicas de máscara</translation>
+    </message>
 </context>
 <context>
     <name>EditorPreferencesDialog</name>
@@ -509,6 +513,10 @@ Local: %2</translation>
         <source>Text</source>
         <translation>Texto</translation>
     </message>
+    <message>
+        <source>Save &amp;All</source>
+        <translation>Salvar tudo</translation>
+    </message>
 </context>
 <context>
     <name>FileListModel</name>
@@ -543,6 +551,10 @@ Local: %2</translation>
     <message>
         <source>Link target</source>
         <translation>Destino do Link</translation>
+    </message>
+    <message>
+        <source>Ext</source>
+        <translation>Ext</translation>
     </message>
 </context>
 <context>
@@ -590,6 +602,10 @@ Local: %2</translation>
     <message>
         <source>&amp;Link Target</source>
         <translation>Des&amp;tino do Link</translation>
+    </message>
+    <message>
+        <source>mask hi&amp;nts</source>
+        <translation>dicas de másca&amp;ra</translation>
     </message>
 </context>
 <context>
@@ -653,6 +669,10 @@ Local: %2</translation>
     <message>
         <source>Found files</source>
         <translation>Arquivos encontrados</translation>
+    </message>
+    <message>
+        <source>mask hi&amp;nts</source>
+        <translation>dicas de másca&amp;ra</translation>
     </message>
 </context>
 <context>
@@ -1619,6 +1639,10 @@ Local: %2</translation>
     <message>
         <source>Default transfer settings</source>
         <translation>Configurações de transferência padrão</translation>
+    </message>
+    <message>
+        <source>Cannot reload &apos;%1&apos;: its session is closed.</source>
+        <translation>Não é possível recarregar &apos;%1&apos;: a sua sessão está fechada.</translation>
     </message>
 </context>
 <context>
@@ -3351,6 +3375,10 @@ Local: %2</translation>
     <message>
         <source>E&amp;xclude empty directories</source>
         <translation>E&amp;xcluir diretórios vazios</translation>
+    </message>
+    <message>
+        <source>mask hints</source>
+        <translation>dicas de máscara</translation>
     </message>
 </context>
 </TS>

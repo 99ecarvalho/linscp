@@ -2774,6 +2774,44 @@ TEditedFile TSession::EditNew(const std::string & Name)
   }
 }
 
+void TSession::EditReload(TEditedFile & File)
+{
+  try
+  {
+    CheckActive(*this);
+    const UnicodeString RemoteFileName = UnixCombinePaths(FromUtf8(File.RemoteDirectory), FromUtf8(File.OriginalName));
+    std::unique_ptr<TRemoteFile> Remote;
+    F->Terminal->ExceptionOnFail = true;
+    try
+    {
+      Remote.reset(F->Terminal->ReadFile(RemoteFileName));
+    }
+    catch (...)
+    {
+      F->Terminal->ExceptionOnFail = false;
+      throw;
+    }
+    F->Terminal->ExceptionOnFail = false;
+    if (!Remote->HaveFullFileName)
+    {
+      Remote->FullFileName = RemoteFileName;
+    }
+    std::unique_ptr<TStringList> Files(new TStringList());
+    Files->AddObject(RemoteFileName, Remote.get());
+    TCopyParamType CopyParam = TemporaryFileCopyParam(File.ForceText);
+    {
+      TTransferBracket Bracket(false, 1);
+      F->Terminal->CopyToLocal(Files.get(), ExtractFilePath(FromUtf8(File.LocalFile)), &CopyParam,
+        cpNoConfirmation | cpTemporary, NULL);
+    }
+    File.SetSourceTimestamp(UnixTimeOf(Remote->Modification));
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 // TCustomScpExplorerForm::ExecutedFileChanged's upload.
 bool TSession::EditUpload(TEditedFile & File, bool Background)
 {

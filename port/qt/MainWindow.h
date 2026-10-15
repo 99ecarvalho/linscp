@@ -421,6 +421,9 @@ private:
   void SaveToolbarSettings();
   void UpdatePresetCombo();
   void UpdateSortActions();
+  // The Open Directory button's menu (CreateOpenDirMenu): the side's
+  // bookmarks, the site's and the shared ones.
+  void FillOpenDirMenu(QMenu * Menu, bool Left, QAction * OpenDirectory);
   QMenu * PanelMenu(bool Local);
   FileView * ActiveView() const;
   void SelectSameExtension(bool Select);

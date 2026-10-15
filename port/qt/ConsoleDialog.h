@@ -20,6 +20,7 @@ class ConsoleDialog : public QDialog
 
 public:
   explicit ConsoleDialog(CoreBridge::TSession * Session, QWidget * Parent = nullptr);
+  ~ConsoleDialog() override;
 
   // Execute: the command, its output added. False when core failed (its
   // error shown).
@@ -36,6 +37,7 @@ public:
   void reject() override;
 
 private:
+  QSize FAutoSize;
   void UpdateControls();
 
   CoreBridge::TSession * FSession;

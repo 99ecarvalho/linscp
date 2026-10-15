@@ -1,4 +1,5 @@
 #include "FindFilesDialog.h"
+#include "HintButton.h"
 
 #include <QApplication>
 #include <QClipboard>
@@ -79,6 +80,9 @@ FindFilesDialog::FindFilesDialog(MainWindow * Window, const QString & Directory)
   QLabel * MaskLabel = new QLabel(tr("&File mask:"), Filter);
   MaskLabel->setBuddy(FMask);
   Fields->addRow(MaskLabel, MaskRow);
+  Fields->addRow(QString(), MakeMaskHintButton(tr("mask hi&nts"),
+    { CoreBridge::TText::MaskHint, CoreBridge::TText::FileMaskExHint, CoreBridge::TText::CombiningMasksHint,
+      CoreBridge::TText::PathMaskHint, CoreBridge::TText::DirectoryMaskHint }, Filter));
   FDirectory = new QComboBox(Filter);
   FDirectory->setEditable(true);
   FDirectory->setEditText(Directory);
