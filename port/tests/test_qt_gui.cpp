@@ -135,6 +135,7 @@
 #include "TransferSettingsDialog.h"
 #include "SingleInstance.h"
 #include "MasterPasswordDialog.h"
+#include "SshHostCADialog.h"
 #include "AboutDialog.h"
 #include "LicenseDialog.h"
 #include <QTextBrowser>
@@ -4710,6 +4711,65 @@ void InstanceTest(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// P3-16: trusted host certification authorities: the dialog (a key typed
+// or loaded from a file, the hosts checked), kept with the configuration.
+void HostCAsTest(const QString & Ini, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.AcceptDialogs = true;
+    QDir().mkpath(Directory);
+    // A throwaway key's public half.
+    const QString Pub = QDir(Directory).filePath(QStringLiteral("ca.pub"));
+    {
+      QFile File(Pub);
+      File.open(QIODevice::WriteOnly);
+      File.write("ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN9nUd7u2xYElrRkEPMTdqMDA+tRlTXqos8hCFvvtNk7 linscp-test-ca\n");
+    }
+    SshHostCADialog Dialog(true, CoreBridge::TSshHostCA(), &Window);
+    Check(!Dialog.Buttons()->button(QDialogButtonBox::Ok)->isEnabled(), "a name and key needed");
+    Dialog.PublicKeyEdit()->setText(QStringLiteral("not a key"));
+    Check(!Dialog.StatusLabel()->text().isEmpty() && !Dialog.StatusLabel()->text().contains(QStringLiteral("SHA256")),
+      "a bad key said so");
+    Dialog.LoadKeyFile(Pub);
+    Check((Dialog.NameEdit()->text() == QStringLiteral("linscp-test-ca")) &&
+      Dialog.PublicKeyEdit()->text().startsWith(QStringLiteral("AAAAC3NzaC1lZDI1NTE5")) &&
+      Dialog.StatusLabel()->text().contains(QStringLiteral("SHA256")), "loaded from its file: named after its comment, fingerprinted");
+    Dialog.HostsEdit()->setText(QStringLiteral("*.example.com"));
+    std::string Error;
+    int Start = 0;
+    int Length = 0;
+    Check(CoreBridge::SshHostCAValidityValid("*.example.com", Error, Start, Length) &&
+      !CoreBridge::SshHostCAValidityValid("*.example.com &&", Error, Start, Length) && !Error.empty(),
+      "validity expressions checked");
+    const CoreBridge::TSshHostCA CA = Dialog.CA();
+    Check(CA.PermitRsaSha256 && CA.PermitRsaSha512 && !CA.PermitRsaSha1, "core's signature defaults");
+
+    PreferencesDialog Preferences(&Window);
+    Preferences.AddHostCA(CA);
+    Check(Preferences.HostCAsView()->topLevelItemCount() == 1, "listed");
+    Preferences.Save();
+    const std::vector<CoreBridge::TSshHostCA> Saved = CoreBridge::SshHostCAs();
+    Check((Saved.size() == 1) && (Saved[0].Name == "linscp-test-ca") && (Saved[0].ValidityExpression == "*.example.com") &&
+      (Saved[0].PublicKey == CA.PublicKey), "kept");
+    QString Text;
+    {
+      QFile File(Ini);
+      File.open(QIODevice::ReadOnly);
+      Text = QString::fromUtf8(File.readAll());
+    }
+    Check(Text.contains(QStringLiteral("SshHostCAs")) && Text.contains(QStringLiteral("Validity=*.example.com")),
+      "under core's SshHostCAs key");
+  }
+  CoreBridge::Finalize();
+}
+
 // MasterPasswordTest's other runs: a site read with the master password
 // given ("right"), refused ("cancel-save", the site then saved), or with
 // none asked for ("none"). Prints what was read.
@@ -4996,6 +5056,11 @@ int main(int argc, char ** argv)
   else if ((argc >= 4) && (std::strcmp(argv[1], "masterpasswordread") == 0))
   {
     return MasterPasswordRead(QString::fromLocal8Bit(argv[3]));
+  }
+  else if ((argc >= 4) && (std::strcmp(argv[1], "hostcas") == 0))
+  {
+    // argv[2] is /ini=<file>.
+    HostCAsTest(QString::fromLocal8Bit(argv[2] + 5), QString::fromLocal8Bit(argv[3]));
   }
   else if ((argc >= 3) && (std::strcmp(argv[1], "masterpassword") == 0))
   {

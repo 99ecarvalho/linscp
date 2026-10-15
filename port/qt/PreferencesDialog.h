@@ -73,6 +73,9 @@ public:
   QCheckBox * CopyParamAutoSelectNoticeCheck() const { return FCopyParamAutoSelectNotice; }
   QCheckBox * MinimizeToTrayCheck() const { return FMinimizeToTray; }
   QCheckBox * UseMasterPasswordCheck() const { return FUseMasterPassword; }
+  QTreeWidget * HostCAsView() const { return FHostCAs; }
+  const std::vector<CoreBridge::TSshHostCA> & HostCAs() const { return FHostCAList; }
+  void AddHostCA(const CoreBridge::TSshHostCA & CA) { FHostCAList.push_back(CA); LoadHostCAs(); }
   QPushButton * SetMasterPasswordButton() const { return FSetMasterPassword; }
   QCheckBox * ExternalSessionInExistingInstanceCheck() const { return FExternalSessionInExistingInstance; }
   void RemoveSelected();
@@ -200,6 +203,16 @@ private:
   QCheckBox * FCopyParamAutoSelectNotice = nullptr;
   QCheckBox * FMinimizeToTray = nullptr;
   QCheckBox * FUseMasterPassword = nullptr;
+  QTreeWidget * FHostCAs = nullptr;
+  QPushButton * FAddHostCA = nullptr;
+  QPushButton * FEditHostCA = nullptr;
+  QPushButton * FRemoveHostCA = nullptr;
+  QPushButton * FConfigureHostCAs = nullptr;
+  QCheckBox * FHostCAsFromPuTTY = nullptr;
+  std::vector<CoreBridge::TSshHostCA> FHostCAList;
+  void LoadHostCAs();
+  void UpdateHostCAControls();
+  void EditHostCA(bool Add);
   QPushButton * FSetMasterPassword = nullptr;
   bool CanSetMasterPassword();
   void MasterPasswordChanged(CoreBridge::TText Message, const std::vector<std::string> & Errors);

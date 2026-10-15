@@ -3,6 +3,7 @@
 #include <QApplication>
 #include "HintButton.h"
 #include "MasterPasswordDialog.h"
+#include "SshHostCADialog.h"
 #include "QtFrontend.h"
 #include "SingleInstance.h"
 
@@ -643,7 +644,59 @@ QWidget * PreferencesDialog::MakeSecurityPage(const TPreferences & Preferences)
   FAuthAgent->setCurrentIndex(qBound(0, Preferences.AuthAgent, 1));
   Form->addRow(tr("Aut&hentication agent:"), FAuthAgent);
   Layout->addWidget(Authentication);
-  Layout->addStretch(1);
+  // As SshHostCAsGroup.
+  QGroupBox * HostCAs = new QGroupBox(tr("Trusted host certification authorities"), Page);
+  QGridLayout * HostCAsLayout = new QGridLayout(HostCAs);
+  FHostCAs = new QTreeWidget(HostCAs);
+  FHostCAs->setAccessibleName(HostCAs->title());
+  FHostCAs->setHeaderLabels({ tr("Name"), tr("Hosts") });
+  FHostCAs->setRootIsDecorated(false);
+  connect(FHostCAs, &QTreeWidget::itemSelectionChanged, this, &PreferencesDialog::UpdateHostCAControls);
+  connect(FHostCAs, &QTreeWidget::itemDoubleClicked, this, [this]() { if (FEditHostCA->isEnabled()) EditHostCA(false); });
+  HostCAsLayout->addWidget(FHostCAs, 0, 0, 4, 1);
+  FAddHostCA = new QPushButton(tr("&Add..."), HostCAs);
+  connect(FAddHostCA, &QPushButton::clicked, this, [this]() { EditHostCA(true); });
+  FRemoveHostCA = new QPushButton(tr("&Remove"), HostCAs);
+  connect(FRemoveHostCA, &QPushButton::clicked, this, [this]()
+  {
+    const int Index = FHostCAs->indexOfTopLevelItem(FHostCAs->currentItem());
+    if (Index >= 0)
+    {
+      FHostCAList.erase(FHostCAList.begin() + Index);
+      LoadHostCAs();
+    }
+  });
+  FEditHostCA = new QPushButton(tr("&Edit..."), HostCAs);
+  connect(FEditHostCA, &QPushButton::clicked, this, [this]() { EditHostCA(false); });
+  HostCAsLayout->addWidget(FAddHostCA, 0, 1);
+  HostCAsLayout->addWidget(FEditHostCA, 1, 1);
+  HostCAsLayout->addWidget(FRemoveHostCA, 2, 1);
+  FHostCAList = CoreBridge::SshHostCAs();
+  FHostCAsFromPuTTY = new QCheckBox(tr("&Load authorities from PuTTY"), HostCAs);
+  FHostCAsFromPuTTY->setChecked(CoreBridge::SshHostCAsFromPuTTY());
+  connect(FHostCAsFromPuTTY, &QCheckBox::toggled, this, &PreferencesDialog::LoadHostCAs);
+  HostCAsLayout->addWidget(FHostCAsFromPuTTY, 4, 0);
+  FConfigureHostCAs = new QPushButton(tr("&Edit in PuTTY..."), HostCAs);
+  connect(FConfigureHostCAs, &QPushButton::clicked, this, [this]()
+  {
+    try
+    {
+      CoreBridge::ConfigureSshHostCAsInPutty();
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      Frontend.ShowError(E.Error);
+    }
+  });
+  HostCAsLayout->addWidget(FConfigureHostCAs, 0, 1);
+#if !defined(Q_OS_WIN)
+  // PuTTY keeps them in Windows' registry; elsewhere there are none to load.
+  FHostCAsFromPuTTY->setVisible(FHostCAsFromPuTTY->isChecked());
+#endif
+  Layout->addWidget(HostCAs, 1);
+  LoadHostCAs();
   return Page;
 }
 
@@ -1177,6 +1230,7 @@ void PreferencesDialog::Save()
   Default.ResumeThreshold = static_cast<std::int64_t>(FResumeThreshold->value()) * 1024;
   CoreBridge::SetDefaultTransferSettings(Default);
   CoreBridge::SetTransferPresets(FPresets);
+  CoreBridge::SetSshHostCAs(FHostCAList, FHostCAsFromPuTTY->isChecked());
   CoreBridge::SetCustomCommands(FCommands);
   CoreBridge::SetEditorSettings(EditorSettings());
   CoreBridge::SetEditors(FEditors);
@@ -1921,4 +1975,61 @@ void PreferencesDialog::UseMasterPasswordClicked()
   }
   FUseMasterPassword->setChecked(CoreBridge::UseMasterPassword());
   FSetMasterPassword->setEnabled(CoreBridge::UseMasterPassword());
+}
+
+// As UpdateSshHostCAsViewView: PuTTY's, read again, or linscp's own list.
+void PreferencesDialog::LoadHostCAs()
+{
+  const bool FromPuTTY = FHostCAsFromPuTTY->isChecked();
+  const std::vector<CoreBridge::TSshHostCA> List = FromPuTTY ? CoreBridge::PuttySshHostCAs() : FHostCAList;
+  const int Current = FHostCAs->indexOfTopLevelItem(FHostCAs->currentItem());
+  FHostCAs->clear();
+  for (const CoreBridge::TSshHostCA & CA : List)
+  {
+    new QTreeWidgetItem(FHostCAs, { QString::fromStdString(CA.Name), QString::fromStdString(CA.ValidityExpression) });
+  }
+  if ((Current >= 0) && (Current < FHostCAs->topLevelItemCount()))
+  {
+    FHostCAs->setCurrentItem(FHostCAs->topLevelItem(Current));
+  }
+  UpdateHostCAControls();
+}
+
+// As UpdateControls' host CAs part: the list's buttons for linscp's own,
+// PuTTY's edited in PuTTY.
+void PreferencesDialog::UpdateHostCAControls()
+{
+  const bool Own = !FHostCAsFromPuTTY->isChecked();
+  FHostCAs->setEnabled(Own);
+  const bool Selected = (FHostCAs->currentItem() != nullptr);
+  FAddHostCA->setVisible(Own);
+  FEditHostCA->setVisible(Own);
+  FEditHostCA->setEnabled(Selected);
+  FRemoveHostCA->setVisible(Own);
+  FRemoveHostCA->setEnabled(Selected);
+  FConfigureHostCAs->setVisible(!Own);
+}
+
+void PreferencesDialog::EditHostCA(bool Add)
+{
+  const int Index = FHostCAs->indexOfTopLevelItem(FHostCAs->currentItem());
+  if (!Add && (Index < 0))
+  {
+    return;
+  }
+  SshHostCADialog Dialog(Add, Add ? CoreBridge::TSshHostCA() : FHostCAList[Index], this);
+  if (Dialog.exec() == QDialog::Accepted)
+  {
+    if (Add)
+    {
+      FHostCAList.push_back(Dialog.CA());
+      LoadHostCAs();
+      FHostCAs->setCurrentItem(FHostCAs->topLevelItem(FHostCAs->topLevelItemCount() - 1));
+    }
+    else
+    {
+      FHostCAList[Index] = Dialog.CA();
+      LoadHostCAs();
+    }
+  }
 }

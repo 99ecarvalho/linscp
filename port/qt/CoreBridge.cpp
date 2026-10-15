@@ -922,6 +922,146 @@ std::vector<std::string> ClearMasterPassword()
   }
 }
 
+namespace
+{
+
+TSshHostCA HostCAOf(const ::TSshHostCA & CA)
+{
+  TSshHostCA Result;
+  Result.Name = Utf8(CA.Name);
+  Result.PublicKey = Utf8(EncodeStrToBase64(CA.PublicKey));
+  Result.ValidityExpression = Utf8(CA.ValidityExpression);
+  Result.PermitRsaSha1 = CA.PermitRsaSha1;
+  Result.PermitRsaSha256 = CA.PermitRsaSha256;
+  Result.PermitRsaSha512 = CA.PermitRsaSha512;
+  return Result;
+}
+
+std::vector<TSshHostCA> HostCAsOf(const TSshHostCAList * List)
+{
+  std::vector<TSshHostCA> Result;
+  for (const ::TSshHostCA & CA : List->GetList())
+  {
+    Result.push_back(HostCAOf(CA));
+  }
+  return Result;
+}
+
+}  // namespace
+
+std::vector<TSshHostCA> SshHostCAs()
+{
+  return HostCAsOf(Configuration->SshHostCAList);
+}
+
+bool SshHostCAsFromPuTTY()
+{
+  return Configuration->SshHostCAsFromPuTTY;
+}
+
+std::vector<TSshHostCA> PuttySshHostCAs()
+{
+  try
+  {
+    Configuration->RefreshPuttySshHostCAList();
+    return HostCAsOf(Configuration->PuttySshHostCAList);
+  }
+  catch (Exception &)
+  {
+    return std::vector<TSshHostCA>();
+  }
+}
+
+void SetSshHostCAs(const std::vector<TSshHostCA> & List, bool FromPuTTY)
+{
+  try
+  {
+    ::TSshHostCA::TList Plain;
+    for (const TSshHostCA & CA : List)
+    {
+      ::TSshHostCA Item;
+      Item.Name = FromUtf8(CA.Name);
+      Item.PublicKey = DecodeBase64ToStr(FromUtf8(CA.PublicKey));
+      Item.ValidityExpression = FromUtf8(CA.ValidityExpression);
+      Item.PermitRsaSha1 = CA.PermitRsaSha1;
+      Item.PermitRsaSha256 = CA.PermitRsaSha256;
+      Item.PermitRsaSha512 = CA.PermitRsaSha512;
+      Plain.push_back(Item);
+    }
+    Configuration->SshHostCAsFromPuTTY = FromPuTTY;
+    std::unique_ptr<TSshHostCAList> CAs(new TSshHostCAList(Plain));
+    Configuration->SshHostCAList = CAs.get();
+    Configuration->SaveExplicit();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+bool SshHostCAKeyStatus(const std::string & PublicKey, std::string & Status)
+{
+  const UnicodeString Text = FromUtf8(PublicKey).Trim();
+  if (Text.IsEmpty())
+  {
+    Status = Utf8(LoadStr(SSH_HOST_CA_NO_KEY));
+    return false;
+  }
+  try
+  {
+    RawByteString Dummy;
+    UnicodeString Fingerprint;
+    ParseCertificatePublicKey(Text, Dummy, Fingerprint);
+    Status = Utf8(Fingerprint);
+    return true;
+  }
+  catch (Exception & E)
+  {
+    Status = Utf8(E.Message);
+    return false;
+  }
+}
+
+bool SshHostCAValidityValid(const std::string & Expression, std::string & Error, int & Start, int & Length)
+{
+  UnicodeString ErrorText;
+  Start = 0;
+  Length = 0;
+  const bool Result = IsCertificateValidityExpressionValid(FromUtf8(Expression), ErrorText, Start, Length);
+  Error = Utf8(ErrorText);
+  return Result;
+}
+
+void LoadSshHostCAKey(const std::string & FileName, std::string & PublicKey, std::string & Comment)
+{
+  try
+  {
+    UnicodeString Algorithm, CommentText;
+    bool HasCertificate = false;
+    const RawByteString Key = LoadPublicKey(FromUtf8(FileName), Algorithm, CommentText, HasCertificate);
+    PublicKey = Utf8(EncodeStrToBase64(Key));
+    Comment = Utf8(CommentText);
+  }
+  catch (Exception & E)
+  {
+    // As BrowseButtonClick: why, under what failed.
+    ExtException Error(&E, MainInstructions(FMTLOAD(SSH_HOST_CA_LOAD_ERROR, (FromUtf8(FileName)))));
+    throw CoreErrorOf(Error);
+  }
+}
+
+void ConfigureSshHostCAsInPutty()
+{
+  try
+  {
+    ExecuteShellChecked(FindPuttyPath(), L"-host-ca");
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 bool EnsureMasterPassword()
 {
   if (!UseMasterPassword())
@@ -1251,6 +1391,18 @@ std::string Text(TText Text)
     case TText::MasterPasswordChanged: Ident = MASTER_PASSWORD_CHANGED; break;
     case TText::MasterPasswordCleared: Ident = MASTER_PASSWORD_CLEARED2; break;
     case TText::MasterPasswordRecryptErrors: Ident = MASTER_PASSWORD_RECRYPT_ERRORS; break;
+    case TText::SshHostCAAdd: Ident = SSH_HOST_CA_ADD; break;
+    case TText::SshHostCAEdit: Ident = SSH_HOST_CA_EDIT; break;
+    case TText::SshHostCAName: Ident = SSH_HOST_CA_NAME; break;
+    case TText::SshHostCAPublicKey: Ident = SSH_HOST_CA_PUBLIC_KEY; break;
+    case TText::SshHostCAPublicHosts: Ident = SSH_HOST_CA_PUBLIC_HOSTS; break;
+    case TText::SshHostCABrowse: Ident = SSH_HOST_CA_BROWSE; break;
+    case TText::SshHostCABrowseTitle: Ident = SSH_HOST_CA_BROWSE_TITLE; break;
+    case TText::SshHostCALoadError: Ident = SSH_HOST_CA_LOAD_ERROR; break;
+    case TText::SshHostCASignatureTypes: Ident = SSH_HOST_CA_SIGNATURE_TYPES; break;
+    case TText::SshHostCASignatures: Ident = SSH_HOST_CA_SIGNATURES; break;
+    case TText::SshHostCANoHosts: Ident = SSH_HOST_CA_NO_HOSTS; break;
+    case TText::SshHostCAHostsInvalid: Ident = SSH_HOST_CA_HOSTS_INVALID; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

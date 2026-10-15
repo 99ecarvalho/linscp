@@ -12,7 +12,7 @@ add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp AboutDialog.cpp 
   FileList.cpp RemotePanel.cpp LocalPanel.cpp
   TransferDialog.cpp QueuePanel.cpp SynchronizeDialog.cpp PreferencesDialog.cpp TransferSettingsDialog.cpp
   RightsFrame.cpp PropertiesDialog.cpp CreateDirectoryDialog.cpp LinkDialog.cpp RemoteTransferDialog.cpp OpenDirectoryDialog.cpp LocationProfilesDialog.cpp FindFilesDialog.cpp EditMaskDialog.cpp ServerInfoDialog.cpp RtfText.cpp GenerateUrlDialog.cpp ConsoleDialog.cpp SiteRawDialog.cpp ImportSitesDialog.cpp CustomCommandDialog.cpp KeepUpToDateDialog.cpp LicenseDialog.cpp CleanupDialog.cpp TagDialog.cpp ShortCutDialog.cpp EditorPreferencesDialog.cpp Integration.cpp SaveWorkspaceDialog.cpp
-  CopyLocalDialog.cpp KeyVerify.cpp SaveSiteDialog.cpp IconSet.cpp PanelBands.cpp WindowParams.cpp HintButton.cpp SingleInstance.cpp MasterPasswordDialog.cpp CoreBridge.h)
+  CopyLocalDialog.cpp KeyVerify.cpp SaveSiteDialog.cpp IconSet.cpp PanelBands.cpp WindowParams.cpp HintButton.cpp SingleInstance.cpp MasterPasswordDialog.cpp SshHostCADialog.cpp CoreBridge.h)
 set_target_properties(linscp-qt-ui PROPERTIES AUTOMOC ON)
 target_link_libraries(linscp-qt-ui PUBLIC Qt6::Widgets Qt6::Svg Qt6::Network)
 if(NOT WIN32)

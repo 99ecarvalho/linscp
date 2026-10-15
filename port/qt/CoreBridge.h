@@ -206,6 +206,37 @@ std::vector<std::string> ClearMasterPassword();
 // true once given (SetMasterPassword), false to give up. Only on the GUI
 // thread; elsewhere core gives up.
 void SetMasterPasswordPrompt(std::function<bool()> Prompt);
+// Trusted host certification authorities (Preferences > Security, core's
+// TSshHostCA): the public key as base64, the hosts it may certify (a
+// validity expression), the RSA signature types allowed.
+struct TSshHostCA
+{
+  std::string Name;
+  std::string PublicKey;
+  std::string ValidityExpression;
+  bool PermitRsaSha1 = false;
+  bool PermitRsaSha256 = true;
+  bool PermitRsaSha512 = true;
+};
+std::vector<TSshHostCA> SshHostCAs();
+// Or PuTTY's, read again (Windows: its registry; elsewhere none), when
+// Configuration's SshHostCAsFromPuTTY says so.
+bool SshHostCAsFromPuTTY();
+std::vector<TSshHostCA> PuttySshHostCAs();
+// Saved. Throws TCoreError.
+void SetSshHostCAs(const std::vector<TSshHostCA> & List, bool FromPuTTY);
+// As TSshHostCADialog::ValidatePublicKey: the key's fingerprint, else
+// what is wrong with it.
+bool SshHostCAKeyStatus(const std::string & PublicKey, std::string & Status);
+// As IsCertificateValidityExpressionValid: what is wrong, and where.
+bool SshHostCAValidityValid(const std::string & Expression, std::string & Error, int & Start, int & Length);
+// A public key file's key (base64) and comment (LoadPublicKey). Throws
+// TCoreError.
+void LoadSshHostCAKey(const std::string & FileName, std::string & PublicKey, std::string & Comment);
+// As ConfigureSshHostCAsButtonClick: PuTTY's own host CA configuration.
+// Throws TCoreError.
+void ConfigureSshHostCAsInPutty();
+
 // As the Save dialogs' DoValidate: passwords to be saved, the master
 // password, when in use, asked for first if not given yet; false when it
 // was not.
@@ -796,6 +827,18 @@ enum class TText
   MasterPasswordChanged, // "Master password successfully changed."
   MasterPasswordCleared, // "**You have deleted your master password.** ..." (MASTER_PASSWORD_CLEARED2)
   MasterPasswordRecryptErrors, // "%s\n\nThere were some errors when encrypting passwords ..."
+  SshHostCAAdd,         // "Add trusted host certificate authority"
+  SshHostCAEdit,        // "Edit trusted host certificate authority"
+  SshHostCAName,        // "&Name:"
+  SshHostCAPublicKey,   // "Public &key:"
+  SshHostCAPublicHosts, // "Valid &hosts this key is trusted to certify:"
+  SshHostCABrowse,      // "B&rowse..."
+  SshHostCABrowseTitle, // "Select public key file of certification authority"
+  SshHostCALoadError,   // "Unable to load public key from '%s'"
+  SshHostCASignatureTypes, // "Signature types (RSA keys only):"
+  SshHostCASignatures,  // "SHA-&1|SHA-&256|SHA-&512"
+  SshHostCANoHosts,     // "No validity expression configured."
+  SshHostCAHostsInvalid, // "Error in validity expression."
 };
 std::string Text(TText Text);
 

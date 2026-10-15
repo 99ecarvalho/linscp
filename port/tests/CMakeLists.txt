@@ -346,6 +346,11 @@ if(TARGET linscp)
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
             panelprefs /ini=nul {port} {tmp}/local -platform offscreen)
   set_tests_properties(qt_gui_panelprefs PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+  add_test(NAME qt_gui_hostcas
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
+            --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
+            hostcas "/ini={tmp}/WinSCP.ini" {tmp}/local -platform offscreen)
+  set_tests_properties(qt_gui_hostcas PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
   add_test(NAME qt_gui_masterpassword
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"

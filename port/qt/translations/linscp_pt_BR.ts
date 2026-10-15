@@ -2466,6 +2466,26 @@ Local: %2</translation>
         <source>&amp;Change master password...</source>
         <translation>&amp;Modificar senha mestra...</translation>
     </message>
+    <message>
+        <source>Trusted host certification authorities</source>
+        <translation>Autoridades de certificação de equipamentos de confiança</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Nome</translation>
+    </message>
+    <message>
+        <source>Hosts</source>
+        <translation>Hosts</translation>
+    </message>
+    <message>
+        <source>&amp;Load authorities from PuTTY</source>
+        <translation>Carregar autori&amp;dades de PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>&amp;Editar no PuTTY...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>
@@ -3110,6 +3130,13 @@ Local: %2</translation>
     <message>
         <source>Ne&amp;w Folder...</source>
         <translation>No&amp;va pasta...</translation>
+    </message>
+</context>
+<context>
+    <name>SshHostCADialog</name>
+    <message>
+        <source>Public key files (*.pub);;All Files (*)</source>
+        <translation>Arquivos de chave pública (*.pub);;Todos os arquivos (*)</translation>
     </message>
 </context>
 <context>
