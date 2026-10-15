@@ -1,0 +1,46 @@
+# linscp's Flatpak: built from this checkout (port/tools/build_flatpak.py)
+# with clang, which linscp needs, from the freedesktop SDK's LLVM extension,
+# on KDE's runtime for Qt 6.
+id: io.github._99ecarvalho.linscp
+runtime: org.kde.Platform
+runtime-version: '6.10'
+sdk: org.kde.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.llvm21
+command: linscp
+finish-args:
+  - --share=network
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --device=dri
+  # Files to transfer, keys, PuTTY, editors: the user's own.
+  - --filesystem=home
+  # Minimize to tray (StatusNotifierItem) and local files' Properties.
+  - --talk-name=org.kde.StatusNotifierWatcher
+  - --talk-name=org.freedesktop.FileManager1
+build-options:
+  append-path: /usr/lib/sdk/llvm21/bin
+  prepend-ld-library-path: /usr/lib/sdk/llvm21/lib
+  env:
+    CC: clang
+    CXX: clang++
+modules:
+  - name: linscp
+    buildsystem: cmake-ninja
+    builddir: true
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DLINSCP_RELEASE=ON
+      - -DBUILD_TESTING=OFF
+    build-commands: []
+    make-args:
+      - linscp
+      - linscp-cli
+      - core-translations
+    sources:
+      - type: dir
+        path: ../../..
+        skip:
+          - build
+          - .git

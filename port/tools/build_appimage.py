@@ -10,13 +10,14 @@ bring in the libraries and Qt's plugins; and packs it with appimagetool.
 The tools run extracted (APPIMAGE_EXTRACT_AND_RUN), so no FUSE is needed.
 
 The AppImage runs on distributions whose glibc is at least the build
-machine's: build it on the oldest system to support (CI's Ubuntu).
+machine's: build it on the oldest system to support (CI builds it on Debian
+trixie, as the port's toolchain needs).
 """
 import argparse, hashlib, os, shutil, stat, subprocess, sys, urllib.request
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 LOCK = os.path.join(ROOT, 'port', 'packaging', 'appimage', 'tools.lock')
-APP_ID = 'io.github.99ecarvalho.linscp'
+APP_ID = 'io.github._99ecarvalho.linscp'
 
 
 def sha256(path):
