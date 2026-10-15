@@ -139,11 +139,13 @@ jobs:
               build/packages/*.AppImage
           - name: windows
             configure: -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-llvm-mingw.cmake
-            targets: installer
+            targets: installer package-portable
             # Inno Setup 6's compiler is 32-bit.
             architecture: i386
             packages: wine wine64 wine32:i386 zstd
-            artifacts: build/packages/*-setup.exe
+            artifacts: |
+              build/packages/*-setup.exe
+              build/packages/*-portable.zip
     steps:
       - name: Install the toolchain
         run: |
@@ -202,6 +204,27 @@ jobs:
           name: linscp-${{ matrix.name }}
           path: ${{ matrix.artifacts }}
           if-no-files-found: error
+
+  # The tests against real servers (P3-18: port/tests/servers/), which start
+  # containers: the build container runs on the runner's network with its
+  # docker socket, and a temporary directory at the same path on both sides
+  # (port/tools/ci_real_servers.sh).
+  real-servers:
+    name: real-servers
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Build and test against the real servers
+        run: |
+          mkdir -p /tmp/linscp-shared
+          docker run --rm --network host \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            -v /tmp/linscp-shared:/tmp/linscp-shared -e TMPDIR=/tmp/linscp-shared \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
+            debian:trixie sh port/tools/ci_real_servers.sh
 
   # The Flatpak, in Flathub's builder image (flatpak-builder needs the
   # privileges to sandbox its builds).
