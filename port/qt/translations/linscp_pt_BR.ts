@@ -3058,6 +3058,26 @@ Local: %2</translation>
         <source>Checklist</source>
         <translation>Lista de verificação</translation>
     </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Ferramentas</translation>
+    </message>
+    <message>
+        <source>C&amp;alculate</source>
+        <translation>C&amp;alcular</translation>
+    </message>
+    <message>
+        <source>Calc&amp;ulate All</source>
+        <translation>Calc&amp;ular Tudo</translation>
+    </message>
+    <message>
+        <source>&amp;Move</source>
+        <translation>&amp;Mover</translation>
+    </message>
+    <message>
+        <source>&amp;Find Move Candidate</source>
+        <translation>Buscar Candidato para Movimentação</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>
@@ -3152,6 +3172,18 @@ Local: %2</translation>
     <message>
         <source>Same si&amp;ze only</source>
         <translation>Apenas do &amp;mesmo tamanho</translation>
+    </message>
+    <message>
+        <source>Selected files o&amp;nly</source>
+        <translation>Ape&amp;nas arquivos selecionados</translation>
+    </message>
+    <message>
+        <source>Checks&amp;um</source>
+        <translation>C&amp;hecksum</translation>
+    </message>
+    <message>
+        <source>Use &amp;same options next time</source>
+        <translation>Usar as me&amp;smas opções na próxima vez</translation>
     </message>
 </context>
 <context>

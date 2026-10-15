@@ -1339,6 +1339,101 @@ void Synchronization(const char * Port, const QString & Directory)
       QApplication::processEvents(QEventLoop::AllEvents, 50);
     }
     Check(Remote->Names().contains(QStringLiteral("s3.txt")), "the queue uploads it, and the panel shows it");
+
+    // P3-16: selected files only, the options kept for next time, checksum
+    // as the server can.
+    {
+      const QDir Root(Dir.filePath(QStringLiteral("../root")));
+      for (const char * Name : { "sel1.txt", "sel2.txt" })
+      {
+        QFile File(Dir.filePath(QString::fromLatin1(Name)));
+        File.open(QIODevice::WriteOnly);
+        File.write(Name);
+      }
+      Window.Local()->ChangeDirectory(Directory);
+      Window.Local()->Refresh();
+      Remote->ChangeDirectory(QStringLiteral("/sub"));
+      Window.Local()->Select({ QStringLiteral("sel1.txt") });
+      Window.ActivatePanel(true);
+      bool Shown = false;
+      bool ChecksumAsServer = false;
+      CoreBridge::TSession * Session = Window.Session();
+      Responder.Custom = [&Shown, &ChecksumAsServer, Session](QWidget * Modal)
+      {
+        SynchronizeDialog * Dialog = qobject_cast<SynchronizeDialog *>(Modal);
+        if (Dialog == nullptr)
+        {
+          return false;
+        }
+        Shown = true;
+        ChecksumAsServer = (Dialog->ByChecksumCheck()->isEnabled() == Session->CanSyncChecksum());
+        Dialog->RemoteButton()->setChecked(true);
+        Dialog->PreviewCheck()->setChecked(false);
+        Dialog->SelectedOnlyCheck()->setChecked(true);
+        Dialog->SaveSettingsCheck()->setChecked(true);
+        Dialog->accept();
+        return true;
+      };
+      Check(Window.Synchronize(true) && Shown, "Synchronize with a selection");
+      Check(ChecksumAsServer, "checksum offered as the server can");
+      Check(WaitUntil([&Root]() { return QFileInfo::exists(Root.filePath(QStringLiteral("sub/sel1.txt"))); }) &&
+        !QFileInfo::exists(Root.filePath(QStringLiteral("sub/sel2.txt"))), "selected files only: the selected one");
+      const CoreBridge::TSyncDefaults Defaults = CoreBridge::SyncDefaults();
+      Check(Defaults.Params.SelectedOnly && !Defaults.Params.PreviewChanges, "the options kept for next time");
+      Check(!Defaults.SaveMode, "not the direction, the active panel's");
+      SynchronizeDialog Next(Directory, QStringLiteral("/sub"), Defaults.Params, true, nullptr, false, true);
+      Check(Next.SelectedOnlyCheck()->isChecked() && !Next.PreviewCheck()->isChecked(), "the next dialog with them");
+      SynchronizeDialog NoSelection(Directory, QStringLiteral("/sub"), Defaults.Params, true, nullptr, false, false);
+      Check(!NoSelection.SelectedOnlyCheck()->isEnabled() && !NoSelection.Params().SelectedOnly, "no selection: not offered");
+    }
+
+    // P3-16: the checklist's Tools: Find Move Candidate, Move, Calculate.
+    {
+      const QDir Root(Dir.filePath(QStringLiteral("../root")));
+      QDir().mkpath(Dir.filePath(QStringLiteral("mv/tree/deep")));
+      auto Write = [](const QString & Path, const QByteArray & Data)
+      {
+        QFile File(Path);
+        File.open(QIODevice::WriteOnly);
+        File.write(Data);
+      };
+      // Through the session: the server's listings are cached.
+      QDir().mkpath(Dir.filePath(QStringLiteral("stage")));
+      Write(Dir.filePath(QStringLiteral("stage/old-name.txt")), "same twelve!");
+      Remote->ChangeDirectory(QStringLiteral("/"));
+      Check(Remote->NewFolder(QStringLiteral("mv")), "(its directory)");
+      Check(Window.Upload({ Dir.filePath(QStringLiteral("stage/old-name.txt")) }, QStringLiteral("/mv"), false),
+        "(a file on the server only)");
+      Write(Dir.filePath(QStringLiteral("mv/new-name.txt")), "same twelve!");
+      Write(Dir.filePath(QStringLiteral("mv/tree/deep/f.bin")), QByteArray(1000, 'x'));
+      CoreBridge::TSyncParams Params;
+      Params.Direction = TSyncParams::TDirection::Remote;
+      Params.Delete = true;
+      std::unique_ptr<CoreBridge::TSyncChecklist> Checklist;
+      try
+      {
+        Checklist = Window.Session()->SyncCollect(QDir::toNativeSeparators(Dir.filePath(QStringLiteral("mv"))).toStdString(),
+          "/mv", Params);
+      }
+      catch (const CoreBridge::TCoreError & E)
+      {
+        std::printf("FAIL collecting: %s\n", E.Error.Message.c_str());
+      }
+      Check(Checklist && (Checklist->Items().size() == 3), "(an upload, a delete, a new directory)");
+      if (Checklist)
+      {
+        SyncChecklistDialog Dialog(*Checklist, Dir.filePath(QStringLiteral("mv")), QStringLiteral("/mv"), &Window, Window.Session());
+        Check(Dialog.FindMoveCandidate() && (Dialog.SelectedIndexes().size() == 2), "Find Move Candidate: the pair selected");
+        Check(Checklist->CanMove(Dialog.SelectedIndexes()), "which Move can take");
+        Check(Dialog.MoveSelected() && (Checklist->Items().size() == 1), "Move: both entries done with");
+        Check(QFileInfo::exists(Root.filePath(QStringLiteral("mv/new-name.txt"))) &&
+          !QFileInfo::exists(Root.filePath(QStringLiteral("mv/old-name.txt"))), "moved on the server, not transferred");
+        Check(Checklist->Items()[0].Directory && !Checklist->Items()[0].HasSize, "(the directory left, its size unknown)");
+        Check(Dialog.CalculateSizes(true) && Checklist->Items()[0].HasSize && (Checklist->Items()[0].LocalSize == 1000),
+          "Calculate All: its size");
+        Check(Dialog.List()->topLevelItem(0)->text(2).contains(QStringLiteral("1")), "shown in the list");
+      }
+    }
     Responder.Custom = nullptr;
     Frontend.SetWindow(nullptr);
   }

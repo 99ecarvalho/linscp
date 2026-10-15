@@ -997,6 +997,7 @@ std::string Text(TText Text)
     case TText::CreateLocalDirectoryError: Ident = CREATE_LOCAL_DIR_ERROR; break;
     case TText::SelectLocalDirectory: Ident = SELECT_LOCAL_DIRECTORY; break;
     case TText::FileOverwrite: Ident = FILE_OVERWRITE; break;
+    case TText::SaveSyncMode: Ident = SAVE_SYNCHRONIZE_MODE2; break;
     case TText::SaveSessionCaption: Ident = SAVE_SESSION_CAPTION; break;
     case TText::SaveSessionPrompt: Ident = SAVE_SESSION_PROMPT; break;
     case TText::SaveSessionFolder: Ident = SAVE_SESSION_FOLDER; break;

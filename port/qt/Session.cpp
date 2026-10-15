@@ -942,7 +942,9 @@ int SyncParamsOf(const TSyncParams & Params, bool CanTimestamps)
     FLAGMASK(Params.Mode == TSyncParams::TMode::Mirror, TTerminal::spMirror) |
     FLAGMASK(!Params.ByTime, TTerminal::spNotByTime) |
     FLAGMASK(Params.BySize, TTerminal::spBySize) |
-    FLAGMASK(Params.CaseSensitive, TTerminal::spCaseSensitive);
+    FLAGMASK(Params.CaseSensitive, TTerminal::spCaseSensitive) |
+    FLAGMASK(Params.SelectedOnly, TTerminal::spSelectedOnly) |
+    FLAGMASK(Params.ByChecksum, TTerminal::spByChecksum);
 }
 
 TTerminal::TSynchronizeMode SyncModeOf(TSyncParams::TDirection Direction)
@@ -1015,9 +1017,132 @@ void TSyncChecklist::Load()
       Entry.RemoteModified = Utf8(UserModificationStr(Item->Info2.Modification, Item->Info2.ModificationFmt));
       Entry.RemoteModifiedTime = UnixTime(Item->Info2.Modification);
     }
+    Entry.HasSize = Item->HasSize();
     F->Items.push_back(Item);
     FItems.push_back(Entry);
   }
+}
+
+namespace
+{
+
+using TChecklistAction = TSynchronizeChecklist::TAction;
+
+bool IsTransferNewAction(TChecklistAction Action)
+{
+  return (Action == TSynchronizeChecklist::saUploadNew) || (Action == TSynchronizeChecklist::saDownloadNew);
+}
+
+TChecklistAction OppositeMoveAction(TChecklistAction Action)
+{
+  switch (Action)
+  {
+    case TSynchronizeChecklist::saUploadNew: return TSynchronizeChecklist::saDeleteRemote;
+    case TSynchronizeChecklist::saDownloadNew: return TSynchronizeChecklist::saDeleteLocal;
+    case TSynchronizeChecklist::saDeleteRemote: return TSynchronizeChecklist::saUploadNew;
+    case TSynchronizeChecklist::saDeleteLocal: return TSynchronizeChecklist::saDownloadNew;
+    default: return TSynchronizeChecklist::saNone;
+  }
+}
+
+}  // namespace
+
+bool TSyncChecklist::FindMoveCandidate(std::size_t Index, std::size_t & First, std::size_t & Second) const
+{
+  const std::size_t Count = F->Items.size();
+  for (std::size_t Offset = 0; Offset < Count; Offset++)
+  {
+    const std::size_t At = (Index + Offset) % Count;
+    const TSynchronizeChecklist::TItem * Item = F->Items[At];
+    const TChecklistAction Opposite = OppositeMoveAction(Item->Action);
+    // The focused one either way; the next ones as transfers only.
+    if ((Opposite == TSynchronizeChecklist::saNone) || ((Offset > 0) && !IsTransferNewAction(Item->Action)))
+    {
+      continue;
+    }
+    for (std::size_t Other = 0; Other < Count; Other++)
+    {
+      const TSynchronizeChecklist::TItem * Candidate = F->Items[Other];
+      if ((Other == At) || (Candidate->Action != Opposite) || (Candidate->IsDirectory != Item->IsDirectory))
+      {
+        continue;
+      }
+      bool Match;
+      if (Item->IsDirectory)
+      {
+        Match = SameText(Item->GetFileName(), Candidate->GetFileName());
+      }
+      else if (Item->GetBaseSize() != Candidate->GetBaseSize())
+      {
+        Match = false;
+      }
+      else if (SameText(Item->GetFileName(), Candidate->GetFileName()))
+      {
+        Match = true;
+      }
+      else if ((Item->Action == TSynchronizeChecklist::saDeleteLocal) || (Item->Action == TSynchronizeChecklist::saDownloadNew))
+      {
+        Match = SamePaths(Item->Info1.Directory, Candidate->Info1.Directory);
+      }
+      else
+      {
+        Match = UnixSamePath(Item->Info2.Directory, Candidate->Info2.Directory);
+      }
+      if (Match)
+      {
+        First = At;
+        Second = Other;
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+bool TSyncChecklist::CanMove(const std::vector<std::size_t> & Indexes) const
+{
+  // As MoveAction's update: two opposite kinds of action...
+  int Transfers = 0;
+  int TransferDirectories = 0;
+  TChecklistAction Transfer = TSynchronizeChecklist::saNone;
+  TChecklistAction Delete = TSynchronizeChecklist::saNone;
+  bool DeletesFiles = true;
+  bool DeletesDirectories = true;
+  for (std::size_t Index : Indexes)
+  {
+    const TSynchronizeChecklist::TItem * Item = F->Items.at(Index);
+    if (IsTransferNewAction(Item->Action))
+    {
+      if ((Transfer != TSynchronizeChecklist::saNone) && (Transfer != Item->Action))
+      {
+        return false;
+      }
+      Transfer = Item->Action;
+      Transfers++;
+      TransferDirectories += Item->IsDirectory ? 1 : 0;
+    }
+    else if (OppositeMoveAction(Item->Action) != TSynchronizeChecklist::saNone)
+    {
+      if ((Delete != TSynchronizeChecklist::saNone) && (Delete != Item->Action))
+      {
+        return false;
+      }
+      Delete = Item->Action;
+      DeletesFiles = DeletesFiles && !Item->IsDirectory;
+      DeletesDirectories = DeletesDirectories && Item->IsDirectory;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  if ((Transfers != 1) || (Delete == TSynchronizeChecklist::saNone) || (OppositeMoveAction(Transfer) != Delete))
+  {
+    return false;
+  }
+  // ... exactly two of one kind, or the new one a directory.
+  const bool TransferIsDirectory = (TransferDirectories == 1);
+  return ((Indexes.size() == 2) && (TransferIsDirectory ? DeletesDirectories : DeletesFiles)) || TransferIsDirectory;
 }
 
 void TSyncChecklist::Check(std::size_t Index, bool Checked)
@@ -1045,6 +1170,182 @@ bool TSession::CanSyncTimestamps() const
   return Active() && F->Terminal->IsCapable[fcTimestampChanging];
 }
 
+void TSession::SyncCalculateSizes(TSyncChecklist & Checklist, const std::vector<std::size_t> & Indexes)
+{
+  try
+  {
+    CheckActive(*this);
+    TSyncChecklist::TImpl & C = *Checklist.F;
+    for (std::size_t Index : Indexes)
+    {
+      const TSynchronizeChecklist::TItem * Item = C.Items.at(Index);
+      if (!Item->IsDirectory)
+      {
+        continue;
+      }
+      // As DoSynchronizeChecklistCalculateSize: the side the size is of.
+      __int64 Size = 0;
+      if (!Item->IsRemoteOnly())
+      {
+        std::unique_ptr<TStringList> Files(new TStringList());
+        Files->Add(Item->ForceGetLocalPath());
+        F->Terminal->CalculateLocalFilesSize(Files.get(), Size, NULL, true, NULL, NULL);
+      }
+      else
+      {
+        std::unique_ptr<TStringList> Files(new TStringList());
+        Files->AddObject(Item->ForceGetRemotePath(), Item->RemoteFile);
+        TCalculateSizeParams Params;
+        Params.UseCache = true;
+        F->Terminal->CalculateFilesSize(Files.get(), Size, Params);
+      }
+      C.Checklist->UpdateDirectorySize(Item, Size);
+    }
+    Checklist.Load();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void TSession::SyncMove(TSyncChecklist & Checklist, const std::vector<std::size_t> & Indexes)
+{
+  try
+  {
+    CheckActive(*this);
+    TSyncChecklist::TImpl & C = *Checklist.F;
+    if (!Checklist.CanMove(Indexes))
+    {
+      return;
+    }
+    const TSynchronizeChecklist::TItem * Transfer = NULL;
+    std::vector<const TSynchronizeChecklist::TItem *> Deletes;
+    for (std::size_t Index : Indexes)
+    {
+      const TSynchronizeChecklist::TItem * Item = C.Items.at(Index);
+      if (IsTransferNewAction(Item->Action))
+      {
+        Transfer = Item;
+      }
+      else
+      {
+        Deletes.push_back(Item);
+      }
+    }
+    // As MoveActionExecute: where the new one is to be, on the deletes' side.
+    const bool Remote = (Deletes.front()->Action == TSynchronizeChecklist::saDeleteRemote);
+    const UnicodeString NewFileName = Remote ? UnixCombinePaths(Transfer->Info2.Directory, Transfer->Info1.FileName) :
+      CombinePaths(Transfer->Info1.Directory, Transfer->Info2.FileName);
+    const bool TargetIsDirectory = Transfer->IsDirectory && !((Deletes.size() == 1) && Deletes.front()->IsDirectory);
+    // As DoSynchronizeMove.
+    if (Remote)
+    {
+      std::unique_ptr<TStringList> Files(new TStringList());
+      for (const TSynchronizeChecklist::TItem * Item : Deletes)
+      {
+        Files->AddObject(Item->ForceGetRemotePath(), Item->RemoteFile);
+      }
+      UnicodeString Target;
+      UnicodeString FileMask;
+      if (TargetIsDirectory)
+      {
+        Target = NewFileName;
+        F->Terminal->CreateTargetDirectory(Target, faDirectory, &C.CopyParam);
+      }
+      else
+      {
+        Target = UnixExtractFileDir(NewFileName);
+        FileMask = DelimitFileNameMask(UnixExtractFileName(NewFileName));
+      }
+      F->Terminal->MoveFiles(Files.get(), Target, FileMask, false);
+    }
+    else
+    {
+      if (TargetIsDirectory && !ForceDirectories(ApiPath(NewFileName)))
+      {
+        throw EOSExtException(FMTLOAD(CREATE_DIR_ERROR, (NewFileName)));
+      }
+      for (const TSynchronizeChecklist::TItem * Item : Deletes)
+      {
+        const UnicodeString FileName = Item->ForceGetLocalPath();
+        const UnicodeString NewFilePath = TargetIsDirectory ? CombinePaths(NewFileName, ExtractFileName(FileName)) : NewFileName;
+        F->Terminal->LogEvent(FORMAT(L"Moving file \"%s\" to \"%s\".", (FileName, NewFilePath)));
+        if (!RenameFile(FileName, NewFilePath))
+        {
+          throw EOSExtException(FMTLOAD(RENAME_FILE_ERROR, (FileName, NewFilePath)));
+        }
+      }
+    }
+    // The entries done with: the moved ones, and the new one but a
+    // directory (its other contents still to transfer).
+    for (const TSynchronizeChecklist::TItem * Item : Deletes)
+    {
+      C.Checklist->Delete(Item);
+    }
+    if (!TargetIsDirectory)
+    {
+      C.Checklist->Delete(Transfer);
+    }
+    Checklist.Load();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+bool TSession::CanSyncChecksum() const
+{
+  return Active() && (F->Terminal->IsCapable[fcCalculatingChecksum] ||
+    (F->Terminal->IsCapable[fcSecondaryShell] && !F->Terminal->IsEncryptingFiles()));
+}
+
+TSyncDefaults SyncDefaults()
+{
+  const int Params = GUIConfiguration->SynchronizeParams;
+  TSyncDefaults Result;
+  TSyncParams & P = Result.Params;
+  P.Delete = FLAGSET(Params, TTerminal::spDelete);
+  P.ExistingOnly = FLAGSET(Params, TTerminal::spExistingOnly);
+  P.PreviewChanges = FLAGSET(Params, TTerminal::spPreviewChanges);
+  P.Mode = FLAGSET(Params, TTerminal::spTimestamp) ? TSyncParams::TMode::Timestamps :
+    (FLAGSET(Params, TTerminal::spMirror) ? TSyncParams::TMode::Mirror : TSyncParams::TMode::Files);
+  P.ByTime = FLAGCLEAR(Params, TTerminal::spNotByTime);
+  P.BySize = FLAGSET(Params, TTerminal::spBySize);
+  P.CaseSensitive = FLAGSET(Params, TTerminal::spCaseSensitive);
+  P.SelectedOnly = FLAGSET(Params, TTerminal::spSelectedOnly);
+  P.ByChecksum = FLAGSET(Params, TTerminal::spByChecksum);
+  // SynchronizeModeAuto: TSynchronizeMode, or -1 (by the active panel).
+  const int Mode = GUIConfiguration->SynchronizeModeAuto;
+  Result.SaveMode = (Mode >= 0);
+  P.Direction = (Mode == TTerminal::smLocal) ? TSyncParams::TDirection::Local :
+    ((Mode == TTerminal::smBoth) ? TSyncParams::TDirection::Both : TSyncParams::TDirection::Remote);
+  return Result;
+}
+
+void SetSyncDefaults(const TSyncParams & Params, bool SaveMode)
+{
+  try
+  {
+    // The params that are not the dialog's kept (TFullSynchronizeDialog's FParams).
+    const int Dialog = TTerminal::spDelete | TTerminal::spExistingOnly | TTerminal::spPreviewChanges |
+      TTerminal::spTimestamp | TTerminal::spNotByTime | TTerminal::spBySize | TTerminal::spSelectedOnly |
+      TTerminal::spMirror | TTerminal::spCaseSensitive | TTerminal::spByChecksum;
+    GUIConfiguration->SynchronizeParams = (GUIConfiguration->SynchronizeParams & ~Dialog) |
+      (SyncParamsOf(Params, true) & Dialog);
+    if (SaveMode)
+    {
+      GUIConfiguration->SynchronizeModeAuto = SyncModeOf(Params.Direction);
+    }
+    Configuration->SaveExplicit();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 // As TCustomScpExplorerForm::DoFullSynchronizeDirectories collects: core's
 // default transfer settings, rooted at the two directories.
 std::unique_ptr<TSyncChecklist> TSession::SyncCollect(const std::string & LocalDirectory,
@@ -1065,6 +1366,18 @@ std::unique_ptr<TSyncChecklist> TSession::SyncCollect(const std::string & LocalD
     TSyncDirectoryHandler Handler;
     Handler.OnDirectory = OnDirectory;
     TSynchronizeOptions Options;
+    // As GetSynchronizeOptions: the panels' selection, by name.
+    if (Params.SelectedOnly && !Params.Selected.empty())
+    {
+      Options.Filter = new TStringList();
+      Options.Filter->CaseSensitive = false;
+      Options.Filter->Duplicates = Types::dupAccept;
+      for (const std::string & Name : Params.Selected)
+      {
+        Options.Filter->Add(FromUtf8(Name));
+      }
+      Options.Filter->Sort();
+    }
     Impl->Checklist.reset(F->Terminal->SynchronizeCollect(Local, Remote, Impl->Mode, &Impl->CopyParam,
       Impl->Params, CLOSURE_OF(&Handler, Handle), &Options));
     return std::unique_ptr<TSyncChecklist>(new TSyncChecklist(Impl.release()));

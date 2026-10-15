@@ -508,8 +508,6 @@ private:
   QAction * FHiddenAction = nullptr;
   class QSplitter * FPanels = nullptr;
   QSplitter * FVertical = nullptr;
-  // As GUIConfiguration's SynchronizeParams, for the session's lifetime.
-  CoreBridge::TSyncParams FSyncParams;
   QAction * FDisconnectAction = nullptr;
   RemotePanel * FPanel = nullptr;
   LocalPanel * FLocal = nullptr;

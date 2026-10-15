@@ -26,8 +26,17 @@ class SynchronizeDialog : public QDialog
 public:
   // CanTimestamps: whether the server can set times ("synchronize
   // timestamps" is disabled otherwise).
+  // CanChecksum: comparing by checksum is possible; AllowSelectedOnly: the
+  // panels have a selection; SaveMode: the direction is kept with the rest
+  // (SynchronizeModeAuto), so is not asked about.
   SynchronizeDialog(const QString & LocalDirectory, const QString & RemoteDirectory,
-    const CoreBridge::TSyncParams & Params, bool CanTimestamps, QWidget * Parent = nullptr);
+    const CoreBridge::TSyncParams & Params, bool CanTimestamps, QWidget * Parent = nullptr,
+    bool CanChecksum = false, bool AllowSelectedOnly = false, bool SaveMode = false);
+  // "Use same options next time", and the direction too (asked about on OK
+  // when changed, as FormCloseQuery).
+  bool SaveSettings() const;
+  bool SaveMode() const { return FSaveMode; }
+  void accept() override;
 
   QString LocalDirectory() const;
   QString RemoteDirectory() const;
@@ -48,11 +57,20 @@ public:
   QCheckBox * ByTimeCheck() const { return FByTime; }
   QCheckBox * BySizeCheck() const { return FBySize; }
   QPushButton * OkButton() const { return FOk; }
+  QCheckBox * SelectedOnlyCheck() const { return FSelectedOnly; }
+  QCheckBox * ByChecksumCheck() const { return FByChecksum; }
+  QCheckBox * SaveSettingsCheck() const { return FSaveSettings; }
 
 private:
   void UpdateControls();
 
   bool FCanTimestamps;
+  bool FCanChecksum = false;
+  bool FSaveMode = false;
+  CoreBridge::TSyncParams::TDirection FOrigDirection = CoreBridge::TSyncParams::TDirection::Remote;
+  QCheckBox * FSelectedOnly = nullptr;
+  QCheckBox * FByChecksum = nullptr;
+  QCheckBox * FSaveSettings = nullptr;
   QLineEdit * FLocalEdit = nullptr;
   QLineEdit * FRemoteEdit = nullptr;
   QRadioButton * FBoth = nullptr;
@@ -99,14 +117,24 @@ public:
   // Started: applied here; Queued: "start in background".
   enum TResult { Cancelled, Started, Queued };
 
+  // Session: the Tools menu's Calculate and Move (none: not offered).
   SyncChecklistDialog(CoreBridge::TSyncChecklist & Checklist, const QString & LocalDirectory,
-    const QString & RemoteDirectory, QWidget * Parent = nullptr);
+    const QString & RemoteDirectory, QWidget * Parent = nullptr, CoreBridge::TSession * Session = nullptr);
   TResult Result() const { return FResult; }
 
   // The buttons' actions, for tests and them alike.
   void CheckAll(bool Check);
   // The selected entries' actions reversed.
   void ReverseSelected();
+  // The Tools menu's (WinSCP's): the selected (All: every) directory's size;
+  // the selection moved instead of transferred and deleted; the next pair
+  // that could be, selected.
+  bool CalculateSizes(bool All);
+  bool MoveSelected();
+  bool FindMoveCandidate();
+  // The entries selected, by the checklist's index.
+  std::vector<std::size_t> SelectedIndexes() const;
+  void SelectIndexes(const std::vector<std::size_t> & Indexes);
   QTreeWidget * List() const { return FList; }
   QLabel * Status() const { return FStatus; }
   QPushButton * StartButton() const { return FStart; }
@@ -114,10 +142,18 @@ public:
 
 private:
   void Load(int Index);
+  void Reload();
+  void UpdateTools();
+  void ShowError(const CoreBridge::TCoreError & E);
   void ItemChanged(QTreeWidgetItem * Item, int Column);
   void UpdateStatus();
 
   CoreBridge::TSyncChecklist & FChecklist;
+  CoreBridge::TSession * FSession = nullptr;
+  class QAction * FCalculateAction = nullptr;
+  QAction * FCalculateAllAction = nullptr;
+  QAction * FMoveAction = nullptr;
+  QAction * FFindMoveAction = nullptr;
   QTreeWidget * FList = nullptr;
   QLabel * FStatus = nullptr;
   QPushButton * FStart = nullptr;

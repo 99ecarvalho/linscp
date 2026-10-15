@@ -1182,20 +1182,47 @@ bool MainWindow::Synchronize(bool Confirm)
   }
   QString LocalDirectory = QDir::toNativeSeparators(FLocal->Path());
   QString RemoteDirectory = FPanel->Path();
-  CoreBridge::TSyncParams Params = FSyncParams;
-  Params.Direction = FLocalActive ? CoreBridge::TSyncParams::TDirection::Remote : CoreBridge::TSyncParams::TDirection::Local;
+  // As FullSynchronizeDirectories: the options kept (GUIConfiguration's),
+  // the direction kept too or the active panel's.
+  const CoreBridge::TSyncDefaults Defaults = CoreBridge::SyncDefaults();
+  CoreBridge::TSyncParams Params = Defaults.Params;
+  if (!Defaults.SaveMode)
+  {
+    Params.Direction = FLocalActive ? CoreBridge::TSyncParams::TDirection::Remote : CoreBridge::TSyncParams::TDirection::Local;
+  }
+  // GetSynchronizeOptions: the panels' selection, by name.
+  for (const QStringList & Names : { FPanel->Selected(), FLocal->Selected() })
+  {
+    for (const QString & Name : Names)
+    {
+      Params.Selected.push_back(Name.toStdString());
+    }
+  }
   CoreBridge::TTransferSettings Settings = CoreBridge::CurrentTransferSettings();
   if (Confirm)
   {
-    SynchronizeDialog Dialog(LocalDirectory, RemoteDirectory, Params, FSession->CanSyncTimestamps(), this);
+    SynchronizeDialog Dialog(LocalDirectory, RemoteDirectory, Params, FSession->CanSyncTimestamps(), this,
+      FSession->CanSyncChecksum(), !Params.Selected.empty(), Defaults.SaveMode);
     if (Dialog.exec() != QDialog::Accepted)
     {
       return false;
     }
     LocalDirectory = Dialog.LocalDirectory();
     RemoteDirectory = Dialog.RemoteDirectory();
+    const std::vector<std::string> Selected = Params.Selected;
     Params = Dialog.Params();
-    FSyncParams = Params;
+    Params.Selected = Selected;
+    if (Dialog.SaveSettings())
+    {
+      try
+      {
+        CoreBridge::SetSyncDefaults(Params, Dialog.SaveMode());
+      }
+      catch (const CoreBridge::TCoreError & E)
+      {
+        ShowError(E);
+      }
+    }
     Settings = Dialog.TransferSettings()->Settings();
     try
     {
@@ -1342,7 +1369,7 @@ bool MainWindow::SynchronizeDirectories(const QString & LocalDirectory, const QS
   bool Queue = false;
   if (Params.PreviewChanges)
   {
-    SyncChecklistDialog Dialog(*Checklist, LocalDirectory, RemoteDirectory, this);
+    SyncChecklistDialog Dialog(*Checklist, LocalDirectory, RemoteDirectory, this, FSession.get());
     // As WinSCP: synchronizing timestamps is not queued.
     Dialog.QueueButton()->setVisible(Params.Mode != CoreBridge::TSyncParams::TMode::Timestamps);
     if (Dialog.exec() != QDialog::Accepted)

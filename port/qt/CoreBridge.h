@@ -648,6 +648,7 @@ enum class TText
   CreateLocalDirectoryError, // "Can't create folder '%s'."
   SelectLocalDirectory, // "Select local directory."
   FileOverwrite, // "File '%s' already exists. Overwrite?"
+  SaveSyncMode, // "Do you want to use the synchronization direction ... next time too?" (SAVE_SYNCHRONIZE_MODE2)
   SaveSessionCaption, // "Save session as site"
   SaveSessionPrompt, // "&Site name:"
   SaveSessionFolder, // "&Folder:"
@@ -1260,7 +1261,22 @@ struct TSyncParams
   bool ByTime = true;
   bool BySize = false;
   bool CaseSensitive = false;
+  // Selected files only (spSelectedOnly): the panels' selection, by name
+  // (GetSynchronizeOptions' filter); by checksum (spByChecksum).
+  bool SelectedOnly = false;
+  std::vector<std::string> Selected;
+  bool ByChecksum = false;
 };
+// The Synchronize dialog's options as kept by "Use same options next time"
+// (GUIConfiguration's SynchronizeParams; SynchronizeModeAuto: the direction
+// too, when SaveMode).
+struct TSyncDefaults
+{
+  TSyncParams Params;
+  bool SaveMode = false;
+};
+TSyncDefaults SyncDefaults();
+void SetSyncDefaults(const TSyncParams & Params, bool SaveMode);
 
 // An entry of the synchronization checklist (TSynchronizeChecklist::TItem):
 // what is to be done, and the file on each side.
@@ -1283,6 +1299,8 @@ struct TSyncItem
   std::string RemoteModified;
   double LocalModifiedTime = 0;
   double RemoteModifiedTime = 0;
+  // A file's size, or a directory's once calculated (HasSize).
+  bool HasSize = true;
 };
 
 // What synchronizing found, before it is applied: the checklist WinSCP shows
@@ -1300,6 +1318,14 @@ public:
   // a download, a delete a transfer back.
   void Reverse(std::size_t Index);
   int CheckedCount() const;
+  // Find Move Candidate (TSynchronizeChecklistDialog's): from Index on, an
+  // entry and the one it would be moved from or to -- a new one and the
+  // opposite delete: directories of the name, files of the size with the
+  // name or the directory. False when there is none.
+  bool FindMoveCandidate(std::size_t Index, std::size_t & First, std::size_t & Second) const;
+  // Whether Move applies to these: exactly a new entry and its opposite
+  // delete of the same kind, or a new directory and deletes to move into it.
+  bool CanMove(const std::vector<std::size_t> & Indexes) const;
 
 private:
   friend class TSession;
@@ -1558,8 +1584,16 @@ public:
   bool SyncApply(TSyncChecklist & Checklist);
   // Each checked entry as its own queue item (TTerminal::SynchronizeToQueue).
   void SyncQueue(TSyncChecklist & Checklist);
+  // The checklist's Calculate: the directories' sizes, each side's
+  // (UpdateDirectorySize). Move (DoSynchronizeMove): the deleted ones moved
+  // to the new one's place on their side, the entries gone. Throw TCoreError.
+  void SyncCalculateSizes(TSyncChecklist & Checklist, const std::vector<std::size_t> & Indexes);
+  void SyncMove(TSyncChecklist & Checklist, const std::vector<std::size_t> & Indexes);
   // Whether the server can set times, which "synchronize timestamps" needs.
   bool CanSyncTimestamps() const;
+  // Whether it can compare by checksum (CanCalculateChecksum: the protocol's,
+  // or a separate shell's).
+  bool CanSyncChecksum() const;
   // Commands > Keep Remote Directory up to Date, as WinSCP's (upstream's
   // TSynchronizeController, compiled as it is): the local directory
   // watched, and each directory that changed, once quiet, synchronized to
