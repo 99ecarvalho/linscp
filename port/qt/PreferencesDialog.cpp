@@ -1,4 +1,5 @@
 #include "PreferencesDialog.h"
+#include "IconSet.h"
 
 #include "TransferSettingsDialog.h"
 #include "CustomCommandDialog.h"
@@ -304,6 +305,19 @@ QWidget * PreferencesDialog::MakeWindowPage(const TPreferences & Preferences)
   FKeepOpen->setChecked(Preferences.KeepOpenWhenNoSession);
   MiscLayout->addWidget(FKeepOpen);
   Layout->addWidget(Misc);
+  // linscp's: WinSCP's own icons are not reusable (IconSet.h).
+  QGroupBox * Icons = new QGroupBox(tr("Icons"), Page);
+  QFormLayout * IconsLayout = new QFormLayout(Icons);
+  FIconSet = new QComboBox(Icons);
+  for (const IconSet::TSet & Set : IconSet::Sets())
+  {
+    FIconSet->addItem(Set.Name, Set.Id);
+  }
+  const int IconSetIndex = FIconSet->findData(Preferences.IconSet.empty() ? IconSet::DefaultSet() :
+    QString::fromStdString(Preferences.IconSet));
+  FIconSet->setCurrentIndex(std::max(IconSetIndex, 0));
+  IconsLayout->addRow(tr("Icon &set:"), FIconSet);
+  Layout->addWidget(Icons);
   Layout->addStretch(1);
   return Page;
 }
@@ -907,6 +921,7 @@ TPreferences PreferencesDialog::Preferences() const
   Result.SessionReopenAutoInactive = FReopenAutoInactive->isChecked();
   Result.SessionReopenAutoStall = FReopenAutoStall->isChecked() ? FReopenAutoStallSeconds->value() : 0;
   Result.SessionReopenTimeout = FReopenTimeout->value();
+  Result.IconSet = FIconSet->currentData().toString().toStdString();
   Result.PathInCaption = FPathFull->isChecked() ? TPreferences::TPathInCaption::Full :
     (FPathNone->isChecked() ? TPreferences::TPathInCaption::None : TPreferences::TPathInCaption::Short);
   Result.KeepOpenWhenNoSession = FKeepOpen->isChecked();

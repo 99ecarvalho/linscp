@@ -23,6 +23,7 @@ c4e42ee26a7a27af289b7dd92ac3cf7af3b874a3fc014a67a1136e8793b7cbe4 mingw-w64-clang
 629e29b6b52668c0abff9e59a76b3300fe8c6b23c37c8472da96dbf6aac4f131 mingw-w64-clang-x86_64-openssl-3.4.0-1-any.pkg.tar.zst
 cca64486975d8eb238f7cb74a98e7dd0c94df563da6e28263d64ba2acea871b2 mingw-w64-clang-x86_64-pcre2-10.44-2-any.pkg.tar.zst
 0dd9322532c5b91c56b17051bbe6bd11ff3423a16512b2729531dd517caa5d89 mingw-w64-clang-x86_64-qt6-base-6.8.2-1-any.pkg.tar.zst
+2ec7124aebde41be6b430ef496ad1be2d8c3871c2bca0966836b498e1cafd1a6 mingw-w64-clang-x86_64-qt6-svg-6.8.2-1-any.pkg.tar.zst
 3d0f0aad37fc72280d75e4cf8229f76a49e9e363fab0d62855bd898eccca341b mingw-w64-clang-x86_64-qt6-translations-6.8.2-1-any.pkg.tar.zst
 fe2bd2a9547a3369d4a2ec24e0735511727d6754a947582acd51fab4e9daea82 mingw-w64-clang-x86_64-sqlite3-3.47.2-1-any.pkg.tar.zst
 b1e830010376a864b116e468422ed150c08b3bdd134128234806bd980b01d46b mingw-w64-clang-x86_64-vulkan-loader-1.4.304.0-1-any.pkg.tar.zst

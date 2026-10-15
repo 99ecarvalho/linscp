@@ -1,4 +1,5 @@
 #include "QueuePanel.h"
+#include "IconSet.h"
 
 #include <QAction>
 #include <QHeaderView>
@@ -132,4 +133,18 @@ void QueuePanel::UpdateActions()
   FCancelAction->setEnabled(Any);
   FPauseAction->setEnabled(Any);
   FResumeAction->setEnabled(Any);
+}
+
+void QueuePanel::ApplyIcons()
+{
+  const std::pair<QAction *, std::pair<const char *, QStyle::StandardPixmap>> Icons[] = {
+    { FCancelAction, { "cancel", QStyle::SP_DialogCancelButton } },
+    { FPauseAction, { "pause", QStyle::SP_MediaPause } },
+    { FResumeAction, { "resume", QStyle::SP_MediaPlay } },
+  };
+  for (const auto & Icon : Icons)
+  {
+    const QIcon Set = IconSet::Icon(QString::fromLatin1(Icon.second.first));
+    Icon.first->setIcon(Set.isNull() ? style()->standardIcon(Icon.second.second) : Set);
+  }
 }

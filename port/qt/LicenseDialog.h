@@ -18,11 +18,15 @@ public:
   enum TLicense { Product, Expat };
 
   explicit LicenseDialog(TLicense License, QWidget * Parent = nullptr);
+  // Another's: an icon set's (About's list), Product named, from FileName.
+  LicenseDialog(const QString & Product, const QString & FileName, QWidget * Parent = nullptr);
 
   // The text, for tests.
   QPlainTextEdit * Text() const { return FText; }
 
 private:
+  void Show(const QString & Text);
+
   QPlainTextEdit * FText = nullptr;
 };
 

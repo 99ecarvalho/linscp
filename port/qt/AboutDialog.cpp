@@ -13,9 +13,25 @@
 #include <QVBoxLayout>
 
 #include "LicenseDialog.h"
+#include "IconSet.h"
 
 namespace
 {
+
+// The bundled icon sets (P3-17), each its license shown by the link.
+QString IconSetsHtml()
+{
+  QString Result;
+  for (const IconSet::TSet & Set : IconSet::Sets())
+  {
+    if (!Set.License.isEmpty())
+    {
+      Result += QStringLiteral("<p>%1<br><a href=\"iconset:%2\">%3</a></p>").arg(
+        AboutDialog::tr("%1 icons").arg(Set.Name), Set.Id, AboutDialog::tr("License"));
+    }
+  }
+  return Result;
+}
 
 const char WebSite[] = "https://github.com/99ecarvalho/linscp";
 const char WinScpWebSite[] = "https://winscp.net/";
@@ -97,7 +113,7 @@ AboutDialog::AboutDialog(const CoreBridge::TInfo & Info, QWidget * Parent) :
     QStringLiteral("<p>%1<br>%2<br>%3</p>").arg(
       tr("Qt %1").arg(QString::fromLatin1(qVersion())),
       tr("Copyright © The Qt Company Ltd. and other contributors"),
-      Link(QStringLiteral("https://www.qt.io/"))));
+      Link(QStringLiteral("https://www.qt.io/"))) + IconSetsHtml());
   FThirdParty->setMinimumHeight(160);
   connect(FThirdParty, &QTextBrowser::anchorClicked, this, [this](const QUrl & Url)
   {
@@ -106,6 +122,17 @@ AboutDialog::AboutDialog(const CoreBridge::TInfo & Info, QWidget * Parent) :
     {
       LicenseDialog Dialog(LicenseDialog::Expat, this);
       Dialog.exec();
+    }
+    else if (Url.scheme() == QStringLiteral("iconset"))
+    {
+      for (const IconSet::TSet & Set : IconSet::Sets())
+      {
+        if ((Set.Id == Url.path()) && !Set.License.isEmpty())
+        {
+          LicenseDialog Dialog(Set.Name, Set.License, this);
+          Dialog.exec();
+        }
+      }
     }
     else
     {

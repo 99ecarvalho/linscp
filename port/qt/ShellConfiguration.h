@@ -26,6 +26,8 @@ struct TShellSettings
   // Window: the current directory in the title (TPathInCaption: picShort,
   // picFull, picNone); the window kept when the last session closes.
   int PathInCaption = 0;
+  // linscp's: the icon set (IconSet.h's ids); empty for the platform's default.
+  UnicodeString IconSet;
   bool KeepOpenWhenNoSession = true;
   // Integration > Applications: each new session opened in PuTTY too.
   bool AutoOpenInPutty = false;

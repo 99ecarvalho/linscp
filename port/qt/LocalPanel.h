@@ -88,6 +88,8 @@ public:
   QLabel * Status() const { return FStatus; }
 
   // Its own actions, which the window's context menus offer too.
+  // The icons, of the set chosen (IconSet).
+  void ApplyIcons();
   QAction * BackAction() const { return FBackAction; }
   QAction * ForwardAction() const { return FForwardAction; }
   QAction * ParentAction() const { return FParentAction; }

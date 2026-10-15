@@ -196,6 +196,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"RenameWholeName", FSettings.RenameWholeName);
     Storage->WriteBool(L"DefaultDirIsHome", FSettings.DefaultDirIsHome);
     Storage->WriteInteger(L"PathInCaption", FSettings.PathInCaption);
+    Storage->WriteString(L"IconSet", FSettings.IconSet);
     Storage->WriteBool(L"KeepOpenWhenNoSession", FSettings.KeepOpenWhenNoSession);
     Storage->WriteBool(L"AutoOpenInPutty", FSettings.AutoOpenInPutty);
     Storage->WriteBool(L"AutoSaveWorkspace", FSettings.AutoSaveWorkspace);
@@ -418,6 +419,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.RenameWholeName = Storage->ReadBool(L"RenameWholeName", FSettings.RenameWholeName);
     FSettings.DefaultDirIsHome = Storage->ReadBool(L"DefaultDirIsHome", FSettings.DefaultDirIsHome);
     FSettings.PathInCaption = Storage->ReadInteger(L"PathInCaption", FSettings.PathInCaption);
+    FSettings.IconSet = Storage->ReadString(L"IconSet", FSettings.IconSet);
     FSettings.KeepOpenWhenNoSession = Storage->ReadBool(L"KeepOpenWhenNoSession", FSettings.KeepOpenWhenNoSession);
     FSettings.AutoOpenInPutty = Storage->ReadBool(L"AutoOpenInPutty", FSettings.AutoOpenInPutty);
     FSettings.AutoSaveWorkspace = Storage->ReadBool(L"AutoSaveWorkspace", FSettings.AutoSaveWorkspace);

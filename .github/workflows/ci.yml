@@ -46,7 +46,7 @@ jobs:
             binutils-mingw-w64-x86-64 \
             openssh-client openssh-server rclone microsocks tinyproxy \
             python3-boto3 python3-flask-cors python3-moto python3-openssl \
-            python3-pyftpdlib qt6-base-dev qt6-l10n-tools qt6-translations-l10n \
+            python3-pyftpdlib qt6-base-dev qt6-svg-dev qt6-l10n-tools qt6-translations-l10n \
             ${{ matrix.packages }}
 
       - uses: actions/checkout@v4

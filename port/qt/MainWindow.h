@@ -384,6 +384,10 @@ private:
   QMenu * FRemoteMenu = nullptr;
   // The menu bar, as WinSCP's Commander's (forms/ScpCommander.dfm).
   void BuildMenus();
+  // The actions' icons by role (IconSet), applied again as the set changes.
+  std::vector<std::pair<QAction *, QString>> FIconRoles;
+  QAction * Iconize(QAction * Action, const char * Role);
+  void ApplyIcons();
   QMenu * PanelMenu(bool Local);
   FileView * ActiveView() const;
   void SelectSameExtension(bool Select);

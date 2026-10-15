@@ -46,6 +46,7 @@ public:
   QCheckBox * DirectoriesByNameCheck() const { return FDirectoriesByName; }
   QComboBox * SizeFormatCombo() const { return FSizeFormat; }
   QCheckBox * SwappedPanelsCheck() const { return FSwappedPanels; }
+  QComboBox * IconSetCombo() const { return FIconSet; }
   QComboBox * KeyboardShortcutsCombo() const { return FKeyboardShortcuts; }
   QCheckBox * UseLocationProfilesCheck() const { return FUseLocationProfiles; }
   QListWidget * LanguagesList() const { return FLanguages; }
@@ -172,6 +173,7 @@ private:
   QCheckBox * FDirectoriesByName = nullptr;
   QComboBox * FSizeFormat = nullptr;
   QCheckBox * FSwappedPanels = nullptr;
+  QComboBox * FIconSet = nullptr;
   QCheckBox * FCompareByTime = nullptr;
   QCheckBox * FCompareBySize = nullptr;
   QComboBox * FKeyboardShortcuts = nullptr;

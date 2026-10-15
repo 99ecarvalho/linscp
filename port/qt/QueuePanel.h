@@ -30,6 +30,8 @@ public:
   bool PauseSelected();
   bool ResumeSelected();
   QTreeWidget * List() const { return FList; }
+  // The icons, of the set chosen (IconSet).
+  void ApplyIcons();
 
 private:
   std::uintptr_t SelectedId() const;

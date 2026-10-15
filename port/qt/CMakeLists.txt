@@ -12,9 +12,9 @@ add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp AboutDialog.cpp 
   FileList.cpp RemotePanel.cpp LocalPanel.cpp
   TransferDialog.cpp QueuePanel.cpp SynchronizeDialog.cpp PreferencesDialog.cpp TransferSettingsDialog.cpp
   RightsFrame.cpp PropertiesDialog.cpp CreateDirectoryDialog.cpp LinkDialog.cpp RemoteTransferDialog.cpp OpenDirectoryDialog.cpp LocationProfilesDialog.cpp FindFilesDialog.cpp EditMaskDialog.cpp ServerInfoDialog.cpp RtfText.cpp GenerateUrlDialog.cpp ConsoleDialog.cpp SiteRawDialog.cpp ImportSitesDialog.cpp CustomCommandDialog.cpp KeepUpToDateDialog.cpp LicenseDialog.cpp CleanupDialog.cpp TagDialog.cpp ShortCutDialog.cpp EditorPreferencesDialog.cpp Integration.cpp SaveWorkspaceDialog.cpp
-  CopyLocalDialog.cpp KeyVerify.cpp SaveSiteDialog.cpp CoreBridge.h)
+  CopyLocalDialog.cpp KeyVerify.cpp SaveSiteDialog.cpp IconSet.cpp CoreBridge.h)
 set_target_properties(linscp-qt-ui PROPERTIES AUTOMOC ON)
-target_link_libraries(linscp-qt-ui PUBLIC Qt6::Widgets)
+target_link_libraries(linscp-qt-ui PUBLIC Qt6::Widgets Qt6::Svg)
 if(NOT WIN32)
   target_compile_options(linscp-qt-ui PRIVATE -fno-short-wchar)
 endif()
@@ -100,6 +100,12 @@ qt_add_resources(linscp-qt-ui shell_translations
 # linscp's icon: WinSCP's with an "L" on the padlock (port/tools/make_icon.py).
 qt_add_resources(linscp-qt-ui shell_icons
   PREFIX /icons BASE "${CMAKE_CURRENT_SOURCE_DIR}/icons" FILES "${CMAKE_CURRENT_SOURCE_DIR}/icons/linscp.ico")
+# The icon sets (P3-17, port/tools/import_icons.py): one SVG per role, each
+# set's license beside them.
+file(GLOB _icon_set_files LIST_DIRECTORIES false CONFIGURE_DEPENDS
+  "${CMAKE_SOURCE_DIR}/assets/icons/*/*.svg" "${CMAKE_SOURCE_DIR}/assets/icons/*/LICENSE")
+qt_add_resources(linscp-qt-ui icon_sets
+  PREFIX /iconsets BASE "${CMAKE_SOURCE_DIR}/assets/icons" FILES ${_icon_set_files})
 # The License dialog's texts: linscp's own, and Expat's as WinSCP ships it.
 set_source_files_properties("${CMAKE_SOURCE_DIR}/LICENSE" PROPERTIES QT_RESOURCE_ALIAS LICENSE)
 set_source_files_properties("${LINSCP_UPSTREAM}/source/resource/LicenseExpat.txt" PROPERTIES QT_RESOURCE_ALIAS LicenseExpat.txt)

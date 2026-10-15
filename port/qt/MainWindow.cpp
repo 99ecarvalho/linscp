@@ -63,6 +63,7 @@
 #include "EditorPreferencesDialog.h"
 #include "SaveWorkspaceDialog.h"
 #include "CopyLocalDialog.h"
+#include "IconSet.h"
 #include "SaveSiteDialog.h"
 #include "KeyVerify.h"
 #include "TransferSettingsDialog.h"
@@ -518,6 +519,11 @@ bool MainWindow::PreferencesDialog()
 void MainWindow::ApplyPreferences()
 {
   const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+  if (QString::fromStdString(Preferences.IconSet) != IconSet::Current())
+  {
+    IconSet::SetCurrent(QString::fromStdString(Preferences.IconSet));
+    ApplyIcons();
+  }
   FLocal->ApplyPreferences(Preferences);
   FPanel->ApplyPreferences(Preferences);
   FHiddenAction->setChecked(Preferences.ShowHiddenFiles);
@@ -3159,10 +3165,12 @@ QMenu * MainWindow::PanelMenu(bool Local)
       };
     };
     QMenu * GoTo = Menu->addMenu(tr("&Go To"));
-    GoTo->addAction(tr("&Open Directory/Bookmark..."), this, OnPanel([this]() { OpenDirectory(false); }));
+    GoTo->addAction(IconSet::Icon(QStringLiteral("open-directory")), tr("&Open Directory/Bookmark..."), this,
+      OnPanel([this]() { OpenDirectory(false); }));
     if (Side != nullptr)
     {
-      QAction * Explore = GoTo->addAction(FExploreAction->text(), this, OnPanel([this]() { ExploreLocalDirectory(); }));
+      QAction * Explore = GoTo->addAction(FExploreAction->icon(), FExploreAction->text(), this,
+        OnPanel([this]() { ExploreLocalDirectory(); }));
       Explore->setShortcut(FExploreAction->shortcut());
     }
     GoTo->addSeparator();
@@ -3180,7 +3188,8 @@ QMenu * MainWindow::PanelMenu(bool Local)
     GoTo->addAction((Side != nullptr) ? Side->BackAction() : FPanel->BackAction());
     GoTo->addAction((Side != nullptr) ? Side->ForwardAction() : FPanel->ForwardAction());
     Menu->addAction((Side != nullptr) ? Side->RefreshAction() : FPanel->RefreshAction());
-    Menu->addAction(tr("&Add Path to Bookmarks"), this, OnPanel([this]() { OpenDirectory(true); }));
+    Menu->addAction(IconSet::Icon(QStringLiteral("bookmark")), tr("&Add Path to Bookmarks"), this,
+      OnPanel([this]() { OpenDirectory(true); }));
     Menu->addAction(tr("Copy &Path to Clipboard"), this, [this, Side]()
     {
       QApplication::clipboard()->setText((Side != nullptr) ? QDir::toNativeSeparators(Side->Path()) : FPanel->Path());
@@ -3192,7 +3201,7 @@ QMenu * MainWindow::PanelMenu(bool Local)
     Columns->setTitle(tr("&Columns"));
     Columns->setParent(Menu, Columns->windowFlags());
     Menu->addMenu(Columns);
-    Menu->addAction(tr("&Filter..."), this, OnPanel([this]() { Filter(); }));
+    Menu->addAction(IconSet::Icon(QStringLiteral("filter")), tr("&Filter..."), this, OnPanel([this]() { Filter(); }));
   });
   return Menu;
 }
@@ -3203,16 +3212,17 @@ QMenu * MainWindow::PanelMenu(bool Local)
 // Tab, Show Hidden Files, Ctrl+O and Ctrl+B on the active panel).
 void MainWindow::BuildMenus()
 {
+  IconSet::SetCurrent(QString::fromStdString(CoreBridge::Preferences().IconSet));
   FLocalMenu = PanelMenu(true);
 
   QMenu * Mark = menuBar()->addMenu(tr("&Mark"));
   Mark->addAction(tr("&Select/Unselect"), this, [this]() { ActiveView()->ToggleCurrent(); });
-  Mark->addAction(tr("Sele&ct Files..."), this, [this]() { ActiveView()->SelectByMaskDialog(true); });
-  Mark->addAction(tr("&Unselect Files..."), this, [this]() { ActiveView()->SelectByMaskDialog(false); });
-  Mark->addAction(tr("Select &All"), this, [this]() { ActiveView()->selectAll(); });
+  Iconize(Mark->addAction(tr("Sele&ct Files..."), this, [this]() { ActiveView()->SelectByMaskDialog(true); }), "select-files");
+  Iconize(Mark->addAction(tr("&Unselect Files..."), this, [this]() { ActiveView()->SelectByMaskDialog(false); }), "unselect-files");
+  Iconize(Mark->addAction(tr("Select &All"), this, [this]() { ActiveView()->selectAll(); }), "select-all");
   Mark->addSeparator();
-  Mark->addAction(tr("&Invert Selection"), this, [this]() { ActiveView()->InvertSelection(); });
-  Mark->addAction(tr("C&lear Selection"), this, [this]() { ActiveView()->clearSelection(); });
+  Iconize(Mark->addAction(tr("&Invert Selection"), this, [this]() { ActiveView()->InvertSelection(); }), "invert-selection");
+  Iconize(Mark->addAction(tr("C&lear Selection"), this, [this]() { ActiveView()->clearSelection(); }), "clear-selection");
   Mark->addSeparator();
   Mark->addAction(tr("Select Files with Same &Extension"), this, [this]() { SelectSameExtension(true); });
   Mark->addAction(tr("Unselect Files with Same E&xtension"), this, [this]() { SelectSameExtension(false); });
@@ -3229,7 +3239,7 @@ void MainWindow::BuildMenus()
   QMenu * Files = menuBar()->addMenu(tr("&Files"));
   QMenu * New = Files->addMenu(tr("&New"));
   FNewFileAction = New->addAction(tr("&File..."), this, [this]() { NewFile(); });
-  New->addAction(tr("&Directory..."), this, OnActive(&LocalPanel::NewFolderAction, &RemotePanel::NewFolderAction));
+  Iconize(New->addAction(tr("&Directory..."), this, OnActive(&LocalPanel::NewFolderAction, &RemotePanel::NewFolderAction)), "new-folder");
   Files->addSeparator();
   Files->addAction(FOpenCurrentAction);
   Files->addAction(FEditAction);
@@ -3240,8 +3250,8 @@ void MainWindow::BuildMenus()
   Files->addAction(FMoveAction);
   Files->addAction(FDuplicateAction);
   Files->addAction(FMoveToAction);
-  Files->addAction(tr("&Delete"), this, OnActive(&LocalPanel::DeleteAction, &RemotePanel::DeleteAction));
-  Files->addAction(tr("&Rename"), this, OnActive(&LocalPanel::RenameAction, &RemotePanel::RenameAction));
+  Iconize(Files->addAction(tr("&Delete"), this, OnActive(&LocalPanel::DeleteAction, &RemotePanel::DeleteAction)), "delete");
+  Iconize(Files->addAction(tr("&Rename"), this, OnActive(&LocalPanel::RenameAction, &RemotePanel::RenameAction)), "rename");
   Files->addSeparator();
   FCopyClipboardAction = Files->addAction(tr("&Copy to Clipboard"), this, [this]() { CopyToClipboard(); });
   FCopyClipboardAction->setShortcut(QKeySequence::Copy);
@@ -3281,10 +3291,11 @@ void MainWindow::BuildMenus()
   // As WinSCP's New Tab: a remote one (the Login dialog, Ctrl+N) or a
   // local browser.
   QMenu * NewTab = Tabs->addMenu(tr("&New Tab"));
-  QAction * RemoteTab = NewTab->addAction(tr("&Remote Tab..."), this, &MainWindow::SiteManagerDialog);
+  Iconize(NewTab->menuAction(), "new-tab");
+  QAction * RemoteTab = Iconize(NewTab->addAction(tr("&Remote Tab..."), this, &MainWindow::SiteManagerDialog), "sites");
   RemoteTab->setShortcut(FSitesAction->shortcut());
   FSitesAction->setShortcut(QKeySequence());
-  NewTab->addAction(tr("&Local Tab"), this, &MainWindow::NewLocalTab);
+  Iconize(NewTab->addAction(tr("&Local Tab"), this, &MainWindow::NewLocalTab), "local-tab");
   Tabs->addAction(FCloseTabAction);
   Tabs->addAction(FDuplicateTabAction);
   FRenameTabAction = Tabs->addAction(tr("&Rename Tab"), this, [this]() { RenameTab(); });
@@ -3311,6 +3322,7 @@ void MainWindow::BuildMenus()
     }
   });
   QMenu * Workspaces = Tabs->addMenu(tr("&Workspaces"));
+  Iconize(Workspaces->menuAction(), "workspace");
   connect(Workspaces, &QMenu::aboutToShow, this, [this, Workspaces]()
   {
     Workspaces->clear();
@@ -3324,6 +3336,7 @@ void MainWindow::BuildMenus()
   Tabs->addSeparator();
   // As WinSCP's Sites: the site manager, then the sites to open in a tab.
   QMenu * Sites = Tabs->addMenu(tr("Si&tes"));
+  Iconize(Sites->menuAction(), "sites");
   connect(Sites, &QMenu::aboutToShow, this, [this, Sites]()
   {
     Sites->clear();
@@ -3379,6 +3392,30 @@ void MainWindow::BuildMenus()
 
   QMenu * Help = menuBar()->addMenu(tr("&Help"));
   Help->addAction(FAboutAction);
+
+  // The icons, after WinSCP's glyphs for the same commands.
+  const std::pair<QAction *, const char *> Roles[] = {
+    { FSitesAction, "sites" }, { FOpenAction, "link" }, { FDisconnectAction, "disconnect" }, { FQuitAction, "quit" },
+    { FAboutAction, "about" }, { FEditAction, "edit" }, { FOpenCurrentAction, "open" }, { FLinkAction, "link" },
+    { FPropertiesAction, "properties" }, { FGenerateFileUrlAction, "generate-url" }, { FCopyAction, "copy" },
+    { FMoveAction, "move" }, { FDuplicateAction, "duplicate" }, { FMoveToAction, "move" },
+    { FOpenDirectoryAction, "open-directory" }, { FAddBookmarkAction, "bookmark" }, { FExploreAction, "explore" },
+    { FFindFilesAction, "find" }, { FConsoleAction, "console" }, { FPuttyAction, "putty" },
+    { FServerInfoAction, "server-info" }, { FGenerateSessionUrlAction, "generate-url" },
+    { FSynchronizeAction, "synchronize" }, { FKeepUpToDateAction, "keep-up-to-date" },
+    { FDuplicateTabAction, "duplicate-tab" }, { FCloseTabAction, "close-tab" }, { FSaveWorkspaceAction, "save-workspace" },
+    { FFilterAction, "filter" }, { FPreferencesAction, "preferences" }, { FRenameTabAction, "rename" },
+    { FReconnectAction, "reconnect" }, { FSaveSiteAction, "save-site" }, { FChangePasswordAction, "change-password" },
+    { FPublicKeyAction, "public-key" }, { FClearCachesAction, "clear-caches" }, { FCompareAction, "compare" },
+    { FSyncBrowseAction, "sync-browse" }, { FDirectorySizesAction, "calculate-size" }, { FNewFileAction, "new-file" },
+    { FCopyClipboardAction, "clipboard-copy" }, { FPasteAction, "paste" },
+    { FFileCommandsMenu->menuAction(), "custom-commands" }, { FStaticCommandsMenu->menuAction(), "custom-commands" },
+  };
+  for (const auto & Role : Roles)
+  {
+    Iconize(Role.first, Role.second);
+  }
+  ApplyIcons();
 
   // The keys of what no menu shows.
   addActions({ FSitesAction, FOpenAction, FOpenDirectoryAction, FAddBookmarkAction, FFilterAction, FHiddenAction,
@@ -4464,4 +4501,27 @@ void MainWindow::UpdateQueueView()
   {
     FQueue->setVisible(Show);
   }
+}
+
+// --- Icons (P3-17) ---------------------------------------------------------------------
+
+QAction * MainWindow::Iconize(QAction * Action, const char * Role)
+{
+  if (Action != nullptr)
+  {
+    FIconRoles.emplace_back(Action, QString::fromLatin1(Role));
+  }
+  return Action;
+}
+
+void MainWindow::ApplyIcons()
+{
+  for (const auto & Role : FIconRoles)
+  {
+    Role.first->setIcon(IconSet::Icon(Role.second));
+  }
+  FLocal->ApplyIcons();
+  FOtherLocal->ApplyIcons();
+  FPanel->ApplyIcons();
+  FQueue->ApplyIcons();
 }

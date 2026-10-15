@@ -123,6 +123,7 @@
 #include "EditorPreferencesDialog.h"
 #include "SaveWorkspaceDialog.h"
 #include "SaveSiteDialog.h"
+#include "IconSet.h"
 #include "PreferencesDialog.h"
 #include "Integration.h"
 #include <QSettings>
@@ -4140,6 +4141,107 @@ void ClipboardTest(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// P3-17: every role of every bundled set drawn, in the palette's colour;
+// the main window's actions given them, and again as the set changes.
+// Out (given): each set's Files menu drawn there, to look at.
+void IconsTest(const QString & Out)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    const QStringList Roles = QDir(QStringLiteral(":/iconsets/lucide")).entryList({ QStringLiteral("*.svg") });
+    Check(Roles.size() >= 60, "the roles bundled");
+    for (const QString & Set : { QStringLiteral("lucide"), QStringLiteral("tabler"), QStringLiteral("fluent") })
+    {
+      Check(QFile::exists(QStringLiteral(":/iconsets/%1/LICENSE").arg(Set)), "each set with its license");
+      IconSet::SetCurrent(Set);
+      int Drawn = 0;
+      for (const QString & File : Roles)
+      {
+        const QImage Image = IconSet::Icon(File.chopped(4)).pixmap(QSize(16, 16)).toImage();
+        bool Ink = false;
+        for (int Y = 0; (Y < Image.height()) && !Ink; Y++)
+        {
+          for (int X = 0; (X < Image.width()) && !Ink; X++)
+          {
+            Ink = (qAlpha(Image.pixel(X, Y)) > 0);
+          }
+        }
+        Drawn += Ink ? 1 : 0;
+      }
+      Check(Drawn == Roles.size(), "every role drawn in every set");
+    }
+    // In the palette's text colour, whichever the theme.
+    IconSet::SetCurrent(QStringLiteral("lucide"));
+    const QImage Image = IconSet::Icon(QStringLiteral("delete")).pixmap(QSize(32, 32)).toImage();
+    QColor Ink;
+    for (int Y = 0; (Y < Image.height()) && !Ink.isValid(); Y++)
+    {
+      for (int X = 0; (X < Image.width()) && !Ink.isValid(); X++)
+      {
+        if (qAlpha(Image.pixel(X, Y)) == 255)
+        {
+          Ink = Image.pixelColor(X, Y);
+        }
+      }
+    }
+    Check(Ink.isValid() && (Ink.rgb() == QApplication::palette().color(QPalette::WindowText).rgb()), "in the text colour");
+    Check(IconSet::Icon(QStringLiteral("no-such-role")).isNull(), "a role no set has: none");
+    {
+      AboutDialog About(CoreBridge::Info());
+      const QString Html = About.findChild<QTextBrowser *>()->toHtml();
+      Check(Html.contains(QStringLiteral("Lucide icons")) && Html.contains(QStringLiteral("iconset:fluent")),
+        "About credits the sets, each with its license");
+    }
+
+    CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+    Preferences.IconSet = "tabler";
+    CoreBridge::SetPreferences(Preferences);
+    MainWindow Window(CoreBridge::Info());
+    Window.show();
+    Check(IconSet::Current() == QStringLiteral("tabler"), "the set the preferences say");
+    QAction * Find = nullptr;
+    for (QAction * Action : Window.findChildren<QAction *>())
+    {
+      if (Action->text() == MainWindow::tr("&Find Files..."))
+      {
+        Find = Action;
+      }
+    }
+    Check((Find != nullptr) && !Find->icon().isNull(), "the commands have icons");
+    Check(!Window.Panel()->RefreshAction()->icon().isNull(), "the panels' too");
+    Preferences.IconSet = "none";
+    CoreBridge::SetPreferences(Preferences);
+    Window.ApplyPreferences();
+    Check((Find != nullptr) && Find->icon().isNull(), "none: the menus without");
+    Check(!Window.Panel()->RefreshAction()->icon().isNull(), "the panels' toolbars keep Qt's");
+    if (!Out.isEmpty())
+    {
+      for (const QString & Set : { QStringLiteral("lucide"), QStringLiteral("tabler"), QStringLiteral("fluent") })
+      {
+        Preferences.IconSet = Set.toStdString();
+        CoreBridge::SetPreferences(Preferences);
+        Window.ApplyPreferences();
+        for (QAction * Action : Window.menuBar()->actions())
+        {
+          if (Action->text() == MainWindow::tr("&Files"))
+          {
+            QMenu * Menu = Action->menu();
+            Menu->popup(QPoint(0, 0));
+            QApplication::processEvents();
+            Menu->grab().save(QDir(Out).filePath(Set + QStringLiteral("-files.png")));
+            Menu->hide();
+          }
+        }
+        Window.grab().save(QDir(Out).filePath(Set + QStringLiteral("-window.png")));
+      }
+    }
+    Preferences.IconSet.clear();
+    CoreBridge::SetPreferences(Preferences);
+  }
+  CoreBridge::Finalize();
+}
+
 // The menu bar as text, a menu's items indented under it, separators as
 // "----": for comparing with WinSCP's (forms/ScpCommander.dfm).
 void DumpMenu(QMenu * Menu, int Depth, QString & Out)
@@ -4208,6 +4310,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 5) && (std::strcmp(argv[1], "clipboard") == 0))
   {
     ClipboardTest(argv[3], QString::fromLocal8Bit(argv[4]));
+  }
+  else if ((argc >= 3) && (std::strcmp(argv[1], "icons") == 0))
+  {
+    IconsTest((argc >= 4) && (argv[3][0] != '-') ? QString::fromLocal8Bit(argv[3]) : QString());
   }
   else if ((argc >= 3) && (std::strcmp(argv[1], "menus") == 0))
   {

@@ -252,6 +252,7 @@ TPreferences Preferences()
   Result.CompareBySize = Settings.CompareBySize;
   Result.UseLocationProfiles = Settings.UseLocationProfiles;
   Result.PathInCaption = static_cast<TPreferences::TPathInCaption>(Settings.PathInCaption);
+  Result.IconSet = Utf8(Settings.IconSet);
   Result.KeepOpenWhenNoSession = Settings.KeepOpenWhenNoSession;
   // As TFileColorData::LoadList: comma text of "BBGGRR:mask" (TColor).
   std::unique_ptr<TStringList> Colors(CommaTextToStringList(Settings.FileColors));
@@ -550,6 +551,7 @@ void SetPreferences(const TPreferences & Preferences)
   Settings.UseLocationProfiles = Preferences.UseLocationProfiles;
   Settings.AutoOpenInPutty = Preferences.AutoOpenInPutty;
   Settings.PathInCaption = static_cast<int>(Preferences.PathInCaption);
+  Settings.IconSet = FromUtf8(Preferences.IconSet);
   Settings.KeepOpenWhenNoSession = Preferences.KeepOpenWhenNoSession;
   // As TFileColorData::SaveList.
   std::unique_ptr<TStringList> Colors(new TStringList());

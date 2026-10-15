@@ -55,6 +55,14 @@
         <source>Third party software</source>
         <translation>Software de terceiros</translation>
     </message>
+    <message>
+        <source>%1 icons</source>
+        <translation>Ícones %1</translation>
+    </message>
+    <message>
+        <source>License</source>
+        <translation>Licença</translation>
+    </message>
 </context>
 <context>
     <name>CleanupDialog</name>
@@ -728,6 +736,17 @@ Local: %2</translation>
     <message>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Copiar para a área de transferência</translation>
+    </message>
+</context>
+<context>
+    <name>IconSet</name>
+    <message>
+        <source>Desktop theme</source>
+        <translation>Tema da área de trabalho</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Nenhum</translation>
     </message>
 </context>
 <context>
@@ -2110,6 +2129,14 @@ Local: %2</translation>
     <message>
         <source>Compare by &amp;size</source>
         <translation>Comparar por &amp;tamanho</translation>
+    </message>
+    <message>
+        <source>Icons</source>
+        <translation>Ícones</translation>
+    </message>
+    <message>
+        <source>Icon &amp;set:</source>
+        <translation>&amp;Conjunto de ícones:</translation>
     </message>
 </context>
 <context>

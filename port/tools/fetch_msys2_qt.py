@@ -26,8 +26,9 @@ WINDOW = datetime.timedelta(days=1)
 # libunwind.dll, so Qt does not load with llvm-mingw's. linscp is compiled by
 # the llvm-mingw of the same LLVM release (cmake/toolchain-llvm-mingw.cmake).
 # qt6-translations: Qt's own texts (standard buttons and dialogs), as
-# Debian's qt6-translations-l10n gives them on Linux.
-ROOTS = ['qt6-base', 'qt6-translations', 'libc++', 'libunwind', 'libwinpthread']
+# Debian's qt6-translations-l10n gives them on Linux. qt6-svg: the icon
+# sets (assets/icons), drawn from their SVGs as qt6-svg-dev does on Linux.
+ROOTS = ['qt6-base', 'qt6-svg', 'qt6-translations', 'libc++', 'libunwind', 'libwinpthread']
 # Not fetched: gcc-libs is a virtual package for that runtime; the Vulkan
 # headers are a build-time dependency only, and so is Python with what it
 # brings (glib2's code generators): Qt links none of them.

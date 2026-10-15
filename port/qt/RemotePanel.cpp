@@ -1,4 +1,5 @@
 #include "RemotePanel.h"
+#include "IconSet.h"
 
 #include <QAction>
 #include <QApplication>
@@ -545,4 +546,26 @@ std::vector<CoreBridge::TRemoteEntry> RemotePanel::Entries() const
 void RemotePanel::SetDirectorySize(const QString & Name, std::int64_t Size)
 {
   FModel->SetDirectorySize(Name, Size);
+}
+
+// The set's icons (IconSet), else -- with none -- Qt's own, the panel's
+// toolbar being of icons.
+void RemotePanel::ApplyIcons()
+{
+  const std::pair<QAction *, std::pair<const char *, QStyle::StandardPixmap>> Icons[] = {
+    { FBackAction, { "back", QStyle::SP_ArrowBack } },
+    { FForwardAction, { "forward", QStyle::SP_ArrowForward } },
+    { FParentAction, { "parent", QStyle::SP_FileDialogToParent } },
+    { FRootAction, { "root", QStyle::SP_DriveHDIcon } },
+    { FHomeAction, { "home", QStyle::SP_DirHomeIcon } },
+    { FRefreshAction, { "refresh", QStyle::SP_BrowserReload } },
+    { FNewFolderAction, { "new-folder", QStyle::SP_FileDialogNewFolder } },
+    { FRenameAction, { "rename", QStyle::SP_FileDialogDetailedView } },
+    { FDeleteAction, { "delete", QStyle::SP_TrashIcon } },
+  };
+  for (const auto & Icon : Icons)
+  {
+    const QIcon Set = IconSet::Icon(QString::fromLatin1(Icon.second.first));
+    Icon.first->setIcon(Set.isNull() ? style()->standardIcon(Icon.second.second) : Set);
+  }
 }

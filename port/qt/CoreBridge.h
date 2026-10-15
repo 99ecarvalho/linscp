@@ -386,6 +386,8 @@ struct TPreferences
   // full, or none; the window kept when the last session closes.
   enum class TPathInCaption { Short, Full, None };
   TPathInCaption PathInCaption = TPathInCaption::Short;
+  // The icon set (IconSet.h's id; empty: the platform's default).
+  std::string IconSet;
   bool KeepOpenWhenNoSession = true;
   // File colors: the first mask a file matches colors it.
   struct TFileColor

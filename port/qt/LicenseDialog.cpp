@@ -28,6 +28,22 @@ LicenseDialog::LicenseDialog(TLicense License, QWidget * Parent) :
   }
   setWindowTitle(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::LicenseCaption)).replace(QStringLiteral("%s"), Product));
 
+  Show(Text);
+}
+
+LicenseDialog::LicenseDialog(const QString & Product, const QString & FileName, QWidget * Parent) :
+  QDialog(Parent)
+{
+  QFile File(FileName);
+  File.open(QIODevice::ReadOnly);
+  QString Text = QString::fromUtf8(File.readAll());
+  Text.remove(QLatin1Char('\r'));
+  setWindowTitle(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::LicenseCaption)).replace(QStringLiteral("%s"), Product));
+  Show(Text);
+}
+
+void LicenseDialog::Show(const QString & Text)
+{
   QVBoxLayout * Layout = new QVBoxLayout(this);
   FText = new QPlainTextEdit(Text, this);
   FText->setAccessibleName(windowTitle());
