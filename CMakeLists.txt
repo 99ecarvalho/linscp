@@ -34,6 +34,12 @@ add_compile_options(-fms-extensions -fshort-wchar)
 #                  Windows' wcslen is 2-byte and stays a builtin.
 if(NOT WIN32)
   add_compile_options(-fno-builtin-wcslen)
+  # WinSCP's OpenSSL, linked statically, kept to the programs themselves: the
+  # system's libssl comes in too (Kerberos' libldap needs it, and Qt's TLS
+  # backend loads it), and an executable exporting OpenSSL's symbols has the
+  # system's resolve to ours, two OpenSSLs mixed (Help > Check for Updates
+  # crashed in SSL_CTX_new).
+  add_link_options("LINKER:--exclude-libs,libssl.a:libcrypto.a")
 endif()
 
 set(LINSCP_UPSTREAM "${CMAKE_SOURCE_DIR}/3rd-party/winscp"
