@@ -257,12 +257,13 @@ P2-10 and P2-11 waited, at the user's request, for P3.
 
 1. **P2-11**: the P2 exit gate, driven by the user: a day's work in linscp
    from an installed package (0.2.0's).
-2. Run the `real-servers` tests in CI (a job on the runner's host, where docker is: P3-18's container cannot start from inside CI's Debian container).
+2. The Preferences pages WinSCP has and linscp lacks: Environment (confirmations and more), Interface, Updates, Drag & Drop, the panels' Remote and Local pages.
 3. Follow up the upstream PRs for the carried patches (ADR 0006): the
    portability series winscp/winscp#79, and #80 (`LogEvent`), #81 (log file
    names), #82 (local EOL), #83 (OpenSSH import paths); offer the two S3
    ones found by P3-18 (`core-s3-acl-not-implemented.patch`,
-   `core-s3-folder-tags.patch`); drop each patch when a pin move brings it in.
+   `core-s3-folder-tags.patch`, PRs below); drop each patch when a pin move
+   brings it in.
 
 ## P3 UI gap audit (2026-10-14)
 
@@ -301,6 +302,10 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-15 | Help > Donate offered, linscp's GitHub Sponsors page for now (one constant, `DonateUrl`) | The user's call: linscp's own donation pages come later |
+| 2026-10-15 | A portable package: on Windows a zip of the deploy folder with an empty `linscp.ini` (WinSCP's portable mode: an INI beside the program; `linscp-cli` shares it), on Linux the AppImage with a `WinSCP.ini` beside the `.AppImage` file | The user's call; WinSCP offers a portable package too |
+| 2026-10-15 | WinSCP's OpenSSL kept out of the programs' dynamic symbols on POSIX (`--exclude-libs,libssl.a:libcrypto.a`) | The system's libssl is loaded as well (Kerberos' libldap, Qt's TLS backend); with our OpenSSL exported, the two mixed and Help > Check for Updates crashed in SSL_CTX_new |
+| 2026-10-15 | The Windows suite runs natively on the VM through `port/tools/vm_tests.py` (ctest's own list, made native), beside Linux and Wine | The user's call: every change tested on Linux, Wine and real Windows; the first run found the deploy folder without Qt's TLS backend (no HTTPS) and image plugins |
 | 2026-10-15 | Real test servers (P3-18) in one image, one container per test on the host's network (free loopback ports, FTP's passive ports needing no mapping), the test's directory mounted at its own path, the servers as user linscp with the host user's uid; versitygw for S3, not MinIO | Each test keeps owning its server's files, as with the loopback fixtures. MinIO refuses secret keys under 8 characters (the suite's "secret") and keeps objects in its own format; versitygw serves a directory as buckets. OpenSSH stays out of the GUI tests' SFTP: its chroot cannot give a writable "/", which they expect (rclone stays) |
 | 2026-10-15 | The shim's AnsiString and UnicodeString data() return NULL when empty, as C++Builder's | Core tells "none" by it: S3FileSystem's empty session token went out as an empty, unsigned x-amz-security-token header, which a real S3 server rejects |
 | 2026-10-15 | `core-s3-acl-not-implemented.patch` and `core-s3-folder-tags.patch` carried, to offer upstream | Against versitygw WinSCP's Properties fail: GetObjectAcl answers NotImplemented (many S3-compatible servers keep no object ACLs), and a folder that is only a key prefix has no tags to read; NotImplemented now reads as no grants, and tags load for files only, as the dialog shows them |
