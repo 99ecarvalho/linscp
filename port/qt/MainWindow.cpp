@@ -1302,6 +1302,27 @@ bool MainWindow::CopyDialog(bool FromLocal, const QStringList & Names, QString &
   QDialogButtonBox * Box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &Dialog);
   connect(Box, &QDialogButtonBox::accepted, &Dialog, &QDialog::accept);
   connect(Box, &QDialogButtonBox::rejected, &Dialog, &QDialog::reject);
+  // As the transfer settings menu's cplGenerateCode: this transfer, as a
+  // script or .NET code (not for a temporary or remote transfer).
+  if (FSession && FSession->Active())
+  {
+    QPushButton * Generate = Box->addButton(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::CopyParamGenerateCode)),
+      QDialogButtonBox::ActionRole);
+    connect(Generate, &QPushButton::clicked, &Dialog, [this, &Dialog, FromLocal, &Names, TargetEdit, Move, SettingsBox]()
+    {
+      CoreBridge::TSession::TTransferCode Transfer;
+      Transfer.ToRemote = FromLocal;
+      Transfer.Move = Move;
+      for (const QString & Name : Names)
+      {
+        Transfer.Paths.push_back(FromLocal ? QDir::toNativeSeparators(QDir(FLocal->Path()).filePath(Name)).toStdString() : Name.toStdString());
+      }
+      Transfer.Target = (FromLocal ? TargetEdit->text().trimmed() : QDir::toNativeSeparators(TargetEdit->text().trimmed())).toStdString();
+      Transfer.Settings = SettingsBox->Settings();
+      GenerateUrlDialog Code(FSession.get(), {}, &Dialog, &Transfer);
+      Code.exec();
+    });
+  }
   Layout->addRow(Box);
   if ((Dialog.exec() != QDialog::Accepted) || TargetEdit->text().trimmed().isEmpty())
   {

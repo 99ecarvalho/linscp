@@ -872,6 +872,7 @@ enum class TText
   ConfirmCreateShortcutWorkspace, // "Create desktop shortcut for workspace '%s'?"
   ConfirmCreateSendTo,  // "Create Explorer's 'send to' shortcut for site '%s'?"
   SaveSiteShortcut,     // "&Create desktop shortcut"
+  CopyParamGenerateCode, // "Generate &Code..."
 };
 std::string Text(TText Text);
 
@@ -1845,6 +1846,19 @@ public:
   // TCustomScpExplorerForm's GenerateUrl over this session's data
   // (SessionDataForCode). Throws TCoreError.
   TGeneratedCode GenerateCode(const TGenerateCodeOptions & Options);
+  // The Copy dialog's Generate Code (DoGenerateTransferCodeDialog): the
+  // transfer as script or .NET code. Paths: local full paths to upload,
+  // or remote names (in the current directory) to download; Target the
+  // destination directory.
+  struct TTransferCode
+  {
+    bool ToRemote = false;
+    bool Move = false;
+    std::vector<std::string> Paths;
+    std::string Target;
+    TTransferSettings Settings;
+  };
+  TGeneratedCode GenerateTransferCode(const TGenerateCodeOptions & Options, const TTransferCode & Transfer);
   // The site's key for what is kept per site (SessionData's SessionKey):
   // its bookmarks.
   std::string SessionKey() const;

@@ -3169,6 +3169,38 @@ void Tools(const char * Port, const QString & Directory)
       Check((Dialog.Pages()->count() == 1) && (Dialog.windowTitle() == QStringLiteral("Generate file URL")), "a file's URL only");
       Check(Dialog.Text().endsWith(QStringLiteral("/hello.txt")), "the file's URL");
     }
+    // The Copy dialog's Generate Code: the transfer, as a script and code.
+    {
+      CoreBridge::TSession::TTransferCode Transfer;
+      Transfer.ToRemote = true;
+      Transfer.Move = true;
+      Transfer.Paths = { QDir::toNativeSeparators(QDir(Directory).filePath(QStringLiteral("one.txt"))).toStdString(),
+        QDir::toNativeSeparators(QDir(Directory).filePath(QStringLiteral("two.txt"))).toStdString() };
+      Transfer.Target = "/sub/";
+      Transfer.Settings = CoreBridge::CurrentTransferSettings();
+      GenerateUrlDialog Dialog(Session, {}, nullptr, &Transfer);
+      Check((Dialog.windowTitle() == QStringLiteral("Generate transfer code")) && !Dialog.Pages()->isTabVisible(0) &&
+        (Dialog.Pages()->currentIndex() != 0), "WinSCP's title, no URL page");
+      Dialog.Pages()->setCurrentIndex(1);
+      Dialog.ScriptFormatCombo()->setCurrentIndex(0);
+      const QString Script = Dialog.Text();
+      Check(Script.contains(QStringLiteral("lcd ")) && Script.contains(QStringLiteral("cd /sub")) &&
+        Script.contains(QStringLiteral("put -delete")) && Script.contains(QStringLiteral("one.txt")) && Script.contains(QStringLiteral("two.txt")),
+        "a script: to the directory, each file put, moved");
+      Dialog.Pages()->setCurrentIndex(2);
+      Dialog.LanguageCombo()->setCurrentIndex(0);
+      Check(Dialog.Text().contains(QStringLiteral("PutFiles")) && Dialog.Text().contains(QStringLiteral("remotePath")),
+        ".NET code: PutFiles, a shared target");
+      Transfer.ToRemote = false;
+      Transfer.Move = false;
+      Transfer.Paths = { "hello.txt" };
+      Transfer.Target = QDir::toNativeSeparators(Directory).toStdString();
+      GenerateUrlDialog Download(Session, {}, nullptr, &Transfer);
+      Download.Pages()->setCurrentIndex(1);
+      Download.ScriptFormatCombo()->setCurrentIndex(0);
+      Check(Download.Text().contains(QStringLiteral("get hello.txt")) && !Download.Text().contains(QStringLiteral("-delete")),
+        "a download: get");
+    }
     // Commands > Open in PuTTY: the program Preferences name, given the
     // session on its command line (POSIX) or as a PuTTY session (Windows).
     {

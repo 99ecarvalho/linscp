@@ -1,8 +1,7 @@
 // forms/GenerateUrl.cpp's generation, as TGenerateUrlDialog's GenerateUrl,
 // GenerateScript, GenerateAssemblyCode and UpdateControls write it, for a
-// session and for files (the transfer code, from the Copy dialog, is not
-// ported yet). The scripts run linscp's command-line client, where
-// upstream's run WinSCP.com.
+// session, for files, and for the Copy dialog's transfer. The scripts run
+// linscp's command-line client, where upstream's run WinSCP.com.
 #include <vcl.h>
 #pragma hdrstop
 
@@ -11,6 +10,7 @@
 #include <Common.h>
 #include <Interface.h>
 #include <TextsWin.h>
+#include <RemoteFiles.h>
 
 #include <algorithm>
 #include <vector>
@@ -21,6 +21,42 @@ namespace
 // windows/WinInterface.h's and ProgParams' (the GUI's headers).
 const wchar_t * const LogSwitch = L"Log";
 const wchar_t * const IniSwitch = L"Ini";
+
+const UnicodeString AllFilesMask(L"*");
+const UnicodeString NoOpOperationMask(L"*");
+
+// Upstream's: a drive's root keeps its backslash (and POSIX's root, its
+// slash).
+UnicodeString ExcludeTrailingBackslashUnlessRoot(const UnicodeString & Path)
+{
+  UnicodeString Result = ExcludeTrailingBackslash(Path);
+  if (Result.IsEmpty() || SameText(Result, ExtractFileDrive(Result)))
+  {
+    Result = IncludeTrailingBackslash(Path);
+  }
+  return Result;
+}
+
+UnicodeString QuoteStringParam(UnicodeString S)
+{
+  return AddQuotes(RtfEscapeParam(S, false));
+}
+
+// Keep in sync with .NET Session.EscapeFileMask (as upstream's).
+UnicodeString EscapeFileMask(UnicodeString S)
+{
+  return
+    ReplaceStr(ReplaceStr(ReplaceStr(ReplaceStr(ReplaceStr(
+      S, L"[", L"[[]"), L"*", L"[*]"), L"?", L"[?]"), L">", L">>"), L"<", L"<<");
+}
+
+void AddSampleDescription(const TGenerateTransfer * Transfer, UnicodeString & Description)
+{
+  if ((Transfer != nullptr) && Transfer->PathsSample)
+  {
+    Description += LoadStr(GENERATE_URL_FILE_SAMPLE) + L"\n";
+  }
+}
 
 UnicodeString FormatSwitch(const UnicodeString & Switch)
 {
@@ -88,8 +124,9 @@ UnicodeString GenerateUrl(TSessionData * Data, const CoreBridge::TGenerateCodeOp
   return Url;
 }
 
-// TGenerateUrlDialog::GenerateScript, without a transfer.
-UnicodeString GenerateScript(TSessionData * Data, int ScriptFormat, const UnicodeString & ExeName)
+// TGenerateUrlDialog::GenerateScript.
+UnicodeString GenerateScript(TSessionData * Data, int ScriptFormat, const UnicodeString & ExeName,
+  const TGenerateTransfer * Transfer, UnicodeString & ScriptDescription)
 {
   UnicodeString Result;
 
@@ -110,8 +147,61 @@ UnicodeString GenerateScript(TSessionData * Data, int ScriptFormat, const Unicod
 
   Commands.push_back(RtfScriptCommand(L"open") + L" " + OpenCommand);
   Commands.push_back(UnicodeString());
-  Commands.push_back(L"# " + CommandPlaceholder1);
-  Commands.push_back(L"# " + CommandPlaceholder2);
+
+  if (Transfer != nullptr)
+  {
+    UnicodeString TransferCommand;
+
+    if (Transfer->ToRemote)
+    {
+      Commands.push_back(RtfScriptCommand(L"lcd") + L" " + RtfText(QuoteStringParam(Transfer->SourcePath)));
+      Commands.push_back(RtfScriptCommand(L"cd") + L" " + RtfText(QuoteStringParam(UnixExcludeTrailingBackslash(Transfer->Path))));
+      TransferCommand = L"put";
+    }
+    else
+    {
+      Commands.push_back(RtfScriptCommand(L"cd") + L" " + RtfText(QuoteStringParam(Transfer->SourcePath)));
+      Commands.push_back(RtfScriptCommand(L"lcd") + L" " + RtfText(QuoteStringParam(ExcludeTrailingBackslashUnlessRoot(Transfer->Path))));
+      TransferCommand = L"get";
+    }
+
+    Commands.push_back(UnicodeString());
+
+    UnicodeString TransferCommandLink = ScriptCommandLink(TransferCommand);
+    UnicodeString TransferCommandArgs;
+    if (Transfer->Move)
+    {
+      TransferCommandArgs += RtfSwitch(DELETE_SWITCH, TransferCommandLink);
+    }
+    TransferCommandArgs += Transfer->CopyParam.GenerateTransferCommandArgs(Transfer->CopyParamAttrs, TransferCommandLink);
+
+    AddSampleDescription(Transfer, ScriptDescription);
+
+    TransferCommand = RtfScriptCommand(TransferCommand) + TransferCommandArgs;
+
+    if (!Transfer->AllFiles)
+    {
+      for (const UnicodeString & Name : Transfer->Paths)
+      {
+        UnicodeString Path = ExtractFileName(Name, !Transfer->ToRemote);
+        if (!Transfer->ToRemote)
+        {
+          Path = EscapeFileMask(Path);
+        }
+        Commands.push_back(TransferCommand + L" " + RtfText(QuoteStringParam(Path)));
+      }
+    }
+    else
+    {
+      Commands.push_back(TransferCommand + L" " + RtfText(AllFilesMask));
+    }
+  }
+  else
+  {
+    Commands.push_back(L"# " + CommandPlaceholder1);
+    Commands.push_back(L"# " + CommandPlaceholder2);
+  }
+
   Commands.push_back(UnicodeString());
   Commands.push_back(RtfScriptCommand(L"exit"));
 
@@ -267,8 +357,9 @@ UnicodeString GenerateScript(TSessionData * Data, int ScriptFormat, const Unicod
   return Result;
 }
 
-// TGenerateUrlDialog::GenerateAssemblyCode, without a transfer.
-UnicodeString GenerateAssemblyCode(TSessionData * Data, int AssemblyLanguage)
+// TGenerateUrlDialog::GenerateAssemblyCode.
+UnicodeString GenerateAssemblyCode(TSessionData * Data, int AssemblyLanguage, const TGenerateTransfer * Transfer,
+  UnicodeString & AssemblyDescription)
 {
   TAssemblyLanguage Language = static_cast<TAssemblyLanguage>(AssemblyLanguage);
 
@@ -280,7 +371,110 @@ UnicodeString GenerateAssemblyCode(TSessionData * Data, int AssemblyLanguage)
 
   UnicodeString Result = Head;
 
-  UnicodeString Code = AssemblyCommentLine(Language, LoadStr(GENERATE_URL_YOUR_CODE));
+  UnicodeString Code;
+  if (Transfer != nullptr)
+  {
+    UnicodeString CopyParamProperties = Transfer->CopyParam.GenerateAssemblyCode(Language, Transfer->CopyParamAttrs);
+
+    bool HasTransferOptions = !CopyParamProperties.IsEmpty();
+    if (HasTransferOptions)
+    {
+      Code +=
+        AssemblyCommentLine(Language, LoadStr(GENERATE_URL_COPY_PARAM)) +
+        CopyParamProperties +
+        RtfPara;
+    }
+
+    Code += AssemblyCommentLine(Language, LoadStr(GENERATE_URL_TRANSFER_FILES));
+
+    AddSampleDescription(Transfer, AssemblyDescription);
+
+    UnicodeString DestPath = Transfer->Path;
+    UnicodeString TransferMethodName;
+    if (Transfer->ToRemote)
+    {
+      TransferMethodName = L"PutFiles";
+      DestPath = UnixIncludeTrailingBackslash(DestPath);
+    }
+    else
+    {
+      TransferMethodName = L"GetFiles";
+      DestPath = IncludeTrailingBackslash(DestPath);
+    }
+    DestPath += NoOpOperationMask;
+
+    UnicodeString DestPathVariableName = AssemblyVariableName(Language, L"remotePath");
+    UnicodeString StatementSeparator = AssemblyStatementSeparator(Language);
+    UnicodeString DestPathString = AssemblyString(Language, DestPath);
+    UnicodeString DestPathCode;
+    if (Transfer->AllFiles || (Transfer->Paths.size() == 1))
+    {
+      DestPathCode = DestPathString;
+    }
+    else
+    {
+      switch (Language)
+      {
+        case alCSharp:
+          Code += RtfKeyword(L"const") + L" " + RtfKeyword(L"string") + L" " + DestPathVariableName;
+          break;
+
+        case alVBNET:
+          Code += RtfKeyword(L"Const") + L" " + DestPathVariableName;
+          break;
+
+        case alPowerShell:
+          Code += DestPathVariableName;
+          break;
+      }
+      Code += L" = " + DestPathString + StatementSeparator + RtfPara;
+      DestPathCode = DestPathVariableName;
+    }
+
+    UnicodeString TransferMethodCallStart =
+      AssemblyVariableName(Language, SessionClassName) + L"." +
+      RtfLibraryMethod(SessionClassName, TransferMethodName, false) + L"(";
+    const UnicodeString ParameterSeparator = L", ";
+    UnicodeString TransferMethodCallEnd = ParameterSeparator + DestPathCode;
+    if (Transfer->Move || HasTransferOptions)
+    {
+      TransferMethodCallEnd += ParameterSeparator + AssemblyBoolean(Language, Transfer->Move);
+    }
+    if (HasTransferOptions)
+    {
+      TransferMethodCallEnd += ParameterSeparator + AssemblyVariableName(Language, TransferOptionsClassName);
+    }
+
+    TransferMethodCallEnd +=
+      L")." + RtfLibraryMethod(L"OperationResultBase", L"Check", true) + L"()" +
+      StatementSeparator + RtfPara;
+
+    UnicodeString SourcePath = UniversalIncludeTrailingBackslash(!Transfer->ToRemote, Transfer->SourcePath);
+    if (!Transfer->AllFiles)
+    {
+      for (const UnicodeString & FileName : Transfer->Paths)
+      {
+        UnicodeString Path = SourcePath + FileName;
+        UnicodeString PathCode = AssemblyString(Language, Path);
+        if (!Transfer->ToRemote && (FileName != EscapeFileMask(FileName)))
+        {
+          PathCode =
+            AssemblyVariableName(Language, SessionClassName) + L"." +
+            RtfLibraryMethod(SessionClassName, L"EscapeFileMask", false) + L"(" + PathCode + L")";
+        }
+        Code += TransferMethodCallStart + PathCode + TransferMethodCallEnd;
+      }
+    }
+    else
+    {
+      SourcePath += AllFilesMask;
+      Code += TransferMethodCallStart + AssemblyString(Language, SourcePath) + TransferMethodCallEnd;
+    }
+  }
+  else
+  {
+    Code = AssemblyCommentLine(Language, LoadStr(GENERATE_URL_YOUR_CODE));
+  }
 
   UnicodeString Indentation = UnicodeString::StringOfChar(L' ', Indent);
   Code = Indentation + ReplaceStr(Code, RtfPara, RtfPara + Indentation);
@@ -300,13 +494,19 @@ UnicodeString GenerateAssemblyCode(TSessionData * Data, int AssemblyLanguage)
 
 // TGenerateUrlDialog::UpdateControls' choices and generation.
 CoreBridge::TGeneratedCode GenerateSessionCode(TSessionData * Data, const CoreBridge::TGenerateCodeOptions & Options,
-  const UnicodeString & ExeName)
+  const UnicodeString & ExeName, const TGenerateTransfer * Transfer)
 {
   using TTarget = CoreBridge::TGenerateCodeOptions::TTarget;
   CoreBridge::TGeneratedCode Result;
-  const bool FileUrl = !Options.Paths.empty();
-  const TTarget Target = FileUrl ? TTarget::Url : Options.Target;
-  Result.Title = Narrow(LoadStr(FileUrl ? GENERATE_URL_FILE_TITLE : GENERATE_URL_SESSION_TITLE));
+  const bool FileUrl = !Options.Paths.empty() && (Transfer == nullptr);
+  TTarget Target = FileUrl ? TTarget::Url : Options.Target;
+  // A transfer has no URL page (UrlSheet hidden).
+  if ((Transfer != nullptr) && (Target == TTarget::Url))
+  {
+    Target = TTarget::Script;
+  }
+  Result.Title = Narrow(LoadStr((Transfer != nullptr) ? GENERATE_URL_TRANSFER_TITLE :
+    (FileUrl ? GENERATE_URL_FILE_TITLE : GENERATE_URL_SESSION_TITLE)));
 
   bool HostKeyUnknown = Data->UsesSsh && Data->HostKey.IsEmpty();
 
@@ -363,7 +563,7 @@ CoreBridge::TGeneratedCode GenerateSessionCode(TSessionData * Data, const CoreBr
     {
       Description += LoadStr(GENERATE_URL_HOSTKEY_UNKNOWN) + L"\n";
     }
-    Rtf = GenerateScript(Data, ScriptFormat, ExeName);
+    Rtf = GenerateScript(Data, ScriptFormat, ExeName, Transfer, Description);
   }
   else
   {
@@ -372,7 +572,7 @@ CoreBridge::TGeneratedCode GenerateSessionCode(TSessionData * Data, const CoreBr
     {
       Description += LoadStr(GENERATE_URL_HOSTKEY_UNKNOWN) + L"\n";
     }
-    Rtf = GenerateAssemblyCode(Data, std::min(std::max(Options.AssemblyLanguage, 0), 2));
+    Rtf = GenerateAssemblyCode(Data, std::min(std::max(Options.AssemblyLanguage, 0), 2), Transfer, Description);
     Result.WordWrap = false;
     Result.FixedWidth = true;
   }

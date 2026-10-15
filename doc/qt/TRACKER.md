@@ -280,7 +280,7 @@ registry, tray or window messages.
 | Properties | S3 ACLs | missing | |
 | Properties | checksums through the secondary shell | missing | copies go through a temporary copy instead |
 | Navigation | Go To's bookmark list; Location Profiles' opened folders kept; mask hints | done | the Open Directory button's menu (`CreateOpenDirMenu`); `NodeOpened`; the mask hint buttons (Select, Filter, Edit mask, Find files, Transfer settings) |
-| Session tools | Copy dialog's transfer code; OpenSSH key conversion on import | missing | the console's size is kept (`ConsoleWin.WindowSize`) |
+| Session tools | Copy dialog's transfer code; OpenSSH key conversion on import | partial | the Copy dialog's Generate Code (DoGenerateTransferCodeDialog: script and .NET code, no URL page); the console's size is kept (`ConsoleWin.WindowSize`); OpenSSH key conversion on import missing |
 | Custom commands | local commands; extensions and their options | missing | local ones shown disabled |
 | Keep up to date | start in a new window; minimize to the tray | missing | presets are a combo, not WinSCP's split button |
 | Workspaces | local tabs saved | done | as WinSCP's (TSessionData::IsLocalBrowser: both local directories, no host), opened again as local tabs |

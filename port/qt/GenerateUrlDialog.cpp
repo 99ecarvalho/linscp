@@ -18,11 +18,18 @@
 #include "QtFrontend.h"
 #include "RtfText.h"
 
-GenerateUrlDialog::GenerateUrlDialog(CoreBridge::TSession * Session, const std::vector<std::string> & Paths, QWidget * Parent) :
+GenerateUrlDialog::GenerateUrlDialog(CoreBridge::TSession * Session, const std::vector<std::string> & Paths, QWidget * Parent,
+  const CoreBridge::TSession::TTransferCode * Transfer) :
   QDialog(Parent),
   FSession(Session),
   FPaths(Paths)
 {
+  if (Transfer != nullptr)
+  {
+    FHasTransfer = true;
+    FTransfer = *Transfer;
+    FPaths.clear();
+  }
   const CoreBridge::TGenerateCodeOptions Settings = CoreBridge::GenerateCodeSettings();
   QVBoxLayout * Layout = new QVBoxLayout(this);
   FPages = new QTabWidget(this);
@@ -69,6 +76,15 @@ GenerateUrlDialog::GenerateUrlDialog(CoreBridge::TSession * Session, const std::
     connect(FScriptFormat, &QComboBox::currentIndexChanged, this, &GenerateUrlDialog::Generate);
     connect(FLanguage, &QComboBox::currentIndexChanged, this, &GenerateUrlDialog::Generate);
     FPages->setCurrentIndex(static_cast<int>(Settings.Target));
+    // As UrlSheet->TabVisible: a transfer has no URL.
+    if (FHasTransfer)
+    {
+      FPages->setTabVisible(0, false);
+      if (FPages->currentIndex() == 0)
+      {
+        FPages->setCurrentIndex(1);
+      }
+    }
   }
   connect(FPages, &QTabWidget::currentChanged, this, &GenerateUrlDialog::Generate);
   FPages->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
@@ -131,7 +147,7 @@ void GenerateUrlDialog::Generate()
   CoreBridge::TGeneratedCode Code;
   try
   {
-    Code = FSession->GenerateCode(Options());
+    Code = FHasTransfer ? FSession->GenerateTransferCode(Options(), FTransfer) : FSession->GenerateCode(Options());
   }
   catch (const CoreBridge::TCoreError & E)
   {

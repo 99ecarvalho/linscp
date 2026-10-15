@@ -23,7 +23,9 @@ class GenerateUrlDialog : public QDialog
 public:
   // Paths: files' full remote paths, for their URLs; empty for the
   // session's.
-  GenerateUrlDialog(CoreBridge::TSession * Session, const std::vector<std::string> & Paths, QWidget * Parent = nullptr);
+  // Transfer: the Copy dialog's transfer's code (no URL page).
+  GenerateUrlDialog(CoreBridge::TSession * Session, const std::vector<std::string> & Paths, QWidget * Parent = nullptr,
+    const CoreBridge::TSession::TTransferCode * Transfer = nullptr);
 
   // What it shows, as text (Copy to Clipboard's).
   QString Text() const;
@@ -44,6 +46,8 @@ private:
 
   CoreBridge::TSession * FSession;
   std::vector<std::string> FPaths;
+  bool FHasTransfer = false;
+  CoreBridge::TSession::TTransferCode FTransfer;
   QTabWidget * FPages = nullptr;
   std::vector<std::pair<int, QCheckBox *>> FChecks;
   QComboBox * FScriptFormat = nullptr;

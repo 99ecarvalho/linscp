@@ -2414,31 +2414,90 @@ std::vector<std::string> TSession::RunCustomCommand(const TCustomCommandDefiniti
 
 // TCustomScpExplorerForm::SessionDataForCode, then the dialog's
 // generation.
+namespace
+{
+
+// TCustomScpExplorerForm's GenerateUrl's session data, and the command-line
+// client beside the shell (upstream's WinSCP.com).
+std::unique_ptr<TSessionData> CodeSessionData(TTerminal * Terminal)
+{
+  std::unique_ptr<TSessionData> Data(new TSessionData(L""));
+  Data->Assign(Terminal->SessionData);
+  Data->RemoteDirectory = Terminal->CurrentDirectory;
+  Terminal->UpdateSessionCredentials(Data.get());
+  if (!Terminal->SessionData->HasSessionName())
+  {
+    Data->Name = UnicodeString();
+  }
+  Data->IsWorkspace = false;
+  Terminal->FillSessionDataForCode(Data.get());
+  return Data;
+}
+
+UnicodeString CodeCli()
+{
+  TShellConfiguration * Shell = dynamic_cast<TShellConfiguration *>(GUIConfiguration);
+  return IncludeTrailingBackslash(ExtractFilePath(Shell->ModuleFileName())) +
+#if defined(_WIN32)
+    L"linscp-cli.exe";
+#else
+    L"linscp-cli";
+#endif
+}
+
+}  // namespace
+
 TGeneratedCode TSession::GenerateCode(const TGenerateCodeOptions & Options)
 {
   try
   {
     CheckActive(*this);
+    std::unique_ptr<TSessionData> Data = CodeSessionData(F->Terminal.get());
+    return GenerateSessionCode(Data.get(), Options, CodeCli());
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+// As TCopyDialog::GenerateCode and TGenerateUrlDialog's constructor.
+TGeneratedCode TSession::GenerateTransferCode(const TGenerateCodeOptions & Options, const TTransferCode & Transfer)
+{
+  try
+  {
+    CheckActive(*this);
     TTerminal * Terminal = F->Terminal.get();
-    std::unique_ptr<TSessionData> Data(new TSessionData(L""));
-    Data->Assign(Terminal->SessionData);
-    Data->RemoteDirectory = Terminal->CurrentDirectory;
-    Terminal->UpdateSessionCredentials(Data.get());
-    if (!Terminal->SessionData->HasSessionName())
+    std::unique_ptr<TSessionData> Data = CodeSessionData(Terminal);
+    TGenerateTransfer Code;
+    Code.ToRemote = Transfer.ToRemote;
+    Code.Move = Transfer.Move;
+    const TUsableCopyParamAttrs Attrs = Terminal->UsableCopyParamAttrs(0);
+    Code.CopyParamAttrs = Transfer.ToRemote ? Attrs.Upload : Attrs.Download;
+    Code.CopyParam = TransferCopyParam(&Transfer.Settings);
+    Code.Path = FromUtf8(Transfer.Target);
+    // A sample of a long list.
+    const std::size_t MaxSample = 3;
+    for (std::size_t Index = 0; (Index < Transfer.Paths.size()) && (Index < MaxSample); Index++)
     {
-      Data->Name = UnicodeString();
+      const UnicodeString Path = FromUtf8(Transfer.Paths[Index]);
+      Code.Paths.push_back(Transfer.ToRemote ? ExtractFileName(Path) : UnixExtractFileName(Path));
     }
-    Data->IsWorkspace = false;
-    Terminal->FillSessionDataForCode(Data.get());
-    // The command-line client beside the shell, upstream's WinSCP.com.
-    TShellConfiguration * Shell = dynamic_cast<TShellConfiguration *>(GUIConfiguration);
-    UnicodeString Cli = IncludeTrailingBackslash(ExtractFilePath(Shell->ModuleFileName())) +
-#if defined(_WIN32)
-      L"linscp-cli.exe";
-#else
-      L"linscp-cli";
-#endif
-    return GenerateSessionCode(Data.get(), Options, Cli);
+    Code.PathsSample = (Transfer.Paths.size() > MaxSample);
+    if (Transfer.ToRemote && !Transfer.Paths.empty())
+    {
+      const UnicodeString First = FromUtf8(Transfer.Paths.front());
+      Code.SourcePath = ExcludeTrailingBackslash(ExtractFilePath(First));
+      if (Code.SourcePath.IsEmpty() || SameText(Code.SourcePath, ExtractFileDrive(Code.SourcePath)))
+      {
+        Code.SourcePath = IncludeTrailingBackslash(ExtractFilePath(First));
+      }
+    }
+    else
+    {
+      Code.SourcePath = Data->RemoteDirectory;
+    }
+    return GenerateSessionCode(Data.get(), Options, CodeCli(), &Code);
   }
   catch (Exception & E)
   {
