@@ -144,6 +144,10 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P3-18 | A test devcontainer with real servers for every protocol: OpenSSH (SFTP, SCP), FTP with FTPES and implicit FTPS (e.g. vsftpd or ProFTPD), WebDAV over HTTP and HTTPS (e.g. Apache mod_dav), and S3 (e.g. MinIO), alongside today's in-repo pyftpdlib and moto ones; the protocol, CLI, GUI and golden suites run against them, locally and in CI | L | P1-19 | Raised 2026-10-15 by the user; deferred, P3-15 first |
 | P3-19 | The Preferences pages left out so far: Environment (confirmations, notifications), Interface (the theme), the panels' Remote and Local, Drag & Drop, Updates; each setting doing what it does in WinSCP | M | P3-04 | Raised 2026-10-15 by the user |
 | P3-20 | Custom command extensions (WinSCP's .WinSCPextension files): found in the program's and the user's extension folders, added from a file or URL, their options (Preferences' and each run's), in the menus and run; WinSCP's PowerShell extensions running over WinSCP's .NET assembly, which the Windows packages carry | M | P3-06d | Deferred from P3-16 (2026-10-15); raised again 2026-10-15 by the user |
+| P3-21 | The Explorer interface (WinSCP's TScpExplorerForm): one remote panel with its address bar and tree, Explorer's keys, menus and toolbars; chosen in Preferences > Interface, applied on the next start, as WinSCP's | L | P3-19 | Q-13, decided 2026-10-15 by the user |
+| P3-22 | Windows: the taskbar's jump list of recent sites and workspaces (WinSCP's AddSessionToJumpList, UpdateJumpList), opened through `/JumpList` | S | P3-13 | Raised 2026-10-15 by the user |
+| P3-23 | Windows: the local panel's system context menu (Panels > Local's "Use system file context menu", the shell's IContextMenu) | S | P3-19 | Raised 2026-10-15 by the user |
+| P3-24 | Windows: WinSCP's drag & drop shell extension (DragExt, its copy hook) and the fake-file drag (DDFakeFile): remote files dropped straight onto Explorer's folders, downloaded there; built from the pinned source, registered by the installer | M | P3-07 | Raised 2026-10-15 by the user |
 
 ## P4 — Cleanup
 
