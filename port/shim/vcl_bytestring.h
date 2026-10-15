@@ -95,7 +95,10 @@ public:
   // secrets in place with memset(Str.c_str(), ...) and hands c_str() to C APIs
   // taking char * (neon's ne_uri.path).
   char * c_str() const { return const_cast<char *>(FData.c_str()); }
-  const char * data() const { return FData.c_str(); }
+  // NULL when empty, as C++Builder's data() (its empty string is a null
+  // pointer, c_str() an empty one): core takes an empty S3 session token's
+  // data() for "no token", which libs3 sends only when not NULL.
+  const char * data() const { return FData.empty() ? nullptr : FData.c_str(); }
   char * MutableData() { return const_cast<char *>(FData.data()); }
 
   // 1-based, as in Delphi.

@@ -237,8 +237,17 @@ void TestCrossTypeStrings()
 
 }  // namespace
 
+// data() NULL when empty, as C++Builder's.
+void TestDataOfEmpty()
+{
+  const UnicodeString Empty;
+  CHECK(Empty.data() == nullptr);
+  CHECK(UnicodeString(L"x").data() != nullptr);
+}
+
 int main()
 {
+  TestDataOfEmpty();
   TestConstruction();
   TestIndexingIsOneBased();
   TestSubString();

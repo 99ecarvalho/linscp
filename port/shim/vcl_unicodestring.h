@@ -115,7 +115,8 @@ public:
   // c_str() to LoadString as the destination to fill.
   const wchar_t * c_str() const;
   wchar_t * c_str();
-  const wchar_t * data() const { return c_str(); }
+  // NULL when empty, as C++Builder's data() (AnsiStringT's says why).
+  const wchar_t * data() const { return IsEmpty() ? nullptr : c_str(); }
   wchar_t * MutableData();
 
   // --- element access (1-based) --------------------------------------------

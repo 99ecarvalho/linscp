@@ -234,10 +234,22 @@ void TestTrim()
   CHECK(RawByteString("caf\xC3\xA9 ").TrimRight() == RawByteString("caf\xC3\xA9"));  // high bytes kept
 }
 
+// C++Builder's data() of an empty string is NULL, c_str() an empty one;
+// core tells "none" by it (S3FileSystem's session token).
+void TestDataOfEmpty()
+{
+  const UTF8String Empty;
+  CHECK(Empty.data() == nullptr);
+  CHECK((Empty.c_str() != nullptr) && (Empty.c_str()[0] == '\0'));
+  const UTF8String Token("token");
+  CHECK((Token.data() != nullptr) && (std::strcmp(Token.data(), "token") == 0));
+}
+
 }  // namespace
 
 int main()
 {
+  TestDataOfEmpty();
   TestUtf8Ascii();
   TestUtf8MultiByte();
   TestUtf8Malformed();
