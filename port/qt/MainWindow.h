@@ -82,7 +82,9 @@ public:
   // Commands > Keep Remote Directory up to Date (Ctrl+U), as WinSCP's
   // Commander: the panels' directories in its dialog, which watches and
   // synchronizes until closed.
-  bool KeepUpToDate();
+  // Given: its settings and directories (the command line's); AutoStart:
+  // started at once.
+  bool KeepUpToDate(const CoreBridge::TKeepUpToDateParams * Given = nullptr, bool AutoStart = false);
   // Commands > Open in PuTTY (Ctrl+P), as WinSCP's: the session in the
   // program Preferences name, PuTTY by default (on POSIX, if none, ssh in
   // the desktop's terminal). False when it did not start (the error shown).
@@ -361,6 +363,7 @@ private:
   void UpdateActions();
   void TransferPresetAutoSelect();
   void StandaloneUpload(const std::vector<std::string> & Files, bool UseDefaults);
+  void StandaloneKeepUpToDate(const CoreBridge::TKeepUpToDateParams & Params, bool UseDefaults);
   CoreBridge::TTransferPresetRule TransferPresetAutoSelectData() const;
 
   CoreBridge::TInfo FInfo;
@@ -396,6 +399,12 @@ private:
   QString FCopyParamAutoSelected;
   // /upload's run (StandaloneUpload).
   bool FStandalone = false;
+  std::function<bool(const QStringList &)> FNewInstanceStarter;
+public:
+  // What starts another instance (Start in New Window's), instead of the
+  // program itself (tests).
+  void SetNewInstanceStarter(std::function<bool(const QStringList &)> Starter) { FNewInstanceStarter = std::move(Starter); }
+private:
   QAction * FCopyClipboardAction = nullptr;
   QAction * FPasteAction = nullptr;
   QAction * FStatusBarAction = nullptr;

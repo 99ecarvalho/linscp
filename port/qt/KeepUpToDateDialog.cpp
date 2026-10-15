@@ -115,6 +115,16 @@ KeepUpToDateDialog::KeepUpToDateDialog(CoreBridge::TSession & Session, const Cor
   }
   FClose = new QPushButton(tr("Close"), this);
   Buttons->addWidget(FStart);
+  // As StartButton's split part (AllowStartInNewWindow).
+  FStartMenu = new QToolButton(this);
+  FStartMenu->setArrowType(Qt::DownArrow);
+  FStartMenu->setPopupMode(QToolButton::InstantPopup);
+  FStartMenu->setAccessibleName(tr("Start options"));
+  QMenu * StartMenu = new QMenu(FStartMenu);
+  StartMenu->addAction(tr("&Start"), this, [this]() { Start(); });
+  FStartInNewWindow = StartMenu->addAction(tr("Start in &New Window"), this, [this]() { StartInNewWindow(); });
+  FStartMenu->setMenu(StartMenu);
+  Buttons->addWidget(FStartMenu);
   Buttons->addWidget(FStop);
   Buttons->addWidget(FMinimize);
   Buttons->addWidget(FClose);
@@ -167,6 +177,9 @@ void KeepUpToDateDialog::UpdateControls()
 {
   FStart->setEnabled(!FLocalEdit->text().trimmed().isEmpty() && !FRemoteEdit->text().trimmed().isEmpty());
   FStart->setVisible(!FSynchronizing);
+  FStartMenu->setVisible(!FSynchronizing && FOnStartInNewWindow);
+  FStartMenu->setEnabled(FStart->isEnabled());
+  FStartInNewWindow->setEnabled(FStart->isEnabled() && !(FSelectedOnly->isEnabled() && FSelectedOnly->isChecked()));
   FStop->setVisible(FSynchronizing);
   (FSynchronizing ? FStop : FStart)->setDefault(true);
   setWindowTitle(FSynchronizing ? tr("Keeping remote directory up to date ...") :
@@ -402,4 +415,24 @@ void KeepUpToDateDialog::Minimize(bool ToTray)
   QWidget * Main = (parentWidget() != nullptr) ? parentWidget()->window() : this;
   Main->showMinimized();
   showMinimized();
+}
+
+bool KeepUpToDateDialog::StartInNewWindow()
+{
+  if (!FOnStartInNewWindow || !FStartInNewWindow->isEnabled())
+  {
+    return false;
+  }
+  if (!FOnStartInNewWindow(Params(), FTransferSettings->Settings()))
+  {
+    return false;
+  }
+  reject();
+  return true;
+}
+
+void KeepUpToDateDialog::SetStartInNewWindow(TStartInNewWindow Handler)
+{
+  FOnStartInNewWindow = std::move(Handler);
+  UpdateControls();
 }

@@ -885,6 +885,14 @@ Local: %2</translation>
         <source>Minimize to System &amp;Tray</source>
         <translation>Minimizar para a &amp;bandeja do sistema</translation>
     </message>
+    <message>
+        <source>Start options</source>
+        <translation>Opções de início</translation>
+    </message>
+    <message>
+        <source>Start in &amp;New Window</source>
+        <translation>Iniciar em uma &amp;Nova Janela</translation>
+    </message>
 </context>
 <context>
     <name>LinkDialog</name>

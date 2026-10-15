@@ -1556,6 +1556,44 @@ TKeepUpToDateParams KeepUpToDateDefaults()
   return Result;
 }
 
+bool CommandLineKeepUpToDate(TKeepUpToDateParams & Params, bool & UseDefaults)
+{
+  UseDefaults = false;
+  try
+  {
+    TProgramParams * Program = TProgramParams::Instance();
+    std::unique_ptr<TStringList> Values(new TStringList());
+    if (!Program->FindSwitch(L"KeepUpToDate", Values.get(), 4))
+    {
+      return false;
+    }
+    // Undocumented syntax for "Start in New Window" (upstream's).
+    if (Values->Count >= 4)
+    {
+      GUIConfiguration->SynchronizeParams = StrToIntDef(Values->Strings[2], -1);
+      GUIConfiguration->SynchronizeOptions = StrToIntDef(Values->Strings[3], -1);
+      Configuration->DontSave();
+    }
+    std::unique_ptr<TStringList> Raw(new TStringList());
+    if (Program->FindSwitch(RAWTRANSFERSETTINGS_SWITCH, Raw.get()))
+    {
+      std::unique_ptr<TOptionsStorage> Storage(new TOptionsStorage(Raw.get(), false));
+      GUIConfiguration->LoadDefaultCopyParam(Storage.get());
+      Configuration->DontSave();
+    }
+    Params = KeepUpToDateDefaults();
+    Params.LocalDirectory = (Values->Count >= 1) ? Utf8(Values->Strings[0]) : std::string();
+    Params.RemoteDirectory = (Values->Count >= 2) ? Utf8(Values->Strings[1]) : std::string();
+    UnicodeString Value;
+    UseDefaults = Program->FindSwitch(L"Defaults", Value);
+    return true;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 void SaveKeepUpToDateDefaults(const TKeepUpToDateParams & Params, bool SaveSettings)
 {
   const TSynchronizeParamType SParams = SynchronizeParamsOf(Params);
@@ -2446,6 +2484,68 @@ UnicodeString CodeCli()
 }
 
 }  // namespace
+
+std::vector<std::string> TSession::KeepUpToDateInNewWindow(const TKeepUpToDateParams & Params, const TTransferSettings & Settings)
+{
+  try
+  {
+    CheckActive(*this);
+    TTerminal * Terminal = F->Terminal.get();
+    // As SaveHiddenDuplicateSession.
+    std::unique_ptr<TSessionData> Data(CloneCurrentSessionData(Terminal));
+    const UnicodeString Name = StoredSessions->HiddenPrefix + Terminal->SessionData->SessionName;
+    StoredSessions->NewSession(Name, Data.get());
+    StoredSessions->Save(false, true);
+    std::vector<std::string> Result;
+    // As ExecuteNewInstance.
+    Result.push_back(Utf8(EncodeUrlString(Name)));
+    const UnicodeString Ini = Configuration->GetIniFileParamValue();
+    if (!Ini.IsEmpty())
+    {
+      Result.push_back(Utf8(L"/ini=" + Ini));
+    }
+    Result.push_back("/NewInstance");
+    Result.push_back("/Defaults");
+    // As SerializeCopyParamForCommandLine: what differs from the stored
+    // defaults.
+    TCopyParamType Defaults;
+    {
+      std::unique_ptr<THierarchicalStorage> ConfigStorage(Configuration->CreateConfigStorage());
+      ConfigStorage->AccessMode = smRead;
+      if (ConfigStorage->OpenSubKey(Configuration->ConfigurationSubKey, false))
+      {
+        GUIConfiguration->LoadCopyParam(ConfigStorage.get(), &Defaults);
+      }
+    }
+    std::unique_ptr<TStringList> Options(new TStringList());
+    {
+      std::unique_ptr<TOptionsStorage> OptionsStorage(new TOptionsStorage(Options.get(), true));
+      const TGUICopyParamType CopyParam = TransferCopyParam(&Settings);
+      CopyParam.Save(OptionsStorage.get(), &Defaults);
+    }
+    if (Options->Count > 0)
+    {
+      Result.push_back(Utf8(L"/" RAWTRANSFERSETTINGS_SWITCH));
+      for (int Index = 0; Index < Options->Count; Index++)
+      {
+        Result.push_back(Utf8(Options->Strings[Index]));
+      }
+    }
+    // "//": no more switches, as the directories may start with a slash.
+    const TSynchronizeParamType SParams = SynchronizeParamsOf(Params);
+    Result.push_back("/KeepUpToDate");
+    Result.push_back("//");
+    Result.push_back(Params.LocalDirectory);
+    Result.push_back(Params.RemoteDirectory);
+    Result.push_back(std::to_string(SParams.Params));
+    Result.push_back(std::to_string(SParams.Options));
+    return Result;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
 
 TGeneratedCode TSession::GenerateCode(const TGenerateCodeOptions & Options)
 {

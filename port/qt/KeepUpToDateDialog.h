@@ -63,6 +63,14 @@ public:
   // (MinimizetoTray1Click) or Preferences say so. The window's to do.
   std::function<void(bool ToTray)> OnMinimize;
   class QToolButton * MinimizeButton() const { return FMinimize; }
+  // As StartInNewWindowItem (with the hook given, the window's): another
+  // instance keeps the directories up to date, this dialog closes. Not
+  // for the selected files only (CanStartInNewWindow).
+  using TStartInNewWindow =
+    std::function<bool(const CoreBridge::TKeepUpToDateParams & Params, const CoreBridge::TTransferSettings & Settings)>;
+  void SetStartInNewWindow(TStartInNewWindow Handler);
+  bool StartInNewWindow();
+  class QAction * StartInNewWindowAction() const { return FStartInNewWindow; }
 
 protected:
   void reject() override;
@@ -91,6 +99,9 @@ private:
   QWidget * FOptions = nullptr;
   TransferSettingsBox * FTransferSettings = nullptr;
   QPushButton * FStart = nullptr;
+  QToolButton * FStartMenu = nullptr;
+  QAction * FStartInNewWindow = nullptr;
+  TStartInNewWindow FOnStartInNewWindow;
   QPushButton * FStop = nullptr;
   class QToolButton * FMinimize = nullptr;
   QPushButton * FClose = nullptr;

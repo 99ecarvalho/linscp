@@ -3616,6 +3616,35 @@ void KeepUpToDateTest(const char * Port, const QString & Tmp)
       }
     });
     Check(Window.KeepUpToDate() && Shown, "Commands > Keep Remote Directory up to Date opens it on the panels' directories");
+
+    // Start in New Window: what starts the other instance, and what that
+    // instance reads of it (a hidden copy of the site, the directories,
+    // started at once).
+    QStringList Started;
+    Window.SetNewInstanceStarter([&Started](const QStringList & Arguments) { Started = Arguments; return true; });
+    bool Offered = false;
+    QTimer::singleShot(0, &Window, [&Window, &Offered]()
+    {
+      KeepUpToDateDialog * Dialog = Window.KeepUpToDateWindow();
+      Offered = (Dialog != nullptr) && Dialog->StartInNewWindowAction()->isEnabled() && Dialog->StartInNewWindow();
+    });
+    Window.KeepUpToDate();
+    Check(Offered && Started.contains(QStringLiteral("/NewInstance")) && Started.contains(QStringLiteral("/KeepUpToDate")) &&
+      Started.contains(QStringLiteral("/sub")) && (Started.indexOf(QStringLiteral("//")) == Started.indexOf(QStringLiteral("/KeepUpToDate")) + 1),
+      "started in a new window: its arguments, the directories after \"//\"");
+    std::vector<std::string> Arguments;
+    for (const QString & Argument : Started)
+    {
+      Arguments.push_back(Argument.toStdString());
+    }
+    CoreBridge::SetArguments(Arguments);
+    CoreBridge::TKeepUpToDateParams Read;
+    bool UseDefaults = false;
+    Check(CoreBridge::CommandLineKeepUpToDate(Read, UseDefaults) && UseDefaults && (Read.RemoteDirectory == "/sub") &&
+      (QDir(QString::fromStdString(Read.LocalDirectory)) == QDir(Window.Local()->Path())), "read back by the new instance");
+    bool CanOpen = false;
+    const std::unique_ptr<CoreBridge::TSession> Hidden = CoreBridge::TSession::FromCommandLine(CanOpen);
+    Check(Hidden && CanOpen, "its session, the hidden copy of this one");
   }
   CoreBridge::Finalize();
 }

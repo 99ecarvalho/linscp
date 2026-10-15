@@ -1547,6 +1547,13 @@ TKeepUpToDateParams KeepUpToDateDefaults();
 void SaveKeepUpToDateDefaults(const TKeepUpToDateParams & Params, bool SaveSettings);
 // The synchronize-on-start question, as TSynchronizeDialog::Start asks it.
 std::string KeepUpToDateSynchronizeQuestion();
+// As WinMain's pcSynchronize: /keepuptodate [local [remote [params
+// options]]] (the last two, Start in New Window's, used for this run only),
+// taken off the command line; the directories (empty: not given) over the
+// kept settings; whether /defaults starts it at once. /rawtransfersettings
+// become this run's default transfer settings. False without it. Throws
+// TCoreError.
+bool CommandLineKeepUpToDate(TKeepUpToDateParams & Params, bool & UseDefaults);
 
 // What keeping up to date logs (TSynchronizeLogEntry).
 enum class TKeepUpToDateLog { Scan, Start, Change, Upload, Delete, DirChange, ContinuedError };
@@ -1852,6 +1859,11 @@ public:
   // TCustomScpExplorerForm's GenerateUrl over this session's data
   // (SessionDataForCode). Throws TCoreError.
   TGeneratedCode GenerateCode(const TGenerateCodeOptions & Options);
+  // As TCustomScpExplorerForm::SynchronizeInNewWindow: this session saved as
+  // a hidden site (CreateHiddenDuplicateSession) and what starts another
+  // instance keeping the directories up to date with these settings (the
+  // program's arguments). Throws TCoreError.
+  std::vector<std::string> KeepUpToDateInNewWindow(const TKeepUpToDateParams & Params, const TTransferSettings & Settings);
   // The Copy dialog's Generate Code (DoGenerateTransferCodeDialog): the
   // transfer as script or .NET code. Paths: local full paths to upload,
   // or remote names (in the current directory) to download; Target the

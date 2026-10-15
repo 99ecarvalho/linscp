@@ -840,6 +840,22 @@ void MainWindow::StartUp()
     StandaloneUpload(UploadFiles, UseDefaults);
     return;
   }
+  CoreBridge::TKeepUpToDateParams KeepParams;
+  bool KeepUseDefaults = false;
+  bool Keep = false;
+  try
+  {
+    Keep = CoreBridge::CommandLineKeepUpToDate(KeepParams, KeepUseDefaults);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  if (Keep)
+  {
+    StandaloneKeepUpToDate(KeepParams, KeepUseDefaults);
+    return;
+  }
   bool CanOpen = false;
   std::unique_ptr<CoreBridge::TSession> Session;
   try
@@ -898,6 +914,30 @@ void MainWindow::StandaloneUpload(const std::vector<std::string> & Files, bool U
       Names.append(QDir::cleanPath(QDir::current().absoluteFilePath(QString::fromStdString(File))));
     }
     Transfer(true, Names, FPanel->Path(), false, !UseDefaults, false);
+  }
+  close();
+}
+
+// As WinMain's Synchronize (Start in New Window starts it): the session
+// named, else the site manager's; Keep Up To Date with the directories
+// given, started at once with /defaults; then the program ends.
+void MainWindow::StandaloneKeepUpToDate(const CoreBridge::TKeepUpToDateParams & Params, bool UseDefaults)
+{
+  FStandalone = true;
+  bool CanOpen = false;
+  std::unique_ptr<CoreBridge::TSession> Session;
+  try
+  {
+    Session = CoreBridge::TSession::FromCommandLine(CanOpen);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  const bool Connected = (Session && CanOpen) ? Open(std::move(Session)) : SiteManagerDialog();
+  if (Connected && FSession && FSession->Active())
+  {
+    KeepUpToDate(&Params, UseDefaults);
   }
   close();
 }
@@ -1532,15 +1572,22 @@ bool MainWindow::OpenInPutty()
 // As TCustomScpExplorerForm::DoSynchronizeDirectories, from the Commander's
 // SynchronizeDirectories: the panels' directories, the settings kept, and
 // what is selected in either panel for "selected files only".
-bool MainWindow::KeepUpToDate()
+bool MainWindow::KeepUpToDate(const CoreBridge::TKeepUpToDateParams * Given, bool AutoStart)
 {
   if (FBusy || !FSession || !FSession->Active())
   {
     return false;
   }
-  CoreBridge::TKeepUpToDateParams Params = CoreBridge::KeepUpToDateDefaults();
-  Params.LocalDirectory = QDir::toNativeSeparators(FLocal->Path()).toStdString();
-  Params.RemoteDirectory = FPanel->Path().toStdString();
+  CoreBridge::TKeepUpToDateParams Params = (Given != nullptr) ? *Given : CoreBridge::KeepUpToDateDefaults();
+  // As SynchronizeDirectories: what is not given, the panels'.
+  if (Params.LocalDirectory.empty())
+  {
+    Params.LocalDirectory = QDir::toNativeSeparators(FLocal->Path()).toStdString();
+  }
+  if (Params.RemoteDirectory.empty())
+  {
+    Params.RemoteDirectory = FPanel->Path().toStdString();
+  }
   std::vector<std::string> Selected;
   for (const QStringList & Names : { FPanel->Selected(), FLocal->Selected() })
   {
@@ -1555,7 +1602,34 @@ bool MainWindow::KeepUpToDate()
   {
     KeepUpToDateDialog Dialog(*FSession, Params, Selected, this);
     Dialog.OnMinimize = [this](bool ToTray) { MinimizeApplication(ToTray); };
+    // Not from a run that is itself standalone (IsMainFormLike).
+    if (!FStandalone)
+    {
+      Dialog.SetStartInNewWindow([this](const CoreBridge::TKeepUpToDateParams & Started, const CoreBridge::TTransferSettings & Settings)
+      {
+        try
+        {
+          const std::vector<std::string> Arguments = FSession->KeepUpToDateInNewWindow(Started, Settings);
+          QStringList List;
+          for (const std::string & Argument : Arguments)
+          {
+            List.append(QString::fromStdString(Argument));
+          }
+          return FNewInstanceStarter ? FNewInstanceStarter(List) : QProcess::startDetached(QCoreApplication::applicationFilePath(), List);
+        }
+        catch (const CoreBridge::TCoreError & E)
+        {
+          ShowError(E);
+          return false;
+        }
+      });
+    }
     FKeepUpToDate = &Dialog;
+    // /defaults: started at once (DoSynchronizeDirectories' UseDefaults).
+    if (AutoStart)
+    {
+      QTimer::singleShot(0, &Dialog, [&Dialog]() { Dialog.Start(); });
+    }
     Dialog.exec();
     FKeepUpToDate = nullptr;
     Result = true;
