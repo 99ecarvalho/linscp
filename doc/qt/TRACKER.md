@@ -12,7 +12,7 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 10 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 26 | 28 | Parity on features users depend on |
-| P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
+| P4 Cleanup | 0 | 4 | Dropped for now (2026-10-15); may be reopened |
 | **Total** | **102** | **115** | |
 
 ## Next three actions
@@ -255,9 +255,9 @@ To and shortcuts, Keep Up To Date in a new window, S3 ACLs and more (the
 audit below); only custom command extensions are deferred.
 P2-10 and P2-11 waited, at the user's request, for P3.
 
-1. **P2-11**: the P2 exit gate, now that packaging (P2-10) is done: a
-   day's work in linscp from an installed package.
-2. **P4-01**: retire the VCL frontend (its gate, P3-10, is passed).
+1. **P2-11**: the P2 exit gate, driven by the user: a day's work in linscp
+   from an installed package (0.2.0's).
+2. **P3-15**: the rest of WinSCP's Commander commands (wip).
 3. Follow up the upstream PRs for the carried patches (ADR 0006): the
    portability series winscp/winscp#79, and #80 (`LogEvent`), #81 (log file
    names), #82 (local EOL), #83 (OpenSSH import paths); drop each patch
@@ -300,6 +300,8 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-15 | P4 (cleanup) dropped for now, all four tasks; it may be reopened | The user's call: retiring the VCL frontend and collapsing the dual-target code would make linscp unmergeable upstream, which stays the goal (ADR 0006); the C++Builder build keeps working |
+| 2026-10-15 | Version 0.2.0 tagged and published as a GitHub pre-release, with the four packages CI builds | The user's call; P2-11 (the exit gate) is still to be driven by the user |
 | 2026-10-15 | Every carried core patch offered upstream: the twelve portability ones as one PR of independent commits (winscp/winscp#79), the `LogEvent` link fix and the three POSIX behaviour fixes as their own (#80 to #83), written in upstream's style rather than our line-count-preserving form | The user's call; one portability PR with a short justification, bugs and behaviour separately so each can be judged alone |
 | 2026-10-15 | Packages: a .deb, an AppImage and a Flatpak on Linux, an Inno Setup installer on Windows laid out as WinSCP's (all-users or current-user, translations a component, desktop icon, Send To, URL handler and search path as tasks the program does: `/RegisterForDefaultProtocols`, `/AddSearchPath` and their reverses on uninstall); app id `io.github._99ecarvalho.linscp` | The user's choice of formats; D-Bus names cannot have a segment starting with a digit, hence the underscore; the installer is linscp's own script, not a copy of WinSCP's |
 | 2026-10-15 | Inno Setup pinned at 6.7.3 (`port/tools/fetch_innosetup.py`, SHA-256), installed portable and run under Wine, locally and in CI | WinSCP's installer is Inno Setup 6; a pinned compiler keeps the installer reproducible without a Windows build machine |
@@ -850,14 +852,14 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-12 | Local-to-local browsing | done | Tabs > New Tab > Local Tab, as WinSCP's local browser: a tab with no session and a second local panel in the remote one's place (the right side, swapped with it), titled by its two directories; Copy and Move (F5, F6) and drags between its panels copy and move local files (`LocalLocalCopy`), after the Copy dialog (`TCopyLocalDialog`: target path and file mask, Browse, the directory created after asking, several files to one name confirmed), an existing file overwritten after asking, a directory merged; the popups, Mark, Files and the Right menu act on the panel focused. Not yet: local tabs in saved workspaces. ctest `qt_gui_localtab` |
 | P3-13 | Session tabs and workspaces | done | Tabs: a session opened goes to a tab of its own, each tab with its own remote and local directories, its editors uploading to it whichever tab is active, every tab's session kept alive (`TTerminal::Idle`, which the shell had not called); the Tabs menu (New, Duplicate, Close Ctrl+Shift+D, Next and Previous Ctrl+Tab). Workspaces: Tabs > Save Workspace (`TSaveWorkspaceDialog`'s name, passwords and automatic saving) stores the tabs as core's workspace sessions; the site manager lists workspaces, logs in to one (a tab per session) and deletes it; saved on closing when automatic and opened at the next start; a workspace or folder of sites named on the command line opens in tabs. ctest `qt_gui_tabs` |
 | P3-14 | Daily Commander commands | done | the gate waited for it (decision 2026-10-14). Tabs > Rename Tab, Reconnect Session (a lost connection reopened where it was, `TTerminal::Reopen`), Save Session as Site (`TSaveSessionDialog`: name, folder, password), Change Password (a secondary session, as WinSCP), Install Public Key into Server (the key checked and converted as on login, non-OpenSSH servers asked about); Commands > Clear Caches; ctest `qt_gui_sessioncommands`. Commands > Compare Directories (Shift+F2: newer or missing files selected in each panel, times at the coarser listing's precision, by time and size as Preferences > Commander's new criteria say) and Synchronize Browsing (Ctrl+Alt+B: the other panel follows, a missing directory created after asking, per tab); Files > New > File (local made, remote edited empty and uploaded once saved), Calculate Directory Sizes (Shift+Alt+Enter); Go To > Path from Other Panel (Ctrl+., local tabs); ctest `qt_gui_panelcommands`. Files > Copy to Clipboard and Paste from Clipboard (Ctrl+C, Ctrl+V: the panel's drag data, remote files by their full paths and downloaded as another program pastes them; pasted, uploaded, copied locally or downloaded; a line of text opened as a session URL or gone to as a path); Options > Status Bar and Queue (show, hide when empty -- WinSCP's default, now linscp's -- or hide), kept under WinSCP's keys; ctest `qt_gui_clipboard`. Not done: pasting remote files into the remote panel (WinSCP's duplicate) |
-| P3-15 | The rest of the Commander's commands | todo | backlog, not gating P3 |
+| P3-15 | The rest of the Commander's commands | wip | backlog, not gating P3; started 2026-10-15 |
 | P3-16 | Verified UI gaps | done | the audit below, every gap closed but extensions (deferred, 2026-10-15) |
 | P3-17 | Icon sets | done | Lucide (ISC), Tabler (MIT), Fluent UI (MIT) imported to `assets/icons/` (`port/tools/import_icons.py`, 62 roles after WinSCP's glyphs), embedded and drawn by `port/qt/IconSet.cpp` in the palette's text colour (light and dark themes); Preferences > Window > Icon set (Fluent by default on Windows, Lucide elsewhere; the desktop's theme on POSIX only; none), on the menus and the panels' toolbars; About credits each set with its license; Qt Svg added on both platforms (`qt6-svg-dev`, MSYS2 `qt6-svg` in `msys2-qt.lock`); ctest `qt_gui_icons`; native on Windows 11 too. WinSCP's toolbars: the main bands (Commands, Preferences with the queue's, Transfer Settings with the presets, and hidden by default Sessions and Tabs, Sort, Custom Commands) and each panel's five (Path, History, Navigation, Files, Selection; PanelBands.h), Options > Toolbars (each band, lock, selective text labels, icon size) and Left/Right Panel, kept as WinSCP's `ToolbarsLayout2`, `LockToolbars`, `SelectiveToolbarText`, `LargerToolbar`; ctest `qt_gui_toolbars` |
 
 ### P4 — Cleanup
 | ID | Task | Status | Note |
 |---|---|---|---|
-| P4-01 | Retire VCL frontend | todo | |
-| P4-02 | Collapse dual-target `#ifdef`s | todo | |
-| P4-03 | Fold generated tree into source | todo | optional, one-way door |
-| P4-04 | De-shimming evaluation | todo | recommendation: do not |
+| P4-01 | Retire VCL frontend | dropped | for now (decision 2026-10-15); may be reopened |
+| P4-02 | Collapse dual-target `#ifdef`s | dropped | for now (decision 2026-10-15); may be reopened |
+| P4-03 | Fold generated tree into source | dropped | for now (decision 2026-10-15); optional, one-way door |
+| P4-04 | De-shimming evaluation | dropped | for now (decision 2026-10-15); recommendation was: do not |

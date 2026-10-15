@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(linscp VERSION 0.1.0 LANGUAGES C CXX
+project(linscp VERSION 0.2.0 LANGUAGES C CXX
         DESCRIPTION "Qt port of WinSCP for Linux and Windows")
 if(WIN32)
   # Version resources (port/frontend).
