@@ -10,10 +10,10 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 |---|---|---|---|
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
-| P2 Qt shell | 9 | 11 | A user can do a day's work in it |
+| P2 Qt shell | 10 | 11 | A user can do a day's work in it |
 | P3 Qt parity | 26 | 28 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **101** | **115** | |
+| **Total** | **102** | **115** | |
 
 ## Next three actions
 
@@ -255,8 +255,8 @@ To and shortcuts, Keep Up To Date in a new window, S3 ACLs and more (the
 audit below); only custom command extensions are deferred.
 P2-10 and P2-11 waited, at the user's request, for P3.
 
-1. **P2-10**: packaging (wip: the four packages build and run; CI's packaging
-   jobs to go green), then the P2 exit gate (**P2-11**).
+1. **P2-11**: the P2 exit gate, now that packaging (P2-10) is done: a
+   day's work in linscp from an installed package.
 2. **P4-01**: retire the VCL frontend (its gate, P3-10, is passed).
 3. Offer `core-log-file-name-delimiter.patch`,
    `core-local-eol-platform.patch`, `core-openssh-import-posix-paths.patch`
@@ -817,7 +817,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P2-07 | Transfer + queue UI | done | foreground: `TSession::Upload`/`Download`, `TransferDialog`, F5/F6; background: `TSession::Queue*` over `TTerminalQueue`, `QueuePanel`; ctests `qt_gui_transfer`, `qt_session`/`qt_session_ftp`; native on Windows 11 too |
 | P2-08 | Local file panel | done | `port/qt/LocalPanel.cpp` over the shared `FileList` model; Commander layout; ctest `qt_gui_local`; native on Windows 11 too |
 | P2-09 | i18n pipeline | done | ADR 0013, `doc/qt/translations.md`: core via `gen_translations.py` and shim translation modules (55 languages), the shell via Qt Linguist (`linscp_pt_BR.ts`), Qt's own; ctests `qt_session_pt_BR`, `qt_language`, `translations_current`; native on Windows 11 too |
-| P2-10 | Packaging | wip | `port/packaging`: install rules and a .deb (CPack, `package-deb`), an AppImage (`build_appimage.py`, `package-appimage`), a Flatpak (`build_flatpak.py`, KDE 6.10 runtime) and the Windows installer (`windows/linscp.iss`, Inno Setup 6.7.3 under Wine, `installer`), each tested installed (the installer on Windows 11, tasks and uninstall); CI's `packages` jobs pending a green run |
+| P2-10 | Packaging | done | `port/packaging`: install rules and a .deb (CPack, `package-deb`), an AppImage (`build_appimage.py`, `package-appimage`), a Flatpak (`build_flatpak.py`, KDE 6.10 runtime) and the Windows installer (`windows/linscp.iss`, Inno Setup 6.7.3 under Wine, `installer`), each tested installed (the installer on Windows 11, tasks and uninstall); CI builds all four as artifacts (`packages-linux`, `packages-windows`, `packages-flatpak`) |
 | P2-11 | P2 exit gate | todo | |
 
 ### P3 — Qt parity
