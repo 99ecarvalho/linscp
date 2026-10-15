@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 24 | 26 | Parity on features users depend on |
+| P3 Qt parity | 24 | 28 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **99** | **113** | |
+| **Total** | **99** | **115** | |
 
 ## Next three actions
 
@@ -254,6 +254,39 @@ P2-10 and P2-11 waited, at the user's request, for P3.
 2. **P4-01**: retire the VCL frontend (its gate, P3-10, is passed).
 3. Offer `core-log-file-name-delimiter.patch` and
    `core-local-eol-platform.patch` upstream (ADR 0006).
+
+## P3 UI gap audit (2026-10-14)
+
+The earlier P3 rows' "Not yet" notes, checked against the code (P3-16 closes
+what is still missing). Win-only: WinSCP does it through the Windows shell,
+registry, tray or window messages.
+
+| Area | Gap | Status | Note |
+|---|---|---|---|
+| Panels | extension column | missing | WinSCP's `uvExt` |
+| Panels | incremental search with its status | missing | |
+| Main window | WinSCP's toolbars (Commands, Sort, Preferences, Transfer, Custom commands) | missing | with P3-17's icons |
+| Synchronize | selected files only; by checksum; "use same options next time" saved | missing | options kept for the run only |
+| Synchronize checklist | calculate sizes; find move candidates; custom commands | missing | |
+| Preferences > Panels | incremental search; preserve panel state; full row; double-click action; panel font; Explorer-style selection; tree | missing | no directory tree view |
+| Preferences > Transfer | presets' autoselection rules (edited, matched) | missing | rules kept when saved |
+| Preferences > Background | parallel threshold; enable queue by default; queue list visibility on the page | missing | visibility is in Options > Queue |
+| Preferences > Window | minimize to tray; single instance | missing | Win-only in WinSCP; QSystemTrayIcon, QLocalServer |
+| Preferences > Security | master password | missing | |
+| Preferences > SSH | host CAs | missing | |
+| Preferences > Integration | "Send to" | missing | Win-only (Explorer's Send To) |
+| Editor | reload from the server; save all; window position kept | missing | |
+| Properties | local files' | missing | WinSCP shows the shell's (Win-only) |
+| Properties | S3 ACLs | missing | |
+| Properties | checksums through the secondary shell | missing | copies go through a temporary copy instead |
+| Navigation | Go To's bookmark list; Location Profiles' opened folders kept; mask hints | missing | |
+| Session tools | Copy dialog's transfer code; console's size kept; OpenSSH key conversion on import | missing | |
+| Custom commands | local commands; extensions and their options | missing | local ones shown disabled |
+| Keep up to date | start in a new window; minimize to the tray | missing | presets are a combo, not WinSCP's split button |
+| Workspaces | local tabs saved | missing | |
+| Clipboard | remote files pasted into the remote panel (duplicate) | missing | |
+| Save Session as Site | create desktop shortcut | missing | `.lnk` on Windows, `.desktop` on POSIX |
+| Done since their notes | Shift+F5/F6, kept layout, Synchronize's transfer settings, keep up to date, location profiles, compare criteria, editor font, external editors, S3 tags, bookmark shortcuts, commands list, transfer presets, open with the associated application, URL handler, folders of sites on the command line | done | |
 
 ## Decisions taken
 
@@ -801,6 +834,8 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-13 | Session tabs and workspaces | done | Tabs: a session opened goes to a tab of its own, each tab with its own remote and local directories, its editors uploading to it whichever tab is active, every tab's session kept alive (`TTerminal::Idle`, which the shell had not called); the Tabs menu (New, Duplicate, Close Ctrl+Shift+D, Next and Previous Ctrl+Tab). Workspaces: Tabs > Save Workspace (`TSaveWorkspaceDialog`'s name, passwords and automatic saving) stores the tabs as core's workspace sessions; the site manager lists workspaces, logs in to one (a tab per session) and deletes it; saved on closing when automatic and opened at the next start; a workspace or folder of sites named on the command line opens in tabs. ctest `qt_gui_tabs` |
 | P3-14 | Daily Commander commands | done | the gate waited for it (decision 2026-10-14). Tabs > Rename Tab, Reconnect Session (a lost connection reopened where it was, `TTerminal::Reopen`), Save Session as Site (`TSaveSessionDialog`: name, folder, password), Change Password (a secondary session, as WinSCP), Install Public Key into Server (the key checked and converted as on login, non-OpenSSH servers asked about); Commands > Clear Caches; ctest `qt_gui_sessioncommands`. Commands > Compare Directories (Shift+F2: newer or missing files selected in each panel, times at the coarser listing's precision, by time and size as Preferences > Commander's new criteria say) and Synchronize Browsing (Ctrl+Alt+B: the other panel follows, a missing directory created after asking, per tab); Files > New > File (local made, remote edited empty and uploaded once saved), Calculate Directory Sizes (Shift+Alt+Enter); Go To > Path from Other Panel (Ctrl+., local tabs); ctest `qt_gui_panelcommands`. Files > Copy to Clipboard and Paste from Clipboard (Ctrl+C, Ctrl+V: the panel's drag data, remote files by their full paths and downloaded as another program pastes them; pasted, uploaded, copied locally or downloaded; a line of text opened as a session URL or gone to as a path); Options > Status Bar and Queue (show, hide when empty -- WinSCP's default, now linscp's -- or hide), kept under WinSCP's keys; ctest `qt_gui_clipboard`. Not done: pasting remote files into the remote panel (WinSCP's duplicate) |
 | P3-15 | The rest of the Commander's commands | todo | backlog, not gating P3 |
+| P3-16 | Verified UI gaps | wip | the audit below; closed in batches |
+| P3-17 | Icon sets | wip | Lucide, Tabler, Fluent UI imported to `assets/icons/` (`port/tools/import_icons.py`) |
 
 ### P4 — Cleanup
 | ID | Task | Status | Note |

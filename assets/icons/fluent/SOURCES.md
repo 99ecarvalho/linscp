@@ -1,0 +1,70 @@
+# Fluent UI System Icons
+
+From the npm package `@fluentui/svg-icons` 1.1.343, MIT (LICENSE here),
+imported by `port/tools/import_icons.py`: each role (linscp's, after WinSCP's
+glyphs) is the file below, unchanged.
+
+| Role | File |
+|---|---|
+| back | `icons/arrow_left_20_regular.svg` |
+| forward | `icons/arrow_right_20_regular.svg` |
+| parent | `icons/folder_arrow_up_20_regular.svg` |
+| root | `icons/hard_drive_20_regular.svg` |
+| home | `icons/home_20_regular.svg` |
+| refresh | `icons/arrow_clockwise_20_regular.svg` |
+| new-folder | `icons/folder_add_20_regular.svg` |
+| new-file | `icons/document_add_20_regular.svg` |
+| delete | `icons/delete_20_regular.svg` |
+| rename | `icons/rename_20_regular.svg` |
+| properties | `icons/info_20_regular.svg` |
+| edit | `icons/edit_20_regular.svg` |
+| open | `icons/open_20_regular.svg` |
+| copy | `icons/copy_20_regular.svg` |
+| download | `icons/arrow_download_20_regular.svg` |
+| upload | `icons/arrow_upload_20_regular.svg` |
+| move | `icons/arrow_export_20_regular.svg` |
+| duplicate | `icons/document_copy_20_regular.svg` |
+| link | `icons/link_20_regular.svg` |
+| find | `icons/search_20_regular.svg` |
+| filter | `icons/filter_20_regular.svg` |
+| synchronize | `icons/arrow_sync_20_regular.svg` |
+| keep-up-to-date | `icons/eye_20_regular.svg` |
+| compare | `icons/branch_compare_20_regular.svg` |
+| sync-browse | `icons/arrow_swap_20_regular.svg` |
+| console | `icons/window_console_20_regular.svg` |
+| putty | `icons/code_20_regular.svg` |
+| sites | `icons/server_20_regular.svg` |
+| new-tab | `icons/tab_add_20_regular.svg` |
+| local-tab | `icons/laptop_20_regular.svg` |
+| close-tab | `icons/dismiss_20_regular.svg` |
+| duplicate-tab | `icons/tabs_20_regular.svg` |
+| disconnect | `icons/plug_disconnected_20_regular.svg` |
+| reconnect | `icons/plug_connected_20_regular.svg` |
+| save-site | `icons/save_20_regular.svg` |
+| save-workspace | `icons/save_multiple_20_regular.svg` |
+| workspace | `icons/grid_20_regular.svg` |
+| server-info | `icons/info_20_regular.svg` |
+| generate-url | `icons/code_20_regular.svg` |
+| preferences | `icons/settings_20_regular.svg` |
+| about | `icons/question_circle_20_regular.svg` |
+| quit | `icons/sign_out_20_regular.svg` |
+| select-files | `icons/select_all_on_20_regular.svg` |
+| unselect-files | `icons/select_all_off_20_regular.svg` |
+| select-all | `icons/select_all_on_20_regular.svg` |
+| invert-selection | `icons/arrow_repeat_all_20_regular.svg` |
+| clear-selection | `icons/select_all_off_20_regular.svg` |
+| clipboard-copy | `icons/clipboard_20_regular.svg` |
+| paste | `icons/clipboard_paste_20_regular.svg` |
+| bookmark | `icons/bookmark_add_20_regular.svg` |
+| open-directory | `icons/folder_open_20_regular.svg` |
+| explore | `icons/folder_search_20_regular.svg` |
+| queue | `icons/list_20_regular.svg` |
+| pause | `icons/pause_20_regular.svg` |
+| resume | `icons/play_20_regular.svg` |
+| cancel | `icons/dismiss_circle_20_regular.svg` |
+| calculate-size | `icons/calculator_20_regular.svg` |
+| clear-caches | `icons/eraser_20_regular.svg` |
+| change-password | `icons/key_20_regular.svg` |
+| public-key | `icons/key_multiple_20_regular.svg` |
+| custom-commands | `icons/apps_20_regular.svg` |
+| swap-panels | `icons/arrow_swap_20_regular.svg` |
