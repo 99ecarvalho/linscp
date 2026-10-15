@@ -1,0 +1,14 @@
+Load S3 tags for files only, as the Properties dialog shows them.
+
+LoadFilesProperties asks DoLoadFileProperties for tags whenever a single
+entry is selected, a folder too, although the Properties dialog shows tags
+for files only. A folder that is only a prefix of its objects' keys -- as
+folders made by other tools often are -- has no object of its own to read
+tags from: GetObjectTagging answers NoSuchKey, and the folder's Properties
+fail. Tags are now loaded for files only. Line counts are unchanged.
+
+--- a/source/core/S3FileSystem.cpp
++++ b/source/core/S3FileSystem.cpp
+@@ -1871,1 +1871,1 @@
+-    if (LoadTags)
++    if (LoadTags && !File->IsDirectory)

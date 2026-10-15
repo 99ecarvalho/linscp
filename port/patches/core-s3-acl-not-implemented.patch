@@ -1,0 +1,14 @@
+Load an S3 object's properties from servers that keep no object ACLs.
+
+DoLoadFileProperties reads the object's ACL before its tags and fails on any
+error, so on a server that implements no object ACLs -- versitygw answers
+GetObjectAcl with 501 NotImplemented, as do other S3-compatible servers --
+the Properties dialog does not open at all, the tags included. A
+NotImplemented answer now reads as an ACL with no grants; any other error
+still fails as before. Line counts are unchanged.
+
+--- a/source/core/S3FileSystem.cpp
++++ b/source/core/S3FileSystem.cpp
+@@ -1869,1 +1869,1 @@
+-    CheckLibS3Error(AclData);
++    if (AclData.Status == S3StatusErrorNotImplemented) { Properties.AclGrantCount = 0; } else { CheckLibS3Error(AclData); }

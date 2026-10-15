@@ -16,3 +16,5 @@ core-log-file-name-delimiter.patch
 core-local-eol-platform.patch
 core-openssh-import-posix-paths.patch
 core-terminal-logevent-not-inline.patch
+core-s3-acl-not-implemented.patch
+core-s3-folder-tags.patch
