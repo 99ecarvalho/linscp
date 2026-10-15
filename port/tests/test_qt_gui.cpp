@@ -4923,6 +4923,14 @@ void LocalCommandsTest(const char * Port, const QString & Directory)
     Command.Command = QStringLiteral("cat \"!\" > \"%1\"").arg(Seen).toStdString();
 #endif
     Check(Window.RunCustomCommand(Command) && (Read(Seen) == QStringLiteral("mine")), "on a local file");
+    // Properties on the local panel: the system's own, given the files.
+    {
+      QStringList Shown;
+      Window.SetLocalPropertiesShower([&Shown](const QStringList & Paths) { Shown = Paths; return true; });
+      Check(Window.Properties() && (Shown.size() == 1) && (QFileInfo(Shown.first()) == QFileInfo(Dir.filePath(QStringLiteral("mine.txt")))),
+        "a local file's Properties: the system's");
+      Window.SetLocalPropertiesShower(nullptr);
+    }
     // A failing one, its output asked for: its exit code an error.
     Command.Name = "Fail";
     Command.CopyResults = true;

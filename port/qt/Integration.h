@@ -36,6 +36,12 @@ enum class TShortcutFolder { Desktop, SendTo };
 bool CreateShortcut(const CoreBridge::TShortcut & Shortcut, TShortcutFolder Folder, QString & Path, QString & Error);
 // The folder (for tests).
 QString ShortcutFolder(TShortcutFolder Folder);
+// Local files' Properties, as the local panel's (DisplayPropertiesMenu): the
+// Windows shell's dialog; elsewhere the desktop's file manager's
+// (org.freedesktop.FileManager1's ShowItemProperties). False with Error
+// set when there is none to show it.
+bool ShowLocalProperties(const QStringList & Paths, QString & Error);
+
 // As the Login dialog's DesktopIconActionExecute and Preferences'
 // IconButtonClick: Question asked (empty: none), then the shortcut, its
 // error shown. False when not made.

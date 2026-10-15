@@ -277,7 +277,7 @@ registry, tray or window messages.
 | Preferences > Security | trusted host CAs | done | on the Security page, as WinSCP has them: core's `SshHostCAList` edited (TSshHostCADialog: a key typed or loaded, fingerprinted, the hosts checked); "Load authorities from PuTTY" and "Edit in PuTTY" on Windows only (PuTTY keeps them in the registry) |
 | Preferences > Integration | "Send to" | done | the Send To shortcut (Preferences, and the Site Manager's for a site) on Windows only, as Explorer's; it runs `/upload`, now handled as WinSCP's standalone upload (the session, the Copy dialog unless `/defaults`, then the program ends); the Site Manager's Desktop Icon too |
 | Editor | reload from the server; save all; window position kept | done | Reload downloads again (`ExecutedFileReload`); Save All (Shift+Ctrl+S); the first editor's place as `Editor.WindowParams` |
-| Properties | local files' | missing | WinSCP shows the shell's (Win-only) |
+| Properties | local files' | done | the system's own: the Windows shell's dialog (SHMultiFileProperties), elsewhere the desktop's file manager's (FileManager1's ShowItemProperties over D-Bus: Nautilus, Dolphin, Nemo, Caja) |
 | Properties | S3 ACLs | missing | |
 | Properties | checksums through the secondary shell | done | CanCalculateChecksum's: offered where only the secondary shell calculates them, the shell opened first (EnsureCommandSessionFallback), for Synchronize by checksum too |
 | Navigation | Go To's bookmark list; Location Profiles' opened folders kept; mask hints | done | the Open Directory button's menu (`CreateOpenDirMenu`); `NodeOpened`; the mask hint buttons (Select, Filter, Edit mask, Find files, Transfer settings) |

@@ -404,10 +404,13 @@ private:
   // /upload's run (StandaloneUpload).
   bool FStandalone = false;
   std::function<bool(const QStringList &)> FNewInstanceStarter;
+  std::function<bool(const QStringList &)> FLocalPropertiesShower;
 public:
   // What starts another instance (Start in New Window's), instead of the
   // program itself (tests).
   void SetNewInstanceStarter(std::function<bool(const QStringList &)> Starter) { FNewInstanceStarter = std::move(Starter); }
+  // What shows local files' properties, instead of the system (tests).
+  void SetLocalPropertiesShower(std::function<bool(const QStringList &)> Shower) { FLocalPropertiesShower = std::move(Shower); }
 private:
   QAction * FCopyClipboardAction = nullptr;
   QAction * FPasteAction = nullptr;

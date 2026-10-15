@@ -1832,7 +1832,7 @@ void MainWindow::UpdateActions()
   FOpenAction->setEnabled(!FBusy);
   FSitesAction->setEnabled(!FBusy);
   FEditAction->setEnabled(!FBusy);
-  FPropertiesAction->setEnabled(!FBusy && FSession);
+  FPropertiesAction->setEnabled(!FBusy && (FSession || (SideLocal(FLocalActive) != nullptr)));
   FLinkAction->setEnabled(!FBusy);
   FDuplicateAction->setEnabled(!FBusy && FSession);
   FOpenDirectoryAction->setEnabled(!FBusy);
@@ -2467,7 +2467,39 @@ void MainWindow::CleanUpEdited()
 
 bool MainWindow::Properties()
 {
-  if (FBusy || !FSession || FLocalActive)
+  if (FBusy)
+  {
+    return false;
+  }
+  // A local panel's: the system's own Properties (Integration's).
+  if (LocalPanel * Panel = SideLocal(FLocalActive))
+  {
+    QStringList Names = Panel->Selected();
+    QStringList Paths;
+    for (const QString & Name : Names)
+    {
+      Paths.append(QDir(Panel->Path()).filePath(Name));
+    }
+    if (Paths.isEmpty())
+    {
+      return false;
+    }
+    QString Error;
+    if (!(FLocalPropertiesShower ? FLocalPropertiesShower(Paths) : Integration::ShowLocalProperties(Paths, Error)))
+    {
+      if (!Error.isEmpty())
+      {
+        CoreBridge::TError Failure;
+        Failure.Message = Error.toStdString();
+        QtFrontend Frontend;
+        Frontend.SetWindow(this);
+        Frontend.ShowError(Failure);
+      }
+      return false;
+    }
+    return true;
+  }
+  if (!FSession)
   {
     return false;
   }

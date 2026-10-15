@@ -16,8 +16,12 @@ add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp AboutDialog.cpp 
 set_target_properties(linscp-qt-ui PROPERTIES AUTOMOC ON)
 target_link_libraries(linscp-qt-ui PUBLIC Qt6::Widgets Qt6::Svg Qt6::Network)
 if(WIN32)
-  # Integration's shortcuts (IShellLink).
-  target_link_libraries(linscp-qt-ui PUBLIC ole32 uuid)
+  # Integration's shortcuts (IShellLink), local files' properties (the shell's).
+  target_link_libraries(linscp-qt-ui PUBLIC ole32 uuid shell32)
+else()
+  # Local files' properties: the desktop's file manager (FileManager1).
+  find_package(Qt6 REQUIRED COMPONENTS DBus)
+  target_link_libraries(linscp-qt-ui PUBLIC Qt6::DBus)
 endif()
 if(NOT WIN32)
   target_compile_options(linscp-qt-ui PRIVATE -fno-short-wchar)

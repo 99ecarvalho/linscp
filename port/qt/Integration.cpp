@@ -18,6 +18,10 @@
 #include <windows.h>
 #include <shlobj.h>
 #include <shobjidl.h>
+#else
+#include <QDBusConnection>
+#include <QDBusMessage>
+#include <QUrl>
 #endif
 
 namespace Integration
@@ -477,6 +481,65 @@ bool AskAndCreateShortcut(QWidget * Parent, const QString & Question, const Core
     return false;
   }
   return true;
+}
+
+bool ShowLocalProperties(const QStringList & Paths, QString & Error)
+{
+  if (Paths.isEmpty())
+  {
+    return false;
+  }
+#if defined(Q_OS_WIN)
+  // SHMultiFileProperties over the files' absolute item IDs.
+  std::vector<PIDLIST_ABSOLUTE> Items;
+  for (const QString & Path : Paths)
+  {
+    PIDLIST_ABSOLUTE Item = nullptr;
+    if (SUCCEEDED(SHParseDisplayName(QDir::toNativeSeparators(Path).toStdWString().c_str(), nullptr, &Item, 0, nullptr)))
+    {
+      Items.push_back(Item);
+    }
+  }
+  bool Result = false;
+  if (!Items.empty())
+  {
+    // Absolute IDs, the desktop their parent.
+    std::vector<PCIDLIST_ABSOLUTE> Absolute(Items.begin(), Items.end());
+    IDataObject * Data = nullptr;
+    if (SUCCEEDED(SHCreateDataObject(nullptr, static_cast<UINT>(Absolute.size()),
+          reinterpret_cast<PCUITEMID_CHILD_ARRAY>(Absolute.data()), nullptr, IID_IDataObject, reinterpret_cast<void **>(&Data))))
+    {
+      Result = SUCCEEDED(SHMultiFileProperties(Data, 0));
+      Data->Release();
+    }
+  }
+  for (PIDLIST_ABSOLUTE Item : Items)
+  {
+    CoTaskMemFree(Item);
+  }
+  if (!Result)
+  {
+    Error = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::NotSupported));
+  }
+  return Result;
+#else
+  QStringList Uris;
+  for (const QString & Path : Paths)
+  {
+    Uris.append(QUrl::fromLocalFile(Path).toString());
+  }
+  QDBusMessage Call = QDBusMessage::createMethodCall(QStringLiteral("org.freedesktop.FileManager1"),
+    QStringLiteral("/org/freedesktop/FileManager1"), QStringLiteral("org.freedesktop.FileManager1"),
+    QStringLiteral("ShowItemProperties"));
+  Call << Uris << QString();
+  const QDBusMessage Reply = QDBusConnection::sessionBus().call(Call, QDBus::Block, 10000);
+  if (Reply.type() == QDBusMessage::ErrorMessage)
+  {
+    Error = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::NotSupported)) + QLatin1Char('\n') + Reply.errorMessage();
+    return false;
+  }
+  return true;
+#endif
 }
 
 }  // namespace Integration
