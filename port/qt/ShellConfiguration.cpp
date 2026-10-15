@@ -197,6 +197,9 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"DefaultDirIsHome", FSettings.DefaultDirIsHome);
     Storage->WriteInteger(L"PathInCaption", FSettings.PathInCaption);
     Storage->WriteString(L"IconSet", FSettings.IconSet);
+    Storage->WriteBool(L"LockToolbars", FSettings.LockToolbars);
+    Storage->WriteBool(L"SelectiveToolbarText", FSettings.SelectiveToolbarText);
+    Storage->WriteInteger(L"LargerToolbar", FSettings.LargerToolbar);
     Storage->WriteBool(L"KeepOpenWhenNoSession", FSettings.KeepOpenWhenNoSession);
     Storage->WriteBool(L"AutoOpenInPutty", FSettings.AutoOpenInPutty);
     Storage->WriteBool(L"AutoSaveWorkspace", FSettings.AutoSaveWorkspace);
@@ -253,6 +256,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"CompareByTime", FSettings.CompareByTime);
     Storage->WriteBool(L"CompareBySize", FSettings.CompareBySize);
     Storage->WriteBool(L"StatusBar", FSettings.CommanderStatusBar);
+    Storage->WriteString(L"ToolbarsLayout2", FSettings.CommanderToolbarsLayout);
     Storage->WriteInteger(L"CurrentPanel", FSettings.CurrentPanel);
     Storage->WriteFloat(L"LocalPanelWidth", FSettings.LocalPanelWidth);
     if (!FSettings.WindowParams.IsEmpty())
@@ -420,6 +424,9 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.DefaultDirIsHome = Storage->ReadBool(L"DefaultDirIsHome", FSettings.DefaultDirIsHome);
     FSettings.PathInCaption = Storage->ReadInteger(L"PathInCaption", FSettings.PathInCaption);
     FSettings.IconSet = Storage->ReadString(L"IconSet", FSettings.IconSet);
+    FSettings.LockToolbars = Storage->ReadBool(L"LockToolbars", FSettings.LockToolbars);
+    FSettings.SelectiveToolbarText = Storage->ReadBool(L"SelectiveToolbarText", FSettings.SelectiveToolbarText);
+    FSettings.LargerToolbar = Storage->ReadInteger(L"LargerToolbar", FSettings.LargerToolbar);
     FSettings.KeepOpenWhenNoSession = Storage->ReadBool(L"KeepOpenWhenNoSession", FSettings.KeepOpenWhenNoSession);
     FSettings.AutoOpenInPutty = Storage->ReadBool(L"AutoOpenInPutty", FSettings.AutoOpenInPutty);
     FSettings.AutoSaveWorkspace = Storage->ReadBool(L"AutoSaveWorkspace", FSettings.AutoSaveWorkspace);
@@ -472,6 +479,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.CompareByTime = Storage->ReadBool(L"CompareByTime", FSettings.CompareByTime);
     FSettings.CompareBySize = Storage->ReadBool(L"CompareBySize", FSettings.CompareBySize);
     FSettings.CommanderStatusBar = Storage->ReadBool(L"StatusBar", FSettings.CommanderStatusBar);
+    FSettings.CommanderToolbarsLayout = Storage->ReadString(L"ToolbarsLayout2", FSettings.CommanderToolbarsLayout);
     FSettings.CurrentPanel = Storage->ReadInteger(L"CurrentPanel", FSettings.CurrentPanel);
     FSettings.LocalPanelWidth = Storage->ReadFloat(L"LocalPanelWidth", FSettings.LocalPanelWidth);
     FSettings.WindowParams = Storage->ReadString(L"WindowParams", FSettings.WindowParams);

@@ -500,6 +500,14 @@ struct TLayout
   enum class TQueueShow { Show, HideWhenEmpty, Hide };
   TQueueShow QueueShow = TQueueShow::HideWhenEmpty;
   bool StatusBar = true;
+  // Options > Toolbars: locked, selective text labels, the icons' size
+  // (LargerToolbar: 0 normal, 1 large, 2 very large); which bands show, as
+  // WinSCP's ToolbarsLayout ("Name=<1 shown, 0 not>:<dock>:<row>+<pos>,"
+  // per band; empty: WinSCP's default).
+  bool LockToolbars = false;
+  bool SelectiveToolbarText = true;
+  int LargerToolbar = 1;
+  std::string ToolbarsLayout;
 };
 TLayout Layout();
 // Saves it.

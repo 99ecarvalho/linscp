@@ -68,3 +68,10 @@ glyphs) is the file below, unchanged.
 | public-key | `icons/key_multiple_20_regular.svg` |
 | custom-commands | `icons/apps_20_regular.svg` |
 | swap-panels | `icons/arrow_swap_20_regular.svg` |
+| sort-ascending | `icons/arrow_sort_up_20_regular.svg` |
+| sort-name | `icons/text_sort_ascending_20_regular.svg` |
+| sort-size | `icons/number_symbol_20_regular.svg` |
+| sort-time | `icons/clock_20_regular.svg` |
+| sort-rights | `icons/lock_closed_20_regular.svg` |
+| sort-owner | `icons/person_20_regular.svg` |
+| sort-group | `icons/people_20_regular.svg` |

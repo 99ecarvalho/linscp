@@ -71,6 +71,8 @@
 #include <QTimer>
 #include <QClipboard>
 #include <QStatusBar>
+#include <QToolBar>
+#include <QToolButton>
 #include <QTest>
 #include <QSettings>
 #include <QSplitter>
@@ -4242,6 +4244,99 @@ void IconsTest(const QString & Out)
   CoreBridge::Finalize();
 }
 
+// P3-16's toolbars: WinSCP's bands, shown as its default layout has them,
+// each toggled and kept, locked, labelled and sized as Options > Toolbars says.
+void ToolbarsTest()
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Window.show();
+    QApplication::processEvents();
+    auto Bar = [&Window](const QString & Name) { return Window.findChild<QToolBar *>(Name); };
+    for (const QString & Name : { QStringLiteral("Commands"), QStringLiteral("Preferences"), QStringLiteral("Transfer") })
+    {
+      Check((Bar(Name) != nullptr) && Bar(Name)->isVisible(), "WinSCP's default bands shown");
+    }
+    for (const QString & Name : { QStringLiteral("Session"), QStringLiteral("Sort"), QStringLiteral("CustomCommands") })
+    {
+      Check((Bar(Name) != nullptr) && !Bar(Name)->isVisible(), "and its hidden ones hidden");
+    }
+    for (TPanelBand Band : { TPanelBand::Path, TPanelBand::History, TPanelBand::Navigation, TPanelBand::File, TPanelBand::Selection })
+    {
+      Check(Window.Local()->Band(Band)->isVisible() && Window.Panel()->Band(Band)->isVisible() &&
+        !Window.Local()->Band(Band)->actions().isEmpty(), "each panel's five bands, each with its buttons");
+    }
+    // The selective labels: Synchronize's text beside its icon.
+    QAction * Synchronize = nullptr;
+    for (QAction * Action : Bar(QStringLiteral("Commands"))->actions())
+    {
+      Synchronize = (Action->text() == MainWindow::tr("&Synchronize...")) ? Action : Synchronize;
+    }
+    QToolButton * Button = (Synchronize != nullptr) ?
+      qobject_cast<QToolButton *>(Bar(QStringLiteral("Commands"))->widgetForAction(Synchronize)) : nullptr;
+    Check((Button != nullptr) && (Button->toolButtonStyle() == Qt::ToolButtonTextBesideIcon), "selective text labels");
+    Check(Bar(QStringLiteral("Commands"))->iconSize() == QSize(20, 20), "WinSCP's default icon size, Large");
+
+    // Toggled from Options: the Sort band shown, the left File band hidden.
+    QAction * SortToggle = nullptr;
+    QAction * FileToggle = nullptr;
+    QAction * Lock = nullptr;
+    QAction * Labels = nullptr;
+    QAction * Normal = nullptr;
+    for (QAction * Action : Window.findChildren<QAction *>())
+    {
+      SortToggle = (Action->text() == MainWindow::tr("So&rt Buttons")) ? Action : SortToggle;
+      if ((Action->text() == MainWindow::tr("&File Buttons")) && (FileToggle == nullptr))
+      {
+        FileToggle = Action;
+      }
+      Lock = (Action->text() == MainWindow::tr("&Lock Toolbars")) ? Action : Lock;
+      Labels = (Action->text() == MainWindow::tr("&Show Selective Text Labels")) ? Action : Labels;
+      Normal = (Action->text() == MainWindow::tr("&Normal")) ? Action : Normal;
+    }
+    Check((SortToggle != nullptr) && (FileToggle != nullptr) && (Lock != nullptr) && (Labels != nullptr) && (Normal != nullptr),
+      "Options > Toolbars and Left Panel");
+    if ((SortToggle != nullptr) && (FileToggle != nullptr) && (Lock != nullptr) && (Labels != nullptr) && (Normal != nullptr))
+    {
+      SortToggle->trigger();
+      FileToggle->trigger();
+      Lock->trigger();
+      Labels->trigger();
+      Normal->trigger();
+      Check(Bar(QStringLiteral("Sort"))->isVisible() && !Window.Local()->Band(TPanelBand::File)->isVisible(), "bands toggled");
+      Check(!Bar(QStringLiteral("Commands"))->isMovable(), "locked");
+      Check(Button->toolButtonStyle() == Qt::ToolButtonIconOnly, "labels off");
+      Check(Bar(QStringLiteral("Commands"))->iconSize() == QSize(16, 16), "normal icons");
+      const CoreBridge::TLayout Layout = CoreBridge::Layout();
+      const QString Stored = QString::fromStdString(Layout.ToolbarsLayout);
+      Check(Stored.contains(QStringLiteral("Sort=1:")) && Stored.contains(QStringLiteral("LocalFile=0:")) &&
+        Stored.contains(QStringLiteral("Menu=1:TopDock")), "kept as WinSCP's layout, its own bands as they were");
+      Check(Layout.LockToolbars && !Layout.SelectiveToolbarText && (Layout.LargerToolbar == 0), "and its settings");
+    }
+    // The next window, as kept.
+    MainWindow Next(CoreBridge::Info());
+    Next.show();
+    QApplication::processEvents();
+    Check(Next.findChild<QToolBar *>(QStringLiteral("Sort"))->isVisible() && !Next.Local()->Band(TPanelBand::File)->isVisible(),
+      "the next window as kept");
+    // The Sort band sorts the active panel.
+    Window.ActivatePanel(true);
+    QAction * BySize = nullptr;
+    for (QAction * Action : Bar(QStringLiteral("Sort"))->actions())
+    {
+      BySize = (Action->text() == MainWindow::tr("By &Size")) ? Action : BySize;
+    }
+    if (BySize != nullptr)
+    {
+      BySize->trigger();
+    }
+    Check(Window.Local()->View()->header()->sortIndicatorSection() == FileListModel::SizeColumn, "Sort > By Size");
+  }
+  CoreBridge::Finalize();
+}
+
 // The menu bar as text, a menu's items indented under it, separators as
 // "----": for comparing with WinSCP's (forms/ScpCommander.dfm).
 void DumpMenu(QMenu * Menu, int Depth, QString & Out)
@@ -4314,6 +4409,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 3) && (std::strcmp(argv[1], "icons") == 0))
   {
     IconsTest((argc >= 4) && (argv[3][0] != '-') ? QString::fromLocal8Bit(argv[3]) : QString());
+  }
+  else if ((argc >= 3) && (std::strcmp(argv[1], "toolbars") == 0))
+  {
+    ToolbarsTest();
   }
   else if ((argc >= 3) && (std::strcmp(argv[1], "menus") == 0))
   {

@@ -1,4 +1,5 @@
 #include "RemotePanel.h"
+#include "PanelBands.h"
 #include "IconSet.h"
 
 #include <QAction>
@@ -37,12 +38,15 @@ RemotePanel::RemotePanel(QWidget * Parent) :
 {
   QVBoxLayout * Layout = new QVBoxLayout(this);
   Layout->setContentsMargins(0, 0, 0, 0);
-  QToolBar * Bar = new QToolBar(this);
-  Bar->setIconSize(QSize(16, 16));
-  auto Add = [this, Bar](QStyle::StandardPixmap Icon, const QString & Text, const QKeySequence & Key,
+  // WinSCP's bands (PanelBands.h): the history and navigation ones are the
+  // panel's; its file commands go in the window's Files band.
+  FBands.Make(this);
+  QToolBar * Bar = FBands[TPanelBand::History];
+  auto Add = [this, &Bar](QStyle::StandardPixmap Icon, const QString & Text, const QKeySequence & Key,
     std::function<void()> Handler) -> QAction *
   {
-    QAction * Action = Bar->addAction(style()->standardIcon(Icon), Text);
+    QAction * Action = (Bar != nullptr) ? Bar->addAction(style()->standardIcon(Icon), Text) :
+      new QAction(style()->standardIcon(Icon), Text, this);
     Action->setShortcut(Key);
     Action->setShortcutContext(Qt::WidgetWithChildrenShortcut);
     connect(Action, &QAction::triggered, this, Handler);
@@ -51,6 +55,7 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   };
   FBackAction = Add(QStyle::SP_ArrowBack, tr("&Back"), QKeySequence::Back, [this]() { Back(); });
   FForwardAction = Add(QStyle::SP_ArrowForward, tr("&Forward"), QKeySequence::Forward, [this]() { Forward(); });
+  Bar = FBands[TPanelBand::Navigation];
   FParentAction = Add(QStyle::SP_FileDialogToParent, tr("&Parent Directory"), QKeySequence(Qt::Key_Backspace), [this]() { RemotePanel::Parent(); });
   // As TCustomDirView.KeyDown: Alt+Up and Ctrl+PgUp too.
   FParentAction->setShortcuts({ QKeySequence(Qt::Key_Backspace), QKeySequence(Qt::ALT | Qt::Key_Up),
@@ -58,7 +63,7 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   FRootAction = Add(QStyle::SP_DriveHDIcon, tr("&Root Directory"), QKeySequence(Qt::CTRL | Qt::Key_Backslash), [this]() { Root(); });
   FHomeAction = Add(QStyle::SP_DirHomeIcon, tr("&Home Directory"), QKeySequence(Qt::CTRL | Qt::Key_H), [this]() { Home(); });
   FRefreshAction = Add(QStyle::SP_BrowserReload, tr("&Refresh"), QKeySequence(Qt::CTRL | Qt::Key_R), [this]() { Refresh(); });
-  Bar->addSeparator();
+  Bar = nullptr;
   FNewFolderAction = Add(QStyle::SP_FileDialogNewFolder, tr("Create Directory"), QKeySequence(Qt::Key_F7), [this]()
   {
     NewFolderDialog();
@@ -69,12 +74,11 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   });
   FDeleteAction = Add(QStyle::SP_TrashIcon, tr("Delete"), QKeySequence::Delete, [this]() { DeleteSelected(true); });
   FDeleteAction->setShortcuts({ QKeySequence::Delete, QKeySequence(Qt::Key_F8) });
-  Layout->addWidget(Bar);
 
   FPath = new QLineEdit(this);
   FPath->setAccessibleName(tr("Remote path"));
   connect(FPath, &QLineEdit::returnPressed, this, [this]() { ChangeDirectory(FPath->text().trimmed()); });
-  Layout->addWidget(FPath);
+  FBands.LayOut(Layout, FPath);
 
   FModel = new FileListModel(this);
   FSort = new DirectoriesFirst(this);

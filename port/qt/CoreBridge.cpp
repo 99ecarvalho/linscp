@@ -643,6 +643,10 @@ TLayout Layout()
   Result.QueueViewHeightPixelsPerInch = Settings.QueueViewHeightPixelsPerInch;
   Result.QueueShow = static_cast<TLayout::TQueueShow>(std::clamp(Settings.QueueViewShow, 0, 2));
   Result.StatusBar = Settings.CommanderStatusBar;
+  Result.LockToolbars = Settings.LockToolbars;
+  Result.SelectiveToolbarText = Settings.SelectiveToolbarText;
+  Result.LargerToolbar = Settings.LargerToolbar;
+  Result.ToolbarsLayout = Utf8(Settings.CommanderToolbarsLayout);
   return Result;
 }
 
@@ -658,6 +662,10 @@ void SetLayout(const TLayout & Layout)
   Settings.QueueViewHeightPixelsPerInch = Layout.QueueViewHeightPixelsPerInch;
   Settings.QueueViewShow = static_cast<int>(Layout.QueueShow);
   Settings.CommanderStatusBar = Layout.StatusBar;
+  Settings.LockToolbars = Layout.LockToolbars;
+  Settings.SelectiveToolbarText = Layout.SelectiveToolbarText;
+  Settings.LargerToolbar = Layout.LargerToolbar;
+  Settings.CommanderToolbarsLayout = FromUtf8(Layout.ToolbarsLayout);
   try
   {
     Shell()->SetSettings(Settings);

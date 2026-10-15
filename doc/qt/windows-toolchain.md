@@ -14,7 +14,7 @@ under Wine, and spot-checked natively on Windows 11.
 | Piece | What | Pinned by | Fetched by |
 |---|---|---|---|
 | Compiler, linker, headers | [llvm-mingw](https://github.com/mstorsjo/llvm-mingw) **20250114** (clang/lld **19.1.7**, mingw-w64 headers, UCRT) | release name + SHA-256 in `port/tools/fetch_llvm_mingw.py` | `fetch_llvm_mingw.py --dest build/tools` |
-| Qt for Windows | MSYS2 `clang64` **qt6-base 6.8.2-1** | `port/qt/msys2-qt.lock` | `fetch_msys2_qt.py --dest build/tools/msys2-qt` |
+| Qt for Windows | MSYS2 `clang64` **qt6-base 6.8.2-1**, **qt6-svg** (the icon sets) | `port/qt/msys2-qt.lock` | `fetch_msys2_qt.py --dest build/tools/msys2-qt` |
 | Qt's dependencies and the C++ runtime | 26 more MSYS2 `clang64` packages (libc++/libunwind **19.1.7**, ICU 76, harfbuzz, ...) | the same lock | the same command |
 | Qt's code generators (`moc`, `uic`, `rcc`) | Debian trixie's **Qt 6.8.2** (`qt6-base-dev`) | Debian's version | `apt` |
 | `objcopy` for COFF | binutils (`binutils-mingw-w64-x86-64`) | Debian's version | `apt` |

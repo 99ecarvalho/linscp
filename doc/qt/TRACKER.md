@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 24 | 28 | Parity on features users depend on |
+| P3 Qt parity | 25 | 28 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **99** | **115** | |
+| **Total** | **100** | **115** | |
 
 ## Next three actions
 
@@ -265,7 +265,7 @@ registry, tray or window messages.
 |---|---|---|---|
 | Panels | extension column | missing | WinSCP's `uvExt` |
 | Panels | incremental search with its status | missing | |
-| Main window | WinSCP's toolbars (Commands, Sort, Preferences, Transfer, Custom commands) | missing | with P3-17's icons |
+| Main window | WinSCP's toolbars (Commands, Sort, Preferences, Transfer, Custom commands) | done | 2026-10-14, with P3-17's icons |
 | Synchronize | selected files only; by checksum; "use same options next time" saved | missing | options kept for the run only |
 | Synchronize checklist | calculate sizes; find move candidates; custom commands | missing | |
 | Preferences > Panels | incremental search; preserve panel state; full row; double-click action; panel font; Explorer-style selection; tree | missing | no directory tree view |
@@ -836,7 +836,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-14 | Daily Commander commands | done | the gate waited for it (decision 2026-10-14). Tabs > Rename Tab, Reconnect Session (a lost connection reopened where it was, `TTerminal::Reopen`), Save Session as Site (`TSaveSessionDialog`: name, folder, password), Change Password (a secondary session, as WinSCP), Install Public Key into Server (the key checked and converted as on login, non-OpenSSH servers asked about); Commands > Clear Caches; ctest `qt_gui_sessioncommands`. Commands > Compare Directories (Shift+F2: newer or missing files selected in each panel, times at the coarser listing's precision, by time and size as Preferences > Commander's new criteria say) and Synchronize Browsing (Ctrl+Alt+B: the other panel follows, a missing directory created after asking, per tab); Files > New > File (local made, remote edited empty and uploaded once saved), Calculate Directory Sizes (Shift+Alt+Enter); Go To > Path from Other Panel (Ctrl+., local tabs); ctest `qt_gui_panelcommands`. Files > Copy to Clipboard and Paste from Clipboard (Ctrl+C, Ctrl+V: the panel's drag data, remote files by their full paths and downloaded as another program pastes them; pasted, uploaded, copied locally or downloaded; a line of text opened as a session URL or gone to as a path); Options > Status Bar and Queue (show, hide when empty -- WinSCP's default, now linscp's -- or hide), kept under WinSCP's keys; ctest `qt_gui_clipboard`. Not done: pasting remote files into the remote panel (WinSCP's duplicate) |
 | P3-15 | The rest of the Commander's commands | todo | backlog, not gating P3 |
 | P3-16 | Verified UI gaps | wip | the audit below; closed in batches |
-| P3-17 | Icon sets | wip | Lucide (ISC), Tabler (MIT), Fluent UI (MIT) imported to `assets/icons/` (`port/tools/import_icons.py`, 62 roles after WinSCP's glyphs), embedded and drawn by `port/qt/IconSet.cpp` in the palette's text colour (light and dark themes); Preferences > Window > Icon set (Fluent by default on Windows, Lucide elsewhere; the desktop's theme on POSIX only; none), on the menus and the panels' toolbars; About credits each set with its license; Qt Svg added on both platforms (`qt6-svg-dev`, MSYS2 `qt6-svg` in `msys2-qt.lock`); ctest `qt_gui_icons`; native on Windows 11 too. Next: WinSCP's toolbars |
+| P3-17 | Icon sets | done | Lucide (ISC), Tabler (MIT), Fluent UI (MIT) imported to `assets/icons/` (`port/tools/import_icons.py`, 62 roles after WinSCP's glyphs), embedded and drawn by `port/qt/IconSet.cpp` in the palette's text colour (light and dark themes); Preferences > Window > Icon set (Fluent by default on Windows, Lucide elsewhere; the desktop's theme on POSIX only; none), on the menus and the panels' toolbars; About credits each set with its license; Qt Svg added on both platforms (`qt6-svg-dev`, MSYS2 `qt6-svg` in `msys2-qt.lock`); ctest `qt_gui_icons`; native on Windows 11 too. WinSCP's toolbars: the main bands (Commands, Preferences with the queue's, Transfer Settings with the presets, and hidden by default Sessions and Tabs, Sort, Custom Commands) and each panel's five (Path, History, Navigation, Files, Selection; PanelBands.h), Options > Toolbars (each band, lock, selective text labels, icon size) and Left/Right Panel, kept as WinSCP's `ToolbarsLayout2`, `LockToolbars`, `SelectiveToolbarText`, `LargerToolbar`; ctest `qt_gui_toolbars` |
 
 ### P4 — Cleanup
 | ID | Task | Status | Note |

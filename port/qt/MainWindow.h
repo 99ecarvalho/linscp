@@ -27,6 +27,7 @@ class QTimer;
 class QUrl;
 class QMenu;
 class FileView;
+class QToolBar;
 class RemotePanel;
 
 class MainWindow : public QMainWindow
@@ -196,7 +197,8 @@ public:
   class QMenu * FileCommandsMenu() const { return FFileCommandsMenu; }
   QMenu * StaticCommandsMenu() const { return FStaticCommandsMenu; }
   // Options > Preferences: false when cancelled.
-  bool PreferencesDialog();
+  // Page: the one to open on (its title), else the first.
+  bool PreferencesDialog(const QString & Page = QString());
   // The preferences applied to the window and its panels.
   void ApplyPreferences();
   // The layout kept between runs (WinSCP's): restored as the window is
@@ -388,6 +390,37 @@ private:
   std::vector<std::pair<QAction *, QString>> FIconRoles;
   QAction * Iconize(QAction * Action, const char * Role);
   void ApplyIcons();
+  // WinSCP's toolbars (P3-16): the main window's bands (Commands, Sessions
+  // and Tabs, Preferences, Sort, Transfer Settings, Custom Commands) and the
+  // panels' (PanelBands.h), each shown or hidden as Options > Toolbars and
+  // Left/Right Panel say, kept as WinSCP's ToolbarsLayout; locked,
+  // selective text labels, the icons' size as its Options > Toolbars.
+  struct TBand
+  {
+    QString Name;
+    QToolBar * Bar = nullptr;
+    QAction * Toggle = nullptr;
+    // A panel's: both local panels' bands follow the left one's toggle.
+    QToolBar * Twin = nullptr;
+  };
+  std::vector<TBand> FBands;
+  std::vector<std::pair<QToolBar *, QAction *>> FTextButtons;
+  QAction * FLockToolbarsAction = nullptr;
+  QAction * FSelectiveTextAction = nullptr;
+  QAction * FIconSizeActions[3] = {};
+  class QComboBox * FPresetCombo = nullptr;
+  QToolBar * FCustomCommandsBar = nullptr;
+  QAction * FLeftCopyAction = nullptr;
+  QAction * FLeftMoveAction = nullptr;
+  QAction * FSortActions[7] = {};
+  void BuildToolbars(QMenu * Options);
+  QToolBar * MainBand(const QString & Name, const QString & Title);
+  QAction * SideAction(bool Local, QAction * Source, const QString & Text, const char * Role);
+  void BandAction(QToolBar * Bar, QAction * Action, bool Text = false);
+  void ApplyToolbarSettings();
+  void SaveToolbarSettings();
+  void UpdatePresetCombo();
+  void UpdateSortActions();
   QMenu * PanelMenu(bool Local);
   FileView * ActiveView() const;
   void SelectSameExtension(bool Select);

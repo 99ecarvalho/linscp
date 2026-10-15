@@ -83,6 +83,13 @@ ROLES = {
     'public-key':       (['key-square', 'key'], ['key'], ['key_multiple']),
     'custom-commands':  (['command'], ['command'], ['apps']),
     'swap-panels':      (['arrow-left-right'], ['arrows-left-right'], ['arrow_swap']),
+    'sort-ascending':   (['arrow-up-narrow-wide'], ['sort-ascending'], ['arrow_sort_up']),
+    'sort-name':        (['arrow-down-a-z'], ['sort-ascending-letters'], ['text_sort_ascending']),
+    'sort-size':        (['arrow-down-1-0'], ['sort-ascending-numbers'], ['number_symbol']),
+    'sort-time':        (['clock'], ['clock'], ['clock']),
+    'sort-rights':      (['lock'], ['lock'], ['lock_closed']),
+    'sort-owner':       (['user'], ['user'], ['person']),
+    'sort-group':       (['users'], ['users'], ['people']),
 }
 
 SETS = {

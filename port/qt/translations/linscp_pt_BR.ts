@@ -1452,6 +1452,174 @@ Local: %2</translation>
         <source>&amp;Hide</source>
         <translation>&amp;Ocultar</translation>
     </message>
+    <message>
+        <source>&amp;Copy...</source>
+        <translation>&amp;Copiar</translation>
+    </message>
+    <message>
+        <source>Up&amp;load...</source>
+        <translation>&amp;Upload...</translation>
+    </message>
+    <message>
+        <source>Upload and Dele&amp;te...</source>
+        <translation>Fazer upload e &amp;apagar</translation>
+    </message>
+    <message>
+        <source>Commands</source>
+        <translation>Comandos</translation>
+    </message>
+    <message>
+        <source>Preferences</source>
+        <translation>Preferências</translation>
+    </message>
+    <message>
+        <source>Transfer Settings</source>
+        <translation>Ajustes de transferência</translation>
+    </message>
+    <message>
+        <source>Transfer settings</source>
+        <translation>Ajustes de transferência</translation>
+    </message>
+    <message>
+        <source>&amp;Configure...</source>
+        <translation>&amp;Configurar</translation>
+    </message>
+    <message>
+        <source>Sessions and Tabs</source>
+        <translation>Sessões e Abas</translation>
+    </message>
+    <message>
+        <source>Sort</source>
+        <translation>Classificar</translation>
+    </message>
+    <message>
+        <source>&amp;Ascending</source>
+        <translation>&amp;Ascendente</translation>
+    </message>
+    <message>
+        <source>By &amp;Name</source>
+        <translation>Por &amp;Nome</translation>
+    </message>
+    <message>
+        <source>By &amp;Size</source>
+        <translation>Por &amp;Tamanho</translation>
+    </message>
+    <message>
+        <source>By Date &amp;modified</source>
+        <translation>Por Data &amp;modificada</translation>
+    </message>
+    <message>
+        <source>By &amp;Permissions/Attributes</source>
+        <translation>Por &amp;Atributos</translation>
+    </message>
+    <message>
+        <source>By &amp;Owner</source>
+        <translation>Pelo &amp;Criador</translation>
+    </message>
+    <message>
+        <source>By &amp;Group</source>
+        <translation>Por &amp;Grupo</translation>
+    </message>
+    <message>
+        <source>Custom Commands</source>
+        <translation>Comandos personalizados</translation>
+    </message>
+    <message>
+        <source>Down&amp;load...</source>
+        <translation>&amp;Download...</translation>
+    </message>
+    <message>
+        <source>Download and Dele&amp;te...</source>
+        <translation>Baixar e Apagar</translation>
+    </message>
+    <message>
+        <source>&amp;Shortcut...</source>
+        <translation>A&amp;talho...</translation>
+    </message>
+    <message>
+        <source>&amp;Link...</source>
+        <translation>&amp;Link...</translation>
+    </message>
+    <message>
+        <source>&amp;Toolbars</source>
+        <translation>Barras de &amp;ferramentas</translation>
+    </message>
+    <message>
+        <source>&amp;Left Panel</source>
+        <translation>Painel &amp;Esquerdo</translation>
+    </message>
+    <message>
+        <source>&amp;Right Panel</source>
+        <translation>Painel &amp;Direito</translation>
+    </message>
+    <message>
+        <source>&amp;Commands Buttons</source>
+        <translation>Botões de &amp;Comando</translation>
+    </message>
+    <message>
+        <source>Sessio&amp;ns and Tabs Buttons</source>
+        <translation>Botões de sessõ&amp;es e abas</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences Buttons</source>
+        <translation>Botões de &amp;Preferências</translation>
+    </message>
+    <message>
+        <source>So&amp;rt Buttons</source>
+        <translation>Botões de &amp;Organizar</translation>
+    </message>
+    <message>
+        <source>&amp;Transfer Settings</source>
+        <translation>Ajustes de &amp;transferência</translation>
+    </message>
+    <message>
+        <source>Custom Co&amp;mmand Buttons</source>
+        <translation>Botões de co&amp;mandos personalizados</translation>
+    </message>
+    <message>
+        <source>&amp;History Buttons</source>
+        <translation>Botões de &amp;Navegação</translation>
+    </message>
+    <message>
+        <source>&amp;Navigation Buttons</source>
+        <translation>Botões de &amp;Navegação</translation>
+    </message>
+    <message>
+        <source>&amp;File Buttons</source>
+        <translation>&amp;Botões de Arquivo</translation>
+    </message>
+    <message>
+        <source>Se&amp;lection Buttons</source>
+        <translation>Botões de &amp;Seleção</translation>
+    </message>
+    <message>
+        <source>&amp;Lock Toolbars</source>
+        <translation>&amp;Bloquear barras de ferramentas</translation>
+    </message>
+    <message>
+        <source>&amp;Show Selective Text Labels</source>
+        <translation>&amp;Mostrar Etiquetas de Texto Seletivas</translation>
+    </message>
+    <message>
+        <source>T&amp;oolbar Icons Size</source>
+        <translation>Tamanh&amp;o dos Ícones da Barra de Ferramentas</translation>
+    </message>
+    <message>
+        <source>&amp;Normal</source>
+        <translation>&amp;Normal</translation>
+    </message>
+    <message>
+        <source>&amp;Large</source>
+        <translation>&amp;Grande</translation>
+    </message>
+    <message>
+        <source>&amp;Very Large</source>
+        <translation>&amp;Muito Grande</translation>
+    </message>
+    <message>
+        <source>Default transfer settings</source>
+        <translation>Configurações de transferência padrão</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

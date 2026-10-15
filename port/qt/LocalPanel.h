@@ -10,6 +10,8 @@
 #include <QStringList>
 #include <QWidget>
 
+#include "PanelBands.h"
+
 #include <functional>
 
 #include "FileList.h"
@@ -90,6 +92,8 @@ public:
   // Its own actions, which the window's context menus offer too.
   // The icons, of the set chosen (IconSet).
   void ApplyIcons();
+  // WinSCP's toolbars above the panel (PanelBands.h).
+  QToolBar * Band(TPanelBand Which) const { return FBands[Which]; }
   QAction * BackAction() const { return FBackAction; }
   QAction * ForwardAction() const { return FForwardAction; }
   QAction * ParentAction() const { return FParentAction; }
@@ -124,6 +128,7 @@ private:
   QString FCurrent;
   QStringList FBack;
   QStringList FForward;
+  TPanelBands FBands;
   QAction * FBackAction = nullptr;
   QAction * FForwardAction = nullptr;
   QAction * FParentAction = nullptr;

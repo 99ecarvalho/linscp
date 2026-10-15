@@ -1,4 +1,5 @@
 #include "LocalPanel.h"
+#include "PanelBands.h"
 #include "IconSet.h"
 
 #include <QAction>
@@ -88,12 +89,15 @@ LocalPanel::LocalPanel(QWidget * Parent) :
 
   QVBoxLayout * Layout = new QVBoxLayout(this);
   Layout->setContentsMargins(0, 0, 0, 0);
-  QToolBar * Bar = new QToolBar(this);
-  Bar->setIconSize(QSize(16, 16));
-  auto Add = [this, Bar](QStyle::StandardPixmap Icon, const QString & Text, const QKeySequence & Key,
+  // WinSCP's bands (PanelBands.h): the history and navigation ones are the
+  // panel's; its file commands go in the window's Files band.
+  FBands.Make(this);
+  QToolBar * Bar = FBands[TPanelBand::History];
+  auto Add = [this, &Bar](QStyle::StandardPixmap Icon, const QString & Text, const QKeySequence & Key,
     std::function<void()> Handler) -> QAction *
   {
-    QAction * Action = Bar->addAction(style()->standardIcon(Icon), Text);
+    QAction * Action = (Bar != nullptr) ? Bar->addAction(style()->standardIcon(Icon), Text) :
+      new QAction(style()->standardIcon(Icon), Text, this);
     Action->setShortcut(Key);
     Action->setShortcutContext(Qt::WidgetWithChildrenShortcut);
     connect(Action, &QAction::triggered, this, Handler);
@@ -102,6 +106,7 @@ LocalPanel::LocalPanel(QWidget * Parent) :
   };
   FBackAction = Add(QStyle::SP_ArrowBack, tr("&Back"), QKeySequence::Back, [this]() { Back(); });
   FForwardAction = Add(QStyle::SP_ArrowForward, tr("&Forward"), QKeySequence::Forward, [this]() { Forward(); });
+  Bar = FBands[TPanelBand::Navigation];
   FParentAction = Add(QStyle::SP_FileDialogToParent, tr("&Parent Directory"), QKeySequence(Qt::Key_Backspace),
     [this]() { LocalPanel::Parent(); });
   // As TCustomDirView.KeyDown: Alt+Up and Ctrl+PgUp too.
@@ -110,7 +115,7 @@ LocalPanel::LocalPanel(QWidget * Parent) :
   FRootAction = Add(QStyle::SP_DriveHDIcon, tr("&Root Directory"), QKeySequence(Qt::CTRL | Qt::Key_Backslash), [this]() { Root(); });
   FHomeAction = Add(QStyle::SP_DirHomeIcon, tr("&Home Directory"), QKeySequence(Qt::CTRL | Qt::Key_H), [this]() { Home(); });
   FRefreshAction = Add(QStyle::SP_BrowserReload, tr("&Refresh"), QKeySequence(Qt::CTRL | Qt::Key_R), [this]() { Refresh(); });
-  Bar->addSeparator();
+  Bar = nullptr;
   FNewFolderAction = Add(QStyle::SP_FileDialogNewFolder, tr("Create Directory"), QKeySequence(Qt::Key_F7), [this]()
   {
     NewFolderDialog();
@@ -126,12 +131,11 @@ LocalPanel::LocalPanel(QWidget * Parent) :
   DeleteAlternative->setShortcutContext(Qt::WidgetWithChildrenShortcut);
   connect(DeleteAlternative, &QAction::triggered, this, [this]() { DeleteSelected(true, true); });
   addAction(DeleteAlternative);
-  Layout->addWidget(Bar);
 
   FPath = new QLineEdit(this);
   FPath->setAccessibleName(tr("Local path"));
   connect(FPath, &QLineEdit::returnPressed, this, [this]() { ChangeDirectory(FPath->text().trimmed()); });
-  Layout->addWidget(FPath);
+  FBands.LayOut(Layout, FPath);
 
   FModel = new FileListModel(this);
 #if defined(Q_OS_WIN)

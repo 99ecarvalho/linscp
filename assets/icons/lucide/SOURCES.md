@@ -68,3 +68,10 @@ glyphs) is the file below, unchanged.
 | public-key | `icons/key-square.svg` |
 | custom-commands | `icons/command.svg` |
 | swap-panels | `icons/arrow-left-right.svg` |
+| sort-ascending | `icons/arrow-up-narrow-wide.svg` |
+| sort-name | `icons/arrow-down-a-z.svg` |
+| sort-size | `icons/arrow-down-1-0.svg` |
+| sort-time | `icons/clock.svg` |
+| sort-rights | `icons/lock.svg` |
+| sort-owner | `icons/user.svg` |
+| sort-group | `icons/users.svg` |
