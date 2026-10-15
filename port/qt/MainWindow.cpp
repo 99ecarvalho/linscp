@@ -3,6 +3,8 @@
 #include <QApplication>
 #include <QClipboard>
 #include <QCloseEvent>
+#include <QElapsedTimer>
+#include <QStorageInfo>
 #include <QComboBox>
 #include <QShortcut>
 #include <QHeaderView>
@@ -20,6 +22,7 @@
 #include <QJsonObject>
 #include <QMessageBox>
 #include <QNetworkAccessManager>
+#include <QNetworkProxy>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QPushButton>
@@ -79,6 +82,7 @@
 #include "SaveWorkspaceDialog.h"
 #include "CopyLocalDialog.h"
 #include "IconSet.h"
+#include "Theme.h"
 #include "Integration.h"
 #include "MasterPasswordDialog.h"
 #include "WindowParams.h"
@@ -208,10 +212,19 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
       QDir(QString::fromStdString(CoreBridge::TemporaryDirectoryBase())).filePath(QStringLiteral("scpXXXXXX"))));
     const QString Directory = FDragDirectories.back()->path();
     const QStringList Names = Drag.Names;
-    return new RemoteFileDrag(Drag, Directory, [this, Names, Directory]()
+    // The files' sizes, for the free space (directories' unknown).
+    std::int64_t Size = 0;
+    for (const CoreBridge::TRemoteEntry & Entry : FPanel->Entries())
+    {
+      if (!Entry.Directory && Names.contains(QString::fromStdString(Entry.Name)))
+      {
+        Size += Entry.Size;
+      }
+    }
+    return new RemoteFileDrag(Drag, Directory, [this, Names, Directory, Size]()
     {
       FDragOuts++;
-      return Download(Names, Directory, false);
+      return WarnLackOfTempSpace(Directory, Size) && Download(Names, Directory, false);
     });
   };
   // A file activated: the double-click action (FileActivated).
@@ -421,6 +434,32 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
     ApplyPreferences();
   });
 
+  // Ctrl+Alt+R, as WinSCP's AutoReadDirectoryAfterOpAction (in no menu):
+  // Panels > Remote's "Automatically refresh directory after operation"
+  // toggled, and noted.
+  QAction * AutoReadAction = new QAction(this);
+  AutoReadAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_R));
+  connect(AutoReadAction, &QAction::triggered, this, [this]()
+  {
+    bool On = false;
+    try
+    {
+      CoreBridge::ChangePreferences([&On](CoreBridge::TPreferences & Changed)
+      {
+        Changed.AutoReadDirectoryAfterOp = !Changed.AutoReadDirectoryAfterOp;
+        On = Changed.AutoReadDirectoryAfterOp;
+      });
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+      return;
+    }
+    const QStringList Parts = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::AutoReadDirectoryToggle)).split(QLatin1Char('|'));
+    statusBar()->showMessage(Parts.value(0).replace(QStringLiteral("%s"), Parts.value(On ? 1 : 2)), 30000);
+  });
+  addAction(AutoReadAction);
+
   FFilterAction = ViewMenu->addAction(tr("&Filter..."), this, [this]() { Filter(); });
   FFilterAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_F));
 
@@ -435,6 +474,9 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   ApplyPreferences();
   RestoreLayout();
   connect(FPanel, &RemotePanel::Changed, this, &MainWindow::UpdateTitle);
+  // When the remote directory was last read (Terminal's DirectoryLoaded).
+  FRemoteLoaded.start();
+  connect(FPanel, &RemotePanel::Changed, this, [this]() { FRemoteLoaded.restart(); });
   UpdateCustomCommands();
   UpdateBookmarkShortCuts();
   UpdateActions();
@@ -648,12 +690,9 @@ bool MainWindow::PreferencesDialog(const QString & Page)
     // A preset's Current button: what autoselection would match now.
     Dialog.SetCurrentRuleData(TransferPresetAutoSelectData());
   }
-  for (int Row = 0; !Page.isEmpty() && (Row < Dialog.Navigation()->count()); Row++)
+  if (!Page.isEmpty())
   {
-    if (Dialog.Navigation()->item(Row)->text() == Page)
-    {
-      Dialog.Navigation()->setCurrentRow(Row);
-    }
+    Dialog.ShowPage(Page);
   }
   if (Dialog.exec() != QDialog::Accepted)
   {
@@ -677,10 +716,36 @@ bool MainWindow::PreferencesDialog(const QString & Page)
 void MainWindow::ApplyPreferences()
 {
   const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
-  if (QString::fromStdString(Preferences.IconSet) != IconSet::Current())
+  // Interface's theme, at once (the icons take the palette's colours).
+  const bool ThemeChanged = (Preferences.DarkTheme != FAppliedTheme);
+  if (ThemeChanged)
+  {
+    FAppliedTheme = Preferences.DarkTheme;
+    Theme::Apply(Preferences.DarkTheme);
+  }
+  if ((QString::fromStdString(Preferences.IconSet) != IconSet::Current()) || ThemeChanged)
   {
     IconSet::SetCurrent(QString::fromStdString(Preferences.IconSet));
     ApplyIcons();
+  }
+  // Panels > Remote's "Refresh remote panel every": looked at each second
+  // while idle, as WinSCP's ApplicationIdle.
+  if (Preferences.RefreshRemotePanel && (FRefreshRemoteTimer == nullptr))
+  {
+    FRefreshRemoteTimer = new QTimer(this);
+    connect(FRefreshRemoteTimer, &QTimer::timeout, this, &MainWindow::RefreshRemotePanelIfDue);
+  }
+  if (FRefreshRemoteTimer != nullptr)
+  {
+    FRefreshRemoteInterval = Preferences.RefreshRemotePanelInterval;
+    if (Preferences.RefreshRemotePanel)
+    {
+      FRefreshRemoteTimer->start(1000);
+    }
+    else
+    {
+      FRefreshRemoteTimer->stop();
+    }
   }
   FLocal->ApplyPreferences(Preferences);
   FPanel->ApplyPreferences(Preferences);
@@ -729,8 +794,95 @@ MainWindow::~MainWindow()
   CleanUpEdited();
 }
 
+bool MainWindow::ConfirmClosingSessions()
+{
+  if (FStandalone || !CoreBridge::Preferences().ConfirmClosingSession)
+  {
+    return true;
+  }
+  int Active = (FSession && FSession->Active()) ? 1 : 0;
+  for (const TTab & Tab : FTabs)
+  {
+    if (Tab.Session && Tab.Session->Active())
+    {
+      Active++;
+    }
+  }
+  // With a session open, or several tabs and no workspace saved
+  // automatically.
+  const bool AutoSave = CoreBridge::WorkspaceSettings().AutoSave;
+  if (!((Active > 0) || ((TabCount() > 1) && !AutoSave)))
+  {
+    return true;
+  }
+  using CoreBridge::TText;
+  QString Message;
+  if ((Active == 1) && FSession && FSession->Active())
+  {
+    Message = QString::fromStdString(CoreBridge::Text(AutoSave ? TText::CloseSession : TText::CloseSessionWorkspace))
+      .replace(QStringLiteral("%s"), QString::fromStdString(FSession->Name()));
+  }
+  else if (Active > 0)
+  {
+    Message = QString::fromStdString(CoreBridge::Text(AutoSave ? TText::CloseSessions : TText::CloseSessionsWorkspace));
+  }
+  else
+  {
+    Message = QString::fromStdString(CoreBridge::Text(TText::CloseWorkspace));
+  }
+  const QString Note = AutoSave ?
+    QString::fromStdString(CoreBridge::Text(TText::AutoWorkspace)).replace(QStringLiteral("%s"), WorkspaceName()) :
+    QString::fromStdString(CoreBridge::Text(TText::AutoWorkspaceEnable));
+  CoreBridge::TQuery Query;
+  Query.Type = CoreBridge::TQueryType::Confirmation;
+  Query.Message = (Message + QStringLiteral("\n\n") + Note).toStdString();
+  auto Button = [](unsigned Answer, const QString & Caption)
+  {
+    CoreBridge::TQueryButton Result;
+    Result.Answer = Answer;
+    Result.Caption = Caption.toStdString();
+    return Result;
+  };
+  if (AutoSave)
+  {
+    Query.Buttons = { Button(CoreBridge::AnswerOK, QMessageBox::tr("OK")), Button(CoreBridge::AnswerCancel, QMessageBox::tr("Cancel")) };
+  }
+  else
+  {
+    Query.Buttons = { Button(CoreBridge::AnswerYes, QMessageBox::tr("&Yes")), Button(CoreBridge::AnswerNo, QMessageBox::tr("&No")),
+      Button(CoreBridge::AnswerCancel, QMessageBox::tr("Cancel")) };
+  }
+  Query.CancelAnswer = CoreBridge::AnswerCancel;
+  Query.NeverAskAgainCheck = true;
+  QtFrontend Frontend;
+  Frontend.SetWindow(this);
+  const CoreBridge::TQueryResult Answer = Frontend.Query(Query);
+  if (Answer.Answer == CoreBridge::AnswerCancel)
+  {
+    return false;
+  }
+  if (Answer.NeverAskAgain)
+  {
+    try
+    {
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & Changed) { Changed.ConfirmClosingSession = false; });
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+    }
+  }
+  // No: the workspace saved, and from now on automatically.
+  return (Answer.Answer != CoreBridge::AnswerNo) || SaveWorkspace(nullptr, false, false, true);
+}
+
 void MainWindow::closeEvent(QCloseEvent * Event)
 {
+  if (!ConfirmClosingSessions())
+  {
+    Event->ignore();
+    return;
+  }
   // As WinSCP: the editors close first, each asking to save.
   if (!CloseEditors(false))
   {
@@ -911,14 +1063,150 @@ void MainWindow::ShowError(const CoreBridge::TCoreError & E)
 {
   if (!E.Aborted)
   {
-    // As ShowExtendedException: the tray's balloon too, while there.
-    if ((FTrayIcon != nullptr) && FTrayIcon->isVisible())
+    // As ShowExtendedException: the tray's balloon too, while there (and
+    // balloons are on).
+    if ((FTrayIcon != nullptr) && FTrayIcon->isVisible() && CoreBridge::Preferences().BalloonNotifications)
     {
       FTrayIcon->showMessage(windowTitle(), QString::fromStdString(E.Error.Message), QSystemTrayIcon::Critical);
     }
     QtFrontend Frontend;
     Frontend.SetWindow(this);
     Frontend.ShowError(E.Error);
+  }
+}
+
+void MainWindow::RefreshRemotePanelIfDue()
+{
+  if (!FBusy && FSession && FSession->Active() && !LocalBrowser() && (QApplication::activeModalWidget() == nullptr) &&
+      FRemoteLoaded.isValid() && (FRemoteLoaded.elapsed() > FRefreshRemoteInterval * 1000LL))
+  {
+    FRemoteLoaded.restart();
+    FPanel->Refresh();
+  }
+}
+
+bool MainWindow::WarnLackOfTempSpace(const QString & Path, std::int64_t RequiredSpace)
+{
+  const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+  if (!Preferences.DDWarnLackOfTempSpace)
+  {
+    return true;
+  }
+  const QStorageInfo Storage(Path);
+  const std::int64_t FreeSpace = Storage.bytesAvailable();
+  // DDWarnLackOfTempSpaceRatio's reserve.
+  if (!Storage.isValid() || (FreeSpace < 0) ||
+      (static_cast<double>(FreeSpace) >= RequiredSpace * Preferences.DDWarnLackOfTempSpaceRatio))
+  {
+    return true;
+  }
+  CoreBridge::TQuery Query;
+  Query.Type = CoreBridge::TQueryType::Warning;
+  QString Message = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::DDWarnLackOfTempSpace));
+  // Its three %s: the directory, the free space, the size.
+  for (const QString & Value : { QDir::toNativeSeparators(Path), FormatBytes(FreeSpace), FormatBytes(RequiredSpace) })
+  {
+    const int At = Message.indexOf(QStringLiteral("%s"));
+    if (At >= 0)
+    {
+      Message.replace(At, 2, Value);
+    }
+  }
+  Query.Message = Message.toStdString();
+  CoreBridge::TQueryButton Yes;
+  Yes.Answer = CoreBridge::AnswerYes;
+  Yes.Caption = QMessageBox::tr("&Yes").toStdString();
+  CoreBridge::TQueryButton No;
+  No.Answer = CoreBridge::AnswerNo;
+  No.Caption = QMessageBox::tr("&No").toStdString();
+  Query.Buttons = { Yes, No };
+  Query.CancelAnswer = CoreBridge::AnswerNo;
+  Query.NeverAskAgainCheck = true;
+  QtFrontend Frontend;
+  Frontend.SetWindow(this);
+  const CoreBridge::TQueryResult Answer = Frontend.Query(Query);
+  if (Answer.NeverAskAgain && (Answer.Answer == CoreBridge::AnswerYes))
+  {
+    try
+    {
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & Changed) { Changed.DDWarnLackOfTempSpace = false; });
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+    }
+  }
+  return (Answer.Answer == CoreBridge::AnswerYes);
+}
+
+void MainWindow::OperationComplete(double Seconds)
+{
+  const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+  if (Preferences.BeepOnFinish && (Seconds > Preferences.BeepOnFinishAfter))
+  {
+    QApplication::beep();
+    FBeeps++;
+  }
+}
+
+void MainWindow::HandleErrorList(CoreBridge::TSession * Session)
+{
+  if (Session != nullptr)
+  {
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    Frontend.ShowErrorList(Session->EndErrorList());
+  }
+}
+
+void MainWindow::FlashOnBackground()
+{
+  if (CoreBridge::Preferences().FlashTaskbar && !isActiveWindow())
+  {
+    QApplication::alert(this);
+  }
+}
+
+void MainWindow::Notify(const QString & Message, bool Error, const std::function<void()> & OnClick)
+{
+  if (CoreBridge::Preferences().BalloonNotifications && QSystemTrayIcon::isSystemTrayAvailable())
+  {
+    // The tray's icon while there, else one for the balloon's time.
+    QSystemTrayIcon * Icon = ((FTrayIcon != nullptr) && FTrayIcon->isVisible()) ? FTrayIcon : nullptr;
+    if (Icon == nullptr)
+    {
+      if (FBalloonIcon == nullptr)
+      {
+        FBalloonIcon = new QSystemTrayIcon(this);
+        QTimer * Hide = new QTimer(FBalloonIcon);
+        Hide->setObjectName(QStringLiteral("BalloonHide"));
+        Hide->setSingleShot(true);
+        connect(Hide, &QTimer::timeout, FBalloonIcon, &QSystemTrayIcon::hide);
+        connect(FBalloonIcon, &QSystemTrayIcon::activated, this, [this]() { activateWindow(); });
+      }
+      FBalloonIcon->setIcon(AppIcon());
+      FBalloonIcon->setToolTip(windowTitle());
+      FBalloonIcon->show();
+      FBalloonIcon->findChild<QTimer *>(QStringLiteral("BalloonHide"))->start(30000);
+      Icon = FBalloonIcon;
+    }
+    FBalloonClick = OnClick;
+    disconnect(Icon, &QSystemTrayIcon::messageClicked, this, nullptr);
+    connect(Icon, &QSystemTrayIcon::messageClicked, this, [this]()
+    {
+      const std::function<void()> Click = std::move(FBalloonClick);
+      FBalloonClick = nullptr;
+      if (Click)
+      {
+        Click();
+      }
+    });
+    Icon->showMessage(windowTitle(), Message, Error ? QSystemTrayIcon::Critical : QSystemTrayIcon::Information);
+  }
+  else
+  {
+    FlashOnBackground();
+    statusBar()->showMessage(QString(Message).replace(QLatin1Char('\n'), QLatin1Char(' ')), 30000);
   }
 }
 
@@ -993,6 +1281,8 @@ void MainWindow::StartUp()
     StandaloneKeepUpToDate(KeepParams, KeepUseDefaults);
     return;
   }
+  // Preferences > Updates' periodic check, once the window is up.
+  QTimer::singleShot(0, this, [this]() { CheckForUpdatesIfDue(); });
   bool CanOpen = false;
   std::unique_ptr<CoreBridge::TSession> Session;
   try
@@ -1265,6 +1555,9 @@ bool MainWindow::Upload(const QStringList & Names, const QString & Target, bool 
   FBusy = true;
   UpdateActions();
   bool Result = false;
+  QElapsedTimer Started;
+  Started.start();
+  FSession->BeginErrorList();
   try
   {
     Result = FSession->Upload(Paths, Target.toStdString(), Move, Settings);
@@ -1273,10 +1566,14 @@ bool MainWindow::Upload(const QStringList & Names, const QString & Target, bool 
   {
     ShowError(E);
   }
+  HandleErrorList(FSession.get());
   FBusy = false;
-  FPanel->Refresh();
+  // Read again by core, as Panels > Remote's "Automatically refresh
+  // directory after operation" has it (AutoReadDirectoryAfterOp).
+  FPanel->Reload();
   FLocal->Refresh();
   UpdateActions();
+  OperationComplete(Started.elapsed() / 1000.0);
   return Result;
 }
 
@@ -1295,6 +1592,9 @@ bool MainWindow::Download(const QStringList & Names, const QString & Target, boo
   FBusy = true;
   UpdateActions();
   bool Result = false;
+  QElapsedTimer Started;
+  Started.start();
+  FSession->BeginErrorList();
   try
   {
     Result = FSession->Download(List, QDir::toNativeSeparators(Target).toStdString(), Move, Settings);
@@ -1303,10 +1603,14 @@ bool MainWindow::Download(const QStringList & Names, const QString & Target, boo
   {
     ShowError(E);
   }
+  HandleErrorList(FSession.get());
   FBusy = false;
-  FPanel->Refresh();
+  // Read again by core, as Panels > Remote's "Automatically refresh
+  // directory after operation" has it (AutoReadDirectoryAfterOp).
+  FPanel->Reload();
   FLocal->Refresh();
   UpdateActions();
+  OperationComplete(Started.elapsed() / 1000.0);
   return Result;
 }
 
@@ -1398,11 +1702,18 @@ void MainWindow::QueueIdle()
     const int Finished = FSession->QueueDoneCount();
     const bool Same = (FQueueSession == FSession.get());
     const bool Emptied = Same && (FQueueBusy || (Finished > FQueueFinished)) && !Busy;
+    // As QueueOperationStart: when it got busy.
+    if (Busy && !(Same && FQueueBusy))
+    {
+      FQueueStarted.start();
+    }
     FQueueSession = FSession.get();
     FQueueBusy = Busy;
     FQueueFinished = Finished;
     if (Emptied)
     {
+      // As QueueEvent's qeEmpty.
+      OperationComplete(FQueueStarted.isValid() ? (FQueueStarted.elapsed() / 1000.0) : 0);
       QueueEmptied();
     }
   }
@@ -1802,7 +2113,7 @@ bool MainWindow::Drop(bool OnLocal, const QMimeData * Data, const QString & OnDi
     }
     const QString Target = OnLocal ?
       QDir::toNativeSeparators(DropTarget(FLocal->Path(), OnDirectory, false)) : DropTarget(FPanel->Path(), OnDirectory, true);
-    return Transfer(Drag.Local, Sources, Target, Move, Confirm, false);
+    return Transfer(Drag.Local, Sources, Target, Move, Confirm, false, true);
   }
   // Files from another program: uploaded when dropped on the remote panel.
   if (OnLocal || (Data == nullptr) || !Data->hasUrls())
@@ -1817,13 +2128,13 @@ bool MainWindow::Drop(bool OnLocal, const QMimeData * Data, const QString & OnDi
       Sources.append(QDir::cleanPath(Url.toLocalFile()));
     }
   }
-  return Transfer(true, Sources, DropTarget(FPanel->Path(), OnDirectory, true), Move, Confirm, false);
+  return Transfer(true, Sources, DropTarget(FPanel->Path(), OnDirectory, true), Move, Confirm, false, true);
 }
 
 // As WinSCP's Copy dialog: where to, editable, the transfer settings, and
 // (Background given) whether through the queue. False when cancelled.
 bool MainWindow::CopyDialog(bool FromLocal, const QStringList & Names, QString & Target, bool Move, bool * Background,
-  CoreBridge::TTransferSettings & Settings)
+  CoreBridge::TTransferSettings & Settings, bool DragDrop)
 {
   const QString What = (Names.size() == 1) ? QStringLiteral("'%1'").arg(QFileInfo(Names.first()).fileName()) : tr("%n file(s)", nullptr, Names.size());
   const QString Prompt = FromLocal ?
@@ -1849,6 +2160,13 @@ bool MainWindow::CopyDialog(bool FromLocal, const QStringList & Names, QString &
     InBackground->setChecked(*Background || SettingsBox->Settings().Queue);
     Layout->addRow(InBackground);
   }
+  // As CopyParamDialog's coDoNotShowAgain: checked to begin with for a
+  // drag while its confirmation is Auto (GetDoNotShowCopyDialogDefault).
+  const bool DDAuto = (CoreBridge::Preferences().DDTransferConfirmation == CoreBridge::TPreferences::TAutoSwitch::Auto);
+  QCheckBox * NeverShowAgain = new QCheckBox(tr("&Do not show this dialog box again"), &Dialog);
+  NeverShowAgain->setObjectName(QStringLiteral("NeverShowAgain"));
+  NeverShowAgain->setChecked(DragDrop && DDAuto);
+  Layout->addRow(NeverShowAgain);
   QDialogButtonBox * Box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &Dialog);
   connect(Box, &QDialogButtonBox::accepted, &Dialog, &QDialog::accept);
   connect(Box, &QDialogButtonBox::rejected, &Dialog, &QDialog::reject);
@@ -1883,6 +2201,47 @@ bool MainWindow::CopyDialog(bool FromLocal, const QStringList & Names, QString &
   {
     *Background = InBackground->isChecked();
   }
+  // As HandleDoNotShowCopyDialogAgain: a drag's confirmation off (noted,
+  // with a click undoing it, the first time), else the transfers'; left
+  // unchecked, a drag's asked again from now on.
+  try
+  {
+    if (NeverShowAgain->isChecked())
+    {
+      if (DragDrop && DDAuto)
+      {
+        Notify(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::DDTransferConfirmOff)), false, []()
+        {
+          CoreBridge::ChangePreferences([](CoreBridge::TPreferences & Changed)
+          {
+            Changed.DDTransferConfirmation = CoreBridge::TPreferences::TAutoSwitch::On;
+          });
+        });
+      }
+      CoreBridge::ChangePreferences([DragDrop](CoreBridge::TPreferences & Changed)
+      {
+        if (DragDrop)
+        {
+          Changed.DDTransferConfirmation = CoreBridge::TPreferences::TAutoSwitch::Off;
+        }
+        else
+        {
+          Changed.ConfirmTransferring = false;
+        }
+      });
+    }
+    else if (DragDrop && DDAuto)
+    {
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & Changed)
+      {
+        Changed.DDTransferConfirmation = CoreBridge::TPreferences::TAutoSwitch::On;
+      });
+    }
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
   Settings = SettingsBox->Settings();
   try
   {
@@ -1895,14 +2254,20 @@ bool MainWindow::CopyDialog(bool FromLocal, const QStringList & Names, QString &
   return true;
 }
 
-bool MainWindow::Transfer(bool FromLocal, const QStringList & Names, QString Target, bool Move, bool Confirm, bool Background)
+bool MainWindow::Transfer(bool FromLocal, const QStringList & Names, QString Target, bool Move, bool Confirm, bool Background,
+  bool DragDrop)
 {
   if (Names.isEmpty() || !FSession || !FSession->Active() || FBusy)
   {
     return false;
   }
+  // As CopyParamDialog: Environment's "Transferring of files", and for a
+  // drag its own (off: not asked).
+  const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+  Confirm = Confirm && Preferences.ConfirmTransferring &&
+    !(DragDrop && (Preferences.DDTransferConfirmation == CoreBridge::TPreferences::TAutoSwitch::Off));
   CoreBridge::TTransferSettings Settings = CoreBridge::CurrentTransferSettings();
-  if (Confirm && !CopyDialog(FromLocal, Names, Target, Move, &Background, Settings))
+  if (Confirm && !CopyDialog(FromLocal, Names, Target, Move, &Background, Settings, DragDrop))
   {
     return false;
   }
@@ -2206,6 +2571,8 @@ bool MainWindow::SynchronizeDirectories(const QString & LocalDirectory, const QS
   FBusy = true;
   UpdateActions();
   std::unique_ptr<CoreBridge::TSyncChecklist> Checklist;
+  QElapsedTimer Collecting;
+  Collecting.start();
   {
     SynchronizeProgress Progress(this);
     Progress.show();
@@ -2224,6 +2591,7 @@ bool MainWindow::SynchronizeDirectories(const QString & LocalDirectory, const QS
   }
   FBusy = false;
   UpdateActions();
+  const double CollectSeconds = Collecting.elapsed() / 1000.0;
   if (!Checklist)
   {
     return false;
@@ -2268,6 +2636,10 @@ bool MainWindow::SynchronizeDirectories(const QString & LocalDirectory, const QS
   bool Result = false;
   FBusy = true;
   UpdateActions();
+  CoreBridge::TSyncStatistics Statistics;
+  QElapsedTimer Applying;
+  Applying.start();
+  FSession->BeginErrorList();
   try
   {
     if (Queue)
@@ -2277,20 +2649,53 @@ bool MainWindow::SynchronizeDirectories(const QString & LocalDirectory, const QS
     }
     else
     {
-      Result = FSession->SyncApply(*Checklist);
+      Result = FSession->SyncApply(*Checklist, &Statistics);
     }
   }
   catch (const CoreBridge::TCoreError & E)
   {
     ShowError(E);
   }
+  HandleErrorList(FSession.get());
   FBusy = false;
-  FPanel->Refresh();
+  FPanel->Reload();
   FLocal->Refresh();
   UpdateActions();
   if (Queue)
   {
     QueueIdle();
+  }
+  else if (Result)
+  {
+    OperationComplete(Applying.elapsed() / 1000.0 + CollectSeconds);
+    // As Synchronize: Environment's "Synchronization summary".
+    if (CoreBridge::Preferences().SynchronizeSummary)
+    {
+      CoreBridge::TQuery Query;
+      Query.Type = CoreBridge::TQueryType::Information;
+      Query.Message = CoreBridge::SyncSummary(Statistics, Params.Mode == CoreBridge::TSyncParams::TMode::Timestamps,
+        CollectSeconds, Applying.elapsed() / 1000.0,
+        [](std::int64_t Bytes) { return FormatBytes(Bytes).toStdString(); });
+      CoreBridge::TQueryButton OK;
+      OK.Answer = CoreBridge::AnswerOK;
+      OK.Caption = QMessageBox::tr("OK").toStdString();
+      Query.Buttons = { OK };
+      Query.CancelAnswer = CoreBridge::AnswerOK;
+      Query.NeverAskAgainCheck = true;
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      if (Frontend.Query(Query).NeverAskAgain)
+      {
+        try
+        {
+          CoreBridge::ChangePreferences([](CoreBridge::TPreferences & Changed) { Changed.SynchronizeSummary = false; });
+        }
+        catch (const CoreBridge::TCoreError & E)
+        {
+          ShowError(E);
+        }
+      }
+    }
   }
   return Result;
 }
@@ -2406,19 +2811,67 @@ int MainWindow::CompareVersions(const QString & A, const QString & B)
   return 0;
 }
 
-void MainWindow::CheckForUpdates()
+double MainWindow::NowAsDateTime()
 {
-  const QUrl Url = UpdatesUrl.isEmpty() ?
-    QUrl(QStringLiteral("https://api.github.com/repos/99ecarvalho/linscp/releases?per_page=1")) : UpdatesUrl;
+  // A TDateTime counts local days from 1899-12-30; 1970 is day 25569.
+  const QDateTime Now = QDateTime::currentDateTime();
+  return (Now.toMSecsSinceEpoch() + Now.offsetFromUtc() * 1000.0) / 86400000.0 + 25569.0;
+}
+
+bool MainWindow::CheckForUpdatesIfDue()
+{
+  const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+  if ((Preferences.UpdatesPeriod <= 0) || FStandalone ||
+      (NowAsDateTime() - Preferences.UpdatesLastCheck < Preferences.UpdatesPeriod))
+  {
+    return false;
+  }
+  CheckForUpdates(true);
+  return true;
+}
+
+void MainWindow::CheckForUpdates(bool Automatic)
+{
+  const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+  const QString Current = QString::fromStdString(FInfo.Version);
+  // Beta versions: GitHub's pre-releases. "latest" is the newest release
+  // that is not one.
+  const bool Beta = (Preferences.UpdatesBetaVersions == CoreBridge::TPreferences::TAutoSwitch::On) ||
+    ((Preferences.UpdatesBetaVersions == CoreBridge::TPreferences::TAutoSwitch::Auto) &&
+     (CompareVersions(Current, QStringLiteral("1.0.0")) < 0));
+  const QUrl Url = !UpdatesUrl.isEmpty() ? UpdatesUrl :
+    QUrl(Beta ? QStringLiteral("https://api.github.com/repos/99ecarvalho/linscp/releases?per_page=1") :
+      QStringLiteral("https://api.github.com/repos/99ecarvalho/linscp/releases/latest"));
   QNetworkAccessManager * Manager = new QNetworkAccessManager(this);
+  // Updates' connection (TConnectionType): no proxy, the system's, or the one given.
+  if (Preferences.UpdatesConnectionType == 2)
+  {
+    Manager->setProxy(QNetworkProxy(QNetworkProxy::HttpProxy, QString::fromStdString(Preferences.UpdatesProxyHost),
+      static_cast<quint16>(Preferences.UpdatesProxyPort)));
+  }
+  else if (Preferences.UpdatesConnectionType == 1)
+  {
+    const QList<QNetworkProxy> System = QNetworkProxyFactory::systemProxyForQuery(QNetworkProxyQuery(Url));
+    Manager->setProxy(System.isEmpty() ? QNetworkProxy(QNetworkProxy::NoProxy) : System.first());
+  }
+  else
+  {
+    Manager->setProxy(QNetworkProxy(QNetworkProxy::NoProxy));
+  }
   QNetworkRequest Request(Url);
   Request.setRawHeader("Accept", "application/vnd.github+json");
-  Request.setHeader(QNetworkRequest::UserAgentHeader, QStringLiteral("linscp/%1").arg(QString::fromStdString(FInfo.Version)));
+  Request.setHeader(QNetworkRequest::UserAgentHeader, QStringLiteral("linscp/%1").arg(Current));
   QNetworkReply * Reply = Manager->get(Request);
-  QApplication::setOverrideCursor(Qt::BusyCursor);
-  connect(Reply, &QNetworkReply::finished, this, [this, Reply, Manager]()
+  if (!Automatic)
   {
-    QApplication::restoreOverrideCursor();
+    QApplication::setOverrideCursor(Qt::BusyCursor);
+  }
+  connect(Reply, &QNetworkReply::finished, this, [this, Reply, Manager, Automatic, Current, Preferences]()
+  {
+    if (!Automatic)
+    {
+      QApplication::restoreOverrideCursor();
+    }
     QString Latest;
     QString Page;
     QString Error;
@@ -2428,43 +2881,57 @@ void MainWindow::CheckForUpdates()
     }
     else
     {
-      // The releases API's list, newest first.
-      const QJsonArray Releases = QJsonDocument::fromJson(Reply->readAll()).array();
-      if (Releases.isEmpty())
+      // The releases API's list, newest first, or "latest"'s one.
+      const QJsonDocument Document = QJsonDocument::fromJson(Reply->readAll());
+      const QJsonArray Releases = Document.isArray() ? Document.array() : QJsonArray({ Document.object() });
+      const QJsonObject Release = Releases.isEmpty() ? QJsonObject() : Releases.first().toObject();
+      Latest = Release.value(QStringLiteral("tag_name")).toString();
+      Page = Release.value(QStringLiteral("html_url")).toString();
+      if (Latest.isEmpty())
       {
         Error = tr("No release information found.");
-      }
-      else
-      {
-        const QJsonObject Release = Releases.first().toObject();
-        Latest = Release.value(QStringLiteral("tag_name")).toString();
-        Page = Release.value(QStringLiteral("html_url")).toString();
       }
     }
     Reply->deleteLater();
     Manager->deleteLater();
-    const QString Current = QString::fromStdString(FInfo.Version);
+    // As TUpdatesConfiguration's LastCheck: checked, whatever it said.
+    try
+    {
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & Changed) { Changed.UpdatesLastCheck = NowAsDateTime(); });
+    }
+    catch (const CoreBridge::TCoreError &)
+    {
+      // Checked again next time.
+    }
     const bool Newer = !Latest.isEmpty() && (CompareVersions(Latest, Current) > 0);
     if (OnUpdatesChecked)
     {
       OnUpdatesChecked(Latest, Newer, Error);
       return;
     }
-    if (!Error.isEmpty())
+    const QString ReleasePage = Page.isEmpty() ? QStringLiteral("https://github.com/99ecarvalho/linscp/releases") : Page;
+    const QString Available = tr("Version %1 of linscp is available. You are using version %2.").arg(Latest, Current);
+    if (Automatic && !Newer)
+    {
+      return;
+    }
+    if (Automatic && !Preferences.UpdatesShowOnStartup)
+    {
+      Notify(Available, false, [this, ReleasePage]() { OpenWebPage(ReleasePage); });
+    }
+    else if (!Error.isEmpty())
     {
       QMessageBox::warning(this, tr("Check for Updates"), tr("Could not check for updates: %1").arg(Error));
     }
     else if (Newer)
     {
-      QMessageBox Box(QMessageBox::Information, tr("Check for Updates"),
-        tr("Version %1 of linscp is available. You are using version %2.").arg(Latest, Current),
-        QMessageBox::NoButton, this);
+      QMessageBox Box(QMessageBox::Information, tr("Check for Updates"), Available, QMessageBox::NoButton, this);
       QPushButton * Download = Box.addButton(tr("&Download Page"), QMessageBox::AcceptRole);
       Box.addButton(QMessageBox::Close);
       Box.exec();
       if (Box.clickedButton() == Download)
       {
-        OpenWebPage(Page.isEmpty() ? QStringLiteral("https://github.com/99ecarvalho/linscp/releases") : Page);
+        OpenWebPage(ReleasePage);
       }
     }
     else
@@ -4181,7 +4648,12 @@ void MainWindow::UnparkTab(int Index)
   FQueueDone = Tab.QueueDone;
   FPanel->SetSession(FSession.get());
   FQueue->SetSession(FSession.get());
-  if (!Tab.LocalPath.isEmpty())
+  // As SessionChanged: the tab's local directory and state, unless Panels >
+  // Local's "Do not change state when switching sessions" keeps the
+  // panel's (a local tab's are always its own).
+  const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+  const bool LocalState = !Preferences.PreserveLocalDirectory || Tab.LocalBrowser;
+  if (!Tab.LocalPath.isEmpty() && LocalState)
   {
     FLocal->ChangeDirectory(Tab.LocalPath);
   }
@@ -4192,9 +4664,12 @@ void MainWindow::UnparkTab(int Index)
   ShowLocalBrowser(Tab.LocalBrowser);
   // As PreservePanelState: each panel's focus, selection and scroll, as the
   // tab left them.
-  if (CoreBridge::Preferences().PreservePanelState)
+  if (Preferences.PreservePanelState)
   {
-    FLocal->RestoreState(Tab.LocalState);
+    if (LocalState)
+    {
+      FLocal->RestoreState(Tab.LocalState);
+    }
     FPanel->RestoreState(Tab.RemoteState);
     FOtherLocal->RestoreState(Tab.OtherLocalState);
   }
@@ -4363,7 +4838,7 @@ QString MainWindow::WorkspaceName() const
     QString::fromStdString(CoreBridge::Text(CoreBridge::TText::NewWorkspace));
 }
 
-bool MainWindow::SaveWorkspace(const QString * Name, bool SavePasswords, bool AutoSave)
+bool MainWindow::SaveWorkspace(const QString * Name, bool SavePasswords, bool AutoSave, bool EnableAutoSave)
 {
   if (FBusy || (TabCount() == 0))
   {
@@ -4381,7 +4856,7 @@ bool MainWindow::SaveWorkspace(const QString * Name, bool SavePasswords, bool Au
     else
     {
       const bool CanSavePasswords = CoreBridge::TSession::WorkspaceHasPasswords(Tabs);
-      SaveWorkspaceDialog Dialog(WorkspaceName(), CanSavePasswords, false, false, this);
+      SaveWorkspaceDialog Dialog(WorkspaceName(), CanSavePasswords, false, EnableAutoSave, this);
       if (Dialog.exec() != QDialog::Accepted)
       {
         return false;
@@ -5086,7 +5561,8 @@ bool MainWindow::LocalLocalCopy(bool Move, bool Confirm, const QStringList * Sou
   }
   QString Directory = (Target != nullptr) ? *Target : QDir::toNativeSeparators(Other->Path());
   QString FileMask = Mask;
-  if (Confirm)
+  // As LocalLocalCopy: asked as Environment's "Transferring of files".
+  if (Confirm && CoreBridge::Preferences().ConfirmTransferring)
   {
     CopyLocalDialog Dialog(Move, Paths.size() > 1, Directory, FileMask, this);
     if (Dialog.exec() != QDialog::Accepted)
@@ -6045,7 +6521,8 @@ bool MainWindow::PasteFromClipboard()
       }
       QString Target = QDir::toNativeSeparators(Panel->Path());
       CoreBridge::TTransferSettings Settings = CoreBridge::CurrentTransferSettings();
-      if (!CopyDialog(false, Names, Target, false, nullptr, Settings))
+      // As ClipboardDownload: asked as Environment's "Transferring of files".
+      if (CoreBridge::Preferences().ConfirmTransferring && !CopyDialog(false, Names, Target, false, nullptr, Settings))
       {
         return false;
       }

@@ -41,6 +41,7 @@
 #include <QHeaderView>
 #include <QKeyEvent>
 #include <QShortcut>
+#include <QScrollBar>
 #include <QTreeWidget>
 #include <QStackedWidget>
 #include <QSystemTrayIcon>
@@ -55,18 +56,37 @@ namespace
 
 enum { LocaleRole = Qt::UserRole };
 
+// As ComboAutoSwitchInitialize, ComboAutoSwitchLoad and ComboAutoSwitchSave:
+// Auto, Off, On, in that order (TPreferences::TAutoSwitch's On, Off, Auto).
+int IndexOfAutoSwitch(TPreferences::TAutoSwitch Value)
+{
+  return (Value == TPreferences::TAutoSwitch::Auto) ? 0 : ((Value == TPreferences::TAutoSwitch::Off) ? 1 : 2);
+}
+
+TPreferences::TAutoSwitch AutoSwitchOfIndex(int Index)
+{
+  return (Index == 0) ? TPreferences::TAutoSwitch::Auto :
+    ((Index == 1) ? TPreferences::TAutoSwitch::Off : TPreferences::TAutoSwitch::On);
+}
+
 }  // namespace
 
 PreferencesDialog::PreferencesDialog(QWidget * Parent) :
   QDialog(Parent)
 {
   setWindowTitle(tr("Preferences"));
-  resize(640, 440);
+  resize(720, 540);
   QVBoxLayout * Layout = new QVBoxLayout(this);
   QHBoxLayout * Main = new QHBoxLayout();
-  FNavigation = new QListWidget(this);
+  // WinSCP's tree of pages, each section's own page with its subpages
+  // under it.
+  FNavigation = new QTreeWidget(this);
   FNavigation->setAccessibleName(tr("Pages"));
-  FNavigation->setMaximumWidth(170);
+  FNavigation->setHeaderHidden(true);
+  FNavigation->setRootIsDecorated(false);
+  FNavigation->setIndentation(12);
+  // Its names are WinSCP's tree's, "Drag & Drop" with a plain "&".
+  FNavigation->setProperty("literalText", true);
   FPages = new QStackedWidget(this);
   Main->addWidget(FNavigation);
   Main->addWidget(FPages, 1);
@@ -76,28 +96,52 @@ PreferencesDialog::PreferencesDialog(QWidget * Parent) :
   FDefaultSettings = CoreBridge::DefaultTransferSettings();
   FPresets = CoreBridge::TransferPresets();
   FFileColors = Preferences.FileColors;
-  // In the order of WinSCP's tree: Environment (Window, Commander,
-  // Languages), Panels (File colors), Transfer (Background, Endurance).
-  AddPage(tr("Window"), MakeWindowPage(Preferences));
-  AddPage(tr("Commander"), MakeCommanderPage(Preferences));
-  AddPage(tr("Languages"), MakeLanguagesPage());
+  // In the order of WinSCP's tree: Environment (Interface, Window,
+  // Commander, Languages), Panels (Remote, Local, File colors), Editors
+  // (Internal editor), Transfer (Drag & Drop, Background, Endurance),
+  // Network, Security, Logging, Integration (Applications, Commands),
+  // Storage, Updates.
+  AddPage(tr("Environment"), MakeEnvironmentPage(Preferences));
+  AddPage(tr("Interface"), MakeInterfacePage(Preferences), true);
+  AddPage(tr("Window"), MakeWindowPage(Preferences), true);
+  AddPage(tr("Commander"), MakeCommanderPage(Preferences), true);
+  AddPage(tr("Languages"), MakeLanguagesPage(), true);
   AddPage(tr("Panels"), MakePanelsPage(Preferences));
-  AddPage(tr("File colors"), MakeFileColorsPage());
+  AddPage(tr("Remote"), MakeRemotePage(Preferences), true);
+  AddPage(tr("Local"), MakeLocalPage(Preferences), true);
+  AddPage(tr("File colors"), MakeFileColorsPage(), true);
   AddPage(tr("Editors"), MakeEditorsPage());
-  AddPage(tr("Internal editor"), MakeInternalEditorPage());
+  AddPage(tr("Internal editor"), MakeInternalEditorPage(), true);
   AddPage(tr("Transfer"), MakeTransferPage(Preferences));
-  AddPage(tr("Background"), MakeBackgroundPage(Preferences));
-  AddPage(tr("Endurance"), MakeEndurancePage(Preferences));
+  AddPage(tr("Drag & Drop"), MakeDragDropPage(Preferences), true);
+  AddPage(tr("Background"), MakeBackgroundPage(Preferences), true);
+  AddPage(tr("Endurance"), MakeEndurancePage(Preferences), true);
   AddPage(tr("Network"), MakeNetworkPage(Preferences));
   AddPage(tr("Security"), MakeSecurityPage(Preferences));
   AddPage(tr("Logging"), MakeLoggingPage(Preferences));
-  // Integration, its Applications, and Commands, as WinSCP's tree has them.
   AddPage(tr("Integration"), MakeIntegrationPage());
-  AddPage(tr("Applications"), MakeApplicationsPage(Preferences));
-  AddPage(tr("Commands"), MakeCommandsPage());
+  AddPage(tr("Applications"), MakeApplicationsPage(Preferences), true);
+  AddPage(tr("Commands"), MakeCommandsPage(), true);
   AddPage(tr("Storage"), MakeStoragePage(Preferences));
-  connect(FNavigation, &QListWidget::currentRowChanged, FPages, &QStackedWidget::setCurrentIndex);
-  FNavigation->setCurrentRow(0);
+  AddPage(tr("Updates"), MakeUpdatesPage(Preferences));
+  FNavigation->expandAll();
+  // As wide as its names (subpages indented), with room for a scroll bar.
+  int NamesWidth = 0;
+  for (const QTreeWidgetItem * Item : FPageItems)
+  {
+    NamesWidth = std::max(NamesWidth, FNavigation->fontMetrics().horizontalAdvance(Item->text(0)) +
+      ((Item->parent() != nullptr) ? FNavigation->indentation() : 0));
+  }
+  FNavigation->setFixedWidth(NamesWidth + 2 * FNavigation->frameWidth() +
+    FNavigation->verticalScrollBar()->sizeHint().width() + 16);
+  connect(FNavigation, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem * Item)
+  {
+    if (Item != nullptr)
+    {
+      FPages->setCurrentIndex(Item->data(0, Qt::UserRole).toInt());
+    }
+  });
+  ShowPageAt(0);
 
   QDialogButtonBox * Box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
   connect(Box, &QDialogButtonBox::accepted, this, &QDialog::accept);
@@ -107,10 +151,39 @@ PreferencesDialog::PreferencesDialog(QWidget * Parent) :
   UpdateControls();
 }
 
-void PreferencesDialog::AddPage(const QString & Name, QWidget * Page)
+void PreferencesDialog::AddPage(const QString & Name, QWidget * Page, bool Subpage)
 {
-  FNavigation->addItem(Name);
-  FPages->addWidget(Page);
+  QTreeWidgetItem * Parent = (Subpage && (FNavigation->topLevelItemCount() > 0)) ?
+    FNavigation->topLevelItem(FNavigation->topLevelItemCount() - 1) : nullptr;
+  QTreeWidgetItem * Item = (Parent != nullptr) ? new QTreeWidgetItem(Parent, { Name }) : new QTreeWidgetItem(FNavigation, { Name });
+  Item->setData(0, Qt::UserRole, FPages->addWidget(Page));
+  FPageItems.push_back(Item);
+}
+
+QString PreferencesDialog::PageName(int Index) const
+{
+  return ((Index >= 0) && (Index < PageCount())) ? FPageItems[Index]->text(0) : QString();
+}
+
+void PreferencesDialog::ShowPageAt(int Index)
+{
+  if ((Index >= 0) && (Index < PageCount()))
+  {
+    FNavigation->setCurrentItem(FPageItems[Index]);
+  }
+}
+
+bool PreferencesDialog::ShowPage(const QString & Name)
+{
+  for (int Index = 0; Index < PageCount(); Index++)
+  {
+    if (PageName(Index) == Name)
+    {
+      ShowPageAt(Index);
+      return true;
+    }
+  }
+  return false;
 }
 
 QWidget * PreferencesDialog::MakePanelsPage(const TPreferences & Preferences)
@@ -316,6 +389,12 @@ void PreferencesDialog::UpdateControls()
   FLogMaxCountSpin->setEnabled(FLogging->isChecked() && FLogMaxCount->isChecked());
   FActionsLogFile->setEnabled(FLogActions->isChecked());
   FEditorLargeFileSize->setEnabled(FEditorWarnLargeFile->isChecked());
+  // As UpdateControls' environment, panels and updates.
+  FConfirmDDTransfer->setEnabled(FConfirmTransferring->isChecked());
+  FBeepOnFinishAfter->setEnabled(FBeepOnFinish->isChecked());
+  FRefreshRemotePanelInterval->setEnabled(FRefreshRemotePanel->isChecked());
+  FUpdatesProxyHost->setEnabled(FUpdatesProxy->isChecked());
+  FUpdatesProxyPort->setEnabled(FUpdatesProxy->isChecked());
   // As UpdateControls' editors.
   const int EditorRow = FEditorsList->indexOfTopLevelItem(FEditorsList->currentItem());
   FEditEditor->setEnabled(EditorRow >= 0);
@@ -1209,6 +1288,51 @@ TPreferences PreferencesDialog::Preferences() const
   {
     Result.PuttyRegistryStorageKey = FPuttyRegistryStorageKey->currentText().toStdString();
   }
+  // As TPreferencesDialog::SaveConfiguration: the environment, the
+  // interface, drag & drop, the panels' pages, the updates.
+  Result.ConfirmTransferring = FConfirmTransferring->isChecked();
+  Result.DDTransferConfirmation = (FConfirmDDTransfer->checkState() == Qt::PartiallyChecked) ? TPreferences::TAutoSwitch::Auto :
+    (FConfirmDDTransfer->isChecked() ? TPreferences::TAutoSwitch::On : TPreferences::TAutoSwitch::Off);
+  Result.ConfirmOverwriting = FConfirmOverwriting->isChecked();
+  Result.ConfirmResume = FConfirmResume->isChecked();
+  Result.ConfirmDeleting = FConfirmDeleting->isChecked();
+  Result.ConfirmRecycling = FConfirmRecycling->isChecked();
+  Result.ConfirmClosingSession = FConfirmClosingSession->isChecked();
+  Result.ConfirmExitOnCompletion = FConfirmExitOnCompletion->isChecked();
+  Result.ConfirmCommandSession = FConfirmCommandSession->isChecked();
+  Result.SynchronizeSummary = FSynchronizeSummary->isChecked();
+  Result.ContinueOnError = FContinueOnError->isChecked();
+  Result.BeepOnFinish = FBeepOnFinish->isChecked();
+  Result.BeepOnFinishAfter = FBeepOnFinishAfter->value();
+  Result.BalloonNotifications = FBalloonNotifications->isChecked();
+  Result.FlashTaskbar = FFlashTaskbar->isChecked();
+  Result.DarkTheme = AutoSwitchOfIndex(FTheme->currentIndex());
+  Result.DDWarnLackOfTempSpace = FDDWarnLackOfTempSpace->isChecked();
+  Result.ShowInaccesibleDirectories = FShowInaccesibleDirectories->isChecked();
+  Result.AutoReadDirectoryAfterOp = FAutoReadDirectoryAfterOp->isChecked();
+  Result.RefreshRemotePanel = FRefreshRemotePanel->isChecked();
+  Result.RefreshRemotePanelInterval = FRefreshRemotePanelInterval->value();
+  Result.PreserveLocalDirectory = FPreserveLocalDirectory->isChecked();
+  Result.DeleteToRecycleBin = FDeleteToRecycleBin->isChecked();
+  // As SaveUpdates.
+  static const int Periods[] = { 0, 1, 7, 30 };
+  Result.UpdatesPeriod = Periods[std::clamp(FUpdatesPeriod->currentIndex(), 0, 3)];
+  Result.UpdatesShowOnStartup = FUpdatesShowOnStartup->isChecked();
+  Result.UpdatesBetaVersions = AutoSwitchOfIndex(FUpdatesBetaVersions->currentIndex());
+  Result.UpdatesProxyHost = FUpdatesProxyHost->text().trimmed().toStdString();
+  Result.UpdatesProxyPort = FUpdatesProxyPort->value();
+  if (FUpdatesAuto->isChecked())
+  {
+    Result.UpdatesConnectionType = 1;
+  }
+  else if (FUpdatesProxy->isChecked() && !Result.UpdatesProxyHost.empty())
+  {
+    Result.UpdatesConnectionType = 2;
+  }
+  else
+  {
+    Result.UpdatesConnectionType = 0;
+  }
   return Result;
 }
 
@@ -2047,4 +2171,274 @@ void PreferencesDialog::EditHostCA(bool Add)
       LoadHostCAs();
     }
   }
+}
+
+// Environment, as WinSCP's PreferencesSheet: the confirmations (in its
+// order) and the notifications.
+QWidget * PreferencesDialog::MakeEnvironmentPage(const TPreferences & Preferences)
+{
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  QGroupBox * Confirmations = new QGroupBox(tr("Confirmations"), Page);
+  QVBoxLayout * ConfirmationsLayout = new QVBoxLayout(Confirmations);
+  auto Add = [Confirmations, ConfirmationsLayout](const QString & Caption, bool Checked)
+  {
+    QCheckBox * Check = new QCheckBox(Caption, Confirmations);
+    Check->setChecked(Checked);
+    ConfirmationsLayout->addWidget(Check);
+    return Check;
+  };
+  FConfirmTransferring = Add(tr("&Transferring of files"), Preferences.ConfirmTransferring);
+  connect(FConfirmTransferring, &QCheckBox::toggled, this, &PreferencesDialog::UpdateControls);
+  // Indented under it; grayed (the default, asAuto) only while it has
+  // never been changed, as WinSCP's AllowGrayed.
+  FConfirmDDTransfer = new QCheckBox(tr("D&rag && drop operations and paste to other applications"), Confirmations);
+  FConfirmDDTransfer->setTristate(Preferences.DDTransferConfirmation == TPreferences::TAutoSwitch::Auto);
+  FConfirmDDTransfer->setCheckState((Preferences.DDTransferConfirmation == TPreferences::TAutoSwitch::Auto) ? Qt::PartiallyChecked :
+    ((Preferences.DDTransferConfirmation == TPreferences::TAutoSwitch::On) ? Qt::Checked : Qt::Unchecked));
+  connect(FConfirmDDTransfer, &QCheckBox::checkStateChanged, this, [this](Qt::CheckState State)
+  {
+    if (State != Qt::PartiallyChecked)
+    {
+      FConfirmDDTransfer->setTristate(false);
+    }
+  });
+  QHBoxLayout * DDLayout = new QHBoxLayout();
+  DDLayout->addSpacing(16);
+  DDLayout->addWidget(FConfirmDDTransfer, 1);
+  ConfirmationsLayout->addLayout(DDLayout);
+  FConfirmOverwriting = Add(tr("&Overwriting of files"), Preferences.ConfirmOverwriting);
+  FConfirmResume = Add(tr("Trans&fer resuming"), Preferences.ConfirmResume);
+  // BackgroundConfirmationsLink: to the Background page.
+  QLabel * BackgroundLink = new QLabel(QStringLiteral("<a href=\"#\">%1</a>").arg(tr("Change confirmations of background transfers").toHtmlEscaped()),
+    Confirmations);
+  BackgroundLink->setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
+  connect(BackgroundLink, &QLabel::linkActivated, this, [this]()
+  {
+    if (ShowPage(tr("Background")))
+    {
+      FQueueNoConfirmation->setFocus();
+    }
+  });
+  ConfirmationsLayout->addWidget(BackgroundLink);
+  FConfirmDeleting = Add(tr("&Deleting of files (recommended)"), Preferences.ConfirmDeleting);
+  FConfirmRecycling = Add(tr("&Moving files to Recycle bin"), Preferences.ConfirmRecycling);
+  FConfirmClosingSession = Add(tr("Closing sessions when exiting appli&cation"), Preferences.ConfirmClosingSession);
+  FConfirmExitOnCompletion = Add(tr("Exiting application on o&peration completion"), Preferences.ConfirmExitOnCompletion);
+  FConfirmCommandSession = Add(tr("Opening separate &shell session"), Preferences.ConfirmCommandSession);
+  FSynchronizeSummary = Add(tr("Sync&hronization summary"), Preferences.SynchronizeSummary);
+  FContinueOnError = Add(tr("Continue on &error (advanced users)"), Preferences.ContinueOnError);
+  Layout->addWidget(Confirmations);
+  QGroupBox * Notifications = new QGroupBox(tr("Notifications"), Page);
+  QGridLayout * NotificationsLayout = new QGridLayout(Notifications);
+  FBeepOnFinish = new QCheckBox(tr("&Beep when work finishes, if it lasted more than"), Notifications);
+  FBeepOnFinish->setChecked(Preferences.BeepOnFinish);
+  connect(FBeepOnFinish, &QCheckBox::toggled, this, &PreferencesDialog::UpdateControls);
+  FBeepOnFinishAfter = new QSpinBox(Notifications);
+  FBeepOnFinishAfter->setRange(0, 24 * 60 * 60);
+  FBeepOnFinishAfter->setSuffix(tr(" s"));
+  FBeepOnFinishAfter->setValue(Preferences.BeepOnFinishAfter);
+  FBeepOnFinishAfter->setAccessibleName(tr("Beep when work lasted more than seconds"));
+  NotificationsLayout->addWidget(FBeepOnFinish, 0, 0);
+  NotificationsLayout->addWidget(FBeepOnFinishAfter, 0, 1);
+  // The tray's, where the desktop has one.
+  FBalloonNotifications = new QCheckBox(tr("Show balloon &notifications in taskbar status area (system tray)"), Notifications);
+  FBalloonNotifications->setChecked(Preferences.BalloonNotifications);
+  NotificationsLayout->addWidget(FBalloonNotifications, 1, 0, 1, 2);
+  FFlashTaskbar = new QCheckBox(tr("Flash taskbar button when &attention is needed while on background"), Notifications);
+  FFlashTaskbar->setChecked(Preferences.FlashTaskbar);
+  NotificationsLayout->addWidget(FFlashTaskbar, 2, 0, 1, 2);
+  NotificationsLayout->setColumnStretch(0, 1);
+  Layout->addWidget(Notifications);
+  Layout->addStretch(1);
+  return Page;
+}
+
+// Interface, as WinSCP's GeneralSheet: the Commander (linscp has no
+// Explorer interface, ADR 0012) and the theme, applied at once.
+QWidget * PreferencesDialog::MakeInterfacePage(const TPreferences & Preferences)
+{
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  QGroupBox * Interface = new QGroupBox(tr("User Interface"), Page);
+  QGridLayout * InterfaceLayout = new QGridLayout(Interface);
+  QRadioButton * Commander = new QRadioButton(tr("&Commander"), Interface);
+  Commander->setChecked(true);
+  QLabel * CommanderDescription = new QLabel(
+    tr("- two panels (left for local directory, right for remote directory)\n"
+       "- keyboard shortcuts like in Norton Commander (and other similar programs as Total Commander, Midnight Commander...)\n"
+       "- drag && drop to/from both panels").replace(QStringLiteral("&&"), QStringLiteral("&")), Interface);
+  CommanderDescription->setWordWrap(true);
+  CommanderDescription->setProperty("literalText", true);
+  QRadioButton * Explorer = new QRadioButton(tr("&Explorer"), Interface);
+  Explorer->setEnabled(false);
+  Explorer->setToolTip(tr("linscp has only the Commander interface."));
+  QLabel * ExplorerDescription = new QLabel(
+    tr("- only remote directory\n- keyboard shortcuts like in Windows File Explorer\n- drag && drop").replace(QStringLiteral("&&"), QStringLiteral("&")),
+    Interface);
+  ExplorerDescription->setWordWrap(true);
+  ExplorerDescription->setEnabled(false);
+  ExplorerDescription->setProperty("literalText", true);
+  InterfaceLayout->addWidget(Commander, 0, 0);
+  InterfaceLayout->addWidget(CommanderDescription, 1, 0);
+  InterfaceLayout->addWidget(Explorer, 0, 1);
+  InterfaceLayout->addWidget(ExplorerDescription, 1, 1);
+  InterfaceLayout->setRowStretch(1, 1);
+  InterfaceLayout->setColumnStretch(0, 1);
+  InterfaceLayout->setColumnStretch(1, 1);
+  Layout->addWidget(Interface);
+  QGroupBox * Theme = new QGroupBox(tr("Theme"), Page);
+  QFormLayout * ThemeLayout = new QFormLayout(Theme);
+  FTheme = new QComboBox(Theme);
+  FTheme->addItems({ tr("Automatic"), tr("Light"), tr("Dark") });
+  FTheme->setCurrentIndex(IndexOfAutoSwitch(Preferences.DarkTheme));
+  ThemeLayout->addRow(tr("Interface &theme:"), FTheme);
+  Layout->addWidget(Theme);
+  Layout->addStretch(1);
+  return Page;
+}
+
+// Panels > Remote, as WinSCP's PanelRemoteSheet.
+QWidget * PreferencesDialog::MakeRemotePage(const TPreferences & Preferences)
+{
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  QGroupBox * Group = new QGroupBox(tr("Remote panel"), Page);
+  QGridLayout * GroupLayout = new QGridLayout(Group);
+  FShowInaccesibleDirectories = new QCheckBox(tr("Show in&accessible directories"), Group);
+  FShowInaccesibleDirectories->setChecked(Preferences.ShowInaccesibleDirectories);
+  GroupLayout->addWidget(FShowInaccesibleDirectories, 0, 0, 1, 2);
+  FAutoReadDirectoryAfterOp = new QCheckBox(tr("Auto&matically refresh directory after operation (Ctrl+Alt+R)"), Group);
+  FAutoReadDirectoryAfterOp->setChecked(Preferences.AutoReadDirectoryAfterOp);
+  GroupLayout->addWidget(FAutoReadDirectoryAfterOp, 1, 0, 1, 2);
+  FRefreshRemotePanel = new QCheckBox(tr("Refresh remote panel &every"), Group);
+  FRefreshRemotePanel->setChecked(Preferences.RefreshRemotePanel);
+  connect(FRefreshRemotePanel, &QCheckBox::toggled, this, &PreferencesDialog::UpdateControls);
+  FRefreshRemotePanelInterval = new QSpinBox(Group);
+  FRefreshRemotePanelInterval->setRange(1, 24 * 60 * 60);
+  FRefreshRemotePanelInterval->setSuffix(tr(" s"));
+  FRefreshRemotePanelInterval->setValue(std::max(1, Preferences.RefreshRemotePanelInterval));
+  FRefreshRemotePanelInterval->setAccessibleName(tr("Refresh remote panel every seconds"));
+  GroupLayout->addWidget(FRefreshRemotePanel, 2, 0);
+  GroupLayout->addWidget(FRefreshRemotePanelInterval, 2, 1);
+  GroupLayout->setColumnStretch(0, 1);
+  Layout->addWidget(Group);
+  Layout->addStretch(1);
+  return Page;
+}
+
+// Panels > Local, as WinSCP's PanelLocalSheet. Its "Use system file context
+// menu" is the Windows shell's (kept, not offered).
+QWidget * PreferencesDialog::MakeLocalPage(const TPreferences & Preferences)
+{
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  QGroupBox * Group = new QGroupBox(tr("Local panel"), Page);
+  QVBoxLayout * GroupLayout = new QVBoxLayout(Group);
+  FPreserveLocalDirectory = new QCheckBox(tr("Do not &change state when switching sessions"), Group);
+  FPreserveLocalDirectory->setChecked(Preferences.PreserveLocalDirectory);
+  GroupLayout->addWidget(FPreserveLocalDirectory);
+  FDeleteToRecycleBin = new QCheckBox(tr("&Delete files to recycle bin"), Group);
+  FDeleteToRecycleBin->setChecked(Preferences.DeleteToRecycleBin);
+  GroupLayout->addWidget(FDeleteToRecycleBin);
+  Layout->addWidget(Group);
+  Layout->addStretch(1);
+  return Page;
+}
+
+// Transfer > Drag & Drop, as WinSCP's DragDropSheet: remote files dragged
+// to other programs go through a temporary folder; the fake file needs
+// WinSCP's shell extension, which linscp does not have (ADR 0012).
+QWidget * PreferencesDialog::MakeDragDropPage(const TPreferences & Preferences)
+{
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  QGroupBox * Group = new QGroupBox(tr("Drag && Drop downloads"), Page);
+  QGridLayout * GroupLayout = new QGridLayout(Group);
+  QRadioButton * FakeFile = new QRadioButton(tr("Determine drop target by dragging a &fake file"), Group);
+  FakeFile->setEnabled(false);
+  FakeFile->setToolTip(tr("Needs WinSCP's shell extension, which linscp does not have."));
+  QLabel * FakeFileLabel = new QLabel(tr("Allows direct downloads to regular local folders (e.g. Windows File Explorer). "
+    "Does not allow downloads to other destinations (ZIP archives,  FTP, etc.). Uses drag&&drop shell extension, when available.")
+    .replace(QStringLiteral("&&"), QStringLiteral("&")), Group);
+  FakeFileLabel->setWordWrap(true);
+  FakeFileLabel->setEnabled(false);
+  FakeFileLabel->setProperty("literalText", true);
+  QRadioButton * Temporary = new QRadioButton(tr("Download files via &temporary folder"), Group);
+  Temporary->setChecked(true);
+  QLabel * TemporaryLabel = new QLabel(tr("Allows downloads to any destinations (regular folders, ZIP archives,  FTP, etc.). "
+    "Files are downloaded first to temporary folder, from where they are delivered to the destination."), Group);
+  TemporaryLabel->setWordWrap(true);
+  FDDWarnLackOfTempSpace = new QCheckBox(tr("&Warn when there is not enough free space"), Group);
+  FDDWarnLackOfTempSpace->setChecked(Preferences.DDWarnLackOfTempSpace);
+  GroupLayout->addWidget(FakeFile, 0, 0, 1, 2);
+  GroupLayout->addWidget(FakeFileLabel, 1, 1);
+  GroupLayout->addWidget(Temporary, 2, 0, 1, 2);
+  GroupLayout->addWidget(TemporaryLabel, 3, 1);
+  GroupLayout->addWidget(FDDWarnLackOfTempSpace, 4, 1);
+  GroupLayout->setColumnMinimumWidth(0, 16);
+  GroupLayout->setColumnStretch(1, 1);
+  Layout->addWidget(Group);
+  Layout->addStretch(1);
+  return Page;
+}
+
+// Updates, as WinSCP's UpdatesSheet, for linscp's releases (GitHub's):
+// no authorized e-mail (WinSCP's donors' automatic updates) and no usage
+// statistics (linscp collects none).
+QWidget * PreferencesDialog::MakeUpdatesPage(const TPreferences & Preferences)
+{
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  QGroupBox * Automatic = new QGroupBox(tr("Automatic updates"), Page);
+  QFormLayout * AutomaticLayout = new QFormLayout(Automatic);
+  FUpdatesPeriod = new QComboBox(Automatic);
+  FUpdatesPeriod->addItems({ tr("Never"), tr("Daily"), tr("Weekly"), tr("Monthly") });
+  // As LoadConfiguration: the period rounded up to one of the four.
+  const int Period = Preferences.UpdatesPeriod;
+  FUpdatesPeriod->setCurrentIndex((Period <= 0) ? 0 : ((Period <= 1) ? 1 : ((Period <= 7) ? 2 : 3)));
+  AutomaticLayout->addRow(tr("Automatic check &period:"), FUpdatesPeriod);
+  FUpdatesShowOnStartup = new QCheckBox(tr("&Display information about update on startup"), Automatic);
+  FUpdatesShowOnStartup->setChecked(Preferences.UpdatesShowOnStartup);
+  AutomaticLayout->addRow(FUpdatesShowOnStartup);
+  Layout->addWidget(Automatic);
+  QGroupBox * Connection = new QGroupBox(tr("Connection"), Page);
+  QGridLayout * ConnectionLayout = new QGridLayout(Connection);
+  FUpdatesDirect = new QRadioButton(tr("&No proxy"), Connection);
+  FUpdatesAuto = new QRadioButton(tr("&Automatically detect proxy settings"), Connection);
+  FUpdatesProxy = new QRadioButton(tr("&Use proxy server"), Connection);
+  FUpdatesAuto->setChecked(Preferences.UpdatesConnectionType == 1);
+  FUpdatesProxy->setChecked(Preferences.UpdatesConnectionType == 2);
+  FUpdatesDirect->setChecked(!FUpdatesAuto->isChecked() && !FUpdatesProxy->isChecked());
+  for (QRadioButton * Button : { FUpdatesDirect, FUpdatesAuto, FUpdatesProxy })
+  {
+    connect(Button, &QRadioButton::toggled, this, &PreferencesDialog::UpdateControls);
+  }
+  FUpdatesProxyHost = new QLineEdit(QString::fromStdString(Preferences.UpdatesProxyHost), Connection);
+  FUpdatesProxyPort = new QSpinBox(Connection);
+  FUpdatesProxyPort->setRange(1, 65535);
+  FUpdatesProxyPort->setValue(std::clamp(Preferences.UpdatesProxyPort, 1, 65535));
+  QLabel * HostLabel = new QLabel(tr("Proxy &hostname:"), Connection);
+  HostLabel->setBuddy(FUpdatesProxyHost);
+  QLabel * PortLabel = new QLabel(tr("Po&rt number:"), Connection);
+  PortLabel->setBuddy(FUpdatesProxyPort);
+  ConnectionLayout->addWidget(FUpdatesDirect, 0, 0, 1, 3);
+  ConnectionLayout->addWidget(FUpdatesAuto, 1, 0, 1, 3);
+  ConnectionLayout->addWidget(FUpdatesProxy, 2, 0, 1, 3);
+  ConnectionLayout->addWidget(HostLabel, 3, 1);
+  ConnectionLayout->addWidget(PortLabel, 3, 2);
+  ConnectionLayout->addWidget(FUpdatesProxyHost, 4, 1);
+  ConnectionLayout->addWidget(FUpdatesProxyPort, 4, 2);
+  ConnectionLayout->setColumnMinimumWidth(0, 16);
+  ConnectionLayout->setColumnStretch(1, 1);
+  Layout->addWidget(Connection);
+  QGroupBox * Options = new QGroupBox(tr("Options"), Page);
+  QFormLayout * OptionsLayout = new QFormLayout(Options);
+  FUpdatesBetaVersions = new QComboBox(Options);
+  FUpdatesBetaVersions->addItems({ tr("Auto"), tr("Off"), tr("On") });
+  FUpdatesBetaVersions->setCurrentIndex(IndexOfAutoSwitch(Preferences.UpdatesBetaVersions));
+  OptionsLayout->addRow(tr("Check for &beta versions:"), FUpdatesBetaVersions);
+  Layout->addWidget(Options);
+  Layout->addStretch(1);
+  return Page;
 }

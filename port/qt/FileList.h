@@ -36,7 +36,7 @@ public:
   enum { NameColumn, SizeColumn, ModifiedColumn, RightsColumn, OwnerColumn, GroupColumn, LinkTargetColumn, ExtColumn,
     TypeColumn, ColumnCount };
   // What the sort proxy compares; directories first is the proxy's.
-  enum { SortRole = Qt::UserRole, DirectoryRole, ParentRole, HiddenRole };
+  enum { SortRole = Qt::UserRole, DirectoryRole, ParentRole, HiddenRole, InaccessibleRole };
 
   using QAbstractTableModel::QAbstractTableModel;
   void SetEntries(std::vector<CoreBridge::TRemoteEntry> Entries, bool WithParent);
@@ -89,6 +89,8 @@ public:
   // WinSCP's "Show hidden files" (Ctrl+Alt+H); off by default, as WinSCP's.
   void SetShowHidden(bool Show);
   bool ShowHidden() const { return FShowHidden; }
+  // Panels > Remote's "Show inaccessible directories" (on by default).
+  void SetShowInaccessible(bool Show);
   // Preferences, Panels: "use natural order numerical sorting" (on by
   // default) and "always sort directories by name".
   void SetSorting(bool Natural, bool DirectoriesByName);
@@ -105,6 +107,7 @@ private:
   int CompareText(const QString & A, const QString & B) const;
 
   bool FShowHidden = false;
+  bool FShowInaccessible = true;
   bool FNatural = true;
   bool FDirectoriesByName = false;
   QString FMask;

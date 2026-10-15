@@ -447,7 +447,9 @@ bool RemotePanel::DeleteSelected(bool Confirm)
   {
     return false;
   }
-  if (Confirm)
+  // As DeleteFiles: Environment's confirmation, with "Never ask me again"
+  // turning it off.
+  if (Confirm && CoreBridge::Preferences().ConfirmDeleting)
   {
     CoreBridge::TQuery Query;
     Query.Type = CoreBridge::TQueryType::Confirmation;
@@ -462,11 +464,17 @@ bool RemotePanel::DeleteSelected(bool Confirm)
     Cancel.Caption = "Cancel";
     Query.Buttons = { OK, Cancel };
     Query.CancelAnswer = CoreBridge::AnswerCancel;
+    Query.NeverAskAgainCheck = true;
     QtFrontend Frontend;
     Frontend.SetWindow(window());
-    if (Frontend.Query(Query).Answer != CoreBridge::AnswerOK)
+    const CoreBridge::TQueryResult Answer = Frontend.Query(Query);
+    if (Answer.Answer != CoreBridge::AnswerOK)
     {
       return false;
+    }
+    if (Answer.NeverAskAgain)
+    {
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & Changed) { Changed.ConfirmDeleting = false; });
     }
   }
   std::vector<std::string> List;
@@ -475,7 +483,15 @@ bool RemotePanel::DeleteSelected(bool Confirm)
     List.push_back(Name.toStdString());
   }
   bool Complete = true;
+  // As ExecuteFileOperation's TAutoBatch: "Continue on error" collecting.
+  FSession->BeginErrorList();
   const bool Result = Run([this, &List, &Complete]() { Complete = FSession->Delete(List); }, false);
+  if (FSession != nullptr)
+  {
+    QtFrontend Frontend;
+    Frontend.SetWindow(window());
+    Frontend.ShowErrorList(FSession->EndErrorList());
+  }
   return Result && Complete;
 }
 
@@ -646,6 +662,7 @@ void RemotePanel::ApplyPreferences(const CoreBridge::TPreferences & Preferences)
       return (FCurrent.endsWith(QLatin1Char('/')) ? FCurrent : (FCurrent + QLatin1Char('/'))).toStdString() + Entry.Name;
     });
   SetShowHidden(Preferences.ShowHiddenFiles);
+  FSort->SetShowInaccessible(Preferences.ShowInaccesibleDirectories);
 }
 
 // WinSCP's columns: name, size, changed, rights, owner, group, extension, link target, type (TUnixDirView).

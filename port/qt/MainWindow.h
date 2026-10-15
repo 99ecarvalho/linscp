@@ -6,6 +6,7 @@
 #define LINSCP_QT_MAIN_WINDOW_H
 
 #include <QDateTime>
+#include <QElapsedTimer>
 #include <QIcon>
 #include <QMainWindow>
 #include <QUrl>
@@ -57,11 +58,19 @@ public:
   // What opens URLs instead of the desktop's (tests).
   void SetUrlOpener(std::function<bool(const QUrl &)> Opener) { FUrlOpener = std::move(Opener); }
   // Help > Check for Updates, as WinSCP's (it asks winscp.net): linscp's
-  // newest release, pre-releases included, from GitHub's releases API (or
-  // UpdatesUrl's JSON), compared with this version. The answer is shown, or,
-  // with OnUpdatesChecked set (tests), given there: the newest version (empty
-  // when not known), whether it is newer, and an error.
-  void CheckForUpdates();
+  // newest release from GitHub's releases API (or UpdatesUrl's JSON),
+  // pre-releases as Preferences > Updates' "beta versions" has it (Auto:
+  // while this is one, a 0.x), through its proxy, compared with this
+  // version. The answer is shown, or, with OnUpdatesChecked set (tests),
+  // given there: the newest version (empty when not known), whether it is
+  // newer, and an error. Automatic: the periodic check's, quiet unless
+  // newer (shown, or with "Display information about update on startup"
+  // off, noted).
+  void CheckForUpdates(bool Automatic = false);
+  // The periodic check, when Updates' period has passed since the last.
+  bool CheckForUpdatesIfDue();
+  // When the check runs to (tests): the last check's TDateTime.
+  static double NowAsDateTime();
   QUrl UpdatesUrl;
   std::function<void(const QString & Latest, bool Newer, const QString & Error)> OnUpdatesChecked;
   // Options > Queue > Once Empty (NonVisual's Queue...OnceEmptyAction): what
@@ -109,7 +118,28 @@ public:
   // in background" (with Confirm, the dialog's checkbox decides).
   bool TransferSelected(bool Move, bool Confirm = true, bool Background = false);
   // Names (or full paths, from the local side) to Target, as the above.
-  bool Transfer(bool FromLocal, const QStringList & Names, QString Target, bool Move, bool Confirm, bool Background);
+  // DragDrop: a drag's, confirmed as Environment's "Drag & drop operations"
+  // has it.
+  bool Transfer(bool FromLocal, const QStringList & Names, QString Target, bool Move, bool Confirm, bool Background,
+    bool DragDrop = false);
+  // As PopupTrayBalloon (Environment's balloon notifications on) or
+  // PostNote with FlashOnBackground: the tray's balloon, clicked for
+  // OnClick, or the status bar's note.
+  void Notify(const QString & Message, bool Error = false, const std::function<void()> & OnClick = {});
+  // As FlashOnBackground: the taskbar's button, while elsewhere.
+  void FlashOnBackground();
+  // As OperationComplete: Environment's beep, for work that took longer than
+  // its seconds; how many so far, for tests.
+  void OperationComplete(double Seconds);
+  int Beeps() const { return FBeeps; }
+  // Panels > Remote's periodic refresh, when its seconds have passed since
+  // the directory was read.
+  void RefreshRemotePanelIfDue();
+  // As BatchEnd: the errors "Continue on error" collected (BeginErrorList).
+  void HandleErrorList(CoreBridge::TSession * Session);
+  // As DoWarnLackOfTempSpace: Drag & Drop's warning, when the files do not
+  // fit where they are downloaded to first; false when not to go on.
+  bool WarnLackOfTempSpace(const QString & Path, std::int64_t RequiredSpace);
   // What is dropped on a panel (OnLocal: the local one), onto one of its
   // directories or (OnDirectory empty) the panel itself, as WinSCP's drag
   // and drop: from the other panel, transferred there after the Copy
@@ -378,7 +408,12 @@ public:
   // tabs' sessions saved together, after its dialog, unless Name is given
   // (tests). Opening one (the site manager's, or at start): each of its
   // sessions in a tab. False when nothing was saved or opened.
-  bool SaveWorkspace(const QString * Name = nullptr, bool SavePasswords = false, bool AutoSave = false);
+  // EnableAutoSave: the dialog's "automatically save" checked to begin with.
+  bool SaveWorkspace(const QString * Name = nullptr, bool SavePasswords = false, bool AutoSave = false,
+    bool EnableAutoSave = false);
+  // As FormCloseQuery: Environment's "Closing sessions when exiting
+  // application"; false when cancelled.
+  bool ConfirmClosingSessions();
   bool OpenWorkspace(const QString & Name);
   // As WorkspaceName: the last saved, else the automatic one, else "My
   // Workspace".
@@ -411,7 +446,7 @@ private:
   bool EnsureShellSession(bool Shell);
   bool EnsureCommandSession(bool Capable);
   bool CopyDialog(bool FromLocal, const QStringList & Names, QString & Target, bool Move, bool * Background,
-    CoreBridge::TTransferSettings & Settings);
+    CoreBridge::TTransferSettings & Settings, bool DragDrop = false);
   bool GoRemote(const QString & Directory);
   // Removes the closed editors' temporary directories, once the queue has
   // no uploads left for them (or there is no session).
@@ -494,6 +529,15 @@ private:
   void StoreLayoutChoice(const std::function<void(CoreBridge::TLayout &)> & Change);
   QAction * FRemoteTreeAction = nullptr;
   QSystemTrayIcon * FTrayIcon = nullptr;
+  // Notify's, while the window is not in the tray, and its click.
+  QSystemTrayIcon * FBalloonIcon = nullptr;
+  int FBeeps = 0;
+  CoreBridge::TPreferences::TAutoSwitch FAppliedTheme = CoreBridge::TPreferences::TAutoSwitch::Auto;
+  QTimer * FRefreshRemoteTimer = nullptr;
+  int FRefreshRemoteInterval = 60;
+  QElapsedTimer FRemoteLoaded;
+  QElapsedTimer FQueueStarted;
+  std::function<void()> FBalloonClick;
   QList<QPointer<QWidget>> FTrayHidden;
   // TransferPresetAutoSelect's: the preset chosen by hand, the one last
   // autoselected.

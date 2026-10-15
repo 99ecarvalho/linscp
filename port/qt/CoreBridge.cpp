@@ -340,6 +340,40 @@ TPreferences Preferences()
     Configuration->GetDefaultIniFileExportPath());
   Result.RandomSeedFile = Utf8(Configuration->RandomSeedFile);
   Result.TemporaryDirectory = Utf8(Settings.DDTemporaryDirectory);
+  Result.ConfirmOverwriting = Configuration->ConfirmOverwriting;
+  Result.ConfirmResume = Configuration->ConfirmResume;
+  Result.ConfirmDeleting = Settings.ConfirmDeleting;
+  Result.ConfirmRecycling = Settings.ConfirmRecycling;
+  Result.ConfirmTransferring = Settings.ConfirmTransferring;
+  Result.DDTransferConfirmation = static_cast<TPreferences::TAutoSwitch>(std::clamp(Settings.DDTransferConfirmation, 0, 2));
+  Result.ConfirmClosingSession = Settings.ConfirmClosingSession;
+  Result.ConfirmExitOnCompletion = Settings.ConfirmExitOnCompletion;
+  Result.ConfirmCommandSession = GUIConfiguration->ConfirmCommandSession;
+  Result.ContinueOnError = GUIConfiguration->ContinueOnError;
+  Result.SynchronizeSummary = Settings.SynchronizeSummary;
+  Result.BeepOnFinish = GUIConfiguration->BeepOnFinish;
+  Result.BeepOnFinishAfter = static_cast<int>(static_cast<double>(GUIConfiguration->BeepOnFinishAfter) * SecsPerDay + 0.5);
+  Result.BalloonNotifications = Settings.BalloonNotifications;
+  Result.FlashTaskbar = Settings.FlashTaskbar;
+  Result.ExplorerInterface = (Settings.Interface == 1);
+  Result.DarkTheme = static_cast<TPreferences::TAutoSwitch>(std::clamp(Settings.DarkTheme, 0, 2));
+  Result.DDWarnLackOfTempSpace = Settings.DDWarnLackOfTempSpace;
+  Result.DDWarnLackOfTempSpaceRatio = Settings.DDWarnLackOfTempSpaceRatio;
+  Result.DDFakeFile = Settings.DDFakeFile;
+  Result.ShowInaccesibleDirectories = Settings.ShowInaccesibleDirectories;
+  Result.AutoReadDirectoryAfterOp = Configuration->AutoReadDirectoryAfterOp;
+  Result.RefreshRemotePanel = Settings.RefreshRemotePanel;
+  Result.RefreshRemotePanelInterval = Settings.RefreshRemotePanelInterval;
+  Result.PreserveLocalDirectory = Settings.PreserveLocalDirectory;
+  Result.DeleteToRecycleBin = Settings.DeleteToRecycleBin;
+  Result.SystemContextMenu = Settings.SystemContextMenu;
+  Result.UpdatesPeriod = Settings.UpdatesPeriod;
+  Result.UpdatesLastCheck = Settings.UpdatesLastCheck;
+  Result.UpdatesShowOnStartup = Settings.UpdatesShowOnStartup;
+  Result.UpdatesBetaVersions = static_cast<TPreferences::TAutoSwitch>(std::clamp(Settings.UpdatesBetaVersions, 0, 2));
+  Result.UpdatesConnectionType = Settings.UpdatesConnectionType;
+  Result.UpdatesProxyHost = Utf8(Settings.UpdatesProxyHost);
+  Result.UpdatesProxyPort = Settings.UpdatesProxyPort;
   return Result;
 }
 
@@ -621,6 +655,32 @@ void SetPreferences(const TPreferences & Preferences)
   }
   Settings.FileColors = Colors->CommaText;
   Settings.DDTemporaryDirectory = FromUtf8(Preferences.TemporaryDirectory);
+  Settings.ConfirmDeleting = Preferences.ConfirmDeleting;
+  Settings.ConfirmRecycling = Preferences.ConfirmRecycling;
+  Settings.ConfirmTransferring = Preferences.ConfirmTransferring;
+  Settings.DDTransferConfirmation = static_cast<int>(Preferences.DDTransferConfirmation);
+  Settings.ConfirmClosingSession = Preferences.ConfirmClosingSession;
+  Settings.ConfirmExitOnCompletion = Preferences.ConfirmExitOnCompletion;
+  Settings.SynchronizeSummary = Preferences.SynchronizeSummary;
+  Settings.BalloonNotifications = Preferences.BalloonNotifications;
+  Settings.FlashTaskbar = Preferences.FlashTaskbar;
+  Settings.Interface = Preferences.ExplorerInterface ? 1 : 0;
+  Settings.DarkTheme = static_cast<int>(Preferences.DarkTheme);
+  Settings.DDWarnLackOfTempSpace = Preferences.DDWarnLackOfTempSpace;
+  Settings.DDFakeFile = Preferences.DDFakeFile;
+  Settings.ShowInaccesibleDirectories = Preferences.ShowInaccesibleDirectories;
+  Settings.RefreshRemotePanel = Preferences.RefreshRemotePanel;
+  Settings.RefreshRemotePanelInterval = Preferences.RefreshRemotePanelInterval;
+  Settings.PreserveLocalDirectory = Preferences.PreserveLocalDirectory;
+  Settings.DeleteToRecycleBin = Preferences.DeleteToRecycleBin;
+  Settings.SystemContextMenu = Preferences.SystemContextMenu;
+  Settings.UpdatesPeriod = Preferences.UpdatesPeriod;
+  Settings.UpdatesLastCheck = Preferences.UpdatesLastCheck;
+  Settings.UpdatesShowOnStartup = Preferences.UpdatesShowOnStartup;
+  Settings.UpdatesBetaVersions = static_cast<int>(Preferences.UpdatesBetaVersions);
+  Settings.UpdatesConnectionType = Preferences.UpdatesConnectionType;
+  Settings.UpdatesProxyHost = FromUtf8(Preferences.UpdatesProxyHost);
+  Settings.UpdatesProxyPort = Preferences.UpdatesProxyPort;
   try
   {
     Shell()->SetSettings(Settings);
@@ -654,6 +714,13 @@ void SetPreferences(const TPreferences & Preferences)
     GUIConfiguration->PuttyPath = FromUtf8(Preferences.PuttyPath);
     GUIConfiguration->PuttyPassword = Preferences.PuttyPassword;
     GUIConfiguration->TelnetForFtpInPutty = Preferences.TelnetForFtpInPutty;
+    Configuration->ConfirmOverwriting = Preferences.ConfirmOverwriting;
+    Configuration->ConfirmResume = Preferences.ConfirmResume;
+    Configuration->AutoReadDirectoryAfterOp = Preferences.AutoReadDirectoryAfterOp;
+    GUIConfiguration->ConfirmCommandSession = Preferences.ConfirmCommandSession;
+    GUIConfiguration->ContinueOnError = Preferences.ContinueOnError;
+    GUIConfiguration->BeepOnFinish = Preferences.BeepOnFinish;
+    GUIConfiguration->BeepOnFinishAfter = TDateTime(static_cast<double>(Preferences.BeepOnFinishAfter) / SecsPerDay);
     if (!Preferences.PuttyRegistryStorageKey.empty())
     {
       Configuration->PuttyRegistryStorageKey = FromUtf8(Preferences.PuttyRegistryStorageKey);
@@ -688,6 +755,13 @@ void SetPreferences(const TPreferences & Preferences)
   {
     throw CoreErrorOf(E);
   }
+}
+
+void ChangePreferences(const std::function<void(TPreferences &)> & Change)
+{
+  TPreferences Changed = Preferences();
+  Change(Changed);
+  SetPreferences(Changed);
 }
 
 TLayout Layout()
@@ -1540,6 +1614,11 @@ std::string Text(TText Text)
     case TText::SyncBrowseCreate: Ident = SYNC_DIR_BROWSE_CREATE2; break;
     case TText::SyncBrowseError: Ident = SYNC_DIR_BROWSE_ERROR; break;
     case TText::SyncBrowseToggle: Ident = SYNC_DIR_BROWSE_TOGGLE; break;
+    case TText::AutoReadDirectoryToggle: Ident = AUTO_READ_DIRECTORY_TOGGLE; break;
+    case TText::ErrorListCount: Ident = ERROR_LIST_COUNT; break;
+    case TText::ErrorListNumber: Ident = ERROR_LIST_NUMBER; break;
+    case TText::PreviousButton: Ident = PREV_BUTTON; break;
+    case TText::NextButton: Ident = NEXT_BUTTON; break;
     case TText::NewFileName: Ident = NEW_FILE; break;
     case TText::EditFileCaption: Ident = EDIT_FILE_CAPTION; break;
     case TText::EditFilePrompt: Ident = EDIT_FILE_PROMPT; break;
@@ -1629,9 +1708,50 @@ std::string Text(TText Text)
     case TText::SpecialFolderDocuments: Ident = SPECIAL_FOLDER_MY_DOCUMENTS; break;
     case TText::SpecialFolderDesktop: Ident = SPECIAL_FOLDER_DESKTOP; break;
     case TText::CommandLineLabel: Ident = COMMAND_LINE_LABEL; break;
+    case TText::CloseSession: Ident = CLOSE_SESSION; break;
+    case TText::CloseSessions: Ident = CLOSE_SESSIONS; break;
+    case TText::CloseSessionWorkspace: Ident = CLOSE_SESSION_WORKSPACE; break;
+    case TText::CloseSessionsWorkspace: Ident = CLOSE_SESSIONS_WORKSPACE3; break;
+    case TText::CloseWorkspace: Ident = CLOSE_WORKSPACE; break;
+    case TText::AutoWorkspace: Ident = AUTO_WORKSPACE; break;
+    case TText::AutoWorkspaceEnable: Ident = AUTO_WORKSPACE_ENABLE; break;
+    case TText::DDTransferConfirmOff: return Utf8(UnformatMessage(LoadStr(DD_TRANSFER_CONFIRM_OFF2)));
+    case TText::DDWarnLackOfTempSpace: Ident = DD_WARN_LACK_OF_TEMP_SPACE; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));
+}
+
+std::string SyncSummary(const TSyncStatistics & Statistics, bool Timestamps, double CollectSeconds, double Seconds,
+  const std::function<std::string(std::int64_t)> & FormatBytesOf)
+{
+  auto FormatBytes = [&FormatBytesOf](std::int64_t Bytes) { return FromUtf8(FormatBytesOf(Bytes)); };
+  UnicodeString Message = LoadStr(SYNCHRONIZE_COMPLETE) + L"\n";
+  if (!Timestamps)
+  {
+    Message += L"\n";
+    if (Statistics.FilesUploaded > 0)
+    {
+      Message += FORMAT(LoadStrPart(SYNCHRONIZE_SUMMARY, 1), (FormatNumber(Statistics.FilesUploaded), FormatBytes(Statistics.TotalUploaded))) + L"\n";
+    }
+    if (Statistics.FilesDownloaded > 0)
+    {
+      Message += FORMAT(LoadStrPart(SYNCHRONIZE_SUMMARY, 2), (FormatNumber(Statistics.FilesDownloaded), FormatBytes(Statistics.TotalDownloaded))) + L"\n";
+    }
+    if (Statistics.FilesDeletedLocal > 0)
+    {
+      Message += FORMAT(LoadStrPart(SYNCHRONIZE_SUMMARY, 3), (FormatNumber(Statistics.FilesDeletedLocal))) + L"\n";
+    }
+    if (Statistics.FilesDeletedRemote > 0)
+    {
+      Message += FORMAT(LoadStrPart(SYNCHRONIZE_SUMMARY, 4), (FormatNumber(Statistics.FilesDeletedRemote))) + L"\n";
+    }
+  }
+  Message +=
+    L"\n" +
+    FORMAT(LoadStrPart(SYNCHRONIZE_SUMMARY, 5), (FormatDateTimeSpan(TDateTime(CollectSeconds / SecsPerDay)))) + L"\n" +
+    FORMAT(LoadStrPart(SYNCHRONIZE_SUMMARY, 6), (FormatDateTimeSpan(TDateTime(Seconds / SecsPerDay))));
+  return Utf8(Message);
 }
 
 const char ExpatLicenseUrl[] = "license:expat";

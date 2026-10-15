@@ -2191,6 +2191,10 @@ Local: %2</translation>
         <source>D&amp;onate</source>
         <translation>D&amp;oar</translation>
     </message>
+    <message>
+        <source>&amp;Do not show this dialog box again</source>
+        <translation>Não mostrar esse diálogo novamente</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>
@@ -3029,6 +3033,286 @@ Local: %2</translation>
         <source>Add upload shortcut to Explorer&apos;s &apos;&amp;Send to&apos; context menu</source>
         <translation>Adicionar atalho de upload ao menu de contexto &apos;&amp;Enviar para&apos; do Explorer</translation>
     </message>
+    <message>
+        <source>Environment</source>
+        <translation>Ambiente</translation>
+    </message>
+    <message>
+        <source>Interface</source>
+        <translation>Interface</translation>
+    </message>
+    <message>
+        <source>Remote</source>
+        <translation>Remoto</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Local</translation>
+    </message>
+    <message>
+        <source>Drag &amp; Drop</source>
+        <translation>Arrastar e soltar</translation>
+    </message>
+    <message>
+        <source>Updates</source>
+        <translation>Atualizações</translation>
+    </message>
+    <message>
+        <source>Confirmations</source>
+        <translation>Confirmações</translation>
+    </message>
+    <message>
+        <source>&amp;Transferring of files</source>
+        <translation>&amp;Transferência de arquivos</translation>
+    </message>
+    <message>
+        <source>D&amp;rag &amp;&amp; drop operations and paste to other applications</source>
+        <translation>Operações de a&amp;rrastar &amp;&amp; soltar e colar para outros aplicativos</translation>
+    </message>
+    <message>
+        <source>&amp;Overwriting of files</source>
+        <translation>S&amp;obrescrição de arquivos</translation>
+    </message>
+    <message>
+        <source>Trans&amp;fer resuming</source>
+        <translation>Resumo de &amp;Transferências</translation>
+    </message>
+    <message>
+        <source>Change confirmations of background transfers</source>
+        <translation>Mudar confirmações de transferências em plano de fundo</translation>
+    </message>
+    <message>
+        <source>&amp;Deleting of files (recommended)</source>
+        <translation>&amp;Exclusão de arquivos (recomendado)</translation>
+    </message>
+    <message>
+        <source>&amp;Moving files to Recycle bin</source>
+        <translation>&amp;Mover arquivos para a lixeira</translation>
+    </message>
+    <message>
+        <source>Closing sessions when exiting appli&amp;cation</source>
+        <translation>Fechar sessões quando sair da aplicação</translation>
+    </message>
+    <message>
+        <source>Exiting application on o&amp;peration completion</source>
+        <translation>Sair do programa ao concluir a operação</translation>
+    </message>
+    <message>
+        <source>Opening separate &amp;shell session</source>
+        <translation>Abrir sessão &amp;shell em separado</translation>
+    </message>
+    <message>
+        <source>Sync&amp;hronization summary</source>
+        <translation>Sinc&amp;ronizar sumário</translation>
+    </message>
+    <message>
+        <source>Continue on &amp;error (advanced users)</source>
+        <translation>Continuar em caso de erro (usuários avançados)</translation>
+    </message>
+    <message>
+        <source>Notifications</source>
+        <translation>Avisos</translation>
+    </message>
+    <message>
+        <source>&amp;Beep when work finishes, if it lasted more than</source>
+        <translation>&amp;Alertar quando a última tarefa terminar.</translation>
+    </message>
+    <message>
+        <source> s</source>
+        <translation> s</translation>
+    </message>
+    <message>
+        <source>Beep when work lasted more than seconds</source>
+        <translation>Bipar quando o trabalho durar mais que segundos</translation>
+    </message>
+    <message>
+        <source>Show balloon &amp;notifications in taskbar status area (system tray)</source>
+        <translation>Mo&amp;strar notificações na barra de tarefas</translation>
+    </message>
+    <message>
+        <source>Flash taskbar button when &amp;attention is needed while on background</source>
+        <translation>Piscar botão na barra de tarefas quando necessita &amp;atenção em plano de fundo</translation>
+    </message>
+    <message>
+        <source>User Interface</source>
+        <translation>Interface do usuário</translation>
+    </message>
+    <message>
+        <source>&amp;Commander</source>
+        <translation>&amp;Commander</translation>
+    </message>
+    <message>
+        <source>- two panels (left for local directory, right for remote directory)
+- keyboard shortcuts like in Norton Commander (and other similar programs as Total Commander, Midnight Commander...)
+- drag &amp;&amp; drop to/from both panels</source>
+        <translation>- dois painéis (esquerdo para diretório local, direito para remoto)
+- atalhos do teclado como no Norton Commander (e outros similares como Total Commander, Midnight Commander, etc.)
+- arrastar e soltar de/para ambos painéis</translation>
+    </message>
+    <message>
+        <source>&amp;Explorer</source>
+        <translation>&amp;Explorer</translation>
+    </message>
+    <message>
+        <source>linscp has only the Commander interface.</source>
+        <translation>O linscp tem apenas a interface Commander.</translation>
+    </message>
+    <message>
+        <source>- only remote directory
+- keyboard shortcuts like in Windows File Explorer
+- drag &amp;&amp; drop</source>
+        <translation>- somente diretório remoto
+- atalhos de teclado como no Windows Explorer
+- arrastar e soltar</translation>
+    </message>
+    <message>
+        <source>Theme</source>
+        <translation>Tema</translation>
+    </message>
+    <message>
+        <source>Automatic</source>
+        <translation>Automático</translation>
+    </message>
+    <message>
+        <source>Light</source>
+        <translation>Claro</translation>
+    </message>
+    <message>
+        <source>Dark</source>
+        <translation>Escuro</translation>
+    </message>
+    <message>
+        <source>Interface &amp;theme:</source>
+        <translation>&amp;Tema da Interface</translation>
+    </message>
+    <message>
+        <source>Remote panel</source>
+        <translation>Painel remoto</translation>
+    </message>
+    <message>
+        <source>Show in&amp;accessible directories</source>
+        <translation>&amp;Mostrar diretórios inacessíveis</translation>
+    </message>
+    <message>
+        <source>Auto&amp;matically refresh directory after operation (Ctrl+Alt+R)</source>
+        <translation>Atualizar diretório auto&amp;maticamente após operação (Ctrl+Alt+R)</translation>
+    </message>
+    <message>
+        <source>Refresh remote panel &amp;every</source>
+        <translation>Atualizar painel remoto &amp;sempre</translation>
+    </message>
+    <message>
+        <source>Refresh remote panel every seconds</source>
+        <translation>Atualizar painel remoto a cada segundos</translation>
+    </message>
+    <message>
+        <source>Local panel</source>
+        <translation>Painel Local</translation>
+    </message>
+    <message>
+        <source>Do not &amp;change state when switching sessions</source>
+        <translation>Não mudar estado quando trocar sessões</translation>
+    </message>
+    <message>
+        <source>&amp;Delete files to recycle bin</source>
+        <translation>Apagar arquivos para lixeira</translation>
+    </message>
+    <message>
+        <source>Determine drop target by dragging a &amp;fake file</source>
+        <translation>Determina o destino de soltar arrastando um arquivo &amp;falso</translation>
+    </message>
+    <message>
+        <source>Needs WinSCP&apos;s shell extension, which linscp does not have.</source>
+        <translation>Requer a extensão de shell do WinSCP, que o linscp não tem.</translation>
+    </message>
+    <message>
+        <source>Allows direct downloads to regular local folders (e.g. Windows File Explorer). Does not allow downloads to other destinations (ZIP archives,  FTP, etc.). Uses drag&amp;&amp;drop shell extension, when available.</source>
+        <translation>Permite downloads diretos para pastas locais (p.e. Windows Explorer). Não permite downloads para outros destinos (arquivos ZIP,  FTP, etc.). Usa a extensão de arrastar e soltar, quando disponível.</translation>
+    </message>
+    <message>
+        <source>Download files via &amp;temporary folder</source>
+        <translation>Baixa arquivos por uma pasta &amp;temporária</translation>
+    </message>
+    <message>
+        <source>Allows downloads to any destinations (regular folders, ZIP archives,  FTP, etc.). Files are downloaded first to temporary folder, from where they are delivered to the destination.</source>
+        <translation>Permitir download para quaisquer destinos (pastas regulares, arquivos ZIP, FTP, etc.). Os arquivos serão baixados para um diretório temporário antes de seguirem ao seu destino.</translation>
+    </message>
+    <message>
+        <source>&amp;Warn when there is not enough free space</source>
+        <translation>&amp;Alertar se não houver espaço em disco disponível</translation>
+    </message>
+    <message>
+        <source>Automatic updates</source>
+        <translation>Atualizações automáticas</translation>
+    </message>
+    <message>
+        <source>Daily</source>
+        <translation>Diariamente</translation>
+    </message>
+    <message>
+        <source>Weekly</source>
+        <translation>Semanalmente</translation>
+    </message>
+    <message>
+        <source>Monthly</source>
+        <translation>Mensalmente</translation>
+    </message>
+    <message>
+        <source>Automatic check &amp;period:</source>
+        <translation>Período automático de procura</translation>
+    </message>
+    <message>
+        <source>&amp;Display information about update on startup</source>
+        <translation>Exibir informação sobre atualizações ao iniciar</translation>
+    </message>
+    <message>
+        <source>Connection</source>
+        <translation>Conexão</translation>
+    </message>
+    <message>
+        <source>&amp;No proxy</source>
+        <translation>Sem &amp;proxy</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically detect proxy settings</source>
+        <translation>Detectar &amp;automaticamente configurações de proxy</translation>
+    </message>
+    <message>
+        <source>&amp;Use proxy server</source>
+        <translation>&amp;Usar servidor proxy</translation>
+    </message>
+    <message>
+        <source>Proxy &amp;hostname:</source>
+        <translation>Endereço do pro&amp;xy</translation>
+    </message>
+    <message>
+        <source>Po&amp;rt number:</source>
+        <translation>Número da po&amp;rta:</translation>
+    </message>
+    <message>
+        <source>Options</source>
+        <translation>Opções</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Auto</translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation>Desligado</translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation>Ligado</translation>
+    </message>
+    <message>
+        <source>Check for &amp;beta versions:</source>
+        <translation>Procurar por versões &amp;beta:</translation>
+    </message>
+    <message>
+        <source>Drag &amp;&amp; Drop downloads</source>
+        <translation>Downloads de Arrastar e soltar</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>
@@ -3137,6 +3421,14 @@ Local: %2</translation>
         <source>&amp;No</source>
         <translation>&amp;Não</translation>
     </message>
+    <message>
+        <source>OK</source>
+        <translation>OK</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Cancelar</translation>
+    </message>
 </context>
 <context>
     <name>QueryDialog</name>
@@ -3167,6 +3459,10 @@ Local: %2</translation>
     <message>
         <source>More messages</source>
         <translation>Mais mensagens</translation>
+    </message>
+    <message>
+        <source>Never show this message a&amp;gain</source>
+        <translation>Nunca exibir esta mensa&amp;gem novamente</translation>
     </message>
 </context>
 <context>

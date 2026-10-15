@@ -109,6 +109,7 @@
 #include "QtFrontend.h"
 #include "LocalPanel.h"
 #include "QueryDialog.h"
+#include "Theme.h"
 #include "QueuePanel.h"
 #include "TransferDialog.h"
 
@@ -117,6 +118,7 @@
 
 #include <QDir>
 #include <QElapsedTimer>
+#include <cmath>
 #include <QFileInfo>
 #include "SiteAdvanced.h"
 
@@ -2015,17 +2017,57 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
     {
       PreferencesDialog Dialog(&Window);
       QStringList Pages;
-      for (int Row = 0; Row < Dialog.Navigation()->count(); Row++)
+      for (int Index = 0; Index < Dialog.PageCount(); Index++)
       {
-        Pages.append(Dialog.Navigation()->item(Row)->text());
+        Pages.append(Dialog.PageName(Index));
       }
-      Check(Pages == QStringList({ PreferencesDialog::tr("Window"), PreferencesDialog::tr("Commander"),
-        PreferencesDialog::tr("Languages"), PreferencesDialog::tr("Panels"), PreferencesDialog::tr("File colors"),
-        PreferencesDialog::tr("Editors"), PreferencesDialog::tr("Internal editor"), PreferencesDialog::tr("Transfer"), PreferencesDialog::tr("Background"), PreferencesDialog::tr("Endurance"),
+      Check(Pages == QStringList({ PreferencesDialog::tr("Environment"), PreferencesDialog::tr("Interface"),
+        PreferencesDialog::tr("Window"), PreferencesDialog::tr("Commander"),
+        PreferencesDialog::tr("Languages"), PreferencesDialog::tr("Panels"), PreferencesDialog::tr("Remote"),
+        PreferencesDialog::tr("Local"), PreferencesDialog::tr("File colors"),
+        PreferencesDialog::tr("Editors"), PreferencesDialog::tr("Internal editor"), PreferencesDialog::tr("Transfer"),
+        PreferencesDialog::tr("Drag & Drop"), PreferencesDialog::tr("Background"), PreferencesDialog::tr("Endurance"),
         PreferencesDialog::tr("Network"), PreferencesDialog::tr("Security"), PreferencesDialog::tr("Logging"),
         PreferencesDialog::tr("Integration"), PreferencesDialog::tr("Applications"), PreferencesDialog::tr("Commands"),
-        PreferencesDialog::tr("Storage") }),
+        PreferencesDialog::tr("Storage"), PreferencesDialog::tr("Updates") }),
         "the dialog's pages, in the order of WinSCP's tree");
+      Check((Dialog.Navigation()->topLevelItemCount() == 10) && (Dialog.Navigation()->topLevelItem(0)->childCount() == 4) &&
+        (Dialog.Navigation()->topLevelItem(3)->child(0)->text(0) == PreferencesDialog::tr("Drag & Drop")),
+        "as its tree: each section with its subpages");
+      // Environment, Interface, Remote, Local, Drag & Drop, Updates: WinSCP's
+      // defaults.
+      Check(Dialog.ConfirmTransferringCheck()->isChecked() && Dialog.ConfirmDeletingCheck()->isChecked() &&
+        Dialog.ConfirmRecyclingCheck()->isChecked() && Dialog.ConfirmClosingSessionCheck()->isChecked() &&
+        Dialog.SynchronizeSummaryCheck()->isChecked() && !Dialog.BeepOnFinishCheck()->isChecked() &&
+        !Dialog.BeepOnFinishAfterSpin()->isEnabled() && Dialog.BalloonNotificationsCheck()->isChecked(),
+        "the confirmations on, no beep");
+      Check(Dialog.ConfirmDDTransferCheck()->checkState() == Qt::PartiallyChecked, "drags' confirmation Auto (grayed)");
+      Dialog.ConfirmTransferringCheck()->setChecked(false);
+      Check(!Dialog.ConfirmDDTransferCheck()->isEnabled(), "drags' only with transfers'");
+      Dialog.ConfirmTransferringCheck()->setChecked(true);
+      Check((Dialog.ThemeCombo()->currentIndex() == 0) && (Dialog.UpdatesPeriodCombo()->currentIndex() == 0) &&
+        (Dialog.UpdatesBetaVersionsCombo()->currentIndex() == 0) && !Dialog.UpdatesProxyHostEdit()->isEnabled(),
+        "automatic theme, no automatic updates");
+      Check(Dialog.ShowInaccesibleDirectoriesCheck()->isChecked() && !Dialog.RefreshRemotePanelCheck()->isChecked() &&
+        !Dialog.RefreshRemotePanelIntervalSpin()->isEnabled() && !Dialog.PreserveLocalDirectoryCheck()->isChecked() &&
+        Dialog.DeleteToRecycleBinCheck()->isChecked() && Dialog.DDWarnLackOfTempSpaceCheck()->isChecked(),
+        "the panels' and drag and drop's defaults");
+      Check(Dialog.ShowPage(PreferencesDialog::tr("Updates")) && !Dialog.ShowPage(QStringLiteral("Explorer")),
+        "pages shown by name; no Explorer's");
+      Dialog.ConfirmDeletingCheck()->setChecked(false);
+      Dialog.ConfirmDDTransferCheck()->setCheckState(Qt::Unchecked);
+      Check(!Dialog.ConfirmDDTransferCheck()->isTristate(), "once changed, never grayed again");
+      Dialog.BeepOnFinishCheck()->setChecked(true);
+      Check(Dialog.BeepOnFinishAfterSpin()->isEnabled(), "the beep's seconds with the beep");
+      Dialog.BeepOnFinishAfterSpin()->setValue(5);
+      Dialog.RefreshRemotePanelCheck()->setChecked(true);
+      Dialog.RefreshRemotePanelIntervalSpin()->setValue(30);
+      Dialog.PreserveLocalDirectoryCheck()->setChecked(true);
+      Dialog.UpdatesPeriodCombo()->setCurrentIndex(2);
+      Dialog.UpdatesProxyButton()->setChecked(true);
+      Check(Dialog.UpdatesProxyHostEdit()->isEnabled(), "the proxy's host with the proxy");
+      Dialog.UpdatesProxyHostEdit()->setText(QStringLiteral("proxy.example"));
+      Dialog.UpdatesBetaVersionsCombo()->setCurrentIndex(1);
       Check(!Dialog.LoggingCheck()->isChecked() && !Dialog.LogFileEdit()->text().isEmpty() && !Dialog.LogFileEdit()->isEnabled(),
         "logging off, its default file shown, not editable until on");
       Check(!Dialog.StorageLabel()->text().isEmpty(), "the storage shown");
@@ -2042,7 +2084,7 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       Check(Dialog.LanguagesList()->count() > 40, "the languages WinSCP is translated into");
       Check(Portuguese, "Brazilian Portuguese among them");
       Check(Dialog.LanguagesList()->currentItem() != nullptr, "the one in use chosen");
-      Dialog.Navigation()->setCurrentRow(2);
+      Dialog.ShowPage(PreferencesDialog::tr("Languages"));
       Check(Dialog.LanguageChangeLabel()->isHidden(), "no change to apply");
       for (int Row = 0; Row < Dialog.LanguagesList()->count(); Row++)
       {
@@ -2188,7 +2230,25 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       (Saved(Interface, QStringLiteral("FormatSizeBytes")) == QStringLiteral("0")) &&
       (Saved(Interface, QStringLiteral("NaturalOrderNumericalSorting")) == QStringLiteral("0")),
       "saved in WinSCP's Interface keys");
+    Check((Saved(Interface, QStringLiteral("ConfirmDeleting")) == QStringLiteral("0")) &&
+      (Saved(Interface, QStringLiteral("DDTransferConfirmation2")) == QStringLiteral("1")) &&
+      (Saved(Interface, QStringLiteral("BeepOnFinish")) == QStringLiteral("1")) &&
+      (Saved(Interface, QStringLiteral("RefreshRemotePanel")) == QStringLiteral("1")) &&
+      (Saved(Interface, QStringLiteral("ConfirmTransferring")) == QStringLiteral("1")),
+      "Environment's and Remote's in WinSCP's keys");
+    const QString Updates = QStringLiteral("Configuration\\Interface\\Updates");
+    Check((Saved(Updates, QStringLiteral("Period")) == QStringLiteral("7")) &&
+      (Saved(Updates, QStringLiteral("ConnectionType")) == QStringLiteral("2")) &&
+      (Saved(Updates, QStringLiteral("ProxyHost")) == QStringLiteral("proxy.example")) &&
+      (Saved(Updates, QStringLiteral("BetaVersions")) == QStringLiteral("1")), "Updates' in Interface\\Updates");
+    {
+      const CoreBridge::TPreferences Now = CoreBridge::Preferences();
+      Check(!Now.ConfirmDeleting && (Now.DDTransferConfirmation == CoreBridge::TPreferences::TAutoSwitch::Off) &&
+        Now.BeepOnFinish && (Now.BeepOnFinishAfter == 5) && Now.RefreshRemotePanel && (Now.RefreshRemotePanelInterval == 30) &&
+        Now.PreserveLocalDirectory && (Now.UpdatesPeriod == 7), "and read back");
+    }
     const QString Commander = QStringLiteral("Configuration\\Interface\\Commander");
+    Check((Saved(Commander, QStringLiteral("PreserveLocalDirectory")) == QStringLiteral("1")), "Local's in Interface\\Commander");
     Check((Saved(Commander, QStringLiteral("SwappedPanels")) == QStringLiteral("1")) &&
       (Saved(Commander, QStringLiteral("ExplorerKeyboardShortcuts")) == QStringLiteral("1")),
       "and Interface\\Commander's");
@@ -3793,6 +3853,201 @@ void Commands(const char * Port, const QString & Key, const QString & User, cons
   CoreBridge::Finalize();
 }
 
+// Preferences' Environment, Panels > Remote and Local, Drag & Drop: what
+// their settings do (P3-19).
+void EnvironmentTest(const char * Port, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = { "secret" };
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "the session opens");
+    const QDir Dir(Directory);
+    for (const char * Name : { "e1.txt", "e2.txt", "e3.txt", "e4.txt", "e5.txt", "e6.txt" })
+    {
+      QFile File(Dir.filePath(QString::fromLatin1(Name)));
+      File.open(QIODevice::WriteOnly);
+      File.write(Name);
+    }
+    LocalPanel * Local = Window.Local();
+    RemotePanel * Remote = Window.Panel();
+    Local->ChangeDirectory(Directory);
+    Remote->ChangeDirectory(QStringLiteral("/sub"));
+    Local->DeleteToTrash = false;
+    const auto Change = [](const std::function<void(CoreBridge::TPreferences &)> & What)
+    {
+      CoreBridge::ChangePreferences(What);
+    };
+
+    // Deleting: Environment's confirmation, then "Never ask me again".
+    int Asked = 0;
+    Responder.Custom = [&Asked](QWidget * Modal)
+    {
+      QueryDialog * Query = qobject_cast<QueryDialog *>(Modal);
+      if ((Query == nullptr) || (Query->NeverAskAgain() == nullptr))
+      {
+        return false;
+      }
+      Asked++;
+      Query->NeverAskAgain()->setChecked(true);
+      Query->Buttons()[0]->click();
+      return true;
+    };
+    Local->Select({ QStringLiteral("e1.txt") });
+    Check(Local->DeleteSelected(true) && !Dir.exists(QStringLiteral("e1.txt")) && (Asked == 1) &&
+      !CoreBridge::Preferences().ConfirmDeleting, "a delete asked, with never ask again");
+    Local->Select({ QStringLiteral("e2.txt") });
+    Check(Local->DeleteSelected(true) && !Dir.exists(QStringLiteral("e2.txt")) && (Asked == 1), "and then not asked");
+    Check(CoreBridge::Preferences().ConfirmRecycling, "to the trash still asked");
+    Change([](CoreBridge::TPreferences & P) { P.ConfirmDeleting = true; });
+    Responder.Custom = nullptr;
+
+    // Transferring: the Copy dialog's "Do not show this dialog box again",
+    // then none.
+    int Copies = 0;
+    bool CheckedAtFirst = false;
+    Responder.Custom = [&Copies, &CheckedAtFirst](QWidget * Modal)
+    {
+      QCheckBox * NeverShowAgain = Modal->findChild<QCheckBox *>(QStringLiteral("NeverShowAgain"));
+      QDialog * Dialog = qobject_cast<QDialog *>(Modal);
+      if ((NeverShowAgain == nullptr) || (Dialog == nullptr))
+      {
+        return false;
+      }
+      Copies++;
+      CheckedAtFirst = NeverShowAgain->isChecked();
+      NeverShowAgain->setChecked(true);
+      Dialog->accept();
+      return true;
+    };
+    Check(Window.Transfer(true, { QStringLiteral("e3.txt") }, QStringLiteral("/sub"), false, true, false) &&
+      (Copies == 1) && !CheckedAtFirst && !CoreBridge::Preferences().ConfirmTransferring,
+      "the Copy dialog, its \"do not show again\" unchecked, turns it off");
+    Check(Window.Transfer(true, { QStringLiteral("e4.txt") }, QStringLiteral("/sub"), false, true, false) && (Copies == 1),
+      "then transfers are not confirmed");
+    Change([](CoreBridge::TPreferences & P) { P.ConfirmTransferring = true; });
+    // A drag's, while Auto: "do not show again" checked to begin with; kept,
+    // drags are not confirmed from then on.
+    Check(Window.Transfer(true, { QStringLiteral("e5.txt") }, QStringLiteral("/sub"), false, true, false, true) &&
+      (Copies == 2) && CheckedAtFirst &&
+      (CoreBridge::Preferences().DDTransferConfirmation == CoreBridge::TPreferences::TAutoSwitch::Off) &&
+      CoreBridge::Preferences().ConfirmTransferring, "a drag's dialog turns drags' off, not the rest");
+    Check(Window.Transfer(true, { QStringLiteral("e6.txt") }, QStringLiteral("/sub"), false, true, false, true) && (Copies == 2),
+      "a drag then not confirmed");
+    Responder.Custom = nullptr;
+    Check(Remote->Names().contains(QStringLiteral("e6.txt")), "uploaded all the same");
+
+    // The beep, for work longer than its seconds.
+    Change([](CoreBridge::TPreferences & P) { P.BeepOnFinish = true; P.BeepOnFinishAfter = 0; });
+    const int Beeps = Window.Beeps();
+    Window.OperationComplete(1);
+    Check(Window.Beeps() == Beeps + 1, "a beep when work finishes");
+    Change([](CoreBridge::TPreferences & P) { P.BeepOnFinishAfter = 30; });
+    Window.OperationComplete(1);
+    Check(Window.Beeps() == Beeps + 1, "not for shorter work");
+
+    // Synchronizing: the summary, never shown again once asked.
+    {
+      QFile File(Dir.filePath(QStringLiteral("e7.txt")));
+      File.open(QIODevice::WriteOnly);
+      File.write("e7");
+    }
+    QString Summary;
+    Responder.Custom = [&Summary](QWidget * Modal)
+    {
+      QueryDialog * Query = qobject_cast<QueryDialog *>(Modal);
+      if ((Query == nullptr) || (Query->NeverAskAgain() == nullptr) || (Query->Buttons().size() != 1))
+      {
+        return false;
+      }
+      for (const QLabel * Label : Query->findChildren<QLabel *>())
+      {
+        Summary += Label->text();
+      }
+      Summary += Query->NeverAskAgain()->text();
+      Query->NeverAskAgain()->setChecked(true);
+      Query->Buttons()[0]->click();
+      return true;
+    };
+    CoreBridge::TSyncParams Params;
+    Params.PreviewChanges = false;
+    // Its first line, "Synchronization was completed."
+    const QString Completed = QString::fromStdString(CoreBridge::SyncSummary(CoreBridge::TSyncStatistics(), true, 0, 0,
+      [](std::int64_t) { return std::string(); })).section(QLatin1Char('\n'), 0, 0);
+    Check(Window.SynchronizeDirectories(Directory, QStringLiteral("/sub"), Params) &&
+      !Completed.isEmpty() && Summary.contains(Completed) && !CoreBridge::Preferences().SynchronizeSummary,
+      "the synchronization summary, and never again");
+    Check(Summary.contains(QueryDialog::tr("Never show this message a&gain")), "with \"Never show this message again\"");
+    Responder.Custom = nullptr;
+
+    // Panels > Remote: directories that cannot be entered, hidden when not shown.
+    {
+      FileListModel Model;
+      DirectoriesFirst Sort;
+      Sort.setSourceModel(&Model);
+      CoreBridge::TRemoteEntry Open;
+      Open.Name = "open";
+      Open.Directory = true;
+      CoreBridge::TRemoteEntry Closed = Open;
+      Closed.Name = "closed";
+      Closed.Inaccessible = true;
+      Model.SetEntries({ Open, Closed }, false);
+      Check(Sort.rowCount() == 2, "inaccessible directories shown by default");
+      Sort.SetShowInaccessible(false);
+      Check(Sort.rowCount() == 1, "and not, when not shown");
+    }
+
+    // Panels > Remote's periodic refresh: the panel read again once its
+    // seconds pass, and not when off. (Counted: rclone's server caches
+    // its listings, so what changes on its disk shows later.)
+    int Reads = 0;
+    const QMetaObject::Connection Counting = QObject::connect(Remote, &RemotePanel::Changed, [&Reads]() { Reads++; });
+    QTest::qWait(1500);
+    Check(Reads == 0, "not refreshed by default");
+    Change([](CoreBridge::TPreferences & P) { P.RefreshRemotePanel = true; P.RefreshRemotePanelInterval = 1; });
+    Window.ApplyPreferences();
+    QTest::qWait(2500);
+    Check(Reads >= 1, "refreshed every second, when on");
+    Change([](CoreBridge::TPreferences & P) { P.RefreshRemotePanel = false; });
+    Window.ApplyPreferences();
+    Reads = 0;
+    QTest::qWait(1500);
+    Check(Reads == 0, "and no more when off");
+    QObject::disconnect(Counting);
+
+    // Closing with a session: asked, and cancelled, nothing closes.
+    QString Closing;
+    Responder.Custom = [&Closing](QWidget * Modal)
+    {
+      QueryDialog * Query = qobject_cast<QueryDialog *>(Modal);
+      if ((Query == nullptr) || (Query->NeverAskAgain() == nullptr))
+      {
+        return false;
+      }
+      for (const QLabel * Label : Query->findChildren<QLabel *>())
+      {
+        Closing += Label->text();
+      }
+      Query->Buttons().back()->click();
+      return true;
+    };
+    Window.close();
+    Check(!Closing.isEmpty() && Window.isVisible() && Window.Session() && Window.Session()->Active(),
+      "closing with a session asks, and Cancel keeps it");
+    Change([](CoreBridge::TPreferences & P) { P.ConfirmClosingSession = false; });
+    Closing.clear();
+    Window.close();
+    Check(Closing.isEmpty() && (Window.TabCount() == 0), "not asked when turned off");
+    Responder.Custom = nullptr;
+  }
+  CoreBridge::Finalize();
+}
+
 void Session(const char * Port)
 {
   QtFrontend Frontend;
@@ -4629,10 +4884,17 @@ void AccessibilityTest(const char * Port)
     }
     {
       PreferencesDialog Dialog(&Window);
-      for (int Page = 0; Page < Dialog.Navigation()->count(); Page++)
+      const QString Shots = qEnvironmentVariable("LINSCP_SHOTS");
+      for (int Page = 0; Page < Dialog.PageCount(); Page++)
       {
-        Dialog.Navigation()->setCurrentRow(Page);
+        Dialog.ShowPageAt(Page);
         Audit(Dialog);
+        // Each page, for a person to look at (the audit keeps the first).
+        if (!Shots.isEmpty())
+        {
+          QDir().mkpath(Shots);
+          Dialog.grab().save(QDir(Shots).filePath(QStringLiteral("Preferences_%1.png").arg(Page, 2, 10, QLatin1Char('0'))));
+        }
       }
     }
     {
@@ -5151,6 +5413,42 @@ void OptionsHelpTest(const QString & Directory)
     {
       const auto [Done, Latest, Newer, Error] = Check4(QByteArray(), QStringLiteral("missing.json"));
       Check(Done && !Error.isEmpty(), "and a failure is an error");
+    }
+    // "latest"'s single release, as with beta versions off.
+    {
+      const auto [Done, Latest, Newer, Error] = Check4(R"({"tag_name":"v99.1.0"})", QStringLiteral("latest.json"));
+      Check(Done && (Latest == QStringLiteral("v99.1.0")) && Newer, "a single release read too");
+    }
+    // Updates' period: due when that long since the last check, which the
+    // check notes.
+    {
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.UpdatesPeriod = 0; });
+      Check(!Window.CheckForUpdatesIfDue(), "never, by default");
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.UpdatesPeriod = 7; P.UpdatesLastCheck = 0; });
+      bool Done = false;
+      Window.OnUpdatesChecked = [&Done](const QString &, bool, const QString &) { Done = true; };
+      Window.UpdatesUrl = QUrl::fromLocalFile(QDir(Directory).filePath(QStringLiteral("older.json")));
+      Check(Window.CheckForUpdatesIfDue(), "weekly, never checked: due");
+      QElapsedTimer Timer;
+      Timer.start();
+      while (!Done && (Timer.elapsed() < 10000))
+      {
+        QApplication::processEvents(QEventLoop::AllEvents, 50);
+      }
+      Check(Done && (std::abs(CoreBridge::Preferences().UpdatesLastCheck - MainWindow::NowAsDateTime()) < 0.01),
+        "checked, and noted when");
+      Check(!Window.CheckForUpdatesIfDue(), "not due again within the week");
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.UpdatesPeriod = 0; });
+    }
+    // Interface's theme: dark, light, and back to the system's.
+    {
+      const bool WasDark = Theme::IsDark();
+      Theme::Apply(CoreBridge::TPreferences::TAutoSwitch::On);
+      Check(Theme::IsDark(), "the dark theme");
+      Theme::Apply(CoreBridge::TPreferences::TAutoSwitch::Off);
+      Check(!Theme::IsDark(), "the light one");
+      Theme::Apply(CoreBridge::TPreferences::TAutoSwitch::Auto);
+      Check(Theme::IsDark() == WasDark, "and the system's again");
     }
     // Over HTTPS for real, when asked (the network is not the suite's).
     if (!qEnvironmentVariableIsEmpty("LINSCP_TEST_NETWORK"))
@@ -6299,6 +6597,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 4) && (std::strcmp(argv[1], "keys") == 0))
   {
     Keys(QString::fromLocal8Bit(argv[3]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "environment") == 0))
+  {
+    EnvironmentTest(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "sync") == 0))
   {

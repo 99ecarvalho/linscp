@@ -157,6 +157,48 @@ struct TShellSettings
   UnicodeString CommanderToolbarsLayout;
   // ConsoleWin.WindowSize: "width,height,ppi".
   UnicodeString ConsoleWindowSize = L"570,430,96";
+  // Environment's confirmations and notifications (Interface; TAutoSwitch:
+  // asOn, asOff, asAuto, DDTransferConfirmation's key
+  // DDTransferConfirmation2; SynchronizeSummary TCustomWinConfiguration's).
+  bool ConfirmTransferring = true;
+  bool ConfirmDeleting = true;
+  bool ConfirmRecycling = true;
+  bool ConfirmClosingSession = true;
+  int DDTransferConfirmation = 2;
+  bool SynchronizeSummary = true;
+  bool BalloonNotifications = true;
+  bool FlashTaskbar = true;
+  // Interface: TInterface (ifCommander, ifExplorer: linscp has only the
+  // first, the value kept), DarkTheme (TAutoSwitch).
+  int Interface = 0;
+  int DarkTheme = 2;
+  // Drag & Drop: the temporary folder's free space checked first, against
+  // the size times the ratio; DDFakeFile kept as read (the shell
+  // extension's).
+  bool DDWarnLackOfTempSpace = true;
+  double DDWarnLackOfTempSpaceRatio = 1.1;
+  bool DDFakeFile = true;
+  // Panels' Local and Remote pages: local deletes to the trash, remote
+  // directories that cannot be read shown, the remote panel refreshed
+  // while idle every so many seconds (stored as a TDateTime);
+  // ScpCommander.PreserveLocalDirectory and SystemContextMenu.
+  bool DeleteToRecycleBin = true;
+  bool ShowInaccesibleDirectories = true;
+  bool RefreshRemotePanel = false;
+  int RefreshRemotePanelInterval = 60;
+  bool PreserveLocalDirectory = false;
+  bool SystemContextMenu = false;
+  // Interface\Updates (TUpdatesConfiguration): the period in days (0
+  // never), the last check (a TDateTime), the result shown on starting,
+  // beta versions (TAutoSwitch), the connection (TConnectionType:
+  // ctUndefined -1, ctDirect, ctAuto, ctProxy) and its proxy.
+  int UpdatesPeriod = 0;
+  double UpdatesLastCheck = 0;
+  bool UpdatesShowOnStartup = true;
+  int UpdatesBetaVersions = 2;
+  int UpdatesConnectionType = -1;
+  UnicodeString UpdatesProxyHost;
+  int UpdatesProxyPort = 8080;
 };
 
 class TCustomCommandList;

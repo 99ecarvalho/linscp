@@ -17,9 +17,36 @@
 QtFrontend::QtFrontend() = default;
 QtFrontend::~QtFrontend() = default;
 
+namespace
+{
+
+// As FlashOnBackground: a question while another program is in front,
+// with Environment's "Flash taskbar button when attention is needed".
+void FlashOnBackground(QWidget * Window)
+{
+  if ((Window == nullptr) || (QApplication::activeWindow() != nullptr))
+  {
+    return;
+  }
+  try
+  {
+    if (CoreBridge::Preferences().FlashTaskbar)
+    {
+      QApplication::alert(Window->window());
+    }
+  }
+  catch (const std::exception &)
+  {
+    // No shell's configuration (a tool's own frontend): not flashed.
+  }
+}
+
+}  // namespace
+
 CoreBridge::TQueryResult QtFrontend::Query(const CoreBridge::TQuery & Query)
 {
   QueryDialog Dialog(Query, FWindow);
+  FlashOnBackground(FWindow);
   Dialog.exec();
   return Dialog.Result();
 }
@@ -27,6 +54,7 @@ CoreBridge::TQueryResult QtFrontend::Query(const CoreBridge::TQuery & Query)
 bool QtFrontend::Prompt(CoreBridge::TPrompt & Prompt)
 {
   PromptDialog Dialog(Prompt, FWindow);
+  FlashOnBackground(FWindow);
   if (Dialog.exec() != QDialog::Accepted)
   {
     return false;
@@ -48,6 +76,68 @@ void QtFrontend::ShowError(const CoreBridge::TError & Error)
   Query.CancelAnswer = CoreBridge::AnswerOK;
   QueryDialog Dialog(Query, FWindow);
   Dialog.exec();
+}
+
+void QtFrontend::ShowErrorList(const std::vector<CoreBridge::TError> & Errors)
+{
+  if (Errors.empty())
+  {
+    return;
+  }
+  auto Button = [](unsigned Answer, const std::string & Caption)
+  {
+    CoreBridge::TQueryButton Result;
+    Result.Answer = Answer;
+    Result.Caption = Caption;
+    return Result;
+  };
+  const int Count = static_cast<int>(Errors.size());
+  CoreBridge::TQuery Ask;
+  Ask.Type = CoreBridge::TQueryType::Error;
+  Ask.Message = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ErrorListCount))
+    .replace(QStringLiteral("%d"), QString::number(Count)).toStdString();
+  Ask.Buttons = { Button(CoreBridge::AnswerOK, "OK"), Button(CoreBridge::AnswerCancel, "Cancel") };
+  Ask.CancelAnswer = CoreBridge::AnswerCancel;
+  if (Query(Ask).Answer != CoreBridge::AnswerOK)
+  {
+    return;
+  }
+  int Index = 0;
+  while (true)
+  {
+    // "Error %d of %d:\n%s", Previous and Next as there are.
+    QString Message = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ErrorListNumber));
+    Message.replace(Message.indexOf(QStringLiteral("%d")), 2, QString::number(Index + 1));
+    Message.replace(Message.indexOf(QStringLiteral("%d")), 2, QString::number(Count));
+    Message.replace(QStringLiteral("%s"), QString::fromStdString(Errors[Index].Message));
+    CoreBridge::TQuery Item;
+    Item.Type = CoreBridge::TQueryType::Error;
+    Item.Message = Message.toStdString();
+    Item.MoreMessages = Errors[Index].MoreMessages;
+    if (Index > 0)
+    {
+      Item.Buttons.push_back(Button(CoreBridge::AnswerYes, CoreBridge::Text(CoreBridge::TText::PreviousButton)));
+    }
+    if (Index < Count - 1)
+    {
+      Item.Buttons.push_back(Button(CoreBridge::AnswerNo, CoreBridge::Text(CoreBridge::TText::NextButton)));
+    }
+    Item.Buttons.push_back(Button(CoreBridge::AnswerOK, "OK"));
+    Item.CancelAnswer = CoreBridge::AnswerOK;
+    const unsigned Answer = Query(Item).Answer;
+    if (Answer == CoreBridge::AnswerYes)
+    {
+      Index--;
+    }
+    else if (Answer == CoreBridge::AnswerNo)
+    {
+      Index++;
+    }
+    else
+    {
+      break;
+    }
+  }
 }
 
 // As upstream's forms/Banner.cpp: the text in a fixed font, as servers lay

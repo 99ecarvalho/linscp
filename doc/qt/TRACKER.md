@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 10 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 28 | 29 | Parity on features users depend on |
+| P3 Qt parity | 29 | 30 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Dropped for now (2026-10-15); may be reopened |
-| **Total** | **104** | **116** | |
+| **Total** | **105** | **117** | |
 
 ## Next three actions
 
@@ -257,13 +257,13 @@ P2-10 and P2-11 waited, at the user's request, for P3.
 
 1. **P2-11**: the P2 exit gate, driven by the user: a day's work in linscp
    from an installed package (0.3.0's).
-2. The Preferences pages WinSCP has and linscp lacks: Environment (confirmations and more), Interface, Updates, Drag & Drop, the panels' Remote and Local pages.
-3. Follow up the upstream PRs for the carried patches (ADR 0006): the
+2. Follow up the upstream PRs for the carried patches (ADR 0006): the
    portability series winscp/winscp#79, and #80 (`LogEvent`), #81 (log file
-   names), #82 (local EOL), #83 (OpenSSH import paths); offer the two S3
-   ones found by P3-18 (`core-s3-acl-not-implemented.patch`,
+   names), #82 (local EOL), #83 (OpenSSH import paths), and the two S3 ones
+   found by P3-18 (`core-s3-acl-not-implemented.patch`,
    `core-s3-folder-tags.patch`: #84, #85); drop each patch when a pin move
    brings it in.
+3. Custom command extensions, the one UI gap P3-16 deferred.
 
 ## P3 UI gap audit (2026-10-14)
 
@@ -302,6 +302,10 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-15 | P3-19: the Drag & Drop and Updates pages offered after all (P3-04d and P3-04e had left them out), with what applies to linscp: drags out through the temporary folder and its free-space warning; linscp's GitHub releases, checked as WinSCP's period has it (Never by default), through its proxy settings, pre-releases as "beta versions" | The user's call. The fake file stays the shell extension's (ADR 0012); the authorized e-mail and usage statistics are WinSCP's own service and are not offered |
+| 2026-10-15 | The interface theme asks Qt for the colour scheme; where the platform cannot switch (X11's generic theme, KDE's), Fusion with linscp's own light or dark palette | Qt 6.8's `setColorScheme` switches on Windows and the portal's desktops only; Fusion's standard palette follows the system's scheme, so the light one is spelled out |
+| 2026-10-15 | After uploads, downloads and synchronizing, the remote panel shows what core has; core reads the directory again as `AutoReadDirectoryAfterOp` has it | Panels > Remote's "Automatically refresh directory after operation" (Ctrl+Alt+R) would mean nothing if the shell always read it again; one listing instead of two |
+| 2026-10-15 | Preferences' pages as WinSCP's tree (each section's page with its subpages under it), not a flat list | 23 pages: WinSCP's tree, and its names readable |
 | 2026-10-15 | Version 0.3.0 tagged and published as a GitHub pre-release, with the CI packages and now the Windows portable zip | The user's call: it ships the Check for Updates crash fix (0.2.0 crashes there), the rest of the Commander menus (P3-15), thumbnails, the real-server tests, the Site Manager folders on save, the preset captions and Donate |
 | 2026-10-15 | Help > Donate offered, linscp's GitHub Sponsors page for now (one constant, `DonateUrl`) | The user's call: linscp's own donation pages come later |
 | 2026-10-15 | A portable package: on Windows a zip of the deploy folder with an empty `linscp.ini` (WinSCP's portable mode: an INI beside the program; `linscp-cli` shares it), on Linux the AppImage with a `WinSCP.ini` beside the `.AppImage` file | The user's call; WinSCP offers a portable package too |
@@ -868,6 +872,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-16 | Verified UI gaps | done | the audit below, every gap closed but extensions (deferred, 2026-10-15) |
 | P3-17 | Icon sets | done | Lucide (ISC), Tabler (MIT), Fluent UI (MIT) imported to `assets/icons/` (`port/tools/import_icons.py`, 62 roles after WinSCP's glyphs), embedded and drawn by `port/qt/IconSet.cpp` in the palette's text colour (light and dark themes); Preferences > Window > Icon set (Fluent by default on Windows, Lucide elsewhere; the desktop's theme on POSIX only; none), on the menus and the panels' toolbars; About credits each set with its license; Qt Svg added on both platforms (`qt6-svg-dev`, MSYS2 `qt6-svg` in `msys2-qt.lock`); ctest `qt_gui_icons`; native on Windows 11 too. WinSCP's toolbars: the main bands (Commands, Preferences with the queue's, Transfer Settings with the presets, and hidden by default Sessions and Tabs, Sort, Custom Commands) and each panel's five (Path, History, Navigation, Files, Selection; PanelBands.h), Options > Toolbars (each band, lock, selective text labels, icon size) and Left/Right Panel, kept as WinSCP's `ToolbarsLayout2`, `LockToolbars`, `SelectiveToolbarText`, `LargerToolbar`; ctest `qt_gui_toolbars` |
 | P3-18 | Test devcontainer with real servers | done | `port/tests/servers/` (Containerfile, entrypoint.sh): OpenSSH, vsftpd (FTP, FTPES, implicit FTPS), Apache's mod_dav (WebDAV, HTTPS, locking), versitygw (S3), one container per test on the host's network serving the test's directory (fixtures.servers); ctest label `real-servers`: protocols_real (every protocol through linscp-cli), qt_session_ftp_real, qt_gui_properties_real, qt_gui_tags_real, qt_gui_commands_real, qt_gui_locking_real, native and under Wine. They found: S3 requests carrying an empty, unsigned x-amz-security-token (the shim's data() of an empty string, fixed), Properties failing on servers without object ACLs and on prefix-only folders (core patches). CI skips them: its Debian container has no container engine |
+| P3-19 | The remaining Preferences pages | done | done 2026-10-15. Environment: the confirmations (transfers, with the Copy dialog's "Do not show this dialog box again"; drags', Auto until that is used; overwriting, resuming; deleting and moving to the trash, with "Never ask me again"; closing sessions, with WinSCP's workspace question; exiting on completion; the shell session; the synchronization summary; continue on error, errors collected into WinSCP's list) and the notifications (the beep after so many seconds; tray balloons, else the status bar; the taskbar flashed while elsewhere). Interface: the Commander (Explorer shown, not available) and the theme. Remote: inaccessible directories hidden in the panel and its tree, the refresh after operations left to core (Ctrl+Alt+R), the periodic refresh. Local: the local directory kept across tabs, deleting to the trash. Drag & Drop: the temporary folder and its free-space warning. Updates: the period checked at start, the result on startup or noted, beta versions, the proxy. ctests `qt_gui_preferences`, `qt_gui_environment`, `qt_gui_options`; Wine and the VM too. Not offered: the system context menu (the Windows shell's), the updates' e-mail and usage statistics |
 
 ### P4 — Cleanup
 | ID | Task | Status | Note |

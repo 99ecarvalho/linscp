@@ -94,6 +94,9 @@ struct TSession::TImpl
   // "continue on error" (TSynchronizeDialog::FeedSynchronizeError).
   std::unique_ptr<TKeepUpToDateRun> KeepUpToDate;
   std::function<void(const UnicodeString & Message, TStrings * MoreMessages)> FeedError;
+  // BeginErrorList's: collecting, and what.
+  bool ErrorListActive = false;
+  std::vector<TError> ErrorList;
 
   // The queue's events come on its threads: they only flag the change.
   void __fastcall QueueListUpdate(TTerminalQueue * /*Queue*/)
@@ -501,6 +504,7 @@ TRemoteEntry EntryOf(const TRemoteFile * File)
   Entry.Link = File->IsSymLink;
   Entry.LinkTarget = Utf8(File->LinkTo);
   Entry.Hidden = (Entry.Name.size() > 1) && (Entry.Name[0] == '.');
+  Entry.Inaccessible = (File->Terminal != NULL) && File->IsInaccesibleDirectory;
   return Entry;
 }
 
@@ -525,6 +529,39 @@ std::vector<TRemoteEntry> TSession::List() const
   return Result;
 }
 
+void TSession::BeginErrorList()
+{
+  if (!GUIConfiguration->ContinueOnError || F->FeedError || F->ErrorListActive)
+  {
+    return;
+  }
+  F->ErrorListActive = true;
+  F->ErrorList.clear();
+  TImpl * Impl = F.get();
+  F->FeedError = [Impl](const UnicodeString & Message, TStrings * MoreMessages)
+  {
+    TError Error;
+    Error.Message = Utf8(UnformatMessage(RemoveInteractiveMsgTag(Message)));
+    if ((MoreMessages != NULL) && (MoreMessages->Count > 0))
+    {
+      Error.MoreMessages = Utf8(UnformatMessage(MoreMessages->Text));
+    }
+    Impl->ErrorList.push_back(Error);
+  };
+}
+
+std::vector<TError> TSession::EndErrorList()
+{
+  std::vector<TError> Result;
+  if (F->ErrorListActive)
+  {
+    F->ErrorListActive = false;
+    F->FeedError = nullptr;
+    Result.swap(F->ErrorList);
+  }
+  return Result;
+}
+
 std::vector<std::string> TSession::Subdirectories(const std::string & Path)
 {
   try
@@ -535,11 +572,13 @@ std::vector<std::string> TSession::Subdirectories(const std::string & Path)
     }
     std::unique_ptr<TRemoteFileList> Files(F->Terminal->CustomReadDirectoryListing(FromUtf8(Path), true));
     std::vector<std::string> Result;
-    const bool ShowHidden = dynamic_cast<TShellConfiguration *>(GUIConfiguration)->Settings().ShowHiddenFiles;
+    const TShellSettings & Settings = dynamic_cast<TShellConfiguration *>(GUIConfiguration)->Settings();
     for (int Index = 0; Index < Files->Count; Index++)
     {
       TRemoteFile * File = Files->Files[Index];
-      if (File->IsDirectory && !File->IsThisDirectory && !File->IsParentDirectory && (ShowHidden || !File->IsHidden))
+      // As TUnixDriveView: hidden ones and, unless shown, inaccessible ones not.
+      if (File->IsDirectory && !File->IsThisDirectory && !File->IsParentDirectory && (Settings.ShowHiddenFiles || !File->IsHidden) &&
+          (Settings.ShowInaccesibleDirectories || (File->Terminal == NULL) || !File->IsInaccesibleDirectory))
       {
         Result.push_back(Utf8(File->FileName));
       }
@@ -1828,7 +1867,7 @@ std::unique_ptr<TSyncChecklist> TSession::SyncCollect(const std::string & LocalD
 
 // As TCustomScpExplorerForm::FullSynchronize: the checked entries, with the
 // progress window.
-bool TSession::SyncApply(TSyncChecklist & Checklist)
+bool TSession::SyncApply(TSyncChecklist & Checklist, TSyncStatistics * Result)
 {
   try
   {
@@ -1839,6 +1878,15 @@ bool TSession::SyncApply(TSyncChecklist & Checklist)
     F->Terminal->SynchronizeApply(C.Checklist.get(), &C.CopyParam, C.Params | TTerminal::spNoConfirmation,
       TSynchronizeDirectory(), TProcessedSynchronizationChecklistItem(), TUpdatedSynchronizationChecklistItems(),
       NULL, &Statistics);
+    if (Result != nullptr)
+    {
+      Result->FilesUploaded = Statistics.FilesUploaded;
+      Result->TotalUploaded = Statistics.TotalUploaded;
+      Result->FilesDownloaded = Statistics.FilesDownloaded;
+      Result->TotalDownloaded = Statistics.TotalDownloaded;
+      Result->FilesDeletedLocal = Statistics.FilesDeletedLocal;
+      Result->FilesDeletedRemote = Statistics.FilesDeletedRemote;
+    }
     return true;
   }
   catch (Exception & E)

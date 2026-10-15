@@ -1,8 +1,7 @@
 // The Preferences dialog, as WinSCP's (forms/Preferences.cpp): its pages
 // listed on the left, each one's settings on the right. The pages are
-// WinSCP's, with the settings the shell has so far (P3-04a…e): Window,
-// Commander, Languages, Panels, File colors, Transfer, Background,
-// Endurance, Network, Security, Logging, Applications, Commands, Storage.
+// WinSCP's, with the settings the shell has (P3-04a…e, P3-19): all of its
+// pages but Explorer's (linscp has no Explorer interface).
 // What they set is upstream's configuration (ADR 0014).
 #ifndef LINSCP_QT_PREFERENCES_DIALOG_H
 #define LINSCP_QT_PREFERENCES_DIALOG_H
@@ -39,7 +38,35 @@ public:
   void Save();
 
   // The pages and their controls, for tests.
-  QListWidget * Navigation() const { return FNavigation; }
+  // The tree of pages, as WinSCP's; the pages in its order, by index.
+  QTreeWidget * Navigation() const { return FNavigation; }
+  int PageCount() const { return static_cast<int>(FPageItems.size()); }
+  QString PageName(int Index) const;
+  void ShowPageAt(int Index);
+  // Shows the page of that name (as the tree's), if there is one.
+  bool ShowPage(const QString & Name);
+  // Environment, Interface, the panels' Remote and Local, Drag & Drop,
+  // Updates.
+  QCheckBox * ConfirmTransferringCheck() const { return FConfirmTransferring; }
+  QCheckBox * ConfirmDDTransferCheck() const { return FConfirmDDTransfer; }
+  QCheckBox * ConfirmDeletingCheck() const { return FConfirmDeleting; }
+  QCheckBox * ConfirmRecyclingCheck() const { return FConfirmRecycling; }
+  QCheckBox * ConfirmClosingSessionCheck() const { return FConfirmClosingSession; }
+  QCheckBox * SynchronizeSummaryCheck() const { return FSynchronizeSummary; }
+  QCheckBox * BeepOnFinishCheck() const { return FBeepOnFinish; }
+  QSpinBox * BeepOnFinishAfterSpin() const { return FBeepOnFinishAfter; }
+  QCheckBox * BalloonNotificationsCheck() const { return FBalloonNotifications; }
+  QComboBox * ThemeCombo() const { return FTheme; }
+  QCheckBox * ShowInaccesibleDirectoriesCheck() const { return FShowInaccesibleDirectories; }
+  QCheckBox * RefreshRemotePanelCheck() const { return FRefreshRemotePanel; }
+  QSpinBox * RefreshRemotePanelIntervalSpin() const { return FRefreshRemotePanelInterval; }
+  QCheckBox * PreserveLocalDirectoryCheck() const { return FPreserveLocalDirectory; }
+  QCheckBox * DeleteToRecycleBinCheck() const { return FDeleteToRecycleBin; }
+  QCheckBox * DDWarnLackOfTempSpaceCheck() const { return FDDWarnLackOfTempSpace; }
+  QComboBox * UpdatesPeriodCombo() const { return FUpdatesPeriod; }
+  QRadioButton * UpdatesProxyButton() const { return FUpdatesProxy; }
+  QLineEdit * UpdatesProxyHostEdit() const { return FUpdatesProxyHost; }
+  QComboBox * UpdatesBetaVersionsCombo() const { return FUpdatesBetaVersions; }
   QCheckBox * ShowHiddenFilesCheck() const { return FShowHiddenFiles; }
   QCheckBox * DefaultDirIsHomeCheck() const { return FDefaultDirIsHome; }
   QCheckBox * RenameWholeNameCheck() const { return FRenameWholeName; }
@@ -158,7 +185,7 @@ public:
   void MoveCommand(int By);
 
 private:
-  void AddPage(const QString & Name, QWidget * Page);
+  void AddPage(const QString & Name, QWidget * Page, bool Subpage = false);
   QWidget * MakePanelsPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeCommanderPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeLanguagesPage();
@@ -180,6 +207,43 @@ private:
   void UpdateEditorFont();
   void LoadEditors(int Select);
   QWidget * MakeCommandsPage();
+  QWidget * MakeEnvironmentPage(const CoreBridge::TPreferences & Preferences);
+  QWidget * MakeInterfacePage(const CoreBridge::TPreferences & Preferences);
+  QWidget * MakeRemotePage(const CoreBridge::TPreferences & Preferences);
+  QWidget * MakeLocalPage(const CoreBridge::TPreferences & Preferences);
+  QWidget * MakeDragDropPage(const CoreBridge::TPreferences & Preferences);
+  QWidget * MakeUpdatesPage(const CoreBridge::TPreferences & Preferences);
+  QCheckBox * FConfirmTransferring = nullptr;
+  QCheckBox * FConfirmDDTransfer = nullptr;
+  QCheckBox * FConfirmOverwriting = nullptr;
+  QCheckBox * FConfirmResume = nullptr;
+  QCheckBox * FConfirmDeleting = nullptr;
+  QCheckBox * FConfirmRecycling = nullptr;
+  QCheckBox * FConfirmClosingSession = nullptr;
+  QCheckBox * FConfirmExitOnCompletion = nullptr;
+  QCheckBox * FConfirmCommandSession = nullptr;
+  QCheckBox * FSynchronizeSummary = nullptr;
+  QCheckBox * FContinueOnError = nullptr;
+  QCheckBox * FBeepOnFinish = nullptr;
+  QSpinBox * FBeepOnFinishAfter = nullptr;
+  QCheckBox * FBalloonNotifications = nullptr;
+  QCheckBox * FFlashTaskbar = nullptr;
+  QComboBox * FTheme = nullptr;
+  QCheckBox * FShowInaccesibleDirectories = nullptr;
+  QCheckBox * FAutoReadDirectoryAfterOp = nullptr;
+  QCheckBox * FRefreshRemotePanel = nullptr;
+  QSpinBox * FRefreshRemotePanelInterval = nullptr;
+  QCheckBox * FPreserveLocalDirectory = nullptr;
+  QCheckBox * FDeleteToRecycleBin = nullptr;
+  QCheckBox * FDDWarnLackOfTempSpace = nullptr;
+  QComboBox * FUpdatesPeriod = nullptr;
+  QCheckBox * FUpdatesShowOnStartup = nullptr;
+  QRadioButton * FUpdatesDirect = nullptr;
+  QRadioButton * FUpdatesAuto = nullptr;
+  QRadioButton * FUpdatesProxy = nullptr;
+  QLineEdit * FUpdatesProxyHost = nullptr;
+  QSpinBox * FUpdatesProxyPort = nullptr;
+  QComboBox * FUpdatesBetaVersions = nullptr;
   void LoadCommands(int Select);
   void LoadFileColors();
   bool FileColorDialog(CoreBridge::TPreferences::TFileColor & Color);
@@ -187,7 +251,8 @@ private:
   void EditPresetDialog(bool Add, bool Duplicate);
   void UpdateControls();
 
-  QListWidget * FNavigation = nullptr;
+  QTreeWidget * FNavigation = nullptr;
+  std::vector<class QTreeWidgetItem *> FPageItems;
   QStackedWidget * FPages = nullptr;
   QCheckBox * FShowHiddenFiles = nullptr;
   QCheckBox * FDefaultDirIsHome = nullptr;

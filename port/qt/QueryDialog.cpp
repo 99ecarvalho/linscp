@@ -72,8 +72,11 @@ QueryDialog::QueryDialog(const CoreBridge::TQuery & Query, QWidget * Parent) :
 
   if (Query.NeverAskAgainCheck)
   {
+    // As MessageDialog: for a message with OK alone, "never show".
+    const bool OKOnly = (Query.Buttons.size() == 1) && (Query.Buttons.front().Answer == CoreBridge::AnswerOK);
     FNeverAskAgain = new QCheckBox(
-      Query.NeverAskAgainTitle.empty() ? tr("&Never ask me again") : QString::fromStdString(Query.NeverAskAgainTitle), this);
+      !Query.NeverAskAgainTitle.empty() ? QString::fromStdString(Query.NeverAskAgainTitle) :
+        (OKOnly ? tr("Never show this message a&gain") : tr("&Never ask me again")), this);
     FNeverAskAgain->setChecked(Query.NeverAskAgainCheckedInitially);
     Layout->addWidget(FNeverAskAgain);
   }

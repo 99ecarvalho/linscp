@@ -27,6 +27,9 @@ public:
   CoreBridge::TQueryResult Query(const CoreBridge::TQuery & Query) override;
   bool Prompt(CoreBridge::TPrompt & Prompt) override;
   void ShowError(const CoreBridge::TError & Error) override;
+  // As HandleErrorList: what "Continue on error" collected, if anything,
+  // offered and then gone through one by one.
+  void ShowErrorList(const std::vector<CoreBridge::TError> & Errors);
   void Banner(const std::string & SessionName, const std::string & Banner,
     bool CanNeverShowAgain, bool & NeverShowAgain) override;
   void Information(const std::string & Text) override;

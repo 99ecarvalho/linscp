@@ -53,6 +53,8 @@ public:
   bool Root();
   bool Home();
   bool Refresh();
+  // What core has read, shown again (no listing of the server's).
+  void Reload();
   // With the permissions the Create folder dialog sets, when given.
   bool NewFolder(const QString & Name, const CoreBridge::TNewDirectory * Settings = nullptr);
   // F7: the Create folder dialog, then the folder. False when cancelled or
@@ -147,7 +149,6 @@ private:
   class QSplitter * FSplitter = nullptr;
   void ShowTreePath();
   bool Run(const std::function<void()> & Operation, bool Record);
-  void Reload();
   void ShowError(const CoreBridge::TCoreError & E);
   void Activated(const QModelIndex & Index);
   void ContextMenu(const QPoint & Pos);

@@ -488,13 +488,16 @@ bool LocalPanel::MoveInto(const QStringList & Names, const QString & Directory)
 bool LocalPanel::DeleteSelected(bool Confirm, bool Alternative)
 {
   // WinSCP's alternative delete (Shift+Del): the other of the two.
-  const bool ToTrash = (DeleteToTrash != Alternative);
+  const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+  const bool ToTrash = ((DeleteToTrash && Preferences.DeleteToRecycleBin) != Alternative);
   const QStringList Names = Selected();
   if (Names.isEmpty())
   {
     return false;
   }
-  if (Confirm)
+  // As DeleteFiles: Environment's confirmation for that, with "Never ask
+  // me again" turning it off.
+  if (Confirm && (ToTrash ? Preferences.ConfirmRecycling : Preferences.ConfirmDeleting))
   {
     const bool One = (Names.size() == 1);
     QString Message = CoreText(ToTrash ?
@@ -513,11 +516,20 @@ bool LocalPanel::DeleteSelected(bool Confirm, bool Alternative)
     Cancel.Caption = "Cancel";
     Query.Buttons = { OK, Cancel };
     Query.CancelAnswer = CoreBridge::AnswerCancel;
+    Query.NeverAskAgainCheck = true;
     QtFrontend Frontend;
     Frontend.SetWindow(window());
-    if (Frontend.Query(Query).Answer != CoreBridge::AnswerOK)
+    const CoreBridge::TQueryResult Answer = Frontend.Query(Query);
+    if (Answer.Answer != CoreBridge::AnswerOK)
     {
       return false;
+    }
+    if (Answer.NeverAskAgain)
+    {
+      CoreBridge::ChangePreferences([ToTrash](CoreBridge::TPreferences & Changed)
+      {
+        (ToTrash ? Changed.ConfirmRecycling : Changed.ConfirmDeleting) = false;
+      });
     }
   }
   bool Result = true;

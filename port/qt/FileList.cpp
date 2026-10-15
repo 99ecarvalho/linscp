@@ -975,6 +975,15 @@ void DirectoriesFirst::SetShowHidden(bool Show)
   }
 }
 
+void DirectoriesFirst::SetShowInaccessible(bool Show)
+{
+  if (Show != FShowInaccessible)
+  {
+    FShowInaccessible = Show;
+    invalidateFilter();
+  }
+}
+
 void DirectoriesFirst::SetMask(const QString & Mask)
 {
   FMask = Mask;
@@ -985,6 +994,10 @@ bool DirectoriesFirst::filterAcceptsRow(int Row, const QModelIndex & Parent) con
 {
   const QModelIndex Index = sourceModel()->index(Row, 0, Parent);
   if (!FShowHidden && Index.data(FileListModel::HiddenRole).toBool())
+  {
+    return false;
+  }
+  if (!FShowInaccessible && Index.data(FileListModel::InaccessibleRole).toBool())
   {
     return false;
   }
@@ -1240,6 +1253,7 @@ QVariant FileListModel::data(const QModelIndex & Index, int Role) const
     case DirectoryRole: return E->Directory;
     case ParentRole: return false;
     case HiddenRole: return E->Hidden;
+    case InaccessibleRole: return E->Inaccessible;
     case SortRole:
       switch (Index.column())
       {

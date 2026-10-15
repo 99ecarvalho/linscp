@@ -62,8 +62,8 @@ public:
   void Open(const QString & Name);
   // Where a file is opened: the system's application by default.
   std::function<void(const QString & FileName)> OpenFile;
-  // WinSCP's "delete to recycle bin" (its default): to the trash, else for
-  // good.
+  // Whether the trash may be used: deletes go there as Panels > Local's
+  // "Delete files to recycle bin" has it (its default), else for good.
   bool DeleteToTrash = true;
   // Where Home goes, when not the user's home: the site's local directory
   // with "default directory is home", as WinSCP's (TDirView.HomeDirectory).

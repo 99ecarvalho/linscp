@@ -281,6 +281,24 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteInteger(L"GenerateUrlCodeTarget", FSettings.GenerateUrlCodeTarget);
     Storage->WriteInteger(L"GenerateUrlScriptFormat", FSettings.GenerateUrlScriptFormat);
     Storage->WriteInteger(L"GenerateUrlAssemblyLanguage", FSettings.GenerateUrlAssemblyLanguage);
+    Storage->WriteBool(L"ConfirmTransferring", FSettings.ConfirmTransferring);
+    Storage->WriteBool(L"ConfirmDeleting", FSettings.ConfirmDeleting);
+    Storage->WriteBool(L"ConfirmRecycling", FSettings.ConfirmRecycling);
+    Storage->WriteBool(L"ConfirmClosingSession", FSettings.ConfirmClosingSession);
+    Storage->WriteInteger(L"DDTransferConfirmation2", FSettings.DDTransferConfirmation);
+    Storage->WriteBool(L"SynchronizeSummary", FSettings.SynchronizeSummary);
+    Storage->WriteBool(L"BalloonNotifications", FSettings.BalloonNotifications);
+    Storage->WriteBool(L"FlashTaskbar", FSettings.FlashTaskbar);
+    Storage->WriteInteger(L"Interface", FSettings.Interface);
+    Storage->WriteInteger(L"DarkTheme", FSettings.DarkTheme);
+    Storage->WriteBool(L"DDWarnLackOfTempSpace", FSettings.DDWarnLackOfTempSpace);
+    Storage->WriteFloat(L"DDWarnLackOfTempSpaceRatio", FSettings.DDWarnLackOfTempSpaceRatio);
+    Storage->WriteBool(L"DDFakeFile", FSettings.DDFakeFile);
+    Storage->WriteBool(L"DeleteToRecycleBin", FSettings.DeleteToRecycleBin);
+    Storage->WriteBool(L"ShowInaccesibleDirectories", FSettings.ShowInaccesibleDirectories);
+    Storage->WriteBool(L"RefreshRemotePanel", FSettings.RefreshRemotePanel);
+    Storage->WriteDateTime(L"RefreshRemotePanelInterval",
+      TDateTime(static_cast<double>(FSettings.RefreshRemotePanelInterval) / SecsPerDay));
   }
   if (Storage->OpenSubKey(L"Bookmarks", true))
   {
@@ -315,6 +333,17 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"UseMasterPassword", FUseMasterPassword);
     Storage->WriteString(L"MasterPasswordVerifier", FMasterPasswordVerifier);
   }
+  if (Storage->OpenSubKeyPath(L"Interface\\Updates", true))
+  {
+    TCloseSubKeyPath Close(Storage);
+    Storage->WriteInteger(L"Period", FSettings.UpdatesPeriod);
+    Storage->WriteDateTime(L"LastCheck", TDateTime(FSettings.UpdatesLastCheck));
+    Storage->WriteBool(L"ShowOnStartup", FSettings.UpdatesShowOnStartup);
+    Storage->WriteInteger(L"BetaVersions", FSettings.UpdatesBetaVersions);
+    Storage->WriteInteger(L"ConnectionType", FSettings.UpdatesConnectionType);
+    Storage->WriteString(L"ProxyHost", FSettings.UpdatesProxyHost);
+    Storage->WriteInteger(L"ProxyPort", FSettings.UpdatesProxyPort);
+  }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander", true))
   {
     TCloseSubKeyPath Close(Storage);
@@ -328,6 +357,8 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteString(L"ToolbarsLayout2", FSettings.CommanderToolbarsLayout);
     Storage->WriteInteger(L"CurrentPanel", FSettings.CurrentPanel);
     Storage->WriteFloat(L"LocalPanelWidth", FSettings.LocalPanelWidth);
+    Storage->WriteBool(L"PreserveLocalDirectory", FSettings.PreserveLocalDirectory);
+    Storage->WriteBool(L"SystemContextMenu", FSettings.SystemContextMenu);
     if (!FSettings.WindowParams.IsEmpty())
     {
       Storage->WriteString(L"WindowParams", FSettings.WindowParams);
@@ -581,6 +612,27 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.GenerateUrlScriptFormat = Storage->ReadInteger(L"GenerateUrlScriptFormat", FSettings.GenerateUrlScriptFormat);
     FSettings.GenerateUrlAssemblyLanguage =
       Storage->ReadInteger(L"GenerateUrlAssemblyLanguage", FSettings.GenerateUrlAssemblyLanguage);
+    FSettings.ConfirmTransferring = Storage->ReadBool(L"ConfirmTransferring", FSettings.ConfirmTransferring);
+    FSettings.ConfirmDeleting = Storage->ReadBool(L"ConfirmDeleting", FSettings.ConfirmDeleting);
+    FSettings.ConfirmRecycling = Storage->ReadBool(L"ConfirmRecycling", FSettings.ConfirmRecycling);
+    FSettings.ConfirmClosingSession = Storage->ReadBool(L"ConfirmClosingSession", FSettings.ConfirmClosingSession);
+    FSettings.DDTransferConfirmation = Storage->ReadInteger(L"DDTransferConfirmation2", FSettings.DDTransferConfirmation);
+    FSettings.SynchronizeSummary = Storage->ReadBool(L"SynchronizeSummary", FSettings.SynchronizeSummary);
+    FSettings.BalloonNotifications = Storage->ReadBool(L"BalloonNotifications", FSettings.BalloonNotifications);
+    FSettings.FlashTaskbar = Storage->ReadBool(L"FlashTaskbar", FSettings.FlashTaskbar);
+    FSettings.Interface = Storage->ReadInteger(L"Interface", FSettings.Interface);
+    FSettings.DarkTheme = Storage->ReadInteger(L"DarkTheme", FSettings.DarkTheme);
+    FSettings.DDWarnLackOfTempSpace = Storage->ReadBool(L"DDWarnLackOfTempSpace", FSettings.DDWarnLackOfTempSpace);
+    FSettings.DDWarnLackOfTempSpaceRatio =
+      Storage->ReadFloat(L"DDWarnLackOfTempSpaceRatio", FSettings.DDWarnLackOfTempSpaceRatio);
+    FSettings.DDFakeFile = Storage->ReadBool(L"DDFakeFile", FSettings.DDFakeFile);
+    FSettings.DeleteToRecycleBin = Storage->ReadBool(L"DeleteToRecycleBin", FSettings.DeleteToRecycleBin);
+    FSettings.ShowInaccesibleDirectories =
+      Storage->ReadBool(L"ShowInaccesibleDirectories", FSettings.ShowInaccesibleDirectories);
+    FSettings.RefreshRemotePanel = Storage->ReadBool(L"RefreshRemotePanel", FSettings.RefreshRemotePanel);
+    FSettings.RefreshRemotePanelInterval = static_cast<int>(static_cast<double>(Storage->ReadDateTime(
+      L"RefreshRemotePanelInterval", TDateTime(static_cast<double>(FSettings.RefreshRemotePanelInterval) / SecsPerDay))) *
+      SecsPerDay + 0.5);
   }
   if (Storage->OpenSubKey(L"Bookmarks", false))
   {
@@ -606,6 +658,17 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FUseMasterPassword = Storage->ReadBool(L"UseMasterPassword", FUseMasterPassword);
     FMasterPasswordVerifier = Storage->ReadString(L"MasterPasswordVerifier", FMasterPasswordVerifier);
   }
+  if (Storage->OpenSubKeyPath(L"Interface\\Updates", false))
+  {
+    TCloseSubKeyPath Close(Storage);
+    FSettings.UpdatesPeriod = Storage->ReadInteger(L"Period", FSettings.UpdatesPeriod);
+    FSettings.UpdatesLastCheck = static_cast<double>(Storage->ReadDateTime(L"LastCheck", TDateTime(FSettings.UpdatesLastCheck)));
+    FSettings.UpdatesShowOnStartup = Storage->ReadBool(L"ShowOnStartup", FSettings.UpdatesShowOnStartup);
+    FSettings.UpdatesBetaVersions = Storage->ReadInteger(L"BetaVersions", FSettings.UpdatesBetaVersions);
+    FSettings.UpdatesConnectionType = Storage->ReadInteger(L"ConnectionType", FSettings.UpdatesConnectionType);
+    FSettings.UpdatesProxyHost = Storage->ReadString(L"ProxyHost", FSettings.UpdatesProxyHost);
+    FSettings.UpdatesProxyPort = Storage->ReadInteger(L"ProxyPort", FSettings.UpdatesProxyPort);
+  }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander", false))
   {
     TCloseSubKeyPath Close(Storage);
@@ -620,6 +683,8 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.CommanderToolbarsLayout = Storage->ReadString(L"ToolbarsLayout2", FSettings.CommanderToolbarsLayout);
     FSettings.CurrentPanel = Storage->ReadInteger(L"CurrentPanel", FSettings.CurrentPanel);
     FSettings.LocalPanelWidth = Storage->ReadFloat(L"LocalPanelWidth", FSettings.LocalPanelWidth);
+    FSettings.PreserveLocalDirectory = Storage->ReadBool(L"PreserveLocalDirectory", FSettings.PreserveLocalDirectory);
+    FSettings.SystemContextMenu = Storage->ReadBool(L"SystemContextMenu", FSettings.SystemContextMenu);
     FSettings.WindowParams = Storage->ReadString(L"WindowParams", FSettings.WindowParams);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander\\LocalPanel", false))

@@ -614,6 +614,63 @@ struct TPreferences
   std::string CustomIniFile;
   std::string RandomSeedFile;
   std::string TemporaryDirectory;
+  // Environment's confirmations (core's, the GUI's and WinConfiguration's,
+  // as TPreferencesDialog has them): drag & drop transfers confirmed,
+  // not, or until "Do not show again" (Auto, the default).
+  enum class TAutoSwitch { On, Off, Auto };
+  bool ConfirmOverwriting = true;
+  bool ConfirmResume = true;
+  bool ConfirmDeleting = true;
+  bool ConfirmRecycling = true;
+  bool ConfirmTransferring = true;
+  TAutoSwitch DDTransferConfirmation = TAutoSwitch::Auto;
+  bool ConfirmClosingSession = true;
+  bool ConfirmExitOnCompletion = true;
+  bool ConfirmCommandSession = true;
+  bool ContinueOnError = false;
+  bool SynchronizeSummary = true;
+  // Notifications: a beep when work that took longer than so many seconds
+  // finishes; the tray's balloons; the taskbar flashed when a question
+  // waits in the background.
+  bool BeepOnFinish = false;
+  int BeepOnFinishAfter = 30;
+  bool BalloonNotifications = true;
+  bool FlashTaskbar = true;
+  // Interface: the Commander or the Explorer (kept; linscp has only the
+  // first); the theme, dark (On), light (Off) or the system's (Auto).
+  bool ExplorerInterface = false;
+  TAutoSwitch DarkTheme = TAutoSwitch::Auto;
+  // Drag & Drop: the temporary folder's free space checked before remote
+  // files are dragged out; DDFakeFile kept (Windows' shell extension).
+  bool DDWarnLackOfTempSpace = true;
+  // The reserve: the size times this (not in the dialog, as WinSCP's).
+  double DDWarnLackOfTempSpaceRatio = 1.1;
+  bool DDFakeFile = true;
+  // Panels > Remote: directories that cannot be entered shown; the
+  // directory read again after each operation (core's
+  // AutoReadDirectoryAfterOp); refreshed while idle, every so many seconds.
+  bool ShowInaccesibleDirectories = true;
+  bool AutoReadDirectoryAfterOp = true;
+  bool RefreshRemotePanel = false;
+  int RefreshRemotePanelInterval = 60;
+  // Panels > Local: the local directory kept when switching tabs; deleted
+  // files to the trash (the system's recycle bin); WinSCP's system
+  // context menu (kept: not offered).
+  bool PreserveLocalDirectory = false;
+  bool DeleteToRecycleBin = true;
+  bool SystemContextMenu = false;
+  // Updates: checked automatically every so many days (0 never), the last
+  // time (a TDateTime, 0 never), the result shown on starting; pre-releases
+  // offered (Auto: when this is one); through no proxy, the system's, or
+  // the one given (TConnectionType's ctDirect, ctAuto, ctProxy; -1 unset,
+  // as direct).
+  int UpdatesPeriod = 0;
+  double UpdatesLastCheck = 0;
+  bool UpdatesShowOnStartup = true;
+  TAutoSwitch UpdatesBetaVersions = TAutoSwitch::Auto;
+  int UpdatesConnectionType = -1;
+  std::string UpdatesProxyHost;
+  int UpdatesProxyPort = 8080;
 };
 // What a temporary directory goes under (Storage's, else the system's).
 std::string TemporaryDirectoryBase();
@@ -622,6 +679,8 @@ std::string TemporaryDirectoryBase();
 std::int64_t SizeOfText(const std::string & Text);
 std::string TextOfSize(std::int64_t Size);
 TPreferences Preferences();
+// One choice stored, as a question's "Never ask me again" stores it.
+void ChangePreferences(const std::function<void(TPreferences &)> & Change);
 
 // The window's layout, kept between runs in WinSCP's own formats and keys
 // (TWinConfiguration's ScpCommander and QueueView): the window's placement
@@ -836,6 +895,11 @@ enum class TText
   SyncBrowseCreate, // "**Do you want to try to create directory '%s'?**..."
   SyncBrowseError, // "Cannot open corresponding directory in the opposite panel. ..."
   SyncBrowseToggle, // "Synchronized browsing was turned %s.|on|off"
+  AutoReadDirectoryToggle, // "Automatic reload of remote directory after operation was turned %s.|on|off"
+  ErrorListCount,       // "%d error(s) occurred during last operation. Do you want to see it/them?"
+  ErrorListNumber,      // "Error %d of %d:\n%s"
+  PreviousButton,       // "&Previous"
+  NextButton,           // "&Next"
   NewFileName, // "New file"
   EditFileCaption, // "Edit file"
   EditFilePrompt, // "&Enter file name:"
@@ -925,8 +989,33 @@ enum class TText
   SpecialFolderDocuments, // "My documents"
   SpecialFolderDesktop, // "Desktop"
   CommandLineLabel,     // "Command"
+  // Environment's confirmations and notes (main instructions unformatted).
+  CloseSession,         // "Terminate session '%s' and close application?"
+  CloseSessions,        // "Terminate all sessions and close application?"
+  CloseSessionWorkspace, // "... without saving a workspace?"
+  CloseSessionsWorkspace, // "Terminate all sessions ... without saving a workspace?"
+  CloseWorkspace,       // "Close application without saving a workspace?"
+  AutoWorkspace,        // "Workspace '%s' will be automatically saved."
+  AutoWorkspaceEnable,  // "Press 'No' to enable automatic saving of the workspace."
+  DDTransferConfirmOff, // "Transfer confirmation turned off ... Click here to undo."
+  DDWarnLackOfTempSpace, // "Too little space on temporary drive! ... '%s' ... %s ... %s ..."
 };
 std::string Text(TText Text);
+// What synchronizing did, as TCustomScpExplorerForm::Synchronize's summary:
+// files and bytes up and down, deleted on each side, the comparison's and
+// the synchronization's time (seconds); the counts not for timestamps.
+struct TSyncStatistics
+{
+  int FilesUploaded = 0;
+  std::int64_t TotalUploaded = 0;
+  int FilesDownloaded = 0;
+  std::int64_t TotalDownloaded = 0;
+  int FilesDeletedLocal = 0;
+  int FilesDeletedRemote = 0;
+};
+// The sizes formatted by the shell (WinSCP's FormatBytes is its Pascal's).
+std::string SyncSummary(const TSyncStatistics & Statistics, bool Timestamps, double CollectSeconds, double Seconds,
+  const std::function<std::string(std::int64_t)> & FormatBytes);
 
 // The PuTTY command, as the Applications page checks it
 // (TPreferencesDialog::UpdateControls): whether it has the session's
@@ -1262,6 +1351,9 @@ struct TRemoteEntry
   // Hidden as WinSCP's "Show hidden files" means it: a dot file remotely; a
   // hidden file locally.
   bool Hidden = false;
+  // A remote directory the user cannot enter (TRemoteFile's
+  // IsInaccesibleDirectory), hidden unless Panels > Remote shows them.
+  bool Inaccessible = false;
 };
 
 // --- Stored sites -------------------------------------------------------------
@@ -1871,7 +1963,7 @@ public:
     const std::function<bool(const std::string & Local, const std::string & Remote)> & OnDirectory = nullptr,
     const TTransferSettings * Settings = nullptr);
   // The checked entries. False when it was cancelled or core skipped some.
-  bool SyncApply(TSyncChecklist & Checklist);
+  bool SyncApply(TSyncChecklist & Checklist, TSyncStatistics * Statistics = nullptr);
   // Each checked entry as its own queue item (TTerminal::SynchronizeToQueue).
   void SyncQueue(TSyncChecklist & Checklist);
   // The checklist's Calculate: the directories' sizes, each side's
@@ -2060,6 +2152,12 @@ public:
   std::string ThumbnailFile(const std::string & Name);
   bool ThumbnailsChanged();
   void ForgetThumbnails();
+  // Environment's "Continue on error" (the GUI's ContinueOnError), as
+  // TCustomScpExplorerForm's BatchStart and BatchEnd: between the two, the
+  // errors an operation can go on after are collected, not asked (not
+  // when off, nor within Keep Up To Date's own).
+  void BeginErrorList();
+  std::vector<TError> EndErrorList();
   void Close();
 
 private:
