@@ -1,0 +1,17 @@
+Define TTerminal::LogEvent out of line, as the files calling it need.
+
+TTerminal::LogEvent is defined `inline` in Terminal.cpp, but the file
+systems (FtpFileSystem.cpp and others) call it too. An inline function must
+be defined in every translation unit that uses it; when it is not, the
+program is ill-formed, and whether it links depends on the compiler keeping
+an out-of-line copy. An optimizing clang build (-O2, -O3) inlines every
+call within Terminal.cpp and emits none, so the other files' calls are
+undefined at link time. Without `inline` the definition is the one every
+caller links to; the calls within Terminal.cpp may still be inlined.
+Line counts are unchanged.
+
+--- a/source/core/Terminal.cpp
++++ b/source/core/Terminal.cpp
+@@ -3473,1 +3473,1 @@
+-void __fastcall inline TTerminal::LogEvent(const UnicodeString & Str)
++void __fastcall TTerminal::LogEvent(const UnicodeString & Str)

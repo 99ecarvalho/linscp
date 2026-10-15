@@ -15,3 +15,4 @@ gui-configuration-property-subscript.patch
 core-log-file-name-delimiter.patch
 core-local-eol-platform.patch
 core-openssh-import-posix-paths.patch
+core-terminal-logevent-not-inline.patch
