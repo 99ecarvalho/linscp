@@ -1174,6 +1174,9 @@ void DragAndDrop(const char * Port, const QString & Directory)
 {
   QtFrontend Frontend;
   CoreBridge::Initialize(&Frontend);
+  // Drags out through the temporary folder (where WinSCP's shell extension
+  // is registered, the fake file would be dragged: qt_gui_environment).
+  CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.DDFakeFile = false; });
   {
     MainWindow Window(CoreBridge::Info());
     Frontend.SetWindow(&Window);
@@ -4374,6 +4377,110 @@ void ExtensionsTest(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// The Explorer interface (P3-21): the remote panel alone, its tree beside
+// it, the address bar, the view styles, Explorer's keys, downloads to the
+// last local target directory, its own layout.
+void ExplorerTest(const char * Port, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.ExplorerInterface = true; });
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    QApplication::processEvents();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = { "secret" };
+    Check(Window.Explorer(), "the Explorer interface, as chosen");
+    Check(Window.Local()->isHidden() && !Window.Panel()->isHidden(), "the remote panel alone");
+    QSplitter * Split = Window.Panel()->findChild<QSplitter *>();
+    Check((Split != nullptr) && (Split->orientation() == Qt::Horizontal) && Window.Panel()->TreeVisible(),
+      "its tree shown, beside the files");
+    Check((Window.AddressBar() != nullptr) && Window.AddressBar()->isVisibleTo(&Window), "the address bar");
+    QToolBar * Buttons = Window.findChild<QToolBar *>(QStringLiteral("Buttons"));
+    QToolBar * Selection = Window.findChild<QToolBar *>(QStringLiteral("Selection"));
+    Check((Buttons != nullptr) && Buttons->isVisibleTo(&Window) && (Selection != nullptr) && !Selection->isVisibleTo(&Window),
+      "the standard buttons shown, the selection ones not, as the Explorer's default layout");
+    QToolBar * Commands = Window.findChild<QToolBar *>(QStringLiteral("Commands"));
+    Check((Commands == nullptr) || !Commands->isVisibleTo(&Window), "no Commander bands");
+    Check(Window.Panel()->ViewStyle() == RemotePanel::TViewStyle::Icon, "large icons by default, as WinSCP's Explorer");
+
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "the session opens");
+    Check(Window.AddressBar()->currentText() == QStringLiteral("/"), "the address the remote directory");
+    Window.GoToAddress(QStringLiteral("/sub"));
+    Check((Window.Panel()->Path() == QStringLiteral("/sub")) && (Window.AddressBar()->currentText() == QStringLiteral("/sub")),
+      "an address typed goes there");
+    Check(Window.AddressBar()->count() == 2, "its list the directories up to it");
+    Window.GoToAddress(QStringLiteral("/"));
+
+    // For a person to look at ($LINSCP_SHOTS): connected, in its icons and details.
+    const QString Shots = qEnvironmentVariable("LINSCP_SHOTS");
+    if (!Shots.isEmpty())
+    {
+      QDir().mkpath(Shots);
+      Window.resize(1000, 640);
+      QTest::qWait(300);
+      Window.grab().save(QDir(Shots).filePath(QStringLiteral("Explorer_icons.png")));
+      Window.ViewStyleAction(3)->trigger();
+      QTest::qWait(300);
+      Window.grab().save(QDir(Shots).filePath(QStringLiteral("Explorer_details.png")));
+    }
+    // The view styles.
+    Window.ViewStyleAction(3)->trigger();
+    Check((Window.Panel()->ViewStyle() == RemotePanel::TViewStyle::Report) && !Window.Panel()->View()->isHidden() &&
+      (CoreBridge::Layout().Explorer.ViewStyle == RemotePanel::TViewStyle::Report), "details, kept");
+    Window.ViewStyleAction(2)->trigger();
+    Check((Window.Panel()->ViewStyle() == RemotePanel::TViewStyle::List) && !Window.Panel()->Icons()->isHidden() &&
+      (Window.Panel()->Icons()->flow() == QListView::TopToBottom), "a list");
+    Window.ViewStyleAction(1)->trigger();
+    Check(Window.Panel()->Icons()->flow() == QListView::LeftToRight, "small icons");
+    Window.ViewStyleAction(4)->trigger();
+    Check(Window.Panel()->Thumbnails(), "thumbnails");
+    Window.ViewStyleAction(3)->trigger();
+
+    // Explorer's keys.
+    Check((Window.Panel()->RefreshAction()->shortcut() == QKeySequence(Qt::Key_F5)) &&
+      (Window.Panel()->NewFolderAction()->shortcut() == QKeySequence(Qt::CTRL | Qt::Key_D)) &&
+      (Window.Panel()->RenameAction()->shortcut() == QKeySequence(Qt::Key_F2)), "Explorer's keys");
+
+    // A download: to the last local target directory, the one chosen kept.
+    const QString Target = QDir(Directory).filePath(QStringLiteral("down"));
+    QDir().mkpath(Target);
+    Responder.Custom = [&Target](QWidget * Modal)
+    {
+      QDialog * Dialog = qobject_cast<QDialog *>(Modal);
+      QLineEdit * Edit = (Dialog != nullptr) ? Dialog->findChild<QLineEdit *>() : nullptr;
+      if ((Edit == nullptr) || (Dialog->findChild<QCheckBox *>(QStringLiteral("NeverShowAgain")) == nullptr))
+      {
+        return false;
+      }
+      Edit->setText(QDir::toNativeSeparators(Target));
+      Dialog->accept();
+      return true;
+    };
+    Window.Panel()->Select({ QStringLiteral("hello.txt") });
+    Check(Window.TransferSelected(false, true) && QFileInfo::exists(QDir(Target).filePath(QStringLiteral("hello.txt"))),
+      "downloaded where chosen");
+    Responder.Custom = nullptr;
+    Check(QDir(QString::fromStdString(CoreBridge::Layout().Explorer.LastLocalTargetDirectory)) == QDir(Target),
+      "kept as the next download's");
+
+    // Preferences > Interface: the Explorer chosen; the change for the next start.
+    {
+      PreferencesDialog Dialog(&Window);
+      Check(Dialog.ExplorerInterfaceButton()->isChecked() && Dialog.InterfaceChangeLabel()->isHidden(), "the Explorer chosen");
+      Dialog.CommanderInterfaceButton()->setChecked(true);
+      Check(!Dialog.InterfaceChangeLabel()->isHidden(), "another interface on the next start");
+    }
+    Window.close();
+    Check(!CoreBridge::Layout().Explorer.WindowParams.empty() && CoreBridge::Layout().WindowParams.empty(),
+      "the Explorer's window kept as its own");
+  }
+  CoreBridge::Finalize();
+}
+
 void Session(const char * Port)
 {
   QtFrontend Frontend;
@@ -6751,10 +6858,14 @@ void DumpMenu(QMenu * Menu, int Depth, QString & Out)
   }
 }
 
-void Menus()
+void Menus(bool Explorer = false)
 {
   QtFrontend Frontend;
   CoreBridge::Initialize(&Frontend);
+  if (Explorer)
+  {
+    CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.ExplorerInterface = true; });
+  }
   {
     MainWindow Window(CoreBridge::Info());
     QString Out;
@@ -6899,6 +7010,10 @@ int main(int argc, char ** argv)
   {
     Menus();
   }
+  else if ((argc >= 3) && (std::strcmp(argv[1], "menus-explorer") == 0))
+  {
+    Menus(true);
+  }
   else if ((argc >= 3) && (std::strcmp(argv[1], "language") == 0))
   {
     Language(QString::fromLocal8Bit(argv[2]));
@@ -6927,6 +7042,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 4) && (std::strcmp(argv[1], "keys") == 0))
   {
     Keys(QString::fromLocal8Bit(argv[3]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "explorer") == 0))
+  {
+    ExplorerTest(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "environment") == 0))
   {

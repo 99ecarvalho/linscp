@@ -90,6 +90,14 @@ ROLES = {
     'sort-rights':      (['lock'], ['lock'], ['lock_closed']),
     'sort-owner':       (['user'], ['user'], ['person']),
     'sort-group':       (['users'], ['users'], ['people']),
+    # The Explorer's view styles, the tree and the queue's file list.
+    'view-icons':       (['layout-grid'], ['layout-grid'], ['grid']),
+    'view-small-icons': (['grid-2x2'], ['grid-dots'], ['grid_dots']),
+    'view-list':        (['layout-list'], ['layout-list'], ['apps_list']),
+    'view-details':     (['table'], ['list-details'], ['table']),
+    'view-thumbnails':  (['images'], ['photo'], ['image']),
+    'tree':             (['list-tree'], ['list-tree'], ['text_bullet_list_tree']),
+    'queue-file-list':  (['files'], ['files'], ['document_multiple']),
 }
 
 SETS = {

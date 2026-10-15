@@ -124,6 +124,9 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FInfo(Info)
 {
   setWindowTitle(QString::fromStdString(FInfo.AppName));
+  // The interface, as chosen when the window starts (WinSCP's applies on
+  // the next start).
+  FExplorer = CoreBridge::Preferences().ExplorerInterface;
   // linscp's icon, every window's (the application's).
   QApplication::setWindowIcon(AppIcon());
   // As TTerminalManager's OnMasterPasswordPrompt: over the window in front.
@@ -511,6 +514,10 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FPreferencesAction = OptionsMenu->addAction(tr("&Preferences..."), this, [this]() { PreferencesDialog(); });
   FPreferencesAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_P));
   BuildMenus();
+  if (FExplorer)
+  {
+    ApplyExplorerInterface();
+  }
 
   statusBar()->showMessage(tr("%1 %2").arg(QString::fromStdString(FInfo.AppName), QString::fromStdString(FInfo.Version)));
   // From now on a language chosen applies on the next start, as WinSCP's.
@@ -642,6 +649,23 @@ void MainWindow::RestoreLayout()
   const int Dpi = logicalDpiX();
   QScreen * Screen = this->screen();
   const QRect Area = (Screen != nullptr) ? Screen->availableGeometry() : QRect(0, 0, 1280, 800);
+  // As TScpExplorerForm's RestoreParams: its window (at most 960 by 720),
+  // its panel's columns and tree width, the queue.
+  if (FExplorer)
+  {
+    if (!RestoreWindowParams(this, QString::fromStdString(Layout.Explorer.WindowParams)))
+    {
+      resize(std::min(Area.width() - 40, 960 * Dpi / 96), std::min(Area.height() - 30, 720 * Dpi / 96));
+    }
+    FPanel->SetColumnsParams(QString::fromStdString(Layout.Explorer.DirViewParams));
+    FPanel->SetTreeHeight(Layout.Explorer.TreeWidth * Dpi / std::max(1, Layout.Explorer.TreeWidthPixelsPerInch));
+    SetTreeVisible(false, Layout.Explorer.Tree);
+    SetPanelStatusBarVisible(false, Layout.RemoteStatusBar);
+    const int QueueHeight = Layout.QueueViewHeight * Dpi / std::max(1, Layout.QueueViewHeightPixelsPerInch);
+    FVertical->setSizes({ std::max(100, height() - QueueHeight), QueueHeight });
+    ActivatePanel(false);
+    return;
+  }
   if (!RestoreWindowParams(this, QString::fromStdString(Layout.WindowParams)))
   {
     // TWinConfiguration::Default's: the work area, less a margin, at most
@@ -679,6 +703,29 @@ void MainWindow::SaveLayout()
 {
   CoreBridge::TLayout Layout = CoreBridge::Layout();
   const int Dpi = logicalDpiX();
+  if (FExplorer)
+  {
+    Layout.Explorer.WindowParams = StoreWindowParams(this).toStdString();
+    Layout.Explorer.DirViewParams = FPanel->ColumnsParams().toStdString();
+    Layout.Explorer.Tree = FPanel->TreeVisible();
+    if (Layout.Explorer.Tree)
+    {
+      Layout.Explorer.TreeWidth = FPanel->TreeHeight();
+      Layout.Explorer.TreeWidthPixelsPerInch = Dpi;
+    }
+    Layout.Explorer.ViewStyle = FPanel->ViewStyle();
+    Layout.QueueViewHeight = FVertical->sizes().value(1);
+    Layout.QueueViewHeightPixelsPerInch = Dpi;
+    try
+    {
+      CoreBridge::SetLayout(Layout);
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+    }
+    return;
+  }
   Layout.WindowParams = StoreWindowParams(this).toStdString();
   const QList<int> Sizes = FPanels->sizes();
   const int LocalWidth = Sizes.value(FPanels->indexOf(FLocal));
@@ -819,6 +866,7 @@ void MainWindow::ApplyPreferences()
   FLocal->HomeDirectory =
     (Preferences.DefaultDirIsHome && FSession && !FSession->UpdateDirectories() && !FSession->LocalDirectory().empty()) ?
     QString::fromStdString(FSession->LocalDirectory()) : QString();
+  ApplyExplorerShortcuts();
   UpdateTitle();
 }
 
@@ -1683,7 +1731,8 @@ void MainWindow::UpdateTreeShortcut()
 
 void MainWindow::ActivatePanel(bool Local)
 {
-  FLocalActive = Local;
+  // The Explorer's one panel.
+  FLocalActive = Local && !FExplorer;
   UpdateTreeShortcut();
   UpdateCommandLine();
   UpdateHotKeys();
@@ -2258,6 +2307,13 @@ bool MainWindow::CopyDialog(bool FromLocal, const QStringList & Names, QString &
     return false;
   }
   Target = TargetEdit->text().trimmed();
+  // As the Explorer's CopyParamDialog: a download's target, the next one's.
+  if (FExplorer && !FromLocal && QDir(QDir::fromNativeSeparators(Target)).exists())
+  {
+    const std::string Directory = QDir::toNativeSeparators(Target).toStdString();
+    StoreLayoutChoice([Directory](CoreBridge::TLayout & Stored) { Stored.Explorer.LastLocalTargetDirectory = Directory; });
+    FLocal->ChangeDirectory(QDir::fromNativeSeparators(Target));
+  }
   if (Background != nullptr)
   {
     *Background = InBackground->isChecked();
@@ -4744,7 +4800,8 @@ QString MainWindow::ActiveLocalPath() const
 
 void MainWindow::NewLocalTab(const QString & Local, const QString & Other)
 {
-  if (FBusy)
+  // No local tabs in the Explorer.
+  if (FBusy || FExplorer)
   {
     return;
   }
@@ -5393,7 +5450,8 @@ void MainWindow::BuildMenus()
   {
     FTabsShown = Shown;
     UpdateTabs();
-    StoreLayoutChoice([Shown](CoreBridge::TLayout & Layout) { Layout.Tabs = Shown; });
+    const bool Explorer = FExplorer;
+    StoreLayoutChoice([Shown, Explorer](CoreBridge::TLayout & Layout) { (Explorer ? Layout.Explorer.Tabs : Layout.Tabs) = Shown; });
   });
   Options->addAction(FCommandLineAction);
   FStatusBarAction = Options->addAction(tr("Status &Bar"));
@@ -6739,7 +6797,7 @@ void MainWindow::SetStatusBarShown(bool Shown)
   FStatusBarAction->setChecked(Shown);
   statusBar()->setVisible(Shown);
   CoreBridge::TLayout Layout = CoreBridge::Layout();
-  Layout.StatusBar = Shown;
+  (FExplorer ? Layout.Explorer.StatusBar : Layout.StatusBar) = Shown;
   try
   {
     CoreBridge::SetLayout(Layout);
@@ -7354,8 +7412,10 @@ void MainWindow::ApplyToolbarSettings()
 void MainWindow::SaveToolbarSettings()
 {
   CoreBridge::TLayout Layout = CoreBridge::Layout();
-  const QString Stored = QString::fromStdString(Layout.ToolbarsLayout);
-  QStringList Entries = (Stored.isEmpty() ? DefaultToolbarsLayout() : Stored).split(QLatin1Char(','), Qt::SkipEmptyParts);
+  // (The Explorer's own, its bands all in the top dock.)
+  const QString Stored = QString::fromStdString(FExplorer ? Layout.Explorer.ToolbarsLayout : Layout.ToolbarsLayout);
+  QStringList Entries = (Stored.isEmpty() ? (FExplorer ? DefaultExplorerToolbarsLayout() : DefaultToolbarsLayout()) : Stored)
+    .split(QLatin1Char(','), Qt::SkipEmptyParts);
   for (const TBand & Band : FBands)
   {
     const QString Shown = Band.Bar->isVisibleTo(this) || ((Band.Toggle != nullptr) && Band.Toggle->isChecked()) ?
@@ -7378,7 +7438,7 @@ void MainWindow::SaveToolbarSettings()
       Entries.append(Band.Name + QLatin1Char('=') + Shown + QLatin1Char(':') + Dock + QStringLiteral(":0+0"));
     }
   }
-  Layout.ToolbarsLayout = (Entries.join(QLatin1Char(',')) + QLatin1Char(',')).toStdString();
+  (FExplorer ? Layout.Explorer.ToolbarsLayout : Layout.ToolbarsLayout) = (Entries.join(QLatin1Char(',')) + QLatin1Char(',')).toStdString();
   Layout.LockToolbars = FLockToolbarsAction->isChecked();
   Layout.SelectiveToolbarText = FSelectiveTextAction->isChecked();
   for (int Size = 0; Size < 3; Size++)

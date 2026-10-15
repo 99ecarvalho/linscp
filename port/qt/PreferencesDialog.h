@@ -58,6 +58,9 @@ public:
   QSpinBox * BeepOnFinishAfterSpin() const { return FBeepOnFinishAfter; }
   QCheckBox * BalloonNotificationsCheck() const { return FBalloonNotifications; }
   QComboBox * ThemeCombo() const { return FTheme; }
+  QRadioButton * ExplorerInterfaceButton() const { return FExplorerInterface; }
+  QRadioButton * CommanderInterfaceButton() const { return FCommanderInterface; }
+  QLabel * InterfaceChangeLabel() const { return FInterfaceChange; }
   QCheckBox * ShowInaccesibleDirectoriesCheck() const { return FShowInaccesibleDirectories; }
   QCheckBox * RefreshRemotePanelCheck() const { return FRefreshRemotePanel; }
   QSpinBox * RefreshRemotePanelIntervalSpin() const { return FRefreshRemotePanelInterval; }
@@ -245,6 +248,10 @@ private:
   QCheckBox * FBalloonNotifications = nullptr;
   QCheckBox * FFlashTaskbar = nullptr;
   QComboBox * FTheme = nullptr;
+  QRadioButton * FCommanderInterface = nullptr;
+  QRadioButton * FExplorerInterface = nullptr;
+  QLabel * FInterfaceChange = nullptr;
+  bool FExplorerAtStart = false;
   QCheckBox * FShowInaccesibleDirectories = nullptr;
   QCheckBox * FAutoReadDirectoryAfterOp = nullptr;
   QCheckBox * FRefreshRemotePanel = nullptr;

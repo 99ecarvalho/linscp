@@ -177,7 +177,7 @@ def main():
             sftp.stat(mkdir)
         except IOError:
             sftp.mkdir(mkdir)
-        for form in ('NonVisual.dfm', 'ScpCommander.dfm'):
+        for form in ('NonVisual.dfm', 'ScpCommander.dfm', 'ScpExplorer.dfm'):
             copied += push(sftp, os.path.join(ROOT, '3rd-party', 'winscp', 'source', 'forms', form),
                            WINSCP_DIR + '\\forms\\' + form)
         qt_test = os.path.join(a.build, '..', 'tools', 'msys2-qt', 'clang64', 'bin', 'Qt6Test.dll')

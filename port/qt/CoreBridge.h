@@ -752,6 +752,26 @@ struct TLayout
   std::string ToolbarsLayout;
   // The console's size (ConsoleWin.WindowSize: "width,height,ppi").
   std::string ConsoleWindowSize;
+  // The Explorer interface's own (Interface\Explorer): its window, its
+  // panel's columns, toolbars, status bar and tabs, the view style
+  // (TDirViewStyle: icons, small icons, list, details, thumbnails), the
+  // full address shown, the tree and its width (at its pixels per inch),
+  // where downloads go (empty: the documents folder).
+  struct TExplorer
+  {
+    std::string WindowParams;
+    std::string DirViewParams;
+    std::string ToolbarsLayout;
+    bool StatusBar = true;
+    bool Tabs = true;
+    enum class TViewStyle { Icon, SmallIcon, List, Report, Thumbnail };
+    TViewStyle ViewStyle = TViewStyle::Icon;
+    bool ShowFullAddress = true;
+    bool Tree = true;
+    int TreeWidth = 180;
+    int TreeWidthPixelsPerInch = 96;
+    std::string LastLocalTargetDirectory;
+  } Explorer;
 };
 TLayout Layout();
 // The shell's histories, as WinSCP's (CustomWinConfiguration's History:

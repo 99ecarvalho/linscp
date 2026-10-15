@@ -133,6 +133,12 @@ public:
   // its seconds; how many so far, for tests.
   void OperationComplete(double Seconds);
   int Beeps() const { return FBeeps; }
+  // The Explorer interface (P3-21: Preferences > Interface, from the
+  // window's start), its address bar and view styles (tests).
+  bool Explorer() const { return FExplorer; }
+  QComboBox * AddressBar() const { return FAddress; }
+  QAction * ViewStyleAction(int Style) const { return FViewStyleActions[Style]; }
+  void GoToAddress(const QString & Path);
   // Panels > Remote's periodic refresh, when its seconds have passed since
   // the directory was read.
   void RefreshRemotePanelIfDue();
@@ -521,6 +527,15 @@ private:
   QAction * FCurrentMoveAction = nullptr;
   QMenu * FLockingMenu = nullptr;
   void UpdateFilesMenu();
+  // ExplorerInterface.cpp's.
+  bool FExplorer = false;
+  class QComboBox * FAddress = nullptr;
+  QAction * FViewStyleActions[5] = {};
+  void ApplyExplorerInterface();
+  void ApplyExplorerShortcuts();
+  void UpdateAddress();
+  static QString DefaultExplorerToolbarsLayout();
+  static QString DocumentsDirectory();
   QAction * FQueueToolbarAction = nullptr;
   QAction * FQueueFileListAction = nullptr;
   bool FTabsShown = true;

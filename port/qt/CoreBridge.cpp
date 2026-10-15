@@ -798,6 +798,17 @@ TLayout Layout()
   Result.LargerToolbar = Settings.LargerToolbar;
   Result.ToolbarsLayout = Utf8(Settings.CommanderToolbarsLayout);
   Result.ConsoleWindowSize = Utf8(Settings.ConsoleWindowSize);
+  Result.Explorer.WindowParams = Utf8(Settings.ExplorerWindowParams);
+  Result.Explorer.DirViewParams = Utf8(Settings.ExplorerDirViewParams);
+  Result.Explorer.ToolbarsLayout = Utf8(Settings.ExplorerToolbarsLayout);
+  Result.Explorer.StatusBar = Settings.ExplorerStatusBar;
+  Result.Explorer.Tabs = Settings.ExplorerSessionsTabs;
+  Result.Explorer.ViewStyle = static_cast<TLayout::TExplorer::TViewStyle>(std::clamp(Settings.ExplorerViewStyle, 0, 4));
+  Result.Explorer.ShowFullAddress = Settings.ExplorerShowFullAddress;
+  Result.Explorer.Tree = Settings.ExplorerDriveView;
+  Result.Explorer.TreeWidth = Settings.ExplorerDriveViewWidth;
+  Result.Explorer.TreeWidthPixelsPerInch = Settings.ExplorerDriveViewWidthPixelsPerInch;
+  Result.Explorer.LastLocalTargetDirectory = Utf8(Settings.ExplorerLastLocalTargetDirectory);
   return Result;
 }
 
@@ -857,6 +868,17 @@ void SetLayout(const TLayout & Layout)
   Settings.LargerToolbar = Layout.LargerToolbar;
   Settings.CommanderToolbarsLayout = FromUtf8(Layout.ToolbarsLayout);
   Settings.ConsoleWindowSize = FromUtf8(Layout.ConsoleWindowSize);
+  Settings.ExplorerWindowParams = FromUtf8(Layout.Explorer.WindowParams);
+  Settings.ExplorerDirViewParams = FromUtf8(Layout.Explorer.DirViewParams);
+  Settings.ExplorerToolbarsLayout = FromUtf8(Layout.Explorer.ToolbarsLayout);
+  Settings.ExplorerStatusBar = Layout.Explorer.StatusBar;
+  Settings.ExplorerSessionsTabs = Layout.Explorer.Tabs;
+  Settings.ExplorerViewStyle = static_cast<int>(Layout.Explorer.ViewStyle);
+  Settings.ExplorerShowFullAddress = Layout.Explorer.ShowFullAddress;
+  Settings.ExplorerDriveView = Layout.Explorer.Tree;
+  Settings.ExplorerDriveViewWidth = Layout.Explorer.TreeWidth;
+  Settings.ExplorerDriveViewWidthPixelsPerInch = Layout.Explorer.TreeWidthPixelsPerInch;
+  Settings.ExplorerLastLocalTargetDirectory = FromUtf8(Layout.Explorer.LastLocalTargetDirectory);
   try
   {
     Shell()->SetSettings(Settings);

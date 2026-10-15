@@ -429,6 +429,11 @@ if(TARGET linscp)
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
             sync /ini=nul {port} {tmp}/local -platform offscreen)
   set_tests_properties(qt_gui_sync PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+  add_test(NAME qt_gui_explorer
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
+            --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
+            explorer /ini=nul {port} {tmp}/local -platform offscreen)
+  set_tests_properties(qt_gui_explorer PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
   add_test(NAME qt_gui_environment
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
@@ -479,6 +484,10 @@ if(TARGET linscp)
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/check_menus.py"
             --winscp "${LINSCP_UPSTREAM}/source" --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>")
   set_tests_properties(qt_gui_menus PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
+  add_test(NAME qt_gui_menus_explorer
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/check_menus.py"
+            --winscp "${LINSCP_UPSTREAM}/source" --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" --explorer "$<TARGET_FILE:test_qt_gui>")
+  set_tests_properties(qt_gui_menus_explorer PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
   add_test(NAME qt_gui_tabs
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"

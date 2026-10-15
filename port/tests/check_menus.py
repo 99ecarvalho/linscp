@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
-Check linscp's menu bar against WinSCP's Commander's: the menus in WinSCP's
-order, and each menu's items in the order WinSCP has them. linscp may leave
+Check linscp's menu bar against WinSCP's Commander's (or with --explorer,
+its Explorer's, forms/ScpExplorer.dfm): the menus in WinSCP's order, and
+each menu's items in the order WinSCP has them. linscp may leave
 items out (what it does not have yet) but may not reorder them, and may add
 only the items listed in EXTRA. WinSCP's menus are read from its forms
 (ScpCommander.dfm, the captions from NonVisual.dfm's actions); linscp's from
 `test_qt_gui menus`.
 
-  check_menus.py --winscp <winscp/source> [--emulator wine] test_qt_gui[.exe]
+  check_menus.py --winscp <winscp/source> [--emulator wine] [--explorer] test_qt_gui[.exe]
 """
 import argparse, os, re, subprocess, sys
 
@@ -37,14 +38,14 @@ def dfm_string(text):
     return out
 
 
-def winscp_menus(source):
+def winscp_menus(source, form='ScpCommander.dfm'):
     forms = os.path.join(source, 'forms')
     actions = {}
     nv = open(os.path.join(forms, 'NonVisual.dfm'), encoding='latin-1').read()
     for m in re.finditer(r'object (\w+): T\w*Action\b(.*?)\n    end', nv, re.S):
         c = re.search(r'\n\s+Caption = (.+)', m.group(2))
         actions[m.group(1)] = dfm_string(c.group(1)) if c else ''
-    lines = open(os.path.join(forms, 'ScpCommander.dfm'), encoding='latin-1').read().split('\n')
+    lines = open(os.path.join(forms, form), encoding='latin-1').read().split('\n')
     start = next(i for i, l in enumerate(lines) if 'object MenuToolbar' in l)
     base = len(lines[start]) - len(lines[start].lstrip())
     items = []  # (depth, caption)
@@ -89,10 +90,10 @@ def tree(items):
     return root
 
 
-def linscp_menus(test, emulator):
+def linscp_menus(test, emulator, mode='menus'):
     # $LINSCP_QT_PLATFORM: where Qt's offscreen plugin is not deployed
     # (natively on Windows, vm_tests.py: windows).
-    cmd = ([emulator] if emulator else []) + [test, 'menus', '/ini=nul', '-platform',
+    cmd = ([emulator] if emulator else []) + [test, mode, '/ini=nul', '-platform',
                                               os.environ.get('LINSCP_QT_PLATFORM', 'offscreen')]
     out = subprocess.run(cmd, capture_output=True, text=True, timeout=120).stdout
     items = []
@@ -132,13 +133,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--winscp', required=True)
     ap.add_argument('--emulator')
+    ap.add_argument('--explorer', action='store_true')
     ap.add_argument('test')
     a = ap.parse_args()
-    ours = linscp_menus(a.test, a.emulator)
+    ours = linscp_menus(a.test, a.emulator, 'menus-explorer' if a.explorer else 'menus')
     if not ours:
         print('FAIL: no menus from the test program')
         return 1
-    compare([], ours, winscp_menus(a.winscp))
+    compare([], ours, winscp_menus(a.winscp, 'ScpExplorer.dfm' if a.explorer else 'ScpCommander.dfm'))
     for f in failures:
         print('FAIL ' + f)
     if not failures:

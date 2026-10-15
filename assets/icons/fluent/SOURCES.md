@@ -75,3 +75,10 @@ glyphs) is the file below, unchanged.
 | sort-rights | `icons/lock_closed_20_regular.svg` |
 | sort-owner | `icons/person_20_regular.svg` |
 | sort-group | `icons/people_20_regular.svg` |
+| view-icons | `icons/grid_20_regular.svg` |
+| view-small-icons | `icons/grid_dots_20_regular.svg` |
+| view-list | `icons/apps_list_20_regular.svg` |
+| view-details | `icons/table_20_regular.svg` |
+| view-thumbnails | `icons/image_20_regular.svg` |
+| tree | `icons/text_bullet_list_tree_20_regular.svg` |
+| queue-file-list | `icons/document_multiple_20_regular.svg` |

@@ -337,6 +337,24 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"UseMasterPassword", FUseMasterPassword);
     Storage->WriteString(L"MasterPasswordVerifier", FMasterPasswordVerifier);
   }
+  if (Storage->OpenSubKeyPath(L"Interface\\Explorer", true))
+  {
+    TCloseSubKeyPath Close(Storage);
+    if (!FSettings.ExplorerWindowParams.IsEmpty())
+    {
+      Storage->WriteString(L"WindowParams", FSettings.ExplorerWindowParams);
+    }
+    Storage->WriteString(L"DirViewParams", FSettings.ExplorerDirViewParams);
+    Storage->WriteString(L"ToolbarsLayout2", FSettings.ExplorerToolbarsLayout);
+    Storage->WriteBool(L"StatusBar", FSettings.ExplorerStatusBar);
+    Storage->WriteBool(L"SessionsTabs", FSettings.ExplorerSessionsTabs);
+    Storage->WriteInteger(L"ViewStyle", FSettings.ExplorerViewStyle);
+    Storage->WriteBool(L"ShowFullAddress", FSettings.ExplorerShowFullAddress);
+    Storage->WriteBool(L"DriveView", FSettings.ExplorerDriveView);
+    Storage->WriteInteger(L"DriveViewWidth", FSettings.ExplorerDriveViewWidth);
+    Storage->WriteInteger(L"DriveViewWidthPixelsPerInch", FSettings.ExplorerDriveViewWidthPixelsPerInch);
+    Storage->WriteString(L"LastLocalTargetDirectory", FSettings.ExplorerLastLocalTargetDirectory);
+  }
   if (Storage->OpenSubKeyPath(L"Interface\\Updates", true))
   {
     TCloseSubKeyPath Close(Storage);
@@ -906,6 +924,23 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     TCloseSubKeyPath Close(Storage);
     FUseMasterPassword = Storage->ReadBool(L"UseMasterPassword", FUseMasterPassword);
     FMasterPasswordVerifier = Storage->ReadString(L"MasterPasswordVerifier", FMasterPasswordVerifier);
+  }
+  if (Storage->OpenSubKeyPath(L"Interface\\Explorer", false))
+  {
+    TCloseSubKeyPath Close(Storage);
+    FSettings.ExplorerWindowParams = Storage->ReadString(L"WindowParams", FSettings.ExplorerWindowParams);
+    FSettings.ExplorerDirViewParams = Storage->ReadString(L"DirViewParams", FSettings.ExplorerDirViewParams);
+    FSettings.ExplorerToolbarsLayout = Storage->ReadString(L"ToolbarsLayout2", FSettings.ExplorerToolbarsLayout);
+    FSettings.ExplorerStatusBar = Storage->ReadBool(L"StatusBar", FSettings.ExplorerStatusBar);
+    FSettings.ExplorerSessionsTabs = Storage->ReadBool(L"SessionsTabs", FSettings.ExplorerSessionsTabs);
+    FSettings.ExplorerViewStyle = Storage->ReadInteger(L"ViewStyle", FSettings.ExplorerViewStyle);
+    FSettings.ExplorerShowFullAddress = Storage->ReadBool(L"ShowFullAddress", FSettings.ExplorerShowFullAddress);
+    FSettings.ExplorerDriveView = Storage->ReadBool(L"DriveView", FSettings.ExplorerDriveView);
+    FSettings.ExplorerDriveViewWidth = Storage->ReadInteger(L"DriveViewWidth", FSettings.ExplorerDriveViewWidth);
+    FSettings.ExplorerDriveViewWidthPixelsPerInch =
+      Storage->ReadInteger(L"DriveViewWidthPixelsPerInch", FSettings.ExplorerDriveViewWidthPixelsPerInch);
+    FSettings.ExplorerLastLocalTargetDirectory =
+      Storage->ReadString(L"LastLocalTargetDirectory", FSettings.ExplorerLastLocalTargetDirectory);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Updates", false))
   {

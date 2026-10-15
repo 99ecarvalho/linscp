@@ -397,6 +397,8 @@ void PreferencesDialog::UpdateControls()
   FLogMaxCountSpin->setEnabled(FLogging->isChecked() && FLogMaxCount->isChecked());
   FActionsLogFile->setEnabled(FLogActions->isChecked());
   FEditorLargeFileSize->setEnabled(FEditorWarnLargeFile->isChecked());
+  // As UpdateControls: the interface's change noted.
+  FInterfaceChange->setVisible(FExplorerInterface->isChecked() != FExplorerAtStart);
   // As UpdateControls' environment, panels and updates.
   FConfirmDDTransfer->setEnabled(FConfirmTransferring->isChecked());
   FBeepOnFinishAfter->setEnabled(FBeepOnFinish->isChecked());
@@ -1326,6 +1328,7 @@ TPreferences PreferencesDialog::Preferences() const
   Result.BalloonNotifications = FBalloonNotifications->isChecked();
   Result.FlashTaskbar = FFlashTaskbar->isChecked();
   Result.DarkTheme = AutoSwitchOfIndex(FTheme->currentIndex());
+  Result.ExplorerInterface = FExplorerInterface->isChecked();
   Result.DDWarnLackOfTempSpace = FDDWarnLackOfTempSpace->isChecked();
   if (FDDFakeFile->isEnabled())
   {
@@ -2536,10 +2539,13 @@ QWidget * PreferencesDialog::MakeInterfacePage(const TPreferences & Preferences)
 {
   QWidget * Page = new QWidget(this);
   QVBoxLayout * Layout = new QVBoxLayout(Page);
+  // InterfaceChangeLabel: the interface is the window's from its start.
+  FInterfaceChange = new QLabel(tr("Changes will apply on the next start."), Page);
+  Layout->addWidget(FInterfaceChange);
   QGroupBox * Interface = new QGroupBox(tr("User Interface"), Page);
   QGridLayout * InterfaceLayout = new QGridLayout(Interface);
   QRadioButton * Commander = new QRadioButton(tr("&Commander"), Interface);
-  Commander->setChecked(true);
+  FCommanderInterface = Commander;
   QLabel * CommanderDescription = new QLabel(
     tr("- two panels (left for local directory, right for remote directory)\n"
        "- keyboard shortcuts like in Norton Commander (and other similar programs as Total Commander, Midnight Commander...)\n"
@@ -2547,13 +2553,15 @@ QWidget * PreferencesDialog::MakeInterfacePage(const TPreferences & Preferences)
   CommanderDescription->setWordWrap(true);
   CommanderDescription->setProperty("literalText", true);
   QRadioButton * Explorer = new QRadioButton(tr("&Explorer"), Interface);
-  Explorer->setEnabled(false);
-  Explorer->setToolTip(tr("linscp has only the Commander interface."));
+  FExplorerInterface = Explorer;
+  FExplorerAtStart = Preferences.ExplorerInterface;
+  Explorer->setChecked(Preferences.ExplorerInterface);
+  Commander->setChecked(!Preferences.ExplorerInterface);
+  connect(Explorer, &QRadioButton::toggled, this, &PreferencesDialog::UpdateControls);
   QLabel * ExplorerDescription = new QLabel(
     tr("- only remote directory\n- keyboard shortcuts like in Windows File Explorer\n- drag && drop").replace(QStringLiteral("&&"), QStringLiteral("&")),
     Interface);
   ExplorerDescription->setWordWrap(true);
-  ExplorerDescription->setEnabled(false);
   ExplorerDescription->setProperty("literalText", true);
   InterfaceLayout->addWidget(Commander, 0, 0);
   InterfaceLayout->addWidget(CommanderDescription, 1, 0);

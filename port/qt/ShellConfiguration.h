@@ -157,6 +157,23 @@ struct TShellSettings
   UnicodeString CommanderToolbarsLayout;
   // ConsoleWin.WindowSize: "width,height,ppi".
   UnicodeString ConsoleWindowSize = L"570,430,96";
+  // Interface\Explorer (TScpExplorerConfiguration), the Explorer
+  // interface's: its window, its panel's columns, its toolbars (its key
+  // ToolbarsLayout2), status bar and tabs, the view style (TDirViewStyle:
+  // dvsIcon 0, dvsSmallIcon, dvsList, dvsReport, dvsThumbnail), the full
+  // address, the tree and its width at its pixels per inch, where downloads
+  // go (empty: the documents folder).
+  UnicodeString ExplorerWindowParams;
+  UnicodeString ExplorerDirViewParams = L"0;1;0|150,1;70,1;150,1;79,1;62,1;55,0;20,0;150,0;125,0;@96|6;7;8;0;1;2;3;4;5";
+  UnicodeString ExplorerToolbarsLayout;
+  bool ExplorerStatusBar = true;
+  bool ExplorerSessionsTabs = true;
+  int ExplorerViewStyle = 0;
+  bool ExplorerShowFullAddress = true;
+  bool ExplorerDriveView = true;
+  int ExplorerDriveViewWidth = 180;
+  int ExplorerDriveViewWidthPixelsPerInch = 96;
+  UnicodeString ExplorerLastLocalTargetDirectory;
   // Environment's confirmations and notifications (Interface; TAutoSwitch:
   // asOn, asOff, asAuto, DDTransferConfirmation's key
   // DDTransferConfirmation2; SynchronizeSummary TCustomWinConfiguration's).

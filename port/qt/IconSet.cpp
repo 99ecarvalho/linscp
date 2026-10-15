@@ -184,6 +184,12 @@ QString ThemeName(const QString & Role)
     { QStringLiteral("cancel"), QStringLiteral("process-stop") },
     { QStringLiteral("change-password"), QStringLiteral("dialog-password") },
     { QStringLiteral("clear-caches"), QStringLiteral("edit-clear") },
+    { QStringLiteral("view-icons"), QStringLiteral("view-list-icons") },
+    { QStringLiteral("view-small-icons"), QStringLiteral("view-list-icons") },
+    { QStringLiteral("view-list"), QStringLiteral("view-list-text") },
+    { QStringLiteral("view-details"), QStringLiteral("view-list-details") },
+    { QStringLiteral("view-thumbnails"), QStringLiteral("view-preview") },
+    { QStringLiteral("tree"), QStringLiteral("view-list-tree") },
   };
   return Names.value(Role);
 }

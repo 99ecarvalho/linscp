@@ -75,3 +75,10 @@ glyphs) is the file below, unchanged.
 | sort-rights | `icons/lock.svg` |
 | sort-owner | `icons/user.svg` |
 | sort-group | `icons/users.svg` |
+| view-icons | `icons/layout-grid.svg` |
+| view-small-icons | `icons/grid-2x2.svg` |
+| view-list | `icons/layout-list.svg` |
+| view-details | `icons/table.svg` |
+| view-thumbnails | `icons/images.svg` |
+| tree | `icons/list-tree.svg` |
+| queue-file-list | `icons/files.svg` |

@@ -1,4 +1,5 @@
 #include "RemotePanel.h"
+#include <QListView>
 #include "DirectoryTree.h"
 #include <QScrollBar>
 #include "PanelBands.h"
@@ -165,6 +166,22 @@ RemotePanel::RemotePanel(QWidget * Parent) :
     return QString::fromStdString(Local);
   };
   connect(FThumbs, &QWidget::customContextMenuRequested, this, &RemotePanel::ContextMenu);
+  // The other view styles (TUnixDirView's vsIcon, vsSmallIcon, vsList): the
+  // names with their type icons, over the same entries and selection.
+  FIcons = new QListView(FSplitter);
+  FIcons->hide();
+  FIcons->setModel(FView->model());
+  FIcons->setModelColumn(FileListModel::NameColumn);
+  FIcons->setSelectionModel(FView->selectionModel());
+  FIcons->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  FIcons->setResizeMode(QListView::Adjust);
+  FIcons->setMovement(QListView::Static);
+  FIcons->setUniformItemSizes(true);
+  FIcons->setContextMenuPolicy(Qt::CustomContextMenu);
+  FIcons->setAccessibleName(FView->accessibleName());
+  FSplitter->addWidget(FIcons);
+  connect(FIcons, &QListView::activated, this, &RemotePanel::Activated);
+  connect(FIcons, &QWidget::customContextMenuRequested, this, &RemotePanel::ContextMenu);
   FSplitter->setStretchFactor(1, 1);
   connect(FTree, &RemoteDirectoryTree::DirectoryChosen, this, [this](const QString & Path)
   {
@@ -829,21 +846,69 @@ void RemotePanel::SetTreeHeight(int Height)
 
 void RemotePanel::SetThumbnails(bool Thumbnails)
 {
+  SetViewStyle(Thumbnails ? TViewStyle::Thumbnail : TViewStyle::Report);
+}
+
+bool RemotePanel::Thumbnails() const
+{
+  return (FViewStyle == TViewStyle::Thumbnail);
+}
+
+// As TCustomDirView's ViewStyle: details, thumbnails, or the names with
+// large icons (wrapping across), small ones (across) or a list (down).
+void RemotePanel::SetViewStyle(TViewStyle Style)
+{
   const bool Focused = FocusView()->hasFocus();
-  FView->setVisible(!Thumbnails);
-  FThumbs->setVisible(Thumbnails);
+  FViewStyle = Style;
+  const bool Icons = (Style == TViewStyle::Icon) || (Style == TViewStyle::SmallIcon) || (Style == TViewStyle::List);
+  if (Icons)
+  {
+    const int Size = ((Style == TViewStyle::Icon) ? 32 : 16) * logicalDpiX() / 96;
+    FIcons->setIconSize(QSize(Size, Size));
+    FIcons->setWrapping(true);
+    if (Style == TViewStyle::Icon)
+    {
+      FIcons->setViewMode(QListView::IconMode);
+      FIcons->setFlow(QListView::LeftToRight);
+      FIcons->setWordWrap(true);
+      FIcons->setGridSize(QSize(Size * 3, Size + FIcons->fontMetrics().height() * 2 + 8));
+    }
+    else
+    {
+      FIcons->setViewMode(QListView::ListMode);
+      FIcons->setFlow((Style == TViewStyle::List) ? QListView::TopToBottom : QListView::LeftToRight);
+      FIcons->setWordWrap(false);
+      FIcons->setGridSize(QSize());
+    }
+  }
+  FView->setVisible(Style == TViewStyle::Report);
+  FThumbs->setVisible(Style == TViewStyle::Thumbnail);
+  FIcons->setVisible(Icons);
   if (Focused)
   {
     FocusView()->setFocus();
   }
 }
 
-bool RemotePanel::Thumbnails() const
-{
-  return !FThumbs->isHidden();
-}
-
 QAbstractItemView * RemotePanel::FocusView() const
 {
-  return Thumbnails() ? static_cast<QAbstractItemView *>(FThumbs) : static_cast<QAbstractItemView *>(FView);
+  switch (FViewStyle)
+  {
+    case TViewStyle::Thumbnail: return FThumbs;
+    case TViewStyle::Report: return FView;
+    default: return FIcons;
+  }
+}
+
+void RemotePanel::SetPathBarVisible(bool Visible)
+{
+  FPath->setVisible(Visible);
+}
+
+// As the Explorer has its DriveView: beside the files, not above them.
+void RemotePanel::SetTreeBeside(bool Beside)
+{
+  FSplitter->setOrientation(Beside ? Qt::Horizontal : Qt::Vertical);
+  // Its width kept as the window's changes (the files take the rest).
+  FSplitter->setStretchFactor(0, Beside ? 0 : 1);
 }

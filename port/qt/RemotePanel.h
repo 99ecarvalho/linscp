@@ -106,6 +106,15 @@ public:
   // selection. FocusView: whichever is shown.
   void SetThumbnails(bool Thumbnails);
   bool Thumbnails() const;
+  // The view style, as WinSCP's TDirViewStyle (the Explorer offers all).
+  using TViewStyle = CoreBridge::TLayout::TExplorer::TViewStyle;
+  void SetViewStyle(TViewStyle Style);
+  TViewStyle ViewStyle() const { return FViewStyle; }
+  QListView * Icons() const { return FIcons; }
+  // The tree beside the files (the Explorer's), else above them.
+  void SetTreeBeside(bool Beside);
+  // The path line above the files (the Explorer has its address bar).
+  void SetPathBarVisible(bool Visible);
   ThumbnailView * Thumbs() const { return FThumbs; }
   QAbstractItemView * FocusView() const;
   // The drag of the selection, for other programs too: the main window's
@@ -161,6 +170,8 @@ private:
   DirectoriesFirst * FSort = nullptr;
   FileView * FView = nullptr;
   ThumbnailView * FThumbs = nullptr;
+  class QListView * FIcons = nullptr;
+  TViewStyle FViewStyle = TViewStyle::Report;
   QLineEdit * FPath = nullptr;
   QLabel * FStatus = nullptr;
   // The directory shown: the path box may hold what is being typed.

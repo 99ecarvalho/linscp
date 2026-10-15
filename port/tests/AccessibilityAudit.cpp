@@ -106,6 +106,16 @@ bool WinScpClash(const QString & One, const QString & Other)
     { QStringLiteral("&Copy to Clipboard"), QStringLiteral("File &Custom Commands") },
     { QStringLiteral("&Copy to Clipboard"), QStringLiteral("&Calculate Directory Sizes") },
     { QStringLiteral("&Compare Directories"), QStringLiteral("Static &Custom Commands") },
+    // ScpExplorer.dfm's menus: Files, Commands, View, View > Toolbars.
+    { QStringLiteral("&Properties"), QStringLiteral("&Paste from Clipboard") },
+    { QStringLiteral("&Calculate Directory Sizes"), QStringLiteral("&Close Tab") },
+    { QStringLiteral("Copy &Path to Clipboard"), QStringLiteral("Open in &PuTTY") },
+    { QStringLiteral("Se&lection Buttons"), QStringLiteral("&Lock Toolbars") },
+    { QStringLiteral("&Standard Buttons"), QStringLiteral("&Show Selective Text Labels") },
+    { QStringLiteral("&Toolbars"), QStringLiteral("&Tree") },
+    { QStringLiteral("&Toolbars"), QStringLiteral("Lis&t") },
+    { QStringLiteral("&Toolbars"), QStringLiteral("&Thumbnails") },
+    { QStringLiteral("&Small Icons"), QStringLiteral("&Sort") },
     // A default custom command's name and the Enter... item.
     { QStringLiteral("&Execute"), QStringLiteral("&Enter...") },
   };

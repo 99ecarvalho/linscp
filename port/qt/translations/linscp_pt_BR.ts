@@ -2199,6 +2199,46 @@ Local: %2</translation>
         <source>&amp;System Menu</source>
         <translation>Menu do &amp;Sistema</translation>
     </message>
+    <message>
+        <source>&amp;Large Icons</source>
+        <translation>Ícones &amp;Grandes</translation>
+    </message>
+    <message>
+        <source>&amp;Small Icons</source>
+        <translation>Ícones &amp;Pequenos</translation>
+    </message>
+    <message>
+        <source>Lis&amp;t</source>
+        <translation>Li&amp;sta</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Exibir</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Endereço</translation>
+    </message>
+    <message>
+        <source>&amp;File Colors...</source>
+        <translation>&amp;Cores de Arquivos...</translation>
+    </message>
+    <message>
+        <source>Standard Buttons</source>
+        <translation>Botões padrão</translation>
+    </message>
+    <message>
+        <source>Selection</source>
+        <translation>Seleção</translation>
+    </message>
+    <message>
+        <source>&amp;Address</source>
+        <translation>&amp;Endereço</translation>
+    </message>
+    <message>
+        <source>&amp;Standard Buttons</source>
+        <translation>Botões padrão</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>
@@ -3158,10 +3198,6 @@ Local: %2</translation>
         <translation>&amp;Explorer</translation>
     </message>
     <message>
-        <source>linscp has only the Commander interface.</source>
-        <translation>O linscp tem apenas a interface Commander.</translation>
-    </message>
-    <message>
         <source>- only remote directory
 - keyboard shortcuts like in Windows File Explorer
 - drag &amp;&amp; drop</source>
@@ -3465,10 +3501,6 @@ Local: %2</translation>
         <translation>Confirmar</translation>
     </message>
     <message>
-        <source>&amp;Never ask me again</source>
-        <translation>&amp;Não perguntar novamente</translation>
-    </message>
-    <message>
         <source>%1 (%2 s)</source>
         <translation>%1 (%2 s)</translation>
     </message>
@@ -3479,6 +3511,10 @@ Local: %2</translation>
     <message>
         <source>Never show this message a&amp;gain</source>
         <translation>Nunca exibir esta mensa&amp;gem novamente</translation>
+    </message>
+    <message>
+        <source>Never ask me a&amp;gain</source>
+        <translation>Não me pergunte n&amp;ovamente</translation>
     </message>
 </context>
 <context>

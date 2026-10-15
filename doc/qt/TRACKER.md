@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 11 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 33 | 35 | Parity on features users depend on |
+| P3 Qt parity | 34 | 35 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Dropped for now (2026-10-15); may be reopened |
-| **Total** | **110** | **122** | |
+| **Total** | **111** | **122** | |
 
 ## Next three actions
 
@@ -255,9 +255,10 @@ To and shortcuts, Keep Up To Date in a new window, S3 ACLs and more (the
 audit below); only custom command extensions are deferred.
 P2-10 and P2-11 waited, at the user's request, for P3.
 
-1. **P3-21**: the Explorer interface.
-2. Release 0.4.0 (the user's call): the Preferences pages, extensions, the
-   Windows shell's parts and, once done, the Explorer interface.
+1. Release 0.4.0 (the user's call): the Preferences pages, extensions, the
+   Windows shell's parts, the Explorer interface.
+2. Custom command extensions on POSIX: WinSCP's own need Windows PowerShell;
+   pwsh and the assembly with console pipes (P1-23) could run them there.
 3. The upstream PRs for the carried patches (ADR 0006), waiting on WinSCP's
    maintainer: winscp/winscp#79 (portability), #80 (`LogEvent`), #81 (log
    file names), #82 (local EOL), #83 (OpenSSH import paths), #84, #85 (S3);
@@ -300,6 +301,7 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-15 | The Explorer interface is the same window and actions as the Commander's, laid out as TScpExplorerForm from the window's start; its own settings under `Interface\Explorer` | As WinSCP's: one set of commands, two layouts, the interface chosen in Preferences applying on the next start. The local panel stays, hidden, as where downloads go |
 | 2026-10-15 | linscp's installer registers WinSCP's drag & drop shell extension (`DragExt64.dll`, from the pinned source) only when no other copy is registered | It is WinSCP's own extension, its class, mapping and protocol unchanged, so one registered copy serves both programs; registering over WinSCP's would leave WinSCP without it once linscp is uninstalled |
 | 2026-10-15 | linscp offers the Explorer interface (P3-21) and the Windows shell's jump list, system context menu and drag & drop shell extension (P3-22…24); WinSCP's own services (tips, usage statistics, the donors' automatic updates) stay out for now | The user's call (Q-13) |
 | 2026-10-15 | P2 exit gate (P2-11) passed: the user's daily work in linscp | The user's sign-off: it does the daily work |
@@ -879,7 +881,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-18 | Test devcontainer with real servers | done | `port/tests/servers/` (Containerfile, entrypoint.sh): OpenSSH, vsftpd (FTP, FTPES, implicit FTPS), Apache's mod_dav (WebDAV, HTTPS, locking), versitygw (S3), one container per test on the host's network serving the test's directory (fixtures.servers); ctest label `real-servers`: protocols_real (every protocol through linscp-cli), qt_session_ftp_real, qt_gui_properties_real, qt_gui_tags_real, qt_gui_commands_real, qt_gui_locking_real, native and under Wine. They found: S3 requests carrying an empty, unsigned x-amz-security-token (the shim's data() of an empty string, fixed), Properties failing on servers without object ACLs and on prefix-only folders (core patches). CI skips them: its Debian container has no container engine |
 | P3-19 | The remaining Preferences pages | done | done 2026-10-15. Environment: the confirmations (transfers, with the Copy dialog's "Do not show this dialog box again"; drags', Auto until that is used; overwriting, resuming; deleting and moving to the trash, with "Never ask me again"; closing sessions, with WinSCP's workspace question; exiting on completion; the shell session; the synchronization summary; continue on error, errors collected into WinSCP's list) and the notifications (the beep after so many seconds; tray balloons, else the status bar; the taskbar flashed while elsewhere). Interface: the Commander (Explorer shown, not available) and the theme. Remote: inaccessible directories hidden in the panel and its tree, the refresh after operations left to core (Ctrl+Alt+R), the periodic refresh. Local: the local directory kept across tabs, deleting to the trash. Drag & Drop: the temporary folder and its free-space warning. Updates: the period checked at start, the result on startup or noted, beta versions, the proxy. ctests `qt_gui_preferences`, `qt_gui_environment`, `qt_gui_options`; Wine and the VM too. Not offered: the system context menu (the Windows shell's), the updates' e-mail and usage statistics |
 | P3-20 | Custom command extensions | done | done 2026-10-15. WinSCP's TCustomCommandType (sliced) loads them from the three folders, with their order, deletions and shortcuts kept; Preferences > Commands lists them after the custom commands: Add's split button (a custom command or an extension, from a file or a URL, winscp.net asked as WinSCP asks it, untrusted ones confirmed), Configure (the extension's options dialog, `ExtensionOptionsDialog`, and its keyboard shortcut), Remove, Up, Down; the menus and the Custom Commands toolbar; run with their options expanded, those asked on each run first and kept, per site where they say so; `@require` checked. The Windows packages' `dotnet` folder (WinSCP's .NET assembly, `linscp-cli` as `WinSCP.exe`), `WINSCP_PATH` set. ctest `qt_gui_extensions` (a local extension; on Windows a PowerShell one listing the server over the assembly); Linux, Wine and the VM |
-| P3-21 | Explorer interface | todo | |
+| P3-21 | Explorer interface | done | done 2026-10-15: Preferences > Interface's Explorer, from the next start (`Interface`, as WinSCP's); the window as TScpExplorerForm: the remote panel alone (the local one hidden, where downloads go: `LastLocalTargetDirectory`, the one chosen kept), its tree beside it, the address bar (`ShowFullAddress`, the path's parents its list), ScpExplorer.dfm's menus (ctest `qt_gui_menus_explorer` against WinSCP's form) and bands (Address, Standard Buttons, Selection, Preferences, Sort, Sessions and Tabs, Transfer, Updates, Custom Commands; `ToolbarsLayout2` with WinSCP's default), ExplorerShortcuts' keys, the five view styles (large and small icons, list, details, thumbnails; `ViewStyle`), its own window, columns, tree width, status bar and tabs (`Interface\Explorer`); no local tabs. ctest `qt_gui_explorer`; Linux, Wine and the VM |
 | P3-22 | Jump list | done | done 2026-10-15: the recent sites (on connecting) and workspaces (on opening), newest first, at most 30, under WinSCP's keys (`JumpList`, `JumpListWorkspaces`), dropped when deleted or removed from the taskbar's list; shown as the taskbar's Recent Sites and Recent Workspaces (ICustomDestinationList), each a link with `/JumpList` (a site's with `/UploadIfAny`), shown again at start. ctest `qt_gui_preferences` (on Windows 11, the link in the program's `.customDestinations-ms`) |
 | P3-23 | System context menu | done | done 2026-10-15: the Windows shell's context menu of the selected local files (as WinSCP's ShellDisplayContextMenu: IContextMenu from the folder's IShellFolder, IContextMenu2 drawing Open With and Send To through a callback window, Shift for extended verbs, a rename done in place by the panel), on a right click with Panels > Local's "Use system file context menu" (shown on Windows only) and from the local file menu's System Menu (with Properties, now there for local files too). ctest `qt_gui_environment` (Windows 11's own items) |
 | P3-24 | Drag & drop shell extension | done | done 2026-10-15: WinSCP's DragExt built from the pristine source (`port/dragext`, a wrapper for mingw's GUID operators) as `DragExt64.dll`, in the deploy folder, registered by the installer unless WinSCP's own copy is; remote files dragged as WinSCP's fake file (a hidden `scp…` directory, the shared WinSCPDragExtMapping), downloaded where the copy hook says the drop was, under drag & drop's confirmation; the temporary folder's way when the extension is not there; Drag & Drop's fake-file option and status (installed, loaded, broken builds) on Windows. ctest `qt_gui_environment` (on Windows 11, the shell's copy stopped by the real hook and the file downloaded there) |
