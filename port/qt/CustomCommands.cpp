@@ -107,6 +107,7 @@ TCustomCommandCheck CheckCustomCommand(const std::string & ACommand, bool Remote
       Result.AllowRecursive = !LocalCustomCommand.HasLocalFileName(Cmd);
     }
     Result.AllowApplyToDirectories = Result.FileCommand;
+    Result.LocalFileCommand = !Remote && LocalCustomCommand.HasLocalFileName(Cmd);
   }
   catch (...)
   {

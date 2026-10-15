@@ -374,7 +374,13 @@ SyncChecklistDialog::SyncChecklistDialog(CoreBridge::TSyncChecklist & Checklist,
   }
   Tools->setMenu(ToolsMenu);
   Tools->setVisible(FSession != nullptr);
-  for (QPushButton * Button : { FStart, FQueue, Cancel, CheckAllButton, UncheckAllButton, FReverse, Tools })
+  // As CustomCommandsButton2.
+  FCustomCommands = new QPushButton(tr("&Custom Commands"), this);
+  QMenu * CommandsMenu = new QMenu(FCustomCommands);
+  connect(CommandsMenu, &QMenu::aboutToShow, this, [this, CommandsMenu]() { FillCustomCommands(CommandsMenu); });
+  FCustomCommands->setMenu(CommandsMenu);
+  FCustomCommands->setVisible(false);
+  for (QPushButton * Button : { FStart, FQueue, Cancel, CheckAllButton, UncheckAllButton, FReverse, Tools, FCustomCommands })
   {
     Buttons->addWidget(Button);
   }
@@ -472,6 +478,61 @@ void SyncChecklistDialog::UpdateTools()
   FCalculateAllAction->setEnabled(Can && AllDirectories);
   FMoveAction->setEnabled(Can && FChecklist.CanMove(Selected));
   FFindMoveAction->setEnabled(!FChecklist.Items().empty());
+  // As CustomCommandsAction's Enabled: each selected item on both sides.
+  bool AnyBoth = false;
+  bool AnyNonBoth = false;
+  for (std::size_t Index : Selected)
+  {
+    const CoreBridge::TSyncItem::TAction Action = FChecklist.Items()[Index].Action;
+    const bool Both = (Action == CoreBridge::TSyncItem::TAction::UploadUpdate) || (Action == CoreBridge::TSyncItem::TAction::DownloadUpdate);
+    AnyBoth = AnyBoth || Both;
+    AnyNonBoth = AnyNonBoth || !Both;
+  }
+  FCustomCommands->setEnabled(FRunCustomCommand && AnyBoth && !AnyNonBoth);
+}
+
+void SyncChecklistDialog::SetCustomCommandRunner(TRunCustomCommand Run)
+{
+  FRunCustomCommand = std::move(Run);
+  FCustomCommands->setVisible(FRunCustomCommand && (FSession != nullptr));
+  UpdateTools();
+}
+
+// As CreateCustomCommandsMenu's ccltBoth: the local commands with a local
+// file's pattern.
+void SyncChecklistDialog::FillCustomCommands(QMenu * Menu)
+{
+  Menu->clear();
+  for (const CoreBridge::TCustomCommandDefinition & Command : CoreBridge::CustomCommands())
+  {
+    if (Command.Local && CoreBridge::CheckCustomCommand(Command.Command, false).LocalFileCommand)
+    {
+      Menu->addAction(QString::fromStdString(Command.Name), this, [this, Command]() { RunCustomCommand(Command); });
+    }
+  }
+  if (Menu->isEmpty())
+  {
+    Menu->addAction(tr("(none)"))->setEnabled(false);
+  }
+}
+
+bool SyncChecklistDialog::RunCustomCommand(const CoreBridge::TCustomCommandDefinition & Command)
+{
+  if (!FRunCustomCommand || !FCustomCommands->isEnabled())
+  {
+    return false;
+  }
+  std::vector<std::pair<std::string, std::string>> Pairs;
+  for (std::size_t Index : SelectedIndexes())
+  {
+    const CoreBridge::TSyncItem & Item = FChecklist.Items()[Index];
+    const QString Local = QDir(QString::fromStdString(Item.LocalDirectory)).filePath(QString::fromStdString(Item.Name));
+    QString Remote = QString::fromStdString(Item.RemoteDirectory);
+    Remote += (Remote.endsWith(QLatin1Char('/')) ? QString() : QStringLiteral("/")) + QString::fromStdString(Item.Name);
+    Pairs.emplace_back(QDir::toNativeSeparators(Local).toStdString(), Remote.toStdString());
+  }
+  FRunCustomCommand(Command, Pairs);
+  return true;
 }
 
 void SyncChecklistDialog::ShowError(const CoreBridge::TCoreError & E)

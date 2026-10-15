@@ -4906,6 +4906,66 @@ void LocalCommandsTest(const char * Port, const QString & Directory)
 #endif
     const int Errors = Responder.Errors;
     Check(!Window.RunCustomCommand(Command) && (Responder.Errors > Errors), "a failure's exit code an error");
+    Command.CopyResults = false;
+
+    // The checklist's Custom Commands: a "diff"-style one (!^!), on a file
+    // changed on both sides.
+    const QDir Pair(Dir.filePath(QStringLiteral("pair")));
+    QDir().mkpath(Pair.path());
+    {
+      QFile File(Pair.filePath(QStringLiteral("both.txt")));
+      File.open(QIODevice::WriteOnly);
+      File.write("remote\n");
+    }
+    Window.Local()->ChangeDirectory(Pair.path());
+    Window.ActivatePanel(true);
+    Check(Window.Upload({ QStringLiteral("both.txt") }, QStringLiteral("/sub"), false), "(the remote side)");
+    {
+      QFile File(Pair.filePath(QStringLiteral("both.txt")));
+      File.open(QIODevice::WriteOnly);
+      File.write("local, longer\n");
+    }
+    const QString Both = QDir::toNativeSeparators(Dir.filePath(QStringLiteral("both-seen.txt")));
+    CoreBridge::TCustomCommandDefinition Diff;
+    Diff.Name = "Diff";
+    Diff.Local = true;
+#if defined(Q_OS_WIN)
+    Diff.Command = QStringLiteral("cmd /c type \"!^!\" \"!\" > \"%1\"").arg(Both).toStdString();
+#else
+    Diff.Command = QStringLiteral("cat \"!^!\" \"!\" > \"%1\"").arg(Both).toStdString();
+#endif
+    std::vector<CoreBridge::TCustomCommandDefinition> Commands = CoreBridge::CustomCommands();
+    Commands.push_back(Diff);
+    CoreBridge::SetCustomCommands(Commands);
+    CoreBridge::TSyncParams Params;
+    // The sizes tell them apart, whatever the second they were written in.
+    Params.BySize = true;
+    std::unique_ptr<CoreBridge::TSyncChecklist> List =
+      Window.Session()->SyncCollect(QDir::toNativeSeparators(Pair.path()).toStdString(), "/sub", Params);
+    Check(List && (List->Items().size() == 1) && (List->Items()[0].Action == CoreBridge::TSyncItem::TAction::UploadUpdate),
+      "(an update)");
+    SyncChecklistDialog Dialog(*List, Pair.path(), QStringLiteral("/sub"), &Window, Window.Session());
+    Dialog.SetCustomCommandRunner([&Window](const CoreBridge::TCustomCommandDefinition & Run,
+      const std::vector<std::pair<std::string, std::string>> & Pairs)
+    {
+      for (const auto & Files : Pairs)
+      {
+        CoreBridge::TSession::RunLocalCustomCommand(Window.Session(), Run, { Files.second }, { Files.first }, false,
+          std::string(), CoreBridge::TCustomCommandPrompts(), Window.LocalRunner());
+      }
+    });
+    Dialog.List()->topLevelItem(0)->setSelected(true);
+    Check(!Dialog.CustomCommandsButton()->isHidden() && Dialog.CustomCommandsButton()->isEnabled(), "offered for it");
+    Dialog.CustomCommandsButton()->menu()->popup(QPoint());
+    QStringList Offered;
+    for (QAction * Action : Dialog.CustomCommandsButton()->menu()->actions())
+    {
+      Offered.append(Action->text());
+    }
+    Dialog.CustomCommandsButton()->menu()->hide();
+    Check(Offered.contains(QStringLiteral("Diff")) && !Offered.contains(QStringLiteral("Look")), "the diff-style ones only");
+    Check(Dialog.RunCustomCommand(Diff) && (Read(Both).remove(QLatin1Char('\r')) == QStringLiteral("local, longer\nremote")),
+      "run on the pair: the local file and the remote one's copy");
   }
   CoreBridge::Finalize();
 }

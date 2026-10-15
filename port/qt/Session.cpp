@@ -2504,7 +2504,24 @@ std::string TSession::RunLocalCustomCommand(TSession * Session, const TCustomCom
       {
         NotSupported();
       }
-      std::unique_ptr<TStringList> FileList = FileListOf(Terminal, Names);
+      // Names in the current directory, or full paths (the checklist's).
+      std::unique_ptr<TStringList> FileList(new TStringList());
+      std::vector<std::unique_ptr<TRemoteFile>> Owned;
+      for (const std::string & Name : Names)
+      {
+        const UnicodeString AName = FromUtf8(Name);
+        if (UnixIsAbsolutePath(AName))
+        {
+          Owned.emplace_back(Terminal->ReadFile(AName));
+          Owned.back()->FullFileName = AName;
+          FileList->AddObject(AName, Owned.back().get());
+        }
+        else
+        {
+          TRemoteFile * File = FindFile(Terminal, Name);
+          FileList->AddObject(File->FileName, File);
+        }
+      }
       if (LocalFileCommand)
       {
         if (FileListCommand)

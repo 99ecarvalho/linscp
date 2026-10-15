@@ -9,6 +9,8 @@
 
 #include <QDialog>
 
+#include <functional>
+
 #include "CoreBridge.h"
 
 class QCheckBox;
@@ -140,7 +142,19 @@ public:
   QPushButton * StartButton() const { return FStart; }
   QPushButton * QueueButton() const { return FQueue; }
 
+  // As CustomCommandsAction (FOnCustomCommandMenu): the "diff"-style
+  // local commands, on each selected pair of files (both sides there); the
+  // window runs them (Run: the command, local and remote full paths).
+  using TRunCustomCommand = std::function<void(const CoreBridge::TCustomCommandDefinition & Command,
+    const std::vector<std::pair<std::string, std::string>> & Pairs)>;
+  void SetCustomCommandRunner(TRunCustomCommand Run);
+  class QPushButton * CustomCommandsButton() const { return FCustomCommands; }
+  bool RunCustomCommand(const CoreBridge::TCustomCommandDefinition & Command);
+
 private:
+  QPushButton * FCustomCommands = nullptr;
+  TRunCustomCommand FRunCustomCommand;
+  void FillCustomCommands(class QMenu * Menu);
   void Load(int Index);
   void Reload();
   void UpdateTools();

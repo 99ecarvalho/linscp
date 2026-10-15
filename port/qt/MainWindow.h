@@ -220,6 +220,8 @@ public:
   void ActivatePanel(bool Local);
   bool LocalActive() const { return FLocalActive; }
   CoreBridge::TSession * Session() const { return FSession.get(); }
+  // What runs local custom commands' programs.
+  static CoreBridge::TSession::TLocalRunner LocalRunner();
   // As TCustomScpExplorerForm::CommandLineFromAnotherInstance: the session a
   // command line given to another instance names, opened here, unless the
   // window is busy (false: that instance opens it itself).
@@ -363,7 +365,6 @@ private:
   void UpdateActions();
   void TransferPresetAutoSelect();
   bool RunLocalCustomCommand(const CoreBridge::TCustomCommandDefinition & Command);
-  CoreBridge::TSession::TLocalRunner LocalRunner();
   void StandaloneUpload(const std::vector<std::string> & Files, bool UseDefaults);
   void StandaloneKeepUpToDate(const CoreBridge::TKeepUpToDateParams & Params, bool UseDefaults);
   CoreBridge::TTransferPresetRule TransferPresetAutoSelectData() const;

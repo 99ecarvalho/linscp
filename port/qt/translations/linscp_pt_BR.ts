@@ -3265,6 +3265,14 @@ Local: %2</translation>
         <source>&amp;Find Move Candidate</source>
         <translation>Buscar Candidato para Movimentação</translation>
     </message>
+    <message>
+        <source>&amp;Custom Commands</source>
+        <translation>&amp;Comandos personalizados</translation>
+    </message>
+    <message>
+        <source>(none)</source>
+        <translation>(nenhum)</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

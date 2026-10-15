@@ -1012,6 +1012,9 @@ struct TCustomCommandCheck
   bool AllowRecursive = true;
   bool AllowApplyToDirectories = true;
   bool AllowRemoteFiles = false;
+  // A local command's !^! (HasLocalFileName): a "diff"-style one, on a
+  // local and a remote file at once.
+  bool LocalFileCommand = false;
   std::string Error;
 };
 TCustomCommandCheck CheckCustomCommand(const std::string & Command, bool Remote);

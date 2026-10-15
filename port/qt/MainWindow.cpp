@@ -1758,6 +1758,26 @@ bool MainWindow::SynchronizeDirectories(const QString & LocalDirectory, const QS
   if (Params.PreviewChanges)
   {
     SyncChecklistDialog Dialog(*Checklist, LocalDirectory, RemoteDirectory, this, FSession.get());
+    // As BothCustomCommand: each pair on its own.
+    Dialog.SetCustomCommandRunner([this, &Dialog](const CoreBridge::TCustomCommandDefinition & Command,
+      const std::vector<std::pair<std::string, std::string>> & Pairs)
+    {
+      for (const auto & Pair : Pairs)
+      {
+        try
+        {
+          CoreBridge::TSession::RunLocalCustomCommand(FSession.get(), Command, { Pair.second }, { Pair.first }, false,
+            QDir::toNativeSeparators(FLocal->Path()).toStdString(), CommandPrompts(), LocalRunner());
+        }
+        catch (const CoreBridge::TCoreError & E)
+        {
+          QtFrontend Frontend;
+          Frontend.SetWindow(&Dialog);
+          Frontend.ShowError(E.Error);
+          return;
+        }
+      }
+    });
     // As WinSCP: synchronizing timestamps is not queued.
     Dialog.QueueButton()->setVisible(Params.Mode != CoreBridge::TSyncParams::TMode::Timestamps);
     if (Dialog.exec() != QDialog::Accepted)
