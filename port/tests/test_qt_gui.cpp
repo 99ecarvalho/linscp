@@ -4070,6 +4070,34 @@ void EnvironmentTest(const char * Port, const QString & Directory)
     Reads = 0;
     QTest::qWait(1500);
     Check(Reads == 0, "and no more when off");
+
+    // Panels > Local's system context menu (P3-23): the shell's own, on
+    // Windows only; LocalFilePopup's System Menu.
+    {
+      PreferencesDialog Dialog(&Window);
+      Check(Dialog.SystemContextMenuCheck()->isHidden() != Integration::HasSystemContextMenu(), "offered on Windows only");
+    }
+    {
+      QString Verb;
+      QStringList Items;
+      const bool Shown = Integration::ShowSystemContextMenu(&Window, Directory, { QStringLiteral("e3.txt") }, QPoint(), Verb, &Items);
+#if defined(_WIN32)
+      std::printf("system context menu: %s\n", Items.join(QStringLiteral(" | ")).toUtf8().constData());
+      Check(Shown && (Items.size() >= 3), "the shell's menu for a local file");
+#else
+      Check(!Shown && Items.isEmpty(), "none elsewhere");
+#endif
+      QMenu * Menu = Window.ContextMenu(true, true, QPoint(), false);
+      bool SystemMenu = false;
+      bool Properties = false;
+      for (QAction * Action : Menu->actions())
+      {
+        SystemMenu = SystemMenu || (Action->text() == MainWindow::tr("&System Menu"));
+        Properties = Properties || (Action->text() == MainWindow::tr("&Properties"));
+      }
+      Check((SystemMenu == Integration::HasSystemContextMenu()) && Properties, "the local file menu's System Menu and Properties");
+      delete Menu;
+    }
     QObject::disconnect(Counting);
 
     // Closing with a session: asked, and cancelled, nothing closes.

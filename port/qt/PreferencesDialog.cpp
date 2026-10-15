@@ -1329,6 +1329,7 @@ TPreferences PreferencesDialog::Preferences() const
   Result.RefreshRemotePanelInterval = FRefreshRemotePanelInterval->value();
   Result.PreserveLocalDirectory = FPreserveLocalDirectory->isChecked();
   Result.DeleteToRecycleBin = FDeleteToRecycleBin->isChecked();
+  Result.SystemContextMenu = FSystemContextMenu->isChecked();
   // As SaveUpdates.
   static const int Periods[] = { 0, 1, 7, 30 };
   Result.UpdatesPeriod = Periods[std::clamp(FUpdatesPeriod->currentIndex(), 0, 3)];
@@ -2594,8 +2595,8 @@ QWidget * PreferencesDialog::MakeRemotePage(const TPreferences & Preferences)
   return Page;
 }
 
-// Panels > Local, as WinSCP's PanelLocalSheet. Its "Use system file context
-// menu" is the Windows shell's (kept, not offered).
+// Panels > Local, as WinSCP's PanelLocalSheet; its "Use system file context
+// menu" (the Windows shell's) on Windows only.
 QWidget * PreferencesDialog::MakeLocalPage(const TPreferences & Preferences)
 {
   QWidget * Page = new QWidget(this);
@@ -2605,6 +2606,10 @@ QWidget * PreferencesDialog::MakeLocalPage(const TPreferences & Preferences)
   FPreserveLocalDirectory = new QCheckBox(tr("Do not &change state when switching sessions"), Group);
   FPreserveLocalDirectory->setChecked(Preferences.PreserveLocalDirectory);
   GroupLayout->addWidget(FPreserveLocalDirectory);
+  FSystemContextMenu = new QCheckBox(tr("Use &system file context menu"), Group);
+  FSystemContextMenu->setChecked(Preferences.SystemContextMenu);
+  FSystemContextMenu->setVisible(Integration::HasSystemContextMenu());
+  GroupLayout->addWidget(FSystemContextMenu);
   FDeleteToRecycleBin = new QCheckBox(tr("&Delete files to recycle bin"), Group);
   FDeleteToRecycleBin->setChecked(Preferences.DeleteToRecycleBin);
   GroupLayout->addWidget(FDeleteToRecycleBin);

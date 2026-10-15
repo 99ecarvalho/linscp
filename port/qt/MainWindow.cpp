@@ -233,7 +233,15 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FOtherLocal->OpenFile = [this](const QString &) { FileActivated(false); };
   FPanel->OpenFile = [this](const QString &) { FileActivated(false); };
   // Right clicks: WinSCP's popups.
-  FLocal->OnContextMenu = [this](const QPoint & Global, bool OnItem) { ContextMenu(true, OnItem, Global); };
+  FLocal->OnContextMenu = [this](const QPoint & Global, bool OnItem)
+  {
+    // As DoLocalDirViewContextPopup: on a file, the shell's own menu with
+    // Panels > Local's "Use system file context menu".
+    if (!(OnItem && CoreBridge::Preferences().SystemContextMenu && SystemContextMenu(true, Global)))
+    {
+      ContextMenu(true, OnItem, Global);
+    }
+  };
   FPanel->OnContextMenu = [this](const QPoint & Global, bool OnItem) { ContextMenu(false, OnItem, Global); };
   FOtherLocal->OnContextMenu = [this](const QPoint & Global, bool OnItem) { ContextMenu(false, OnItem, Global); };
   connect(FOtherLocal->View(), &FileView::SwitchPanel, this, [this]() { ActivatePanel(true); });
@@ -3129,10 +3137,13 @@ QMenu * MainWindow::ContextMenu(bool Local, bool OnItem, const QPoint & Global, 
     {
       Names->addAction(FGenerateFileUrlAction);
     }
-    if (!IsLocal)
+    Menu->addSeparator();
+    Menu->addAction(FPropertiesAction);
+    // LocalFilePopup's CurrentSystemMenuFocusedAction: the shell's menu
+    // (Windows), where the click was.
+    if (IsLocal && Integration::HasSystemContextMenu())
     {
-      Menu->addSeparator();
-      Menu->addAction(FPropertiesAction);
+      Menu->addAction(tr("&System Menu"), this, [this, Local, Global]() { SystemContextMenu(Local, Global); });
     }
   }
   else
@@ -3173,6 +3184,37 @@ QMenu * MainWindow::ContextMenu(bool Local, bool OnItem, const QPoint & Global, 
     Menu->popup(Global);
   }
   return Menu;
+}
+
+// As DisplaySystemContextMenu: the selected local files' shell menu; a
+// rename chosen there done in place; the panel read again after.
+bool MainWindow::SystemContextMenu(bool Local, const QPoint & Global)
+{
+  LocalPanel * Panel = SideLocal(Local);
+  if ((Panel == nullptr) || !Integration::HasSystemContextMenu())
+  {
+    return false;
+  }
+  ActivatePanel(Local);
+  QStringList Names = Panel->Selected();
+  if (Names.isEmpty() && (Panel->View()->CurrentEntry() != nullptr))
+  {
+    Names.append(QString::fromStdString(Panel->View()->CurrentEntry()->Name));
+  }
+  QString Verb;
+  if (!Integration::ShowSystemContextMenu(this, Panel->Path(), Names, Global, Verb))
+  {
+    return false;
+  }
+  if (Verb == QStringLiteral("rename"))
+  {
+    Panel->RenameAction()->trigger();
+  }
+  else
+  {
+    Panel->Refresh();
+  }
+  return true;
 }
 
 void MainWindow::CopyFileNames(bool Local, bool Paths)

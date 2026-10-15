@@ -829,4 +829,178 @@ void UpdateJumpList(CoreBridge::TJumpListEntry Kind, const std::string & Name, b
 #endif
 }
 
+bool HasSystemContextMenu()
+{
+#if defined(Q_OS_WIN)
+  return true;
+#else
+  return false;
+#endif
+}
+
+#if defined(Q_OS_WIN)
+namespace
+{
+
+// MenuCallbackProc: the menu's owner draws and fills the shell's owner-drawn
+// submenus (Open With, Send To) through IContextMenu2.
+LRESULT CALLBACK SystemMenuCallback(HWND Wnd, UINT Msg, WPARAM WParam, LPARAM LParam)
+{
+  switch (Msg)
+  {
+    case WM_CREATE:
+      SetWindowLongPtrW(Wnd, GWLP_USERDATA,
+        reinterpret_cast<LONG_PTR>(reinterpret_cast<CREATESTRUCTW *>(LParam)->lpCreateParams));
+      break;
+    case WM_DRAWITEM:
+    case WM_MEASUREITEM:
+    case WM_INITMENUPOPUP:
+    {
+      IContextMenu2 * Menu2 = reinterpret_cast<IContextMenu2 *>(GetWindowLongPtrW(Wnd, GWLP_USERDATA));
+      if (Menu2 != nullptr)
+      {
+        Menu2->HandleMenuMsg(Msg, WParam, LParam);
+      }
+      return (Msg == WM_INITMENUPOPUP) ? 0 : 1;
+    }
+  }
+  return DefWindowProcW(Wnd, Msg, WParam, LParam);
+}
+
+}  // namespace
+#endif
+
+bool ShowSystemContextMenu(QWidget * Window, const QString & Directory, const QStringList & Names, const QPoint & Global,
+  QString & Verb, QStringList * Items)
+{
+  Verb.clear();
+#if defined(Q_OS_WIN)
+  if (Names.isEmpty())
+  {
+    return false;
+  }
+  const HRESULT Init = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+  bool Result = false;
+  // The files' parent folder, and each one's PIDL in it.
+  PIDLIST_ABSOLUTE FolderPidl = nullptr;
+  IShellFolder * Desktop = nullptr;
+  IShellFolder * Folder = nullptr;
+  std::vector<PITEMID_CHILD> Children;
+  const std::wstring FolderPath = QDir::toNativeSeparators(Directory).toStdWString();
+  if (SUCCEEDED(SHParseDisplayName(FolderPath.c_str(), nullptr, &FolderPidl, 0, nullptr)) &&
+      SUCCEEDED(SHGetDesktopFolder(&Desktop)) &&
+      SUCCEEDED(Desktop->BindToObject(FolderPidl, nullptr, IID_IShellFolder, reinterpret_cast<void **>(&Folder))))
+  {
+    for (const QString & Name : Names)
+    {
+      std::wstring Child = Name.toStdWString();
+      PIDLIST_RELATIVE Pidl = nullptr;
+      if (SUCCEEDED(Folder->ParseDisplayName(nullptr, nullptr, &Child[0], nullptr, &Pidl, nullptr)))
+      {
+        Children.push_back(static_cast<PITEMID_CHILD>(Pidl));
+      }
+    }
+  }
+  HWND Owner = (Window != nullptr) ? reinterpret_cast<HWND>(Window->window()->winId()) : nullptr;
+  IContextMenu * Menu = nullptr;
+  if (!Children.empty() && (Children.size() == static_cast<std::size_t>(Names.size())) &&
+      SUCCEEDED(Folder->GetUIObjectOf(Owner, static_cast<UINT>(Children.size()), const_cast<PCUITEMID_CHILD_ARRAY>(Children.data()),
+        IID_IContextMenu, nullptr, reinterpret_cast<void **>(&Menu))))
+  {
+    const UINT MaxEntries = 1000;
+    HMENU Popup = CreatePopupMenu();
+    IContextMenu2 * Menu2 = nullptr;
+    HWND Callback = nullptr;
+    const UINT Flags = CMF_EXPLORE | CMF_CANRENAME | (((GetKeyState(VK_SHIFT) & 0x8000) != 0) ? CMF_EXTENDEDVERBS : 0);
+    if (SUCCEEDED(Menu->QueryInterface(IID_IContextMenu2, reinterpret_cast<void **>(&Menu2))))
+    {
+      Menu2->QueryContextMenu(Popup, 0, 1, MaxEntries, Flags);
+      static const wchar_t ClassName[] = L"linscpSystemMenuCallback";
+      WNDCLASSW Class = {};
+      Class.lpfnWndProc = SystemMenuCallback;
+      Class.hInstance = GetModuleHandleW(nullptr);
+      Class.lpszClassName = ClassName;
+      RegisterClassW(&Class);
+      Callback = CreateWindowW(ClassName, L"", WS_POPUPWINDOW, 0, 0, 0, 0, nullptr, nullptr, Class.hInstance, Menu2);
+    }
+    else
+    {
+      Menu->QueryContextMenu(Popup, 0, 1, 0x7FFF, Flags);
+    }
+    int Command = 0;
+    if (Items != nullptr)
+    {
+      for (int Index = 0; Index < GetMenuItemCount(Popup); Index++)
+      {
+        wchar_t Text[256] = {};
+        if (GetMenuStringW(Popup, static_cast<UINT>(Index), Text, 255, MF_BYPOSITION) > 0)
+        {
+          Items->append(QString::fromWCharArray(Text));
+        }
+      }
+    }
+    else
+    {
+      // (The point in device pixels, as the shell's.)
+      const qreal Scale = (Window != nullptr) ? Window->devicePixelRatioF() : 1.0;
+      Command = static_cast<int>(TrackPopupMenuEx(Popup, TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
+        qRound(Global.x() * Scale), qRound(Global.y() * Scale), (Callback != nullptr) ? Callback : Owner, nullptr));
+    }
+    Result = true;
+    if (Command > 0)
+    {
+      char AnsiVerb[256] = {};
+      if (SUCCEEDED(Menu->GetCommandString(static_cast<UINT_PTR>(Command - 1), GCS_VERBA, nullptr, AnsiVerb, sizeof(AnsiVerb) - 1)))
+      {
+        Verb = QString::fromLatin1(AnsiVerb).toLower();
+      }
+      if (Verb != QStringLiteral("rename"))
+      {
+        CMINVOKECOMMANDINFO Info = {};
+        Info.cbSize = sizeof(Info);
+        Info.hwnd = Owner;
+        Info.lpVerb = MAKEINTRESOURCEA(Command - 1);
+        Info.nShow = SW_SHOWNORMAL;
+        Menu->InvokeCommand(&Info);
+      }
+    }
+    if (Callback != nullptr)
+    {
+      DestroyWindow(Callback);
+    }
+    if (Menu2 != nullptr)
+    {
+      Menu2->Release();
+    }
+    DestroyMenu(Popup);
+    Menu->Release();
+  }
+  for (PITEMID_CHILD Child : Children)
+  {
+    CoTaskMemFree(Child);
+  }
+  if (Folder != nullptr)
+  {
+    Folder->Release();
+  }
+  if (Desktop != nullptr)
+  {
+    Desktop->Release();
+  }
+  CoTaskMemFree(FolderPidl);
+  if (SUCCEEDED(Init))
+  {
+    CoUninitialize();
+  }
+  return Result;
+#else
+  Q_UNUSED(Window);
+  Q_UNUSED(Directory);
+  Q_UNUSED(Names);
+  Q_UNUSED(Global);
+  Q_UNUSED(Items);
+  return false;
+#endif
+}
+
 }  // namespace Integration

@@ -135,6 +135,9 @@ public:
   // Panels > Remote's periodic refresh, when its seconds have passed since
   // the directory was read.
   void RefreshRemotePanelIfDue();
+  // The shell's context menu of the selected local files (Windows); false
+  // when not shown.
+  bool SystemContextMenu(bool Local, const QPoint & Global);
   // An extension's options asked as it runs (false: cancelled).
   bool AskExtensionRunOptions(const CoreBridge::TCustomCommandDefinition & Command);
   // As BatchEnd: the errors "Continue on error" collected (BeginErrorList).

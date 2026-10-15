@@ -63,6 +63,7 @@ public:
   QSpinBox * RefreshRemotePanelIntervalSpin() const { return FRefreshRemotePanelInterval; }
   QCheckBox * PreserveLocalDirectoryCheck() const { return FPreserveLocalDirectory; }
   QCheckBox * DeleteToRecycleBinCheck() const { return FDeleteToRecycleBin; }
+  QCheckBox * SystemContextMenuCheck() const { return FSystemContextMenu; }
   QCheckBox * DDWarnLackOfTempSpaceCheck() const { return FDDWarnLackOfTempSpace; }
   QComboBox * UpdatesPeriodCombo() const { return FUpdatesPeriod; }
   QRadioButton * UpdatesProxyButton() const { return FUpdatesProxy; }
@@ -248,6 +249,7 @@ private:
   QSpinBox * FRefreshRemotePanelInterval = nullptr;
   QCheckBox * FPreserveLocalDirectory = nullptr;
   QCheckBox * FDeleteToRecycleBin = nullptr;
+  QCheckBox * FSystemContextMenu = nullptr;
   QCheckBox * FDDWarnLackOfTempSpace = nullptr;
   QComboBox * FUpdatesPeriod = nullptr;
   QCheckBox * FUpdatesShowOnStartup = nullptr;

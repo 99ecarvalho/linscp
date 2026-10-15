@@ -8,6 +8,8 @@
 #ifndef LINSCP_QT_INTEGRATION_H
 #define LINSCP_QT_INTEGRATION_H
 
+#include <QPoint>
+#include <QStringList>
 #include <QString>
 #include <QStringList>
 
@@ -34,6 +36,14 @@ bool AddToSearchPath(QString & Error);
 // elsewhere. Its path in Path.
 enum class TShortcutFolder { Desktop, SendTo };
 bool CreateShortcut(const CoreBridge::TShortcut & Shortcut, TShortcutFolder Folder, QString & Path, QString & Error);
+// Windows: the shell's context menu of a folder's files (as WinSCP's
+// ShellDisplayContextMenu), at Global; the verb chosen ("rename" is left to
+// the caller, as WinSCP's DirView renames in place), empty when none; false
+// when it could not be shown (or elsewhere).
+// With Items given, its items' texts instead, not shown (tests).
+bool ShowSystemContextMenu(QWidget * Window, const QString & Directory, const QStringList & Names, const QPoint & Global,
+  QString & Verb, QStringList * Items = nullptr);
+bool HasSystemContextMenu();
 // The taskbar's jump list of recent sites and workspaces (Windows; nothing
 // elsewhere): Name added first or removed, else shown again (at start).
 void UpdateJumpList(CoreBridge::TJumpListEntry Kind = CoreBridge::TJumpListEntry::Site, const std::string & Name = std::string(),

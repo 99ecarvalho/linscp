@@ -668,7 +668,7 @@ struct TPreferences
   int RefreshRemotePanelInterval = 60;
   // Panels > Local: the local directory kept when switching tabs; deleted
   // files to the trash (the system's recycle bin); WinSCP's system
-  // context menu (kept: not offered).
+  // context menu instead of linscp's (Windows).
   bool PreserveLocalDirectory = false;
   bool DeleteToRecycleBin = true;
   bool SystemContextMenu = false;

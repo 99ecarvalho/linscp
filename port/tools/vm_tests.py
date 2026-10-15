@@ -137,6 +137,7 @@ def main():
     ap.add_argument('--user', default='user')
     ap.add_argument('-R', dest='regex', default='')
     ap.add_argument('--no-push', action='store_true')
+    ap.add_argument('-V', dest='verbose', action='store_true', help="each test's output, not only a failure's")
     a = ap.parse_args()
     password = os.environ.get('LINSCP_VM_PASSWORD')
     if not password:
@@ -205,7 +206,7 @@ def main():
             failed.append(name)
             verdict = f'Failed (rc {rc})'
         print(f'{name:40} {verdict} {took:.1f} s', flush=True)
-        if verdict.startswith('Failed'):
+        if verdict.startswith('Failed') or a.verbose:
             print('  ' + '\n  '.join(out.strip().splitlines()[-25:]))
     client.close()
     print(f'{len(passed)} passed, {len(failed)} failed, {len(skipped)} skipped of {len(tests)}')
