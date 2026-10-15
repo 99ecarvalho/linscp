@@ -1867,6 +1867,9 @@ public:
   // (fcSecondaryShell), which opens after WinSCP's question
   // (CommandSessionQuestion; GUIConfiguration's ConfirmCommandSession).
   bool CanRunCommands() const;
+  // Checksums without opening the secondary shell first (the protocol's,
+  // or that session already open).
+  bool CanCalculateChecksumsNow() const;
   bool CanOpenShellSession() const;
   std::string CommandSessionQuestion() const;
   void OpenShellSession();

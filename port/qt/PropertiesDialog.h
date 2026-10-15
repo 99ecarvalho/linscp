@@ -8,6 +8,8 @@
 
 #include <QDialog>
 
+#include <functional>
+
 #include <string>
 #include <vector>
 
@@ -60,7 +62,12 @@ public:
   bool AddEditTag(bool Add);
   void RemoveTag();
 
+  // What opens the secondary shell for checksums first, when needed
+  // (the window's); false to give up.
+  void SetChecksumSession(std::function<bool()> Ensure) { FChecksumSession = std::move(Ensure); }
+
 private:
+  std::function<bool()> FChecksumSession;
   void LoadStats(std::int64_t Size, int Files, int Directories, int SymLinks, bool Calculated);
   void UpdateControls();
   void ShowError(const CoreBridge::TCoreError & E);

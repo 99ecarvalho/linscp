@@ -2260,6 +2260,11 @@ bool TSession::CanRunCommands() const
   return Active() && (F->Terminal->IsCapable[fcAnyCommand] || F->Terminal->CommandSessionOpened);
 }
 
+bool TSession::CanCalculateChecksumsNow() const
+{
+  return Active() && (F->Terminal->IsCapable[fcCalculatingChecksum] || F->Terminal->CommandSessionOpened);
+}
+
 bool TSession::CanOpenShellSession() const
 {
   return Active() && F->Terminal->IsCapable[fcSecondaryShell];
@@ -3365,9 +3370,9 @@ TPropertiesInfo TSession::PropertiesOf(const std::vector<std::string> & Names)
     {
       Result.LinkTarget = Utf8(static_cast<TRemoteFile *>(Files->Objects[0])->LinkTo);
     }
-    // TCustomScpExplorerForm::CanCalculateChecksum, without the secondary
-    // shell.
-    if (Terminal->IsCapable[fcCalculatingChecksum])
+    // TCustomScpExplorerForm::CanCalculateChecksum: the protocol's, or the
+    // secondary shell's (unless the files are encrypted).
+    if (Terminal->IsCapable[fcCalculatingChecksum] || (Terminal->IsCapable[fcSecondaryShell] && !Terminal->IsEncryptingFiles()))
     {
       std::unique_ptr<TStrings> Algs(new TStringList());
       Terminal->GetSupportedChecksumAlgs(Algs.get());

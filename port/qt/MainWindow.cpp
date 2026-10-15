@@ -1724,6 +1724,11 @@ bool MainWindow::SynchronizeDirectories(const QString & LocalDirectory, const QS
   {
     return false;
   }
+  // By checksum where only the secondary shell calculates them: it first.
+  if (Params.ByChecksum && !EnsureCommandSession(FSession->CanCalculateChecksumsNow()))
+  {
+    return false;
+  }
   FBusy = true;
   UpdateActions();
   std::unique_ptr<CoreBridge::TSyncChecklist> Checklist;
@@ -2491,6 +2496,8 @@ bool MainWindow::Properties()
   {
     const CoreBridge::TPropertiesInfo Info = FSession->PropertiesOf(List);
     ::PropertiesDialog Dialog(FSession.get(), List, FPanel->Path(), Info, this);
+    // As CalculateChecksum's EnsureCommandSessionFallback(fcCalculatingChecksum).
+    Dialog.SetChecksumSession([this]() { return EnsureCommandSession(FSession->CanCalculateChecksumsNow()); });
     if (Dialog.exec() == QDialog::Accepted)
     {
       Result = FSession->SetProperties(List, Dialog.Properties());
@@ -3028,7 +3035,14 @@ void MainWindow::GenerateUrl(bool Files)
 // opening a separate shell session, asked first, where it must.
 bool MainWindow::EnsureShellSession(bool Shell)
 {
-  if (Shell ? FSession->CanRunShellCommands() : FSession->CanRunCommands())
+  return EnsureCommandSession(Shell ? FSession->CanRunShellCommands() : FSession->CanRunCommands());
+}
+
+// As EnsureCommandSessionFallback: Capable, or the secondary shell opened
+// (asked first, unless told not to).
+bool MainWindow::EnsureCommandSession(bool Capable)
+{
+  if (Capable)
   {
     return true;
   }

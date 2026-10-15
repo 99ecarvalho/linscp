@@ -279,7 +279,7 @@ registry, tray or window messages.
 | Editor | reload from the server; save all; window position kept | done | Reload downloads again (`ExecutedFileReload`); Save All (Shift+Ctrl+S); the first editor's place as `Editor.WindowParams` |
 | Properties | local files' | missing | WinSCP shows the shell's (Win-only) |
 | Properties | S3 ACLs | missing | |
-| Properties | checksums through the secondary shell | missing | copies go through a temporary copy instead |
+| Properties | checksums through the secondary shell | done | CanCalculateChecksum's: offered where only the secondary shell calculates them, the shell opened first (EnsureCommandSessionFallback), for Synchronize by checksum too |
 | Navigation | Go To's bookmark list; Location Profiles' opened folders kept; mask hints | done | the Open Directory button's menu (`CreateOpenDirMenu`); `NodeOpened`; the mask hint buttons (Select, Filter, Edit mask, Find files, Transfer settings) |
 | Session tools | Copy dialog's transfer code; OpenSSH key conversion on import | done | the Copy dialog's Generate Code (DoGenerateTransferCodeDialog: script and .NET code, no URL page); an OpenSSH import's keys offered for conversion first (TImportSessionsDialog::Execute), its paths kept POSIX ones on POSIX (`core-openssh-import-posix-paths.patch`); the console's size is kept (`ConsoleWin.WindowSize`) |
 | Custom commands | local commands; extensions and their options | partial | local commands run as LocalCustomCommand (on local files, or on remote ones downloaded first and what changed uploaded back; output copied or shown, a failure's exit code an error), through the shell on POSIX, as a command line on Windows; extensions missing |

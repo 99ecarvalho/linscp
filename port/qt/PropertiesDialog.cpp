@@ -443,6 +443,10 @@ bool PropertiesDialog::CalculateChecksum()
   {
     return false;
   }
+  if (FChecksumSession && !FChecksumSession())
+  {
+    return false;
+  }
   std::vector<std::pair<std::string, std::string>> Checksums;
   try
   {

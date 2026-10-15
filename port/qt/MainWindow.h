@@ -355,6 +355,7 @@ private:
   bool OpenLocationProfile(bool AddBookmark, bool & Switched);
   bool GoLocal(const QString & Directory);
   bool EnsureShellSession(bool Shell);
+  bool EnsureCommandSession(bool Capable);
   bool CopyDialog(bool FromLocal, const QStringList & Names, QString & Target, bool Move, bool * Background,
     CoreBridge::TTransferSettings & Settings);
   bool GoRemote(const QString & Directory);

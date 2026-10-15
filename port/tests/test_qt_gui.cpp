@@ -3392,6 +3392,33 @@ void Commands(const char * Port, const QString & Key, const QString & User, cons
       Last = Last || Action->text().contains(QStringLiteral("touch adhoc.txt"));
     }
     Check(Last, "and kept as Last");
+
+    // SFTP to OpenSSH, which calculates no checksums: through the secondary
+    // shell (CanCalculateChecksum), opened for it.
+    CoreBridge::TSite Sftp = Site;
+    Sftp.Protocol = CoreBridge::TSite::TProtocol::Sftp;
+    Check(Window.OpenSite(Sftp) && Window.Panel()->ChangeDirectory(HostDirectory + QStringLiteral("/commands")), "an SFTP session");
+    CoreBridge::TSession * SftpSession = Window.Session();
+    const CoreBridge::TPropertiesInfo Info = SftpSession->PropertiesOf({ "data.txt" });
+    Check(!Info.ChecksumAlgorithms.empty() && !SftpSession->CanCalculateChecksumsNow(), "checksums offered through the shell");
+    {
+      PropertiesDialog Dialog(SftpSession, { "data.txt" }, Window.Panel()->Path(), Info, &Window);
+      bool Opened = false;
+      Dialog.SetChecksumSession([SftpSession, &Opened]()
+      {
+        if (!SftpSession->CanCalculateChecksumsNow())
+        {
+          SftpSession->OpenShellSession();
+          Opened = true;
+        }
+        return true;
+      });
+      const int Md5 = Dialog.ChecksumAlgorithmCombo()->findText(QStringLiteral("md5"), Qt::MatchFixedString);
+      Dialog.ChecksumAlgorithmCombo()->setCurrentIndex(Md5);
+      Check((Md5 >= 0) && Dialog.CalculateChecksum() && Opened &&
+        Dialog.ChecksumEdit()->text().contains(QStringLiteral("827ccb0eea8a706c4c34a16891f84e7b")),
+        "the shell opened for it, the checksum calculated there");
+    }
     Frontend.SetWindow(nullptr);
   }
   CoreBridge::Finalize();
