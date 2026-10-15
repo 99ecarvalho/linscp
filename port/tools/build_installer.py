@@ -31,7 +31,7 @@ def main():
     a = ap.parse_args()
 
     iscc = subprocess.run([sys.executable, os.path.join(HERE, 'fetch_innosetup.py'), '--dest', a.tools],
-                          check=True, capture_output=True, text=True).stdout.strip().splitlines()[-1]
+                          check=True, stdout=subprocess.PIPE, text=True).stdout.strip().splitlines()[-1]
     licenses = os.path.abspath(os.path.join(a.work, 'licenses'))
     shutil.rmtree(licenses, ignore_errors=True)
     os.makedirs(licenses)

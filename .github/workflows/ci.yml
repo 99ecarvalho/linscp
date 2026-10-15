@@ -140,11 +140,14 @@ jobs:
           - name: windows
             configure: -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-llvm-mingw.cmake
             targets: installer
-            packages: wine wine64 zstd
+            # Inno Setup 6's compiler is 32-bit.
+            architecture: i386
+            packages: wine wine64 wine32:i386 zstd
             artifacts: build/packages/*-setup.exe
     steps:
       - name: Install the toolchain
         run: |
+          if [ -n "${{ matrix.architecture }}" ]; then dpkg --add-architecture ${{ matrix.architecture }}; fi
           apt-get update
           DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
             ca-certificates git clang lld llvm cmake ninja-build make perl python3 \
