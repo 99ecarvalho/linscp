@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 11 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 34 | 37 | Parity on features users depend on |
+| P3 Qt parity | 35 | 37 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Dropped for now (2026-10-15); may be reopened |
-| **Total** | **111** | **124** | |
+| **Total** | **112** | **124** | |
 
 ## Next three actions
 
@@ -259,11 +259,8 @@ P2-10 and P2-11 waited, at the user's request, for P3.
    maintainer: winscp/winscp#79 (portability), #80 (`LogEvent`), #81 (log
    file names), #82 (local EOL), #83 (OpenSSH import paths), #84, #85 (S3);
    each patch dropped when a pin move brings it in.
-2. The shell's texts in WinSCP's other languages (P3-25), in batches by
-   how much each language is used on the web (W3Techs' content languages):
-   es, de, ja, fr, ru, pt_PT, it, nl, pl, tr; then zh_CN, zh_TW, fa, vi,
-   id, cs, ko, uk, ar, hu; then el, sv, ro, da, fi, sk, he, th, sr_Latn,
-   nb, bg, hr; then the other 20.
+2. Mnemonic clashes in the translated shell (P3-26), and Serbian's locale
+   (Q-14).
 3. Custom command extensions on POSIX (the user's call): WinSCP's own need
    Windows PowerShell; pwsh and the assembly with console pipes (P1-23)
    could run them there.
@@ -892,7 +889,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-22 | Jump list | done | done 2026-10-15: the recent sites (on connecting) and workspaces (on opening), newest first, at most 30, under WinSCP's keys (`JumpList`, `JumpListWorkspaces`), dropped when deleted or removed from the taskbar's list; shown as the taskbar's Recent Sites and Recent Workspaces (ICustomDestinationList), each a link with `/JumpList` (a site's with `/UploadIfAny`), shown again at start. ctest `qt_gui_preferences` (on Windows 11, the link in the program's `.customDestinations-ms`) |
 | P3-23 | System context menu | done | done 2026-10-15: the Windows shell's context menu of the selected local files (as WinSCP's ShellDisplayContextMenu: IContextMenu from the folder's IShellFolder, IContextMenu2 drawing Open With and Send To through a callback window, Shift for extended verbs, a rename done in place by the panel), on a right click with Panels > Local's "Use system file context menu" (shown on Windows only) and from the local file menu's System Menu (with Properties, now there for local files too). ctest `qt_gui_environment` (Windows 11's own items) |
 | P3-24 | Drag & drop shell extension | done | done 2026-10-15: WinSCP's DragExt built from the pristine source (`port/dragext`, a wrapper for mingw's GUID operators) as `DragExt64.dll`, in the deploy folder, registered by the installer unless WinSCP's own copy is; remote files dragged as WinSCP's fake file (a hidden `scp…` directory, the shared WinSCPDragExtMapping), downloaded where the copy hook says the drop was, under drag & drop's confirmation; the temporary folder's way when the extension is not there; Drag & Drop's fake-file option and status (installed, loaded, broken builds) on Windows. ctest `qt_gui_environment` (on Windows 11, the shell's copy stopped by the real hook and the file downloaded there) |
-| P3-25 | The shell in WinSCP's languages | wip | batches 1 to 3 of 4 done 2026-10-15: es, de, ja, fr, ru, pt_PT, it, nl, pl, tr; zh_CN, zh_TW, fa, vi, id, cs, ko, uk, ar, hu; el, sv, ro, da, fi, sk, he, th, sr_Latn, nb, bg, hr. Serbian is not reachable yet (Q-14) |
+| P3-25 | The shell in WinSCP's languages | done | done 2026-10-15, in four batches: es, de, ja, fr, ru, pt_PT, it, nl, pl, tr; zh_CN, zh_TW, fa, vi, id, cs, ko, uk, ar, hu; el, sv, ro, da, fi, sk, he, th, sr_Latn, nb, bg, hr; lt, sl, ca, et, lv, hi, ms, be, bn, sq, mk, ka, hy, gl, is, af, ta, pa, fil, my. With pt_BR, the 53 languages core can choose, each `.ts` complete; WinSCP's own texts where it has them (none for hi, sq, hy). Not reviewed by native speakers. Serbian is not reachable yet (Q-14); mnemonic clashes are P3-26 |
 | P3-26 | Mnemonic clashes in the translations | todo | |
 
 ### P4 — Cleanup
