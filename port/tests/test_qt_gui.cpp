@@ -5519,8 +5519,26 @@ void Menus()
   CoreBridge::Finalize();
 }
 
+// Qt's complaints that are the shell's bugs fail the run: an action added
+// before it exists, say. The rest pass through.
+QtMessageHandler GPreviousMessageHandler = nullptr;
+
+void FailOnShellWarnings(QtMsgType Type, const QMessageLogContext & Context, const QString & Message)
+{
+  if (Message.contains(QStringLiteral("Attempt to insert null action")) ||
+      Message.contains(QStringLiteral("Attempt to add null action")))
+  {
+    Check(false, Message.toUtf8().constData());
+  }
+  if (GPreviousMessageHandler != nullptr)
+  {
+    GPreviousMessageHandler(Type, Context, Message);
+  }
+}
+
 int main(int argc, char ** argv)
 {
+  GPreviousMessageHandler = qInstallMessageHandler(FailOnShellWarnings);
   QApplication App(argc, argv);
   if ((argc >= 4) && (std::strcmp(argv[1], "instancesend") == 0))
   {
