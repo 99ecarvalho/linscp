@@ -1951,6 +1951,90 @@ Local: %2</translation>
         <source>Unlock selected file(s)</source>
         <translation>Destravar o(s) arquivo(s) selecionado(s)</translation>
     </message>
+    <message>
+        <source>Rose</source>
+        <translation>Rosa</translation>
+    </message>
+    <message>
+        <source>Tan</source>
+        <translation>Bege</translation>
+    </message>
+    <message>
+        <source>Light Yellow</source>
+        <translation>Amarelo-claro</translation>
+    </message>
+    <message>
+        <source>Light Green</source>
+        <translation>Verde-claro</translation>
+    </message>
+    <message>
+        <source>Light Turquoise</source>
+        <translation>Turquesa-claro</translation>
+    </message>
+    <message>
+        <source>Pale Blue</source>
+        <translation>Azul-pálido</translation>
+    </message>
+    <message>
+        <source>Lavender</source>
+        <translation>Lavanda</translation>
+    </message>
+    <message>
+        <source>Light Orange</source>
+        <translation>Laranja-claro</translation>
+    </message>
+    <message>
+        <source>Darker White</source>
+        <translation>Branco escurecido</translation>
+    </message>
+    <message>
+        <source>Darker Tan</source>
+        <translation>Bege escurecido</translation>
+    </message>
+    <message>
+        <source>Lighter Blue</source>
+        <translation>Azul mais claro</translation>
+    </message>
+    <message>
+        <source>Light Blue</source>
+        <translation>Azul-claro</translation>
+    </message>
+    <message>
+        <source>Lighter Red</source>
+        <translation>Vermelho mais claro</translation>
+    </message>
+    <message>
+        <source>Light Olive Green</source>
+        <translation>Verde-oliva-claro</translation>
+    </message>
+    <message>
+        <source>Light Purple</source>
+        <translation>Roxo-claro</translation>
+    </message>
+    <message>
+        <source>Light Aqua</source>
+        <translation>Água-claro</translation>
+    </message>
+    <message>
+        <source>Custom</source>
+        <translation>Personalizada</translation>
+    </message>
+    <message>
+        <source>&amp;Default to Remote Tab</source>
+        <translation>&amp;Definir Aba Remota como Padrão</translation>
+    </message>
+    <message>
+        <source>Make the New Tab command open a remote tab rather than a local one</source>
+        <translation>Fazer o comando Nova Aba abrir uma aba remota em vez de uma local</translation>
+    </message>
+    <message>
+        <source>Co&amp;lor</source>
+        <translation>Co&amp;r</translation>
+    </message>
+    <message>
+        <source>Change color of the current tab</source>
+        <translation>Mudar a cor da aba atual</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

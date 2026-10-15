@@ -31,6 +31,7 @@
 #include <QMimeData>
 #include <QUrl>
 #include <QActionGroup>
+#include <QColorDialog>
 #include <QDateTime>
 #include <QDirIterator>
 #include <QFileDialog>
@@ -1345,6 +1346,108 @@ void MainWindow::QueueIdle()
   }
 }
 
+void MainWindow::NewDefaultTab(bool Reverse)
+{
+  if (CoreBridge::Layout().DefaultToNewRemoteTab != Reverse)
+  {
+    SiteManagerDialog();
+  }
+  else
+  {
+    NewLocalTab();
+  }
+}
+
+// As CreateSessionColorMenu: the default, WinSCP's standard session colors
+// (GetStandardSessionColorInfo), and any other.
+void MainWindow::FillColorMenu()
+{
+  FColorMenu->clear();
+  const int Current = FSession ? FSession->Color() : 0;
+  const auto Swatch = [](int Color)
+  {
+    QPixmap Pixmap(16, 16);
+    Pixmap.fill(QColor(Color & 0xFF, (Color >> 8) & 0xFF, (Color >> 16) & 0xFF));
+    return QIcon(Pixmap);
+  };
+  QActionGroup * Group = new QActionGroup(FColorMenu);
+  QAction * Default = FColorMenu->addAction(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ColorDefault)));
+  Default->setStatusTip(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ColorDefaultHint)));
+  Default->setCheckable(true);
+  Default->setChecked(Current == 0);
+  Group->addAction(Default);
+  connect(Default, &QAction::triggered, this, [this]() { SetSessionColor(0); });
+  FColorMenu->addSeparator();
+  static const std::pair<const char *, int> Standard[] = {
+    { QT_TR_NOOP("Rose"), 0xCC99FF }, { QT_TR_NOOP("Tan"), 0x99CCFF }, { QT_TR_NOOP("Light Yellow"), 0x99FFFF },
+    { QT_TR_NOOP("Light Green"), 0xCCFFCC }, { QT_TR_NOOP("Light Turquoise"), 0xFFFFCC }, { QT_TR_NOOP("Pale Blue"), 0xFFCC99 },
+    { QT_TR_NOOP("Lavender"), 0xFF99CC }, { QT_TR_NOOP("Light Orange"), 0xB5D5FB }, { QT_TR_NOOP("Darker White"), 0xD8D8D8 },
+    { QT_TR_NOOP("Darker Tan"), 0x97BDC4 }, { QT_TR_NOOP("Lighter Blue"), 0xE2B38D }, { QT_TR_NOOP("Light Blue"), 0xE4CCB8 },
+    { QT_TR_NOOP("Lighter Red"), 0xB7B9E5 }, { QT_TR_NOOP("Light Olive Green"), 0xBCE3D7 }, { QT_TR_NOOP("Light Purple"), 0xD9C1CC },
+    { QT_TR_NOOP("Light Aqua"), 0xE8DDB7 } };
+  bool Known = (Current == 0);
+  for (const auto & Color : Standard)
+  {
+    QAction * Action = FColorMenu->addAction(Swatch(Color.second), tr(Color.first));
+    Action->setCheckable(true);
+    Action->setChecked(Current == Color.second);
+    Known = Known || (Current == Color.second);
+    Group->addAction(Action);
+    const int Value = Color.second;
+    connect(Action, &QAction::triggered, this, [this, Value]() { SetSessionColor(Value); });
+  }
+  if (!Known)
+  {
+    QAction * Other = FColorMenu->addAction(Swatch(Current), tr("Custom"));
+    Other->setCheckable(true);
+    Other->setChecked(true);
+    Group->addAction(Other);
+  }
+  FColorMenu->addSeparator();
+  QAction * Pick = FColorMenu->addAction(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ColorPick)), this, [this, Current]()
+  {
+    const QColor Initial = (Current != 0) ? QColor(Current & 0xFF, (Current >> 8) & 0xFF, (Current >> 16) & 0xFF) : QColor(Qt::white);
+    const QColor Chosen = QColorDialog::getColor(Initial, this);
+    if (Chosen.isValid())
+    {
+      // A TColor; black would read as none, so the nearest other.
+      const int Value = std::max(1, Chosen.red() | (Chosen.green() << 8) | (Chosen.blue() << 16));
+      SetSessionColor(Value);
+    }
+  });
+  Pick->setStatusTip(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ColorPickHint)));
+}
+
+void MainWindow::SetSessionColor(int Color)
+{
+  if (!FSession)
+  {
+    return;
+  }
+  FSession->SetColor(Color);
+  UpdateTabs();
+}
+
+// As PanelColor (GetWindowColor): the remote panel's background the
+// session's color, darkened under a dark palette.
+void MainWindow::ApplySessionColor()
+{
+  const int Color = FSession ? FSession->Color() : 0;
+  QPalette Palette = FPanel->View()->palette();
+  QColor Base = QApplication::palette().color(QPalette::Base);
+  if (Color != 0)
+  {
+    const bool Dark = (Base.lightness() < 128);
+    Base = QColor(Color & 0xFF, (Color >> 8) & 0xFF, (Color >> 16) & 0xFF);
+    if (Dark)
+    {
+      Base = Base.darker(300);
+    }
+  }
+  Palette.setColor(QPalette::Base, Base);
+  FPanel->View()->setPalette(Palette);
+}
+
 void MainWindow::SetOnceEmpty(TOnceEmpty Operation)
 {
   FOnceEmpty = Operation;
@@ -2048,6 +2151,10 @@ void MainWindow::UpdateActions()
   FKeepUpToDateAction->setEnabled(!FBusy && FSession);
   FDisconnectAction->setEnabled(!FBusy && FSession);
   FDuplicateTabAction->setEnabled(!FBusy && FSession);
+  if (FColorMenu != nullptr)
+  {
+    FColorMenu->menuAction()->setEnabled(!FBusy && FSession);
+  }
   if (FRenameTabAction != nullptr)
   {
     const bool Active = FSession && FSession->Active();
@@ -4014,8 +4121,22 @@ void MainWindow::UpdateTabs()
   {
     FTabBar->setCurrentIndex(FActiveTab);
   }
+  for (int Index = 0; Index < FTabBar->count(); Index++)
+  {
+    CoreBridge::TSession * Session = TabSession(Index);
+    const int Color = (Session != nullptr) ? Session->Color() : 0;
+    QIcon Swatch;
+    if (Color != 0)
+    {
+      QPixmap Pixmap(12, 12);
+      Pixmap.fill(QColor(Color & 0xFF, (Color >> 8) & 0xFF, (Color >> 16) & 0xFF));
+      Swatch = QIcon(Pixmap);
+    }
+    FTabBar->setTabIcon(Index, Swatch);
+  }
   FTabBar->setVisible(FTabsShown && (TabCount() > 0));
   FUpdatingTabs = false;
+  ApplySessionColor();
 }
 
 // --- Workspaces --------------------------------------------------------------------
@@ -4370,9 +4491,23 @@ void MainWindow::BuildMenus()
   RemoteTab->setShortcut(FSitesAction->shortcut());
   FSitesAction->setShortcut(QKeySequence());
   Iconize(NewTab->addAction(tr("&Local Tab"), this, [this]() { NewLocalTab(); }), "local-tab");
+  NewTab->addSeparator();
+  FDefaultRemoteTabAction = NewTab->addAction(tr("&Default to Remote Tab"));
+  FDefaultRemoteTabAction->setCheckable(true);
+  FDefaultRemoteTabAction->setChecked(CoreBridge::Layout().DefaultToNewRemoteTab);
+  FDefaultRemoteTabAction->setStatusTip(tr("Make the New Tab command open a remote tab rather than a local one"));
+  connect(FDefaultRemoteTabAction, &QAction::triggered, this, [this](bool Remote)
+  {
+    StoreLayoutChoice([Remote](CoreBridge::TLayout & Layout) { Layout.DefaultToNewRemoteTab = Remote; });
+  });
   Tabs->addAction(FCloseTabAction);
   Tabs->addAction(FDuplicateTabAction);
   FRenameTabAction = Tabs->addAction(tr("&Rename Tab"), this, [this]() { RenameTab(); });
+  Tabs->addSeparator();
+  FColorMenu = Tabs->addMenu(tr("Co&lor"));
+  FColorMenu->menuAction()->setStatusTip(tr("Change color of the current tab"));
+  connect(FColorMenu, &QMenu::aboutToShow, this, &MainWindow::FillColorMenu);
+  FillColorMenu();
   Tabs->addSeparator();
   Tabs->addAction(FDisconnectAction);
   FReconnectAction = Tabs->addAction(tr("&Reconnect Session"), this, [this]() { ReconnectSession(); });
@@ -5978,7 +6113,10 @@ void MainWindow::BuildToolbars(QMenu * Options)
     }
   }
   NewTab->setMenu(NewTabMenu);
-  connect(NewTab, &QAction::triggered, this, &MainWindow::SiteManagerDialog);
+  connect(NewTab, &QAction::triggered, this, [this]()
+  {
+    NewDefaultTab(QGuiApplication::queryKeyboardModifiers().testFlag(Qt::ControlModifier));
+  });
   BandAction(Session, NewTab, true);
   BandAction(Session, FSaveSiteAction);
   Session->addSeparator();

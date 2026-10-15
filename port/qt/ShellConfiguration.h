@@ -142,6 +142,8 @@ struct TShellSettings
   bool QueueViewToolBar = true;
   // Interface's ConfirmExitOnCompletion (TCustomWinConfiguration's).
   bool ConfirmExitOnCompletion = true;
+  // Interface's DefaultToNewRemoteTab (TWinConfiguration's).
+  bool DefaultToNewRemoteTab = true;
   // The toolbars (Interface: LockToolbars, SelectiveToolbarText,
   // LargerToolbar; ScpCommander.ToolbarsLayout, its key ToolbarsLayout2).
   bool LockToolbars = false;

@@ -4052,6 +4052,27 @@ void TabsTest(const char * Port, const QString & Directory)
       "back on the first tab: its remote and local directories");
     Check(Window.TabBar()->currentIndex() == 0, "the tab bar says so");
 
+    // P3-15: Tabs > Color: the first tab's color, its swatch, the remote
+    // panel's background; the second tab keeps none. Default to Remote Tab
+    // off: the New Tab button opens a local tab.
+    Window.SetSessionColor(0xCC99FF);
+    Check((First->Color() == 0xCC99FF) && !Window.TabBar()->tabIcon(0).isNull() && Window.TabBar()->tabIcon(1).isNull(),
+      "Tabs > Color colors the tab, not the other");
+    const QColor Rose(0xFF, 0x99, 0xCC);
+    const QColor Base = Window.Panel()->View()->palette().color(QPalette::Base);
+    Check((Base == Rose) || (Base == Rose.darker(300)), "and the remote panel");
+    QAction * DefaultRemote = MenuAction(Window, { "Tabs", "New Tab", "Default to Remote Tab" });
+    Check((DefaultRemote != nullptr) && DefaultRemote->isChecked(), "New Tab defaults to a remote tab");
+    DefaultRemote->trigger();
+    Check(!CoreBridge::Layout().DefaultToNewRemoteTab, "Default to Remote Tab off, kept");
+    Window.NewDefaultTab();
+    Check((Window.TabCount() == 3) && Window.LocalBrowser(), "the New Tab button opens a local tab then");
+    Window.CloseTab(Window.ActiveTab());
+    DefaultRemote->trigger();
+    Check(Window.SwitchTab(0) && (Window.Session() == First), "(back on the first tab)");
+    Window.SetSessionColor(0);
+    Check((First->Color() == 0) && Window.TabBar()->tabIcon(0).isNull(), "Default takes the color away");
+
     // An editor of the first tab's, saved while the second is active.
     Check(Window.Panel()->ChangeDirectory(QStringLiteral("/")), "(the root)");
     Window.Panel()->Select({ QStringLiteral("hello.txt") });

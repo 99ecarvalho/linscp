@@ -658,6 +658,8 @@ struct TLayout
   // Whether to ask before the application exits once a queue's operation
   // completes (Interface's ConfirmExitOnCompletion).
   bool ConfirmExitOnCompletion = true;
+  // Tabs > New Tab > Default to Remote Tab (Interface's DefaultToNewRemoteTab).
+  bool DefaultToNewRemoteTab = true;
   // Options > Toolbars: locked, selective text labels, the icons' size
   // (LargerToolbar: 0 normal, 1 large, 2 very large); which bands show, as
   // WinSCP's ToolbarsLayout ("Name=<1 shown, 0 not>:<dock>:<row>+<pos>,"
@@ -901,6 +903,10 @@ enum class TText
   ClosedOnQueueEmpty,   // "All background transfers were finished. Connection was closed."
   ExitOnCompletion,     // "%s\n\nDo you want to close application?"
   DisconnectOnCompletion, // "%%s\n\nDo you want to terminate %d remaining session(s) and close the application?"
+  ColorDefault,         // "&Default"
+  ColorDefaultHint,     // "Reset session (panel) color to system default"
+  ColorPick,            // "&More Colors..."
+  ColorPickHint,        // "Choose any session (panel) color"
 };
 std::string Text(TText Text);
 
@@ -1710,6 +1716,11 @@ public:
   TSession & operator=(const TSession &) = delete;
 
   std::string Name() const;
+  // The session's color, as Tabs > Color sets it (the site's to start
+  // with; TSessionData's Color, a TColor: 0x00BBGGRR, 0 none), kept with it
+  // when it is saved as a site.
+  int Color() const;
+  void SetColor(int Color);
   // The site's host and user, as autoselection rules match them
   // (SessionData's HostNameExpanded and UserNameExpanded).
   std::string HostNameExpanded() const;

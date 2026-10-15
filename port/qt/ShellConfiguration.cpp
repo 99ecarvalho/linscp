@@ -196,6 +196,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteInteger(PropertyToKey(L"LocaleSafe"), FOverridden ? FSavedLocale : LocaleSafe);
     Storage->WriteBool(L"ShowHiddenFiles", FSettings.ShowHiddenFiles);
     Storage->WriteBool(L"ConfirmExitOnCompletion", FSettings.ConfirmExitOnCompletion);
+    Storage->WriteBool(L"DefaultToNewRemoteTab", FSettings.DefaultToNewRemoteTab);
     Storage->WriteInteger(L"FormatSizeBytes", FSettings.FormatSizeBytes);
     Storage->WriteBool(L"NaturalOrderNumericalSorting", FSettings.NaturalOrderNumericalSorting);
     Storage->WriteBool(L"AlwaysSortDirectoriesByName", FSettings.AlwaysSortDirectoriesByName);
@@ -458,6 +459,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     LocaleSafe = Storage->ReadInteger(PropertyToKey(L"LocaleSafe"), LocaleSafe);
     FSettings.ShowHiddenFiles = Storage->ReadBool(L"ShowHiddenFiles", FSettings.ShowHiddenFiles);
     FSettings.ConfirmExitOnCompletion = Storage->ReadBool(L"ConfirmExitOnCompletion", FSettings.ConfirmExitOnCompletion);
+    FSettings.DefaultToNewRemoteTab = Storage->ReadBool(L"DefaultToNewRemoteTab", FSettings.DefaultToNewRemoteTab);
     FSettings.FormatSizeBytes = Storage->ReadInteger(L"FormatSizeBytes", FSettings.FormatSizeBytes);
     FSettings.NaturalOrderNumericalSorting =
       Storage->ReadBool(L"NaturalOrderNumericalSorting", FSettings.NaturalOrderNumericalSorting);

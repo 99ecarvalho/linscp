@@ -71,6 +71,12 @@ public:
   // the computer put to sleep, or shut down; then, unless shutting down and
   // as ConfirmExitOnCompletion asks, the application closed.
   enum class TOnceEmpty { Idle, Disconnect, Suspend, ShutDown };
+  // Tabs > Color (ColorMenuAction2): the active session's color (a TColor,
+  // 0 none), its tab's swatch and the remote panel's background.
+  void SetSessionColor(int Color);
+  // The New Tab button (NewTabAction): a remote tab or a local one, as
+  // Tabs > New Tab > Default to Remote Tab says (Reverse: the other).
+  void NewDefaultTab(bool Reverse = false);
   TOnceEmpty OnceEmpty() const { return FOnceEmpty; }
   void SetOnceEmpty(TOnceEmpty Operation);
   // What sleeps or shuts down the computer instead (tests); false: refused.
@@ -434,6 +440,10 @@ private:
   QAction * FLocalStatusBarAction = nullptr;
   QAction * FRemoteStatusBarAction = nullptr;
   QAction * FTabsAction = nullptr;
+  QAction * FDefaultRemoteTabAction = nullptr;
+  QMenu * FColorMenu = nullptr;
+  void FillColorMenu();
+  void ApplySessionColor();
   // Files > Upload/Download (CurrentCopyItem): the active side's transfer,
   // in the background, and moving; Files > Locking.
   QMenu * FCurrentCopyMenu = nullptr;

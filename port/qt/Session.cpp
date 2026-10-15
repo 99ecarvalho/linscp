@@ -330,6 +330,16 @@ std::string TSession::Name() const
   return Utf8(F->Data->SessionName);
 }
 
+int TSession::Color() const
+{
+  return F->Data->Color;
+}
+
+void TSession::SetColor(int Color)
+{
+  F->Data->Color = Color;
+}
+
 std::string TSession::HostNameExpanded() const
 {
   return Utf8(F->Data->HostNameExpanded);

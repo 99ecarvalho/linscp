@@ -714,6 +714,7 @@ TLayout Layout()
   Result.RemoteStatusBar = Settings.RemotePanelStatusBar;
   Result.QueueToolbar = Settings.QueueViewToolBar;
   Result.ConfirmExitOnCompletion = Settings.ConfirmExitOnCompletion;
+  Result.DefaultToNewRemoteTab = Settings.DefaultToNewRemoteTab;
   Result.LockToolbars = Settings.LockToolbars;
   Result.SelectiveToolbarText = Settings.SelectiveToolbarText;
   Result.LargerToolbar = Settings.LargerToolbar;
@@ -745,6 +746,7 @@ void SetLayout(const TLayout & Layout)
   Settings.RemotePanelStatusBar = Layout.RemoteStatusBar;
   Settings.QueueViewToolBar = Layout.QueueToolbar;
   Settings.ConfirmExitOnCompletion = Layout.ConfirmExitOnCompletion;
+  Settings.DefaultToNewRemoteTab = Layout.DefaultToNewRemoteTab;
   Settings.LockToolbars = Layout.LockToolbars;
   Settings.SelectiveToolbarText = Layout.SelectiveToolbarText;
   Settings.LargerToolbar = Layout.LargerToolbar;
@@ -1589,6 +1591,10 @@ std::string Text(TText Text)
     case TText::ClosedOnQueueEmpty: Ident = CLOSED_ON_QUEUE_EMPTY; break;
     case TText::ExitOnCompletion: Ident = EXIT_ON_COMPLETION; break;
     case TText::DisconnectOnCompletion: Ident = DISCONNECT_ON_COMPLETION; break;
+    case TText::ColorDefault: Ident = COLOR_TRUE_DEFAULT_CAPTION; break;
+    case TText::ColorDefaultHint: Ident = COLOR_DEFAULT_HINT; break;
+    case TText::ColorPick: Ident = COLOR_PICK_CAPTION; break;
+    case TText::ColorPickHint: Ident = COLOR_PICK_HINT; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));
