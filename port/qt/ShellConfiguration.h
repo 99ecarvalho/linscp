@@ -34,6 +34,7 @@ struct TShellSettings
   int PanelSearch = 0;
   bool PreservePanelState = true;
   bool EnableQueueByDefault = true;
+  bool CopyParamAutoSelectNotice = true;
   bool FullRowSelect = false;
   int DoubleClickAction = 2;
   bool CopyOnDoubleClickConfirmation = false;

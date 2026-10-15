@@ -244,19 +244,37 @@ struct TTransferSettings
 // dialog shows it; what differs from the defaults.
 std::string TransferSettingsInfo(const TTransferSettings & Settings);
 
+// A preset's autoselection rule (TCopyParamRuleData): masks the session's
+// host and user, and the panels' directories, are matched against; an empty
+// one matches anything.
+struct TTransferPresetRule
+{
+  std::string HostName;
+  std::string UserName;
+  std::string RemoteDirectory;
+  std::string LocalDirectory;
+  bool Empty() const { return HostName.empty() && UserName.empty() && RemoteDirectory.empty() && LocalDirectory.empty(); }
+};
 // A transfer settings preset, as the Transfer preferences page lists them.
 struct TTransferPreset
 {
   std::string Name;
   TTransferSettings Settings;
+  bool HasRule = false;
+  TTransferPresetRule Rule;
 };
+// The first preset whose rule matches the data (TCopyParamList::Find), ""
+// when none does; Found tells the two apart.
+std::string FindTransferPreset(const TTransferPresetRule & Data, bool & Found);
+// A rule as WinSCP lists it (TCopyParamRule::GetInfoStr), a line a mask.
+std::string TransferPresetRuleInfo(const TTransferPresetRule & Rule);
 // The default settings, the presets, and the one in use ("": the default).
 TTransferSettings DefaultTransferSettings();
 std::vector<TTransferPreset> TransferPresets();
 std::string CurrentTransferPreset();
 // What transfers use: the preset in use, else the default.
 TTransferSettings CurrentTransferSettings();
-// These save. A preset kept by name keeps its autoselection rule. Throw
+// These save, each preset with its rule. Throw
 // TCoreError (a preset name that is not one, for instance).
 void SetDefaultTransferSettings(const TTransferSettings & Settings);
 void SetTransferPresets(const std::vector<TTransferPreset> & Presets);
@@ -441,6 +459,8 @@ struct TPreferences
   // or less: never).
   bool EnableQueueByDefault = true;
   int ParallelTransferThreshold = -1;
+  // Transfer: announce an autoselected preset (CopyParamAutoSelectNotice).
+  bool CopyParamAutoSelectNotice = true;
   // Endurance: reconnect a session that breaks during a transfer, while
   // idle or inactive, or stalls, after so many seconds (0: not), and keep
   // trying for so many (0: for ever).
@@ -724,6 +744,12 @@ enum class TText
   SaveWorkspacePasswordsRecommended, // "Save &passwords"
   SaveWorkspaceAuto, // "Enable &automatic saving of this workspace"
   NewWorkspace, // "My Workspace"
+  CopyParamAutoSelected, // "Transfer settings preset '%s' was automatically selected."
+  CopyParamDefaultCustom, // "Returned back to transfer settings preset '%s'."
+  CopyParamDefaultNorm, // "Returned back to default transfer settings."
+  CopyParamRule,        // "Autoselection rule:\n%s"
+  CopyParamNoRule,      // "You have not specified any autoselection rule mask."
+  ConfigureButton,      // "&Configure..."
 };
 std::string Text(TText Text);
 
@@ -1495,6 +1521,10 @@ public:
   TSession & operator=(const TSession &) = delete;
 
   std::string Name() const;
+  // The site's host and user, as autoselection rules match them
+  // (SessionData's HostNameExpanded and UserNameExpanded).
+  std::string HostNameExpanded() const;
+  std::string UserNameExpanded() const;
   // Connects and authenticates, asking through the frontend. Throws
   // TCoreError when that fails or the user gives up.
   void Open();

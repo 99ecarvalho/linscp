@@ -297,6 +297,16 @@ std::string TSession::Name() const
   return Utf8(F->Data->SessionName);
 }
 
+std::string TSession::HostNameExpanded() const
+{
+  return Utf8(F->Data->HostNameExpanded);
+}
+
+std::string TSession::UserNameExpanded() const
+{
+  return Utf8(F->Data->UserNameExpanded);
+}
+
 bool TSession::UpdateDirectories() const
 {
   return F->Data->UpdateDirectories;

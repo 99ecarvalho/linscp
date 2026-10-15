@@ -1,7 +1,7 @@
 // WinSCP's transfer settings: the frame its dialogs share
 // (forms/CopyParams.cpp), the Transfer settings dialog of one transfer
-// (forms/CopyParamCustom.cpp), and a preset's (forms/CopyParamPreset.cpp,
-// without the autoselection rule).
+// (forms/CopyParamCustom.cpp), and a preset's with its autoselection rule
+// (forms/CopyParamPreset.cpp).
 #ifndef LINSCP_QT_TRANSFER_SETTINGS_DIALOG_H
 #define LINSCP_QT_TRANSFER_SETTINGS_DIALOG_H
 
@@ -83,12 +83,31 @@ public:
 
   CoreBridge::TTransferSettings Settings() const;
   QString PresetName() const;
+  // A preset's autoselection rule: Current (when given) is what the
+  // Current button fills in, the active session's.
+  void SetRule(bool HasRule, const CoreBridge::TTransferPresetRule & Rule,
+    const CoreBridge::TTransferPresetRule * Current);
+  bool HasRule() const;
+  CoreBridge::TTransferPresetRule Rule() const;
   TransferSettingsFrame * Frame() const { return FFrame; }
   QLineEdit * NameEdit() const { return FName; }
+  QCheckBox * HasRuleCheck() const { return FHasRule; }
+  QLineEdit * RuleEdit(int Index) const { return FRuleEdits[Index]; }
+  class QPushButton * CurrentRuleButton() const { return FCurrentRule; }
+
+  void accept() override;
 
 private:
+  void SetRuleEdits(const CoreBridge::TTransferPresetRule & Rule);
+
   TransferSettingsFrame * FFrame = nullptr;
   QLineEdit * FName = nullptr;
+  QCheckBox * FHasRule = nullptr;
+  class QGroupBox * FRuleGroup = nullptr;
+  // Hostname, Username, Remote directory, Local directory.
+  QLineEdit * FRuleEdits[4] = {};
+  QPushButton * FCurrentRule = nullptr;
+  CoreBridge::TTransferPresetRule FCurrentRuleData;
 };
 
 // The Transfer settings group of WinSCP's Copy and Synchronize dialogs:

@@ -495,6 +495,11 @@ bool MainWindow::PreferencesDialog(const QString & Page)
       }
     }
   } QueueView{ this, &Dialog };
+  if (FSession && FSession->Active() && !LocalBrowser())
+  {
+    // A preset's Current button: what autoselection would match now.
+    Dialog.SetCurrentRuleData(TransferPresetAutoSelectData());
+  }
   for (int Row = 0; !Page.isEmpty() && (Row < Dialog.Navigation()->count()); Row++)
   {
     if (Dialog.Navigation()->item(Row)->text() == Page)
@@ -3029,6 +3034,7 @@ bool MainWindow::SwitchTab(int Index)
   }
   ParkActiveTab();
   UnparkTab(Index);
+  TransferPresetAutoSelect();
   UpdateTabs();
   UpdateTitle();
   UpdateActions();
@@ -4180,8 +4186,117 @@ bool MainWindow::SyncBrowse(bool Local, const QString & PrevPath, QString & NewP
   return true;
 }
 
+// As TScpCommanderForm::GetTransferPresetAutoSelectData: the session's
+// host and user, the panels' directories.
+CoreBridge::TTransferPresetRule MainWindow::TransferPresetAutoSelectData() const
+{
+  CoreBridge::TTransferPresetRule Result;
+  Result.HostName = FSession->HostNameExpanded();
+  Result.UserName = FSession->UserNameExpanded();
+  Result.RemoteDirectory = FPanel->Path().toStdString();
+  Result.LocalDirectory = QDir::toNativeSeparators(FLocal->Path()).toStdString();
+  return Result;
+}
+
+// As TCustomScpExplorerForm::TransferPresetAutoSelect: the first preset
+// whose rule matches the session and the panels made the current one; none
+// matching, back to the one chosen. Announced either way.
+void MainWindow::TransferPresetAutoSelect()
+{
+  if (!FSession || !FSession->Active() || LocalBrowser() || FSynchronisingBrowse)
+  {
+    return;
+  }
+  bool Found = false;
+  const QString Name = QString::fromStdString(CoreBridge::FindTransferPreset(TransferPresetAutoSelectData(), Found));
+  const QString Current = QString::fromStdString(CoreBridge::CurrentTransferPreset());
+  QString New = Current;
+  if (!Found)
+  {
+    FCopyParamAutoSelected.clear();
+    New = FCopyParamDefault;
+  }
+  else if (Name != FCopyParamAutoSelected)
+  {
+    FCopyParamAutoSelected = Name;
+    New = Name;
+  }
+  if (New == Current)
+  {
+    return;
+  }
+  try
+  {
+    CoreBridge::SetCurrentTransferPreset(New.toStdString());
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return;
+  }
+  UpdatePresetCombo();
+  QString Message;
+  if (Found)
+  {
+    Message = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::CopyParamAutoSelected));
+  }
+  else
+  {
+    Message = QString::fromStdString(CoreBridge::Text(New.isEmpty() ?
+      CoreBridge::TText::CopyParamDefaultNorm : CoreBridge::TText::CopyParamDefaultCustom));
+  }
+  Message.replace(QStringLiteral("%s"), QString(New).remove(QLatin1Char('&')));
+  if (!CoreBridge::Preferences().CopyParamAutoSelectNotice)
+  {
+    // As PostNote: the status bar's.
+    statusBar()->showMessage(Message, 30000);
+    return;
+  }
+  QString Info = QString::fromStdString(CoreBridge::TransferSettingsInfo(CoreBridge::CurrentTransferSettings()));
+  if (Found)
+  {
+    for (const CoreBridge::TTransferPreset & Preset : CoreBridge::TransferPresets())
+    {
+      if (QString::fromStdString(Preset.Name) == Name)
+      {
+        Info += QStringLiteral("\n \n") + QString::fromStdString(CoreBridge::Text(CoreBridge::TText::CopyParamRule))
+          .replace(QStringLiteral("%s"), QString::fromStdString(CoreBridge::TransferPresetRuleInfo(Preset.Rule)));
+      }
+    }
+  }
+  // As TransferPresetNoteMessage: OK, Configure..., never again.
+  CoreBridge::TQuery Query;
+  Query.Type = CoreBridge::TQueryType::Information;
+  Query.Message = Message.toStdString();
+  Query.MoreMessages = Info.toStdString();
+  CoreBridge::TQueryButton OK;
+  OK.Answer = CoreBridge::AnswerOK;
+  OK.Caption = "OK";
+  CoreBridge::TQueryButton Configure;
+  Configure.Answer = CoreBridge::AnswerIgnore;
+  Configure.Caption = CoreBridge::Text(CoreBridge::TText::ConfigureButton);
+  Query.Buttons = { OK, Configure };
+  Query.CancelAnswer = CoreBridge::AnswerOK;
+  Query.NeverAskAgainCheck = true;
+  QtFrontend Frontend;
+  Frontend.SetWindow(this);
+  const CoreBridge::TQueryResult Answer = Frontend.Query(Query);
+  if ((Answer.Answer == CoreBridge::AnswerOK) && Answer.NeverAskAgain)
+  {
+    CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+    Preferences.CopyParamAutoSelectNotice = false;
+    CoreBridge::SetPreferences(Preferences);
+  }
+  else if (Answer.Answer == CoreBridge::AnswerIgnore)
+  {
+    PreferencesDialog(::PreferencesDialog::tr("Transfer"));
+    UpdatePresetCombo();
+  }
+}
+
 void MainWindow::PanelLoaded(bool Local)
 {
+  TransferPresetAutoSelect();
   const QString Current = Local ? FLocal->Path() : FPanel->Path();
   const QString PrevPath = FPrevPath[Local ? 1 : 0];
   FPrevPath[Local ? 1 : 0] = Current;
@@ -4743,7 +4858,14 @@ void MainWindow::BuildToolbars(QMenu * Options)
   {
     try
     {
-      CoreBridge::SetCurrentTransferPreset(FPresetCombo->itemData(Index).toString().toStdString());
+      const QString Name = FPresetCombo->itemData(Index).toString();
+      // As TransferListChange: chosen while none was autoselected, the
+      // one to return to when no rule matches.
+      if (FCopyParamAutoSelected.isEmpty())
+      {
+        FCopyParamDefault = Name;
+      }
+      CoreBridge::SetCurrentTransferPreset(Name.toStdString());
     }
     catch (const CoreBridge::TCoreError & E)
     {

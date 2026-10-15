@@ -1,4 +1,5 @@
 #include "TransferSettingsDialog.h"
+
 #include "HintButton.h"
 
 #include <QCheckBox>
@@ -11,6 +12,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QRadioButton>
 #include <QRegularExpressionValidator>
 #include <QSpinBox>
@@ -220,6 +222,35 @@ TransferSettingsDialog::TransferSettingsDialog(const TTransferSettings & Setting
   FFrame = new TransferSettingsFrame(this);
   FFrame->SetSettings(Settings);
   Layout->addWidget(FFrame);
+  if (PresetName != nullptr)
+  {
+    // As RuleGroup, below the frame, enabled by HasRuleCheck.
+    FHasRule = new QCheckBox(tr("Automatically select this preset when"), this);
+    Layout->addWidget(FHasRule);
+    FRuleGroup = new QGroupBox(tr("Autoselection rule"), this);
+    QGridLayout * Grid = new QGridLayout(FRuleGroup);
+    const QString Labels[] = { tr("Hostna&me mask:"), tr("Us&ername mask:"), tr("Remote director&y mask:"), tr("&Local directory mask:") };
+    for (int Index = 0; Index < 4; Index++)
+    {
+      FRuleEdits[Index] = new QLineEdit(FRuleGroup);
+      QLabel * Label = new QLabel(Labels[Index], FRuleGroup);
+      Label->setBuddy(FRuleEdits[Index]);
+      Grid->addWidget(Label, (Index / 2) * 2, Index % 2);
+      Grid->addWidget(FRuleEdits[Index], (Index / 2) * 2 + 1, Index % 2);
+    }
+    QHBoxLayout * RuleButtons = new QHBoxLayout();
+    RuleButtons->addWidget(MakeMaskHintButton(tr("mask hints"),
+      { CoreBridge::TText::MaskHint, CoreBridge::TText::CombiningMasksHint }, FRuleGroup));
+    RuleButtons->addStretch(1);
+    FCurrentRule = new QPushButton(tr("Current"), FRuleGroup);
+    FCurrentRule->setVisible(false);
+    connect(FCurrentRule, &QPushButton::clicked, this, [this]() { SetRuleEdits(FCurrentRuleData); });
+    RuleButtons->addWidget(FCurrentRule);
+    Grid->addLayout(RuleButtons, 4, 0, 1, 2);
+    Layout->addWidget(FRuleGroup);
+    FRuleGroup->setEnabled(false);
+    connect(FHasRule, &QCheckBox::toggled, FRuleGroup, &QWidget::setEnabled);
+  }
   QDialogButtonBox * Box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
   connect(Box, &QDialogButtonBox::accepted, this, &QDialog::accept);
   connect(Box, &QDialogButtonBox::rejected, this, &QDialog::reject);
@@ -234,6 +265,62 @@ TTransferSettings TransferSettingsDialog::Settings() const
 QString TransferSettingsDialog::PresetName() const
 {
   return (FName != nullptr) ? FName->text().trimmed() : QString();
+}
+
+void TransferSettingsDialog::SetRule(bool HasRule, const CoreBridge::TTransferPresetRule & Rule,
+  const CoreBridge::TTransferPresetRule * Current)
+{
+  if (FHasRule == nullptr)
+  {
+    return;
+  }
+  FHasRule->setChecked(HasRule);
+  SetRuleEdits(Rule);
+  FCurrentRule->setVisible(Current != nullptr);
+  if (Current != nullptr)
+  {
+    FCurrentRuleData = *Current;
+  }
+}
+
+void TransferSettingsDialog::SetRuleEdits(const CoreBridge::TTransferPresetRule & Rule)
+{
+  const std::string * Values[] = { &Rule.HostName, &Rule.UserName, &Rule.RemoteDirectory, &Rule.LocalDirectory };
+  for (int Index = 0; Index < 4; Index++)
+  {
+    FRuleEdits[Index]->setText(QString::fromStdString(*Values[Index]));
+  }
+}
+
+bool TransferSettingsDialog::HasRule() const
+{
+  return (FHasRule != nullptr) && FHasRule->isChecked();
+}
+
+CoreBridge::TTransferPresetRule TransferSettingsDialog::Rule() const
+{
+  CoreBridge::TTransferPresetRule Result;
+  if (FHasRule != nullptr)
+  {
+    std::string * Values[] = { &Result.HostName, &Result.UserName, &Result.RemoteDirectory, &Result.LocalDirectory };
+    for (int Index = 0; Index < 4; Index++)
+    {
+      *Values[Index] = FRuleEdits[Index]->text().trimmed().toStdString();
+    }
+  }
+  return Result;
+}
+
+// As TCopyParamPresetDialog::FormCloseQuery: a rule with no mask refused.
+void TransferSettingsDialog::accept()
+{
+  if (HasRule() && Rule().Empty())
+  {
+    QMessageBox::warning(this, windowTitle(), QString::fromStdString(CoreBridge::Text(CoreBridge::TText::CopyParamNoRule)));
+    FRuleEdits[0]->setFocus();
+    return;
+  }
+  QDialog::accept();
 }
 
 TransferSettingsBox::TransferSettingsBox(QWidget * Parent) :

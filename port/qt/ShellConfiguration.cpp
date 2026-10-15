@@ -199,6 +199,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteInteger(L"PanelSearch", FSettings.PanelSearch);
     Storage->WriteBool(L"PreservePanelState", FSettings.PreservePanelState);
     Storage->WriteBool(L"EnableQueueByDefault", FSettings.EnableQueueByDefault);
+    Storage->WriteBool(L"CopyParamAutoSelectNotice", FSettings.CopyParamAutoSelectNotice);
     Storage->WriteBool(L"FullRowSelect", FSettings.FullRowSelect);
     Storage->WriteInteger(L"CopyOnDoubleClick", FSettings.DoubleClickAction);
     Storage->WriteBool(L"CopyOnDoubleClickConfirmation", FSettings.CopyOnDoubleClickConfirmation);
@@ -443,6 +444,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.PanelSearch = Storage->ReadInteger(L"PanelSearch", FSettings.PanelSearch);
     FSettings.PreservePanelState = Storage->ReadBool(L"PreservePanelState", FSettings.PreservePanelState);
     FSettings.EnableQueueByDefault = Storage->ReadBool(L"EnableQueueByDefault", FSettings.EnableQueueByDefault);
+    FSettings.CopyParamAutoSelectNotice = Storage->ReadBool(L"CopyParamAutoSelectNotice", FSettings.CopyParamAutoSelectNotice);
     FSettings.FullRowSelect = Storage->ReadBool(L"FullRowSelect", FSettings.FullRowSelect);
     FSettings.DoubleClickAction = Storage->ReadInteger(L"CopyOnDoubleClick", FSettings.DoubleClickAction);
     FSettings.CopyOnDoubleClickConfirmation =

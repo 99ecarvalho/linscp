@@ -41,6 +41,8 @@
 #include <QStackedWidget>
 #include <QVBoxLayout>
 
+#include <algorithm>
+
 using TPreferences = CoreBridge::TPreferences;
 
 namespace
@@ -78,7 +80,7 @@ PreferencesDialog::PreferencesDialog(QWidget * Parent) :
   AddPage(tr("File colors"), MakeFileColorsPage());
   AddPage(tr("Editors"), MakeEditorsPage());
   AddPage(tr("Internal editor"), MakeInternalEditorPage());
-  AddPage(tr("Transfer"), MakeTransferPage());
+  AddPage(tr("Transfer"), MakeTransferPage(Preferences));
   AddPage(tr("Background"), MakeBackgroundPage(Preferences));
   AddPage(tr("Endurance"), MakeEndurancePage(Preferences));
   AddPage(tr("Network"), MakeNetworkPage(Preferences));
@@ -352,9 +354,19 @@ void PreferencesDialog::LoadPresets()
   FPresetsList->addItem(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::CopyParamDefault)).remove(QLatin1Char('&')));
   for (const CoreBridge::TTransferPreset & Preset : FPresets)
   {
-    FPresetsList->addItem(QString::fromStdString(Preset.Name));
+    // WinSCP's Auto column, as the item's tip.
+    QListWidgetItem * Item = new QListWidgetItem(QString::fromStdString(Preset.Name), FPresetsList);
+    if (Preset.HasRule)
+    {
+      Item->setToolTip(QString::fromStdString(CoreBridge::TransferPresetRuleInfo(Preset.Rule)));
+    }
   }
   FPresetsList->setCurrentRow(qBound(0, Row, FPresetsList->count() - 1));
+  if (FCopyParamAutoSelectNotice != nullptr)
+  {
+    FCopyParamAutoSelectNotice->setEnabled(std::any_of(FPresets.begin(), FPresets.end(),
+      [](const CoreBridge::TTransferPreset & Preset) { return Preset.HasRule; }));
+  }
 }
 
 QWidget * PreferencesDialog::MakeWindowPage(const TPreferences & Preferences)
@@ -726,7 +738,7 @@ QWidget * PreferencesDialog::MakeStoragePage(const TPreferences & Preferences)
   return Page;
 }
 
-QWidget * PreferencesDialog::MakeTransferPage()
+QWidget * PreferencesDialog::MakeTransferPage(const TPreferences & Preferences)
 {
   QWidget * Page = new QWidget(this);
   QVBoxLayout * Layout = new QVBoxLayout(Page);
@@ -757,6 +769,10 @@ QWidget * PreferencesDialog::MakeTransferPage()
   Buttons->addStretch(1);
   GroupLayout->addLayout(Buttons);
   Layout->addWidget(Group, 1);
+  // As CopyParamAutoSelectNoticeCheck: enabled once a preset has a rule.
+  FCopyParamAutoSelectNotice = new QCheckBox(tr("&Announce when transfer settings preset is autoselected"), Page);
+  FCopyParamAutoSelectNotice->setChecked(Preferences.CopyParamAutoSelectNotice);
+  Layout->addWidget(FCopyParamAutoSelectNotice);
   LoadPresets();
   return Page;
 }
@@ -770,20 +786,26 @@ void PreferencesDialog::EditPresetDialog(bool Add, bool Duplicate)
   const bool Default = !Add && (Row <= 0);
   QString Name = (Add && !Duplicate) ? QString() : FPresetsList->item(Row)->text();
   TransferSettingsDialog Dialog(Settings, Default ? nullptr : &Name, this);
+  const bool Existing = (Row > 0) && (!Add || Duplicate);
+  Dialog.SetRule(Existing && FPresets[Row - 1].HasRule, Existing ? FPresets[Row - 1].Rule : CoreBridge::TTransferPresetRule(),
+    FHasCurrentRuleData ? &FCurrentRuleData : nullptr);
   if (Dialog.exec() == QDialog::Accepted)
   {
+    const bool HasRule = Dialog.HasRule();
+    const CoreBridge::TTransferPresetRule Rule = Dialog.Rule();
     if (Add)
     {
-      AddPreset(Dialog.PresetName(), Dialog.Settings());
+      AddPreset(Dialog.PresetName(), Dialog.Settings(), &HasRule, &Rule);
     }
     else
     {
-      EditSelected(Dialog.PresetName(), Dialog.Settings());
+      EditSelected(Dialog.PresetName(), Dialog.Settings(), &HasRule, &Rule);
     }
   }
 }
 
-bool PreferencesDialog::AddPreset(const QString & Name, const CoreBridge::TTransferSettings & Settings)
+bool PreferencesDialog::AddPreset(const QString & Name, const CoreBridge::TTransferSettings & Settings,
+  const bool * HasRule, const CoreBridge::TTransferPresetRule * Rule)
 {
   for (const CoreBridge::TTransferPreset & Preset : FPresets)
   {
@@ -801,6 +823,11 @@ bool PreferencesDialog::AddPreset(const QString & Name, const CoreBridge::TTrans
   CoreBridge::TTransferPreset Preset;
   Preset.Name = Name.toStdString();
   Preset.Settings = Settings;
+  if ((HasRule != nullptr) && (Rule != nullptr))
+  {
+    Preset.HasRule = *HasRule;
+    Preset.Rule = *Rule;
+  }
   const int Row = FPresetsList->currentRow();
   // As WinSCP: after the selected one.
   const int At = qBound(0, Row, static_cast<int>(FPresets.size()));
@@ -810,7 +837,8 @@ bool PreferencesDialog::AddPreset(const QString & Name, const CoreBridge::TTrans
   return true;
 }
 
-bool PreferencesDialog::EditSelected(const QString & Name, const CoreBridge::TTransferSettings & Settings)
+bool PreferencesDialog::EditSelected(const QString & Name, const CoreBridge::TTransferSettings & Settings,
+  const bool * HasRule, const CoreBridge::TTransferPresetRule * Rule)
 {
   const int Row = FPresetsList->currentRow();
   if (Row <= 0)
@@ -830,6 +858,11 @@ bool PreferencesDialog::EditSelected(const QString & Name, const CoreBridge::TTr
   }
   FPresets[Row - 1].Name = Name.toStdString();
   FPresets[Row - 1].Settings = Settings;
+  if ((HasRule != nullptr) && (Rule != nullptr))
+  {
+    FPresets[Row - 1].HasRule = *HasRule;
+    FPresets[Row - 1].Rule = *Rule;
+  }
   LoadPresets();
   return true;
 }
@@ -1034,6 +1067,7 @@ TPreferences PreferencesDialog::Preferences() const
   Result.QueueKeepDoneItemsFor = FQueueKeepDone->currentData().toInt();
   Result.QueueAutoPopup = FQueueAutoPopup->isChecked();
   Result.EnableQueueByDefault = FEnableQueueByDefault->isChecked();
+  Result.CopyParamAutoSelectNotice = FCopyParamAutoSelectNotice->isChecked();
   // In KB, as Configuration keeps it; -1 when off.
   Result.ParallelTransferThreshold = FParallelThresholdCheck->isChecked() ? (FParallelThreshold->value() * 1024) : -1;
   Result.SessionReopenAuto = FReopenAuto->isChecked() ? FReopenAutoSeconds->value() : 0;

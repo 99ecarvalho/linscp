@@ -95,6 +95,44 @@ std::string TransferSettingsInfo(const TTransferSettings & Settings)
   return Utf8(CopyParam.GetInfoStr(L"; ", 0));
 }
 
+namespace
+{
+
+TTransferPresetRule RuleOf(const TCopyParamRuleData & Data)
+{
+  TTransferPresetRule Result;
+  Result.HostName = Utf8(Data.HostName);
+  Result.UserName = Utf8(Data.UserName);
+  Result.RemoteDirectory = Utf8(Data.RemoteDirectory);
+  Result.LocalDirectory = Utf8(Data.LocalDirectory);
+  return Result;
+}
+
+TCopyParamRuleData RuleDataOf(const TTransferPresetRule & Rule)
+{
+  TCopyParamRuleData Result;
+  Result.HostName = FromUtf8(Rule.HostName);
+  Result.UserName = FromUtf8(Rule.UserName);
+  Result.RemoteDirectory = FromUtf8(Rule.RemoteDirectory);
+  Result.LocalDirectory = FromUtf8(Rule.LocalDirectory);
+  return Result;
+}
+
+}  // namespace
+
+std::string FindTransferPreset(const TTransferPresetRule & Data, bool & Found)
+{
+  const TCopyParamList * List = GUIConfiguration->CopyParamList;
+  const int Index = List->Find(RuleDataOf(Data));
+  Found = (Index >= 0);
+  return Found ? Utf8(List->Names[Index]) : std::string();
+}
+
+std::string TransferPresetRuleInfo(const TTransferPresetRule & Rule)
+{
+  return Utf8(TCopyParamRule(RuleDataOf(Rule)).GetInfoStr(L"\n"));
+}
+
 TTransferSettings DefaultTransferSettings()
 {
   return SettingsOf(GUIConfiguration->DefaultCopyParam);
@@ -111,6 +149,12 @@ std::vector<TTransferPreset> TransferPresets()
     TGUICopyParamType CopyParam(GUIConfiguration->DefaultCopyParam);
     CopyParam.Assign(List->CopyParams[Index]);
     Preset.Settings = SettingsOf(CopyParam);
+    if (List->Rules[Index] != NULL)
+    {
+      const TCopyParamRuleData & Data = List->Rules[Index]->Data;
+      Preset.HasRule = true;
+      Preset.Rule = RuleOf(Data);
+    }
     Result.push_back(Preset);
   }
   return Result;
@@ -158,8 +202,7 @@ void SetTransferPresets(const std::vector<TTransferPreset> & Presets)
         Base.Assign(Old->CopyParams[OldIndex]);
       }
       TCopyParamType * CopyParam = new TCopyParamType(CopyParamOf(Preset.Settings, Base));
-      TCopyParamRule * Rule = ((OldIndex >= 0) && (Old->Rules[OldIndex] != NULL)) ?
-        new TCopyParamRule(*Old->Rules[OldIndex]) : NULL;
+      TCopyParamRule * Rule = Preset.HasRule ? new TCopyParamRule(RuleDataOf(Preset.Rule)) : NULL;
       List.Add(Name, CopyParam, Rule);
     }
     GUIConfiguration->CopyParamList = &List;

@@ -282,6 +282,7 @@ TPreferences Preferences()
   Result.QueueKeepDoneItemsFor = GUIConfiguration->QueueKeepDoneItems ? GUIConfiguration->QueueKeepDoneItemsFor : 0;
   Result.QueueAutoPopup = GUIConfiguration->QueueAutoPopup;
   Result.EnableQueueByDefault = Settings.EnableQueueByDefault;
+  Result.CopyParamAutoSelectNotice = Settings.CopyParamAutoSelectNotice;
   Result.ParallelTransferThreshold = Configuration->ParallelTransferThreshold;
   Result.SessionReopenAuto = Configuration->SessionReopenAuto / MSecsPerSec;
   Result.SessionReopenAutoIdleOn = GUIConfiguration->SessionReopenAutoIdleOn && (GUIConfiguration->SessionReopenAutoIdle > 0);
@@ -583,6 +584,7 @@ void SetPreferences(const TPreferences & Preferences)
   Settings.AlwaysSortDirectoriesByName = Preferences.AlwaysSortDirectoriesByName;
   Settings.RenameWholeName = Preferences.RenameWholeName;
   Settings.EnableQueueByDefault = Preferences.EnableQueueByDefault;
+  Settings.CopyParamAutoSelectNotice = Preferences.CopyParamAutoSelectNotice;
   Settings.PanelSearch = static_cast<int>(Preferences.PanelSearch);
   Settings.PreservePanelState = Preferences.PreservePanelState;
   Settings.FullRowSelect = Preferences.FullRowSelect;
@@ -1075,6 +1077,12 @@ std::string Text(TText Text)
     case TText::SaveWorkspacePasswordsRecommended: Ident = SAVE_WORKSPACE_PASSWORDS_RECOMMENDED; break;
     case TText::SaveWorkspaceAuto: Ident = SAVE_WORKSPACE_AUTO; break;
     case TText::NewWorkspace: Ident = NEW_WORKSPACE; break;
+    case TText::CopyParamAutoSelected: Ident = COPY_PARAM_AUTOSELECTED; break;
+    case TText::CopyParamDefaultCustom: Ident = COPY_PARAM_DEFAULT_CUSTOM; break;
+    case TText::CopyParamDefaultNorm: Ident = COPY_PARAM_DEFAULT_NORM; break;
+    case TText::CopyParamRule: Ident = COPY_PARAM_RULE; break;
+    case TText::CopyParamNoRule: Ident = COPY_PARAM_NO_RULE; break;
+    case TText::ConfigureButton: Ident = CONFIGURE_BUTTON; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

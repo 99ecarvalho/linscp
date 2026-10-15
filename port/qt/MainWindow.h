@@ -342,6 +342,8 @@ private:
   void CleanUpEdited();
   void ShowError(const CoreBridge::TCoreError & E);
   void UpdateActions();
+  void TransferPresetAutoSelect();
+  CoreBridge::TTransferPresetRule TransferPresetAutoSelectData() const;
 
   CoreBridge::TInfo FInfo;
   std::unique_ptr<CoreBridge::TSession> FSession;
@@ -368,6 +370,10 @@ private:
   QAction * FDirectorySizesAction = nullptr;
   QAction * FNewFileAction = nullptr;
   QAction * FProcessQueueAction = nullptr;
+  // TransferPresetAutoSelect's: the preset chosen by hand, the one last
+  // autoselected.
+  QString FCopyParamDefault;
+  QString FCopyParamAutoSelected;
   QAction * FCopyClipboardAction = nullptr;
   QAction * FPasteAction = nullptr;
   QAction * FStatusBarAction = nullptr;

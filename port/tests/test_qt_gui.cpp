@@ -4570,6 +4570,78 @@ void ToolbarsTest()
 // P3-16's Preferences > Panels and Commander: Explorer-style selection,
 // incremental search, the double-click, the panel font, the panels' state
 // kept per tab.
+// P3-16: transfer presets' autoselection rules: kept, edited in the
+// preset's dialog, and matched as the panels move.
+void PresetRulesTest(const char * Port, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = std::deque<QString>(4, QStringLiteral("secret"));
+    Responder.AcceptDialogs = true;
+    const QDir Dir(Directory);
+    QDir().mkpath(Dir.filePath(QStringLiteral("into")));
+
+    // Kept with the presets.
+    CoreBridge::TTransferPreset Sub;
+    Sub.Name = "Sub";
+    Sub.Settings = CoreBridge::DefaultTransferSettings();
+    Sub.HasRule = true;
+    Sub.Rule.RemoteDirectory = "/sub";
+    CoreBridge::TTransferPreset Into;
+    Into.Name = "Into";
+    Into.Settings = Sub.Settings;
+    Into.HasRule = true;
+    Into.Rule.LocalDirectory = QDir::toNativeSeparators(Dir.filePath(QStringLiteral("into"))).toStdString();
+    CoreBridge::TTransferPreset Plain;
+    Plain.Name = "Plain";
+    Plain.Settings = Sub.Settings;
+    CoreBridge::SetTransferPresets({ Sub, Into, Plain });
+    const std::vector<CoreBridge::TTransferPreset> Presets = CoreBridge::TransferPresets();
+    Check((Presets.size() == 3) && Presets[0].HasRule && (Presets[0].Rule.RemoteDirectory == "/sub") &&
+      Presets[1].HasRule && !Presets[2].HasRule, "the rules kept with the presets");
+    Check(CoreBridge::TransferPresetRuleInfo(Presets[0].Rule).find("/sub") != std::string::npos, "a rule described");
+
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "(connected)");
+    Window.Local()->ChangeDirectory(Directory);
+    Check(CoreBridge::CurrentTransferPreset().empty(), "no rule matching: the default");
+    // Announced, as WinSCP's default, the responder taking its OK.
+    Window.Panel()->ChangeDirectory(QStringLiteral("/sub"));
+    Check(CoreBridge::CurrentTransferPreset() == "Sub", "a remote directory's rule: its preset selected");
+    Window.Panel()->ChangeDirectory(QStringLiteral("/"));
+    Check(CoreBridge::CurrentTransferPreset().empty(), "back where none matches: the one chosen");
+    CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+    Preferences.CopyParamAutoSelectNotice = false;
+    CoreBridge::SetPreferences(Preferences);
+    Window.Local()->ChangeDirectory(Dir.filePath(QStringLiteral("into")));
+    Check(CoreBridge::CurrentTransferPreset() == "Into", "a local directory's rule too");
+    Check(Window.statusBar()->currentMessage().contains(QStringLiteral("Into")), "unannounced: noted in the status bar");
+    Window.Local()->ChangeDirectory(Directory);
+
+    // The preset's dialog: the rule's masks, Current filling them in.
+    QString Name = QStringLiteral("Sub");
+    TransferSettingsDialog Dialog(Presets[0].Settings, &Name, &Window);
+    CoreBridge::TTransferPresetRule Current;
+    Current.HostName = "127.0.0.1";
+    Current.RemoteDirectory = "/";
+    Dialog.SetRule(true, Presets[0].Rule, &Current);
+    Check(Dialog.HasRuleCheck()->isChecked() && (Dialog.RuleEdit(2)->text() == QStringLiteral("/sub")),
+      "the rule shown");
+    Dialog.CurrentRuleButton()->click();
+    Check((Dialog.Rule().HostName == "127.0.0.1") && (Dialog.Rule().RemoteDirectory == "/"), "Current fills in the session's");
+    Dialog.HasRuleCheck()->setChecked(false);
+    Check(!Dialog.HasRule() && !Dialog.RuleEdit(0)->isEnabled(), "no rule: its masks off");
+    TransferSettingsDialog Custom(Presets[0].Settings, nullptr, &Window);
+    Check(Custom.HasRuleCheck() == nullptr, "a transfer's own settings have no rule");
+  }
+  CoreBridge::Finalize();
+}
+
 void PanelPreferencesTest(const char * Port, const QString & Directory)
 {
   QtFrontend Frontend;
@@ -4735,6 +4807,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 3) && (std::strcmp(argv[1], "toolbars") == 0))
   {
     ToolbarsTest();
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "presetrules") == 0))
+  {
+    PresetRulesTest(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "panelprefs") == 0))
   {

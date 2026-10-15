@@ -2442,6 +2442,10 @@ Local: %2</translation>
         <source>&amp;Hide</source>
         <translation>&amp;Ocultar</translation>
     </message>
+    <message>
+        <source>&amp;Announce when transfer settings preset is autoselected</source>
+        <translation>&amp;Avisar quando as configurações de transferências padrões forem autoselecionadas</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>
@@ -3392,6 +3396,38 @@ Local: %2</translation>
     <message>
         <source>Preset &amp;description:</source>
         <translation>&amp;Descrição do esquema</translation>
+    </message>
+    <message>
+        <source>Automatically select this preset when</source>
+        <translation>Automaticamente selecionar este esquema quando</translation>
+    </message>
+    <message>
+        <source>Autoselection rule</source>
+        <translation>Regra de autoseleção</translation>
+    </message>
+    <message>
+        <source>Hostna&amp;me mask:</source>
+        <translation>Máscara de no&amp;me de host:</translation>
+    </message>
+    <message>
+        <source>Us&amp;ername mask:</source>
+        <translation>Máscara de nom&amp;e de usuário:</translation>
+    </message>
+    <message>
+        <source>Remote director&amp;y mask:</source>
+        <translation>Máscara de diretório &amp;remoto:</translation>
+    </message>
+    <message>
+        <source>&amp;Local directory mask:</source>
+        <translation>Máscara de diretório &amp;local:</translation>
+    </message>
+    <message>
+        <source>mask hints</source>
+        <translation>dicas de máscara</translation>
+    </message>
+    <message>
+        <source>Current</source>
+        <translation>Atual</translation>
     </message>
 </context>
 <context>

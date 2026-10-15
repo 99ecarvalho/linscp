@@ -58,8 +58,19 @@ public:
   const std::vector<CoreBridge::TTransferPreset> & Presets() const { return FPresets; }
   // Its buttons' actions, for tests and them alike: what the dialogs would
   // edit is given.
-  bool AddPreset(const QString & Name, const CoreBridge::TTransferSettings & Settings);
-  bool EditSelected(const QString & Name, const CoreBridge::TTransferSettings & Settings);
+  // With HasRule and Rule given, the preset's autoselection rule too;
+  // else an edited preset keeps its own.
+  bool AddPreset(const QString & Name, const CoreBridge::TTransferSettings & Settings,
+    const bool * HasRule = nullptr, const CoreBridge::TTransferPresetRule * Rule = nullptr);
+  bool EditSelected(const QString & Name, const CoreBridge::TTransferSettings & Settings,
+    const bool * HasRule = nullptr, const CoreBridge::TTransferPresetRule * Rule = nullptr);
+  // What a preset's Current button fills in: the active session's.
+  void SetCurrentRuleData(const CoreBridge::TTransferPresetRule & Data)
+  {
+    FCurrentRuleData = Data;
+    FHasCurrentRuleData = true;
+  }
+  QCheckBox * CopyParamAutoSelectNoticeCheck() const { return FCopyParamAutoSelectNotice; }
   void RemoveSelected();
   void MoveSelected(int By);
   class QSpinBox * QueueTransfersLimitSpin() const { return FQueueTransfersLimit; }
@@ -144,7 +155,7 @@ private:
   QWidget * MakePanelsPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeCommanderPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeLanguagesPage();
-  QWidget * MakeTransferPage();
+  QWidget * MakeTransferPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeBackgroundPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeEndurancePage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeWindowPage(const CoreBridge::TPreferences & Preferences);
@@ -182,6 +193,9 @@ private:
   QCheckBox * FParallelThresholdCheck = nullptr;
   QSpinBox * FParallelThreshold = nullptr;
   QCheckBox * FEnableQueueByDefault = nullptr;
+  QCheckBox * FCopyParamAutoSelectNotice = nullptr;
+  CoreBridge::TTransferPresetRule FCurrentRuleData;
+  bool FHasCurrentRuleData = false;
   QRadioButton * FQueueView[3] = {};
 public:
   // The Background page's queue list choice (Options > Queue's).
