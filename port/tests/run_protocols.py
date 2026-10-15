@@ -4,7 +4,10 @@ The same everyday script over every protocol, through linscp-cli, against
 throwaway servers on loopback: list, download, upload, make a directory,
 move, delete, remove the directory -- each checked on the server's side.
 
-  run_protocols.py [--emulator wine] [--only proto,...] linscp-cli[.exe]
+  run_protocols.py [--emulator wine] [--only proto,...] [--servers container] linscp-cli[.exe]
+
+With --servers container, against real servers instead (fixtures.servers:
+OpenSSH, vsftpd, Apache's mod_dav, versitygw), one container for them all.
 
 A protocol whose server is not installed here is reported as skipped; the
 test fails only on a protocol that ran. Exits 77 when none could run.
@@ -145,10 +148,52 @@ class S3View:
         return None
 
 
+def container(runner, tmp, wanted, ran, skipped):
+    """The scenario against real servers (fixtures.servers), each protocol
+    on a directory of its own, one container serving them."""
+    protocols = [p for p in ('sftp', 'scp', 'ftp', 'ftpes', 'ftps', 'dav', 'davs', 's3') if wanted(p)]
+    if not protocols:
+        return
+    root = os.path.join(tmp, 'container-server')
+    os.makedirs(root)
+    services = {'sftp': 'ssh', 'scp': 'ssh', 'ftp': 'ftp', 'ftpes': 'ftp', 'ftps': 'ftps', 'dav': 'dav',
+                'davs': 'davs', 's3': 's3'}
+    try:
+        with fixtures.servers(root, tmp, sorted({services[p] for p in protocols}), s3_access='LINSCPKEY') as served:
+            for proto in protocols:
+                # Each protocol in a directory of its own (S3: a bucket of
+                # its own), the scenario addressing it as the server shows it.
+                # (A bucket's name has three characters at least.)
+                where = os.path.join(root, 'linscp-' + proto)
+                os.makedirs(where)
+                port = served[services[proto]]
+                if proto in ('sftp', 'scp'):
+                    ppk = os.path.join(tmp, 'container-client.ppk')
+                    if not os.path.exists(ppk):
+                        rc, text = runner.run('/keygen', runner.native(served['key']), '/output=' + runner.native(ppk))
+                        runner.check('ssh', rc == 0, f'/keygen (rc {rc})', text)
+                    open_cmd = (f'open {proto}://linscp@127.0.0.1:{port}/ -privatekey={runner.native(ppk)} '
+                                f'-hostkey={served["hostkey"].split()[-1]}')
+                    remote = where
+                elif proto == 's3':
+                    open_cmd = f'open s3plain://LINSCPKEY:secret@127.0.0.1:{port}/ -rawsettings S3UrlStyle=1'
+                    remote = '/linscp-' + proto
+                else:
+                    tls = proto in ('ftpes', 'ftps', 'davs')
+                    extra = f' -certificate={served["certificate"]}' if tls else ''
+                    open_cmd = f'open {proto}://linscp:secret@127.0.0.1:{port}/{extra}'
+                    remote = '/linscp-' + proto
+                runner.scenario(proto + '-real', open_cmd, where, remote)
+                ran.append(proto + '-real')
+    except fixtures.Missing as e:
+        skipped.append(f'real servers ({e})')
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--emulator')
     ap.add_argument('--only', default='')
+    ap.add_argument('--servers', choices=('local', 'container'), default='local')
     ap.add_argument('cli')
     a = ap.parse_args()
     only = set(filter(None, a.only.split(',')))
@@ -162,6 +207,9 @@ def main():
         return not only or proto in only
 
     try:
+      if a.servers == 'container':
+        container(runner, tmp, wanted, ran, skipped)
+      else:
         # SFTP and SCP: the same sshd, the key converted with /keygen.
         if wanted('sftp') or wanted('scp'):
             try:

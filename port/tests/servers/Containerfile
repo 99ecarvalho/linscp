@@ -1,0 +1,25 @@
+# linscp's test servers, real ones for every protocol (P3-18): OpenSSH (SFTP,
+# SCP, a shell), vsftpd (FTP with explicit TLS, and implicit FTPS), Apache's
+# mod_dav (WebDAV over HTTP and HTTPS, with locking) and Versity's S3 gateway
+# (S3 over a directory). fixtures.py's servers() starts one per test, on the
+# host's network, serving the test's own directory: see entrypoint.sh.
+FROM debian:trixie-slim
+
+RUN apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      ca-certificates curl openssh-server vsftpd apache2 openssl \
+ && rm -rf /var/lib/apt/lists/*
+
+# versitygw, pinned and checked.
+ARG VERSITYGW_VERSION=1.9.0
+ARG VERSITYGW_SHA256=0c28ccda3452451d7c71a0427f6aa7d0db5cac5e2b98a8e4dd2970967e1aadc1
+RUN curl -fsSL -o /tmp/versitygw.tar.gz \
+      "https://github.com/versity/versitygw/releases/download/v${VERSITYGW_VERSION}/versitygw_v${VERSITYGW_VERSION}_Linux_x86_64.tar.gz" \
+ && echo "${VERSITYGW_SHA256}  /tmp/versitygw.tar.gz" | sha256sum -c - \
+ && mkdir /tmp/versitygw && tar -xzf /tmp/versitygw.tar.gz -C /tmp/versitygw \
+ && install -m 0755 "$(find /tmp/versitygw -type f -name versitygw | head -1)" /usr/local/bin/versitygw \
+ && rm -rf /tmp/versitygw /tmp/versitygw.tar.gz
+
+COPY entrypoint.sh /usr/local/bin/linscp-servers
+RUN chmod 0755 /usr/local/bin/linscp-servers
+ENTRYPOINT ["/usr/local/bin/linscp-servers"]

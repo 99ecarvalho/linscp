@@ -76,6 +76,17 @@ build/linux/port/qt/linscp
 ctest --test-dir build/linux        # the test suite
 ```
 
+The suite starts its own throwaway servers on loopback (rclone, sshd, and
+FTP and S3 servers written for it). With docker or podman, the tests labelled
+`real-servers` also run against real ones, built from
+[port/tests/servers/](port/tests/servers/) into one image the first time:
+OpenSSH, vsftpd (FTP, explicit and implicit FTPS), Apache's mod_dav (WebDAV,
+with locking) and Versity's S3 gateway. Without either they are skipped.
+
+```sh
+ctest --test-dir build/linux -L real-servers
+```
+
 ### Windows (cross-compiled from Linux)
 
 The toolchain and Qt are fetched pinned

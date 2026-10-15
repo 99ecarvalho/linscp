@@ -212,6 +212,14 @@ add_test(NAME protocols
           --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:linscp-cli>")
 set_tests_properties(protocols PROPERTIES
   DEPENDS cli_session_build SKIP_RETURN_CODE 77 TIMEOUT 600)
+# The same against real servers in a container (P3-18, servers/): OpenSSH,
+# vsftpd, Apache's mod_dav, versitygw. Skipped without docker or podman
+# (fixtures.container_engine); label real-servers.
+add_test(NAME protocols_real
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_protocols.py"
+          --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" --servers container "$<TARGET_FILE:linscp-cli>")
+set_tests_properties(protocols_real PROPERTIES
+  DEPENDS cli_session_build SKIP_RETURN_CODE 77 TIMEOUT 900 LABELS real-servers)
 # The golden comparison: the cases in golden/cases run by linscp-cli and
 # compared with the logs real WinSCP wrote for them on Windows
 # (golden/expected, captured with run_golden.py capture). Skipped until the
@@ -486,6 +494,23 @@ if(TARGET linscp)
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
             session /ini=nul {port} -platform offscreen)
   set_tests_properties(qt_gui_session PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+  # The shell against real servers (P3-18): FTP (vsftpd), S3 (versitygw,
+  # which keeps no object ACLs), a real shell (OpenSSH), WebDAV locking
+  # (Apache's mod_dav). Label real-servers.
+  foreach(_real
+      "qt_session_ftp_real|ftp|$<TARGET_FILE:test_qt_session>"
+      "qt_gui_properties_real|ftp|$<TARGET_FILE:test_qt_gui>|properties|/ini=nul|{port}|-platform|offscreen"
+      "qt_gui_tags_real|s3|$<TARGET_FILE:test_qt_gui>|tags|/ini=nul|{port}|noacl|-platform|offscreen"
+      "qt_gui_commands_real|sshd|$<TARGET_FILE:test_qt_gui>|commands|/ini=nul|{port}|{key}|{user}|{tmp}|{hosttmp}|-platform|offscreen"
+      "qt_gui_locking_real|dav|$<TARGET_FILE:test_qt_gui>|locking|/ini=nul|{port}|-platform|offscreen")
+    string(REPLACE "|" ";" _real "${_real}")
+    list(POP_FRONT _real _name _protocol _program)
+    add_test(NAME ${_name}
+      COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
+              --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" --servers container --protocol ${_protocol} "${_program}" ${_real})
+    set_tests_properties(${_name} PROPERTIES DEPENDS "qt_gui_build;qt_session_build" SKIP_RETURN_CODE 77 TIMEOUT 400
+      LABELS real-servers)
+  endforeach()
   add_test(NAME gui_build
     COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target linscp)
   add_test(NAME gui_smoke COMMAND linscp /ini=nul --smoke -platform offscreen)

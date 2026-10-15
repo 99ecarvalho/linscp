@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 10 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 27 | 29 | Parity on features users depend on |
+| P3 Qt parity | 28 | 29 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Dropped for now (2026-10-15); may be reopened |
-| **Total** | **103** | **116** | |
+| **Total** | **104** | **116** | |
 
 ## Next three actions
 
@@ -257,11 +257,12 @@ P2-10 and P2-11 waited, at the user's request, for P3.
 
 1. **P2-11**: the P2 exit gate, driven by the user: a day's work in linscp
    from an installed package (0.2.0's).
-2. **P3-18**: the test devcontainer with real servers (FTP/FTPS, S3, a locking WebDAV), the suites run against them.
+2. Run the `real-servers` tests in CI (a job on the runner's host, where docker is: P3-18's container cannot start from inside CI's Debian container).
 3. Follow up the upstream PRs for the carried patches (ADR 0006): the
    portability series winscp/winscp#79, and #80 (`LogEvent`), #81 (log file
-   names), #82 (local EOL), #83 (OpenSSH import paths); drop each patch
-   when a pin move brings it in.
+   names), #82 (local EOL), #83 (OpenSSH import paths); offer the two S3
+   ones found by P3-18 (`core-s3-acl-not-implemented.patch`,
+   `core-s3-folder-tags.patch`); drop each patch when a pin move brings it in.
 
 ## P3 UI gap audit (2026-10-14)
 
@@ -300,6 +301,9 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-15 | Real test servers (P3-18) in one image, one container per test on the host's network (free loopback ports, FTP's passive ports needing no mapping), the test's directory mounted at its own path, the servers as user linscp with the host user's uid; versitygw for S3, not MinIO | Each test keeps owning its server's files, as with the loopback fixtures. MinIO refuses secret keys under 8 characters (the suite's "secret") and keeps objects in its own format; versitygw serves a directory as buckets. OpenSSH stays out of the GUI tests' SFTP: its chroot cannot give a writable "/", which they expect (rclone stays) |
+| 2026-10-15 | The shim's AnsiString and UnicodeString data() return NULL when empty, as C++Builder's | Core tells "none" by it: S3FileSystem's empty session token went out as an empty, unsigned x-amz-security-token header, which a real S3 server rejects |
+| 2026-10-15 | `core-s3-acl-not-implemented.patch` and `core-s3-folder-tags.patch` carried, to offer upstream | Against versitygw WinSCP's Properties fail: GetObjectAcl answers NotImplemented (many S3-compatible servers keep no object ACLs), and a folder that is only a key prefix has no tags to read; NotImplemented now reads as no grants, and tags load for files only, as the dialog shows them |
 | 2026-10-15 | Help's pages are linscp's (GitHub: homepage, issues as the support forum, releases as the history) but for Contents, WinSCP's documentation, which linscp's interface follows; Check for Updates asks GitHub's releases API; Show Tips and Donate are left out | WinSCP's pages, tips and update service are about WinSCP; linscp takes no donations |
 | 2026-10-15 | P3-18 added: a devcontainer with real test servers for every protocol (FTP/FTPS and S3 included), the suites run against them; done after P3-15 | The user's call. The suite's FTP and S3 servers are pyftpdlib and moto, written for tests; real servers catch what they do not |
 | 2026-10-15 | P4 (cleanup) dropped for now, all four tasks; it may be reopened | The user's call: retiring the VCL frontend and collapsing the dual-target code would make linscp unmergeable upstream, which stays the goal (ADR 0006); the C++Builder build keeps working |
@@ -857,7 +861,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-15 | The rest of the Commander's commands | done | done 2026-10-15, every item of WinSCP's Commander menus but Help > Show Tips and Donate (not offered) and, on POSIX, the local Columns' Attributes (Permissions there). Done: Commands > Queue's commands (TQueueController's operations: show query/error/prompt, execute now, suspend, resume, cancel, move up/down, all; Go To), also the queue list's context menu; the panels' Type column (the shell's type names on Windows, MIME descriptions elsewhere), Sort submenu, Columns' Name, Size Automatically and Reset Layout; Mark > Restore Selection; Help's pages (the documentation WinSCP's, the homepage, support and history linscp's GitHub ones) and Check for Updates (linscp's GitHub releases, pre-releases included; ctest `qt_gui_options`); Options > Tabs, Left/Right Panel > Status Bar, Queue > Toolbar, Reset Columns Layout and Customize, kept under WinSCP's keys; Queue > Once Empty (Stay Idle, Disconnect Session, Sleep Computer, Shut Down Computer: the session closed, the computer asleep or shut down through logind or Windows' own calls, then the application closed as ConfirmExitOnCompletion asks); Files > Upload/Download (the active side's, in the background, and deleting; Copy and Move in a local tab), New > Link, Locking (Lock, Unlock where the protocol locks: WebDAV; only its disabled state is tested, the suite's WebDAV server does not lock, see P3-18); Tabs > Color (WinSCP's standard session colors, Default and More Colors: the tab's swatch and the remote panel's background, kept when the session is saved as a site) and New Tab > Default to Remote Tab (the New Tab button's choice, Ctrl reversing it); Local > Change Drive (Alt+F1: documents, desktop, the drives or, on POSIX, the root, home and mounted volumes) and Remote > Change Directory (Alt+F2: the path's directories), as the path boxes' drop-downs; the right side's Go To > Explore Directory (a local tab's); the command line (Options > Command Line, Shift+Ctrl+M: the remote side's commands in the console, a local side's started in its directory, each side's history kept as WinSCP's History\\Commands and LocalCommands; Files > File Names > Insert to Command Line, Ctrl+Enter). Histories are now kept as WinSCP keeps them (History\\<name>), the command line's the first; Queue > File List (a parallel transfer's files beside the queue, those done grayed); Toolbars > Update Button (Check for Updates, its menu the project's pages) and Hot Keys Toolbar (F2 to F10, at the bottom). Left/Right > View > Details and Thumbnails (a grid over the same entries and selection: local images previewed in the background, remote ones downloaded first by a background queue item of their own, as TThumbnailDownloadQueueItem, WinSCP's image masks up to 50 MB; kept as each panel's ViewStyle). Not offered: Help > Show Tips (WinSCP's tips service) and Donate |
 | P3-16 | Verified UI gaps | done | the audit below, every gap closed but extensions (deferred, 2026-10-15) |
 | P3-17 | Icon sets | done | Lucide (ISC), Tabler (MIT), Fluent UI (MIT) imported to `assets/icons/` (`port/tools/import_icons.py`, 62 roles after WinSCP's glyphs), embedded and drawn by `port/qt/IconSet.cpp` in the palette's text colour (light and dark themes); Preferences > Window > Icon set (Fluent by default on Windows, Lucide elsewhere; the desktop's theme on POSIX only; none), on the menus and the panels' toolbars; About credits each set with its license; Qt Svg added on both platforms (`qt6-svg-dev`, MSYS2 `qt6-svg` in `msys2-qt.lock`); ctest `qt_gui_icons`; native on Windows 11 too. WinSCP's toolbars: the main bands (Commands, Preferences with the queue's, Transfer Settings with the presets, and hidden by default Sessions and Tabs, Sort, Custom Commands) and each panel's five (Path, History, Navigation, Files, Selection; PanelBands.h), Options > Toolbars (each band, lock, selective text labels, icon size) and Left/Right Panel, kept as WinSCP's `ToolbarsLayout2`, `LockToolbars`, `SelectiveToolbarText`, `LargerToolbar`; ctest `qt_gui_toolbars` |
-| P3-18 | Test devcontainer with real servers | todo | deferred (the user, 2026-10-15): real FTP/FTPS and S3 servers, which the suite only has as pyftpdlib and moto, beside SFTP, SCP and WebDAV (one that locks, for Files > Locking); the suites run against them |
+| P3-18 | Test devcontainer with real servers | done | `port/tests/servers/` (Containerfile, entrypoint.sh): OpenSSH, vsftpd (FTP, FTPES, implicit FTPS), Apache's mod_dav (WebDAV, HTTPS, locking), versitygw (S3), one container per test on the host's network serving the test's directory (fixtures.servers); ctest label `real-servers`: protocols_real (every protocol through linscp-cli), qt_session_ftp_real, qt_gui_properties_real, qt_gui_tags_real, qt_gui_commands_real, qt_gui_locking_real, native and under Wine. They found: S3 requests carrying an empty, unsigned x-amz-security-token (the shim's data() of an empty string, fixed), Properties failing on servers without object ACLs and on prefix-only folders (core patches). CI skips them: its Debian container has no container engine |
 
 ### P4 — Cleanup
 | ID | Task | Status | Note |

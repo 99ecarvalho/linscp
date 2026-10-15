@@ -4,7 +4,12 @@ A Qt shell test against rclone's SFTP server on loopback: test_qt_session
 (the bridge to core, a scripted frontend in Qt's place) or test_qt_gui
 session (the main window, its dialogs answered by a responder).
 
-  run_qt_session.py [--emulator wine] [--protocol sftp|ftp|sshd|s3] test[.exe] [argument ...]
+  run_qt_session.py [--emulator wine] [--protocol sftp|ftp|sshd|s3|dav] [--servers container] test[.exe] [argument ...]
+
+With --servers container, the real servers instead (fixtures.servers, P3-18):
+vsftpd for ftp, versitygw for s3, Apache's mod_dav for dav (which needs it),
+OpenSSH for sshd, letting user linscp ({user}) in with {key}; sftp stays
+rclone's (OpenSSH cannot serve a writable "/").
 
 The server is rclone's SFTP, or the suite's own FTP or S3 server
 (ftp_server.py, s3_server.py, whose bucket "bucket" is the root); user (S3:
@@ -26,7 +31,8 @@ import fixtures  # noqa: E402
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--emulator', default='')
-    ap.add_argument('--protocol', choices=('sftp', 'ftp', 'sshd', 's3'), default='sftp')
+    ap.add_argument('--protocol', choices=('sftp', 'ftp', 'sshd', 's3', 'dav'), default='sftp')
+    ap.add_argument('--servers', choices=('local', 'container'), default='local')
     ap.add_argument('test')
     ap.add_argument('args', nargs=argparse.REMAINDER)
     a = ap.parse_args()
@@ -39,13 +45,31 @@ def main():
         os.makedirs(os.path.join(root, 'sub'))
         with open(os.path.join(root, 'hello.txt'), 'wb') as f:
             f.write(b'Hello, linscp\n')
+        # Whatever the umask: the tests expect these (a real server shows
+        # the file's own).
+        os.chmod(os.path.join(root, 'hello.txt'), 0o644)
+        os.chmod(os.path.join(root, 'sub'), 0o755)
         if any('{key}' in x for x in args) and (a.protocol != 'sshd'):
             if not shutil.which('ssh-keygen'):
                 raise fixtures.Missing('ssh-keygen')
             fixtures.keygen(os.path.join(tmp, 'id_ed25519'))
         os.makedirs(os.path.join(tmp, 'local'))
         key = os.path.join(tmp, 'id_ed25519')
-        if a.protocol == 'sshd':
+        user = getpass.getuser()
+        container = (a.servers == 'container') and (a.protocol != 'sftp')
+        if (a.protocol == 'dav') and not container:
+            raise fixtures.Missing('a WebDAV server (--servers container)')
+        if container:
+            s3_root = None
+            if a.protocol == 's3':
+                os.makedirs(os.path.join(tmp, 's3'))
+                os.rename(root, os.path.join(tmp, 's3', 'bucket'))
+                s3_root = os.path.join(tmp, 's3')
+                root = s3_root
+            service = {'ftp': 'ftp', 's3': 's3', 'sshd': 'ssh', 'dav': 'dav'}[a.protocol]
+            server = fixtures.servers(root, tmp, [service], s3_root=s3_root, mounts=[tmp])
+            user = 'linscp'
+        elif a.protocol == 'sshd':
             # Windows' sshd lets no one in run unprivileged, as here.
             if os.name == 'nt':
                 raise fixtures.Missing('sshd (not run on Windows)')
@@ -61,7 +85,10 @@ def main():
             server = fixtures.python_server('ftp_server.py', root)
         with server as served:
             port = served
-            if a.protocol == 'sshd':
+            if container:
+                port = served[service]
+                key = served['key']
+            elif a.protocol == 'sshd':
                 port, key, _ = served
             target_tmp = tmp
             if a.emulator and os.path.basename(a.emulator).startswith('wine'):
@@ -69,7 +96,7 @@ def main():
                                             env=dict(os.environ, WINEDEBUG='-all')).stdout.strip() or tmp
             cmd = ([a.emulator] if a.emulator else []) + [a.test] + [
                 x.replace('{port}', str(port)).replace('{protocol}', a.protocol).replace('{tmp}', target_tmp).replace('{hosttmp}', tmp)
-                .replace('{key}', key).replace('{user}', getpass.getuser()) for x in args]
+                .replace('{key}', key).replace('{user}', user) for x in args]
             p = subprocess.run(cmd, capture_output=True, text=True, timeout=240)
             print(p.stdout, end='')
             print(p.stderr[-2000:], end='', file=sys.stderr)

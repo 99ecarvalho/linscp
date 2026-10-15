@@ -79,6 +79,8 @@
 #include <QSettings>
 #include <QSplitter>
 #include <QListWidget>
+#include <algorithm>
+#include <set>
 #include <QComboBox>
 #include <QHeaderView>
 #include <QMenu>
@@ -3995,7 +3997,51 @@ void KeepUpToDateTest(const char * Port, const QString & Tmp)
 
 // S3's tags, in the Properties dialog's Tags page, against the suite's S3
 // server (its bucket "bucket").
-void Tags(const char * Port)
+// P3-15/P3-18: Files > Locking over WebDAV, against Apache's mod_dav: a
+// file locked (locked again, the server refuses), unlocked, locked again.
+void LockingTest(const char * Port)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = std::deque<QString>(5, QStringLiteral("secret"));
+    Responder.AcceptDialogs = true;
+    Check(Window.OpenUrl(QStringLiteral("dav://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "a WebDAV session");
+    CoreBridge::TSession * Session = Window.Session();
+    Check((Session != nullptr) && Session->CanLock(), "the server locks (fcLocking)");
+    Window.Panel()->Select({ QStringLiteral("hello.txt") });
+    Window.ActivatePanel(false);
+    QAction * Files = MenuAction(Window, { "Files" });
+    emit Files->menu()->aboutToShow();
+    Check(MenuAction(Window, { "Files", "Locking" })->isEnabled(), "Files > Locking enabled");
+    Check(Window.LockSelected(true), "Lock locks it");
+    bool Refused = false;
+    try
+    {
+      Session->Lock({ "hello.txt" });
+    }
+    catch (const CoreBridge::TCoreError &)
+    {
+      Refused = true;
+    }
+    Check(Refused, "locked again: the server refuses, it is locked");
+    Window.Panel()->Select({ QStringLiteral("hello.txt") });
+    Check(Window.LockSelected(false), "Unlock unlocks it");
+    Window.Panel()->Select({ QStringLiteral("hello.txt") });
+    Check(Window.LockSelected(true) && Window.LockSelected(false), "and it can be locked again");
+    Frontend.SetWindow(nullptr);
+  }
+  CoreBridge::Finalize();
+}
+
+// Acl: the server keeps object ACLs (versitygw keeps none: Properties
+// still open, its tags too, with no ACL to show).
+void Tags(const char * Port, bool Acl)
 {
   QtFrontend Frontend;
   CoreBridge::Initialize(&Frontend);
@@ -4026,8 +4072,9 @@ void Tags(const char * Port)
       Properties.Tags = { { "env", "test" }, { "owner", "linscp" } };
       Check(Session->SetProperties({ "hello.txt" }, Properties), "tags set");
       Info = Session->PropertiesOf({ "hello.txt" });
-      Check((Info.Properties.Tags.size() == 2) && (Info.Properties.Tags[1].first == "owner") &&
-        (Info.Properties.Tags[1].second == "linscp"), "and read back from the server");
+      Check((Info.Properties.Tags.size() == 2) &&
+        std::any_of(Info.Properties.Tags.begin(), Info.Properties.Tags.end(),
+          [](const auto & Tag) { return (Tag.first == "owner") && (Tag.second == "linscp"); }), "and read back from the server");
 
       PropertiesDialog Dialog(Session, { "hello.txt" }, QStringLiteral("/bucket"), Info, &Window);
       Check((Dialog.TagList() != nullptr) && (Dialog.TagList()->topLevelItemCount() == 2), "the Tags page lists them");
@@ -4053,9 +4100,22 @@ void Tags(const char * Port)
       Responder.Custom = nullptr;
       Check(Session->SetProperties({ "hello.txt" }, Dialog.Properties()), "and saved");
       Info = Session->PropertiesOf({ "hello.txt" });
-      Check((Info.Properties.Tags.size() == 2) && (Info.Properties.Tags[0].first == "owner") &&
-        (Info.Properties.Tags[1].first == "new"), "as the dialog had them");
+      // (In any order: S3 promises none, versitygw sorts them.)
+      {
+        std::set<std::string> Keys;
+        for (const auto & Tag : Info.Properties.Tags)
+        {
+          Keys.insert(Tag.first);
+        }
+        Check((Info.Properties.Tags.size() == 2) && (Keys == std::set<std::string>{ "owner", "new" }), "as the dialog had them");
+      }
       // S3's ACL, as the rights frame shows it (DisplayAsAcl): files only.
+      if (!Acl)
+      {
+        CoreBridge::TPropertiesInfo Info = Session->PropertiesOf({ "hello.txt" });
+        Check(Info.Properties.HasTags, "no object ACLs on the server: the properties still read");
+      }
+      else
       {
         CoreBridge::TPropertiesInfo Info = Session->PropertiesOf({ "hello.txt" });
         Check(Info.Acl && Info.CanChangeRights && Info.Properties.HasRights, "a file's ACL");
@@ -6180,9 +6240,13 @@ int main(int argc, char ** argv)
   {
     StartUpTest(argv[3]);
   }
+  else if ((argc >= 4) && (std::strcmp(argv[1], "locking") == 0))
+  {
+    LockingTest(argv[3]);
+  }
   else if ((argc >= 4) && (std::strcmp(argv[1], "tags") == 0))
   {
-    Tags(argv[3]);
+    Tags(argv[3], !((argc >= 5) && (std::strcmp(argv[4], "noacl") == 0)));
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "keep") == 0))
   {
