@@ -3,7 +3,9 @@
 P1-10's reconciliation: every file in `3rd-party/winscp/source/putty` that
 differs from stock PuTTY 0.85 (`3rd-party/putty`), what each change is for,
 and what it means for absorbing a new PuTTY release and for the Linux build.
-Reviewed 2026-10-12 against WinSCP `aaae9dcb` and PuTTY 0.85.
+Reviewed 2026-10-12 against WinSCP `aaae9dcb` and PuTTY 0.85; re-reviewed
+2026-10-15 at WinSCP 6.7.1 (`e19a9a3e`): the only changes are four of the
+bugs below, fixed upstream from linscp's reports (#72, #74, #76, #77).
 
 ctest `putty_deltas` holds this review in place: `port/putty/deltas.txt` lists
 each delta's line counts and a hash of its diff, and the test fails when
@@ -62,7 +64,7 @@ behaviour change).
 |---|---|---|
 | `callback.c` | +42 -6 | hook: per-session callback set; `is_idempotent_callback_pending`. off: frontend notifications |
 | `conf.h` | +26 -0 | hook: `connect_timeout`, `sndbuf`, `srcaddr`, `force_remote_cmd2`, `change_password` |
-| `crypto/aes-ni.c` | +41 -4 | build: unit gated on `WINSCP_VS \|\| _WIN64`, `MM_SETR_EPI8` constants, casts. The pragma pop mismatch is linscp's `putty-aes-ni-non-win64-clang.patch` and winscp/winscp#72 |
+| `crypto/aes-ni.c` | +41 -4 | build: unit gated on `WINSCP_VS \|\| _WIN64`, `MM_SETR_EPI8` constants, casts. The pragma pop mismatch was winscp/winscp#72, fixed in 6.7.1; `MM_SETR_EPI8`'s `_WIN64`-only intrinsic is still linscp's `putty-aes-ni-non-win64-clang.patch` |
 | `crypto/aes.h` | +17 -7 | build: vtable names as named arrays (objconv alignment) |
 | `crypto/aesold.c` | added, 1,057 | hook: pre-0.71 table AES, encrypt only, for core's master password (`aesold_*`) |
 | `crypto/argon2.c` | +1 -1 | beh: automatic Argon2 passes target 3x the time |
@@ -154,8 +156,7 @@ Checked against the build, not only read from the diff.
 
 - `sshrand.c:40` -- `random_add_noise` returns with `putty_section` held
   when the RNG is inactive; every other thread then deadlocks on it.
-  winscp/winscp#74; carried as `putty-random-add-noise-section.patch`, as
-  the Qt shell runs sessions on several threads.
+  winscp/winscp#74, fixed in 6.7.1 (no longer carried).
 - `windows/storage.c:351` -- `retrieve_host_key` compares the converted
   old-style key with its *output* buffer, uninitialised, so old-format RSA
   host keys are never migrated. winscp/winscp#75.
@@ -171,9 +172,9 @@ Checked against the build, not only read from the diff.
   (`schedule_timer` adds in 32 bits; harmless).
 - `windows/utils/get_system_dir.c:32` -- `win_misc_cleanup` frees the
   cached directory without clearing the pointer (only at shutdown).
-  winscp/winscp#76.
+  winscp/winscp#76, fixed in 6.7.1.
 - `crypto/ecc-ssh.c` -- `ec_cleanup` misses Ed448 (a leak at shutdown).
-  winscp/winscp#77.
+  winscp/winscp#77, fixed in 6.7.1.
 
 **Security-relevant, by design:**
 

@@ -9,4 +9,3 @@
 # check_overrides.py fails if a symbol here is no longer defined by both, or
 # if both start defining one that is not listed.
 appname
-get_remote_username

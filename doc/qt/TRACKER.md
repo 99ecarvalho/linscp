@@ -298,6 +298,7 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-15 | WinSCP pin moved to 6.7.1 (`e19a9a3e`); `core-script-rmdir-full-path.patch` and `putty-random-add-noise-section.patch` dropped, `putty-aes-ni-non-win64-clang.patch` cut to its `MM_SETR_EPI8` half, `get_remote_username` no longer an override | Upstream merged linscp's #69, #70, #71, #72, #74, #76 and #77 and removed core's own `get_remote_username`; 16 closure sites moved by lines only |
 | 2026-10-15 | Custom command extensions (.WinSCPextension) deferred; P3-16 closed without them | The user's call: WinSCP's extensions are PowerShell scripts over WinSCP's .NET assembly, which drives winscp.com, not linscp, so most would not run; packaging (P2-10) goes first |
 | 2026-10-14 | P3 exit gate: every WinSCP dialog has its counterpart (the Explorer interface aside); the gate also waits for the Commander commands users reach daily (P3-14); the rest of WinSCP's menus are backlog (P3-15). Answers Q-1 | The user's call at the gate review: the gap was ~50 menu items, about a dozen of daily use |
 | 2026-10-14 | linscp's icons come from bundled, freely licensed sets (Lucide, Tabler, Fluent UI), the user choosing; not WinSCP's | WinSCP's images are licensed stock icons that may not be reused in other software (its license.txt, part B) |

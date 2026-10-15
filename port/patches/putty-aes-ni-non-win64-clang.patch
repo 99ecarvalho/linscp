@@ -1,16 +1,11 @@
-Pair aes-ni.c's clang pragma and pick the intrinsic for any GCC-compatible compiler.
+Pick aes-ni.c's _mm_setr_epi8 for any GCC-compatible compiler.
 
-The file opens `#pragma clang attribute push` under `#ifdef __clang__` but
-closes it under `#ifdef _WIN64`. For WinSCP's own build, C++Builder's clang
-targeting Win64, the two coincide; for clang targeting anything else the
-push is never popped and the file does not compile. The pop now has the
-push's condition.
-
-MM_SETR_EPI8 likewise uses _mm_setr_epi8 only under _WIN64, falling back to
-a brace initialiser that is correct for MSVC's __m128i (a byte union) but
-fills clang's and GCC's (a two-lane vector) wrongly -- the AES-NI SDCTR bug
-this port fixed for 6.5.8, which upstream's _WIN64 condition fixed only for
+MM_SETR_EPI8 uses _mm_setr_epi8 only under _WIN64, falling back to a brace
+initialiser that is correct for MSVC's __m128i (a byte union) but fills
+clang's and GCC's (a two-lane vector) wrongly -- the AES-NI SDCTR bug this
+port fixed for 6.5.8, which upstream's _WIN64 condition fixed only for
 Win64. Any compiler defining __GNUC__ (clang does) now takes the intrinsic.
+(The clang pragma's pop, once in this patch, is upstream since winscp/winscp#72.)
 Line counts are unchanged.
 
 --- a/source/putty/crypto/aes-ni.c	2026-10-11 18:42:14.225530897 -0300
@@ -24,12 +19,3 @@ Line counts are unchanged.
  #define MM_SETR_EPI8(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab, ac, ad, ae, af) \
      _mm_setr_epi8(a0, a1, a2, a3, a4, a5, a6, a7, a8, a9, aa, ab, ac, ad, ae, af)
  #else
-@@ -367,7 +367,7 @@
- AES_EXTRA(_ni);
- AES_ALL_VTABLES(_ni, "AES-NI accelerated");
- 
--#ifdef _WIN64
-+#ifdef __clang__ // linscp: as the push at the top of the file
- #pragma clang attribute pop
- #endif
- 

@@ -404,97 +404,97 @@
     },
     {
       "file": "source/core/Script.cpp",
-      "line": 1165,
+      "line": 1167,
       "column": 50,
       "identifier": "TerminalCaptureLog"
     },
     {
       "file": "source/core/Script.cpp",
-      "line": 1226,
+      "line": 1228,
       "column": 56,
       "identifier": "DoCalculatedChecksum"
     },
     {
       "file": "source/core/Script.cpp",
-      "line": 2199,
+      "line": 2201,
       "column": 36,
       "identifier": "TerminalSynchronizeDirectory"
     },
     {
       "file": "source/core/Script.cpp",
-      "line": 2201,
+      "line": 2203,
       "column": 74,
       "identifier": "ExitProc"
     },
     {
       "file": "source/core/Script.cpp",
-      "line": 2202,
+      "line": 2204,
       "column": 53,
       "identifier": "ExitProc"
     },
     {
       "file": "source/core/Script.cpp",
-      "line": 2203,
+      "line": 2205,
       "column": 71,
       "identifier": "OpenProc"
     },
     {
       "file": "source/core/Script.cpp",
-      "line": 2204,
+      "line": 2206,
       "column": 72,
       "identifier": "CloseProc"
     },
     {
       "file": "source/core/Script.cpp",
-      "line": 2205,
+      "line": 2207,
       "column": 78,
       "identifier": "SessionProc"
     },
     {
       "file": "source/core/Script.cpp",
-      "line": 2206,
+      "line": 2208,
       "column": 69,
       "identifier": "LPwdProc"
     },
     {
       "file": "source/core/Script.cpp",
-      "line": 2207,
+      "line": 2209,
       "column": 66,
       "identifier": "LCdProc"
     },
     {
       "file": "source/core/Script.cpp",
-      "line": 2208,
+      "line": 2210,
       "column": 67,
       "identifier": "LLsProc"
     },
     {
       "file": "source/core/Script.cpp",
-      "line": 2778,
+      "line": 2780,
       "column": 38,
       "identifier": "TerminalInformation"
     },
     {
       "file": "source/core/Script.cpp",
-      "line": 2779,
+      "line": 2781,
       "column": 37,
       "identifier": "TerminalPromptUser"
     },
     {
       "file": "source/core/Script.cpp",
-      "line": 2782,
+      "line": 2784,
       "column": 35,
       "identifier": "TerminalOperationProgress"
     },
     {
       "file": "source/core/Script.cpp",
-      "line": 2783,
+      "line": 2785,
       "column": 35,
       "identifier": "TerminalOperationFinished"
     },
     {
       "file": "source/core/Script.cpp",
-      "line": 2784,
+      "line": 2786,
       "column": 40,
       "identifier": "TerminalInitializeLog"
     },

@@ -2,11 +2,11 @@
 # doc/qt/putty-deltas.md; regenerate only together with that review.
 modified +42 -6 c2d6bcb67179 callback.c
 modified +26 -0 4c840046d2d2 conf.h
-modified +41 -4 9fca191d1a58 crypto/aes-ni.c
+modified +41 -4 d4e16475d50b crypto/aes-ni.c
 modified +17 -7 327c900e908e crypto/aes.h
 added +1057 -0 15f0794f4652 crypto/aesold.c
 modified +1 -1 3972242378a0 crypto/argon2.c
-modified +71 -0 8b413715aa1b crypto/ecc-ssh.c
+modified +74 -0 0f727fd6f377 crypto/ecc-ssh.c
 modified +16 -7 efdd354e457b crypto/mpint.c
 modified +5 -3 793caa45e39b crypto/mpint_i.h
 modified +5 -0 00e74ab0e76e crypto/openssh-certs.c
@@ -45,7 +45,7 @@ modified +93 -30 e201eb69d996 ssh/ssh.c
 modified +78 -9 957e8a0da7ee ssh/transport2.c
 modified +68 -26 73420803fa3b ssh/userauth2-client.c
 modified +34 -2 c7c7f39da90e sshpubk.c
-modified +25 -0 52131216a799 sshrand.c
+modified +28 -0 270427585834 sshrand.c
 modified +5 -0 cd3a5533de2c storage.h
 modified +4 -2 d13104dd6681 stubs/null-seat.c
 modified +4 -1 4d31148195a4 utils/bufchain.c
@@ -68,7 +68,7 @@ modified +29 -13 53affdcb6237 windows/platform.h
 modified +33 -2 e58ee7aea2f8 windows/storage.c
 modified +17 -0 95718871e473 windows/unicode.c
 modified +42 -1 996e12d8410f windows/utils/filename.c
-modified +23 -0 9b21db116d9a windows/utils/get_system_dir.c
+modified +25 -0 ae74ff2a9105 windows/utils/get_system_dir.c
 modified +31 -1 db3aa5ffd294 windows/utils/registry.c
 added +355 -0 6519cca88671 windows/utils/security_p.c
 added +73 -0 33cbacca4f61 windows/utils/win_strerr.c
