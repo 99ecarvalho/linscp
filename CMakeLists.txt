@@ -27,6 +27,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #                  wchar_t. Must be uniform across every translation unit --
 #                  a single TU without it is an ABI landmine. See ADR 0001.
 add_compile_options(-fms-extensions -fshort-wchar)
+# -fno-builtin-wcslen: glibc's wcslen counts 4-byte units, and clang 21's
+#                  loop idiom recognition turns the shim's own 2-byte length
+#                  loops into calls to it (the Flatpak SDK's clang did; its
+#                  static initializers then looped through overlong strings).
+#                  Windows' wcslen is 2-byte and stays a builtin.
+if(NOT WIN32)
+  add_compile_options(-fno-builtin-wcslen)
+endif()
 
 set(LINSCP_UPSTREAM "${CMAKE_SOURCE_DIR}/3rd-party/winscp"
     CACHE PATH "Pristine WinSCP submodule")
