@@ -979,6 +979,140 @@ bool TSession::QueueResume(std::uintptr_t Id)
   return (Item != NULL) && Item->Resume();
 }
 
+bool TSession::QueueAllows(TQueueOperation Operation, std::uintptr_t Id) const
+{
+  TTerminalQueueStatus * Status = F->QueueStatus;
+  TQueueItemProxy * Item = FindItem(Status, Id);
+  const int Index = (Item != NULL) ? Item->Index : -1;
+  switch (Operation)
+  {
+    case TQueueOperation::UserAction:
+      return (Item != NULL) && TQueueItem::IsUserActionStatus(Item->Status);
+    case TQueueOperation::Query:
+      return (Item != NULL) && (Item->Status == TQueueItem::qsQuery);
+    case TQueueOperation::Error:
+      return (Item != NULL) && (Item->Status == TQueueItem::qsError);
+    case TQueueOperation::Prompt:
+      return (Item != NULL) && (Item->Status == TQueueItem::qsPrompt);
+    case TQueueOperation::Delete:
+      return (Item != NULL);
+    case TQueueOperation::Execute:
+      return (Item != NULL) && (Item->Status == TQueueItem::qsPending);
+    case TQueueOperation::Up:
+      // Not the first pending one.
+      return (Item != NULL) && (Item->Status == TQueueItem::qsPending) &&
+        (Index > 0) && (Status->Items[Index - 1]->Status == TQueueItem::qsPending);
+    case TQueueOperation::Down:
+      return (Item != NULL) && (Item->Status == TQueueItem::qsPending) && (Index < Status->Count - 1);
+    case TQueueOperation::Pause:
+      return (Item != NULL) && (Item->Status == TQueueItem::qsProcessing);
+    case TQueueOperation::Resume:
+      return (Item != NULL) && (Item->Status == TQueueItem::qsPaused);
+    case TQueueOperation::PauseAll:
+    case TQueueOperation::ResumeAll:
+    {
+      const TQueueItem::TStatus Wanted =
+        (Operation == TQueueOperation::PauseAll) ? TQueueItem::qsProcessing : TQueueItem::qsPaused;
+      for (int I = (Status != NULL) ? Status->DoneCount : 0; (Status != NULL) && (I < Status->DoneAndActiveCount); I++)
+      {
+        if (Status->Items[I]->Status == Wanted)
+        {
+          return true;
+        }
+      }
+      return false;
+    }
+    case TQueueOperation::DeleteAllDone:
+      return (Status != NULL) && (Status->DoneCount > 0);
+    case TQueueOperation::DeleteAll:
+      return (Status != NULL) && (Status->Count > 0);
+  }
+  return false;
+}
+
+void TSession::QueueExecute(TQueueOperation Operation, std::uintptr_t Id)
+{
+  TTerminalQueueStatus * Status = F->QueueStatus;
+  TQueueItemProxy * Item = FindItem(Status, Id);
+  try
+  {
+    switch (Operation)
+    {
+      case TQueueOperation::UserAction:
+      case TQueueOperation::Query:
+      case TQueueOperation::Error:
+      case TQueueOperation::Prompt:
+        if (Item != NULL)
+        {
+          Item->ProcessUserAction();
+        }
+        break;
+      case TQueueOperation::Execute:
+        if (Item != NULL)
+        {
+          Item->ExecuteNow();
+        }
+        break;
+      case TQueueOperation::Up:
+      case TQueueOperation::Down:
+        if (Item != NULL)
+        {
+          Item->Move(Operation == TQueueOperation::Up);
+        }
+        break;
+      case TQueueOperation::Delete:
+        if (Item != NULL)
+        {
+          Item->Delete();
+        }
+        break;
+      case TQueueOperation::Pause:
+        if (Item != NULL)
+        {
+          Item->Pause();
+        }
+        break;
+      case TQueueOperation::Resume:
+        if (Item != NULL)
+        {
+          Item->Resume();
+        }
+        break;
+      case TQueueOperation::PauseAll:
+      case TQueueOperation::ResumeAll:
+        for (int I = (Status != NULL) ? Status->DoneCount : 0; (Status != NULL) && (I < Status->DoneAndActiveCount); I++)
+        {
+          TQueueItemProxy * Each = Status->Items[I];
+          if ((Operation == TQueueOperation::PauseAll) && (Each->Status == TQueueItem::qsProcessing))
+          {
+            Each->Pause();
+          }
+          else if ((Operation == TQueueOperation::ResumeAll) && (Each->Status == TQueueItem::qsPaused))
+          {
+            Each->Resume();
+          }
+        }
+        break;
+      case TQueueOperation::DeleteAllDone:
+      case TQueueOperation::DeleteAll:
+      {
+        const int Count = (Status == NULL) ? 0 :
+          ((Operation == TQueueOperation::DeleteAll) ? Status->Count : Status->DoneCount);
+        for (int I = 0; I < Count; I++)
+        {
+          Status->Items[I]->Delete();
+        }
+        break;
+      }
+    }
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+  F->QueueChanged = true;
+}
+
 void TSession::Close()
 {
   KeepUpToDateStop();

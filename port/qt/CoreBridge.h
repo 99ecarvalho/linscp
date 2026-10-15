@@ -1986,6 +1986,14 @@ public:
   bool QueueCancel(std::uintptr_t Id);
   bool QueuePause(std::uintptr_t Id);
   bool QueueResume(std::uintptr_t Id);
+  // As TQueueController's operations (QueueController.cpp), the item ones
+  // on the entry Id: whether one applies now (AllowOperation), and doing it
+  // (ExecuteOperation). The user actions ask, through the frontend, the
+  // question, error or prompt the entry waits on. Throws TCoreError.
+  enum class TQueueOperation { UserAction, Query, Error, Prompt, Delete, Execute, Up, Down, Pause, Resume,
+    PauseAll, ResumeAll, DeleteAllDone, DeleteAll };
+  bool QueueAllows(TQueueOperation Operation, std::uintptr_t Id) const;
+  void QueueExecute(TQueueOperation Operation, std::uintptr_t Id);
   void Close();
 
 private:

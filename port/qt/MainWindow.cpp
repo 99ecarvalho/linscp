@@ -3986,6 +3986,7 @@ void MainWindow::BuildMenus()
   QMenu * QueueCommands = Commands->addMenu(tr("Q&ueue"));
   FProcessQueueAction = QueueCommands->addAction(tr("&Process Queue"));
   FProcessQueueAction->setCheckable(true);
+  FProcessQueueAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Q));
   connect(FProcessQueueAction, &QAction::triggered, this, [this](bool Enabled)
   {
     if (FSession)
@@ -3993,6 +3994,19 @@ void MainWindow::BuildMenus()
       FSession->SetQueueEnabled(Enabled);
     }
   });
+  // As GoToQueue: the list shown if hidden, and focused.
+  QAction * QueueGoTo = QueueCommands->addAction(tr("&Go To"), this, [this]()
+  {
+    if (!FQueue->isVisible())
+    {
+      SetQueueShow(CoreBridge::TLayout::TQueueShow::Show);
+    }
+    FQueue->List()->setFocus();
+  });
+  QueueGoTo->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Q));
+  QueueGoTo->setStatusTip(tr("Go to transfer queue list"));
+  QueueCommands->addSeparator();
+  FQueue->AddCommands(QueueCommands);
   Commands->addMenu(FStaticCommandsMenu);
   Commands->addSeparator();
   Commands->addAction(FConsoleAction);

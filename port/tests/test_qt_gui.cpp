@@ -945,6 +945,52 @@ void Transfer(const char * Port, const QString & Directory)
     Check(WaitFor([Local]() { return Local->Names().contains(QStringLiteral("queued.txt")); }),
       "and the local panel shows it when done");
 
+    // Commands > Queue, on a held queue (Process Queue off): two entries
+    // wait, the second can move up and run now but not be suspended; Cancel
+    // All empties it.
+    {
+      using TOperation = QueuePanel::TOperation;
+      for (const QString & Name : { QStringLiteral("held1.txt"), QStringLiteral("held2.txt") })
+      {
+        QFile File(Dir.filePath(Name));
+        File.open(QIODevice::WriteOnly);
+        File.write("held\n");
+      }
+      Window.Session()->SetQueueEnabled(false);
+      Local->Refresh();
+      for (const QString & Name : { QStringLiteral("held1.txt"), QStringLiteral("held2.txt") })
+      {
+        Local->Select({ Name });
+        Window.ActivatePanel(true);
+        Check(Window.TransferSelected(false, false, true), "an upload is queued while the queue is held");
+      }
+      QueuePanel * Queue = Window.Queue();
+      Check(WaitFor([Queue]() { return Queue->List()->topLevelItemCount() == 2; }), "both wait in the queue");
+      const auto Source = [Queue](int Row) { return Queue->List()->topLevelItem(Row)->text(1); };
+      Check(Source(0).endsWith(QStringLiteral("held1.txt")) && Source(1).endsWith(QStringLiteral("held2.txt")),
+        "in the order queued");
+      Queue->List()->topLevelItem(0)->setSelected(true);
+      Check(!Queue->Action(TOperation::Up)->isEnabled() && Queue->Action(TOperation::Down)->isEnabled(),
+        "the first can move down, not up");
+      Queue->List()->clearSelection();
+      Queue->List()->topLevelItem(1)->setSelected(true);
+      Check(Queue->Action(TOperation::Up)->isEnabled() && !Queue->Action(TOperation::Down)->isEnabled() &&
+        Queue->Action(TOperation::Execute)->isEnabled() && !Queue->Action(TOperation::Pause)->isEnabled() &&
+        !Queue->Action(TOperation::Query)->isEnabled() && Queue->Action(TOperation::DeleteAll)->isEnabled(),
+        "the second can move up and execute now; a waiting entry cannot be suspended or asked about");
+      Queue->Action(TOperation::Up)->trigger();
+      Check(WaitFor([&Source]() { return Source(0).endsWith(QStringLiteral("held2.txt")); }),
+        "Move Up puts it first");
+      Queue->Action(TOperation::DeleteAll)->trigger();
+      Check(WaitFor([Queue]() { return Queue->List()->topLevelItemCount() == 0; }), "Cancel All empties the queue");
+      Window.Session()->SetQueueEnabled(true);
+      for (const QString & Name : { QStringLiteral("held1.txt"), QStringLiteral("held2.txt") })
+      {
+        QFile::remove(Dir.filePath(Name));
+      }
+      Local->Refresh();
+    }
+
     Local->Select({ QStringLiteral("big.bin") });
     Window.ActivatePanel(true);
     Check(Window.TransferSelected(false, false, true), "a big upload goes to the queue");
