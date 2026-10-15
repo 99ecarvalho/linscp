@@ -258,9 +258,10 @@ P2-10 and P2-11 waited, at the user's request, for P3.
 1. **P2-11**: the P2 exit gate, now that packaging (P2-10) is done: a
    day's work in linscp from an installed package.
 2. **P4-01**: retire the VCL frontend (its gate, P3-10, is passed).
-3. Offer `core-log-file-name-delimiter.patch`,
-   `core-local-eol-platform.patch`, `core-openssh-import-posix-paths.patch`
-   and `core-terminal-logevent-not-inline.patch` upstream (ADR 0006).
+3. Follow up the upstream PRs for the carried patches (ADR 0006): the
+   portability series winscp/winscp#79, and #80 (`LogEvent`), #81 (log file
+   names), #82 (local EOL), #83 (OpenSSH import paths); drop each patch
+   when a pin move brings it in.
 
 ## P3 UI gap audit (2026-10-14)
 
@@ -299,6 +300,7 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-15 | Every carried core patch offered upstream: the twelve portability ones as one PR of independent commits (winscp/winscp#79), the `LogEvent` link fix and the three POSIX behaviour fixes as their own (#80 to #83), written in upstream's style rather than our line-count-preserving form | The user's call; one portability PR with a short justification, bugs and behaviour separately so each can be judged alone |
 | 2026-10-15 | Packages: a .deb, an AppImage and a Flatpak on Linux, an Inno Setup installer on Windows laid out as WinSCP's (all-users or current-user, translations a component, desktop icon, Send To, URL handler and search path as tasks the program does: `/RegisterForDefaultProtocols`, `/AddSearchPath` and their reverses on uninstall); app id `io.github._99ecarvalho.linscp` | The user's choice of formats; D-Bus names cannot have a segment starting with a digit, hence the underscore; the installer is linscp's own script, not a copy of WinSCP's |
 | 2026-10-15 | Inno Setup pinned at 6.7.3 (`port/tools/fetch_innosetup.py`, SHA-256), installed portable and run under Wine, locally and in CI | WinSCP's installer is Inno Setup 6; a pinned compiler keeps the installer reproducible without a Windows build machine |
 | 2026-10-15 | `-fno-builtin-wcslen` on POSIX | clang 21 (the Flatpak SDK's) turns the shim's 2-byte length loops into calls to glibc's 4-byte `wcslen`; static initializers then looped over overlong strings. Windows' `wcslen` is 2-byte |
