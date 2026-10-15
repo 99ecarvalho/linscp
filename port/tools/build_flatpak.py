@@ -2,6 +2,7 @@
 """Build linscp's Flatpak bundle from this checkout.
 
   build_flatpak.py [--work build/flatpak] [--out build/flatpak/packages]
+                   [--builder-arg=ARG ...]
 
 Runs flatpak-builder on port/packaging/flatpak/<id>.yml (the runtime, SDK
 and LLVM extension installed for the user from Flathub when missing), then
@@ -24,12 +25,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--work', default=os.path.join(ROOT, 'build', 'flatpak'))
     ap.add_argument('--out')
+    # flatpak-builder's own, as CI's --disable-rofiles-fuse (no FUSE in a container).
+    ap.add_argument('--builder-arg', action='append', default=[])
     a = ap.parse_args()
     work = os.path.abspath(a.work)
     out = os.path.abspath(a.out or os.path.join(work, 'packages'))
     os.makedirs(out, exist_ok=True)
     repo = os.path.join(work, 'repo')
-    subprocess.run(['flatpak-builder', '--user', '--install-deps-from=flathub', '--force-clean',
+    subprocess.run(['flatpak-builder', '--user', '--install-deps-from=flathub', '--force-clean'] + a.builder_arg + [
                     '--state-dir', os.path.join(work, 'state'), '--repo', repo,
                     os.path.join(work, 'app'), MANIFEST], check=True)
     bundle = os.path.join(out, f'linscp-{version()}.flatpak')

@@ -217,7 +217,7 @@ jobs:
       - name: Build the bundle
         run: |
           flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-          python3 port/tools/build_flatpak.py --out build/packages
+          python3 port/tools/build_flatpak.py --out build/packages --builder-arg=--disable-rofiles-fuse
 
       - uses: actions/upload-artifact@v4
         with:
