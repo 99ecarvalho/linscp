@@ -40,6 +40,12 @@ public:
   // What the toolbar, keys and menu do, for tests and them alike. Each
   // reports core's error itself; false when it did not happen.
   bool ChangeDirectory(const QString & Directory);
+  // Remote > Change Directory (Alt+F2), as the path box's drop-down
+  // (UpdateRemotePathComboBox): the root and each directory down to the
+  // current one, which is checked; one chosen is changed to. PathMenu builds
+  // it (tests), ShowPathMenu shows it under the path box.
+  class QMenu * PathMenu();
+  void ShowPathMenu();
   bool Back();
   bool Forward();
   bool Parent();

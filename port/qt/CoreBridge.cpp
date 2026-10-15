@@ -1595,6 +1595,8 @@ std::string Text(TText Text)
     case TText::ColorDefaultHint: Ident = COLOR_DEFAULT_HINT; break;
     case TText::ColorPick: Ident = COLOR_PICK_CAPTION; break;
     case TText::ColorPickHint: Ident = COLOR_PICK_HINT; break;
+    case TText::SpecialFolderDocuments: Ident = SPECIAL_FOLDER_MY_DOCUMENTS; break;
+    case TText::SpecialFolderDesktop: Ident = SPECIAL_FOLDER_DESKTOP; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

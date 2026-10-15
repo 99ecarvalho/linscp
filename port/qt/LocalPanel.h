@@ -33,6 +33,13 @@ public:
   // As RemotePanel's: each reports its error itself, false when it did not
   // happen.
   bool ChangeDirectory(const QString & Directory);
+  // Local > Change Drive (Alt+F1), as the path box's drop-down
+  // (LocalPathComboUpdateDrives): the documents and desktop folders, then
+  // the drives (elsewhere the file system's root, the home directory and
+  // the mounted volumes), the current one checked; one chosen is changed to.
+  // PathMenu builds it (tests), ShowPathMenu shows it under the path box.
+  class QMenu * PathMenu();
+  void ShowPathMenu();
   bool Back();
   bool Forward();
   bool Parent();

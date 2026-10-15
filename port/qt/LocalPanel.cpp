@@ -1,4 +1,9 @@
 #include "LocalPanel.h"
+#include <QMenu>
+#include <QStandardPaths>
+#include <QStorageInfo>
+#include <QStyle>
+#include <memory>
 #include "DirectoryTree.h"
 #include <QScrollBar>
 #include <QApplication>
@@ -274,6 +279,75 @@ void LocalPanel::ShowTreePath()
   {
     FTree->ShowPath(FCurrent);
   }
+}
+
+QMenu * LocalPanel::PathMenu()
+{
+  QMenu * Menu = new QMenu(this);
+  std::vector<std::pair<QString, QString>> Places = {
+    { QString::fromStdString(CoreBridge::Text(CoreBridge::TText::SpecialFolderDocuments)),
+      QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) },
+    { QString::fromStdString(CoreBridge::Text(CoreBridge::TText::SpecialFolderDesktop)),
+      QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) } };
+#if defined(Q_OS_WIN)
+  for (const QFileInfo & Drive : QDir::drives())
+  {
+    const QString Root = Drive.absoluteFilePath();
+    const QStorageInfo Info(Root);
+    const QString Letter = QDir::toNativeSeparators(Root).left(2);
+    // As GetPrettyName: "C: Label", the letter its accelerator.
+    Places.push_back({ QStringLiteral("&") + Letter + (Info.displayName().isEmpty() || (Info.displayName() == Root) ?
+      QString() : (QLatin1Char(' ') + Info.displayName())), Root });
+  }
+#else
+  Places.push_back({ QStringLiteral("/"), QStringLiteral("/") });
+  Places.push_back({ QDir::homePath(), QDir::homePath() });
+  for (const QStorageInfo & Volume : QStorageInfo::mountedVolumes())
+  {
+    const QString Root = Volume.rootPath();
+    if (Volume.isValid() && Volume.isReady() &&
+        (Root.startsWith(QStringLiteral("/media/")) || Root.startsWith(QStringLiteral("/mnt/")) ||
+         Root.startsWith(QStringLiteral("/run/media/"))))
+    {
+      Places.push_back({ Volume.displayName().isEmpty() ? Root : QStringLiteral("%1 (%2)").arg(Volume.displayName(), Root), Root });
+    }
+  }
+#endif
+  // The current one: the longest that the path starts with.
+  int Current = -1;
+  int Longest = -1;
+  const QString Here = QDir::cleanPath(FCurrent);
+  for (int Index = 0; Index < static_cast<int>(Places.size()); Index++)
+  {
+    const QString Path = QDir::cleanPath(Places[Index].second);
+    const bool Under = !Path.isEmpty() && ((Here.compare(Path, Qt::CaseInsensitive) == 0) ||
+      Here.startsWith(Path.endsWith(QLatin1Char('/')) ? Path : (Path + QLatin1Char('/')), Qt::CaseInsensitive));
+    if (Under && (Path.length() > Longest))
+    {
+      Longest = Path.length();
+      Current = Index;
+    }
+  }
+  for (int Index = 0; Index < static_cast<int>(Places.size()); Index++)
+  {
+    if (Places[Index].second.isEmpty())
+    {
+      continue;
+    }
+    QAction * Action = Menu->addAction(style()->standardIcon((Index < 2) ? QStyle::SP_DirHomeIcon : QStyle::SP_DriveHDIcon),
+      Places[Index].first);
+    Action->setCheckable(true);
+    Action->setChecked(Index == Current);
+    const QString Path = Places[Index].second;
+    connect(Action, &QAction::triggered, this, [this, Path]() { ChangeDirectory(Path); });
+  }
+  return Menu;
+}
+
+void LocalPanel::ShowPathMenu()
+{
+  std::unique_ptr<QMenu> Menu(PathMenu());
+  Menu->exec(FPath->mapToGlobal(QPoint(0, FPath->height())));
 }
 
 bool LocalPanel::ChangeDirectory(const QString & Directory)

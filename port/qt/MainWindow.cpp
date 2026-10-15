@@ -339,6 +339,29 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   // The local panel's (the Commander's Local > Go To).
   FExploreAction = GoMenu->addAction(tr("&Explore Directory"), this, [this]() { ExploreLocalDirectory(); });
   FExploreAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_E));
+  // As LocalChangePathAction2 and RemoteChangePathAction2: each panel's
+  // path drop-down (the right side's local one in a local tab).
+  FChangeLocalPathAction = GoMenu->addAction(tr("C&hange Drive"), this, [this]()
+  {
+    ActivatePanel(true);
+    FLocal->ShowPathMenu();
+  });
+  FChangeLocalPathAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_F1));
+  FChangeLocalPathAction->setStatusTip(tr("Allows selection of different drive for panel"));
+  FChangeRemotePathAction = GoMenu->addAction(tr("C&hange Directory"), this, [this]()
+  {
+    ActivatePanel(false);
+    if (LocalBrowser())
+    {
+      FOtherLocal->ShowPathMenu();
+    }
+    else
+    {
+      FPanel->ShowPathMenu();
+    }
+  });
+  FChangeRemotePathAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_F2));
+  FChangeRemotePathAction->setStatusTip(tr("Allows selection of different directory for panel"));
 
   QMenu * CommandsMenu = FilesMenu;
   FFindFilesAction = CommandsMenu->addAction(tr("&Find Files..."), this, [this]() { FindFilesDialog(); });
@@ -4301,15 +4324,16 @@ QMenu * MainWindow::PanelMenu(bool Local)
         Function();
       };
     };
+    Menu->addAction(Local ? FChangeLocalPathAction : FChangeRemotePathAction);
+    Menu->addSeparator();
     QMenu * GoTo = Menu->addMenu(tr("&Go To"));
     GoTo->addAction(IconSet::Icon(QStringLiteral("open-directory")), tr("&Open Directory/Bookmark..."), this,
       OnPanel([this]() { OpenDirectory(false); }));
-    if (Side != nullptr)
-    {
-      QAction * Explore = GoTo->addAction(FExploreAction->icon(), FExploreAction->text(), this,
-        OnPanel([this]() { ExploreLocalDirectory(); }));
-      Explore->setShortcut(FExploreAction->shortcut());
-    }
+    // As ...ExploreDirectoryAction: a local side's only.
+    QAction * Explore = GoTo->addAction(FExploreAction->icon(), FExploreAction->text(), this,
+      OnPanel([this]() { ExploreLocalDirectory(); }));
+    Explore->setShortcut(FExploreAction->shortcut());
+    Explore->setEnabled(Side != nullptr);
     GoTo->addSeparator();
     for (QAction * Action : (Side != nullptr) ?
            std::initializer_list<QAction *>{ Side->ParentAction(), Side->RootAction(), Side->HomeAction() } :

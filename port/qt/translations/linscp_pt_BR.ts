@@ -2035,6 +2035,22 @@ Local: %2</translation>
         <source>Change color of the current tab</source>
         <translation>Mudar a cor da aba atual</translation>
     </message>
+    <message>
+        <source>C&amp;hange Drive</source>
+        <translation>&amp;Mudar de unidade</translation>
+    </message>
+    <message>
+        <source>Allows selection of different drive for panel</source>
+        <translation>Permite escolher outra unidade para o painel</translation>
+    </message>
+    <message>
+        <source>C&amp;hange Directory</source>
+        <translation>&amp;Mudar de diretório</translation>
+    </message>
+    <message>
+        <source>Allows selection of different directory for panel</source>
+        <translation>Permite escolher outro diretório para o painel</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

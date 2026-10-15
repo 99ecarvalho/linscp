@@ -1767,6 +1767,32 @@ void Keys(const QString & Directory)
       Selected.sort();
       Check(Selected == Two, "Restore Selection selects them again");
     }
+    // Local > Change Drive (Alt+F1): the documents and desktop folders, then
+    // the drives (the root and home here), the current one checked; one
+    // chosen is changed to.
+    {
+      std::unique_ptr<QMenu> Menu(Local->PathMenu());
+      const QList<QAction *> Places = Menu->actions();
+      Check((Places.size() >= 3) &&
+        (Places[0]->text() == QString::fromStdString(CoreBridge::Text(CoreBridge::TText::SpecialFolderDocuments))),
+        "Change Drive: the documents folder first");
+      int Checked = 0;
+      QAction * Root = nullptr;
+      for (QAction * Place : Places)
+      {
+        Checked += Place->isChecked() ? 1 : 0;
+#if defined(_WIN32)
+        Root = ((Root == nullptr) && Place->text().startsWith(QLatin1Char('&'))) ? Place : Root;
+#else
+        Root = (Place->text() == QStringLiteral("/")) ? Place : Root;
+#endif
+      }
+      Check((Checked == 1) && (Root != nullptr), "one checked, the drives listed");
+      const QString Before = Local->Path();
+      Root->trigger();
+      Check(Local->Path() != Before, "a drive chosen is gone to");
+      Local->ChangeDirectory(Before);
+    }
 
     // Tab: to the other panel and back; Ctrl+[: the local path copied.
     Window.ActivatePanel(true);
@@ -2782,6 +2808,17 @@ void Properties(const char * Port)
         MenuAction(Window, { "Files", "Download", "Download and Delete" }) != nullptr, "the remote side's Download");
       Check(!Session->CanLock() && !MenuAction(Window, { "Files", "Locking" })->isEnabled() && !Window.LockSelected(true),
         "FTP locks nothing: Locking disabled");
+    }
+    // Remote > Change Directory (Alt+F2): the root and each directory down
+    // to the current one, which is checked.
+    {
+      Check(Remote->ChangeDirectory(QStringLiteral("/sub")), "(in /sub)");
+      std::unique_ptr<QMenu> Menu(Remote->PathMenu());
+      const QList<QAction *> Paths = Menu->actions();
+      Check((Paths.size() == 2) && (Paths[0]->text() == QStringLiteral("/")) && Paths[1]->text().trimmed() == QStringLiteral("sub") &&
+        Paths[1]->isChecked() && !Paths[0]->isChecked(), "Change Directory: / and sub, sub checked");
+      Paths[0]->trigger();
+      Check(Remote->Path() == QStringLiteral("/"), "the root chosen is gone to");
     }
 
     // Duplicate and Move To.

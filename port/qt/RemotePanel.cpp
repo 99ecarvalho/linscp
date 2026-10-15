@@ -23,6 +23,7 @@
 #include <QVBoxLayout>
 
 #include <functional>
+#include <memory>
 
 #include "CreateDirectoryDialog.h"
 #include "QtFrontend.h"
@@ -227,6 +228,40 @@ void RemotePanel::Reload()
 
 // Core reports a directory it cannot enter itself, and stays: so it is the
 // directory shown afterwards that says whether it changed.
+QMenu * RemotePanel::PathMenu()
+{
+  QMenu * Menu = new QMenu(this);
+  if ((FSession == nullptr) || !FSession->Active() || FCurrent.isEmpty())
+  {
+    return Menu;
+  }
+  QStringList Paths = { QStringLiteral("/") };
+  QString Path;
+  for (const QString & Part : FCurrent.split(QLatin1Char('/'), Qt::SkipEmptyParts))
+  {
+    Path += QLatin1Char('/') + Part;
+    Paths.append(Path);
+  }
+  for (int Index = 0; Index < Paths.size(); Index++)
+  {
+    const QString Name = (Index == 0) ? QStringLiteral("/") : Paths[Index].section(QLatin1Char('/'), -1);
+    // Indented by depth, as the drop-down's tree.
+    QAction * Action = Menu->addAction(style()->standardIcon((Index == Paths.size() - 1) ? QStyle::SP_DirOpenIcon : QStyle::SP_DirIcon),
+      QString(Index * 2, QLatin1Char(' ')) + Name);
+    Action->setCheckable(true);
+    Action->setChecked(Index == Paths.size() - 1);
+    const QString Target = Paths[Index];
+    connect(Action, &QAction::triggered, this, [this, Target]() { ChangeDirectory(Target); });
+  }
+  return Menu;
+}
+
+void RemotePanel::ShowPathMenu()
+{
+  std::unique_ptr<QMenu> Menu(PathMenu());
+  Menu->exec(FPath->mapToGlobal(QPoint(0, FPath->height())));
+}
+
 bool RemotePanel::ChangeDirectory(const QString & Directory)
 {
   const QString Before = FCurrent;

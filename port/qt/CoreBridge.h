@@ -907,6 +907,8 @@ enum class TText
   ColorDefaultHint,     // "Reset session (panel) color to system default"
   ColorPick,            // "&More Colors..."
   ColorPickHint,        // "Choose any session (panel) color"
+  SpecialFolderDocuments, // "My documents"
+  SpecialFolderDesktop, // "Desktop"
 };
 std::string Text(TText Text);
 

@@ -441,6 +441,8 @@ private:
   QAction * FRemoteStatusBarAction = nullptr;
   QAction * FTabsAction = nullptr;
   QAction * FDefaultRemoteTabAction = nullptr;
+  QAction * FChangeLocalPathAction = nullptr;
+  QAction * FChangeRemotePathAction = nullptr;
   QMenu * FColorMenu = nullptr;
   void FillColorMenu();
   void ApplySessionColor();
