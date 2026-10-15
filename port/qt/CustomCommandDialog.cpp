@@ -71,6 +71,8 @@ CustomCommandDialog::CustomCommandDialog(TMode Mode, const CoreBridge::TCustomCo
     FDescription->hide();
   }
   FCommand = new QComboBox(Group);
+  // Commands are full of '&' ("!&", "!?&Prompt:?!"): shown as they are.
+  FCommand->setProperty("literalText", true);
   FCommand->setEditable(true);
   for (const CoreBridge::TCustomCommandDefinition & Other : Commands)
   {

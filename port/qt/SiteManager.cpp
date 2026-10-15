@@ -1,4 +1,6 @@
 #include "SiteManager.h"
+#include <QTreeWidgetItemIterator>
+#include "SaveSiteDialog.h"
 #include "Integration.h"
 #include "KeyVerify.h"
 
@@ -678,26 +680,37 @@ void SiteManager::Save()
     Fill(Name);
     return;
   }
-  QDialog Dialog(this);
-  Dialog.setWindowTitle(CoreText(CoreBridge::TText::SaveSiteCaption));
-  QFormLayout * Layout = new QFormLayout(&Dialog);
-  QLineEdit * NameEdit = new QLineEdit(&Dialog);
+  // As DoSaveSessionDialog (TSaveSessionDialog): the name, and its folder,
+  // the selected one to start with, chosen among the sites' folders and
+  // the new ones.
   const CoreBridge::TSite Site = Edited();
   const QString Folder = SelectedFolder();
+  CoreBridge::TSession::TSaveAsSite Defaults;
   const QString Suggested =
     QString::fromStdString(Site.UserName.empty() ? Site.HostName : Site.UserName + "@" + Site.HostName);
-  NameEdit->setText(Folder.isEmpty() ? Suggested : (Folder + QLatin1Char('/') + Suggested));
-  Layout->addRow(CoreText(CoreBridge::TText::SaveSitePrompt), NameEdit);
-  QCheckBox * SavePassword = new QCheckBox(CoreText(CoreBridge::TText::SaveSitePassword), &Dialog);
-  SavePassword->setEnabled(!FPassword->text().isEmpty());
-  Layout->addRow(SavePassword);
-  QDialogButtonBox * Box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &Dialog);
-  connect(Box, &QDialogButtonBox::accepted, &Dialog, &QDialog::accept);
-  connect(Box, &QDialogButtonBox::rejected, &Dialog, &QDialog::reject);
-  Layout->addRow(Box);
-  if ((Dialog.exec() == QDialog::Accepted) && !NameEdit->text().trimmed().isEmpty())
+  Defaults.Name = (Folder.isEmpty() ? Suggested : (Folder + QLatin1Char('/') + Suggested)).toStdString();
+  Defaults.CanSavePassword = !FPassword->text().isEmpty();
+  QStringList Folders;
+  for (QTreeWidgetItemIterator It(FTree); *It; ++It)
   {
-    SaveAs(NameEdit->text().trimmed(), SavePassword->isChecked());
+    if ((*It)->data(0, KindRole).toInt() == FolderKind)
+    {
+      Folders.append((*It)->data(0, NameRole).toString());
+    }
+  }
+  Folders.sort(Qt::CaseInsensitive);
+  for (const QString & Each : Folders)
+  {
+    Defaults.Folders.push_back(Each.toStdString());
+  }
+  SaveSiteDialog Dialog(Defaults, this);
+  if (Dialog.exec() == QDialog::Accepted)
+  {
+    SaveAs(Dialog.Name(), Dialog.SavePassword());
+    if (Dialog.CreateShortcut())
+    {
+      CreateSessionShortcut(false);
+    }
   }
 }
 

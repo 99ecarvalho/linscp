@@ -179,6 +179,24 @@
 #include <QSpinBox>
 #include <QTreeWidget>
 
+// What the thumbnails' delegate asks of each entry as it paints: its image's
+// file and, for that, its preview.
+void RequestPreviews(ThumbnailView * View)
+{
+  for (int Row = 0; Row < View->model()->rowCount(); Row++)
+  {
+    const CoreBridge::TRemoteEntry * Entry = View->EntryAt(View->model()->index(Row, FileListModel::NameColumn));
+    if ((Entry != nullptr) && !Entry->Directory && View->ImagePath)
+    {
+      const QString Path = View->ImagePath(*Entry);
+      if (!Path.isEmpty())
+      {
+        View->Preview(Path);
+      }
+    }
+  }
+}
+
 // The menu bar's action at Path (captions without their & and ...).
 QAction * MenuAction(QMainWindow & Window, const QStringList & Path);
 
@@ -484,6 +502,36 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
       const QTreeWidgetItem * Folder = Dialog.Tree()->topLevelItem(1);
       Check((Folder != nullptr) && (Folder->text(0) == QStringLiteral("Tests")) && (Folder->childCount() == 1),
         "under its folder in the tree");
+    }
+    // Save's own dialog, as WinSCP's TSaveSessionDialog: the name and a
+    // folder chosen among the sites' ones; saved there, a child in the tree.
+    {
+      SiteManager Dialog(&Window);
+      Dialog.SelectNewSite();
+      Dialog.HostName()->setText(QStringLiteral("127.0.0.2"));
+      Dialog.UserName()->setText(QStringLiteral("other"));
+      bool Asked = false;
+      Responder.Custom = [&Asked](QWidget * Modal)
+      {
+        SaveSiteDialog * Save = qobject_cast<SaveSiteDialog *>(Modal);
+        if (Save == nullptr)
+        {
+          return false;
+        }
+        Asked = true;
+        Check((Save->NameEdit()->text() == QStringLiteral("other@127.0.0.2")) && (Save->FolderCombo()->findText(QStringLiteral("Tests")) > 0),
+          "Save asks for the name, the sites' folders offered");
+        Save->FolderCombo()->setEditText(QStringLiteral("Tests"));
+        Save->accept();
+        return true;
+      };
+      Dialog.Save();
+      Responder.Custom = nullptr;
+      const QTreeWidgetItem * Folder = Dialog.Tree()->topLevelItem(1);
+      Check(Asked && (Folder != nullptr) && (Folder->text(0) == QStringLiteral("Tests")) && (Folder->childCount() == 2),
+        "saved in the folder chosen, under it in the tree");
+      Check(Dialog.SelectSite(QStringLiteral("Tests/other@127.0.0.2")), "as Tests/other@127.0.0.2");
+      Dialog.DeleteSelected(false);
     }
     {
       SiteManager Dialog(&Window);
@@ -1032,13 +1080,13 @@ void Transfer(const char * Port, const QString & Directory)
       Check(Window.Panel()->Thumbnails(), "the remote panel's thumbnails");
       Check(WaitFor([&Window]()
       {
-        Window.Panel()->Thumbs()->viewport()->repaint();
+        RequestPreviews(Window.Panel()->Thumbs());
         return !Window.Session()->ThumbnailFile("remote.png").empty();
       }), "its file downloaded in the background");
       const QString Copy = QString::fromStdString(Window.Session()->ThumbnailFile("remote.png"));
       Check(WaitFor([&Window, &Copy]()
       {
-        Window.Panel()->Thumbs()->viewport()->repaint();
+        RequestPreviews(Window.Panel()->Thumbs());
         return Window.Panel()->Thumbs()->HasPreview(Copy);
       }) && !Window.Panel()->Thumbs()->Preview(Copy).isNull(), "and previewed");
       Window.SetPanelThumbnails(false, false);
@@ -1882,9 +1930,11 @@ void Keys(const QString & Directory)
       const QString Picture = QDir(Local->Path()).filePath(QStringLiteral("picture.png"));
       QElapsedTimer Timer;
       Timer.start();
+      // Asked for as the delegate asks (a window not exposed, as over SSH
+      // on Windows, is never painted).
       while (!Local->Thumbs()->HasPreview(Picture) && (Timer.elapsed() < 10000))
       {
-        Local->Thumbs()->viewport()->repaint();
+        RequestPreviews(Local->Thumbs());
         QApplication::processEvents(QEventLoop::AllEvents, 50);
       }
       Check(Local->Thumbs()->HasPreview(Picture) && !Local->Thumbs()->Preview(Picture).isNull(), "the image's preview loaded");
@@ -5032,7 +5082,7 @@ void OptionsHelpTest(const QString & Directory)
     QList<QUrl> Opened;
     Window.SetUrlOpener([&Opened](const QUrl & Url) { Opened.append(Url); return true; });
     for (const QStringList & Path : { QStringList{ "Help", "Contents" }, QStringList{ "Help", "Product Homepage" },
-           QStringList{ "Help", "Support Forum" }, QStringList{ "Help", "Version History" } })
+           QStringList{ "Help", "Support Forum" }, QStringList{ "Help", "Version History" }, QStringList{ "Help", "Donate" } })
     {
       QAction * Action = MenuAction(Window, Path);
       Check(Action != nullptr, "Help has WinSCP's pages");
@@ -5041,7 +5091,8 @@ void OptionsHelpTest(const QString & Directory)
         Action->trigger();
       }
     }
-    Check((Opened.size() == 4) && (Opened[0].host() == QStringLiteral("winscp.net")) &&
+    Check((Opened.size() == 5) && Opened[4].toString().contains(QStringLiteral("sponsors")), "Donate: the project's donation page");
+    Check((Opened.size() == 5) && (Opened[0].host() == QStringLiteral("winscp.net")) &&
       Opened[1].toString().endsWith(QStringLiteral("/linscp")) && Opened[2].toString().endsWith(QStringLiteral("/issues")) &&
       Opened[3].toString().endsWith(QStringLiteral("/releases")),
       "the documentation WinSCP's, the rest linscp's own pages");
@@ -5087,6 +5138,23 @@ void OptionsHelpTest(const QString & Directory)
     {
       const auto [Done, Latest, Newer, Error] = Check4(QByteArray(), QStringLiteral("missing.json"));
       Check(Done && !Error.isEmpty(), "and a failure is an error");
+    }
+    // Over HTTPS for real, when asked (the network is not the suite's).
+    if (!qEnvironmentVariableIsEmpty("LINSCP_TEST_NETWORK"))
+    {
+      Window.UpdatesUrl = QUrl();
+      bool Done = false;
+      QString Latest, Error;
+      Window.OnUpdatesChecked = [&](const QString & L, bool, const QString & E) { Done = true; Latest = L; Error = E; };
+      Window.CheckForUpdates();
+      QElapsedTimer Timer;
+      Timer.start();
+      while (!Done && (Timer.elapsed() < 30000))
+      {
+        QApplication::processEvents(QEventLoop::AllEvents, 50);
+      }
+      std::printf("network: done %d latest %s error %s\n", int(Done), Latest.toUtf8().constData(), Error.toUtf8().constData());
+      Check(Done && Error.isEmpty() && !Latest.isEmpty(), "GitHub's releases read over HTTPS");
     }
 
     QAction * Status = MenuAction(Window, { "Options", "Left Panel", "Status Bar" });

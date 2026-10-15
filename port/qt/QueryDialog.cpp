@@ -53,6 +53,8 @@ QueryDialog::QueryDialog(const CoreBridge::TQuery & Query, QWidget * Parent) :
   Icon->setAlignment(Qt::AlignTop);
   Top->addWidget(Icon);
   QLabel * Message = new QLabel(QString::fromStdString(Query.Message), this);
+  // What a message quotes is the user's, '&' and all (audited as such).
+  Message->setProperty("literalText", true);
   Message->setWordWrap(true);
   Message->setTextInteractionFlags(Qt::TextSelectableByMouse);
   Message->setTextFormat(Qt::PlainText);

@@ -90,6 +90,11 @@
 namespace
 {
 
+// Help > Donate's page (DonatePageAction): linscp's GitHub Sponsors page
+// until linscp has a page of its own.
+const char DonateUrl[] = "https://github.com/sponsors/99ecarvalho";
+
+
 // ExtractShortName: a path's last part, the root as it is.
 QString ShortPath(const QString & Path)
 {
@@ -4879,7 +4884,7 @@ void MainWindow::BuildMenus()
 
   // As WinSCP's Help, its pages linscp's own (the project's GitHub pages),
   // but the documentation, which is WinSCP's: linscp follows its interface.
-  // Show Tips (WinSCP's tips, from winscp.net) and Donate are not offered.
+  // Show Tips (WinSCP's tips, from winscp.net) is not offered.
   QMenu * Help = menuBar()->addMenu(tr("&Help"));
   QAction * Contents = Help->addAction(tr("&Contents"), this,
     [this]() { OpenWebPage(QStringLiteral("https://winscp.net/eng/docs/start")); });
@@ -4898,6 +4903,9 @@ void MainWindow::BuildMenus()
   Help->addSeparator();
   Help->addAction(tr("Check for &Updates"), this, [this]() { CheckForUpdates(); })
     ->setStatusTip(tr("Queries application homepage for updates"));
+  Help->addSeparator();
+  Help->addAction(tr("&Donate"), this, [this]() { OpenWebPage(QString::fromLatin1(DonateUrl)); })
+    ->setStatusTip(tr("Opens web browser and points it to project donation page"));
   Help->addSeparator();
   Help->addAction(FAboutAction);
 
@@ -5643,7 +5651,7 @@ void MainWindow::TransferPresetAutoSelect()
     Message = QString::fromStdString(CoreBridge::Text(New.isEmpty() ?
       CoreBridge::TText::CopyParamDefaultNorm : CoreBridge::TText::CopyParamDefaultCustom));
   }
-  Message.replace(QStringLiteral("%s"), QString(New).remove(QLatin1Char('&')));
+  Message.replace(QStringLiteral("%s"), PresetCaption(New));
   if (!CoreBridge::Preferences().CopyParamAutoSelectNotice)
   {
     // As PostNote: the status bar's.
@@ -6395,6 +6403,7 @@ void MainWindow::BuildToolbars(QMenu * Options)
     [this]() { OpenWebPage(QStringLiteral("https://github.com/99ecarvalho/linscp/issues")); });
   UpdatesMenu->addAction(tr("&Version History"), this,
     [this]() { OpenWebPage(QStringLiteral("https://github.com/99ecarvalho/linscp/releases")); });
+  UpdatesMenu->addAction(tr("D&onate"), this, [this]() { OpenWebPage(QString::fromLatin1(DonateUrl)); });
   UpdatesButton->setMenu(UpdatesMenu);
   BandAction(Updates, UpdatesButton);
 
@@ -6787,7 +6796,7 @@ void MainWindow::UpdatePresetCombo()
   FPresetCombo->addItem(tr("Default transfer settings"), QString());
   for (const CoreBridge::TTransferPreset & Preset : CoreBridge::TransferPresets())
   {
-    FPresetCombo->addItem(QString::fromStdString(Preset.Name), QString::fromStdString(Preset.Name));
+    FPresetCombo->addItem(PresetCaption(Preset.Name), QString::fromStdString(Preset.Name));
   }
   FPresetCombo->setCurrentIndex(std::max(0, FPresetCombo->findData(QString::fromStdString(CoreBridge::CurrentTransferPreset()))));
 }

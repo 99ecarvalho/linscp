@@ -1,5 +1,25 @@
 #include "TransferSettingsDialog.h"
 
+QString PresetCaption(const QString & Name)
+{
+  QString Result;
+  for (int Index = 0; Index < Name.size(); Index++)
+  {
+    if (Name[Index] == QLatin1Char('&'))
+    {
+      // "&&" is a "&"; a single one is dropped.
+      if ((Index + 1 < Name.size()) && (Name[Index + 1] == QLatin1Char('&')))
+      {
+        Result += QLatin1Char('&');
+        Index++;
+      }
+      continue;
+    }
+    Result += Name[Index];
+  }
+  return Result;
+}
+
 #include "HintButton.h"
 
 #include <QCheckBox>
@@ -339,7 +359,7 @@ TransferSettingsBox::TransferSettingsBox(QWidget * Parent) :
   FPresets->addItem(tr("Default transfer settings"), QString());
   for (const CoreBridge::TTransferPreset & Preset : CoreBridge::TransferPresets())
   {
-    FPresets->addItem(QString::fromStdString(Preset.Name), QString::fromStdString(Preset.Name));
+    FPresets->addItem(PresetCaption(Preset.Name), QString::fromStdString(Preset.Name));
   }
   const int Current = FPresets->findData(QString::fromStdString(CoreBridge::CurrentTransferPreset()));
   FPresets->setCurrentIndex((Current >= 0) ? Current : 0);

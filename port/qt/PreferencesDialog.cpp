@@ -360,7 +360,7 @@ void PreferencesDialog::LoadPresets()
   for (const CoreBridge::TTransferPreset & Preset : FPresets)
   {
     // WinSCP's Auto column, as the item's tip.
-    QListWidgetItem * Item = new QListWidgetItem(QString::fromStdString(Preset.Name), FPresetsList);
+    QListWidgetItem * Item = new QListWidgetItem(PresetCaption(Preset.Name), FPresetsList);
     if (Preset.HasRule)
     {
       Item->setToolTip(QString::fromStdString(CoreBridge::TransferPresetRuleInfo(Preset.Rule)));
@@ -868,7 +868,9 @@ void PreferencesDialog::EditPresetDialog(bool Add, bool Duplicate)
   const int Row = FPresetsList->currentRow();
   CoreBridge::TTransferSettings Settings = (Row <= 0) ? FDefaultSettings : FPresets[Row - 1].Settings;
   const bool Default = !Add && (Row <= 0);
-  QString Name = (Add && !Duplicate) ? QString() : FPresetsList->item(Row)->text();
+  // The preset's own name (its accelerator kept), not its caption.
+  QString Name = (Add && !Duplicate) ? QString() :
+    ((Row > 0) ? QString::fromStdString(FPresets[Row - 1].Name) : FPresetsList->item(Row)->text());
   TransferSettingsDialog Dialog(Settings, Default ? nullptr : &Name, this);
   const bool Existing = (Row > 0) && (!Add || Duplicate);
   Dialog.SetRule(Existing && FPresets[Row - 1].HasRule, Existing ? FPresets[Row - 1].Rule : CoreBridge::TTransferPresetRule(),
@@ -1306,6 +1308,7 @@ QWidget * PreferencesDialog::MakeCommandsPage()
   QGroupBox * Group = new QGroupBox(tr("Custom commands"), Page);
   QHBoxLayout * GroupLayout = new QHBoxLayout(Group);
   FCommandsList = new QTreeWidget(Group);
+  FCommandsList->setProperty("literalText", true);
   FCommandsList->setAccessibleName(Group->title());
   FCommandsList->setRootIsDecorated(false);
   FCommandsList->setHeaderLabels({ tr("Description"), tr("Command"), tr("L/R") });

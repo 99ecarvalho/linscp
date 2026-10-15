@@ -1,4 +1,8 @@
 #include "AccessibilityAudit.h"
+#include <QRegularExpression>
+#include <QDir>
+#include <QTreeWidget>
+#include <QListWidget>
 
 #include <QAbstractButton>
 #include <QAbstractItemView>
@@ -148,6 +152,15 @@ bool AccessibilityAudit::eventFilter(QObject * Object, QEvent * Event)
       if (!FSeen.contains(Key))
       {
         FSeen.insert(Key);
+        // $LINSCP_SHOTS: each window as first shown, for a person to look at.
+        const QString Shots = qEnvironmentVariable("LINSCP_SHOTS");
+        if (!Shots.isEmpty())
+        {
+          QDir().mkpath(Shots);
+          QString Name = Key;
+          Name.replace(QRegularExpression(QStringLiteral("[^A-Za-z0-9_-]+")), QStringLiteral("_"));
+          Widget->grab().save(QDir(Shots).filePath(Name + QStringLiteral(".png")));
+        }
         if (FReportOnly)
         {
           std::printf("A11Y-SEEN %s\n", qPrintable(QString::fromLatin1(Widget->metaObject()->className())));
@@ -223,7 +236,13 @@ void AccessibilityAudit::Audit(QWidget * Window)
     }
     if (QLabel * Label = qobject_cast<QLabel *>(Widget))
     {
-      // (A message, word-wrapped, shows its '&' as it is.)
+      // A message, word-wrapped, shows its '&' as it is: a caption's
+      // accelerator left in one is seen.
+      if ((Label->textFormat() != Qt::RichText) && Label->wordWrap() && (Label->buddy() == nullptr) &&
+          !Label->property("literalText").toBool() && !Mnemonic(Label->text()).isNull())
+      {
+        Issue(Where, QStringLiteral("label '%1' shows its '&'").arg(Label->text()));
+      }
       if ((Label->textFormat() != Qt::RichText) && !Label->wordWrap() && !Mnemonic(Label->text()).isNull())
       {
         if (Label->buddy() == nullptr)
@@ -236,6 +255,42 @@ void AccessibilityAudit::Audit(QWidget * Window)
         }
       }
       continue;
+    }
+    // Lists show their items' text as it is: no accelerators there (but in
+    // those whose text is the user's, "literalText").
+    QStringList Shown;
+    const bool Literal = Widget->property("literalText").toBool();
+    if (QComboBox * Combo = qobject_cast<QComboBox *>(Widget))
+    {
+      for (int Index = 0; Index < Combo->count(); Index++)
+      {
+        Shown.append(Combo->itemText(Index));
+      }
+    }
+    else if (QListWidget * List = qobject_cast<QListWidget *>(Widget))
+    {
+      for (int Index = 0; Index < List->count(); Index++)
+      {
+        Shown.append(List->item(Index)->text());
+      }
+    }
+    else if (QTreeWidget * Tree = qobject_cast<QTreeWidget *>(Widget))
+    {
+      for (int Column = 0; Column < Tree->columnCount(); Column++)
+      {
+        Shown.append(Tree->headerItem()->text(Column));
+        for (int Index = 0; Index < Tree->topLevelItemCount(); Index++)
+        {
+          Shown.append(Tree->topLevelItem(Index)->text(Column));
+        }
+      }
+    }
+    for (const QString & Text : Shown)
+    {
+      if (!Literal && !Mnemonic(Text).isNull())
+      {
+        Issue(Where, QStringLiteral("%1 shows '%2' with its '&'").arg(Describe(Widget), Text));
+      }
     }
     if (QAbstractButton * Button = qobject_cast<QAbstractButton *>(Widget); (Button != nullptr) && Button->isEnabled())
     {

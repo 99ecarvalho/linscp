@@ -2179,6 +2179,18 @@ Local: %2</translation>
         <source>View thumbnails</source>
         <translation>Ver miniaturas</translation>
     </message>
+    <message>
+        <source>&amp;Donate</source>
+        <translation>Enviar &amp;Doações</translation>
+    </message>
+    <message>
+        <source>Opens web browser and points it to project donation page</source>
+        <translation>Abre o navegador na página de doações do projeto</translation>
+    </message>
+    <message>
+        <source>D&amp;onate</source>
+        <translation>D&amp;oar</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

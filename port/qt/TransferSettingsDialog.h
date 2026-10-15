@@ -16,6 +16,12 @@ class QLineEdit;
 class QRadioButton;
 class QSpinBox;
 
+// A preset's name as shown, as WinSCP's StripHotkey: WinSCP's own presets'
+// names ("&Text", "Exclude &directories") carry the menus' accelerators,
+// which lists show without ("&&" stands for "&").
+QString PresetCaption(const QString & Name);
+inline QString PresetCaption(const std::string & Name) { return PresetCaption(QString::fromStdString(Name)); }
+
 class TransferSettingsFrame : public QWidget
 {
   Q_OBJECT
