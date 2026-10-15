@@ -224,7 +224,7 @@ jobs:
             -v /var/run/docker.sock:/var/run/docker.sock \
             -v /tmp/linscp-shared:/tmp/linscp-shared -e TMPDIR=/tmp/linscp-shared \
             -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
-            debian:trixie sh port/tools/ci_real_servers.sh
+            debian:trixie bash port/tools/ci_real_servers.sh
 
   # The Flatpak, in Flathub's builder image (flatpak-builder needs the
   # privileges to sandbox its builds).
