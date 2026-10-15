@@ -3,9 +3,11 @@
 A Qt port of [WinSCP](https://winscp.net/), targeting **Linux and Windows from
 one codebase**.
 
-> **Status: early. Phase 0 of 4.** There is no usable client yet — the work so
-> far decouples WinSCP's protocol core from the Embarcadero C++Builder toolchain
-> it currently requires. Not affiliated with or endorsed by the WinSCP project.
+> **Status: pre-release (0.1.0).** WinSCP's core runs unmodified under a Qt 6
+> shell on Linux and Windows: sites, the Commander layout, transfers and the
+> queue, synchronization, the editor, translations. See
+> [doc/qt/TRACKER.md](doc/qt/TRACKER.md) for what is done and what is left.
+> Not affiliated with or endorsed by the WinSCP project.
 
 ## Why
 
@@ -37,8 +39,11 @@ port/patches       reviewed patch series applied to the generated tree
 port/shim          VCL runtime replacement
 port/platform      POSIX and Win32 compatibility
 port/frontend      headless frontend interface and linscp-cli, the scripting client
-port/tools         transformation and verification scripts
-qt/                Qt 6 frontend
+port/qt            Qt 6 frontend (the linscp program)
+port/packaging     install rules and the .deb, AppImage, Flatpak and
+                   Windows installer definitions
+port/tests         unit, protocol, golden and GUI tests (ctest)
+port/tools         transformation, verification, fetch and packaging scripts
 doc/qt/            plan, tasks, tracker, estimates
 ```
 
@@ -50,19 +55,80 @@ the live status.
 
 ## Building
 
-Not yet buildable end to end. To run what exists:
+Requires **clang** (GCC is not supported: it has no `__declspec(property)`
+equivalent, which the VCL property shim depends on), CMake, Ninja, Python 3,
+Perl and make (for OpenSSL's `Configure`), and Qt 6 (`qt6-base-dev`,
+`qt6-svg-dev`, `qt6-l10n-tools` on Debian).
 
 ```sh
 git clone https://github.com/99ecarvalho/linscp
 cd linscp
 # Not --recurse-submodules: OpenSSL's own submodules are test suites.
 git submodule update --init --depth 1
-python3 port/tools/transform.py --out build/gen   # rewrite upstream core
-python3 port/tools/check_properties.py            # verify the rewrite compiles
 ```
 
-Requires **clang**, Python 3, and Perl and make for OpenSSL's `Configure`. GCC is not supported: it has no
-`__declspec(property)` equivalent, which the VCL property shim depends on.
+### Linux
+
+```sh
+cmake -S . -B build/linux -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+cmake --build build/linux --target linscp linscp-cli
+build/linux/port/qt/linscp
+ctest --test-dir build/linux        # the test suite
+```
+
+### Windows (cross-compiled from Linux)
+
+The toolchain and Qt are fetched pinned
+([doc/qt/windows-toolchain.md](doc/qt/windows-toolchain.md)); the tests run
+under Wine.
+
+```sh
+python3 port/tools/fetch_llvm_mingw.py --dest build/tools
+python3 port/tools/fetch_msys2_qt.py --dest build/tools/msys2-qt
+cmake -S . -B build/win -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-llvm-mingw.cmake
+cmake --build build/win --target deploy   # a folder that runs on Windows: build/win/deploy
+```
+
+### Packages
+
+Configure a release build (`LINSCP_RELEASE=ON` drops the "Dev Build"
+marking), then build the package's target; the packages land in
+`<build>/packages`. CI builds all four on every run, as artifacts.
+
+```sh
+cmake -S . -B build/release -G Ninja -DCMAKE_BUILD_TYPE=Release -DLINSCP_RELEASE=ON \
+      -DBUILD_TESTING=OFF -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+cmake --build build/release --target package-deb        # linscp_<version>_amd64.deb
+cmake --build build/release --target package-appimage   # linscp-<version>-x86_64.AppImage
+```
+
+- **.deb**: built with CPack; its dependencies are read from the binaries, so
+  it is for the distribution it is built on. Needs `dpkg-dev`.
+- **AppImage**: linuxdeploy and appimagetool are fetched pinned
+  ([port/packaging/appimage/tools.lock](port/packaging/appimage/tools.lock)).
+  Needs `file`, `qt6-svg-plugins` and `qt6-wayland`. It runs on distributions
+  whose glibc is at least the build machine's.
+- **Flatpak**: built from the checkout with `flatpak-builder` on KDE's
+  runtime; the runtime, SDK and LLVM extension are installed for the user
+  from Flathub when missing.
+
+  ```sh
+  python3 port/tools/build_flatpak.py      # build/flatpak/packages/linscp-<version>.flatpak
+  flatpak install --user build/flatpak/packages/linscp-<version>.flatpak
+  ```
+
+- **Windows installer**: Inno Setup 6, fetched pinned and run under Wine
+  (`wine`, with `wine32` for its 32-bit compiler), over the deploy folder:
+
+  ```sh
+  cmake -S . -B build/win-release -G Ninja -DCMAKE_BUILD_TYPE=Release -DLINSCP_RELEASE=ON \
+        -DBUILD_TESTING=OFF -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-llvm-mingw.cmake
+  cmake --build build/win-release --target installer      # linscp-<version>-setup.exe
+  ```
+
+  It installs for all users or only the current one, and offers a desktop
+  icon, the Send To upload shortcut, the URL handler and the search path, as
+  WinSCP's installer does.
 
 ## Licence
 
