@@ -632,6 +632,15 @@ struct TLayout
   int CurrentPanel = 0;
   std::string LocalDirViewParams;
   std::string RemoteDirViewParams;
+  // Options > Left/Right Panel > Tree (ScpCommander's LocalPanel and
+  // RemotePanel DriveView), and its height (DriveViewHeight, at
+  // DriveViewHeightPixelsPerInch).
+  bool LocalTree = false;
+  bool RemoteTree = false;
+  int LocalTreeHeight = 100;
+  int RemoteTreeHeight = 100;
+  int LocalTreeHeightPixelsPerInch = 96;
+  int RemoteTreeHeightPixelsPerInch = 96;
   int QueueViewHeight = 140;
   int QueueViewHeightPixelsPerInch = 96;
   // Options > Queue (QueueView.Show, TQueueViewShow's order) and Options >
@@ -1706,6 +1715,10 @@ public:
   bool SaveDirectories(const std::string & LocalDirectory);
   // The current directory's entries, without "." and "..".
   std::vector<TRemoteEntry> List() const;
+  // A directory's subdirectories, by name, sorted (the directory tree's,
+  // as TUnixDriveView loads a node), the directory cache used. Throws
+  // TCoreError.
+  std::vector<std::string> Subdirectories(const std::string & Path);
   // These throw TCoreError; what fails along the way is asked about first
   // (retry, skip, abort) through the frontend, as core does.
   void ChangeDirectory(const std::string & Directory);

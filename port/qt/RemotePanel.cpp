@@ -1,4 +1,5 @@
 #include "RemotePanel.h"
+#include "DirectoryTree.h"
 #include <QScrollBar>
 #include "PanelBands.h"
 #include "IconSet.h"
@@ -8,7 +9,9 @@
 #include <QDateTime>
 #include <QHeaderView>
 #include <QInputDialog>
+#include <QDir>
 #include <QLabel>
+#include <QSplitter>
 #include <QLineEdit>
 #include <QLocale>
 #include <QMenu>
@@ -117,7 +120,23 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   connect(FView, &QTreeView::activated, this, &RemotePanel::Activated);
   connect(FView, &QWidget::customContextMenuRequested, this, &RemotePanel::ContextMenu);
   connect(FView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &RemotePanel::UpdateActions);
-  Layout->addWidget(FView, 1);
+  // As the Commander's DriveView: the tree above the files (Options >
+  // Panel > Tree), hidden by default.
+  FSplitter = new QSplitter(Qt::Vertical, this);
+  FSplitter->setChildrenCollapsible(false);
+  FTree = new RemoteDirectoryTree(FSplitter);
+  FTree->hide();
+  FSplitter->addWidget(FTree);
+  FSplitter->addWidget(FView);
+  FSplitter->setStretchFactor(1, 1);
+  connect(FTree, &RemoteDirectoryTree::DirectoryChosen, this, [this](const QString & Path)
+  {
+    if (QDir::cleanPath(Path) != QDir::cleanPath(this->Path()))
+    {
+      ChangeDirectory(Path);
+    }
+  });
+  Layout->addWidget(FSplitter, 1);
   FStatus = new QLabel(this);
   Layout->addWidget(FStatus);
   UpdateActions();
@@ -128,7 +147,20 @@ void RemotePanel::SetSession(CoreBridge::TSession * Session)
   FSession = Session;
   FBack.clear();
   FForward.clear();
+  FTree->SetSession(Session);
   Reload();
+}
+
+void RemotePanel::ShowTreePath()
+{
+  if (TreeVisible() && (FSession != nullptr) && FSession->Active())
+  {
+    if (FTree->model()->rowCount() == 0)
+    {
+      FTree->SetSession(FSession);
+    }
+    FTree->ShowPath(Path());
+  }
 }
 
 void RemotePanel::ShowError(const CoreBridge::TCoreError & E)
@@ -185,6 +217,7 @@ void RemotePanel::Reload()
   FPath->setEnabled(Active);
   Select(Keep);
   UpdateActions();
+  ShowTreePath();
   emit Changed();
 }
 
@@ -250,7 +283,13 @@ bool RemotePanel::Home()
 
 bool RemotePanel::Refresh()
 {
-  return Run([this]() { FSession->Refresh(); }, false);
+  const bool Result = Run([this]() { FSession->Refresh(); }, false);
+  // Its folders read again too.
+  if (TreeVisible())
+  {
+    FTree->Reload();
+  }
+  return Result;
 }
 
 bool RemotePanel::NewFolderDialog()
@@ -419,6 +458,10 @@ void RemotePanel::ContextMenu(const QPoint & Pos)
 void RemotePanel::SetShowHidden(bool Show)
 {
   FSort->SetShowHidden(Show);
+  if (TreeVisible())
+  {
+    FTree->Reload();
+  }
   UpdateActions();
 }
 
@@ -660,4 +703,29 @@ QStringList RemotePanel::Selection() const
     }
   }
   return Result;
+}
+
+void RemotePanel::SetTreeVisible(bool Visible)
+{
+  FTree->setVisible(Visible);
+  if (Visible)
+  {
+    ShowTreePath();
+  }
+}
+
+bool RemotePanel::TreeVisible() const
+{
+  return !FTree->isHidden();
+}
+
+int RemotePanel::TreeHeight() const
+{
+  return FSplitter->sizes().value(0);
+}
+
+void RemotePanel::SetTreeHeight(int Height)
+{
+  const int Total = std::max(FSplitter->height(), Height + 100);
+  FSplitter->setSizes({ Height, Total - Height });
 }

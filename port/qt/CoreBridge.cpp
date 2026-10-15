@@ -698,6 +698,12 @@ TLayout Layout()
   Result.LocalPanelWidth = Settings.LocalPanelWidth;
   Result.CurrentPanel = Settings.CurrentPanel;
   Result.LocalDirViewParams = Utf8(Settings.LocalDirViewParams);
+  Result.LocalTree = Settings.LocalDriveView;
+  Result.RemoteTree = Settings.RemoteDriveView;
+  Result.LocalTreeHeight = Settings.LocalDriveViewHeight;
+  Result.RemoteTreeHeight = Settings.RemoteDriveViewHeight;
+  Result.LocalTreeHeightPixelsPerInch = Settings.LocalDriveViewHeightPixelsPerInch;
+  Result.RemoteTreeHeightPixelsPerInch = Settings.RemoteDriveViewHeightPixelsPerInch;
   Result.RemoteDirViewParams = Utf8(Settings.RemoteDirViewParams);
   Result.QueueViewHeight = Settings.QueueViewHeight;
   Result.QueueViewHeightPixelsPerInch = Settings.QueueViewHeightPixelsPerInch;
@@ -718,6 +724,12 @@ void SetLayout(const TLayout & Layout)
   Settings.LocalPanelWidth = Layout.LocalPanelWidth;
   Settings.CurrentPanel = Layout.CurrentPanel;
   Settings.LocalDirViewParams = FromUtf8(Layout.LocalDirViewParams);
+  Settings.LocalDriveView = Layout.LocalTree;
+  Settings.RemoteDriveView = Layout.RemoteTree;
+  Settings.LocalDriveViewHeight = Layout.LocalTreeHeight;
+  Settings.RemoteDriveViewHeight = Layout.RemoteTreeHeight;
+  Settings.LocalDriveViewHeightPixelsPerInch = Layout.LocalTreeHeightPixelsPerInch;
+  Settings.RemoteDriveViewHeightPixelsPerInch = Layout.RemoteTreeHeightPixelsPerInch;
   Settings.RemoteDirViewParams = FromUtf8(Layout.RemoteDirViewParams);
   Settings.QueueViewHeight = Layout.QueueViewHeight;
   Settings.QueueViewHeightPixelsPerInch = Layout.QueueViewHeightPixelsPerInch;

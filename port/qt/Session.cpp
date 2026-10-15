@@ -34,6 +34,7 @@
 
 #include <TextsWin.h>
 
+#include <algorithm>
 #include <atomic>
 #include <map>
 #include <mutex>
@@ -489,6 +490,37 @@ std::vector<TRemoteEntry> TSession::List() const
     }
   }
   return Result;
+}
+
+std::vector<std::string> TSession::Subdirectories(const std::string & Path)
+{
+  try
+  {
+    if (!Active())
+    {
+      throw Exception(LoadStr(NOT_CONNECTED));
+    }
+    std::unique_ptr<TRemoteFileList> Files(F->Terminal->CustomReadDirectoryListing(FromUtf8(Path), true));
+    std::vector<std::string> Result;
+    const bool ShowHidden = dynamic_cast<TShellConfiguration *>(GUIConfiguration)->Settings().ShowHiddenFiles;
+    for (int Index = 0; Index < Files->Count; Index++)
+    {
+      TRemoteFile * File = Files->Files[Index];
+      if (File->IsDirectory && !File->IsThisDirectory && !File->IsParentDirectory && (ShowHidden || !File->IsHidden))
+      {
+        Result.push_back(Utf8(File->FileName));
+      }
+    }
+    std::sort(Result.begin(), Result.end(), [](const std::string & A, const std::string & B)
+    {
+      return AnsiCompareText(FromUtf8(A), FromUtf8(B)) < 0;
+    });
+    return Result;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
 }
 
 void TSession::ChangeDirectory(const std::string & Directory)

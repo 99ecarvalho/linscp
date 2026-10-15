@@ -910,6 +910,13 @@ Local: %2</translation>
     </message>
 </context>
 <context>
+    <name>LocalDirectoryTree</name>
+    <message>
+        <source>Local directory tree</source>
+        <translation>Árvore de diretórios local</translation>
+    </message>
+</context>
+<context>
     <name>LocalPanel</name>
     <message>
         <source>Create Directory</source>
@@ -1663,6 +1670,14 @@ Local: %2</translation>
     <message>
         <source>&amp;Process Queue</source>
         <translation>&amp;Processar fila</translation>
+    </message>
+    <message>
+        <source>&amp;Tree</source>
+        <translation>Ár&amp;vore</translation>
+    </message>
+    <message>
+        <source>Hide/show directory tree</source>
+        <translation>Ocultar/mostrar árvore de diretórios</translation>
     </message>
 </context>
 <context>
@@ -2720,6 +2735,13 @@ Local: %2</translation>
     <message>
         <source>Queue</source>
         <translation>Fila</translation>
+    </message>
+</context>
+<context>
+    <name>RemoteDirectoryTree</name>
+    <message>
+        <source>Remote directory tree</source>
+        <translation>Árvore de diretórios remota</translation>
     </message>
 </context>
 <context>

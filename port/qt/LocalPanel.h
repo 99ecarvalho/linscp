@@ -113,10 +113,21 @@ public:
   // directory popups): OnItem when over a file, not the parent entry.
   std::function<void(const QPoint & Global, bool OnItem)> OnContextMenu;
 
+  // The directory tree above the files (WinSCP's DriveView), and its
+  // height (DriveViewHeight).
+  void SetTreeVisible(bool Visible);
+  bool TreeVisible() const;
+  int TreeHeight() const;
+  void SetTreeHeight(int Height);
+  class LocalDirectoryTree * Tree() const { return FTree; }
+
 signals:
   void Changed();
 
 private:
+  LocalDirectoryTree * FTree = nullptr;
+  class QSplitter * FSplitter = nullptr;
+  void ShowTreePath();
   bool Go(const QString & Directory, bool Record);
   void Reload();
   void Fail(const QString & Message);

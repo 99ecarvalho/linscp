@@ -293,11 +293,17 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
   {
     TCloseSubKeyPath Close(Storage);
     Storage->WriteString(L"DirViewParams", FSettings.LocalDirViewParams);
+    Storage->WriteBool(L"DriveView", FSettings.LocalDriveView);
+    Storage->WriteInteger(L"DriveViewHeight", FSettings.LocalDriveViewHeight);
+    Storage->WriteInteger(L"DriveViewHeightPixelsPerInch", FSettings.LocalDriveViewHeightPixelsPerInch);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander\\RemotePanel", true))
   {
     TCloseSubKeyPath Close(Storage);
     Storage->WriteString(L"DirViewParams", FSettings.RemoteDirViewParams);
+    Storage->WriteBool(L"DriveView", FSettings.RemoteDriveView);
+    Storage->WriteInteger(L"DriveViewHeight", FSettings.RemoteDriveViewHeight);
+    Storage->WriteInteger(L"DriveViewHeightPixelsPerInch", FSettings.RemoteDriveViewHeightPixelsPerInch);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Editor", true))
   {
@@ -541,11 +547,19 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
   {
     TCloseSubKeyPath Close(Storage);
     FSettings.LocalDirViewParams = Storage->ReadString(L"DirViewParams", FSettings.LocalDirViewParams);
+    FSettings.LocalDriveView = Storage->ReadBool(L"DriveView", FSettings.LocalDriveView);
+    FSettings.LocalDriveViewHeight = Storage->ReadInteger(L"DriveViewHeight", FSettings.LocalDriveViewHeight);
+    FSettings.LocalDriveViewHeightPixelsPerInch =
+      Storage->ReadInteger(L"DriveViewHeightPixelsPerInch", FSettings.LocalDriveViewHeightPixelsPerInch);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander\\RemotePanel", false))
   {
     TCloseSubKeyPath Close(Storage);
     FSettings.RemoteDirViewParams = Storage->ReadString(L"DirViewParams", FSettings.RemoteDirViewParams);
+    FSettings.RemoteDriveView = Storage->ReadBool(L"DriveView", FSettings.RemoteDriveView);
+    FSettings.RemoteDriveViewHeight = Storage->ReadInteger(L"DriveViewHeight", FSettings.RemoteDriveViewHeight);
+    FSettings.RemoteDriveViewHeightPixelsPerInch =
+      Storage->ReadInteger(L"DriveViewHeightPixelsPerInch", FSettings.RemoteDriveViewHeightPixelsPerInch);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Editor", false))
   {

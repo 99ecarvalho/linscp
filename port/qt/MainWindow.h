@@ -230,6 +230,9 @@ public:
   // window hidden, the tray's icon (its tip the window's title) bringing
   // it back. Where the desktop has no tray, minimized as ever.
   void MinimizeToTray();
+  // Options > Left (Left) or Right Panel > Tree.
+  void SetTreeVisible(bool Left, bool Visible);
+  QAction * TreeAction(bool Left) const { return Left ? FLocalTreeAction : FRemoteTreeAction; }
   // As ApplicationMinimize (Keep Up To Date's Minimize): to the tray when
   // asked, or Preferences say so.
   void MinimizeApplication(bool ToTray);
@@ -365,6 +368,7 @@ private:
   void ShowError(const CoreBridge::TCoreError & E);
   void UpdateActions();
   void TransferPresetAutoSelect();
+  void UpdateTreeShortcut();
   bool RunLocalCustomCommand(const CoreBridge::TCustomCommandDefinition & Command);
   void StandaloneUpload(const std::vector<std::string> & Files, bool UseDefaults);
   void StandaloneKeepUpToDate(const CoreBridge::TKeepUpToDateParams & Params, bool UseDefaults);
@@ -395,6 +399,8 @@ private:
   QAction * FDirectorySizesAction = nullptr;
   QAction * FNewFileAction = nullptr;
   QAction * FProcessQueueAction = nullptr;
+  QAction * FLocalTreeAction = nullptr;
+  QAction * FRemoteTreeAction = nullptr;
   QSystemTrayIcon * FTrayIcon = nullptr;
   QList<QPointer<QWidget>> FTrayHidden;
   // TransferPresetAutoSelect's: the preset chosen by hand, the one last

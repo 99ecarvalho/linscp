@@ -130,6 +130,7 @@
 #include "IconSet.h"
 #include "PreferencesDialog.h"
 #include "Integration.h"
+#include "DirectoryTree.h"
 #include <QSettings>
 #include "SynchronizeDialog.h"
 #include "TransferSettingsDialog.h"
@@ -4856,6 +4857,67 @@ void InstanceTest(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// P3-16: the panels' directory trees (Options > Left/Right Panel > Tree):
+// following the panel, taking it where a folder is chosen, kept.
+void TreesTest(const char * Port, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    const QDir Dir(Directory);
+    QDir().mkpath(Dir.filePath(QStringLiteral("inner/deeper")));
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = std::deque<QString>(4, QStringLiteral("secret"));
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "(connected)");
+    Check(!Window.Panel()->TreeVisible() && !Window.TreeAction(false)->isChecked(), "hidden by default, as WinSCP's");
+
+    // The remote one.
+    Window.SetTreeVisible(false, true);
+    RemoteDirectoryTree * Remote = Window.Panel()->Tree();
+    Check(Window.Panel()->TreeVisible() && Window.TreeAction(false)->isChecked() && (Remote->CurrentPath() == QStringLiteral("/")),
+      "shown, on the panel's directory");
+    const QModelIndex Root = Remote->model()->index(0, 0);
+    Remote->expand(Root);
+    QModelIndex Sub;
+    for (int Row = 0; Row < Remote->model()->rowCount(Root); Row++)
+    {
+      if (Remote->model()->index(Row, 0, Root).data().toString() == QStringLiteral("sub"))
+      {
+        Sub = Remote->model()->index(Row, 0, Root);
+      }
+    }
+    Check(Sub.isValid(), "its folders listed");
+    Remote->setCurrentIndex(Sub);
+    Check(WaitUntil([&Window]() { return Window.Panel()->Path() == QStringLiteral("/sub"); }), "a folder chosen: the panel goes there");
+    Window.Panel()->ChangeDirectory(QStringLiteral("/"));
+    Check(Remote->CurrentPath() == QStringLiteral("/"), "and it follows the panel");
+
+    // The local one.
+    Window.SetTreeVisible(true, true);
+    Window.Local()->ChangeDirectory(Directory);
+    LocalDirectoryTree * Local = Window.Local()->Tree();
+    Check(QDir(Local->CurrentPath()) == Dir, "the local one on the local panel's directory");
+    Window.Local()->ChangeDirectory(Dir.filePath(QStringLiteral("inner")));
+    Check(QDir(Local->CurrentPath()) == QDir(Dir.filePath(QStringLiteral("inner"))), "following it");
+    Window.Local()->ChangeDirectory(Directory);
+
+    // Kept.
+    Window.SaveLayout();
+    Check(CoreBridge::Layout().LocalTree && CoreBridge::Layout().RemoteTree, "kept, as DriveView");
+    Window.ActivatePanel(false);
+    Check(Window.TreeAction(false)->shortcut() == QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_T) &&
+      Window.TreeAction(true)->shortcut().isEmpty(), "Ctrl+Alt+T the active side's");
+    Window.SetTreeVisible(true, false);
+    Window.SetTreeVisible(false, false);
+    Check(!Window.Local()->TreeVisible() && !Window.Panel()->TreeVisible(), "hidden again");
+  }
+  CoreBridge::Finalize();
+}
+
 // P3-16: local custom commands: on a remote file (downloaded for it, what
 // the program changed uploaded back), their output copied, on local files.
 // Run through the shell on POSIX, as a command line (cmd's) on Windows.
@@ -5506,6 +5568,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 4) && (std::strcmp(argv[1], "masterpasswordread") == 0))
   {
     return MasterPasswordRead(QString::fromLocal8Bit(argv[3]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "trees") == 0))
+  {
+    TreesTest(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "localcommands") == 0))
   {

@@ -1,4 +1,5 @@
 #include "LocalPanel.h"
+#include "DirectoryTree.h"
 #include <QScrollBar>
 #include <QApplication>
 #include "PanelBands.h"
@@ -14,6 +15,7 @@
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QLabel>
+#include <QSplitter>
 #include <QLineEdit>
 #include <QLocale>
 #include <QMenu>
@@ -173,7 +175,23 @@ LocalPanel::LocalPanel(QWidget * Parent) :
   connect(FView, &QTreeView::activated, this, &LocalPanel::Activated);
   connect(FView, &QWidget::customContextMenuRequested, this, &LocalPanel::ContextMenu);
   connect(FView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &LocalPanel::UpdateActions);
-  Layout->addWidget(FView, 1);
+  // As the Commander's DriveView: the tree above the files (Options >
+  // Panel > Tree), hidden by default.
+  FSplitter = new QSplitter(Qt::Vertical, this);
+  FSplitter->setChildrenCollapsible(false);
+  FTree = new LocalDirectoryTree(FSplitter);
+  FTree->hide();
+  FSplitter->addWidget(FTree);
+  FSplitter->addWidget(FView);
+  FSplitter->setStretchFactor(1, 1);
+  connect(FTree, &LocalDirectoryTree::DirectoryChosen, this, [this](const QString & Path)
+  {
+    if (QDir::cleanPath(Path) != QDir::cleanPath(this->Path()))
+    {
+      ChangeDirectory(Path);
+    }
+  });
+  Layout->addWidget(FSplitter, 1);
   FStatus = new QLabel(this);
   Layout->addWidget(FStatus);
 
@@ -242,7 +260,16 @@ void LocalPanel::Reload()
   FPath->setText(QDir::toNativeSeparators(FCurrent));
   Select(Keep);
   UpdateActions();
+  ShowTreePath();
   emit Changed();
+}
+
+void LocalPanel::ShowTreePath()
+{
+  if (TreeVisible())
+  {
+    FTree->ShowPath(FCurrent);
+  }
 }
 
 bool LocalPanel::ChangeDirectory(const QString & Directory)
@@ -464,6 +491,7 @@ void LocalPanel::ContextMenu(const QPoint & Pos)
 void LocalPanel::SetShowHidden(bool Show)
 {
   FSort->SetShowHidden(Show);
+  FTree->SetShowHidden(Show);
   UpdateActions();
 }
 
@@ -687,4 +715,29 @@ QStringList LocalPanel::Selection() const
     }
   }
   return Result;
+}
+
+void LocalPanel::SetTreeVisible(bool Visible)
+{
+  FTree->setVisible(Visible);
+  if (Visible)
+  {
+    ShowTreePath();
+  }
+}
+
+bool LocalPanel::TreeVisible() const
+{
+  return !FTree->isHidden();
+}
+
+int LocalPanel::TreeHeight() const
+{
+  return FSplitter->sizes().value(0);
+}
+
+void LocalPanel::SetTreeHeight(int Height)
+{
+  const int Total = std::max(FSplitter->height(), Height + 100);
+  FSplitter->setSizes({ Height, Total - Height });
 }

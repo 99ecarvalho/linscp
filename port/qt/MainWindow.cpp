@@ -283,6 +283,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
     {
       FLocalActive = false;
     }
+    UpdateTreeShortcut();
   });
 
   QMenu * FilesMenu = new QMenu(this);
@@ -432,6 +433,25 @@ void MainWindow::UpdateTitle()
   setWindowTitle(Title);
 }
 
+// Options > Left/Right Panel > Tree.
+void MainWindow::SetTreeVisible(bool Left, bool Visible)
+{
+  if (Left)
+  {
+    FLocal->SetTreeVisible(Visible);
+  }
+  else
+  {
+    FPanel->SetTreeVisible(Visible);
+    FOtherLocal->SetTreeVisible(Visible);
+  }
+  QAction * Action = Left ? FLocalTreeAction : FRemoteTreeAction;
+  if (Action != nullptr)
+  {
+    Action->setChecked(Visible);
+  }
+}
+
 // As TScpCommanderForm's RestoreParams: the window's placement, the panels'
 // split and columns, the queue's height, the active panel; WinSCP's
 // formats (TWinConfiguration's ScpCommander, QueueView).
@@ -449,6 +469,12 @@ void MainWindow::RestoreLayout()
   }
   FLocal->SetColumnsParams(QString::fromStdString(Layout.LocalDirViewParams));
   FPanel->SetColumnsParams(QString::fromStdString(Layout.RemoteDirViewParams));
+  const int RemoteTreeHeight = Layout.RemoteTreeHeight * Dpi / std::max(1, Layout.RemoteTreeHeightPixelsPerInch);
+  FLocal->SetTreeHeight(Layout.LocalTreeHeight * Dpi / std::max(1, Layout.LocalTreeHeightPixelsPerInch));
+  FPanel->SetTreeHeight(RemoteTreeHeight);
+  FOtherLocal->SetTreeHeight(RemoteTreeHeight);
+  SetTreeVisible(true, Layout.LocalTree);
+  SetTreeVisible(false, Layout.RemoteTree);
   const int Total = std::max(FPanels->width(), width());
   const int LocalWidth = static_cast<int>(Total * std::clamp(Layout.LocalPanelWidth, 0.1, 0.9));
   // (The right side's two panels share its width, one shown.)
@@ -476,6 +502,18 @@ void MainWindow::SaveLayout()
   Layout.CurrentPanel = FLocalActive ? 0 : 1;
   Layout.LocalDirViewParams = FLocal->ColumnsParams().toStdString();
   Layout.RemoteDirViewParams = FPanel->ColumnsParams().toStdString();
+  Layout.LocalTree = FLocal->TreeVisible();
+  Layout.RemoteTree = FPanel->TreeVisible();
+  if (Layout.LocalTree)
+  {
+    Layout.LocalTreeHeight = FLocal->TreeHeight();
+    Layout.LocalTreeHeightPixelsPerInch = Dpi;
+  }
+  if (Layout.RemoteTree)
+  {
+    Layout.RemoteTreeHeight = FPanel->TreeHeight();
+    Layout.RemoteTreeHeightPixelsPerInch = Dpi;
+  }
   Layout.QueueViewHeight = FVertical->sizes().value(1);
   Layout.QueueViewHeightPixelsPerInch = Dpi;
   try
@@ -1174,9 +1212,21 @@ bool MainWindow::Download(const QStringList & Names, const QString & Target, boo
   return Result;
 }
 
+// Ctrl+Alt+T: the active side's tree (the two actions share it in WinSCP).
+void MainWindow::UpdateTreeShortcut()
+{
+  if ((FLocalTreeAction != nullptr) && (FRemoteTreeAction != nullptr))
+  {
+    const QKeySequence Key(Qt::CTRL | Qt::ALT | Qt::Key_T);
+    FLocalTreeAction->setShortcut(FLocalActive ? Key : QKeySequence());
+    FRemoteTreeAction->setShortcut(FLocalActive ? QKeySequence() : Key);
+  }
+}
+
 void MainWindow::ActivatePanel(bool Local)
 {
   FLocalActive = Local;
+  UpdateTreeShortcut();
   LocalPanel * Panel = SideLocal(Local);
   ((Panel != nullptr) ? static_cast<QWidget *>(Panel->View()) : static_cast<QWidget *>(FPanel->View()))->setFocus();
 }
@@ -1833,6 +1883,7 @@ void MainWindow::UpdateActions()
   FSitesAction->setEnabled(!FBusy);
   FEditAction->setEnabled(!FBusy);
   FPropertiesAction->setEnabled(!FBusy && (FSession || (SideLocal(FLocalActive) != nullptr)));
+  UpdateTreeShortcut();
   FLinkAction->setEnabled(!FBusy);
   FDuplicateAction->setEnabled(!FBusy && FSession);
   FOpenDirectoryAction->setEnabled(!FBusy);
@@ -5678,6 +5729,18 @@ void MainWindow::BuildToolbars(QMenu * Options)
   for (QAction * Action : { FLockToolbarsAction, FSelectiveTextAction })
   {
     connect(Action, &QAction::triggered, this, [this]() { ApplyToolbarSettings(); SaveToolbarSettings(); });
+  }
+  // As LocalTreeAction and RemoteTreeAction: each panel's tree (the right
+  // side's both panels', one shown); Ctrl+Alt+T the active side's.
+  for (QMenu * Menu : { LeftPanel, RightPanel })
+  {
+    const bool Left = (Menu == LeftPanel);
+    Menu->addSeparator();
+    QAction * Tree = Menu->addAction(tr("&Tree"));
+    Tree->setCheckable(true);
+    Tree->setStatusTip(tr("Hide/show directory tree"));
+    (Left ? FLocalTreeAction : FRemoteTreeAction) = Tree;
+    connect(Tree, &QAction::triggered, this, [this, Left](bool Shown) { SetTreeVisible(Left, Shown); });
   }
   Options->addMenu(LeftPanel);
   Options->addMenu(RightPanel);

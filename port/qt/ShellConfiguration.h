@@ -116,6 +116,12 @@ struct TShellSettings
   int CurrentPanel = 0;
   UnicodeString LocalDirViewParams = L"0;1;0|150,1;70,1;120,1;150,1;55,0;55,0;@96|5;0;1;2;3;4";
   UnicodeString RemoteDirViewParams = L"0;1;0|150,1;70,1;150,1;79,1;62,1;55,0;20,0;150,0;125,0;@96|6;7;8;0;1;2;3;4;5";
+  bool LocalDriveView = false;
+  bool RemoteDriveView = false;
+  int LocalDriveViewHeight = 100;
+  int RemoteDriveViewHeight = 100;
+  int LocalDriveViewHeightPixelsPerInch = 96;
+  int RemoteDriveViewHeightPixelsPerInch = 96;
   // Open directory's page: the shared bookmarks rather than the site's.
   bool UseSharedBookmarks = false;
   bool UseLocationProfiles = false;
