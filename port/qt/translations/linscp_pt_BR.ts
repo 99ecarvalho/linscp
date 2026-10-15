@@ -556,6 +556,10 @@ Local: %2</translation>
         <source>Ext</source>
         <translation>Ext</translation>
     </message>
+    <message>
+        <source>Type</source>
+        <translation>Tipo</translation>
+    </message>
 </context>
 <context>
     <name>FileView</name>
@@ -606,6 +610,74 @@ Local: %2</translation>
     <message>
         <source>mask hi&amp;nts</source>
         <translation>dicas de másca&amp;ra</translation>
+    </message>
+    <message>
+        <source>&amp;Name</source>
+        <translation>&amp;Nome</translation>
+    </message>
+    <message>
+        <source>&amp;Type</source>
+        <translation>&amp;Tipo</translation>
+    </message>
+    <message>
+        <source>Size A&amp;utomatically</source>
+        <translation>Tamanho a&amp;utomático</translation>
+    </message>
+    <message>
+        <source>Adjust columns width to fit their contents</source>
+        <translation>Ajustar a largura das colunas ao seu conteúdo</translation>
+    </message>
+    <message>
+        <source>&amp;Reset Layout</source>
+        <translation>&amp;Restabelecer aparência</translation>
+    </message>
+    <message>
+        <source>Reset to the default layout of list columns</source>
+        <translation>Restabelecer a aparência padrão das colunas da lista</translation>
+    </message>
+    <message>
+        <source>&amp;Ascending</source>
+        <translation>&amp;Ascendente</translation>
+    </message>
+    <message>
+        <source>Toggle ascending/descending sort of the panel</source>
+        <translation>Alternar entre ordem ascendente e descendente do painel</translation>
+    </message>
+    <message>
+        <source>By &amp;Name</source>
+        <translation>Por &amp;Nome</translation>
+    </message>
+    <message>
+        <source>By &amp;Extension</source>
+        <translation>Por &amp;Extensão</translation>
+    </message>
+    <message>
+        <source>By &amp;Size</source>
+        <translation>Por &amp;Tamanho</translation>
+    </message>
+    <message>
+        <source>By &amp;Type</source>
+        <translation>Por &amp;Tipo</translation>
+    </message>
+    <message>
+        <source>By &amp;Date modified</source>
+        <translation>Por &amp;Data de modificação</translation>
+    </message>
+    <message>
+        <source>By Att&amp;ributes</source>
+        <translation>Por Atri&amp;butos</translation>
+    </message>
+    <message>
+        <source>By &amp;Permissions/Attributes</source>
+        <translation>Por &amp;Permissões/Atributos</translation>
+    </message>
+    <message>
+        <source>By &amp;Owner</source>
+        <translation>Por P&amp;roprietário</translation>
+    </message>
+    <message>
+        <source>By &amp;Group</source>
+        <translation>Por &amp;Grupo</translation>
     </message>
 </context>
 <context>
@@ -1679,6 +1751,22 @@ Local: %2</translation>
         <source>Hide/show directory tree</source>
         <translation>Ocultar/mostrar árvore de diretórios</translation>
     </message>
+    <message>
+        <source>&amp;Sort</source>
+        <translation>Cla&amp;ssificar</translation>
+    </message>
+    <message>
+        <source>&amp;Restore Selection</source>
+        <translation>&amp;Restaurar seleção</translation>
+    </message>
+    <message>
+        <source>Restore previous selection</source>
+        <translation>Restaurar a seleção anterior</translation>
+    </message>
+    <message>
+        <source>Go to transfer queue list</source>
+        <translation>Ir para a lista da fila de transferências</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>
@@ -2677,18 +2765,6 @@ Local: %2</translation>
         <translation>Concluído</translation>
     </message>
     <message>
-        <source>Cancel</source>
-        <translation>Cancelar</translation>
-    </message>
-    <message>
-        <source>Suspend</source>
-        <translation>Suspender</translation>
-    </message>
-    <message>
-        <source>Resume</source>
-        <translation>Retomar</translation>
-    </message>
-    <message>
         <source>Operation</source>
         <translation>Operação</translation>
     </message>
@@ -2735,6 +2811,114 @@ Local: %2</translation>
     <message>
         <source>Queue</source>
         <translation>Fila</translation>
+    </message>
+    <message>
+        <source>Show &amp;Query</source>
+        <translation>Mostrar per&amp;gunta</translation>
+    </message>
+    <message>
+        <source>Show pending query of selected queue item</source>
+        <translation>Mostrar a pergunta pendente do item selecionado da fila</translation>
+    </message>
+    <message>
+        <source>Sho&amp;w Error</source>
+        <translation>Mostr&amp;ar erro</translation>
+    </message>
+    <message>
+        <source>Show pending error message of selected queue item</source>
+        <translation>Mostrar a mensagem de erro pendente do item selecionado da fila</translation>
+    </message>
+    <message>
+        <source>Show Pr&amp;ompt</source>
+        <translation>Mostrar s&amp;olicitação</translation>
+    </message>
+    <message>
+        <source>Show pending prompt of selected queue item</source>
+        <translation>Mostrar a solicitação pendente do item selecionado da fila</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>E&amp;xcluir</translation>
+    </message>
+    <message>
+        <source>Remove selected queue item</source>
+        <translation>Remover o item selecionado da fila</translation>
+    </message>
+    <message>
+        <source>&amp;Execute Now</source>
+        <translation>&amp;Executar agora</translation>
+    </message>
+    <message>
+        <source>Execute selected queue item now</source>
+        <translation>Executar agora o item selecionado da fila</translation>
+    </message>
+    <message>
+        <source>Move &amp;Up</source>
+        <translation>Mover para &amp;cima</translation>
+    </message>
+    <message>
+        <source>Move selected queue item up to be processed earlier</source>
+        <translation>Mover o item selecionado da fila para cima, para ser processado antes</translation>
+    </message>
+    <message>
+        <source>Move &amp;Down</source>
+        <translation>Mover para &amp;baixo</translation>
+    </message>
+    <message>
+        <source>Move selected queue item down to be processed later</source>
+        <translation>Mover o item selecionado da fila para baixo, para ser processado depois</translation>
+    </message>
+    <message>
+        <source>&amp;Suspend</source>
+        <translation>&amp;Suspender</translation>
+    </message>
+    <message>
+        <source>Suspend selected queue item</source>
+        <translation>Suspender o item selecionado da fila</translation>
+    </message>
+    <message>
+        <source>&amp;Resume</source>
+        <translation>&amp;Retomar</translation>
+    </message>
+    <message>
+        <source>Resume selected suspended queue item</source>
+        <translation>Retomar o item suspenso selecionado da fila</translation>
+    </message>
+    <message>
+        <source>&amp;Suspend All</source>
+        <translation>&amp;Suspender Todos</translation>
+    </message>
+    <message>
+        <source>Suspend all running queue items</source>
+        <translation>Suspender todos os itens da fila em execução</translation>
+    </message>
+    <message>
+        <source>&amp;Resume All</source>
+        <translation>&amp;Retomar todos</translation>
+    </message>
+    <message>
+        <source>Resume all suspended queue items</source>
+        <translation>Retomar todos os itens suspensos da fila</translation>
+    </message>
+    <message>
+        <source>&amp;Delete All Completed</source>
+        <translation>&amp;Excluir todos os concluídos</translation>
+    </message>
+    <message>
+        <source>Remove all completed queue items</source>
+        <translation>Remover todos os itens concluídos da fila</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel All</source>
+        <translation>&amp;Cancelar tudo</translation>
+    </message>
+    <message>
+        <source>Remove all queue items</source>
+        <translation>Remover todos os itens da fila</translation>
+    </message>
+    <message>
+        <source>&amp;All</source>
+        <translation>&amp;Tudo</translation>
     </message>
 </context>
 <context>

@@ -212,6 +212,10 @@ void RemotePanel::Reload()
   const QString Current = Active ? QString::fromStdString(FSession->CurrentDirectory()) : QString();
   FModel->SetEntries(Active ? FSession->List() : std::vector<CoreBridge::TRemoteEntry>(),
     Active && (Current != QStringLiteral("/")));
+  if (FCurrent != Current)
+  {
+    FView->ForgetSelectedNames();
+  }
   FCurrent = Current;
   FPath->setText(Current);
   FPath->setEnabled(Active);
@@ -576,7 +580,7 @@ void RemotePanel::ApplyPreferences(const CoreBridge::TPreferences & Preferences)
 }
 
 // WinSCP's columns: name, size, changed, rights, owner, group, extension, link target, type (TUnixDirView).
-static const std::vector<int> WinScpColumns = { 0, 1, 2, 3, 4, 5, 7, 6 };
+static const std::vector<int> WinScpColumns = { 0, 1, 2, 3, 4, 5, 7, 6, 8 };
 
 void RemotePanel::SetColumnsParams(const QString & Params)
 {

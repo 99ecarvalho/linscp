@@ -1491,6 +1491,8 @@ bool MainWindow::Transfer(bool FromLocal, const QStringList & Names, QString Tar
   {
     return false;
   }
+  // As DoCopyParamDialog's SaveSelectedNames, for Restore Selection.
+  (FromLocal ? FLocal->View() : FPanel->View())->SaveSelectedNames();
   if (Background)
   {
     std::vector<std::string> List;
@@ -2585,6 +2587,8 @@ bool MainWindow::Properties()
   try
   {
     const CoreBridge::TPropertiesInfo Info = FSession->PropertiesOf(List);
+    // As ExecuteFileOperation's foSetProperties, for Restore Selection.
+    FPanel->View()->SaveSelectedNames();
     ::PropertiesDialog Dialog(FSession.get(), List, FPanel->Path(), Info, this);
     // As CalculateChecksum's EnsureCommandSessionFallback(fcCalculatingChecksum).
     Dialog.SetChecksumSession([this]() { return EnsureCommandSession(FSession->CanCalculateChecksumsNow()); });
@@ -3292,6 +3296,8 @@ bool MainWindow::RunCustomCommand(const CoreBridge::TCustomCommandDefinition & C
     List.push_back(Name.toStdString());
   }
   const CoreBridge::TCustomCommandPrompts Prompts = CommandPrompts();
+  // As ExecuteFileOperation's foCustomCommand, for Restore Selection.
+  FPanel->View()->SaveSelectedNames();
   FBusy = true;
   UpdateActions();
   bool Result = false;
@@ -3899,8 +3905,12 @@ QMenu * MainWindow::PanelMenu(bool Local)
       QApplication::clipboard()->setText((Side != nullptr) ? QDir::toNativeSeparators(Side->Path()) : FPanel->Path());
     });
     Menu->addSeparator();
-    // The view's columns, as its header's menu.
+    // The view's sort and columns, as its header's.
     FileView * View = (Side != nullptr) ? Side->View() : FPanel->View();
+    QMenu * Sort = View->SortMenu(Side != nullptr);
+    Sort->setTitle(tr("&Sort"));
+    Sort->setParent(Menu, Sort->windowFlags());
+    Menu->addMenu(Sort);
     QMenu * Columns = View->ColumnsMenu(true);
     Columns->setTitle(tr("&Columns"));
     Columns->setParent(Menu, Columns->windowFlags());
@@ -3927,6 +3937,19 @@ void MainWindow::BuildMenus()
   Mark->addSeparator();
   Iconize(Mark->addAction(tr("&Invert Selection"), this, [this]() { ActiveView()->InvertSelection(); }), "invert-selection");
   Iconize(Mark->addAction(tr("C&lear Selection"), this, [this]() { ActiveView()->clearSelection(); }), "clear-selection");
+  QAction * RestoreSelection = Mark->addAction(tr("&Restore Selection"), this, [this]()
+  {
+    if (ActiveView()->SelectedNamesSaved())
+    {
+      ActiveView()->RestoreSelectedNames();
+    }
+  });
+  RestoreSelection->setStatusTip(tr("Restore previous selection"));
+  RestoreSelection->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S));
+  connect(Mark, &QMenu::aboutToShow, this, [this, RestoreSelection]()
+  {
+    RestoreSelection->setEnabled(ActiveView()->SelectedNamesSaved());
+  });
   Mark->addSeparator();
   Mark->addAction(tr("Select Files with Same &Extension"), this, [this]() { SelectSameExtension(true); });
   Mark->addAction(tr("Unselect Files with Same E&xtension"), this, [this]() { SelectSameExtension(false); });

@@ -28,8 +28,9 @@ class FileListModel : public QAbstractTableModel
 
 public:
   // ExtColumn: WinSCP's extension column (uvExt, dvExt), hidden by default.
+  // TypeColumn: its type column (uvType, dvType), the file type's name.
   enum { NameColumn, SizeColumn, ModifiedColumn, RightsColumn, OwnerColumn, GroupColumn, LinkTargetColumn, ExtColumn,
-    ColumnCount };
+    TypeColumn, ColumnCount };
   // What the sort proxy compares; directories first is the proxy's.
   enum { SortRole = Qt::UserRole, DirectoryRole, ParentRole, HiddenRole };
 
@@ -194,12 +195,32 @@ public:
   // The panel's status line, as WinSCP's (FileStatusBarText): the selected
   // entries' size of all, and how many of how many; and how many hidden.
   QString StatusText() const;
-  // The columns as WinSCP's panels have them: group and link target hidden
-  // until shown; the header's context menu shows and hides each but the
-  // name. To call once the model is set.
-  void SetupColumns();
-  // MenuCaptions: the main menu's names for them, else the headers'.
+  // The columns as WinSCP's panels have them: group, link target and
+  // extension hidden until shown, and the type unless TypeShown (WinSCP's
+  // local panel shows it, its remote one does not); the header's context
+  // menu shows and hides each but the name. To call once the model is set:
+  // what it sets is the layout Reset Layout goes back to.
+  void SetupColumns(bool TypeShown = false);
+  // MenuCaptions: the main menu's Columns (NonVisual.dfm's ShowHide...
+  // ColumnActions, in WinSCP's order, then Size Automatically and Reset
+  // Layout), else the header's. Checked as the columns are when shown.
   QMenu * ColumnsMenu(bool MenuCaptions = false);
+  // Columns > Size Automatically: each shown column as wide as its content.
+  void SizeColumnsAutomatically();
+  // Columns > Reset Layout (ResetLayoutColumns): the columns as SetupColumns
+  // left them.
+  void ResetLayout();
+  // The panel menus' Sort (NonVisual.dfm's ...SortBy...Actions): Ascending,
+  // then by each column; Local, the local panel's (attributes, no owner).
+  QMenu * SortMenu(bool Local);
+  // Mark > Restore Selection, as TCustomDirView's SaveSelectedNames and
+  // RestoreSelectedNames: the names selected when an operation started
+  // (a transfer, Properties, a custom command), selected again; forgotten
+  // when the directory changes.
+  void SaveSelectedNames();
+  bool SelectedNamesSaved() const { return !FSavedNames.isEmpty(); }
+  void RestoreSelectedNames();
+  void ForgetSelectedNames() { FSavedNames.clear(); }
   // Preferences > Panels and Commander (P3-16): Explorer-style selection
   // (Never: the focus alone moves with the keys and plain clicks; MouseOnly,
   // WinSCP's default: with the keys only), full row selection,
@@ -246,6 +267,8 @@ private:
   CoreBridge::TPreferences::TPanelSearch FPanelSearch = CoreBridge::TPreferences::TPanelSearch::NameStart;
   QString FSearch;
   class TPanelDelegate * FDelegate = nullptr;
+  QByteArray FDefaultLayout;
+  QStringList FSavedNames;
   void EndSearch();
   static bool FLastDirectories;
   // WinSCP's entries as last given, for the columns the view does not have.

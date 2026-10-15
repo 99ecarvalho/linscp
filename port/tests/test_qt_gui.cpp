@@ -1676,6 +1676,69 @@ void Keys(const QString & Directory)
     }
     View->setColumnHidden(FileListModel::SizeColumn, false);
 
+    // P3-15: the local panel shows WinSCP's Type column after the size; the
+    // main menu's Columns lists the name (always shown), then Size
+    // Automatically and Reset Layout, which brings the defaults back.
+    Check(!View->isColumnHidden(FileListModel::TypeColumn) &&
+      (View->header()->visualIndex(FileListModel::TypeColumn) == View->header()->visualIndex(FileListModel::SizeColumn) + 1),
+      "the local panel shows the type column after the size");
+    {
+      bool Typed = false;
+      for (int Row = 0; Row < View->model()->rowCount(); Row++)
+      {
+        if (View->model()->index(Row, FileListModel::NameColumn).data().toString() == QStringLiteral("d.txt"))
+        {
+          Typed = !View->model()->index(Row, FileListModel::TypeColumn).data().toString().isEmpty();
+        }
+      }
+      Check(Typed, "with each entry's type name");
+    }
+    {
+      std::unique_ptr<QMenu> Menu(View->ColumnsMenu(true));
+      QStringList Texts;
+      for (QAction * Action : Menu->actions())
+      {
+        Texts.append(Action->text());
+      }
+      Check(Texts.startsWith(QStringLiteral("&Name")) && !Menu->actions().first()->isEnabled() &&
+        Texts.contains(QStringLiteral("Size A&utomatically")) && (Texts.last() == QStringLiteral("&Reset Layout")),
+        "the main menu's Columns: the name, then Size Automatically and Reset Layout");
+      View->setColumnHidden(FileListModel::GroupColumn, false);
+      Menu->actions().last()->trigger();
+      Check(View->isColumnHidden(FileListModel::GroupColumn) && !View->isColumnHidden(FileListModel::TypeColumn) &&
+        (View->header()->sortIndicatorSection() == FileListModel::NameColumn) &&
+        (View->header()->sortIndicatorOrder() == Qt::AscendingOrder),
+        "Reset Layout goes back to the default columns, sorted by name");
+    }
+    {
+      std::unique_ptr<QMenu> Menu(View->SortMenu(true));
+      emit Menu->aboutToShow();
+      for (QAction * Action : Menu->actions())
+      {
+        if (Action->text() == QStringLiteral("By &Size"))
+        {
+          Action->trigger();
+        }
+      }
+      Check(View->header()->sortIndicatorSection() == FileListModel::SizeColumn, "Sort > By Size");
+      Menu->actions().first()->trigger();
+      Check(View->header()->sortIndicatorOrder() == Qt::DescendingOrder, "Sort > Ascending unchecked: descending");
+      View->sortByColumn(FileListModel::NameColumn, Qt::AscendingOrder);
+    }
+    // Mark > Restore Selection: the names selected when an operation
+    // started, selected again.
+    {
+      const QStringList Two = { QStringLiteral("b.log"), QStringLiteral("d.txt") };
+      Local->Select(Two);
+      Check(!View->SelectedNamesSaved(), "nothing to restore at first");
+      View->SaveSelectedNames();
+      View->clearSelection();
+      View->RestoreSelectedNames();
+      QStringList Selected = Local->Selected();
+      Selected.sort();
+      Check(Selected == Two, "Restore Selection selects them again");
+    }
+
     // Tab: to the other panel and back; Ctrl+[: the local path copied.
     Window.ActivatePanel(true);
     QTest::keyClick(Window.windowHandle(), Qt::Key_Tab);

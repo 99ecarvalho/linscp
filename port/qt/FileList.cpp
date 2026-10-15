@@ -2,11 +2,13 @@
 #include <QMouseEvent>
 #include <QStyledItemDelegate>
 #include "HintButton.h"
+#include "Integration.h"
 #include "EditMaskDialog.h"
 
 #include <algorithm>
 #include <cmath>
 
+#include <QActionGroup>
 #include <QApplication>
 #include <QCheckBox>
 #include <QDialog>
@@ -398,11 +400,16 @@ QString FileView::StatusText() const
   return Result;
 }
 
-void FileView::SetupColumns()
+void FileView::SetupColumns(bool TypeShown)
 {
   setColumnHidden(FileListModel::GroupColumn, true);
   setColumnHidden(FileListModel::LinkTargetColumn, true);
   setColumnHidden(FileListModel::ExtColumn, true);
+  setColumnHidden(FileListModel::TypeColumn, !TypeShown);
+  // As WinSCP's panels have it: after the size (moved, not reordered in the
+  // model, so that saved layouts keep their indexes).
+  header()->moveSection(header()->visualIndex(FileListModel::TypeColumn), FileListModel::SizeColumn + 1);
+  FDefaultLayout = header()->saveState();
   header()->setContextMenuPolicy(Qt::CustomContextMenu);
   connect(header(), &QWidget::customContextMenuRequested, this, [this](const QPoint & Pos)
   {
@@ -537,37 +544,158 @@ QString FileView::ColumnsParams(const std::vector<int> & Map, int Count) const
 QMenu * FileView::ColumnsMenu(bool MenuCaptions)
 {
   QMenu * Menu = new QMenu(this);
-  for (int Column = FileListModel::NameColumn + 1; Column < model()->columnCount(); Column++)
+  // Filled each time it opens, so that the checks follow the header's.
+  const auto Fill = [this, Menu, MenuCaptions]()
   {
-    // The main menu's Columns has no extension, as WinSCP's (its header's has).
-    if (MenuCaptions && (Column == FileListModel::ExtColumn))
+    Menu->clear();
+    const int Order[] = { FileListModel::NameColumn, FileListModel::SizeColumn, FileListModel::TypeColumn,
+      FileListModel::ModifiedColumn, FileListModel::RightsColumn, FileListModel::OwnerColumn, FileListModel::GroupColumn,
+      FileListModel::LinkTargetColumn, FileListModel::ExtColumn };
+    for (const int Column : Order)
     {
-      continue;
+      // The main menu's Columns has no extension, as WinSCP's (its header's
+      // has); the header's has no name, which stays.
+      if ((MenuCaptions && (Column == FileListModel::ExtColumn)) || (!MenuCaptions && (Column == FileListModel::NameColumn)))
+      {
+        continue;
+      }
+      const QString Header = model()->headerData(Column, Qt::Horizontal).toString();
+      QString Caption = Header;
+      // As the main menu's Columns (NonVisual.dfm's ShowHide...ColumnAction).
+      if (MenuCaptions)
+      {
+        switch (Column)
+        {
+          case FileListModel::NameColumn: Caption = tr("&Name"); break;
+          case FileListModel::SizeColumn: Caption = tr("&Size"); break;
+          case FileListModel::TypeColumn: Caption = tr("&Type"); break;
+          case FileListModel::ModifiedColumn: Caption = tr("&Date modified"); break;
+          case FileListModel::RightsColumn:
+            Caption = (Header == FileListModel::tr("Attributes")) ? tr("&Attributes") : tr("&Permissions");
+            break;
+          case FileListModel::OwnerColumn: Caption = tr("&Owner"); break;
+          case FileListModel::GroupColumn: Caption = tr("&Group"); break;
+          case FileListModel::LinkTargetColumn: Caption = tr("&Link Target"); break;
+          default: break;
+        }
+      }
+      QAction * Action = Menu->addAction(Caption);
+      Action->setCheckable(true);
+      Action->setChecked(!isColumnHidden(Column));
+      // The name is always shown.
+      Action->setEnabled(Column != FileListModel::NameColumn);
+      connect(Action, &QAction::toggled, this, [this, Column](bool Shown) { setColumnHidden(Column, !Shown); });
     }
-    const QString Header = model()->headerData(Column, Qt::Horizontal).toString();
-    QString Caption = Header;
-    // As the main menu's Columns (NonVisual.dfm's ShowHide...ColumnAction).
     if (MenuCaptions)
     {
-      switch (Column)
-      {
-        case FileListModel::SizeColumn: Caption = tr("&Size"); break;
-        case FileListModel::ModifiedColumn: Caption = tr("&Date modified"); break;
-        case FileListModel::RightsColumn:
-          Caption = (Header == FileListModel::tr("Attributes")) ? tr("&Attributes") : tr("&Permissions");
-          break;
-        case FileListModel::OwnerColumn: Caption = tr("&Owner"); break;
-        case FileListModel::GroupColumn: Caption = tr("&Group"); break;
-        case FileListModel::LinkTargetColumn: Caption = tr("&Link Target"); break;
-        default: break;
-      }
+      Menu->addSeparator();
+      Menu->addAction(tr("Size A&utomatically"), this, [this]() { SizeColumnsAutomatically(); })
+        ->setStatusTip(tr("Adjust columns width to fit their contents"));
+      Menu->addAction(tr("&Reset Layout"), this, [this]() { ResetLayout(); })
+        ->setStatusTip(tr("Reset to the default layout of list columns"));
     }
-    QAction * Action = Menu->addAction(Caption);
-    Action->setCheckable(true);
-    Action->setChecked(!isColumnHidden(Column));
-    connect(Action, &QAction::toggled, this, [this, Column](bool Shown) { setColumnHidden(Column, !Shown); });
-  }
+  };
+  Fill();
+  connect(Menu, &QMenu::aboutToShow, this, Fill);
   return Menu;
+}
+
+void FileView::SizeColumnsAutomatically()
+{
+  for (int Column = 0; Column < model()->columnCount(); Column++)
+  {
+    if (!isColumnHidden(Column))
+    {
+      resizeColumnToContents(Column);
+    }
+  }
+}
+
+void FileView::ResetLayout()
+{
+  if (!FDefaultLayout.isEmpty())
+  {
+    header()->restoreState(FDefaultLayout);
+  }
+  // WinSCP's default sort ("0;1": by name, ascending).
+  sortByColumn(FileListModel::NameColumn, Qt::AscendingOrder);
+}
+
+QMenu * FileView::SortMenu(bool Local)
+{
+  QMenu * Menu = new QMenu(this);
+  QAction * Ascending = Menu->addAction(tr("&Ascending"));
+  Ascending->setCheckable(true);
+  Ascending->setStatusTip(tr("Toggle ascending/descending sort of the panel"));
+  connect(Ascending, &QAction::triggered, this, [this](bool On)
+  {
+    sortByColumn(header()->sortIndicatorSection(), On ? Qt::AscendingOrder : Qt::DescendingOrder);
+  });
+  Menu->addSeparator();
+  std::vector<std::pair<int, QString>> By = {
+    { FileListModel::NameColumn, tr("By &Name") },
+    { FileListModel::ExtColumn, tr("By &Extension") },
+    { FileListModel::SizeColumn, tr("By &Size") },
+    { FileListModel::TypeColumn, tr("By &Type") },
+    { FileListModel::ModifiedColumn, tr("By &Date modified") } };
+  if (Local)
+  {
+    By.push_back({ FileListModel::RightsColumn, tr("By Att&ributes") });
+  }
+  else
+  {
+    By.push_back({ FileListModel::RightsColumn, tr("By &Permissions/Attributes") });
+    By.push_back({ FileListModel::OwnerColumn, tr("By &Owner") });
+    By.push_back({ FileListModel::GroupColumn, tr("By &Group") });
+  }
+  QActionGroup * Group = new QActionGroup(Menu);
+  std::vector<std::pair<int, QAction *>> Actions;
+  for (const auto & Each : By)
+  {
+    QAction * Action = Menu->addAction(Each.second);
+    Action->setCheckable(true);
+    Group->addAction(Action);
+    const int Column = Each.first;
+    connect(Action, &QAction::triggered, this, [this, Column]() { sortByColumn(Column, header()->sortIndicatorOrder()); });
+    Actions.push_back({ Column, Action });
+  }
+  connect(Menu, &QMenu::aboutToShow, this, [this, Ascending, Actions]()
+  {
+    Ascending->setChecked(header()->sortIndicatorOrder() == Qt::AscendingOrder);
+    for (const auto & Each : Actions)
+    {
+      Each.second->setChecked(header()->sortIndicatorSection() == Each.first);
+    }
+  });
+  return Menu;
+}
+
+void FileView::SaveSelectedNames()
+{
+  FSavedNames.clear();
+  const QModelIndexList Rows = selectionModel()->selectedRows(FileListModel::NameColumn);
+  for (const QModelIndex & Row : Rows)
+  {
+    if (EntryAt(Row.row()) != nullptr)
+    {
+      FSavedNames.append(Row.data(Qt::DisplayRole).toString());
+    }
+  }
+}
+
+void FileView::RestoreSelectedNames()
+{
+  QItemSelection Selection;
+  for (int Row = 0; Row < model()->rowCount(); Row++)
+  {
+    const QModelIndex Name = model()->index(Row, FileListModel::NameColumn);
+    if ((EntryAt(Row) != nullptr) && FSavedNames.contains(Name.data(Qt::DisplayRole).toString()))
+    {
+      Selection.select(Name, Name);
+    }
+  }
+  selectionModel()->select(Selection, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+  setFocus();
 }
 
 QString FileView::FLastMask = QStringLiteral("*.*");
@@ -1079,6 +1207,7 @@ QVariant FileListModel::data(const QModelIndex & Index, int Role) const
         case GroupColumn: return QString::fromStdString(E->Group);
         case LinkTargetColumn: return QString::fromStdString(E->LinkTarget);
         case ExtColumn: return Extension(*E);
+        case TypeColumn: return Integration::FileTypeName(QString::fromStdString(E->Name), E->Directory);
       }
       break;
     case Qt::ForegroundRole:
@@ -1115,6 +1244,7 @@ QVariant FileListModel::data(const QModelIndex & Index, int Role) const
         case GroupColumn: return QString::fromStdString(E->Group);
         case LinkTargetColumn: return QString::fromStdString(E->LinkTarget);
         case ExtColumn: return Extension(*E);
+        case TypeColumn: return Integration::FileTypeName(QString::fromStdString(E->Name), E->Directory);
         default: return QString::fromStdString(E->Name);
       }
   }
@@ -1137,6 +1267,7 @@ QVariant FileListModel::headerData(int Section, Qt::Orientation Orientation, int
     case GroupColumn: return tr("Group");
     case LinkTargetColumn: return tr("Link target");
     case ExtColumn: return tr("Ext");
+    case TypeColumn: return tr("Type");
   }
   return QVariant();
 }

@@ -41,6 +41,10 @@ QString ShortcutFolder(TShortcutFolder Folder);
 // (org.freedesktop.FileManager1's ShowItemProperties). False with Error
 // set when there is none to show it.
 bool ShowLocalProperties(const QStringList & Paths, QString & Error);
+// The panels' Type column, as WinSCP's (GetFileTypeName, by name only, the
+// file need not exist): the Windows shell's type name; elsewhere the
+// freedesktop MIME type's description, by extension. Cached by extension.
+QString FileTypeName(const QString & Name, bool Directory);
 
 // As the Login dialog's DesktopIconActionExecute and Preferences'
 // IconButtonClick: Question asked (empty: none), then the shortcut, its

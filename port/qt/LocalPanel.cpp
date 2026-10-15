@@ -152,7 +152,7 @@ LocalPanel::LocalPanel(QWidget * Parent) :
   connect(FView, &FileView::SearchChanged, this, [this]() { UpdateActions(); });
   FView->setAccessibleName(tr("Local files"));
   FView->setModel(FSort);
-  FView->SetupColumns();
+  FView->SetupColumns(true);
   FView->setRootIsDecorated(false);
   FView->setItemsExpandable(false);
   FView->setUniformRowHeights(true);
@@ -238,6 +238,10 @@ bool LocalPanel::Go(const QString & Directory, bool Record)
   if (!FCurrent.isEmpty())
   {
     FWatcher->removePath(FCurrent);
+  }
+  if (FCurrent != Target)
+  {
+    FView->ForgetSelectedNames();
   }
   FCurrent = Target;
   FWatcher->addPath(FCurrent);
@@ -589,7 +593,7 @@ void LocalPanel::ApplyPreferences(const CoreBridge::TPreferences & Preferences)
 }
 
 // WinSCP's columns: name, size, type, changed, attributes, extension (TDirView); owner, group and link target are not among them.
-static const std::vector<int> WinScpColumns = { 0, 1, 3, 4, -1, -1, -1, 5 };
+static const std::vector<int> WinScpColumns = { 0, 1, 3, 4, -1, -1, -1, 5, 2 };
 
 void LocalPanel::SetColumnsParams(const QString & Params)
 {

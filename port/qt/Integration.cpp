@@ -4,7 +4,9 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QHash>
 #include <QIcon>
+#include <QMimeDatabase>
 #include <QPixmap>
 #include <QProcess>
 #include <QStandardPaths>
@@ -556,6 +558,35 @@ bool ShowLocalProperties(const QStringList & Paths, QString & Error)
   }
   return true;
 #endif
+}
+
+QString FileTypeName(const QString & Name, bool Directory)
+{
+  static QHash<QString, QString> Cache;
+  const int Dot = Name.lastIndexOf(QLatin1Char('.'));
+  const QString Key = Directory ? QStringLiteral("/") : ((Dot > 0) ? Name.mid(Dot).toLower() : QString());
+  const auto Found = Cache.constFind(Key);
+  if (Found != Cache.constEnd())
+  {
+    return Found.value();
+  }
+  QString Result;
+#if defined(Q_OS_WIN)
+  SHFILEINFOW Info = {};
+  const std::wstring Wide = (Directory ? QStringLiteral("folder") : Name).toStdWString();
+  if (SHGetFileInfoW(Wide.c_str(), Directory ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL, &Info, sizeof(Info),
+        SHGFI_TYPENAME | SHGFI_USEFILEATTRIBUTES) != 0)
+  {
+    Result = QString::fromWCharArray(Info.szTypeName);
+  }
+#else
+  const QMimeDatabase Database;
+  const QMimeType Type = Directory ? Database.mimeTypeForName(QStringLiteral("inode/directory")) :
+    Database.mimeTypeForFile(Name, QMimeDatabase::MatchExtension);
+  Result = Type.comment();
+#endif
+  Cache.insert(Key, Result);
+  return Result;
 }
 
 }  // namespace Integration
