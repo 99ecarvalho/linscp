@@ -1,5 +1,6 @@
 #include "FileList.h"
 #include <QMouseEvent>
+#include <QMimeDatabase>
 #include <QStyledItemDelegate>
 #include "HintButton.h"
 #include "Integration.h"
@@ -9,6 +10,11 @@
 #include <cmath>
 
 #include <QActionGroup>
+#include <QFileIconProvider>
+#include <QImageReader>
+#include <QPainter>
+#include <QPointer>
+#include <QThreadPool>
 #include <QApplication>
 #include <QCheckBox>
 #include <QDialog>
@@ -1382,4 +1388,138 @@ void FileView::focusOutEvent(QFocusEvent * Event)
 {
   EndSearch();
   QTreeView::focusOutEvent(Event);
+}
+
+// --- Thumbnails (P3-15) ---------------------------------------------------------
+
+namespace
+{
+
+// Draws a thumbnail's icon: the preview when there is one, else the type's
+// icon, as large; the name below.
+class TThumbnailDelegate : public QStyledItemDelegate
+{
+public:
+  explicit TThumbnailDelegate(ThumbnailView * View) : QStyledItemDelegate(View), FView(View) {}
+
+protected:
+  void initStyleOption(QStyleOptionViewItem * Option, const QModelIndex & Index) const override
+  {
+    QStyledItemDelegate::initStyleOption(Option, Index);
+    const CoreBridge::TRemoteEntry * Entry = FView->EntryAt(Index);
+    QIcon Icon;
+    if ((Entry != nullptr) && !Entry->Directory && FView->ImagePath)
+    {
+      const QString Path = FView->ImagePath(*Entry);
+      const QPixmap Preview = Path.isEmpty() ? QPixmap() : FView->Preview(Path);
+      if (!Preview.isNull())
+      {
+        Icon = QIcon(Preview);
+      }
+    }
+    if (Icon.isNull() && (Entry != nullptr))
+    {
+      Icon = TypeIcon(*Entry);
+    }
+    if (!Icon.isNull())
+    {
+      Option->icon = Icon;
+      Option->features |= QStyleOptionViewItem::HasDecoration;
+    }
+    Option->decorationSize = QSize(FView->ThumbnailSize(), FView->ThumbnailSize());
+    Option->decorationAlignment = Qt::AlignCenter;
+  }
+
+private:
+  QIcon TypeIcon(const CoreBridge::TRemoteEntry & Entry) const
+  {
+    if (Entry.Directory)
+    {
+      return QApplication::style()->standardIcon(QStyle::SP_DirIcon);
+    }
+    static const QMimeDatabase Database;
+    const QMimeType Type = Database.mimeTypeForFile(QString::fromStdString(Entry.Name), QMimeDatabase::MatchExtension);
+    const QIcon Themed = QIcon::fromTheme(Type.iconName(), QIcon::fromTheme(Type.genericIconName()));
+    return Themed.isNull() ? QApplication::style()->standardIcon(QStyle::SP_FileIcon) : Themed;
+  }
+
+  ThumbnailView * FView;
+};
+
+}  // namespace
+
+ThumbnailView::ThumbnailView(FileView * Details, QWidget * Parent) :
+  QListView(Parent), FDetails(Details), FSize(128 * logicalDpiX() / 96)
+{
+  setViewMode(QListView::IconMode);
+  setResizeMode(QListView::Adjust);
+  setMovement(QListView::Static);
+  setWrapping(true);
+  setUniformItemSizes(true);
+  setSelectionMode(QAbstractItemView::ExtendedSelection);
+  setIconSize(QSize(FSize, FSize));
+  setGridSize(QSize(FSize + 24, FSize + fontMetrics().height() * 2 + 12));
+  setTextElideMode(Qt::ElideMiddle);
+  setWordWrap(true);
+  setModel(Details->model());
+  setModelColumn(FileListModel::NameColumn);
+  setSelectionModel(Details->selectionModel());
+  setItemDelegate(new TThumbnailDelegate(this));
+  setContextMenuPolicy(Qt::CustomContextMenu);
+  setAccessibleName(Details->accessibleName());
+}
+
+const CoreBridge::TRemoteEntry * ThumbnailView::EntryAt(const QModelIndex & Index) const
+{
+  const QSortFilterProxyModel * Proxy = qobject_cast<const QSortFilterProxyModel *>(model());
+  const FileListModel * Files = (Proxy != nullptr) ? qobject_cast<const FileListModel *>(Proxy->sourceModel()) : nullptr;
+  return ((Files != nullptr) && Index.isValid()) ? Files->Entry(Proxy->mapToSource(Index).row()) : nullptr;
+}
+
+void ThumbnailView::Forget()
+{
+  FPreviews.clear();
+  FPending.clear();
+}
+
+QPixmap ThumbnailView::Preview(const QString & Path)
+{
+  const auto Found = FPreviews.constFind(Path);
+  if (Found != FPreviews.constEnd())
+  {
+    return Found.value();
+  }
+  if (!FPending.contains(Path))
+  {
+    FPending.insert(Path);
+    QPointer<ThumbnailView> Self(this);
+    const int Size = FSize;
+    QThreadPool::globalInstance()->start([Self, Path, Size]()
+    {
+      QImageReader Reader(Path);
+      Reader.setAutoTransform(true);
+      const QSize Full = Reader.size();
+      if (Full.isValid() && ((Full.width() > Size) || (Full.height() > Size)))
+      {
+        Reader.setScaledSize(Full.scaled(Size, Size, Qt::KeepAspectRatio));
+      }
+      QImage Image = Reader.read();
+      if (!Image.isNull() && ((Image.width() > Size) || (Image.height() > Size)))
+      {
+        Image = Image.scaled(Size, Size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+      }
+      // Back on the GUI thread, if the view is still there.
+      QMetaObject::invokeMethod(qApp, [Self, Path, Image]()
+      {
+        if (Self)
+        {
+          Self->FPending.remove(Path);
+          // A file that is no image: its type's icon stays (a null preview).
+          Self->FPreviews.insert(Path, Image.isNull() ? QPixmap() : QPixmap::fromImage(Image));
+          Self->viewport()->update();
+        }
+      }, Qt::QueuedConnection);
+    });
+  }
+  return QPixmap();
 }

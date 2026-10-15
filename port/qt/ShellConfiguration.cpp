@@ -339,6 +339,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteString(L"DirViewParams", FSettings.LocalDirViewParams);
     Storage->WriteBool(L"DriveView", FSettings.LocalDriveView);
     Storage->WriteBool(L"StatusBar", FSettings.LocalPanelStatusBar);
+    Storage->WriteInteger(L"ViewStyle", FSettings.LocalPanelViewStyle);
     Storage->WriteInteger(L"DriveViewHeight", FSettings.LocalDriveViewHeight);
     Storage->WriteInteger(L"DriveViewHeightPixelsPerInch", FSettings.LocalDriveViewHeightPixelsPerInch);
   }
@@ -348,8 +349,14 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteString(L"DirViewParams", FSettings.RemoteDirViewParams);
     Storage->WriteBool(L"DriveView", FSettings.RemoteDriveView);
     Storage->WriteBool(L"StatusBar", FSettings.RemotePanelStatusBar);
+    Storage->WriteInteger(L"ViewStyle", FSettings.RemotePanelViewStyle);
     Storage->WriteInteger(L"DriveViewHeight", FSettings.RemoteDriveViewHeight);
     Storage->WriteInteger(L"DriveViewHeightPixelsPerInch", FSettings.RemoteDriveViewHeightPixelsPerInch);
+  }
+  if (Storage->OpenSubKeyPath(L"Interface\\Commander\\OtherLocalPanel", true))
+  {
+    TCloseSubKeyPath Close(Storage);
+    Storage->WriteInteger(L"ViewStyle", FSettings.OtherLocalPanelViewStyle);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Editor", true))
   {
@@ -621,6 +628,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.LocalDirViewParams = Storage->ReadString(L"DirViewParams", FSettings.LocalDirViewParams);
     FSettings.LocalDriveView = Storage->ReadBool(L"DriveView", FSettings.LocalDriveView);
     FSettings.LocalPanelStatusBar = Storage->ReadBool(L"StatusBar", FSettings.LocalPanelStatusBar);
+    FSettings.LocalPanelViewStyle = Storage->ReadInteger(L"ViewStyle", FSettings.LocalPanelViewStyle);
     FSettings.LocalDriveViewHeight = Storage->ReadInteger(L"DriveViewHeight", FSettings.LocalDriveViewHeight);
     FSettings.LocalDriveViewHeightPixelsPerInch =
       Storage->ReadInteger(L"DriveViewHeightPixelsPerInch", FSettings.LocalDriveViewHeightPixelsPerInch);
@@ -631,9 +639,15 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.RemoteDirViewParams = Storage->ReadString(L"DirViewParams", FSettings.RemoteDirViewParams);
     FSettings.RemoteDriveView = Storage->ReadBool(L"DriveView", FSettings.RemoteDriveView);
     FSettings.RemotePanelStatusBar = Storage->ReadBool(L"StatusBar", FSettings.RemotePanelStatusBar);
+    FSettings.RemotePanelViewStyle = Storage->ReadInteger(L"ViewStyle", FSettings.RemotePanelViewStyle);
     FSettings.RemoteDriveViewHeight = Storage->ReadInteger(L"DriveViewHeight", FSettings.RemoteDriveViewHeight);
     FSettings.RemoteDriveViewHeightPixelsPerInch =
       Storage->ReadInteger(L"DriveViewHeightPixelsPerInch", FSettings.RemoteDriveViewHeightPixelsPerInch);
+  }
+  if (Storage->OpenSubKeyPath(L"Interface\\Commander\\OtherLocalPanel", false))
+  {
+    TCloseSubKeyPath Close(Storage);
+    FSettings.OtherLocalPanelViewStyle = Storage->ReadInteger(L"ViewStyle", FSettings.OtherLocalPanelViewStyle);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Editor", false))
   {

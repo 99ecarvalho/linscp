@@ -1015,6 +1015,36 @@ void Transfer(const char * Port, const QString & Directory)
     Responder.CancelTransfers = false;
     Check(Frontend.Transfer() == nullptr, "and the window closes");
 
+    // P3-15: Remote > View > Thumbnails: a remote image downloaded in the
+    // background for its preview.
+    {
+      QImage Image(40, 30, QImage::Format_RGB32);
+      Image.fill(Qt::blue);
+      Check(Image.save(Dir.filePath(QStringLiteral("remote.png"))), "(an image)");
+      Local->Refresh();
+      Local->Select({ QStringLiteral("remote.png") });
+      Window.ActivatePanel(true);
+      Check(Window.TransferSelected(false, false), "uploaded");
+      Window.Panel()->Refresh();
+      Window.SetPanelThumbnails(false, true);
+      Check(Window.Panel()->Thumbnails(), "the remote panel's thumbnails");
+      Check(WaitFor([&Window]()
+      {
+        Window.Panel()->Thumbs()->viewport()->repaint();
+        return !Window.Session()->ThumbnailFile("remote.png").empty();
+      }), "its file downloaded in the background");
+      const QString Copy = QString::fromStdString(Window.Session()->ThumbnailFile("remote.png"));
+      Check(WaitFor([&Window, &Copy]()
+      {
+        Window.Panel()->Thumbs()->viewport()->repaint();
+        return Window.Panel()->Thumbs()->HasPreview(Copy);
+      }) && !Window.Panel()->Thumbs()->Preview(Copy).isNull(), "and previewed");
+      Window.SetPanelThumbnails(false, false);
+      QFile::remove(Dir.filePath(QStringLiteral("remote.png")));
+      // (The thumbnails' queue item gone before the next test's queue.)
+      Check(WaitFor([&Window]() { return Window.Session()->QueueEmpty(); }), "the thumbnails' download ends");
+    }
+
     // P3-15: Options > Queue > Once Empty, Sleep Computer: once the queue
     // empties, the session closed, the computer asleep (here a hook), then
     // the window closed (ConfirmExitOnCompletion off: not asked), and Stay
@@ -1834,6 +1864,32 @@ void Keys(const QString & Directory)
       Frontend.SetStartProgram(nullptr);
       Shown->trigger();
       Check(!Window.CommandLine()->isVisible(), "Command Line hides it again");
+    }
+    // P3-15: Local > View > Thumbnails: a grid over the same selection, an
+    // image's preview loaded in the background; Details back.
+    {
+      QImage Image(32, 24, QImage::Format_RGB32);
+      Image.fill(Qt::red);
+      Check(Image.save(Dir.filePath(QStringLiteral("picture.png"))), "(an image)");
+      Local->Refresh();
+      Window.SetPanelThumbnails(true, true);
+      Check(Local->Thumbnails() && Local->Thumbs()->isVisible() && !Local->View()->isVisible() &&
+        CoreBridge::Layout().LocalThumbnails, "View > Thumbnails shows the grid, and is kept");
+      Local->Select({ QStringLiteral("picture.png") });
+      Check(Local->Thumbs()->selectionModel() == Local->View()->selectionModel(), "the same selection");
+      const QString Picture = QDir(Local->Path()).filePath(QStringLiteral("picture.png"));
+      QElapsedTimer Timer;
+      Timer.start();
+      while (!Local->Thumbs()->HasPreview(Picture) && (Timer.elapsed() < 10000))
+      {
+        Local->Thumbs()->viewport()->repaint();
+        QApplication::processEvents(QEventLoop::AllEvents, 50);
+      }
+      Check(Local->Thumbs()->HasPreview(Picture) && !Local->Thumbs()->Preview(Picture).isNull(), "the image's preview loaded");
+      Window.SetPanelThumbnails(true, false);
+      Check(!Local->Thumbnails() && Local->View()->isVisible() && !CoreBridge::Layout().LocalThumbnails, "View > Details back");
+      QFile::remove(Dir.filePath(QStringLiteral("picture.png")));
+      Local->Refresh();
     }
 
     // Tab: to the other panel and back; Ctrl+[: the local path copied.

@@ -36,6 +36,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <deque>
 #include <map>
 #include <mutex>
 #include <set>
@@ -45,6 +46,25 @@ namespace CoreBridge
 {
 
 class TKeepUpToDateRun;
+
+namespace
+{
+
+// View > Thumbnails' downloads: those asked for (the files as listed),
+// those there (name: local copy), the queue item downloading them while it
+// runs, its temporary directory; under Mutex.
+struct TThumbnailState
+{
+  std::mutex Mutex;
+  std::deque<std::unique_ptr<TRemoteFile>> Requests;
+  std::set<std::string> Asked;
+  std::map<std::string, std::string> Files;
+  TQueueItem * Item = NULL;
+  UnicodeString Directory;
+  std::atomic<bool> Arrived{false};
+};
+
+}  // namespace
 
 struct TSession::TImpl
 {
@@ -62,6 +82,7 @@ struct TSession::TImpl
   TTerminalQueueStatus * QueueStatus = NULL;
   // Options > Queue > File List's (UpdateFileList fills it).
   std::unique_ptr<TQueueFileList> QueueFileList;
+  TThumbnailState Thumbnails;
   std::atomic<bool> QueueChanged{false};
   // Items added; those no longer listed have finished (done, or removed:
   // core drops done items at once unless told to keep them).
@@ -991,6 +1012,134 @@ bool TSession::QueueResume(std::uintptr_t Id)
   return (Item != NULL) && Item->Resume();
 }
 
+// As TThumbnailDownloadQueueItem (TerminalManager.cpp): the thumbnails' files
+// asked for, downloaded one after the other until none is left.
+class TThumbnailQueueItem : public TTransferQueueItem
+{
+public:
+  TThumbnailQueueItem(TThumbnailState * State, TTerminal * Terminal, const UnicodeString & SourceDir,
+      const UnicodeString & TargetDir, const TCopyParamType * CopyParam) :
+    TTransferQueueItem(Terminal, NULL, TargetDir, CopyParam, cpNoConfirmation | cpTemporary, osRemote, true, false),
+    FState(State)
+  {
+    FInfo->Source = SourceDir;
+  }
+
+protected:
+  virtual void __fastcall DoTransferExecute(TTerminal * Terminal, TParallelOperation *)
+  {
+    while (!IsExecutionCancelled())
+    {
+      std::unique_ptr<TRemoteFile> File;
+      {
+        std::lock_guard<std::mutex> Lock(FState->Mutex);
+        if (FState->Requests.empty())
+        {
+          FState->Item = NULL;
+          return;
+        }
+        File = std::move(FState->Requests.front());
+        FState->Requests.pop_front();
+      }
+      const UnicodeString FileName = File->FullFileName;
+      {
+        TGuard ItemGuard(FSection);
+        FInfo->Source = FileName;
+      }
+      std::unique_ptr<TStringList> Files(new TStringList());
+      Files->AddObject(FileName, File.get());
+      try
+      {
+        Terminal->CopyToLocal(Files.get(), FTargetDir, FCopyParam, FParams, NULL);
+      }
+      catch (Exception &)
+      {
+        // That one has no thumbnail; the others still may.
+        continue;
+      }
+      const UnicodeString LocalPath = IncludeTrailingBackslash(FTargetDir) +
+        Terminal->ChangeFileName(FCopyParam, UnixExtractFileName(FileName), osRemote, false);
+      std::lock_guard<std::mutex> Lock(FState->Mutex);
+      FState->Files[Utf8(File->FileName)] = Utf8(LocalPath);
+      FState->Arrived = true;
+    }
+    std::lock_guard<std::mutex> Lock(FState->Mutex);
+    FState->Item = NULL;
+  }
+
+private:
+  TThumbnailState * FState;
+};
+
+void TSession::RequestThumbnail(const std::string & Name)
+{
+  if (!Active())
+  {
+    return;
+  }
+  std::lock_guard<std::mutex> Lock(F->Thumbnails.Mutex);
+  if (F->Thumbnails.Asked.count(Name) > 0)
+  {
+    return;
+  }
+  TRemoteFile * Listed = NULL;
+  try
+  {
+    Listed = FindFile(F->Terminal.get(), Name);
+  }
+  catch (Exception &)
+  {
+    // Not listed (yet): asked for again when shown again.
+    return;
+  }
+  F->Thumbnails.Asked.insert(Name);
+  F->Thumbnails.Requests.emplace_back(Listed->Duplicate());
+  if (F->Thumbnails.Item == NULL)
+  {
+    try
+    {
+      if (F->Thumbnails.Directory.IsEmpty())
+      {
+        F->Thumbnails.Directory = IncludeTrailingBackslash(Configuration->TemporaryDir());
+        if (!ForceDirectories(ApiPath(F->Thumbnails.Directory)))
+        {
+          throw EOSExtException(FMTLOAD(CREATE_TEMP_DIR_ERROR, (F->Thumbnails.Directory)));
+        }
+      }
+      TCopyParamType CopyParam = TemporaryFileCopyParam(false);
+      CopyParam.TransferMode = tmBinary;
+      F->Thumbnails.Item = new TThumbnailQueueItem(&F->Thumbnails, F->Terminal.get(), F->Terminal->CurrentDirectory,
+        F->Thumbnails.Directory, &CopyParam);
+      F->QueueAdded++;
+      F->EnsureQueue()->AddItem(F->Thumbnails.Item);
+    }
+    catch (Exception &)
+    {
+      F->Thumbnails.Item = NULL;
+    }
+  }
+}
+
+std::string TSession::ThumbnailFile(const std::string & Name)
+{
+  std::lock_guard<std::mutex> Lock(F->Thumbnails.Mutex);
+  const auto Found = F->Thumbnails.Files.find(Name);
+  return (Found != F->Thumbnails.Files.end()) ? Found->second : std::string();
+}
+
+bool TSession::ThumbnailsChanged()
+{
+  return F->Thumbnails.Arrived.exchange(false);
+}
+
+void TSession::ForgetThumbnails()
+{
+  std::lock_guard<std::mutex> Lock(F->Thumbnails.Mutex);
+  F->Thumbnails.Requests.clear();
+  F->Thumbnails.Asked.clear();
+  F->Thumbnails.Files.clear();
+}
+
 std::vector<TSession::TQueueFile> TSession::QueueFiles(std::uintptr_t Id)
 {
   std::vector<TQueueFile> Result;
@@ -1159,9 +1308,19 @@ void TSession::Close()
 {
   KeepUpToDateStop();
   // The queue's connections and threads go first: they use the session's.
+  {
+    std::lock_guard<std::mutex> Lock(F->Thumbnails.Mutex);
+    F->Thumbnails.Requests.clear();
+  }
   delete F->QueueStatus;
   F->QueueStatus = NULL;
   F->Queue.reset();
+  F->Thumbnails.Item = NULL;
+  if (!F->Thumbnails.Directory.IsEmpty())
+  {
+    RecursiveDeleteFile(ExcludeTrailingBackslash(F->Thumbnails.Directory));
+    F->Thumbnails.Directory = UnicodeString();
+  }
   if (F->Terminal != NULL)
   {
     try

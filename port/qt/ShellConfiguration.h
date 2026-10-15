@@ -141,6 +141,10 @@ struct TShellSettings
   bool RemotePanelStatusBar = true;
   bool QueueViewToolBar = true;
   bool QueueViewFileList = false;
+  // The panels' ViewStyle (TDirViewStyle: 3 dvsReport, 4 dvsThumbnail).
+  int LocalPanelViewStyle = 3;
+  int RemotePanelViewStyle = 3;
+  int OtherLocalPanelViewStyle = 3;
   // Interface's ConfirmExitOnCompletion (TCustomWinConfiguration's).
   bool ConfirmExitOnCompletion = true;
   // Interface's DefaultToNewRemoteTab (TWinConfiguration's).

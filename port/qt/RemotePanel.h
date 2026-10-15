@@ -21,6 +21,7 @@
 #include "FileList.h"
 
 class QAction;
+class QAbstractItemView;
 class QLabel;
 class QLineEdit;
 class QSortFilterProxyModel;
@@ -98,6 +99,13 @@ public:
   // The directories visited: back, this one, forward.
   QStringList History() const;
   FileView * View() const { return FView; }
+  // View > Details and Thumbnails (ViewStyle: dvsReport, dvsThumbnail):
+  // the file list, or a grid of thumbnails over the same entries and
+  // selection. FocusView: whichever is shown.
+  void SetThumbnails(bool Thumbnails);
+  bool Thumbnails() const;
+  ThumbnailView * Thumbs() const { return FThumbs; }
+  QAbstractItemView * FocusView() const;
   // The drag of the selection, for other programs too: the main window's
   // (RemoteFileDrag); without it, a drag for the panels only.
   std::function<QMimeData *(const TFileDrag & Drag)> MakeDrag;
@@ -149,6 +157,7 @@ private:
   FileListModel * FModel = nullptr;
   DirectoriesFirst * FSort = nullptr;
   FileView * FView = nullptr;
+  ThumbnailView * FThumbs = nullptr;
   QLineEdit * FPath = nullptr;
   QLabel * FStatus = nullptr;
   // The directory shown: the path box may hold what is being typed.

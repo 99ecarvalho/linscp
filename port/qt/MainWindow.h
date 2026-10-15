@@ -280,6 +280,8 @@ public:
   // Options > Left (Left) or Right Panel > Tree, and > Status Bar.
   void SetTreeVisible(bool Left, bool Visible);
   void SetPanelStatusBarVisible(bool Left, bool Visible);
+  // Left/Right > View > Details or Thumbnails, kept as the panel's ViewStyle.
+  void SetPanelThumbnails(bool Left, bool Thumbnails);
   QAction * TreeAction(bool Left) const { return Left ? FLocalTreeAction : FRemoteTreeAction; }
   // As ApplicationMinimize (Keep Up To Date's Minimize): to the tray when
   // asked, or Preferences say so.
@@ -486,6 +488,7 @@ private:
   // The active session's queue as last seen: busy, and whose.
   const void * FQueueSession = nullptr;
   bool FQueueBusy = false;
+  int FQueueFinished = 0;
   void QueueEmptied();
   // An Options choice saved at once (the rest of the layout as stored).
   void StoreLayoutChoice(const std::function<void(CoreBridge::TLayout &)> & Change);

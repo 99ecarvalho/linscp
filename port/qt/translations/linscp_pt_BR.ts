@@ -2159,6 +2159,26 @@ Local: %2</translation>
         <source>Hide/show hot keys toolbar</source>
         <translation>Ocultar/mostrar a barra de atalhos</translation>
     </message>
+    <message>
+        <source>&amp;View</source>
+        <translation>&amp;Visualizar</translation>
+    </message>
+    <message>
+        <source>&amp;Details</source>
+        <translation>&amp;Detalhes</translation>
+    </message>
+    <message>
+        <source>View details</source>
+        <translation>Ver detalhes</translation>
+    </message>
+    <message>
+        <source>&amp;Thumbnails</source>
+        <translation>&amp;Miniaturas</translation>
+    </message>
+    <message>
+        <source>View thumbnails</source>
+        <translation>Ver miniaturas</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

@@ -474,6 +474,24 @@ void MainWindow::UpdateTitle()
 }
 
 // Options > Left/Right Panel > Tree.
+void MainWindow::SetPanelThumbnails(bool Left, bool Thumbnails)
+{
+  LocalPanel * Side = SideLocal(Left);
+  if (Side != nullptr)
+  {
+    Side->SetThumbnails(Thumbnails);
+  }
+  else
+  {
+    FPanel->SetThumbnails(Thumbnails);
+  }
+  const bool Other = (Side == FOtherLocal);
+  StoreLayoutChoice([Left, Other, Thumbnails](CoreBridge::TLayout & Layout)
+  {
+    (Left ? Layout.LocalThumbnails : (Other ? Layout.OtherLocalThumbnails : Layout.RemoteThumbnails)) = Thumbnails;
+  });
+}
+
 void MainWindow::SetPanelStatusBarVisible(bool Left, bool Visible)
 {
   if (Left)
@@ -549,6 +567,9 @@ void MainWindow::RestoreLayout()
   SetTreeVisible(false, Layout.RemoteTree);
   SetPanelStatusBarVisible(true, Layout.LocalStatusBar);
   SetPanelStatusBarVisible(false, Layout.RemoteStatusBar);
+  FLocal->SetThumbnails(Layout.LocalThumbnails);
+  FPanel->SetThumbnails(Layout.RemoteThumbnails);
+  FOtherLocal->SetThumbnails(Layout.OtherLocalThumbnails);
   const int Total = std::max(FPanels->width(), width());
   const int LocalWidth = static_cast<int>(Total * std::clamp(Layout.LocalPanelWidth, 0.1, 0.9));
   // (The right side's two panels share its width, one shown.)
@@ -1302,7 +1323,7 @@ void MainWindow::ActivatePanel(bool Local)
   UpdateCommandLine();
   UpdateHotKeys();
   LocalPanel * Panel = SideLocal(Local);
-  ((Panel != nullptr) ? static_cast<QWidget *>(Panel->View()) : static_cast<QWidget *>(FPanel->View()))->setFocus();
+  ((Panel != nullptr) ? Panel->FocusView() : FPanel->FocusView())->setFocus();
 }
 
 void MainWindow::QueueIdle()
@@ -1346,6 +1367,11 @@ void MainWindow::QueueIdle()
   {
     FQueue->Update();
   }
+  // Remote thumbnails that arrived: drawn.
+  if (FSession && FSession->ThumbnailsChanged())
+  {
+    FPanel->Thumbs()->viewport()->update();
+  }
   // Finished transfers change the directories: as WinSCP, the panels read
   // theirs again.
   const int Done = FSession ? FSession->QueueDoneCount() : 0;
@@ -1361,10 +1387,15 @@ void MainWindow::QueueIdle()
   // As QueueListUpdate: once the active session's queue empties.
   if (FSession)
   {
+    // Busy as last seen, or anything finished since (a short transfer can
+    // come and go between two looks).
     const bool Busy = !FSession->QueueEmpty();
-    const bool Emptied = (FQueueSession == FSession.get()) && FQueueBusy && !Busy;
+    const int Finished = FSession->QueueDoneCount();
+    const bool Same = (FQueueSession == FSession.get());
+    const bool Emptied = Same && (FQueueBusy || (Finished > FQueueFinished)) && !Busy;
     FQueueSession = FSession.get();
     FQueueBusy = Busy;
+    FQueueFinished = Finished;
     if (Emptied)
     {
       QueueEmptied();
@@ -4486,6 +4517,21 @@ QMenu * MainWindow::PanelMenu(bool Local)
       QApplication::clipboard()->setText((Side != nullptr) ? QDir::toNativeSeparators(Side->Path()) : FPanel->Path());
     });
     Menu->addSeparator();
+    // As ...ReportAction and ...ThumbnailAction: details or thumbnails.
+    QMenu * ViewMenu = Menu->addMenu(tr("&View"));
+    QActionGroup * ViewGroup = new QActionGroup(ViewMenu);
+    const bool Thumbnails = (Side != nullptr) ? Side->Thumbnails() : FPanel->Thumbnails();
+    QAction * Details = ViewMenu->addAction(tr("&Details"), this, [this, Local]() { SetPanelThumbnails(Local, false); });
+    Details->setStatusTip(tr("View details"));
+    ViewMenu->addSeparator();
+    QAction * Thumbs = ViewMenu->addAction(tr("&Thumbnails"), this, [this, Local]() { SetPanelThumbnails(Local, true); });
+    Thumbs->setStatusTip(tr("View thumbnails"));
+    for (QAction * Choice : { Details, Thumbs })
+    {
+      Choice->setCheckable(true);
+      ViewGroup->addAction(Choice);
+    }
+    (Thumbnails ? Thumbs : Details)->setChecked(true);
     // The view's sort and columns, as its header's.
     FileView * View = (Side != nullptr) ? Side->View() : FPanel->View();
     QMenu * Sort = View->SortMenu(Side != nullptr);

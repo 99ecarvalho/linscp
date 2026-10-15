@@ -1,4 +1,5 @@
 #include "LocalPanel.h"
+#include <QImageReader>
 #include <QMenu>
 #include <QStandardPaths>
 #include <QStorageInfo>
@@ -188,6 +189,19 @@ LocalPanel::LocalPanel(QWidget * Parent) :
   FTree->hide();
   FSplitter->addWidget(FTree);
   FSplitter->addWidget(FView);
+  FThumbs = new ThumbnailView(FView, FSplitter);
+  FThumbs->hide();
+  FSplitter->addWidget(FThumbs);
+  FSplitter->setStretchFactor(2, 1);
+  connect(FThumbs, &QListView::activated, this, &LocalPanel::Activated);
+  // Previews of the files Qt reads as images.
+  FThumbs->ImagePath = [this](const CoreBridge::TRemoteEntry & Entry)
+  {
+    static const QList<QByteArray> Formats = QImageReader::supportedImageFormats();
+    const QString Name = QString::fromStdString(Entry.Name);
+    return Formats.contains(QFileInfo(Name).suffix().toLower().toLatin1()) ? QDir(FCurrent).filePath(Name) : QString();
+  };
+  connect(FThumbs, &QWidget::customContextMenuRequested, this, &LocalPanel::ContextMenu);
   FSplitter->setStretchFactor(1, 1);
   connect(FTree, &LocalDirectoryTree::DirectoryChosen, this, [this](const QString & Path)
   {
@@ -247,6 +261,7 @@ bool LocalPanel::Go(const QString & Directory, bool Record)
   if (FCurrent != Target)
   {
     FView->ForgetSelectedNames();
+    FThumbs->Forget();
   }
   FCurrent = Target;
   FWatcher->addPath(FCurrent);
@@ -551,10 +566,10 @@ void LocalPanel::ContextMenu(const QPoint & Pos)
 {
   if (OnContextMenu)
   {
-    const QModelIndex Index = FView->indexAt(Pos);
+    const QModelIndex Index = FocusView()->indexAt(Pos);
     const QModelIndex Source = Index.isValid() ? FSort->mapToSource(Index) : QModelIndex();
     const bool OnItem = Source.isValid() && !FModel->IsParent(Source.row()) && (FModel->Entry(Source.row()) != nullptr);
-    OnContextMenu(FView->viewport()->mapToGlobal(Pos), OnItem);
+    OnContextMenu(FocusView()->viewport()->mapToGlobal(Pos), OnItem);
     return;
   }
   QMenu Menu(this);
@@ -563,7 +578,7 @@ void LocalPanel::ContextMenu(const QPoint & Pos)
   Menu.addAction(FDeleteAction);
   Menu.addSeparator();
   Menu.addAction(FRefreshAction);
-  Menu.exec(FView->viewport()->mapToGlobal(Pos));
+  Menu.exec(FocusView()->viewport()->mapToGlobal(Pos));
 }
 
 void LocalPanel::SetShowHidden(bool Show)
@@ -818,4 +833,25 @@ void LocalPanel::SetTreeHeight(int Height)
 {
   const int Total = std::max(FSplitter->height(), Height + 100);
   FSplitter->setSizes({ Height, Total - Height });
+}
+
+void LocalPanel::SetThumbnails(bool Thumbnails)
+{
+  const bool Focused = FocusView()->hasFocus();
+  FView->setVisible(!Thumbnails);
+  FThumbs->setVisible(Thumbnails);
+  if (Focused)
+  {
+    FocusView()->setFocus();
+  }
+}
+
+bool LocalPanel::Thumbnails() const
+{
+  return !FThumbs->isHidden();
+}
+
+QAbstractItemView * LocalPanel::FocusView() const
+{
+  return Thumbnails() ? static_cast<QAbstractItemView *>(FThumbs) : static_cast<QAbstractItemView *>(FView);
 }

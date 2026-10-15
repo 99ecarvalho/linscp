@@ -10,6 +10,7 @@
 #include <QHeaderView>
 #include <QInputDialog>
 #include <QDir>
+#include <QFileInfo>
 #include <QLabel>
 #include <QSplitter>
 #include <QLineEdit>
@@ -129,6 +130,34 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   FTree->hide();
   FSplitter->addWidget(FTree);
   FSplitter->addWidget(FView);
+  FThumbs = new ThumbnailView(FView, FSplitter);
+  FThumbs->hide();
+  FSplitter->addWidget(FThumbs);
+  FSplitter->setStretchFactor(2, 1);
+  connect(FThumbs, &QListView::activated, this, &RemotePanel::Activated);
+  FThumbs->Local = false;
+  // As GetThumbnail's candidates (InitializeRemoteThumbnailMask and
+  // RemoteThumbnailSizeLimit): WinSCP's image masks, up to 50 MB; asked
+  // for as shown, downloaded by the session in the background.
+  FThumbs->ImagePath = [this](const CoreBridge::TRemoteEntry & Entry)
+  {
+    static const QStringList Masks = { QStringLiteral("jpg"), QStringLiteral("jpeg"), QStringLiteral("gif"),
+      QStringLiteral("png"), QStringLiteral("svg"), QStringLiteral("bmp"), QStringLiteral("raw"), QStringLiteral("ico"),
+      QStringLiteral("heic"), QStringLiteral("webp") };
+    const QString Name = QString::fromStdString(Entry.Name);
+    if ((FSession == nullptr) || !FSession->Active() || (Entry.Size > 50LL * 1024 * 1024) ||
+        !Masks.contains(QFileInfo(Name).suffix().toLower()))
+    {
+      return QString();
+    }
+    const std::string Local = FSession->ThumbnailFile(Entry.Name);
+    if (Local.empty())
+    {
+      FSession->RequestThumbnail(Entry.Name);
+    }
+    return QString::fromStdString(Local);
+  };
+  connect(FThumbs, &QWidget::customContextMenuRequested, this, &RemotePanel::ContextMenu);
   FSplitter->setStretchFactor(1, 1);
   connect(FTree, &RemoteDirectoryTree::DirectoryChosen, this, [this](const QString & Path)
   {
@@ -216,6 +245,11 @@ void RemotePanel::Reload()
   if (FCurrent != Current)
   {
     FView->ForgetSelectedNames();
+    FThumbs->Forget();
+    if (FSession != nullptr)
+    {
+      FSession->ForgetThumbnails();
+    }
   }
   FCurrent = Current;
   FPath->setText(Current);
@@ -479,10 +513,10 @@ void RemotePanel::ContextMenu(const QPoint & Pos)
 {
   if (OnContextMenu)
   {
-    const QModelIndex Index = FView->indexAt(Pos);
+    const QModelIndex Index = FocusView()->indexAt(Pos);
     const QModelIndex Source = Index.isValid() ? FSort->mapToSource(Index) : QModelIndex();
     const bool OnItem = Source.isValid() && !FModel->IsParent(Source.row()) && (FModel->Entry(Source.row()) != nullptr);
-    OnContextMenu(FView->viewport()->mapToGlobal(Pos), OnItem);
+    OnContextMenu(FocusView()->viewport()->mapToGlobal(Pos), OnItem);
     return;
   }
   QMenu Menu(this);
@@ -491,7 +525,7 @@ void RemotePanel::ContextMenu(const QPoint & Pos)
   Menu.addAction(FDeleteAction);
   Menu.addSeparator();
   Menu.addAction(FRefreshAction);
-  Menu.exec(FView->viewport()->mapToGlobal(Pos));
+  Menu.exec(FocusView()->viewport()->mapToGlobal(Pos));
 }
 
 void RemotePanel::SetShowHidden(bool Show)
@@ -767,4 +801,25 @@ void RemotePanel::SetTreeHeight(int Height)
 {
   const int Total = std::max(FSplitter->height(), Height + 100);
   FSplitter->setSizes({ Height, Total - Height });
+}
+
+void RemotePanel::SetThumbnails(bool Thumbnails)
+{
+  const bool Focused = FocusView()->hasFocus();
+  FView->setVisible(!Thumbnails);
+  FThumbs->setVisible(Thumbnails);
+  if (Focused)
+  {
+    FocusView()->setFocus();
+  }
+}
+
+bool RemotePanel::Thumbnails() const
+{
+  return !FThumbs->isHidden();
+}
+
+QAbstractItemView * RemotePanel::FocusView() const
+{
+  return Thumbnails() ? static_cast<QAbstractItemView *>(FThumbs) : static_cast<QAbstractItemView *>(FView);
 }

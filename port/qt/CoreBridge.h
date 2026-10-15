@@ -661,6 +661,10 @@ struct TLayout
   bool QueueToolbar = true;
   // Options > Queue > File List (QueueView.FileList).
   bool QueueFileList = false;
+  // The panels' View (ViewStyle): Details, or Thumbnails.
+  bool LocalThumbnails = false;
+  bool RemoteThumbnails = false;
+  bool OtherLocalThumbnails = false;
   // Whether to ask before the application exits once a queue's operation
   // completes (Interface's ConfirmExitOnCompletion).
   bool ConfirmExitOnCompletion = true;
@@ -2046,6 +2050,16 @@ public:
     bool Processed = false;
   };
   std::vector<TQueueFile> QueueFiles(std::uintptr_t Id);
+  // View > Thumbnails' remote previews, as TThumbnailDownloadQueueItem:
+  // files of the current directory asked for, downloaded one after the
+  // other in the background (a queue item of its own) to a temporary
+  // directory of the session's; ThumbnailFile gives each one's local copy
+  // once there (empty until then), ThumbnailsChanged whether any arrived
+  // since the last call. Forgotten when the directory changes.
+  void RequestThumbnail(const std::string & Name);
+  std::string ThumbnailFile(const std::string & Name);
+  bool ThumbnailsChanged();
+  void ForgetThumbnails();
   void Close();
 
 private:

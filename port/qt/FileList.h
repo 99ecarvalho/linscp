@@ -12,6 +12,10 @@
 class QMenu;
 #include <QSortFilterProxyModel>
 #include <QStringList>
+#include <QHash>
+#include <QListView>
+#include <QPixmap>
+#include <QSet>
 #include <QTreeView>
 
 #include <functional>
@@ -274,6 +278,37 @@ private:
   // WinSCP's entries as last given, for the columns the view does not have.
   QStringList FColumnEntries;
   QStringList FColumnOrder;
+};
+
+// View > Thumbnails (dvsThumbnail): the panel's entries as a grid, an
+// image's own preview where ImagePath gives its file (loaded in the
+// background, 128 pixels at 96 DPI, as TCustomDirView's ThumbnailSize),
+// else its type's icon. The same model and selection as the panel's
+// FileView, which keeps doing the panel's commands.
+class ThumbnailView : public QListView
+{
+  Q_OBJECT
+
+public:
+  explicit ThumbnailView(FileView * Details, QWidget * Parent = nullptr);
+  // An entry's local image to preview; empty: none (yet).
+  std::function<QString(const CoreBridge::TRemoteEntry &)> ImagePath;
+  // Local: type icons from the files themselves, else by their names.
+  bool Local = true;
+  // The previews forgotten (the directory changed).
+  void Forget();
+  // Whether a preview of the file is loaded (tests).
+  bool HasPreview(const QString & Path) const { return FPreviews.contains(Path); }
+  int ThumbnailSize() const { return FSize; }
+  const CoreBridge::TRemoteEntry * EntryAt(const QModelIndex & Index) const;
+  // The preview, or null; a missing one is asked for.
+  QPixmap Preview(const QString & Path);
+
+private:
+  FileView * FDetails;
+  int FSize;
+  QHash<QString, QPixmap> FPreviews;
+  QSet<QString> FPending;
 };
 
 #endif

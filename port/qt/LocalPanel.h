@@ -18,6 +18,7 @@
 
 class QAction;
 class QFileSystemWatcher;
+class QAbstractItemView;
 class QLabel;
 class QLineEdit;
 class QTimer;
@@ -99,6 +100,13 @@ public:
   // The directories visited: back, this one, forward (native separators).
   QStringList History() const;
   FileView * View() const { return FView; }
+  // View > Details and Thumbnails (ViewStyle: dvsReport, dvsThumbnail):
+  // the file list, or a grid of thumbnails over the same entries and
+  // selection. FocusView: whichever is shown.
+  void SetThumbnails(bool Thumbnails);
+  bool Thumbnails() const;
+  ThumbnailView * Thumbs() const { return FThumbs; }
+  QAbstractItemView * FocusView() const;
   QLineEdit * PathEdit() const { return FPath; }
   QLabel * Status() const { return FStatus; }
 
@@ -145,6 +153,7 @@ private:
   FileListModel * FModel = nullptr;
   DirectoriesFirst * FSort = nullptr;
   FileView * FView = nullptr;
+  ThumbnailView * FThumbs = nullptr;
   QLineEdit * FPath = nullptr;
   QLabel * FStatus = nullptr;
   QFileSystemWatcher * FWatcher = nullptr;
