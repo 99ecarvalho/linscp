@@ -270,7 +270,7 @@ registry, tray or window messages.
 | Synchronize checklist | calculate sizes; find move candidates; custom commands | partial | Tools > Calculate, Calculate All, Move, Find Move Candidate done; custom commands wait for local custom commands |
 | Preferences > Panels | incremental search; preserve panel state; full row; double-click action; panel font; Explorer-style selection; tree | partial | all but the tree done (WinSCP's keys; Explorer-style selection's default, Mouse only, keeps the arrows off the selection and commands take the focused file); the directory tree view is missing |
 | Preferences > Transfer | presets' autoselection rules (edited, matched) | missing | rules kept when saved |
-| Preferences > Background | parallel threshold; enable queue by default; queue list visibility on the page | missing | visibility is in Options > Queue |
+| Preferences > Background | parallel threshold; enable queue by default; queue list visibility on the page; Process Queue | done | core's `ParallelTransferThreshold` (KB, -1 off, 100 MB offered); `EnableQueueByDefault` sets each session's `TTerminalQueue::Enabled`; Commands > Queue > Process Queue toggles it |
 | Preferences > Window | minimize to tray; single instance | missing | Win-only in WinSCP; QSystemTrayIcon, QLocalServer |
 | Preferences > Security | master password | missing | |
 | Preferences > SSH | host CAs | missing | |

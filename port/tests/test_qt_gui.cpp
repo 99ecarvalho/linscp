@@ -1773,6 +1773,18 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       Dialog.QueueTransfersLimitSpin()->setValue(3);
       Dialog.QueueKeepDoneCombo()->setCurrentIndex(2);
       Dialog.QueueCheck()->setChecked(true);
+      // Single files over several connections: only with parallel transfers.
+      Check(Dialog.ParallelThresholdCheck()->isEnabled() && !Dialog.ParallelThresholdSpin()->isEnabled() &&
+        (Dialog.ParallelThresholdSpin()->value() == 100), "the threshold off, WinSCP's 100 MB offered");
+      Dialog.ParallelThresholdCheck()->setChecked(true);
+      Dialog.ParallelThresholdSpin()->setValue(50);
+      Dialog.QueueParallelCheck()->setChecked(false);
+      Check(!Dialog.ParallelThresholdCheck()->isEnabled() && !Dialog.ParallelThresholdSpin()->isEnabled(),
+        "no threshold without parallel transfers");
+      Dialog.QueueParallelCheck()->setChecked(true);
+      Check(Dialog.EnableQueueByDefaultCheck()->isChecked(), "queue processing on by default");
+      Dialog.EnableQueueByDefaultCheck()->setChecked(false);
+      Check(Dialog.QueueViewButton(1)->isChecked(), "the queue list hidden when empty, as Options > Queue");
       Dialog.ResumeOffButton()->setChecked(true);
       Check(!Dialog.ResumeThresholdSpin()->isEnabled(), "a threshold only for \"files above\"");
       Dialog.ReopenAutoCheck()->setChecked(false);
@@ -1864,7 +1876,9 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       "the language chosen too");
     Check((Saved(Interface, QStringLiteral("QueueTransfersLimit")) == QStringLiteral("3")) &&
       (Saved(Interface, QStringLiteral("QueueKeepDoneItemsFor")) == QStringLiteral("60")) &&
-      (Saved(Interface, QStringLiteral("SessionReopenAuto")) == QStringLiteral("0")),
+      (Saved(Interface, QStringLiteral("SessionReopenAuto")) == QStringLiteral("0")) &&
+      (Saved(Interface, QStringLiteral("ParallelTransferThreshold")) == QStringLiteral("51200")) &&
+      (Saved(Interface, QStringLiteral("EnableQueueByDefault")) == QStringLiteral("0")),
       "Background's and Endurance's, under core's and the GUI's keys");
     const QString CopyParam = QStringLiteral("Configuration\\Interface\\CopyParam");
     Check((Saved(CopyParam, QStringLiteral("Queue")) == QStringLiteral("1")) &&
@@ -4330,6 +4344,18 @@ void ClipboardTest(const char * Port, const QString & Directory)
     Window.SetQueueShow(CoreBridge::TLayout::TQueueShow::Hide);
     Check(!Window.Queue()->isVisible(), "Queue > Hide");
     Window.SetQueueShow(CoreBridge::TLayout::TQueueShow::HideWhenEmpty);
+
+    // Queue > Process Queue off: a background upload waits, until it is on.
+    Check(Window.ProcessQueueAction()->isEnabled() && Window.ProcessQueueAction()->isChecked(),
+      "the queue processed by default (EnableQueueByDefault)");
+    Window.ProcessQueueAction()->trigger();
+    Check(!Window.Session()->QueueEnabled(), "Process Queue off");
+    Window.Session()->QueueUpload({ QDir::toNativeSeparators(Local.filePath(QStringLiteral("up.txt"))).toStdString() }, "/sub");
+    QTest::qWait(1500);
+    Check(!QFileInfo::exists(Root.filePath(QStringLiteral("sub/up.txt"))), "the queued upload waits");
+    Window.ProcessQueueAction()->trigger();
+    Check(WaitUntil([&Root]() { return QFileInfo::exists(Root.filePath(QStringLiteral("sub/up.txt"))); }),
+      "and runs once the queue is processed again");
   }
   CoreBridge::Finalize();
 }

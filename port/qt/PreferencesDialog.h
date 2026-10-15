@@ -66,8 +66,12 @@ public:
   QComboBox * QueueKeepDoneCombo() const { return FQueueKeepDone; }
   QCheckBox * QueueAutoPopupCheck() const { return FQueueAutoPopup; }
   QCheckBox * QueueCheck() const { return FQueue; }
-  QCheckBox * QueueNoConfirmationCheck() const { return FQueueNoConfirmation; }
   QCheckBox * QueueParallelCheck() const { return FQueueParallel; }
+  QCheckBox * ParallelThresholdCheck() const { return FParallelThresholdCheck; }
+  QSpinBox * ParallelThresholdSpin() const { return FParallelThreshold; }
+  QCheckBox * EnableQueueByDefaultCheck() const { return FEnableQueueByDefault; }
+  QRadioButton * QueueViewButton(int Show) const { return FQueueView[Show]; }
+  QCheckBox * QueueNoConfirmationCheck() const { return FQueueNoConfirmation; }
   class QRadioButton * ResumeOnButton() const { return FResumeOn; }
   QRadioButton * ResumeSmartButton() const { return FResumeSmart; }
   QRadioButton * ResumeOffButton() const { return FResumeOff; }
@@ -175,6 +179,14 @@ private:
   QComboBox * FSizeFormat = nullptr;
   QCheckBox * FSwappedPanels = nullptr;
   QComboBox * FIconSet = nullptr;
+  QCheckBox * FParallelThresholdCheck = nullptr;
+  QSpinBox * FParallelThreshold = nullptr;
+  QCheckBox * FEnableQueueByDefault = nullptr;
+  QRadioButton * FQueueView[3] = {};
+public:
+  // The Background page's queue list choice (Options > Queue's).
+  int QueueViewChoice() const;
+private:
   QCheckBox * FPreservePanelState = nullptr;
   QCheckBox * FFullRowSelect = nullptr;
   QComboBox * FPanelSearch = nullptr;

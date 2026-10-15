@@ -281,6 +281,8 @@ TPreferences Preferences()
   Result.QueueTransfersLimit = Configuration->QueueTransfersLimit;
   Result.QueueKeepDoneItemsFor = GUIConfiguration->QueueKeepDoneItems ? GUIConfiguration->QueueKeepDoneItemsFor : 0;
   Result.QueueAutoPopup = GUIConfiguration->QueueAutoPopup;
+  Result.EnableQueueByDefault = Settings.EnableQueueByDefault;
+  Result.ParallelTransferThreshold = Configuration->ParallelTransferThreshold;
   Result.SessionReopenAuto = Configuration->SessionReopenAuto / MSecsPerSec;
   Result.SessionReopenAutoIdleOn = GUIConfiguration->SessionReopenAutoIdleOn && (GUIConfiguration->SessionReopenAutoIdle > 0);
   Result.SessionReopenAutoIdle = GUIConfiguration->SessionReopenAutoIdle / MSecsPerSec;
@@ -580,6 +582,7 @@ void SetPreferences(const TPreferences & Preferences)
   Settings.NaturalOrderNumericalSorting = Preferences.NaturalOrderNumericalSorting;
   Settings.AlwaysSortDirectoriesByName = Preferences.AlwaysSortDirectoriesByName;
   Settings.RenameWholeName = Preferences.RenameWholeName;
+  Settings.EnableQueueByDefault = Preferences.EnableQueueByDefault;
   Settings.PanelSearch = static_cast<int>(Preferences.PanelSearch);
   Settings.PreservePanelState = Preferences.PreservePanelState;
   Settings.FullRowSelect = Preferences.FullRowSelect;
@@ -617,6 +620,7 @@ void SetPreferences(const TPreferences & Preferences)
     GUIConfiguration->QueueKeepDoneItems = (Preferences.QueueKeepDoneItemsFor != 0);
     GUIConfiguration->QueueKeepDoneItemsFor = Preferences.QueueKeepDoneItemsFor;
     GUIConfiguration->QueueAutoPopup = Preferences.QueueAutoPopup;
+    Configuration->ParallelTransferThreshold = Preferences.ParallelTransferThreshold;
     Configuration->SessionReopenAuto = Preferences.SessionReopenAuto * MSecsPerSec;
     GUIConfiguration->SessionReopenAutoIdleOn = Preferences.SessionReopenAutoIdleOn;
     GUIConfiguration->SessionReopenAutoIdle = Preferences.SessionReopenAutoIdle * MSecsPerSec;

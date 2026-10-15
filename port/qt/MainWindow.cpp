@@ -481,6 +481,20 @@ void MainWindow::SaveLayout()
 bool MainWindow::PreferencesDialog(const QString & Page)
 {
   ::PreferencesDialog Dialog(this);
+  struct TQueueViewChoice
+  {
+    MainWindow * Window;
+    ::PreferencesDialog * Dialog;
+    // The page's queue list as Options > Queue, once accepted.
+    void Apply() const
+    {
+      const int Show = Dialog->QueueViewChoice();
+      if (Show >= 0)
+      {
+        Window->SetQueueShow(static_cast<CoreBridge::TLayout::TQueueShow>(Show));
+      }
+    }
+  } QueueView{ this, &Dialog };
   for (int Row = 0; !Page.isEmpty() && (Row < Dialog.Navigation()->count()); Row++)
   {
     if (Dialog.Navigation()->item(Row)->text() == Page)
@@ -495,6 +509,7 @@ bool MainWindow::PreferencesDialog(const QString & Page)
   try
   {
     Dialog.Save();
+    QueueView.Apply();
   }
   catch (const CoreBridge::TCoreError & E)
   {
@@ -1460,6 +1475,11 @@ void MainWindow::UpdateActions()
     UpdateQueueView();
   }
   UpdateSortActions();
+  if (FProcessQueueAction != nullptr)
+  {
+    FProcessQueueAction->setEnabled(FSession && FSession->Active());
+    FProcessQueueAction->setChecked(FSession && FSession->QueueEnabled());
+  }
   // The left Files band's: upload, or in a local tab copy.
   if (FLeftCopyAction != nullptr)
   {
@@ -3359,6 +3379,17 @@ void MainWindow::BuildMenus()
   FSyncBrowseAction->setShortcut(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_B));
   connect(FSyncBrowseAction, &QAction::triggered, this, [this](bool On) { SetSynchronizeBrowsing(On); });
   Commands->addAction(FFindFilesAction);
+  // As Queue > Process Queue (QueueEnableAction): the session's queue run or held.
+  QMenu * QueueCommands = Commands->addMenu(tr("Q&ueue"));
+  FProcessQueueAction = QueueCommands->addAction(tr("&Process Queue"));
+  FProcessQueueAction->setCheckable(true);
+  connect(FProcessQueueAction, &QAction::triggered, this, [this](bool Enabled)
+  {
+    if (FSession)
+    {
+      FSession->SetQueueEnabled(Enabled);
+    }
+  });
   Commands->addMenu(FStaticCommandsMenu);
   Commands->addSeparator();
   Commands->addAction(FConsoleAction);

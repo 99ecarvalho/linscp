@@ -1644,6 +1644,14 @@ Local: %2</translation>
         <source>Cannot reload &apos;%1&apos;: its session is closed.</source>
         <translation>Não é possível recarregar &apos;%1&apos;: a sua sessão está fechada.</translation>
     </message>
+    <message>
+        <source>Q&amp;ueue</source>
+        <translation>Fi&amp;la</translation>
+    </message>
+    <message>
+        <source>&amp;Process Queue</source>
+        <translation>&amp;Processar fila</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>
@@ -2401,6 +2409,38 @@ Local: %2</translation>
     <message>
         <source>&amp;Explorer-style selection:</source>
         <translation>Seleção estilo &amp;Explorer</translation>
+    </message>
+    <message>
+        <source>Use multiple connections for single files abo&amp;ve:</source>
+        <translation>Usar múltiplas conexões para cada arqui&amp;vo acima:</translation>
+    </message>
+    <message>
+        <source> MB</source>
+        <translation> MB</translation>
+    </message>
+    <message>
+        <source>Size</source>
+        <translation>Tamanho</translation>
+    </message>
+    <message>
+        <source>&amp;Enable queue processing by default</source>
+        <translation>&amp;Habilitar processamento de fila por padrão</translation>
+    </message>
+    <message>
+        <source>Queue list</source>
+        <translation>Lista da fila</translation>
+    </message>
+    <message>
+        <source>&amp;Show</source>
+        <translation>&amp;Mostrar</translation>
+    </message>
+    <message>
+        <source>Hide &amp;when empty</source>
+        <translation>Ocultar quando &amp;vazia</translation>
+    </message>
+    <message>
+        <source>&amp;Hide</source>
+        <translation>&amp;Ocultar</translation>
     </message>
 </context>
 <context>

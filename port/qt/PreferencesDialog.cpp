@@ -893,11 +893,44 @@ QWidget * PreferencesDialog::MakeBackgroundPage(const TPreferences & Preferences
   FQueueParallel->setChecked(FDefaultSettings.QueueParallel);
   FQueueAutoPopup = new QCheckBox(tr("&Automatically popup prompts of background transfers when idle"), Group);
   FQueueAutoPopup->setChecked(Preferences.QueueAutoPopup);
-  for (QCheckBox * Check : { FQueue, FQueueNoConfirmation, FQueueParallel, FQueueAutoPopup })
+  // As ParallelTransferCheck: above a size (WinSCP's 100 MB when off).
+  FParallelThresholdCheck = new QCheckBox(tr("Use multiple connections for single files abo&ve:"), Group);
+  FParallelThresholdCheck->setChecked(Preferences.ParallelTransferThreshold > 0);
+  FParallelThreshold = new QSpinBox(Group);
+  FParallelThreshold->setRange(1, 1024 * 1024);
+  FParallelThreshold->setSuffix(tr(" MB"));
+  FParallelThreshold->setValue((Preferences.ParallelTransferThreshold > 0) ? std::max(1, Preferences.ParallelTransferThreshold / 1024) : 100);
+  FParallelThreshold->setAccessibleName(tr("Size"));
+  FEnableQueueByDefault = new QCheckBox(tr("&Enable queue processing by default"), Group);
+  FEnableQueueByDefault->setChecked(Preferences.EnableQueueByDefault);
+  for (QCheckBox * Check : { FQueue, FQueueNoConfirmation, FQueueParallel })
   {
     Form->addRow(Check);
   }
+  Form->addRow(FParallelThresholdCheck, FParallelThreshold);
+  auto UpdateParallel = [this]()
+  {
+    FParallelThresholdCheck->setEnabled(FQueueParallel->isChecked());
+    FParallelThreshold->setEnabled(FQueueParallel->isChecked() && FParallelThresholdCheck->isChecked());
+  };
+  connect(FQueueParallel, &QCheckBox::toggled, this, UpdateParallel);
+  connect(FParallelThresholdCheck, &QCheckBox::toggled, this, UpdateParallel);
+  UpdateParallel();
+  Form->addRow(FQueueAutoPopup);
+  Form->addRow(FEnableQueueByDefault);
   Layout->addWidget(Group);
+  // As QueueViewGroup: Options > Queue's, here too.
+  QGroupBox * View = new QGroupBox(tr("Queue list"), Page);
+  QVBoxLayout * ViewLayout = new QVBoxLayout(View);
+  const QString Shows[] = { tr("&Show"), tr("Hide &when empty"), tr("&Hide") };
+  const int QueueShow = static_cast<int>(CoreBridge::Layout().QueueShow);
+  for (int Show = 0; Show < 3; Show++)
+  {
+    FQueueView[Show] = new QRadioButton(Shows[Show], View);
+    FQueueView[Show]->setChecked(Show == QueueShow);
+    ViewLayout->addWidget(FQueueView[Show]);
+  }
+  Layout->addWidget(View);
   Layout->addStretch(1);
   return Page;
 }
@@ -1000,6 +1033,9 @@ TPreferences PreferencesDialog::Preferences() const
   Result.QueueTransfersLimit = FQueueTransfersLimit->value();
   Result.QueueKeepDoneItemsFor = FQueueKeepDone->currentData().toInt();
   Result.QueueAutoPopup = FQueueAutoPopup->isChecked();
+  Result.EnableQueueByDefault = FEnableQueueByDefault->isChecked();
+  // In KB, as Configuration keeps it; -1 when off.
+  Result.ParallelTransferThreshold = FParallelThresholdCheck->isChecked() ? (FParallelThreshold->value() * 1024) : -1;
   Result.SessionReopenAuto = FReopenAuto->isChecked() ? FReopenAutoSeconds->value() : 0;
   Result.SessionReopenAutoIdleOn = FReopenAutoIdle->isChecked();
   Result.SessionReopenAutoIdle = FReopenAutoIdleSeconds->value();
@@ -1700,4 +1736,16 @@ bool PreferencesDialog::Integrate(const QString & Question, bool (*Action)(QStri
     return false;
   }
   return true;
+}
+
+int PreferencesDialog::QueueViewChoice() const
+{
+  for (int Show = 0; Show < 3; Show++)
+  {
+    if ((FQueueView[Show] != nullptr) && FQueueView[Show]->isChecked())
+    {
+      return Show;
+    }
+  }
+  return -1;
 }

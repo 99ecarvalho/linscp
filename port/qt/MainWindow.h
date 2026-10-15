@@ -218,6 +218,7 @@ public:
   void ActivatePanel(bool Local);
   bool LocalActive() const { return FLocalActive; }
   CoreBridge::TSession * Session() const { return FSession.get(); }
+  QAction * ProcessQueueAction() const { return FProcessQueueAction; }
   // Session tabs, as WinSCP's (TTerminalManager's sessions, its
   // SessionsPageControl): opening a session adds one, Disconnect closes the
   // active one. The active tab's session is Session().
@@ -366,6 +367,7 @@ private:
   QAction * FSyncBrowseAction = nullptr;
   QAction * FDirectorySizesAction = nullptr;
   QAction * FNewFileAction = nullptr;
+  QAction * FProcessQueueAction = nullptr;
   QAction * FCopyClipboardAction = nullptr;
   QAction * FPasteAction = nullptr;
   QAction * FStatusBarAction = nullptr;

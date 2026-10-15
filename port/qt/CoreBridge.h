@@ -435,6 +435,12 @@ struct TPreferences
   int QueueTransfersLimit = 2;
   int QueueKeepDoneItemsFor = 15;
   bool QueueAutoPopup = true;
+  // A new session's queue processing (WinConfiguration's
+  // EnableQueueByDefault); one file transferred over several connections
+  // above this size in KB (Configuration's ParallelTransferThreshold; 0
+  // or less: never).
+  bool EnableQueueByDefault = true;
+  int ParallelTransferThreshold = -1;
   // Endurance: reconnect a session that breaks during a transfer, while
   // idle or inactive, or stalls, after so many seconds (0: not), and keep
   // trying for so many (0: for ever).
@@ -1613,6 +1619,9 @@ public:
   // Whether it can compare by checksum (CanCalculateChecksum: the protocol's,
   // or a separate shell's).
   bool CanSyncChecksum() const;
+  // Queue > Process Queue (TTerminalQueue::Enabled): its items run, or wait.
+  bool QueueEnabled() const;
+  void SetQueueEnabled(bool Enabled);
   // Commands > Keep Remote Directory up to Date, as WinSCP's (upstream's
   // TSynchronizeController, compiled as it is): the local directory
   // watched, and each directory that changed, once quiet, synchronized to

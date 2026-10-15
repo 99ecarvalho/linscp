@@ -84,6 +84,9 @@ struct TSession::TImpl
 
   // Made with its first item, as the GUI's: core's queue over this session,
   // asking its questions through the same handlers as the session's own.
+  // Process Queue: as the session's queue was made (EnableQueueByDefault).
+  bool QueueEnabled = true;
+
   TTerminalQueue * EnsureQueue()
   {
     if (Queue == NULL)
@@ -91,6 +94,7 @@ struct TSession::TImpl
       Queue.reset(new TTerminalQueue(Terminal.get(), Configuration));
       // As TTerminalManager::NewQueue.
       Queue->TransfersLimit = Configuration->QueueTransfersLimit;
+      Queue->Enabled = QueueEnabled;
       Queue->KeepDoneItemsFor =
         (GUIConfiguration->QueueKeepDoneItems ? GUIConfiguration->QueueKeepDoneItemsFor : 0);
       Queue->OnQueryUser = CLOSURE(QueryUser);
@@ -350,6 +354,7 @@ void TSession::Open()
       }
       F->Data->HostName = FromUtf8(Prompt.Fields[0].Value);
     }
+    F->QueueEnabled = dynamic_cast<TShellConfiguration *>(GUIConfiguration)->Settings().EnableQueueByDefault;
     F->Terminal.reset(new TTerminal(F->Data.get(), Configuration));
     TTerminal * Terminal = F->Terminal.get();
     Terminal->AutoReadDirectory = true;
@@ -1292,6 +1297,20 @@ void TSession::SyncMove(TSyncChecklist & Checklist, const std::vector<std::size_
   catch (Exception & E)
   {
     throw CoreErrorOf(E);
+  }
+}
+
+bool TSession::QueueEnabled() const
+{
+  return F->QueueEnabled;
+}
+
+void TSession::SetQueueEnabled(bool Enabled)
+{
+  F->QueueEnabled = Enabled;
+  if (F->Queue)
+  {
+    F->Queue->Enabled = Enabled;
   }
 }
 
