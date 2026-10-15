@@ -462,6 +462,10 @@ std::string EditorName(const TEditorDefinition & Editor);
 // the command's !.! the file, else the file appended. Throws TCoreError
 // (EDITOR_ERROR) when it does not start.
 void StartExternalEditor(const std::string & Command, const std::string & FileName);
+// The command line's on a local side, as ExecuteShellChecked(Command): the
+// program and its parameters split as SplitCommand does, started in
+// Directory, not waited for. Throws TCoreError ("Cannot execute '%s'.").
+void StartLocalCommand(const std::string & Command, const std::string & Directory);
 // EXECUTE_FILE_ERROR: the associated application did not open FileName.
 std::string ExecuteFileError(const std::string & FileName);
 // Saves them.
@@ -672,6 +676,11 @@ struct TLayout
   std::string ConsoleWindowSize;
 };
 TLayout Layout();
+// The shell's histories, as WinSCP's (CustomWinConfiguration's History:
+// "Commands" and "LocalCommands" are the command line's): newest first.
+// Adding saves.
+std::vector<std::string> History(const std::string & Name);
+void AddToHistory(const std::string & Name, const std::string & Value);
 // Saves it.
 void SetLayout(const TLayout & Layout);
 // Saves them, as the dialog's OK does (SaveExplicit).
@@ -909,6 +918,7 @@ enum class TText
   ColorPickHint,        // "Choose any session (panel) color"
   SpecialFolderDocuments, // "My documents"
   SpecialFolderDesktop, // "Desktop"
+  CommandLineLabel,     // "Command"
 };
 std::string Text(TText Text);
 

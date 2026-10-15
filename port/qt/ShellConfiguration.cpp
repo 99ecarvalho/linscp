@@ -3,6 +3,9 @@
 
 #include "ShellConfiguration.h"
 
+#include <algorithm>
+#include <memory>
+
 #include <Common.h>
 #include <HierarchicalStorage.h>
 #include <Exceptions.h>
@@ -89,6 +92,27 @@ void TShellConfiguration::SetPreferredLocale(LCID Locale)
 void TShellConfiguration::SetSettings(const TShellSettings & Settings)
 {
   FSettings = Settings;
+  Changed();
+}
+
+std::vector<UnicodeString> TShellConfiguration::History(const UnicodeString & Name) const
+{
+  const auto Found = FHistory.find(Name);
+  return (Found != FHistory.end()) ? Found->second : std::vector<UnicodeString>();
+}
+
+void TShellConfiguration::AddToHistory(const UnicodeString & Name, const UnicodeString & Value)
+{
+  std::vector<UnicodeString> & Strings = FHistory[Name];
+  if (!Value.IsEmpty())
+  {
+    Strings.erase(std::remove(Strings.begin(), Strings.end(), Value), Strings.end());
+    Strings.insert(Strings.begin(), Value);
+  }
+  if (Strings.size() > 30)
+  {
+    Strings.resize(30);
+  }
   Changed();
 }
 
@@ -190,6 +214,23 @@ void TShellConfiguration::CleanupTemporaryFolders()
 void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bool All)
 {
   TGUIConfiguration::SaveData(Storage, All);
+  if (!FHistory.empty() && Storage->OpenSubKey(L"History", true))
+  {
+    for (const auto & Each : FHistory)
+    {
+      if (Storage->OpenSubKey(Each.first, true))
+      {
+        std::unique_ptr<TStringList> Strings(new TStringList());
+        for (const UnicodeString & Value : Each.second)
+        {
+          Strings->Add(Value);
+        }
+        Storage->WriteValues(Strings.get());
+        Storage->CloseSubKey();
+      }
+    }
+    Storage->CloseSubKey();
+  }
   if (Storage->OpenSubKeyPath(L"Interface", true))
   {
     TCloseSubKeyPath Close(Storage);
@@ -453,6 +494,27 @@ UnicodeString __fastcall TShellConfiguration::ExtensionStringTranslation(const U
 void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
 {
   TGUIConfiguration::LoadData(Storage);
+  if (Storage->OpenSubKey(L"History", false))
+  {
+    std::unique_ptr<TStringList> Names(new TStringList());
+    Storage->GetSubKeyNames(Names.get());
+    for (int Index = 0; Index < Names->Count; Index++)
+    {
+      if (Storage->OpenSubKey(Names->Strings[Index], false))
+      {
+        std::unique_ptr<TStringList> Strings(new TStringList());
+        Storage->ReadValues(Strings.get());
+        std::vector<UnicodeString> & Values = FHistory[Names->Strings[Index]];
+        Values.clear();
+        for (int Value = 0; Value < Strings->Count; Value++)
+        {
+          Values.push_back(Strings->Strings[Value]);
+        }
+        Storage->CloseSubKey();
+      }
+    }
+    Storage->CloseSubKey();
+  }
   if (Storage->OpenSubKeyPath(L"Interface", false))
   {
     TCloseSubKeyPath Close(Storage);

@@ -723,6 +723,29 @@ TLayout Layout()
   return Result;
 }
 
+std::vector<std::string> History(const std::string & Name)
+{
+  std::vector<std::string> Result;
+  for (const UnicodeString & Value : Shell()->History(FromUtf8(Name)))
+  {
+    Result.push_back(Utf8(Value));
+  }
+  return Result;
+}
+
+void AddToHistory(const std::string & Name, const std::string & Value)
+{
+  try
+  {
+    Shell()->AddToHistory(FromUtf8(Name), FromUtf8(Value));
+    Configuration->SaveExplicit();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 void SetLayout(const TLayout & Layout)
 {
   TShellSettings Settings = Shell()->Settings();
@@ -1597,6 +1620,7 @@ std::string Text(TText Text)
     case TText::ColorPickHint: Ident = COLOR_PICK_HINT; break;
     case TText::SpecialFolderDocuments: Ident = SPECIAL_FOLDER_MY_DOCUMENTS; break;
     case TText::SpecialFolderDesktop: Ident = SPECIAL_FOLDER_DESKTOP; break;
+    case TText::CommandLineLabel: Ident = COMMAND_LINE_LABEL; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));
@@ -1886,6 +1910,23 @@ int FindEditor(const std::vector<TEditorDefinition> & Editors, const std::string
       }
     }
     return -1;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void StartLocalCommand(const std::string & Command, const std::string & Directory)
+{
+  try
+  {
+    UnicodeString Program, Params, Dir;
+    SplitCommand(FromUtf8(Command), Program, Params, Dir);
+    if ((Frontend() == NULL) || !Frontend()->StartProgram(Utf8(Program), Utf8(Params), Directory))
+    {
+      throw EOSExtException(FMTLOAD(EXECUTE_APP_ERROR, (Program)));
+    }
   }
   catch (Exception & E)
   {

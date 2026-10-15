@@ -186,6 +186,10 @@ public:
 
   const TShellSettings & Settings() const { return FSettings; }
   void SetSettings(const TShellSettings & Settings);
+  // TCustomWinConfiguration's histories (History\<Name>: 0, 1, ...), as
+  // SaveToHistory keeps them: newest first, once each, at most 30.
+  std::vector<UnicodeString> History(const UnicodeString & Name) const;
+  void AddToHistory(const UnicodeString & Name, const UnicodeString & Value);
   // As TWinConfiguration::ExpandedTemporaryDirectory.
   UnicodeString ExpandedTemporaryDirectory() const;
   // As TWinConfiguration's: whether temporary folders of the program's
@@ -250,6 +254,7 @@ private:
   LCID FSavedLocale = 0;
   LCID FDefaultLocale = 0;
   UnicodeString FModuleFileName;
+  std::map<UnicodeString, std::vector<UnicodeString>> FHistory;
   TShellSettings FSettings;
   std::unique_ptr<TBookmarks> FBookmarks;
   std::unique_ptr<TCustomCommandList> FCustomCommandList;

@@ -71,6 +71,18 @@ public:
   // the computer put to sleep, or shut down; then, unless shutting down and
   // as ConfirmExitOnCompletion asks, the application closed.
   enum class TOnceEmpty { Idle, Disconnect, Suspend, ShutDown };
+  // The command line (Options > Command Line, Shift+Ctrl+M), as the
+  // Commander's CommandLineCombo: a command for the active side, the remote
+  // one's run in the console (as OpenConsole), a local one's started in its
+  // directory (ExecuteShellChecked); each side with its history ("Commands",
+  // "LocalCommands"). Enter runs it (false: nothing was run), Esc clears it,
+  // Tab leaves it. Files > File Names > Insert to Command Line (Ctrl+Enter):
+  // the selected names, quoted where they have spaces, added to it.
+  bool ExecuteCommandLine();
+  void InsertToCommandLine();
+  class QComboBox * CommandLine() const { return FCommandLine; }
+  class QLabel * CommandPrompt() const { return FCommandPrompt; }
+  QAction * CommandLineAction() const { return FCommandLineAction; }
   // Tabs > Color (ColorMenuAction2): the active session's color (a TColor,
   // 0 none), its tab's swatch and the remote panel's background.
   void SetSessionColor(int Color);
@@ -442,6 +454,14 @@ private:
   QAction * FTabsAction = nullptr;
   QAction * FDefaultRemoteTabAction = nullptr;
   QAction * FChangeLocalPathAction = nullptr;
+  QAction * FCommandLineAction = nullptr;
+  QToolBar * FCommandLineBar = nullptr;
+  class QComboBox * FCommandLine = nullptr;
+  class QLabel * FCommandPrompt = nullptr;
+  // The side whose history the command line has (-1: none yet).
+  int FCommandLineSide = -1;
+  void UpdateCommandLine();
+  bool OpenConsoleWith(const QString & Command);
   QAction * FChangeRemotePathAction = nullptr;
   QMenu * FColorMenu = nullptr;
   void FillColorMenu();

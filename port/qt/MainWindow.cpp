@@ -4,6 +4,7 @@
 #include <QClipboard>
 #include <QCloseEvent>
 #include <QComboBox>
+#include <QShortcut>
 #include <QHeaderView>
 #include <QListWidget>
 #include <QRegularExpression>
@@ -1298,6 +1299,7 @@ void MainWindow::ActivatePanel(bool Local)
 {
   FLocalActive = Local;
   UpdateTreeShortcut();
+  UpdateCommandLine();
   LocalPanel * Panel = SideLocal(Local);
   ((Panel != nullptr) ? static_cast<QWidget *>(Panel->View()) : static_cast<QWidget *>(FPanel->View()))->setFocus();
 }
@@ -1367,6 +1369,118 @@ void MainWindow::QueueIdle()
       QueueEmptied();
     }
   }
+}
+
+void MainWindow::UpdateCommandLine()
+{
+  if (FCommandLine == nullptr)
+  {
+    return;
+  }
+  const bool Remote = !FLocalActive && !LocalBrowser();
+  FCommandPrompt->setText(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::CommandLineLabel)) +
+    (Remote ? QStringLiteral(" $") : QStringLiteral(" >")));
+  FCommandLine->setEnabled(!FBusy && (!Remote || (FSession && FSession->Active())));
+  // As CommandLinePopulate: the side's history, when the side changed.
+  const int Side = Remote ? 1 : 0;
+  if (Side != FCommandLineSide)
+  {
+    FCommandLineSide = Side;
+    const QString Text = FCommandLine->currentText();
+    FCommandLine->clear();
+    for (const std::string & Command : CoreBridge::History(Remote ? "Commands" : "LocalCommands"))
+    {
+      FCommandLine->addItem(QString::fromStdString(Command));
+    }
+    FCommandLine->setEditText(Text);
+  }
+}
+
+bool MainWindow::ExecuteCommandLine()
+{
+  const QString Command = FCommandLine->currentText();
+  const bool Remote = !FLocalActive && !LocalBrowser();
+  if (FBusy || Command.trimmed().isEmpty() || (Remote && (!FSession || !FSession->Active())))
+  {
+    return false;
+  }
+  try
+  {
+    CoreBridge::AddToHistory(Remote ? "Commands" : "LocalCommands", Command.toStdString());
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FCommandLineSide = -1;
+  FCommandLine->clearEditText();
+  UpdateCommandLine();
+  FCommandLine->clearEditText();
+  ActivatePanel(FLocalActive);
+  if (Remote)
+  {
+    return OpenConsoleWith(Command);
+  }
+  LocalPanel * Panel = SideLocal(FLocalActive);
+  try
+  {
+    CoreBridge::StartLocalCommand(Command.toStdString(),
+      QDir::toNativeSeparators((Panel != nullptr) ? Panel->Path() : FLocal->Path()).toStdString());
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    // As VK_RETURN's: back to the command line.
+    FCommandLine->setEditText(Command);
+    FCommandLine->setFocus();
+    return false;
+  }
+  return true;
+}
+
+void MainWindow::InsertToCommandLine()
+{
+  LocalPanel * Panel = SideLocal(FLocalActive);
+  QStringList Names = (Panel != nullptr) ? Panel->Selected() : FPanel->Selected();
+  const CoreBridge::TRemoteEntry * Focused = ((Panel != nullptr) ? Panel->View() : FPanel->View())->CurrentEntry();
+  if (Names.isEmpty() && (Focused != nullptr))
+  {
+    Names.append(QString::fromStdString(Focused->Name));
+  }
+  if (Names.isEmpty())
+  {
+    return;
+  }
+  // As PanelExport(peFileList) and PanelExportStore: names with spaces
+  // quoted, each followed by a space.
+  QString Text = FCommandLine->currentText();
+  for (const QString & Name : Names)
+  {
+    Text += (Name.contains(QLatin1Char(' ')) ? (QLatin1Char('"') + Name + QLatin1Char('"')) : Name) + QLatin1Char(' ');
+  }
+  if (!FCommandLineBar->isVisible())
+  {
+    FCommandLineBar->setVisible(true);
+    FCommandLineAction->setChecked(true);
+    SaveToolbarSettings();
+  }
+  UpdateCommandLine();
+  FCommandLine->setEditText(Text);
+}
+
+bool MainWindow::OpenConsoleWith(const QString & Command)
+{
+  if (FBusy || !FSession || !EnsureShellSession(false))
+  {
+    return false;
+  }
+  ConsoleDialog Dialog(FSession.get(), this);
+  Dialog.show();
+  const bool Result = Dialog.Execute(Command);
+  Dialog.exec();
+  FPanel->Refresh();
+  UpdateTitle();
+  return Result;
 }
 
 void MainWindow::NewDefaultTab(bool Reverse)
@@ -2178,6 +2292,7 @@ void MainWindow::UpdateActions()
   {
     FColorMenu->menuAction()->setEnabled(!FBusy && FSession);
   }
+  UpdateCommandLine();
   if (FRenameTabAction != nullptr)
   {
     const bool Active = FSession && FSession->Active();
@@ -4450,6 +4565,9 @@ void MainWindow::BuildMenus()
   Files->addSeparator();
   Files->addMenu(FFileCommandsMenu);
   QMenu * Names = Files->addMenu(tr("&File Names"));
+  QAction * InsertNames = Names->addAction(tr("Insert to Command &Line"), this, [this]() { InsertToCommandLine(); });
+  InsertNames->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Return));
+  InsertNames->setStatusTip(tr("Insert name(s) of selected file(s) to command line"));
   Names->addAction(tr("Copy to &Clipboard"), this, [this]() { CopyFileNames(FLocalActive, false); });
   Names->addAction(tr("Copy to Clipboard (Include &Paths)"), this, [this]() { CopyFileNames(FLocalActive, true); });
   Names->addAction(FGenerateFileUrlAction);
@@ -4604,6 +4722,7 @@ void MainWindow::BuildMenus()
     UpdateTabs();
     StoreLayoutChoice([Shown](CoreBridge::TLayout & Layout) { Layout.Tabs = Shown; });
   });
+  Options->addAction(FCommandLineAction);
   FStatusBarAction = Options->addAction(tr("Status &Bar"));
   FStatusBarAction->setCheckable(true);
   connect(FStatusBarAction, &QAction::triggered, this, [this](bool Shown) { SetStatusBarShown(Shown); });
@@ -6188,6 +6307,50 @@ void MainWindow::BuildToolbars(QMenu * Options)
 
   FCustomCommandsBar = MainBand(QStringLiteral("CustomCommands"), tr("Custom Commands"));
   UpdateCustomCommands();
+
+  // The command line, at the bottom (WinSCP's BottomDock), as a band.
+  FCommandLineBar = new QToolBar(tr("Command Line"), this);
+  FCommandLineBar->setObjectName(QStringLiteral("CommandLine"));
+  addToolBar(Qt::BottomToolBarArea, FCommandLineBar);
+  FCommandPrompt = new QLabel(FCommandLineBar);
+  FCommandLine = new QComboBox(FCommandLineBar);
+  FCommandLine->setEditable(true);
+  FCommandLine->setInsertPolicy(QComboBox::NoInsert);
+  FCommandLine->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+  FCommandLine->setAccessibleName(tr("Command line"));
+  FCommandPrompt->setBuddy(FCommandLine);
+  FCommandLineBar->addWidget(FCommandPrompt);
+  FCommandLineBar->addWidget(FCommandLine);
+  connect(FCommandLine->lineEdit(), &QLineEdit::returnPressed, this, [this]() { ExecuteCommandLine(); });
+  QShortcut * Escape = new QShortcut(QKeySequence(Qt::Key_Escape), FCommandLine->lineEdit(), nullptr, nullptr, Qt::WidgetShortcut);
+  connect(Escape, &QShortcut::activated, this, [this]()
+  {
+    FCommandLine->clearEditText();
+    ActivatePanel(FLocalActive);
+  });
+  QShortcut * Tab = new QShortcut(QKeySequence(Qt::Key_Tab), FCommandLine->lineEdit(), nullptr, nullptr, Qt::WidgetShortcut);
+  connect(Tab, &QShortcut::activated, this, [this]() { ActivatePanel(FLocalActive); });
+  FCommandLineAction = new QAction(tr("Comma&nd Line"), this);
+  FCommandLineAction->setCheckable(true);
+  FCommandLineAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_M));
+  FCommandLineAction->setStatusTip(tr("Hide/show command line"));
+  connect(FCommandLineAction, &QAction::triggered, this, [this](bool Shown)
+  {
+    FCommandLineBar->setVisible(Shown);
+    if (Shown)
+    {
+      UpdateCommandLine();
+      FCommandLine->setFocus();
+    }
+    SaveToolbarSettings();
+  });
+  {
+    TBand Band;
+    Band.Name = QStringLiteral("CommandLine");
+    Band.Bar = FCommandLineBar;
+    Band.Toggle = FCommandLineAction;
+    FBands.push_back(Band);
+  }
 
   // The panels' bands.
   struct TSide

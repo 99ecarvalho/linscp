@@ -1793,6 +1793,43 @@ void Keys(const QString & Directory)
       Check(Local->Path() != Before, "a drive chosen is gone to");
       Local->ChangeDirectory(Before);
     }
+    // P3-15: the command line (Options > Command Line, Shift+Ctrl+M): a
+    // local command started in the local panel's directory, kept in the
+    // local commands' history; Insert to Command Line adds the names.
+    {
+      QStringList Started;
+      Frontend.SetStartProgram([&Started](const QString & Program, const QString & Params, const QString & In)
+      {
+        Started = { Program, Params, In };
+        return true;
+      });
+      Window.ActivatePanel(true);
+      QAction * Shown = Window.CommandLineAction();
+      Check(!Shown->isChecked(), "the command line hidden at first, as WinSCP's");
+      Shown->trigger();
+      Check(Shown->isChecked() && Window.CommandLine()->isVisible() &&
+        Window.CommandPrompt()->text().endsWith(QStringLiteral(" >")), "Command Line shows it, the local prompt");
+      Local->Select({ QStringLiteral("b.log"), QStringLiteral("d.txt") });
+      Window.CommandLine()->setEditText(QStringLiteral("cat "));
+      Window.InsertToCommandLine();
+      // (In the panel's order, as WinSCP's CreateFileList.)
+      const QString Line = Window.CommandLine()->currentText();
+      Check((Line == QStringLiteral("cat b.log d.txt ")) || (Line == QStringLiteral("cat d.txt b.log ")),
+        "Insert to Command Line adds the names");
+      Check(Window.ExecuteCommandLine() && (Started.value(0) == QStringLiteral("cat")) &&
+        (Started.value(1).trimmed() == Line.mid(4).trimmed()) && (QDir(Started.value(2)) == QDir(Local->Path())),
+        "Enter starts it, in the local directory");
+      const std::vector<std::string> History = CoreBridge::History("LocalCommands");
+      Check(!History.empty() && (History.front() == Line.toStdString()) && Window.CommandLine()->currentText().isEmpty(),
+        "kept in the local commands' history, the line cleared");
+      Window.ActivatePanel(false);
+      Check(Window.CommandPrompt()->text().endsWith(QStringLiteral(" $")) && !Window.CommandLine()->isEnabled() &&
+        !Window.ExecuteCommandLine(), "the remote side's prompt, not usable without a session");
+      Window.ActivatePanel(true);
+      Frontend.SetStartProgram(nullptr);
+      Shown->trigger();
+      Check(!Window.CommandLine()->isVisible(), "Command Line hides it again");
+    }
 
     // Tab: to the other panel and back; Ctrl+[: the local path copied.
     Window.ActivatePanel(true);

@@ -2051,6 +2051,30 @@ Local: %2</translation>
         <source>Allows selection of different directory for panel</source>
         <translation>Permite escolher outro diretório para o painel</translation>
     </message>
+    <message>
+        <source>Insert to Command &amp;Line</source>
+        <translation>Inserir para &amp;Linha de comando</translation>
+    </message>
+    <message>
+        <source>Insert name(s) of selected file(s) to command line</source>
+        <translation>Inserir o(s) nome(s) do(s) arquivo(s) selecionado(s) na linha de comando</translation>
+    </message>
+    <message>
+        <source>Command Line</source>
+        <translation>Linha de comando</translation>
+    </message>
+    <message>
+        <source>Command line</source>
+        <translation>Linha de comando</translation>
+    </message>
+    <message>
+        <source>Comma&amp;nd Line</source>
+        <translation>Linha de coma&amp;ndo</translation>
+    </message>
+    <message>
+        <source>Hide/show command line</source>
+        <translation>Ocultar/mostrar a linha de comando</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>
