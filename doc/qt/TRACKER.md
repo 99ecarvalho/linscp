@@ -262,7 +262,7 @@ P2-10 and P2-11 waited, at the user's request, for P3.
    portability series winscp/winscp#79, and #80 (`LogEvent`), #81 (log file
    names), #82 (local EOL), #83 (OpenSSH import paths); offer the two S3
    ones found by P3-18 (`core-s3-acl-not-implemented.patch`,
-   `core-s3-folder-tags.patch`, PRs below); drop each patch when a pin move
+   `core-s3-folder-tags.patch`: #84, #85); drop each patch when a pin move
    brings it in.
 
 ## P3 UI gap audit (2026-10-14)
