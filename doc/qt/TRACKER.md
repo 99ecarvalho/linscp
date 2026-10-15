@@ -1,6 +1,6 @@
 # Tracker
 
-Last updated: **2026-10-14**
+Last updated: **2026-10-15**
 
 Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 
@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 9 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 25 | 28 | Parity on features users depend on |
+| P3 Qt parity | 26 | 28 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Single toolchain; C++Builder gone |
-| **Total** | **100** | **115** | |
+| **Total** | **101** | **115** | |
 
 ## Next three actions
 
@@ -247,7 +247,12 @@ is audited for screen-reader names, label mnemonics and clashes. The
 Commander commands users reach daily (P3-14, done): session commands,
 Compare Directories, Synchronize Browsing, New File, the clipboard,
 directory sizes, the status bar and queue. **The P3 exit gate is passed**
-(P3-10, 2026-10-14); the rest of WinSCP's menus are backlog (P3-15).
+(P3-10, 2026-10-14); the rest of WinSCP's menus are backlog (P3-15). The
+UI gaps raised before packaging (P3-16, done 2026-10-15) are closed: the
+toolbars and icon sets, the directory trees, the tray and single instance,
+the master password, host CAs, local custom commands, `/upload` with Send
+To and shortcuts, Keep Up To Date in a new window, S3 ACLs and more (the
+audit below); only custom command extensions are deferred.
 P2-10 and P2-11 waited, at the user's request, for P3.
 
 1. **P2-10**: packaging, then the P2 exit gate (**P2-11**); both waited for P3.
@@ -282,7 +287,7 @@ registry, tray or window messages.
 | Properties | checksums through the secondary shell | done | CanCalculateChecksum's: offered where only the secondary shell calculates them, the shell opened first (EnsureCommandSessionFallback), for Synchronize by checksum too |
 | Navigation | Go To's bookmark list; Location Profiles' opened folders kept; mask hints | done | the Open Directory button's menu (`CreateOpenDirMenu`); `NodeOpened`; the mask hint buttons (Select, Filter, Edit mask, Find files, Transfer settings) |
 | Session tools | Copy dialog's transfer code; OpenSSH key conversion on import | done | the Copy dialog's Generate Code (DoGenerateTransferCodeDialog: script and .NET code, no URL page); an OpenSSH import's keys offered for conversion first (TImportSessionsDialog::Execute), its paths kept POSIX ones on POSIX (`core-openssh-import-posix-paths.patch`); the console's size is kept (`ConsoleWin.WindowSize`) |
-| Custom commands | local commands; extensions and their options | partial | local commands run as LocalCustomCommand (on local files, or on remote ones downloaded first and what changed uploaded back; output copied or shown, a failure's exit code an error), through the shell on POSIX, as a command line on Windows; extensions missing |
+| Custom commands | local commands; extensions and their options | done | local commands run as LocalCustomCommand (on local files, or on remote ones downloaded first and what changed uploaded back; output copied or shown, a failure's exit code an error), through the shell on POSIX, as a command line on Windows; extensions deferred (decisions, 2026-10-15) |
 | Keep up to date | start in a new window; minimize to the tray | done | Minimize a split button with Minimize to System Tray (where the desktop has a tray), the dialog going with the window; Start in New Window as SynchronizeInNewWindow (a hidden copy of the site, `/rawtransfersettings`, `/keepuptodate // local remote params options`), `/keepuptodate` run standalone; presets are a combo, not WinSCP's split button |
 | Workspaces | local tabs saved | done | as WinSCP's (TSessionData::IsLocalBrowser: both local directories, no host), opened again as local tabs |
 | Clipboard | remote files pasted into the remote panel (duplicate) | done | into the same session's panel, through the Duplicate dialog (foRemoteCopy), from wherever they were copied; between sessions only through a local panel |
@@ -293,6 +298,7 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-15 | Custom command extensions (.WinSCPextension) deferred; P3-16 closed without them | The user's call: WinSCP's extensions are PowerShell scripts over WinSCP's .NET assembly, which drives winscp.com, not linscp, so most would not run; packaging (P2-10) goes first |
 | 2026-10-14 | P3 exit gate: every WinSCP dialog has its counterpart (the Explorer interface aside); the gate also waits for the Commander commands users reach daily (P3-14); the rest of WinSCP's menus are backlog (P3-15). Answers Q-1 | The user's call at the gate review: the gap was ~50 menu items, about a dozen of daily use |
 | 2026-10-14 | linscp's icons come from bundled, freely licensed sets (Lucide, Tabler, Fluent UI), the user choosing; not WinSCP's | WinSCP's images are licensed stock icons that may not be reused in other software (its license.txt, part B) |
 | 2026-10-14 | P3-01 (`.dfm` → `.ui` converter) dropped | Every dialog was written by hand from the `.dfm`s without it; nothing is left for it to convert |
@@ -836,7 +842,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-13 | Session tabs and workspaces | done | Tabs: a session opened goes to a tab of its own, each tab with its own remote and local directories, its editors uploading to it whichever tab is active, every tab's session kept alive (`TTerminal::Idle`, which the shell had not called); the Tabs menu (New, Duplicate, Close Ctrl+Shift+D, Next and Previous Ctrl+Tab). Workspaces: Tabs > Save Workspace (`TSaveWorkspaceDialog`'s name, passwords and automatic saving) stores the tabs as core's workspace sessions; the site manager lists workspaces, logs in to one (a tab per session) and deletes it; saved on closing when automatic and opened at the next start; a workspace or folder of sites named on the command line opens in tabs. ctest `qt_gui_tabs` |
 | P3-14 | Daily Commander commands | done | the gate waited for it (decision 2026-10-14). Tabs > Rename Tab, Reconnect Session (a lost connection reopened where it was, `TTerminal::Reopen`), Save Session as Site (`TSaveSessionDialog`: name, folder, password), Change Password (a secondary session, as WinSCP), Install Public Key into Server (the key checked and converted as on login, non-OpenSSH servers asked about); Commands > Clear Caches; ctest `qt_gui_sessioncommands`. Commands > Compare Directories (Shift+F2: newer or missing files selected in each panel, times at the coarser listing's precision, by time and size as Preferences > Commander's new criteria say) and Synchronize Browsing (Ctrl+Alt+B: the other panel follows, a missing directory created after asking, per tab); Files > New > File (local made, remote edited empty and uploaded once saved), Calculate Directory Sizes (Shift+Alt+Enter); Go To > Path from Other Panel (Ctrl+., local tabs); ctest `qt_gui_panelcommands`. Files > Copy to Clipboard and Paste from Clipboard (Ctrl+C, Ctrl+V: the panel's drag data, remote files by their full paths and downloaded as another program pastes them; pasted, uploaded, copied locally or downloaded; a line of text opened as a session URL or gone to as a path); Options > Status Bar and Queue (show, hide when empty -- WinSCP's default, now linscp's -- or hide), kept under WinSCP's keys; ctest `qt_gui_clipboard`. Not done: pasting remote files into the remote panel (WinSCP's duplicate) |
 | P3-15 | The rest of the Commander's commands | todo | backlog, not gating P3 |
-| P3-16 | Verified UI gaps | wip | the audit below; closed in batches |
+| P3-16 | Verified UI gaps | done | the audit below, every gap closed but extensions (deferred, 2026-10-15) |
 | P3-17 | Icon sets | done | Lucide (ISC), Tabler (MIT), Fluent UI (MIT) imported to `assets/icons/` (`port/tools/import_icons.py`, 62 roles after WinSCP's glyphs), embedded and drawn by `port/qt/IconSet.cpp` in the palette's text colour (light and dark themes); Preferences > Window > Icon set (Fluent by default on Windows, Lucide elsewhere; the desktop's theme on POSIX only; none), on the menus and the panels' toolbars; About credits each set with its license; Qt Svg added on both platforms (`qt6-svg-dev`, MSYS2 `qt6-svg` in `msys2-qt.lock`); ctest `qt_gui_icons`; native on Windows 11 too. WinSCP's toolbars: the main bands (Commands, Preferences with the queue's, Transfer Settings with the presets, and hidden by default Sessions and Tabs, Sort, Custom Commands) and each panel's five (Path, History, Navigation, Files, Selection; PanelBands.h), Options > Toolbars (each band, lock, selective text labels, icon size) and Left/Right Panel, kept as WinSCP's `ToolbarsLayout2`, `LockToolbars`, `SelectiveToolbarText`, `LargerToolbar`; ctest `qt_gui_toolbars` |
 
 ### P4 — Cleanup
