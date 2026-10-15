@@ -60,7 +60,10 @@ def main():
     ap.add_argument('--emulator')
     ap.add_argument('cli')
     a = ap.parse_args()
-
+    # Windows' sshd lets no one in run unprivileged, as here.
+    if os.name == 'nt':
+        print('SKIP: sshd (not run on Windows)')
+        return 77
     sshd = shutil.which('sshd') or '/usr/sbin/sshd'
     if not os.path.isfile(sshd) or not shutil.which('ssh-keygen'):
         print('SKIP: no sshd')
@@ -164,7 +167,7 @@ def main():
             text = out.decode(errors='replace')
             check(rc == 0 and 'hello.txt' in text, f'quoted arguments survive the command line (rc {rc})', text)
 
-        if not a.emulator:
+        if not a.emulator and os.name != 'nt':
             # On a terminal: the prompt, a command, and a clean exit.
             text, rc = run_on_terminal(a.cli, ['help ls', 'exit'])
             check(rc == 0, f'terminal session exits 0 (rc {rc})', text)

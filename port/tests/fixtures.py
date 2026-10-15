@@ -107,6 +107,9 @@ def sshd(tmp, extra=()):
     """An unprivileged sshd that only lets the current user in with a fresh
     key. Yields (port, client key path, host key fingerprint)."""
     binary = shutil.which('sshd') or '/usr/sbin/sshd'
+    # Windows' sshd lets no one in run unprivileged, as here.
+    if os.name == 'nt':
+        raise Missing('sshd (not run on Windows)')
     if not os.path.isfile(binary) or not shutil.which('ssh-keygen'):
         raise Missing('sshd')
     keygen(os.path.join(tmp, 'host'))

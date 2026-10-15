@@ -90,7 +90,10 @@ def tree(items):
 
 
 def linscp_menus(test, emulator):
-    cmd = ([emulator] if emulator else []) + [test, 'menus', '/ini=nul', '-platform', 'offscreen']
+    # $LINSCP_QT_PLATFORM: where Qt's offscreen plugin is not deployed
+    # (natively on Windows, vm_tests.py: windows).
+    cmd = ([emulator] if emulator else []) + [test, 'menus', '/ini=nul', '-platform',
+                                              os.environ.get('LINSCP_QT_PLATFORM', 'offscreen')]
     out = subprocess.run(cmd, capture_output=True, text=True, timeout=120).stdout
     items = []
     for line in out.splitlines():

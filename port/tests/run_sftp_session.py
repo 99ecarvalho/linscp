@@ -46,7 +46,10 @@ def main():
                     help='an extra sshd_config line, e.g. to pin one cipher')
     ap.add_argument('test')
     a = ap.parse_args()
-
+    # Windows' sshd lets no one in run unprivileged, as here.
+    if os.name == 'nt':
+        print('SKIP: sshd (not run on Windows)')
+        return 77
     sshd = shutil.which('sshd') or '/usr/sbin/sshd'
     if not os.path.isfile(sshd) or not shutil.which('ssh-keygen'):
         print('SKIP: no sshd')

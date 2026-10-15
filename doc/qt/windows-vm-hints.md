@@ -138,3 +138,21 @@ Notes:
 - **Close the shell before redeploying `linscp-gui`.** A running `linscp.exe`
   holds its DLLs, and a half-deleted folder is the result. `tasklist /FI
   "IMAGENAME eq linscp.exe"` shows whether one is running.
+
+## 6. Running the whole suite there
+
+`port/tools/vm_tests.py` does all of the above for every test ctest knows
+for the cross build: it copies the deploy folder, the test programs and
+`port/tests` (skipping unchanged files), turns each ctest command into a
+native one (Wine dropped, the VM's paths, `-platform windows`), and runs
+them over SSH, reporting passed, failed and skipped (exit 77) as ctest does.
+The password comes from the environment, never the repository:
+
+```sh
+LINSCP_VM_PASSWORD=... python3 port/tools/vm_tests.py            # everything
+LINSCP_VM_PASSWORD=... python3 port/tools/vm_tests.py -R qt_gui   # some
+```
+
+Tests that check the source tree, and the POSIX layer's own test, are not
+run there; those needing sshd or a container engine skip, as the VM has
+neither.
