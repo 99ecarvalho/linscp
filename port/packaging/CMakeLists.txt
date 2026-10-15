@@ -71,4 +71,11 @@ if(NOT WIN32)
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
     COMMENT "Building the .deb in ${CMAKE_BINARY_DIR}/packages"
     VERBATIM)
+  # The AppImage (port/tools/build_appimage.py): the same install, its
+  # libraries and Qt's plugins bundled.
+  add_custom_target(package-appimage
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/build_appimage.py" --build "${CMAKE_BINARY_DIR}"
+    DEPENDS linscp linscp-cli core-translations
+    COMMENT "Building the AppImage in ${CMAKE_BINARY_DIR}/packages"
+    VERBATIM)
 endif()
