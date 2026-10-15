@@ -4707,6 +4707,124 @@ void IconsTest(const QString & Out)
 
 // P3-16's toolbars: WinSCP's bands, shown as its default layout has them,
 // each toggled and kept, locked, labelled and sized as Options > Toolbars says.
+// P3-15: Help's pages and Check for Updates; Options' Tabs, the panels'
+// Status Bar, and Queue's Toolbar.
+QAction * MenuAction(QMainWindow & Window, const QStringList & Path)
+{
+  QList<QAction *> Actions = Window.menuBar()->actions();
+  QAction * Found = nullptr;
+  for (const QString & Name : Path)
+  {
+    Found = nullptr;
+    for (QAction * Action : Actions)
+    {
+      if (QString(Action->text()).remove(QLatin1Char('&')).remove(QStringLiteral("...")) == Name)
+      {
+        Found = Action;
+        break;
+      }
+    }
+    if (Found == nullptr)
+    {
+      return nullptr;
+    }
+    Actions = (Found->menu() != nullptr) ? Found->menu()->actions() : QList<QAction *>();
+  }
+  return Found;
+}
+
+void OptionsHelpTest(const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Window.show();
+    QApplication::processEvents();
+    QList<QUrl> Opened;
+    Window.SetUrlOpener([&Opened](const QUrl & Url) { Opened.append(Url); return true; });
+    for (const QStringList & Path : { QStringList{ "Help", "Contents" }, QStringList{ "Help", "Product Homepage" },
+           QStringList{ "Help", "Support Forum" }, QStringList{ "Help", "Version History" } })
+    {
+      QAction * Action = MenuAction(Window, Path);
+      Check(Action != nullptr, "Help has WinSCP's pages");
+      if (Action != nullptr)
+      {
+        Action->trigger();
+      }
+    }
+    Check((Opened.size() == 4) && (Opened[0].host() == QStringLiteral("winscp.net")) &&
+      Opened[1].toString().endsWith(QStringLiteral("/linscp")) && Opened[2].toString().endsWith(QStringLiteral("/issues")) &&
+      Opened[3].toString().endsWith(QStringLiteral("/releases")),
+      "the documentation WinSCP's, the rest linscp's own pages");
+    Check((MenuAction(Window, { "Help", "Contents" })->shortcut() == QKeySequence(Qt::Key_F1)), "Contents is F1");
+
+    Check((MainWindow::CompareVersions(QStringLiteral("v0.10.0"), QStringLiteral("0.9.1")) > 0) &&
+      (MainWindow::CompareVersions(QStringLiteral("0.2.0"), QStringLiteral("v0.2.0")) == 0) &&
+      (MainWindow::CompareVersions(QStringLiteral("0.2"), QStringLiteral("0.2.1-rc1")) < 0), "versions compare by number");
+    // Check for Updates against a releases list of its own.
+    const auto Check4 = [&Window, &Directory](const QByteArray & Json, const QString & File)
+    {
+      const QString Path = QDir(Directory).filePath(File);
+      if (!Json.isNull())
+      {
+        QFile Out(Path);
+        Out.open(QIODevice::WriteOnly);
+        Out.write(Json);
+      }
+      Window.UpdatesUrl = QUrl::fromLocalFile(Path);
+      bool Done = false;
+      QString Latest;
+      QString Error;
+      bool Newer = false;
+      Window.OnUpdatesChecked = [&](const QString & L, bool N, const QString & E) { Done = true; Latest = L; Newer = N; Error = E; };
+      Window.CheckForUpdates();
+      QElapsedTimer Timer;
+      Timer.start();
+      while (!Done && (Timer.elapsed() < 10000))
+      {
+        QApplication::processEvents(QEventLoop::AllEvents, 50);
+      }
+      return std::make_tuple(Done, Latest, Newer, Error);
+    };
+    {
+      const auto [Done, Latest, Newer, Error] =
+        Check4(R"([{"tag_name":"v99.0.0","html_url":"https://example/r"}])", QStringLiteral("newer.json"));
+      Check(Done && (Latest == QStringLiteral("v99.0.0")) && Newer && Error.isEmpty(), "a newer release is found");
+    }
+    {
+      const auto [Done, Latest, Newer, Error] = Check4(R"([{"tag_name":"v0.0.1"}])", QStringLiteral("older.json"));
+      Check(Done && !Newer && Error.isEmpty(), "an older one is not newer");
+    }
+    {
+      const auto [Done, Latest, Newer, Error] = Check4(QByteArray(), QStringLiteral("missing.json"));
+      Check(Done && !Error.isEmpty(), "and a failure is an error");
+    }
+
+    QAction * Status = MenuAction(Window, { "Options", "Left Panel", "Status Bar" });
+    Check((Status != nullptr) && Status->isChecked() && !Window.Local()->Status()->isHidden(), "the left panel's status bar shown");
+    Status->trigger();
+    Check(Window.Local()->Status()->isHidden() && !CoreBridge::Layout().LocalStatusBar, "Status Bar hides it, and is kept");
+    Status->trigger();
+    QAction * RightStatus = MenuAction(Window, { "Options", "Right Panel", "Status Bar" });
+    RightStatus->trigger();
+    Check(Window.Panel()->Status()->isHidden() && !CoreBridge::Layout().RemoteStatusBar, "the right panel's too");
+    RightStatus->trigger();
+    QAction * Tabs = MenuAction(Window, { "Options", "Tabs" });
+    Check((Tabs != nullptr) && Tabs->isChecked(), "Options > Tabs shown");
+    Tabs->trigger();
+    Check(Window.TabBar()->isHidden() && !CoreBridge::Layout().Tabs, "Tabs hides the tab bar, and is kept");
+    Tabs->trigger();
+    QAction * QueueToolbar = MenuAction(Window, { "Options", "Queue", "Toolbar" });
+    Check((QueueToolbar != nullptr) && QueueToolbar->isChecked() && Window.Queue()->ToolbarVisible(), "the queue's toolbar shown");
+    QueueToolbar->trigger();
+    Check(!Window.Queue()->ToolbarVisible() && !CoreBridge::Layout().QueueToolbar, "Queue > Toolbar hides it, and is kept");
+    Check(MenuAction(Window, { "Options", "Queue", "Reset Columns Layout" }) != nullptr &&
+      MenuAction(Window, { "Options", "Queue", "Customize" }) != nullptr, "Queue's Reset Columns Layout and Customize");
+  }
+  CoreBridge::Finalize();
+}
+
 void ToolbarsTest()
 {
   QtFrontend Frontend;
@@ -5696,6 +5814,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 3) && (std::strcmp(argv[1], "toolbars") == 0))
   {
     ToolbarsTest();
+  }
+  else if ((argc >= 4) && (std::strcmp(argv[1], "options") == 0))
+  {
+    OptionsHelpTest(QString::fromLocal8Bit(argv[3]));
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "masterpasswordread") == 0))
   {

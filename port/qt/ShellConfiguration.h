@@ -135,6 +135,11 @@ struct TShellSettings
   // QueueView.Show (qvShow, qvHideWhenEmpty, qvHide) and ScpCommander.StatusBar.
   int QueueViewShow = 1;
   bool CommanderStatusBar = true;
+  // ScpCommander.SessionsTabs, its panels' StatusBar, QueueView.ToolBar.
+  bool CommanderSessionsTabs = true;
+  bool LocalPanelStatusBar = true;
+  bool RemotePanelStatusBar = true;
+  bool QueueViewToolBar = true;
   // The toolbars (Interface: LockToolbars, SelectiveToolbarText,
   // LargerToolbar; ScpCommander.ToolbarsLayout, its key ToolbarsLayout2).
   bool LockToolbars = false;

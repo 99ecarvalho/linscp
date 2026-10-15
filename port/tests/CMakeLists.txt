@@ -447,6 +447,11 @@ if(TARGET linscp)
             tags /ini=nul {port} -platform offscreen)
   set_tests_properties(qt_gui_tags PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
   add_test(NAME qt_gui_toolbars COMMAND test_qt_gui toolbars /ini=nul -platform offscreen)
+  add_test(NAME qt_gui_options
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
+            --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
+            options /ini=nul {tmp} -platform offscreen)
+  set_tests_properties(qt_gui_options PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 120)
   set_tests_properties(qt_gui_toolbars PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
   add_test(NAME qt_gui_icons
     COMMAND test_qt_gui icons /ini=nul -platform offscreen)

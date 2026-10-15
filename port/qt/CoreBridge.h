@@ -648,6 +648,13 @@ struct TLayout
   enum class TQueueShow { Show, HideWhenEmpty, Hide };
   TQueueShow QueueShow = TQueueShow::HideWhenEmpty;
   bool StatusBar = true;
+  // Options > Tabs (ScpCommander.SessionsTabs), Options > Left/Right Panel >
+  // Status Bar (its panels' StatusBar), Options > Queue > Toolbar
+  // (QueueView.ToolBar).
+  bool Tabs = true;
+  bool LocalStatusBar = true;
+  bool RemoteStatusBar = true;
+  bool QueueToolbar = true;
   // Options > Toolbars: locked, selective text labels, the icons' size
   // (LargerToolbar: 0 normal, 1 large, 2 very large); which bands show, as
   // WinSCP's ToolbarsLayout ("Name=<1 shown, 0 not>:<dock>:<row>+<pos>,"

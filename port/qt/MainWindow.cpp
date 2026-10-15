@@ -14,7 +14,13 @@
 #include <QLineEdit>
 #include <QLocale>
 #include <QMenuBar>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QMessageBox>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QPushButton>
 #include <QStatusBar>
 #include <QCheckBox>
@@ -443,6 +449,38 @@ void MainWindow::UpdateTitle()
 }
 
 // Options > Left/Right Panel > Tree.
+void MainWindow::SetPanelStatusBarVisible(bool Left, bool Visible)
+{
+  if (Left)
+  {
+    FLocal->Status()->setVisible(Visible);
+  }
+  else
+  {
+    FPanel->Status()->setVisible(Visible);
+    FOtherLocal->Status()->setVisible(Visible);
+  }
+  QAction * Action = Left ? FLocalStatusBarAction : FRemoteStatusBarAction;
+  if (Action != nullptr)
+  {
+    Action->setChecked(Visible);
+  }
+}
+
+void MainWindow::StoreLayoutChoice(const std::function<void(CoreBridge::TLayout &)> & Change)
+{
+  CoreBridge::TLayout Layout = CoreBridge::Layout();
+  Change(Layout);
+  try
+  {
+    CoreBridge::SetLayout(Layout);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+}
+
 void MainWindow::SetTreeVisible(bool Left, bool Visible)
 {
   if (Left)
@@ -484,6 +522,8 @@ void MainWindow::RestoreLayout()
   FOtherLocal->SetTreeHeight(RemoteTreeHeight);
   SetTreeVisible(true, Layout.LocalTree);
   SetTreeVisible(false, Layout.RemoteTree);
+  SetPanelStatusBarVisible(true, Layout.LocalStatusBar);
+  SetPanelStatusBarVisible(false, Layout.RemoteStatusBar);
   const int Total = std::max(FPanels->width(), width());
   const int LocalWidth = static_cast<int>(Total * std::clamp(Layout.LocalPanelWidth, 0.1, 0.9));
   // (The right side's two panels share its width, one shown.)
@@ -1944,6 +1984,114 @@ void MainWindow::UpdateActions()
   FCloseTabAction->setEnabled(!FBusy && FSession);
   FNextTabAction->setEnabled(!FBusy && (TabCount() > 1));
   FPreviousTabAction->setEnabled(!FBusy && (TabCount() > 1));
+}
+
+void MainWindow::OpenWebPage(const QString & Url)
+{
+  const QUrl Address(Url);
+  if (!(FUrlOpener ? FUrlOpener(Address) : QDesktopServices::openUrl(Address)))
+  {
+    QMessageBox::warning(this, windowTitle(), tr("Cannot open %1.").arg(Url));
+  }
+}
+
+int MainWindow::CompareVersions(const QString & A, const QString & B)
+{
+  const auto Numbers = [](QString Version)
+  {
+    if (Version.startsWith(QLatin1Char('v')) || Version.startsWith(QLatin1Char('V')))
+    {
+      Version = Version.mid(1);
+    }
+    Version = Version.section(QLatin1Char('-'), 0, 0);
+    std::vector<int> Result;
+    for (const QString & Part : Version.split(QLatin1Char('.')))
+    {
+      Result.push_back(Part.toInt());
+    }
+    return Result;
+  };
+  const std::vector<int> X = Numbers(A);
+  const std::vector<int> Y = Numbers(B);
+  for (std::size_t Index = 0; Index < std::max(X.size(), Y.size()); Index++)
+  {
+    const int Left = (Index < X.size()) ? X[Index] : 0;
+    const int Right = (Index < Y.size()) ? Y[Index] : 0;
+    if (Left != Right)
+    {
+      return (Left < Right) ? -1 : 1;
+    }
+  }
+  return 0;
+}
+
+void MainWindow::CheckForUpdates()
+{
+  const QUrl Url = UpdatesUrl.isEmpty() ?
+    QUrl(QStringLiteral("https://api.github.com/repos/99ecarvalho/linscp/releases?per_page=1")) : UpdatesUrl;
+  QNetworkAccessManager * Manager = new QNetworkAccessManager(this);
+  QNetworkRequest Request(Url);
+  Request.setRawHeader("Accept", "application/vnd.github+json");
+  Request.setHeader(QNetworkRequest::UserAgentHeader, QStringLiteral("linscp/%1").arg(QString::fromStdString(FInfo.Version)));
+  QNetworkReply * Reply = Manager->get(Request);
+  QApplication::setOverrideCursor(Qt::BusyCursor);
+  connect(Reply, &QNetworkReply::finished, this, [this, Reply, Manager]()
+  {
+    QApplication::restoreOverrideCursor();
+    QString Latest;
+    QString Page;
+    QString Error;
+    if (Reply->error() != QNetworkReply::NoError)
+    {
+      Error = Reply->errorString();
+    }
+    else
+    {
+      // The releases API's list, newest first.
+      const QJsonArray Releases = QJsonDocument::fromJson(Reply->readAll()).array();
+      if (Releases.isEmpty())
+      {
+        Error = tr("No release information found.");
+      }
+      else
+      {
+        const QJsonObject Release = Releases.first().toObject();
+        Latest = Release.value(QStringLiteral("tag_name")).toString();
+        Page = Release.value(QStringLiteral("html_url")).toString();
+      }
+    }
+    Reply->deleteLater();
+    Manager->deleteLater();
+    const QString Current = QString::fromStdString(FInfo.Version);
+    const bool Newer = !Latest.isEmpty() && (CompareVersions(Latest, Current) > 0);
+    if (OnUpdatesChecked)
+    {
+      OnUpdatesChecked(Latest, Newer, Error);
+      return;
+    }
+    if (!Error.isEmpty())
+    {
+      QMessageBox::warning(this, tr("Check for Updates"), tr("Could not check for updates: %1").arg(Error));
+    }
+    else if (Newer)
+    {
+      QMessageBox Box(QMessageBox::Information, tr("Check for Updates"),
+        tr("Version %1 of linscp is available. You are using version %2.").arg(Latest, Current),
+        QMessageBox::NoButton, this);
+      QPushButton * Download = Box.addButton(tr("&Download Page"), QMessageBox::AcceptRole);
+      Box.addButton(QMessageBox::Close);
+      Box.exec();
+      if (Box.clickedButton() == Download)
+      {
+        OpenWebPage(Page.isEmpty() ? QStringLiteral("https://github.com/99ecarvalho/linscp/releases") : Page);
+      }
+    }
+    else
+    {
+      QMessageBox::information(this, tr("Check for Updates"),
+        tr("You are using the latest version of linscp (%1).").arg(Current));
+    }
+  });
 }
 
 void MainWindow::About()
@@ -3708,7 +3856,7 @@ void MainWindow::UpdateTabs()
   {
     FTabBar->setCurrentIndex(FActiveTab);
   }
-  FTabBar->setVisible(TabCount() > 0);
+  FTabBar->setVisible(FTabsShown && (TabCount() > 0));
   FUpdatingTabs = false;
 }
 
@@ -4113,6 +4261,16 @@ void MainWindow::BuildMenus()
 
   QMenu * Options = menuBar()->addMenu(tr("&Options"));
   BuildToolbars(Options);
+  // As SessionsTabsAction: the tab bar, shown or not.
+  FTabsAction = Options->addAction(tr("T&abs"));
+  FTabsAction->setCheckable(true);
+  FTabsAction->setStatusTip(tr("Hide/show tabs"));
+  connect(FTabsAction, &QAction::triggered, this, [this](bool Shown)
+  {
+    FTabsShown = Shown;
+    UpdateTabs();
+    StoreLayoutChoice([Shown](CoreBridge::TLayout & Layout) { Layout.Tabs = Shown; });
+  });
   FStatusBarAction = Options->addAction(tr("Status &Bar"));
   FStatusBarAction->setCheckable(true);
   connect(FStatusBarAction, &QAction::triggered, this, [this](bool Shown) { SetStatusBarShown(Shown); });
@@ -4132,6 +4290,22 @@ void MainWindow::BuildMenus()
     connect(Action, &QAction::triggered, this, [this, Show]() { SetQueueShow(Show); });
     FQueueShowActions[static_cast<int>(Show)] = Action;
   }
+  QueueMenu->addSeparator();
+  FQueueToolbarAction = QueueMenu->addAction(tr("&Toolbar"));
+  FQueueToolbarAction->setCheckable(true);
+  FQueueToolbarAction->setStatusTip(tr("Hide/show queue list toolbar (on queue list panel)"));
+  connect(FQueueToolbarAction, &QAction::triggered, this, [this](bool Shown)
+  {
+    FQueue->SetToolbarVisible(Shown);
+    StoreLayoutChoice([Shown](CoreBridge::TLayout & Layout) { Layout.QueueToolbar = Shown; });
+  });
+  QueueMenu->addSeparator();
+  QueueMenu->addAction(tr("&Reset Columns Layout"), this, [this]() { FQueue->ResetColumnsLayout(); })
+    ->setStatusTip(tr("Reset to the default layout of list columns"));
+  QueueMenu->addSeparator();
+  // As QueuePreferencesAction: Preferences' Background page.
+  QueueMenu->addAction(tr("&Customize..."), this, [this]() { PreferencesDialog(::PreferencesDialog::tr("Background")); })
+    ->setStatusTip(tr("Customize queue list"));
   Options->addSeparator();
   Options->addAction(FPreferencesAction);
   {
@@ -4139,11 +4313,36 @@ void MainWindow::BuildMenus()
     FStatusBarAction->setChecked(Layout.StatusBar);
     statusBar()->setVisible(Layout.StatusBar);
     FQueueShowActions[static_cast<int>(Layout.QueueShow)]->setChecked(true);
+    FTabsShown = Layout.Tabs;
+    FTabsAction->setChecked(Layout.Tabs);
+    FQueueToolbarAction->setChecked(Layout.QueueToolbar);
+    FQueue->SetToolbarVisible(Layout.QueueToolbar);
   }
 
   FRemoteMenu = PanelMenu(false);
 
+  // As WinSCP's Help, its pages linscp's own (the project's GitHub pages),
+  // but the documentation, which is WinSCP's: linscp follows its interface.
+  // Show Tips (WinSCP's tips, from winscp.net) and Donate are not offered.
   QMenu * Help = menuBar()->addMenu(tr("&Help"));
+  QAction * Contents = Help->addAction(tr("&Contents"), this,
+    [this]() { OpenWebPage(QStringLiteral("https://winscp.net/eng/docs/start")); });
+  Contents->setShortcut(QKeySequence(Qt::Key_F1));
+  Contents->setStatusTip(tr("Opens web browser and points it to documentation table of contents"));
+  Help->addSeparator();
+  Help->addAction(tr("Product &Homepage"), this,
+    [this]() { OpenWebPage(QStringLiteral("https://github.com/99ecarvalho/linscp")); })
+    ->setStatusTip(tr("Opens web browser and points it to project homepage"));
+  Help->addAction(tr("&Support Forum"), this,
+    [this]() { OpenWebPage(QStringLiteral("https://github.com/99ecarvalho/linscp/issues")); })
+    ->setStatusTip(tr("Opens web browser and points it to support forum page"));
+  Help->addAction(tr("&Version History"), this,
+    [this]() { OpenWebPage(QStringLiteral("https://github.com/99ecarvalho/linscp/releases")); })
+    ->setStatusTip(tr("Opens web browser and points it to application history page"));
+  Help->addSeparator();
+  Help->addAction(tr("Check for &Updates"), this, [this]() { CheckForUpdates(); })
+    ->setStatusTip(tr("Queries application homepage for updates"));
+  Help->addSeparator();
   Help->addAction(FAboutAction);
 
   // The icons, after WinSCP's glyphs for the same commands.
@@ -5785,6 +5984,17 @@ void MainWindow::BuildToolbars(QMenu * Options)
     Tree->setStatusTip(tr("Hide/show directory tree"));
     (Left ? FLocalTreeAction : FRemoteTreeAction) = Tree;
     connect(Tree, &QAction::triggered, this, [this, Left](bool Shown) { SetTreeVisible(Left, Shown); });
+    // As LocalStatusBarAction2 and RemoteStatusBarAction2: the panel's status line.
+    Menu->addSeparator();
+    QAction * Status = Menu->addAction(tr("&Status Bar"));
+    Status->setCheckable(true);
+    Status->setStatusTip(tr("Hide/show panel status bar"));
+    (Left ? FLocalStatusBarAction : FRemoteStatusBarAction) = Status;
+    connect(Status, &QAction::triggered, this, [this, Left](bool Shown)
+    {
+      SetPanelStatusBarVisible(Left, Shown);
+      StoreLayoutChoice([Left, Shown](CoreBridge::TLayout & Layout) { (Left ? Layout.LocalStatusBar : Layout.RemoteStatusBar) = Shown; });
+    });
   }
   Options->addMenu(LeftPanel);
   Options->addMenu(RightPanel);

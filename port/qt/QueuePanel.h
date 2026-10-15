@@ -39,6 +39,11 @@ public:
   // (the list's context menu has the same).
   void AddCommands(class QMenu * Menu) const;
   QTreeWidget * List() const { return FList; }
+  // Options > Queue > Toolbar (QueueView.ToolBar) and Reset Columns Layout
+  // (QueueResetLayoutColumnsAction: the columns' default widths and order).
+  void SetToolbarVisible(bool Visible);
+  bool ToolbarVisible() const;
+  void ResetColumnsLayout();
   // The icons, of the set chosen (IconSet).
   void ApplyIcons();
 
@@ -49,6 +54,8 @@ private:
 
   CoreBridge::TSession * FSession = nullptr;
   QTreeWidget * FList = nullptr;
+  class QToolBar * FBar = nullptr;
+  QByteArray FDefaultColumns;
   QAction * FCancelAction = nullptr;
   QAction * FPauseAction = nullptr;
   QAction * FResumeAction = nullptr;

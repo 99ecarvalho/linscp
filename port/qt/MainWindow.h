@@ -8,6 +8,7 @@
 #include <QDateTime>
 #include <QIcon>
 #include <QMainWindow>
+#include <QUrl>
 
 #include <QPointer>
 
@@ -55,6 +56,17 @@ public:
   bool ExploreLocalDirectory();
   // What opens URLs instead of the desktop's (tests).
   void SetUrlOpener(std::function<bool(const QUrl &)> Opener) { FUrlOpener = std::move(Opener); }
+  // Help > Check for Updates, as WinSCP's (it asks winscp.net): linscp's
+  // newest release, pre-releases included, from GitHub's releases API (or
+  // UpdatesUrl's JSON), compared with this version. The answer is shown, or,
+  // with OnUpdatesChecked set (tests), given there: the newest version (empty
+  // when not known), whether it is newer, and an error.
+  void CheckForUpdates();
+  QUrl UpdatesUrl;
+  std::function<void(const QString & Latest, bool Newer, const QString & Error)> OnUpdatesChecked;
+  // -1, 0 or 1 as version A is older, the same or newer than B ("v0.2.0",
+  // "0.10.1-rc1": the numbers compared, a leading v and a -suffix ignored).
+  static int CompareVersions(const QString & A, const QString & B);
   // Transfers between the panels, as WinSCP's Commander's F5 (copy) and F6
   // (move) from the active panel to the other's directory, after asking for
   // the target unless Confirm is false. False when nothing was transferred
@@ -232,8 +244,9 @@ public:
   // it back. Where the desktop has no tray, minimized as ever.
   void MinimizeToTray();
   static const QIcon & AppIcon();
-  // Options > Left (Left) or Right Panel > Tree.
+  // Options > Left (Left) or Right Panel > Tree, and > Status Bar.
   void SetTreeVisible(bool Left, bool Visible);
+  void SetPanelStatusBarVisible(bool Left, bool Visible);
   QAction * TreeAction(bool Left) const { return Left ? FLocalTreeAction : FRemoteTreeAction; }
   // As ApplicationMinimize (Keep Up To Date's Minimize): to the tray when
   // asked, or Preferences say so.
@@ -343,6 +356,7 @@ private slots:
   void OpenUrlDialog();
   void Disconnect();
   void About();
+  void OpenWebPage(const QString & Url);
 
 protected:
   // Closing ends the session as Disconnect does, its directories kept.
@@ -402,6 +416,13 @@ private:
   QAction * FNewFileAction = nullptr;
   QAction * FProcessQueueAction = nullptr;
   QAction * FLocalTreeAction = nullptr;
+  QAction * FLocalStatusBarAction = nullptr;
+  QAction * FRemoteStatusBarAction = nullptr;
+  QAction * FTabsAction = nullptr;
+  QAction * FQueueToolbarAction = nullptr;
+  bool FTabsShown = true;
+  // An Options choice saved at once (the rest of the layout as stored).
+  void StoreLayoutChoice(const std::function<void(CoreBridge::TLayout &)> & Change);
   QAction * FRemoteTreeAction = nullptr;
   QSystemTrayIcon * FTrayIcon = nullptr;
   QList<QPointer<QWidget>> FTrayHidden;

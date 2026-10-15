@@ -79,12 +79,12 @@ QueuePanel::QueuePanel(QWidget * Parent) :
   FCancelAction->setIcon(style()->standardIcon(QStyle::SP_DialogCancelButton));
   FPauseAction->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
   FResumeAction->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
-  QToolBar * Bar = new QToolBar(this);
-  Bar->setIconSize(QSize(16, 16));
-  Bar->addAction(FCancelAction);
-  Bar->addAction(FPauseAction);
-  Bar->addAction(FResumeAction);
-  Layout->addWidget(Bar);
+  FBar = new QToolBar(this);
+  FBar->setIconSize(QSize(16, 16));
+  FBar->addAction(FCancelAction);
+  FBar->addAction(FPauseAction);
+  FBar->addAction(FResumeAction);
+  Layout->addWidget(FBar);
   FList = new QTreeWidget(this);
   FList->setAccessibleName(tr("Queue"));
   FList->setRootIsDecorated(false);
@@ -92,6 +92,7 @@ QueuePanel::QueuePanel(QWidget * Parent) :
   FList->setHeaderLabels({ tr("Operation"), tr("Source"), tr("Destination"), tr("Transferred"), tr("Speed"), tr("Progress") });
   FList->header()->setSectionResizeMode(SourceColumn, QHeaderView::Stretch);
   FList->header()->setSectionResizeMode(DestinationColumn, QHeaderView::Stretch);
+  FDefaultColumns = FList->header()->saveState();
   connect(FList, &QTreeWidget::itemSelectionChanged, this, &QueuePanel::UpdateActions);
   // As the queue list's default operation: the entry's question, if any.
   connect(FList, &QTreeWidget::itemDoubleClicked, this, [this]()
@@ -157,6 +158,21 @@ std::uintptr_t QueuePanel::SelectedId() const
 {
   const QList<QTreeWidgetItem *> Items = FList->selectedItems();
   return Items.isEmpty() ? 0 : static_cast<std::uintptr_t>(Items.first()->data(0, IdRole).toULongLong());
+}
+
+void QueuePanel::SetToolbarVisible(bool Visible)
+{
+  FBar->setVisible(Visible);
+}
+
+bool QueuePanel::ToolbarVisible() const
+{
+  return !FBar->isHidden();
+}
+
+void QueuePanel::ResetColumnsLayout()
+{
+  FList->header()->restoreState(FDefaultColumns);
 }
 
 QAction * QueuePanel::Action(TOperation Operation) const

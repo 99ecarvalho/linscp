@@ -1767,6 +1767,114 @@ Local: %2</translation>
         <source>Go to transfer queue list</source>
         <translation>Ir para a lista da fila de transferências</translation>
     </message>
+    <message>
+        <source>Cannot open %1.</source>
+        <translation>Não foi possível abrir %1.</translation>
+    </message>
+    <message>
+        <source>No release information found.</source>
+        <translation>Nenhuma informação de versão encontrada.</translation>
+    </message>
+    <message>
+        <source>Check for Updates</source>
+        <translation>Procurar Atualizações</translation>
+    </message>
+    <message>
+        <source>Could not check for updates: %1</source>
+        <translation>Não foi possível procurar atualizações: %1</translation>
+    </message>
+    <message>
+        <source>Version %1 of linscp is available. You are using version %2.</source>
+        <translation>A versão %1 do linscp está disponível. Você está usando a versão %2.</translation>
+    </message>
+    <message>
+        <source>&amp;Download Page</source>
+        <translation>Página de &amp;download</translation>
+    </message>
+    <message>
+        <source>You are using the latest version of linscp (%1).</source>
+        <translation>Você está usando a versão mais recente do linscp (%1).</translation>
+    </message>
+    <message>
+        <source>T&amp;abs</source>
+        <translation>&amp;Abas</translation>
+    </message>
+    <message>
+        <source>Hide/show tabs</source>
+        <translation>Ocultar/mostrar abas</translation>
+    </message>
+    <message>
+        <source>&amp;Toolbar</source>
+        <translation>&amp;Barra de Ferramentas</translation>
+    </message>
+    <message>
+        <source>Hide/show queue list toolbar (on queue list panel)</source>
+        <translation>Ocultar/mostrar a barra de ferramentas da lista da fila (no painel da fila)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset Columns Layout</source>
+        <translation>&amp;Restabelecer aparência das colunas</translation>
+    </message>
+    <message>
+        <source>Reset to the default layout of list columns</source>
+        <translation>Restabelecer a aparência padrão das colunas da lista</translation>
+    </message>
+    <message>
+        <source>&amp;Customize...</source>
+        <translation>&amp;Personalizar...</translation>
+    </message>
+    <message>
+        <source>Customize queue list</source>
+        <translation>Personalizar a lista da fila</translation>
+    </message>
+    <message>
+        <source>&amp;Contents</source>
+        <translation>&amp;Conteúdo</translation>
+    </message>
+    <message>
+        <source>Opens web browser and points it to documentation table of contents</source>
+        <translation>Abre o navegador no sumário da documentação</translation>
+    </message>
+    <message>
+        <source>Product &amp;Homepage</source>
+        <translation>&amp;Home Page do produto</translation>
+    </message>
+    <message>
+        <source>Opens web browser and points it to project homepage</source>
+        <translation>Abre o navegador na página do projeto</translation>
+    </message>
+    <message>
+        <source>&amp;Support Forum</source>
+        <translation>Fórum de &amp;suporte</translation>
+    </message>
+    <message>
+        <source>Opens web browser and points it to support forum page</source>
+        <translation>Abre o navegador na página do fórum de suporte</translation>
+    </message>
+    <message>
+        <source>&amp;Version History</source>
+        <translation>Histórico da &amp;versão</translation>
+    </message>
+    <message>
+        <source>Opens web browser and points it to application history page</source>
+        <translation>Abre o navegador na página do histórico de versões</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Verificar por at&amp;ualizações</translation>
+    </message>
+    <message>
+        <source>Queries application homepage for updates</source>
+        <translation>Procura atualizações na página do aplicativo</translation>
+    </message>
+    <message>
+        <source>&amp;Status Bar</source>
+        <translation>Barra de &amp;status</translation>
+    </message>
+    <message>
+        <source>Hide/show panel status bar</source>
+        <translation>Ocultar/mostrar a barra de status do painel</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

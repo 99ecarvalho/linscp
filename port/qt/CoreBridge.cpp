@@ -709,6 +709,10 @@ TLayout Layout()
   Result.QueueViewHeightPixelsPerInch = Settings.QueueViewHeightPixelsPerInch;
   Result.QueueShow = static_cast<TLayout::TQueueShow>(std::clamp(Settings.QueueViewShow, 0, 2));
   Result.StatusBar = Settings.CommanderStatusBar;
+  Result.Tabs = Settings.CommanderSessionsTabs;
+  Result.LocalStatusBar = Settings.LocalPanelStatusBar;
+  Result.RemoteStatusBar = Settings.RemotePanelStatusBar;
+  Result.QueueToolbar = Settings.QueueViewToolBar;
   Result.LockToolbars = Settings.LockToolbars;
   Result.SelectiveToolbarText = Settings.SelectiveToolbarText;
   Result.LargerToolbar = Settings.LargerToolbar;
@@ -735,6 +739,10 @@ void SetLayout(const TLayout & Layout)
   Settings.QueueViewHeightPixelsPerInch = Layout.QueueViewHeightPixelsPerInch;
   Settings.QueueViewShow = static_cast<int>(Layout.QueueShow);
   Settings.CommanderStatusBar = Layout.StatusBar;
+  Settings.CommanderSessionsTabs = Layout.Tabs;
+  Settings.LocalPanelStatusBar = Layout.LocalStatusBar;
+  Settings.RemotePanelStatusBar = Layout.RemoteStatusBar;
+  Settings.QueueViewToolBar = Layout.QueueToolbar;
   Settings.LockToolbars = Layout.LockToolbars;
   Settings.SelectiveToolbarText = Layout.SelectiveToolbarText;
   Settings.LargerToolbar = Layout.LargerToolbar;

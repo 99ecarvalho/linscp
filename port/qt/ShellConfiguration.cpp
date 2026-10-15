@@ -281,6 +281,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteInteger(L"ExplorerStyleSelection", FSettings.NortonLikeMode);
     Storage->WriteBool(L"CompareBySize", FSettings.CompareBySize);
     Storage->WriteBool(L"StatusBar", FSettings.CommanderStatusBar);
+    Storage->WriteBool(L"SessionsTabs", FSettings.CommanderSessionsTabs);
     Storage->WriteString(L"ToolbarsLayout2", FSettings.CommanderToolbarsLayout);
     Storage->WriteInteger(L"CurrentPanel", FSettings.CurrentPanel);
     Storage->WriteFloat(L"LocalPanelWidth", FSettings.LocalPanelWidth);
@@ -294,6 +295,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     TCloseSubKeyPath Close(Storage);
     Storage->WriteString(L"DirViewParams", FSettings.LocalDirViewParams);
     Storage->WriteBool(L"DriveView", FSettings.LocalDriveView);
+    Storage->WriteBool(L"StatusBar", FSettings.LocalPanelStatusBar);
     Storage->WriteInteger(L"DriveViewHeight", FSettings.LocalDriveViewHeight);
     Storage->WriteInteger(L"DriveViewHeightPixelsPerInch", FSettings.LocalDriveViewHeightPixelsPerInch);
   }
@@ -302,6 +304,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     TCloseSubKeyPath Close(Storage);
     Storage->WriteString(L"DirViewParams", FSettings.RemoteDirViewParams);
     Storage->WriteBool(L"DriveView", FSettings.RemoteDriveView);
+    Storage->WriteBool(L"StatusBar", FSettings.RemotePanelStatusBar);
     Storage->WriteInteger(L"DriveViewHeight", FSettings.RemoteDriveViewHeight);
     Storage->WriteInteger(L"DriveViewHeightPixelsPerInch", FSettings.RemoteDriveViewHeightPixelsPerInch);
   }
@@ -341,6 +344,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteInteger(L"Height", FSettings.QueueViewHeight);
     Storage->WriteInteger(L"HeightPixelsPerInch", FSettings.QueueViewHeightPixelsPerInch);
     Storage->WriteInteger(L"Show", FSettings.QueueViewShow);
+    Storage->WriteBool(L"ToolBar", FSettings.QueueViewToolBar);
   }
 }
 
@@ -538,6 +542,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.NortonLikeMode = Storage->ReadInteger(L"ExplorerStyleSelection", FSettings.NortonLikeMode);
     FSettings.CompareBySize = Storage->ReadBool(L"CompareBySize", FSettings.CompareBySize);
     FSettings.CommanderStatusBar = Storage->ReadBool(L"StatusBar", FSettings.CommanderStatusBar);
+    FSettings.CommanderSessionsTabs = Storage->ReadBool(L"SessionsTabs", FSettings.CommanderSessionsTabs);
     FSettings.CommanderToolbarsLayout = Storage->ReadString(L"ToolbarsLayout2", FSettings.CommanderToolbarsLayout);
     FSettings.CurrentPanel = Storage->ReadInteger(L"CurrentPanel", FSettings.CurrentPanel);
     FSettings.LocalPanelWidth = Storage->ReadFloat(L"LocalPanelWidth", FSettings.LocalPanelWidth);
@@ -548,6 +553,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     TCloseSubKeyPath Close(Storage);
     FSettings.LocalDirViewParams = Storage->ReadString(L"DirViewParams", FSettings.LocalDirViewParams);
     FSettings.LocalDriveView = Storage->ReadBool(L"DriveView", FSettings.LocalDriveView);
+    FSettings.LocalPanelStatusBar = Storage->ReadBool(L"StatusBar", FSettings.LocalPanelStatusBar);
     FSettings.LocalDriveViewHeight = Storage->ReadInteger(L"DriveViewHeight", FSettings.LocalDriveViewHeight);
     FSettings.LocalDriveViewHeightPixelsPerInch =
       Storage->ReadInteger(L"DriveViewHeightPixelsPerInch", FSettings.LocalDriveViewHeightPixelsPerInch);
@@ -557,6 +563,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     TCloseSubKeyPath Close(Storage);
     FSettings.RemoteDirViewParams = Storage->ReadString(L"DirViewParams", FSettings.RemoteDirViewParams);
     FSettings.RemoteDriveView = Storage->ReadBool(L"DriveView", FSettings.RemoteDriveView);
+    FSettings.RemotePanelStatusBar = Storage->ReadBool(L"StatusBar", FSettings.RemotePanelStatusBar);
     FSettings.RemoteDriveViewHeight = Storage->ReadInteger(L"DriveViewHeight", FSettings.RemoteDriveViewHeight);
     FSettings.RemoteDriveViewHeightPixelsPerInch =
       Storage->ReadInteger(L"DriveViewHeightPixelsPerInch", FSettings.RemoteDriveViewHeightPixelsPerInch);
@@ -602,6 +609,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.QueueViewHeightPixelsPerInch =
       Storage->ReadInteger(L"HeightPixelsPerInch", FSettings.QueueViewHeightPixelsPerInch);
     FSettings.QueueViewShow = Storage->ReadInteger(L"Show", FSettings.QueueViewShow);
+    FSettings.QueueViewToolBar = Storage->ReadBool(L"ToolBar", FSettings.QueueViewToolBar);
   }
 }
 
