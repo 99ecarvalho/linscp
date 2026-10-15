@@ -9,8 +9,16 @@
 #include <QProcess>
 #include <QStandardPaths>
 #include <QTextStream>
+#include <QWidget>
 
 #include "CoreBridge.h"
+#include "QtFrontend.h"
+
+#if defined(Q_OS_WIN)
+#include <windows.h>
+#include <shlobj.h>
+#include <shobjidl.h>
+#endif
 
 namespace Integration
 {
@@ -334,6 +342,141 @@ bool AddToSearchPath(QString & Error)
   }
   return true;
 #endif
+}
+
+QString ShortcutFolder(TShortcutFolder Folder)
+{
+#if defined(Q_OS_WIN)
+  if (Folder == TShortcutFolder::SendTo)
+  {
+    // FOLDERID_SendTo.
+    return QDir::fromNativeSeparators(qEnvironmentVariable("APPDATA")) + QStringLiteral("/Microsoft/Windows/SendTo");
+  }
+#else
+  Q_UNUSED(Folder);
+#endif
+  return QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+}
+
+bool CreateShortcut(const CoreBridge::TShortcut & Shortcut, TShortcutFolder Folder, QString & Path, QString & Error)
+{
+  const QString ShortcutError = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::CreateShortcutError));
+  const QString Directory = ShortcutFolder(Folder);
+  QDir().mkpath(Directory);
+  const QString Name = QString::fromStdString(Shortcut.Name);
+#if defined(Q_OS_WIN)
+  // As CreateDesktopShortCut: the program, its arguments quoted as its
+  // command line has them, its own icon.
+  QStringList Quoted;
+  for (const std::string & Argument : Shortcut.Arguments)
+  {
+    QString Text = QString::fromStdString(Argument);
+    if (Text.contains(QLatin1Char(' ')) || Text.contains(QLatin1Char('"')) || Text.isEmpty())
+    {
+      Text = QLatin1Char('"') + Text.replace(QLatin1Char('"'), QStringLiteral("\\\"")) + QLatin1Char('"');
+    }
+    Quoted.append(Text);
+  }
+  Path = QDir(Directory).filePath(Name + QStringLiteral(".lnk"));
+  const std::wstring Exe = QDir::toNativeSeparators(QCoreApplication::applicationFilePath()).toStdWString();
+  const std::wstring Arguments = Quoted.join(QLatin1Char(' ')).toStdWString();
+  const std::wstring Description = QString::fromStdString(Shortcut.Description).toStdWString();
+  const std::wstring LinkPath = QDir::toNativeSeparators(Path).toStdWString();
+  const HRESULT Init = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+  bool Result = false;
+  IShellLinkW * Link = nullptr;
+  if (SUCCEEDED(CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLinkW, reinterpret_cast<void **>(&Link))))
+  {
+    Link->SetPath(Exe.c_str());
+    Link->SetArguments(Arguments.c_str());
+    Link->SetDescription(Description.c_str());
+    Link->SetShowCmd(SW_SHOW);
+    Link->SetIconLocation(Exe.c_str(), 0);
+    IPersistFile * File = nullptr;
+    if (SUCCEEDED(Link->QueryInterface(IID_IPersistFile, reinterpret_cast<void **>(&File))))
+    {
+      Result = SUCCEEDED(File->Save(LinkPath.c_str(), TRUE));
+      File->Release();
+    }
+    Link->Release();
+  }
+  if (SUCCEEDED(Init))
+  {
+    CoUninitialize();
+  }
+  if (!Result)
+  {
+    Error = ShortcutError;
+  }
+  return Result;
+#else
+  Q_UNUSED(Folder);
+  // A desktop entry's Exec, quoted as the specification has it.
+  QStringList Exec;
+  for (const std::string & Argument : Shortcut.Arguments)
+  {
+    QString Text = QString::fromStdString(Argument);
+    for (const QChar Special : { QLatin1Char('\\'), QLatin1Char('"'), QLatin1Char('`'), QLatin1Char('$') })
+    {
+      Text.replace(Special, QStringLiteral("\\") + Special);
+    }
+    Exec.append(QLatin1Char('"') + Text.replace(QLatin1Char('%'), QStringLiteral("%%")) + QLatin1Char('"'));
+  }
+  InstallIcon();
+  Path = QDir(Directory).filePath(Name + QStringLiteral(".desktop"));
+  const QString Entry = QStringLiteral(
+    "[Desktop Entry]\n"
+    "Type=Application\n"
+    "Name=%1\n"
+    "Comment=%2\n"
+    "Exec=\"%3\" %4\n"
+    "Icon=linscp\n"
+    "Terminal=false\n").arg(Name, QString(QString::fromStdString(Shortcut.Description)).replace(QLatin1Char('\n'), QLatin1Char(' ')),
+      QCoreApplication::applicationFilePath(), Exec.join(QLatin1Char(' ')));
+  if (!WriteFile(Path, Entry.toUtf8(), Error))
+  {
+    Error = ShortcutError + QLatin1Char('\n') + Error;
+    return false;
+  }
+  // Desktops start only executable entries.
+  QFile::setPermissions(Path, QFile::permissions(Path) | QFileDevice::ExeOwner | QFileDevice::ExeUser);
+  return true;
+#endif
+}
+
+bool AskAndCreateShortcut(QWidget * Parent, const QString & Question, const CoreBridge::TShortcut & Shortcut,
+  TShortcutFolder Folder)
+{
+  QtFrontend Frontend;
+  Frontend.SetWindow(Parent);
+  if (!Question.isEmpty())
+  {
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Confirmation;
+    Query.Message = Question.toStdString();
+    CoreBridge::TQueryButton Yes;
+    Yes.Answer = CoreBridge::AnswerYes;
+    Yes.Caption = "&Yes";
+    CoreBridge::TQueryButton No;
+    No.Answer = CoreBridge::AnswerNo;
+    No.Caption = "&No";
+    Query.Buttons = { Yes, No };
+    Query.CancelAnswer = CoreBridge::AnswerNo;
+    if (Frontend.Query(Query).Answer != CoreBridge::AnswerYes)
+    {
+      return false;
+    }
+  }
+  QString Path;
+  QString Error;
+  if (!CreateShortcut(Shortcut, Folder, Path, Error))
+  {
+    CoreBridge::TError Message;
+    Message.Message = Error.toStdString();
+    Frontend.ShowError(Message);
+    return false;
+  }
+  return true;
 }
 
 }  // namespace Integration

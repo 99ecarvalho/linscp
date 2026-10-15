@@ -1741,8 +1741,8 @@ QString IntegrationText(CoreBridge::TText Text)
 
 }  // namespace
 
-// Integration, as WinSCP's IntegrationSheet (its "Windows Shell" group).
-// "Send to" is not here: it needs the command line's /upload.
+// Integration, as WinSCP's IntegrationSheet (its "Windows Shell" group;
+// Explorer's Send To on Windows only).
 QWidget * PreferencesDialog::MakeIntegrationPage()
 {
   QWidget * Page = new QWidget(this);
@@ -1790,6 +1790,15 @@ QWidget * PreferencesDialog::MakeIntegrationPage()
       Frontend.ShowError(Failure);
     }
   });
+#if defined(Q_OS_WIN)
+  // As SendToHookButton: Explorer's Send To uploads with the program.
+  QPushButton * SendTo = new QPushButton(tr("Add upload shortcut to Explorer's '&Send to' context menu"), Shell);
+  connect(SendTo, &QPushButton::clicked, this, [this]()
+  {
+    Integration::AskAndCreateShortcut(this, IntegrationText(CoreBridge::TText::ConfirmCreateIcon),
+      CoreBridge::AppShortcut(CoreBridge::SendToShortcutName(), { "/Upload" }), Integration::TShortcutFolder::SendTo);
+  });
+#endif
   QPushButton * Register = new QPushButton(tr("Register to handle &URL addresses"), Shell);
   QMenu * RegisterMenu = new QMenu(Register);
   RegisterMenu->addAction(tr("Register"), this, [this]()
@@ -1819,6 +1828,9 @@ QWidget * PreferencesDialog::MakeIntegrationPage()
       .replace(QStringLiteral("%%"), QStringLiteral("%")), &Integration::AddToSearchPath);
   });
   ShellLayout->addWidget(DesktopIcon);
+#if defined(Q_OS_WIN)
+  ShellLayout->addWidget(SendTo);
+#endif
   ShellLayout->addWidget(Register);
   ShellLayout->addWidget(SearchPath);
   Layout->addWidget(Shell);

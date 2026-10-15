@@ -91,6 +91,7 @@ bool WinScpClash(const QString & One, const QString & Other)
     { QStringLiteral("Di&sable"), QStringLiteral("Automatically reconnect session, if it &stalls") },
     { QStringLiteral("B&rowse..."), QStringLiteral("&Remember session password and pass it to PuTTY (SSH)") },
     { QStringLiteral("&Tabulator size:"), QStringLiteral("&Text color") },
+    { QStringLiteral("Add upload shortcut to Explorer's '&Send to' context menu"), QStringLiteral("Add linscp to &search path") },
     // NonVisual.dfm, Tabs.
     { QStringLiteral("&Rename Tab"), QStringLiteral("&Reconnect Session") },
     { QStringLiteral("&Close Tab"), QStringLiteral("&Change Password...") },

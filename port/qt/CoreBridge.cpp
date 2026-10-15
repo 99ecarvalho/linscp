@@ -1084,6 +1084,113 @@ void SetMasterPasswordPrompt(std::function<bool()> Prompt)
   GMasterPasswordPrompt = std::move(Prompt);
 }
 
+std::vector<std::string> CommandLineUpload(bool & UseDefaults)
+{
+  UseDefaults = false;
+  std::vector<std::string> Result;
+  try
+  {
+    TProgramParams * Params = TProgramParams::Instance();
+    std::unique_ptr<TStringList> Files(new TStringList());
+    bool Upload = false;
+    if (Params->FindSwitch(L"Upload", Files.get()))
+    {
+      if (Files->Count == 0)
+      {
+        throw Exception(LoadStr(NO_UPLOAD_LIST_ERROR));
+      }
+      Upload = true;
+    }
+    if (Params->FindSwitch(L"UploadIfAny", Files.get()) && (Files->Count > 0))
+    {
+      Upload = true;
+    }
+    if (Upload)
+    {
+      for (int Index = 0; Index < Files->Count; Index++)
+      {
+        Result.push_back(Utf8(Files->Strings[Index]));
+      }
+      // As /defaults' value 0: no Copy dialog (WinSCP's other values time
+      // it out; here it is shown).
+      UnicodeString Value;
+      UseDefaults = Params->FindSwitch(L"Defaults", Value) && (StrToIntDef(Value, 0) == 0);
+    }
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+  return Result;
+}
+
+TShortcut AppShortcut(const std::string & Name, const std::vector<std::string> & Arguments)
+{
+  TShortcut Result;
+  Result.Name = Name;
+  // As GetIniFileParam.
+  const UnicodeString Ini = Configuration->GetIniFileParamValue();
+  if (!Ini.IsEmpty())
+  {
+    Result.Arguments.push_back(Utf8(L"/ini=" + Ini));
+  }
+  Result.Arguments.insert(Result.Arguments.end(), Arguments.begin(), Arguments.end());
+  return Result;
+}
+
+TShortcut SessionShortcut(const std::string & SessionName, TSessionShortcutKind Kind, const std::string & Name,
+  const std::vector<std::string> & Arguments)
+{
+  try
+  {
+    const UnicodeString Session = FromUtf8(SessionName);
+    UnicodeString FileName = FromUtf8(Name);
+    UnicodeString InfoTip;
+    std::vector<std::string> Own;
+    Own.push_back(Utf8(EncodeUrlString(Session)));
+    if (Kind != TSessionShortcutKind::Site)
+    {
+      const bool Folder = (Kind == TSessionShortcutKind::Folder);
+      InfoTip = FMTLOAD(Folder ? SHORTCUT_INFO_TIP_FOLDER : SHORTCUT_INFO_TIP_WORKSPACE, (Session));
+      if (FileName.IsEmpty())
+      {
+        FileName = UnixExtractFileName(Session);
+      }
+      Own.push_back("/Workspace");
+    }
+    else
+    {
+      int ParsedInfo = 0;
+      std::unique_ptr<TSessionData> Data(StoredSessions->ParseUrl(EncodeUrlString(Session), NULL, ParsedInfo));
+      InfoTip = FMTLOAD(SHORTCUT_INFO_TIP, (Session, Data->InfoTip));
+      if (FileName.IsEmpty())
+      {
+        FileName = Data->LocalName;
+      }
+    }
+    Own.insert(Own.end(), Arguments.begin(), Arguments.end());
+    TShortcut Result = AppShortcut(Utf8(ValidLocalFileName(FileName)), Own);
+    Result.Description = Utf8(InfoTip);
+    return Result;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+std::string SendToShortcutName()
+{
+  return Utf8(FMTLOAD(SENDTO_HOOK_NAME2, (AppNameString())));
+}
+
+std::string SiteSendToShortcutName(const std::string & SessionName)
+{
+  const TSessionData * Data = dynamic_cast<TSessionData *>(StoredSessions->FindByName(FromUtf8(SessionName)));
+  const UnicodeString LocalName = (Data != NULL) ? Data->LocalName : FromUtf8(SessionName);
+  return Utf8(FMTLOAD(SESSION_SENDTO_HOOK_NAME2, (LocalName, AppNameString())));
+}
+
 void Initialize(IFrontend * AFrontend)
 {
   GFrontend = AFrontend;
@@ -1403,6 +1510,12 @@ std::string Text(TText Text)
     case TText::SshHostCASignatures: Ident = SSH_HOST_CA_SIGNATURES; break;
     case TText::SshHostCANoHosts: Ident = SSH_HOST_CA_NO_HOSTS; break;
     case TText::SshHostCAHostsInvalid: Ident = SSH_HOST_CA_HOSTS_INVALID; break;
+    case TText::ConfirmCreateIcon: Ident = CONFIRM_CREATE_ICON; break;
+    case TText::ConfirmCreateShortcut: Ident = CONFIRM_CREATE_SHORTCUT; break;
+    case TText::ConfirmCreateShortcutFolder: Ident = CONFIRM_CREATE_SHORTCUT_FOLDER; break;
+    case TText::ConfirmCreateShortcutWorkspace: Ident = CONFIRM_CREATE_SHORTCUT_WORKSPACE; break;
+    case TText::ConfirmCreateSendTo: Ident = CONFIRM_CREATE_SENDTO; break;
+    case TText::SaveSiteShortcut: Ident = SAVE_SITE_WORKSPACE_SHORTCUT; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

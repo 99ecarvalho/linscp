@@ -274,7 +274,7 @@ registry, tray or window messages.
 | Preferences > Window | minimize to tray; single instance | done | `MinimizeToTray` through QSystemTrayIcon, offered only where the desktop has a tray (GNOME needs an extension); `ExternalSessionInExistingInstance` over a per-user QLocalServer in place of WM_COPYDATA, Shift reversing it, never with /NewInstance, /RawConfig, a command or a download URL |
 | Preferences > Security | master password | done | TWinConfiguration's, carried in `TShellConfiguration` (AES-encrypted stored passwords, the verifier under Security); asked once per site read, a refusal leaving the site's passwords as stored; saving one with a password asks first, as WinSCP's dialogs do; other instances found by process, as `AnyOtherInstanceOfSelf` |
 | Preferences > Security | trusted host CAs | done | on the Security page, as WinSCP has them: core's `SshHostCAList` edited (TSshHostCADialog: a key typed or loaded, fingerprinted, the hosts checked); "Load authorities from PuTTY" and "Edit in PuTTY" on Windows only (PuTTY keeps them in the registry) |
-| Preferences > Integration | "Send to" | missing | Win-only (Explorer's Send To) |
+| Preferences > Integration | "Send to" | done | the Send To shortcut (Preferences, and the Site Manager's for a site) on Windows only, as Explorer's; it runs `/upload`, now handled as WinSCP's standalone upload (the session, the Copy dialog unless `/defaults`, then the program ends); the Site Manager's Desktop Icon too |
 | Editor | reload from the server; save all; window position kept | done | Reload downloads again (`ExecutedFileReload`); Save All (Shift+Ctrl+S); the first editor's place as `Editor.WindowParams` |
 | Properties | local files' | missing | WinSCP shows the shell's (Win-only) |
 | Properties | S3 ACLs | missing | |
@@ -285,7 +285,7 @@ registry, tray or window messages.
 | Keep up to date | start in a new window; minimize to the tray | missing | presets are a combo, not WinSCP's split button |
 | Workspaces | local tabs saved | missing | |
 | Clipboard | remote files pasted into the remote panel (duplicate) | missing | |
-| Save Session as Site | create desktop shortcut | missing | `.lnk` on Windows, `.desktop` on POSIX |
+| Save Session as Site | create desktop shortcut | done | `.lnk` through IShellLink on Windows (its arguments, as CreateDesktopSessionShortCut), a desktop entry on POSIX |
 | Done since their notes | Shift+F5/F6, kept layout, Synchronize's transfer settings, keep up to date, location profiles, compare criteria, editor font, external editors, S3 tags, bookmark shortcuts, commands list, transfer presets, open with the associated application, URL handler, folders of sites on the command line | done | |
 
 ## Decisions taken

@@ -70,6 +70,7 @@
 #include "SaveWorkspaceDialog.h"
 #include "CopyLocalDialog.h"
 #include "IconSet.h"
+#include "Integration.h"
 #include "MasterPasswordDialog.h"
 #include "WindowParams.h"
 #include "PanelBands.h"
@@ -597,11 +598,15 @@ void MainWindow::closeEvent(QCloseEvent * Event)
     Event->ignore();
     return;
   }
-  SaveLayout();
+  // A standalone operation's window keeps nothing (WinSCP never shows it).
+  if (!FStandalone)
+  {
+    SaveLayout();
+  }
   // As FormClose: the workspace saved automatically, when that is on (an
   // empty one is not), and noted as the last stored, so it opens next time.
   CoreBridge::TWorkspaceSettings Workspace = CoreBridge::WorkspaceSettings();
-  if (Workspace.AutoSave && (TabCount() > 0))
+  if (Workspace.AutoSave && (TabCount() > 0) && !FStandalone)
   {
     try
     {
@@ -779,6 +784,25 @@ bool MainWindow::ExploreLocalDirectory()
 
 void MainWindow::StartUp()
 {
+  // /upload's files first: what is left of the command line names the
+  // session.
+  bool UseDefaults = false;
+  std::vector<std::string> UploadFiles;
+  try
+  {
+    UploadFiles = CoreBridge::CommandLineUpload(UseDefaults);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    close();
+    return;
+  }
+  if (!UploadFiles.empty())
+  {
+    StandaloneUpload(UploadFiles, UseDefaults);
+    return;
+  }
   bool CanOpen = false;
   std::unique_ptr<CoreBridge::TSession> Session;
   try
@@ -809,6 +833,36 @@ void MainWindow::StartUp()
   {
     SiteManagerDialog();
   }
+}
+
+// As WinMain's standalone Upload (Explorer's "Send to" starts it): the
+// session named, else the site manager's; the files to its directory, through
+// the Copy dialog unless /defaults; then the program ends (WinSCP's
+// OnceDoneOperation odoDisconnect, its window never shown for it).
+void MainWindow::StandaloneUpload(const std::vector<std::string> & Files, bool UseDefaults)
+{
+  FStandalone = true;
+  bool CanOpen = false;
+  std::unique_ptr<CoreBridge::TSession> Session;
+  try
+  {
+    Session = CoreBridge::TSession::FromCommandLine(CanOpen);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  const bool Connected = (Session && CanOpen) ? Open(std::move(Session)) : SiteManagerDialog();
+  if (Connected && FSession && FSession->Active())
+  {
+    QStringList Names;
+    for (const std::string & File : Files)
+    {
+      Names.append(QDir::cleanPath(QDir::current().absoluteFilePath(QString::fromStdString(File))));
+    }
+    Transfer(true, Names, FPanel->Path(), false, !UseDefaults, false);
+  }
+  close();
 }
 
 bool MainWindow::SiteManagerDialog()
@@ -3917,6 +3971,7 @@ bool MainWindow::SaveSessionAsSite(const QString * Name, bool SavePassword)
   {
     QString AName;
     bool ASavePassword = SavePassword;
+    bool CreateShortcut = false;
     if (Name != nullptr)
     {
       AName = *Name;
@@ -3930,10 +3985,18 @@ bool MainWindow::SaveSessionAsSite(const QString * Name, bool SavePassword)
       }
       AName = Dialog.Name();
       ASavePassword = Dialog.SavePassword();
+      CreateShortcut = Dialog.CreateShortcut();
     }
     try
     {
       FSession->SaveAsSite(AName.toStdString(), ASavePassword);
+      // As DoSaveSession: the site's desktop shortcut, with /desktop and
+      // /UploadIfAny.
+      if (CreateShortcut)
+      {
+        Integration::AskAndCreateShortcut(this, QString(), CoreBridge::SessionShortcut(AName.toStdString(),
+          CoreBridge::TSessionShortcutKind::Site, std::string(), { "/Desktop", "/UploadIfAny" }), Integration::TShortcutFolder::Desktop);
+      }
       return true;
     }
     catch (const CoreBridge::TCoreError & E)

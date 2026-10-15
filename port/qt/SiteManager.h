@@ -81,7 +81,13 @@ public:
   CoreBridge::TSite Edited() const;
   void SetEdited(const CoreBridge::TSite & Site);
 
+  // Tools > Desktop Icon, and Explorer's 'Send To' Shortcut (SendTo,
+  // Windows): the selected site's, folder's or workspace's, after asking.
+  bool CreateSessionShortcut(bool SendTo);
+
 private:
+  class QAction * FDesktopIconAction = nullptr;
+  QAction * FSendToAction = nullptr;
   void Fill(const QString & Select, const QStringList & ExtraFolders = QStringList());
   void CurrentChanged();
   void ProtocolChanged();

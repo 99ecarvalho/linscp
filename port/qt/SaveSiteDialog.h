@@ -25,16 +25,20 @@ public:
   // Folder/Name.
   QString Name() const;
   bool SavePassword() const;
+  // SAVE_SITE_WORKSPACE_SHORTCUT: a desktop shortcut to the site.
+  bool CreateShortcut() const;
   void accept() override;
 
   QLineEdit * NameEdit() const { return FName; }
   QComboBox * FolderCombo() const { return FFolder; }
   QCheckBox * SavePasswordCheck() const { return FSavePassword; }
+  QCheckBox * CreateShortcutCheck() const { return FCreateShortcut; }
 
 private:
   QLineEdit * FName = nullptr;
   QComboBox * FFolder = nullptr;
   QCheckBox * FSavePassword = nullptr;
+  QCheckBox * FCreateShortcut = nullptr;
   QPushButton * FOk = nullptr;
   QString FRootFolder;
 };

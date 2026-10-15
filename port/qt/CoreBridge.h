@@ -187,6 +187,33 @@ void SetArguments(const std::vector<std::string> & Arguments);
 // OpenInNewWindow, reverses it): not with /NewInstance, /RawConfig, a
 // command switch, or a URL of a file to download. After Initialize.
 bool CommandLineForAnotherInstance(bool Alternative);
+// As WinMain's pcUpload: the files /upload (or /UploadIfAny, with some)
+// names, taken off the command line so that what is left names the
+// session; whether /defaults says to upload without the Copy dialog.
+// Empty without either. Throws TCoreError: /upload with no files.
+std::vector<std::string> CommandLineUpload(bool & UseDefaults);
+
+// What a shortcut to the program runs (CreateAppDesktopShortCut's):
+// its file name (no extension), its arguments (the /ini= this run has
+// first), its tip.
+struct TShortcut
+{
+  std::string Name;
+  std::vector<std::string> Arguments;
+  std::string Description;
+};
+// The program with Arguments.
+TShortcut AppShortcut(const std::string & Name, const std::vector<std::string> & Arguments);
+// As CreateDesktopSessionShortCut: a site's, a folder of sites' or a
+// workspace's (with /workspace), named Name, else after it; Arguments
+// after. Throws TCoreError.
+enum class TSessionShortcutKind { Site, Folder, Workspace };
+TShortcut SessionShortcut(const std::string & SessionName, TSessionShortcutKind Kind, const std::string & Name,
+  const std::vector<std::string> & Arguments);
+// The Send To shortcut's names: the program's (SENDTO_HOOK_NAME2) and a
+// site's (SESSION_SENDTO_HOOK_NAME2, with its local name).
+std::string SendToShortcutName();
+std::string SiteSendToShortcutName(const std::string & SessionName);
 
 // The master password (Preferences > Security), as TWinConfiguration's:
 // whether it is in use; the one given checked against it (its verifier);
@@ -839,6 +866,12 @@ enum class TText
   SshHostCASignatures,  // "SHA-&1|SHA-&256|SHA-&512"
   SshHostCANoHosts,     // "No validity expression configured."
   SshHostCAHostsInvalid, // "Error in validity expression."
+  ConfirmCreateIcon,    // "Create selected icon/shortcut?"
+  ConfirmCreateShortcut, // "Create desktop shortcut for site '%s'?"
+  ConfirmCreateShortcutFolder, // "Create desktop shortcut for site folder '%s'?"
+  ConfirmCreateShortcutWorkspace, // "Create desktop shortcut for workspace '%s'?"
+  ConfirmCreateSendTo,  // "Create Explorer's 'send to' shortcut for site '%s'?"
+  SaveSiteShortcut,     // "&Create desktop shortcut"
 };
 std::string Text(TText Text);
 

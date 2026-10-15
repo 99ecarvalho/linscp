@@ -2486,6 +2486,10 @@ Local: %2</translation>
         <source>&amp;Edit in PuTTY...</source>
         <translation>&amp;Editar no PuTTY...</translation>
     </message>
+    <message>
+        <source>Add upload shortcut to Explorer&apos;s &apos;&amp;Send to&apos; context menu</source>
+        <translation>Adicionar atalho de upload ao menu de contexto &apos;&amp;Enviar para&apos; do Explorer</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>
@@ -3130,6 +3134,14 @@ Local: %2</translation>
     <message>
         <source>Ne&amp;w Folder...</source>
         <translation>No&amp;va pasta...</translation>
+    </message>
+    <message>
+        <source>Desktop &amp;Icon</source>
+        <translation>&amp;Ícone do Desktop</translation>
+    </message>
+    <message>
+        <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
+        <translation>Atalho &apos;Enviar para&apos; do Explorer</translation>
     </message>
 </context>
 <context>

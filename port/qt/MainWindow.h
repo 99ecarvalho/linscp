@@ -355,6 +355,7 @@ private:
   void ShowError(const CoreBridge::TCoreError & E);
   void UpdateActions();
   void TransferPresetAutoSelect();
+  void StandaloneUpload(const std::vector<std::string> & Files, bool UseDefaults);
   CoreBridge::TTransferPresetRule TransferPresetAutoSelectData() const;
 
   CoreBridge::TInfo FInfo;
@@ -387,6 +388,8 @@ private:
   // autoselected.
   QString FCopyParamDefault;
   QString FCopyParamAutoSelected;
+  // /upload's run (StandaloneUpload).
+  bool FStandalone = false;
   QAction * FCopyClipboardAction = nullptr;
   QAction * FPasteAction = nullptr;
   QAction * FStatusBarAction = nullptr;

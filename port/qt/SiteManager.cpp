@@ -1,4 +1,5 @@
 #include "SiteManager.h"
+#include "Integration.h"
 #include "KeyVerify.h"
 
 #include <QCheckBox>
@@ -163,6 +164,22 @@ SiteManager::SiteManager(QWidget * Parent) :
   ToolsMenu->addAction(tr("&Import Sites..."), this, [this]() { ImportSites(); });
   ToolsMenu->addSeparator();
   ToolsMenu->addAction(tr("&Clean Up..."), this, [this]() { Cleanup(); });
+  // As Manage's DesktopIconAction and SendToHookAction.
+  ToolsMenu->addSeparator();
+  FDesktopIconAction = ToolsMenu->addAction(tr("Desktop &Icon"), this, [this]() { CreateSessionShortcut(false); });
+#if defined(Q_OS_WIN)
+  FSendToAction = ToolsMenu->addAction(tr("Explorer's 'Send To' Shortcut"), this, [this]() { CreateSessionShortcut(true); });
+#endif
+  connect(ToolsMenu, &QMenu::aboutToShow, this, [this]()
+  {
+    const QTreeWidgetItem * Item = FTree->currentItem();
+    const int Kind = (Item != nullptr) ? Item->data(0, KindRole).toInt() : NewSiteKind;
+    FDesktopIconAction->setEnabled((Kind == SiteKind) || (Kind == FolderKind) || (Kind == WorkspaceKind));
+    if (FSendToAction != nullptr)
+    {
+      FSendToAction->setEnabled(Kind == SiteKind);
+    }
+  });
   Tools->setMenu(ToolsMenu);
   connect(FLogin, &QPushButton::clicked, this, &SiteManager::accept);
   connect(FSave, &QPushButton::clicked, this, &SiteManager::Save);
@@ -841,5 +858,59 @@ void SiteManager::UpdateButtons()
   for (QWidget * Field : std::initializer_list<QWidget *>{ FProtocol, FEncryption, FHostName, FPort, FUserName, FPassword })
   {
     Field->setEnabled(Form);
+  }
+}
+
+bool SiteManager::CreateSessionShortcut(bool SendTo)
+{
+  const QTreeWidgetItem * Item = FTree->currentItem();
+  if (Item == nullptr)
+  {
+    return false;
+  }
+  const int Kind = Item->data(0, KindRole).toInt();
+  const QString Name = Item->data(0, NameRole).toString();
+  try
+  {
+    if (SendTo && (Kind == SiteKind))
+    {
+      const CoreBridge::TShortcut Shortcut = CoreBridge::SessionShortcut(Name.toStdString(), CoreBridge::TSessionShortcutKind::Site,
+        CoreBridge::SiteSendToShortcutName(Name.toStdString()), { "/SendToHook", "/Upload" });
+      return Integration::AskAndCreateShortcut(this,
+        QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ConfirmCreateSendTo)).replace(QStringLiteral("%s"), Name),
+        Shortcut, Integration::TShortcutFolder::SendTo);
+    }
+    CoreBridge::TSessionShortcutKind ShortcutKind = CoreBridge::TSessionShortcutKind::Site;
+    CoreBridge::TText Question = CoreBridge::TText::ConfirmCreateShortcut;
+    std::vector<std::string> Arguments = { "/Desktop" };
+    if (Kind == FolderKind)
+    {
+      ShortcutKind = CoreBridge::TSessionShortcutKind::Folder;
+      Question = CoreBridge::TText::ConfirmCreateShortcutFolder;
+    }
+    else if (Kind == WorkspaceKind)
+    {
+      ShortcutKind = CoreBridge::TSessionShortcutKind::Workspace;
+      Question = CoreBridge::TText::ConfirmCreateShortcutWorkspace;
+    }
+    else if (Kind == SiteKind)
+    {
+      Arguments.push_back("/UploadIfAny");
+    }
+    else
+    {
+      return false;
+    }
+    const CoreBridge::TShortcut Shortcut = CoreBridge::SessionShortcut(Name.toStdString(), ShortcutKind, std::string(), Arguments);
+    return Integration::AskAndCreateShortcut(this,
+      QString::fromStdString(CoreBridge::Text(Question)).replace(QStringLiteral("%s"), Name), Shortcut,
+      Integration::TShortcutFolder::Desktop);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    Frontend.ShowError(E.Error);
+    return false;
   }
 }

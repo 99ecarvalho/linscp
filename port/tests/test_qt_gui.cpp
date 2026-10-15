@@ -4711,6 +4711,99 @@ void InstanceTest(const char * Port, const QString & Directory)
   CoreBridge::Finalize();
 }
 
+// P3-16: shortcuts to the program: a site's (its URL, /desktop), the Send
+// To one (/upload). Made in folders of the test's own: the desktop's
+// (POSIX, through XDG's user-dirs.dirs) and Send To's (Windows, APPDATA).
+void ShortcutsTest(const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    const QDir Dir(Directory);
+    QDir().mkpath(Dir.filePath(QStringLiteral("Desktop")));
+#if defined(Q_OS_WIN)
+    qputenv("APPDATA", QDir::toNativeSeparators(Dir.path()).toLocal8Bit());
+    const Integration::TShortcutFolder Folder = Integration::TShortcutFolder::SendTo;
+    const QString Expected = Dir.filePath(QStringLiteral("Microsoft/Windows/SendTo"));
+#else
+    QDir().mkpath(Dir.filePath(QStringLiteral("config")));
+    {
+      QFile Dirs(Dir.filePath(QStringLiteral("config/user-dirs.dirs")));
+      Dirs.open(QIODevice::WriteOnly);
+      Dirs.write(QStringLiteral("XDG_DESKTOP_DIR=\"%1\"\n").arg(Dir.filePath(QStringLiteral("Desktop"))).toUtf8());
+    }
+    qputenv("XDG_CONFIG_HOME", Dir.filePath(QStringLiteral("config")).toLocal8Bit());
+    const Integration::TShortcutFolder Folder = Integration::TShortcutFolder::Desktop;
+    const QString Expected = Dir.filePath(QStringLiteral("Desktop"));
+#endif
+    Check(QDir(Integration::ShortcutFolder(Folder)) == QDir(Expected), "(the test's own folder)");
+
+    CoreBridge::TSite Site = CoreBridge::NewSite();
+    Site.Name = "Short Cut";
+    Site.HostName = "example.com";
+    Site.UserName = "user";
+    CoreBridge::SaveSite(Site);
+    const CoreBridge::TShortcut Shortcut = CoreBridge::SessionShortcut("Short Cut", CoreBridge::TSessionShortcutKind::Site,
+      std::string(), { "/Desktop", "/UploadIfAny" });
+    Check((Shortcut.Name == "Short Cut") && (std::find(Shortcut.Arguments.begin(), Shortcut.Arguments.end(), "Short%20Cut") != Shortcut.Arguments.end()) &&
+      (Shortcut.Arguments.back() == "/UploadIfAny") && (Shortcut.Description.find("Short Cut") != std::string::npos),
+      "a site's: named after it, opening its URL");
+    const CoreBridge::TShortcut Workspace = CoreBridge::SessionShortcut("Work", CoreBridge::TSessionShortcutKind::Workspace,
+      std::string(), {});
+    Check(std::find(Workspace.Arguments.begin(), Workspace.Arguments.end(), "/Workspace") != Workspace.Arguments.end(),
+      "a workspace's: /workspace");
+    const CoreBridge::TShortcut SendTo = CoreBridge::AppShortcut(CoreBridge::SendToShortcutName(), { "/Upload" });
+    Check(QString::fromStdString(SendTo.Name).contains(QStringLiteral("(for upload)")), "Send To's, as WinSCP names it");
+
+    QString Path;
+    QString Error;
+    Check(Integration::CreateShortcut(Shortcut, Folder, Path, Error) && QFileInfo::exists(Path) &&
+      (QFileInfo(Path).dir() == QDir(Expected)), "made");
+#if !defined(Q_OS_WIN)
+    QFile Entry(Path);
+    Entry.open(QIODevice::ReadOnly);
+    const QString Text = QString::fromUtf8(Entry.readAll());
+    Check(Text.contains(QStringLiteral("\"Short%%20Cut\" \"/Desktop\" \"/UploadIfAny\"")) && Text.contains(QStringLiteral("Name=Short Cut")),
+      "a desktop entry, its arguments quoted (and % doubled)");
+#endif
+    Check(Integration::CreateShortcut(SendTo, Folder, Path, Error) && QFileInfo::exists(Path), "and Send To's");
+  }
+  CoreBridge::Finalize();
+}
+
+// P3-16: /upload (what Explorer's "Send to" starts): the session named,
+// the files uploaded to its directory without the Copy dialog (/defaults),
+// then the window closes.
+void UploadSwitchTest(const char * Port, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    const QDir Dir(Directory);
+    QDir().mkpath(Dir.path());
+    const QDir Root(Dir.filePath(QStringLiteral("../root")));
+    const QString File = Dir.filePath(QStringLiteral("sent.txt"));
+    {
+      QFile Out(File);
+      Out.open(QIODevice::WriteOnly);
+      Out.write("sent");
+    }
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = std::deque<QString>(4, QStringLiteral("secret"));
+    Responder.AcceptDialogs = true;
+    CoreBridge::SetArguments({ "/ini=nul", QStringLiteral("sftp://linscp@127.0.0.1:%1/sub/").arg(QString::fromLatin1(Port)).toStdString(),
+      "/upload", QDir::toNativeSeparators(File).toStdString(), "/defaults" });
+    Window.StartUp();
+    Check(QFileInfo::exists(Root.filePath(QStringLiteral("sub/sent.txt"))), "uploaded to the session's directory");
+    Check(!Window.isVisible(), "then the window closes");
+  }
+  CoreBridge::Finalize();
+}
+
 // P3-16: trusted host certification authorities: the dialog (a key typed
 // or loaded from a file, the hosts checked), kept with the configuration.
 void HostCAsTest(const QString & Ini, const QString & Directory)
@@ -5056,6 +5149,14 @@ int main(int argc, char ** argv)
   else if ((argc >= 4) && (std::strcmp(argv[1], "masterpasswordread") == 0))
   {
     return MasterPasswordRead(QString::fromLocal8Bit(argv[3]));
+  }
+  else if ((argc >= 4) && (std::strcmp(argv[1], "shortcuts") == 0))
+  {
+    ShortcutsTest(QString::fromLocal8Bit(argv[3]));
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "uploadswitch") == 0))
+  {
+    UploadSwitchTest(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "hostcas") == 0))
   {

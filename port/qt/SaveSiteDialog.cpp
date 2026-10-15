@@ -49,6 +49,8 @@ SaveSiteDialog::SaveSiteDialog(const CoreBridge::TSession::TSaveAsSite & Default
   FSavePassword->setChecked(Defaults.SavePassword);
   FSavePassword->setEnabled(Defaults.CanSavePassword);
   Layout->addWidget(FSavePassword);
+  FCreateShortcut = new QCheckBox(CoreText(CoreBridge::TText::SaveSiteShortcut), this);
+  Layout->addWidget(FCreateShortcut);
   QDialogButtonBox * Buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
   FOk = Buttons->button(QDialogButtonBox::Ok);
   connect(Buttons, &QDialogButtonBox::accepted, this, &SaveSiteDialog::accept);
@@ -65,6 +67,11 @@ QString SaveSiteDialog::Name() const
 {
   const QString Folder = FFolder->currentText().trimmed();
   return ((Folder.isEmpty() || (Folder == FRootFolder)) ? QString() : (Folder + QLatin1Char('/'))) + FName->text();
+}
+
+bool SaveSiteDialog::CreateShortcut() const
+{
+  return FCreateShortcut->isChecked();
 }
 
 bool SaveSiteDialog::SavePassword() const
