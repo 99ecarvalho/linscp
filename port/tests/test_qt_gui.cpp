@@ -1504,7 +1504,7 @@ void Keys(const QString & Directory)
     View->setCurrentIndex(View->model()->index(0, 0));
     View->clearSelection();
     QTest::keyClick(Window.windowHandle(), Qt::Key_Insert);
-    Check(Local->Selected().isEmpty(), "Insert on \"..\" selects nothing");
+    Check(Local->Selection().isEmpty(), "Insert on \"..\" selects nothing");
     Check(View->currentIndex().row() == 1, "but moves the focus down");
     QTest::keyClick(Window.windowHandle(), Qt::Key_Insert);
     QTest::keyClick(Window.windowHandle(), Qt::Key_Insert);
@@ -1549,7 +1549,7 @@ void Keys(const QString & Directory)
     Responder.Custom = nullptr;
     Activate();
     QTest::keyClick(Window.windowHandle(), Qt::Key_L, Qt::ControlModifier | Qt::ShiftModifier);
-    Check(Local->Selected().isEmpty(), "Ctrl+Shift+L clears the selection");
+    Check(Local->Selection().isEmpty(), "Ctrl+Shift+L clears the selection");
     QTest::keyClick(Window.windowHandle(), Qt::Key_A, Qt::ControlModifier);
     Check(Local->Selected().size() == Local->Names().size() - 1, "Ctrl+A selects all");
     View->clearSelection();
@@ -4541,6 +4541,98 @@ void ToolbarsTest()
   CoreBridge::Finalize();
 }
 
+// P3-16's Preferences > Panels and Commander: Explorer-style selection,
+// incremental search, the double-click, the panel font, the panels' state
+// kept per tab.
+void PanelPreferencesTest(const char * Port, const QString & Directory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = std::deque<QString>(4, QStringLiteral("secret"));
+    Responder.AcceptDialogs = true;
+    const QDir Dir(Directory);
+    QDir().mkpath(Dir.path());
+    for (const char * Name : { "alpha.txt", "beta.log", "gamma.txt" })
+    {
+      QFile File(Dir.filePath(QString::fromLatin1(Name)));
+      File.open(QIODevice::WriteOnly);
+      File.write(Name);
+    }
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "(connected)");
+    LocalPanel * Local = Window.Local();
+    Local->ChangeDirectory(Directory);
+    FileView * View = Local->View();
+    Window.ActivatePanel(true);
+
+    // WinSCP's default, Mouse only: the arrows move the focus alone.
+    View->setCurrentIndex(View->model()->index(1, 0));
+    View->clearSelection();
+    QTest::keyClick(View, Qt::Key_Down);
+    Check(Local->Selection().isEmpty() && (Local->Selected().size() == 1), "the arrows leave the selection; commands take the focused");
+    CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+    Preferences.ExplorerSelection = CoreBridge::TPreferences::TExplorerSelection::MouseAndKeyboard;
+    CoreBridge::SetPreferences(Preferences);
+    Window.ApplyPreferences();
+    QTest::keyClick(View, Qt::Key_Down);
+    Check(Local->Selection().size() == 1, "Explorer style: the arrows select");
+
+    // Incremental search, by the name's start, then any part.
+    QTest::keyClicks(View, QStringLiteral("gam"));
+    Check((View->CurrentEntry() != nullptr) && (View->CurrentEntry()->Name == "gamma.txt"), "typing finds the name");
+    Check(Local->Status()->text().contains(QStringLiteral("gam")), "the status says what is typed");
+    QTest::keyClick(View, Qt::Key_Escape);
+    Check(View->SearchText().isEmpty() && !Local->Status()->text().contains(QStringLiteral("gam")), "Esc ends it");
+    Preferences.PanelSearch = CoreBridge::TPreferences::TPanelSearch::AnyPart;
+    CoreBridge::SetPreferences(Preferences);
+    Window.ApplyPreferences();
+    QTest::keyClicks(View, QStringLiteral(".log"));
+    Check((View->CurrentEntry() != nullptr) && (View->CurrentEntry()->Name == "beta.log"), "any part of the name");
+    QTest::keyClick(View, Qt::Key_Escape);
+
+    // The double-click: Edit (WinSCP's default), Open, Copy.
+    Local->Select({ QStringLiteral("alpha.txt") });
+    Check(Window.FileActivated(true) && (Window.Editors().size() == 1), "Edit: the editor");
+    Window.CloseEditors(false);
+    QUrl Opened;
+    Window.SetUrlOpener([&Opened](const QUrl & Url) { Opened = Url; return true; });
+    Preferences.DoubleClickAction = CoreBridge::TPreferences::TDoubleClick::Open;
+    CoreBridge::SetPreferences(Preferences);
+    Check(Window.FileActivated(true) && Opened.toLocalFile().endsWith(QStringLiteral("alpha.txt")), "Open: the associated application");
+    Window.SetUrlOpener(nullptr);
+    Preferences.DoubleClickAction = CoreBridge::TPreferences::TDoubleClick::Copy;
+    CoreBridge::SetPreferences(Preferences);
+    const QDir Root(Dir.filePath(QStringLiteral("../root")));
+    Check(Window.FileActivated(true) && WaitUntil([&Root]() { return QFileInfo::exists(Root.filePath(QStringLiteral("alpha.txt"))); }),
+      "Copy: to the other panel, unconfirmed by default");
+
+    // The panel font.
+    Preferences.PanelFontName = "Monospace";
+    Preferences.PanelFontSize = 15;
+    CoreBridge::SetPreferences(Preferences);
+    Window.ApplyPreferences();
+    Check(View->font().pointSize() == 15, "the panel font");
+
+    // The panels' state kept per tab.
+    Local->Select({ QStringLiteral("beta.log"), QStringLiteral("gamma.txt") });
+    Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))) && (Window.TabCount() == 2),
+      "(a second tab)");
+    Local->Select({ QStringLiteral("alpha.txt") });
+    Check(Window.SwitchTab(0), "(back on the first)");
+    QStringList Kept = Local->Selection();
+    Kept.sort();
+    Check(Kept == QStringList({ QStringLiteral("beta.log"), QStringLiteral("gamma.txt") }), "its selection as left");
+    Preferences = CoreBridge::TPreferences();
+    CoreBridge::SetPreferences(Preferences);
+  }
+  CoreBridge::Finalize();
+}
+
 // The menu bar as text, a menu's items indented under it, separators as
 // "----": for comparing with WinSCP's (forms/ScpCommander.dfm).
 void DumpMenu(QMenu * Menu, int Depth, QString & Out)
@@ -4617,6 +4709,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 3) && (std::strcmp(argv[1], "toolbars") == 0))
   {
     ToolbarsTest();
+  }
+  else if ((argc >= 5) && (std::strcmp(argv[1], "panelprefs") == 0))
+  {
+    PanelPreferencesTest(argv[3], QString::fromLocal8Bit(argv[4]));
   }
   else if ((argc >= 3) && (std::strcmp(argv[1], "menus") == 0))
   {

@@ -264,11 +264,11 @@ registry, tray or window messages.
 | Area | Gap | Status | Note |
 |---|---|---|---|
 | Panels | extension column | done | `uvExt`, `dvExt`: hidden by default, the header's menu, kept in the layout |
-| Panels | incremental search with its status | missing | |
+| Panels | incremental search with its status | done | name start, any part, all columns (`PanelSearch`); "Search: …" in the panel's status |
 | Main window | WinSCP's toolbars (Commands, Sort, Preferences, Transfer, Custom commands) | done | 2026-10-14, with P3-17's icons |
 | Synchronize | selected files only; by checksum; "use same options next time" saved | done | `spSelectedOnly` with the panels' selection as the filter, `spByChecksum` where the server can, `GUIConfiguration`'s SynchronizeParams and SynchronizeModeAuto (the direction asked about) |
 | Synchronize checklist | calculate sizes; find move candidates; custom commands | partial | Tools > Calculate, Calculate All, Move, Find Move Candidate done; custom commands wait for local custom commands |
-| Preferences > Panels | incremental search; preserve panel state; full row; double-click action; panel font; Explorer-style selection; tree | missing | no directory tree view |
+| Preferences > Panels | incremental search; preserve panel state; full row; double-click action; panel font; Explorer-style selection; tree | partial | all but the tree done (WinSCP's keys; Explorer-style selection's default, Mouse only, keeps the arrows off the selection and commands take the focused file); the directory tree view is missing |
 | Preferences > Transfer | presets' autoselection rules (edited, matched) | missing | rules kept when saved |
 | Preferences > Background | parallel threshold; enable queue by default; queue list visibility on the page | missing | visibility is in Options > Queue |
 | Preferences > Window | minimize to tray; single instance | missing | Win-only in WinSCP; QSystemTrayIcon, QLocalServer |

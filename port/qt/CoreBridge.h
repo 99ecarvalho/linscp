@@ -382,6 +382,24 @@ struct TPreferences
   // Rename in place selects the whole name, not the name without its
   // extension.
   bool RenameWholeName = false;
+  // Panels (P3-16): incremental search, kept state, full row, double-click,
+  // font; the Commander's selection.
+  enum class TPanelSearch { NameStart, AnyPart, AllColumns };
+  TPanelSearch PanelSearch = TPanelSearch::NameStart;
+  bool PreservePanelState = true;
+  bool FullRowSelect = false;
+  enum class TDoubleClick { Open, Copy, Edit };
+  TDoubleClick DoubleClickAction = TDoubleClick::Edit;
+  bool CopyOnDoubleClickConfirmation = false;
+  // An empty name: the system's font. Style as the editor's font's.
+  std::string PanelFontName;
+  int PanelFontSize = 0;
+  bool PanelFontBold = false;
+  bool PanelFontItalic = false;
+  // Explorer-style selection: Never (nlOn), Mouse only (nlKeyboard: the
+  // arrows move the focus, not the selection), Mouse and Keyboard (nlOff).
+  enum class TExplorerSelection { Never, MouseOnly, MouseAndKeyboard };
+  TExplorerSelection ExplorerSelection = TExplorerSelection::MouseOnly;
   // Home is the site's own directories, when the site does not remember
   // the last used ones.
   bool DefaultDirIsHome = true;
@@ -669,6 +687,7 @@ enum class TText
   EditFilePrompt, // "&Enter file name:"
   CreateFileError, // "Can't create file '%s'."
   UnsafeSession, // "**Use potentially unsafe session settings?**..."
+  IncrementalSearch, // "Search: %s" (INC_SEARCH)
   MaskHint, // "* matches any number of characters. ..." (MASK_HINT2)
   FileMaskExHint, // ">size matches file larger than size ..."
   CombiningMasksHint, // "Masks are separated by semicolon or comma. ..."

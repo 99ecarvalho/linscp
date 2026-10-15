@@ -15,6 +15,7 @@
 #include <vector>
 
 #include "CoreBridge.h"
+#include "PanelBands.h"
 
 class EditorWindow;
 class QAction;
@@ -249,6 +250,9 @@ public:
   bool ChangePassword();
   bool InstallPublicKey(const QString * FileName = nullptr);
   bool ClearCaches();
+  // A file double-clicked (or Enter) in a panel, as DoDirViewExecFile:
+  // opened, copied to the other panel, or edited, as Preferences say.
+  bool FileActivated(bool Local);
   // Commands > Compare Directories (Shift+F2), as TScpCommanderForm's: in
   // each panel, the files newer than the other panel's of the name, or
   // missing there (and, by Preferences, of another size), selected; WinSCP's
@@ -481,6 +485,10 @@ private:
     // A local tab's name, as renamed (a session's is its own).
     QString Name;
     bool SynchronizeBrowsing = false;
+    // The panels' state, kept with "remember panels' state" (P3-16).
+    TPanelState LocalState;
+    TPanelState RemoteState;
+    TPanelState OtherLocalState;
   };
   // The right panel's place: the remote panel, or in a local tab the other
   // local one.

@@ -196,6 +196,15 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"RenameWholeName", FSettings.RenameWholeName);
     Storage->WriteBool(L"DefaultDirIsHome", FSettings.DefaultDirIsHome);
     Storage->WriteInteger(L"PathInCaption", FSettings.PathInCaption);
+    Storage->WriteInteger(L"PanelSearch", FSettings.PanelSearch);
+    Storage->WriteBool(L"PreservePanelState", FSettings.PreservePanelState);
+    Storage->WriteBool(L"FullRowSelect", FSettings.FullRowSelect);
+    Storage->WriteInteger(L"CopyOnDoubleClick", FSettings.DoubleClickAction);
+    Storage->WriteBool(L"CopyOnDoubleClickConfirmation", FSettings.CopyOnDoubleClickConfirmation);
+    Storage->WriteString(L"PanelFontName", FSettings.PanelFontName);
+    Storage->WriteInteger(L"PanelFontSize", FSettings.PanelFontSize);
+    Storage->WriteInteger(L"PanelFontStyle", FSettings.PanelFontStyle);
+    Storage->WriteInteger(L"PanelFontCharset", FSettings.PanelFontCharset);
     Storage->WriteString(L"IconSet", FSettings.IconSet);
     Storage->WriteBool(L"LockToolbars", FSettings.LockToolbars);
     Storage->WriteBool(L"SelectiveToolbarText", FSettings.SelectiveToolbarText);
@@ -254,6 +263,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"SwappedPanels", FSettings.SwappedPanels);
     Storage->WriteBool(L"ExplorerKeyboardShortcuts", FSettings.ExplorerKeyboardShortcuts);
     Storage->WriteBool(L"CompareByTime", FSettings.CompareByTime);
+    Storage->WriteInteger(L"ExplorerStyleSelection", FSettings.NortonLikeMode);
     Storage->WriteBool(L"CompareBySize", FSettings.CompareBySize);
     Storage->WriteBool(L"StatusBar", FSettings.CommanderStatusBar);
     Storage->WriteString(L"ToolbarsLayout2", FSettings.CommanderToolbarsLayout);
@@ -429,6 +439,16 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.RenameWholeName = Storage->ReadBool(L"RenameWholeName", FSettings.RenameWholeName);
     FSettings.DefaultDirIsHome = Storage->ReadBool(L"DefaultDirIsHome", FSettings.DefaultDirIsHome);
     FSettings.PathInCaption = Storage->ReadInteger(L"PathInCaption", FSettings.PathInCaption);
+    FSettings.PanelSearch = Storage->ReadInteger(L"PanelSearch", FSettings.PanelSearch);
+    FSettings.PreservePanelState = Storage->ReadBool(L"PreservePanelState", FSettings.PreservePanelState);
+    FSettings.FullRowSelect = Storage->ReadBool(L"FullRowSelect", FSettings.FullRowSelect);
+    FSettings.DoubleClickAction = Storage->ReadInteger(L"CopyOnDoubleClick", FSettings.DoubleClickAction);
+    FSettings.CopyOnDoubleClickConfirmation =
+      Storage->ReadBool(L"CopyOnDoubleClickConfirmation", FSettings.CopyOnDoubleClickConfirmation);
+    FSettings.PanelFontName = Storage->ReadString(L"PanelFontName", FSettings.PanelFontName);
+    FSettings.PanelFontSize = Storage->ReadInteger(L"PanelFontSize", FSettings.PanelFontSize);
+    FSettings.PanelFontStyle = Storage->ReadInteger(L"PanelFontStyle", FSettings.PanelFontStyle);
+    FSettings.PanelFontCharset = Storage->ReadInteger(L"PanelFontCharset", FSettings.PanelFontCharset);
     FSettings.IconSet = Storage->ReadString(L"IconSet", FSettings.IconSet);
     FSettings.LockToolbars = Storage->ReadBool(L"LockToolbars", FSettings.LockToolbars);
     FSettings.SelectiveToolbarText = Storage->ReadBool(L"SelectiveToolbarText", FSettings.SelectiveToolbarText);
@@ -483,6 +503,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.ExplorerKeyboardShortcuts =
       Storage->ReadBool(L"ExplorerKeyboardShortcuts", FSettings.ExplorerKeyboardShortcuts);
     FSettings.CompareByTime = Storage->ReadBool(L"CompareByTime", FSettings.CompareByTime);
+    FSettings.NortonLikeMode = Storage->ReadInteger(L"ExplorerStyleSelection", FSettings.NortonLikeMode);
     FSettings.CompareBySize = Storage->ReadBool(L"CompareBySize", FSettings.CompareBySize);
     FSettings.CommanderStatusBar = Storage->ReadBool(L"StatusBar", FSettings.CommanderStatusBar);
     FSettings.CommanderToolbarsLayout = Storage->ReadString(L"ToolbarsLayout2", FSettings.CommanderToolbarsLayout);

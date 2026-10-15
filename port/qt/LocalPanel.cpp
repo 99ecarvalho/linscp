@@ -1,4 +1,6 @@
 #include "LocalPanel.h"
+#include <QScrollBar>
+#include <QApplication>
 #include "PanelBands.h"
 #include "IconSet.h"
 
@@ -145,6 +147,7 @@ LocalPanel::LocalPanel(QWidget * Parent) :
   FSort->setSourceModel(FModel);
   FSort->setSortRole(FileListModel::SortRole);
   FView = new FileView(this);
+  connect(FView, &FileView::SearchChanged, this, [this]() { UpdateActions(); });
   FView->setAccessibleName(tr("Local files"));
   FView->setModel(FSort);
   FView->SetupColumns();
@@ -475,6 +478,11 @@ QStringList LocalPanel::Selected() const
       Result.append(QString::fromStdString(FModel->Entry(Source.row())->Name));
     }
   }
+  // As CreateFileList: none selected, the focused one.
+  if (Result.isEmpty() && (FView->CurrentEntry() != nullptr))
+  {
+    Result.append(QString::fromStdString(FView->CurrentEntry()->Name));
+  }
   return Result;
 }
 
@@ -504,7 +512,16 @@ QStringList LocalPanel::Names() const
 
 void LocalPanel::UpdateActions()
 {
-  FStatus->setText(FView->StatusText());
+  // While searching, what is typed (FormatIncrementalSearchStatus).
+  if (!FView->SearchText().isEmpty())
+  {
+    FStatus->setText(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::IncrementalSearch))
+      .replace(QStringLiteral("%s"), FView->SearchText()));
+  }
+  else
+  {
+    FStatus->setText(FView->StatusText());
+  }
   const int Count = Selected().size();
   FBackAction->setEnabled(!FBack.isEmpty());
   FForwardAction->setEnabled(!FForward.isEmpty());
@@ -515,6 +532,22 @@ void LocalPanel::UpdateActions()
 
 void LocalPanel::ApplyPreferences(const CoreBridge::TPreferences & Preferences)
 {
+  FView->SetExplorerSelection(Preferences.ExplorerSelection);
+  FView->SetFullRowSelect(Preferences.FullRowSelect);
+  FView->SetPanelSearch(Preferences.PanelSearch);
+  // The panel font (none: the system's).
+  QFont Font = QApplication::font();
+  if (!Preferences.PanelFontName.empty())
+  {
+    Font.setFamily(QString::fromStdString(Preferences.PanelFontName));
+    if (Preferences.PanelFontSize > 0)
+    {
+      Font.setPointSize(Preferences.PanelFontSize);
+    }
+    Font.setBold(Preferences.PanelFontBold);
+    Font.setItalic(Preferences.PanelFontItalic);
+  }
+  FView->setFont(Font);
   FModel->SetSizeFormat(Preferences.SizeFormat);
   FSort->SetSorting(Preferences.NaturalOrderNumericalSorting, Preferences.AlwaysSortDirectoriesByName);
   FView->RenameWholeName = Preferences.RenameWholeName;
@@ -602,4 +635,56 @@ void LocalPanel::ApplyIcons()
     const QIcon Set = IconSet::Icon(QString::fromLatin1(Icon.second.first));
     Icon.first->setIcon(Set.isNull() ? style()->standardIcon(Icon.second.second) : Set);
   }
+}
+
+TPanelState LocalPanel::State() const
+{
+  TPanelState Result;
+  if (const CoreBridge::TRemoteEntry * Focused = FView->CurrentEntry())
+  {
+    Result.Focused = QString::fromStdString(Focused->Name);
+  }
+  for (const QModelIndex & Index : FView->selectionModel()->selectedRows(FileListModel::NameColumn))
+  {
+    Result.Selected.append(Index.data(Qt::DisplayRole).toString());
+  }
+  Result.Scroll = FView->verticalScrollBar()->value();
+  return Result;
+}
+
+void LocalPanel::RestoreState(const TPanelState & State)
+{
+  FView->selectionModel()->clearSelection();
+  for (int Row = 0; Row < FSort->rowCount(); Row++)
+  {
+    const QModelIndex Index = FSort->index(Row, FileListModel::NameColumn);
+    const QString Name = Index.data(Qt::DisplayRole).toString();
+    if (Index.data(FileListModel::ParentRole).toBool())
+    {
+      continue;
+    }
+    if (State.Selected.contains(Name))
+    {
+      FView->selectionModel()->select(Index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    }
+    if (Name == State.Focused)
+    {
+      FView->selectionModel()->setCurrentIndex(Index, QItemSelectionModel::NoUpdate);
+    }
+  }
+  FView->verticalScrollBar()->setValue(State.Scroll);
+}
+
+QStringList LocalPanel::Selection() const
+{
+  QStringList Result;
+  for (const QModelIndex & Index : FView->selectionModel()->selectedRows(FileListModel::NameColumn))
+  {
+    const QModelIndex Source = FSort->mapToSource(Index);
+    if (!FModel->IsParent(Source.row()) && (FModel->Entry(Source.row()) != nullptr))
+    {
+      Result.append(QString::fromStdString(FModel->Entry(Source.row())->Name));
+    }
+  }
+  return Result;
 }

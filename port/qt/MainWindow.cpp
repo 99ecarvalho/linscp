@@ -182,6 +182,10 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
       return Download(Names, Directory, false);
     });
   };
+  // A file activated: the double-click action (FileActivated).
+  FLocal->OpenFile = [this](const QString &) { FileActivated(true); };
+  FOtherLocal->OpenFile = [this](const QString &) { FileActivated(false); };
+  FPanel->OpenFile = [this](const QString &) { FileActivated(false); };
   // Right clicks: WinSCP's popups.
   FLocal->OnContextMenu = [this](const QPoint & Global, bool OnItem) { ContextMenu(true, OnItem, Global); };
   FPanel->OnContextMenu = [this](const QPoint & Global, bool OnItem) { ContextMenu(false, OnItem, Global); };
@@ -2881,6 +2885,9 @@ void MainWindow::ParkActiveTab()
   }
   Tab.QueueDone = FQueueDone;
   Tab.SynchronizeBrowsing = (FSyncBrowseAction != nullptr) && FSyncBrowseAction->isChecked();
+  Tab.LocalState = FLocal->State();
+  Tab.RemoteState = FPanel->State();
+  Tab.OtherLocalState = FOtherLocal->State();
   FActiveTab = -1;
 }
 
@@ -2967,6 +2974,14 @@ void MainWindow::UnparkTab(int Index)
     FOtherLocal->ChangeDirectory(Tab.OtherLocalPath);
   }
   ShowLocalBrowser(Tab.LocalBrowser);
+  // As PreservePanelState: each panel's focus, selection and scroll, as the
+  // tab left them.
+  if (CoreBridge::Preferences().PreservePanelState)
+  {
+    FLocal->RestoreState(Tab.LocalState);
+    FPanel->RestoreState(Tab.RemoteState);
+    FOtherLocal->RestoreState(Tab.OtherLocalState);
+  }
   // As the tab's StateData: its synchronized browsing, its directories as
   // loaded (the switch is no change of directory to follow).
   if (FSyncBrowseAction != nullptr)
@@ -5163,4 +5178,41 @@ void MainWindow::FillOpenDirMenu(QMenu * Menu, bool Left, QAction * OpenAction)
     ActivatePanel(Left);
     OpenDirectory(true);
   });
+}
+
+bool MainWindow::FileActivated(bool Local)
+{
+  if (FBusy)
+  {
+    return false;
+  }
+  ActivatePanel(Local);
+  const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+  switch (Preferences.DoubleClickAction)
+  {
+    case CoreBridge::TPreferences::TDoubleClick::Open:
+      return OpenCurrent();
+    case CoreBridge::TPreferences::TDoubleClick::Copy:
+    {
+      // The file double-clicked, to the other panel (OnFocused).
+      const CoreBridge::TRemoteEntry * Entry = ActiveView()->CurrentEntry();
+      if (Entry == nullptr)
+      {
+        return false;
+      }
+      const QString Name = QString::fromStdString(Entry->Name);
+      const bool Confirm = Preferences.CopyOnDoubleClickConfirmation;
+      if (LocalBrowser())
+      {
+        const QStringList Sources = { QDir(ActiveLocalPath()).filePath(Name) };
+        const QString Target = QDir::toNativeSeparators(SideLocal(!FLocalActive)->Path());
+        return LocalLocalCopy(false, Confirm, &Sources, &Target);
+      }
+      const QStringList Names = { FLocalActive ? QDir(FLocal->Path()).filePath(Name) : Name };
+      return Transfer(FLocalActive, Names, FLocalActive ? FPanel->Path() : QDir::toNativeSeparators(FLocal->Path()),
+        false, Confirm, false);
+    }
+    default:
+      return EditCurrent() != nullptr;
+  }
 }

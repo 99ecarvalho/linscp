@@ -1,4 +1,5 @@
 #include "RemotePanel.h"
+#include <QScrollBar>
 #include "PanelBands.h"
 #include "IconSet.h"
 
@@ -85,6 +86,7 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   FSort->setSourceModel(FModel);
   FSort->setSortRole(FileListModel::SortRole);
   FView = new FileView(this);
+  connect(FView, &FileView::SearchChanged, this, [this]() { UpdateActions(); });
   FView->setAccessibleName(tr("Remote files"));
   FView->setModel(FSort);
   FView->SetupColumns();
@@ -381,7 +383,11 @@ void RemotePanel::Open(const QString & Name)
       return;
     }
   }
-  // Opening a file is a download, P2-07's.
+  // A file: the window's (its double-click action).
+  if (OpenFile)
+  {
+    OpenFile(Name);
+  }
 }
 
 void RemotePanel::Activated(const QModelIndex & Index)
@@ -431,6 +437,11 @@ QStringList RemotePanel::Selected() const
       Result.append(QString::fromStdString(FModel->Entry(Source.row())->Name));
     }
   }
+  // As CreateFileList: none selected, the focused one.
+  if (Result.isEmpty() && (FView->CurrentEntry() != nullptr))
+  {
+    Result.append(QString::fromStdString(FView->CurrentEntry()->Name));
+  }
   return Result;
 }
 
@@ -467,7 +478,16 @@ QString RemotePanel::Path() const
 
 void RemotePanel::UpdateActions()
 {
-  FStatus->setText(((FSession != nullptr) && FSession->Active()) ? FView->StatusText() : QString());
+  // While searching, what is typed (FormatIncrementalSearchStatus).
+  if (!FView->SearchText().isEmpty())
+  {
+    FStatus->setText(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::IncrementalSearch))
+      .replace(QStringLiteral("%s"), FView->SearchText()));
+  }
+  else
+  {
+    FStatus->setText(((FSession != nullptr) && FSession->Active()) ? FView->StatusText() : QString());
+  }
   const bool Active = (FSession != nullptr) && FSession->Active();
   const int Count = Selected().size();
   FBackAction->setEnabled(Active && !FBack.isEmpty());
@@ -483,6 +503,22 @@ void RemotePanel::UpdateActions()
 
 void RemotePanel::ApplyPreferences(const CoreBridge::TPreferences & Preferences)
 {
+  FView->SetExplorerSelection(Preferences.ExplorerSelection);
+  FView->SetFullRowSelect(Preferences.FullRowSelect);
+  FView->SetPanelSearch(Preferences.PanelSearch);
+  // The panel font (none: the system's).
+  QFont Font = QApplication::font();
+  if (!Preferences.PanelFontName.empty())
+  {
+    Font.setFamily(QString::fromStdString(Preferences.PanelFontName));
+    if (Preferences.PanelFontSize > 0)
+    {
+      Font.setPointSize(Preferences.PanelFontSize);
+    }
+    Font.setBold(Preferences.PanelFontBold);
+    Font.setItalic(Preferences.PanelFontItalic);
+  }
+  FView->setFont(Font);
   FModel->SetSizeFormat(Preferences.SizeFormat);
   FSort->SetSorting(Preferences.NaturalOrderNumericalSorting, Preferences.AlwaysSortDirectoriesByName);
   FView->RenameWholeName = Preferences.RenameWholeName;
@@ -572,4 +608,56 @@ void RemotePanel::ApplyIcons()
     const QIcon Set = IconSet::Icon(QString::fromLatin1(Icon.second.first));
     Icon.first->setIcon(Set.isNull() ? style()->standardIcon(Icon.second.second) : Set);
   }
+}
+
+TPanelState RemotePanel::State() const
+{
+  TPanelState Result;
+  if (const CoreBridge::TRemoteEntry * Focused = FView->CurrentEntry())
+  {
+    Result.Focused = QString::fromStdString(Focused->Name);
+  }
+  for (const QModelIndex & Index : FView->selectionModel()->selectedRows(FileListModel::NameColumn))
+  {
+    Result.Selected.append(Index.data(Qt::DisplayRole).toString());
+  }
+  Result.Scroll = FView->verticalScrollBar()->value();
+  return Result;
+}
+
+void RemotePanel::RestoreState(const TPanelState & State)
+{
+  FView->selectionModel()->clearSelection();
+  for (int Row = 0; Row < FSort->rowCount(); Row++)
+  {
+    const QModelIndex Index = FSort->index(Row, FileListModel::NameColumn);
+    const QString Name = Index.data(Qt::DisplayRole).toString();
+    if (Index.data(FileListModel::ParentRole).toBool())
+    {
+      continue;
+    }
+    if (State.Selected.contains(Name))
+    {
+      FView->selectionModel()->select(Index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
+    }
+    if (Name == State.Focused)
+    {
+      FView->selectionModel()->setCurrentIndex(Index, QItemSelectionModel::NoUpdate);
+    }
+  }
+  FView->verticalScrollBar()->setValue(State.Scroll);
+}
+
+QStringList RemotePanel::Selection() const
+{
+  QStringList Result;
+  for (const QModelIndex & Index : FView->selectionModel()->selectedRows(FileListModel::NameColumn))
+  {
+    const QModelIndex Source = FSort->mapToSource(Index);
+    if (!FModel->IsParent(Source.row()) && (FModel->Entry(Source.row()) != nullptr))
+    {
+      Result.append(QString::fromStdString(FModel->Entry(Source.row())->Name));
+    }
+  }
+  return Result;
 }

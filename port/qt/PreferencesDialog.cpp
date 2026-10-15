@@ -1,5 +1,6 @@
 #include "PreferencesDialog.h"
 #include "IconSet.h"
+#include <QApplication>
 #include "HintButton.h"
 
 #include "TransferSettingsDialog.h"
@@ -121,7 +122,13 @@ QWidget * PreferencesDialog::MakePanelsPage(const TPreferences & Preferences)
   FNaturalSorting->setChecked(Preferences.NaturalOrderNumericalSorting);
   FDirectoriesByName = new QCheckBox(tr("Always sort &directories by name"), Common);
   FDirectoriesByName->setChecked(Preferences.AlwaysSortDirectoriesByName);
-  for (QCheckBox * Check : { FShowHiddenFiles, FDefaultDirIsHome, FRenameWholeName, FNaturalSorting, FDirectoriesByName })
+  FPreservePanelState = new QCheckBox(tr("&Remember panels' state when switching sessions"), Common);
+  FPreservePanelState->setChecked(Preferences.PreservePanelState);
+  FFullRowSelect = new QCheckBox(tr("&Full row select"), Common);
+  FFullRowSelect->setChecked(Preferences.FullRowSelect);
+  // In Panels.dfm's order.
+  for (QCheckBox * Check : { FShowHiddenFiles, FDefaultDirIsHome, FPreservePanelState, FRenameWholeName, FFullRowSelect,
+         FNaturalSorting, FDirectoriesByName })
   {
     CommonLayout->addWidget(Check);
   }
@@ -131,8 +138,68 @@ QWidget * PreferencesDialog::MakePanelsPage(const TPreferences & Preferences)
   FSizeFormat->addItems({ tr("Bytes"), tr("Kilobytes"), tr("Short format") });
   FSizeFormat->setCurrentIndex(static_cast<int>(Preferences.SizeFormat));
   Sizes->addRow(tr("Show file si&zes in:"), FSizeFormat);
+  FPanelSearch = new QComboBox(Common);
+  FPanelSearch->addItems({ tr("Beginning of name only"), tr("Any part of name"), tr("All columns") });
+  FPanelSearch->setCurrentIndex(static_cast<int>(Preferences.PanelSearch));
+  Sizes->addRow(tr("&Incremental search:"), FPanelSearch);
   CommonLayout->addLayout(Sizes);
   Layout->addWidget(Common);
+  QGroupBox * DoubleClick = new QGroupBox(tr("Double-click"), Page);
+  QFormLayout * DoubleClickLayout = new QFormLayout(DoubleClick);
+  FDoubleClickAction = new QComboBox(DoubleClick);
+  FDoubleClickAction->addItems({ tr("Open"), tr("Copy"), tr("Edit") });
+  FDoubleClickAction->setCurrentIndex(static_cast<int>(Preferences.DoubleClickAction));
+  DoubleClickLayout->addRow(tr("&Operation to perform on double-click:"), FDoubleClickAction);
+  FCopyOnDoubleClickConfirmation = new QCheckBox(tr("&Confirm copy on double-click operation"), DoubleClick);
+  FCopyOnDoubleClickConfirmation->setChecked(Preferences.CopyOnDoubleClickConfirmation);
+  DoubleClickLayout->addRow(FCopyOnDoubleClickConfirmation);
+  connect(FDoubleClickAction, &QComboBox::currentIndexChanged, this, [this]()
+  {
+    FCopyOnDoubleClickConfirmation->setEnabled(FDoubleClickAction->currentIndex() == 1);
+  });
+  FCopyOnDoubleClickConfirmation->setEnabled(FDoubleClickAction->currentIndex() == 1);
+  Layout->addWidget(DoubleClick);
+  // As PanelFontGroup: a custom font, else the system's.
+  QGroupBox * FontGroup = new QGroupBox(tr("Panel font"), Page);
+  QGridLayout * FontLayout = new QGridLayout(FontGroup);
+  FPanelFontCheck = new QCheckBox(tr("&Use custom font"), FontGroup);
+  FPanelFontCheck->setChecked(!Preferences.PanelFontName.empty());
+  FPanelFont = QApplication::font();
+  if (!Preferences.PanelFontName.empty())
+  {
+    FPanelFont.setFamily(QString::fromStdString(Preferences.PanelFontName));
+    if (Preferences.PanelFontSize > 0)
+    {
+      FPanelFont.setPointSize(Preferences.PanelFontSize);
+    }
+    FPanelFont.setBold(Preferences.PanelFontBold);
+    FPanelFont.setItalic(Preferences.PanelFontItalic);
+  }
+  FPanelFontLabel = new QLabel(FontGroup);
+  QPushButton * FontButton = new QPushButton(tr("Select fon&t..."), FontGroup);
+  auto UpdateFont = [this]()
+  {
+    FPanelFontLabel->setText(FPanelFontCheck->isChecked() ?
+      QStringLiteral("%1, %2 pt").arg(FPanelFont.family()).arg(FPanelFont.pointSize()) : QString());
+    FPanelFontLabel->setFont(FPanelFontCheck->isChecked() ? FPanelFont : QApplication::font());
+  };
+  connect(FontButton, &QPushButton::clicked, this, [this, UpdateFont]()
+  {
+    bool OK = false;
+    const QFont Chosen = QFontDialog::getFont(&OK, FPanelFont, this);
+    if (OK)
+    {
+      FPanelFont = Chosen;
+      FPanelFontCheck->setChecked(true);
+      UpdateFont();
+    }
+  });
+  connect(FPanelFontCheck, &QCheckBox::toggled, this, UpdateFont);
+  FontLayout->addWidget(FPanelFontCheck, 0, 0);
+  FontLayout->addWidget(FontButton, 0, 1, Qt::AlignRight);
+  FontLayout->addWidget(FPanelFontLabel, 1, 0, 1, 2);
+  UpdateFont();
+  Layout->addWidget(FontGroup);
   Layout->addStretch(1);
   return Page;
 }
@@ -144,6 +211,12 @@ QWidget * PreferencesDialog::MakeCommanderPage(const TPreferences & Preferences)
   Layout->addWidget(new QLabel(tr("Preferences on this page apply to Commander interface only."), Page));
   QGroupBox * Panels = new QGroupBox(tr("Panels"), Page);
   QVBoxLayout * PanelsLayout = new QVBoxLayout(Panels);
+  QFormLayout * SelectionLayout = new QFormLayout();
+  FExplorerSelection = new QComboBox(Panels);
+  FExplorerSelection->addItems({ tr("Never"), tr("Mouse only"), tr("Mouse and Keyboard") });
+  FExplorerSelection->setCurrentIndex(static_cast<int>(Preferences.ExplorerSelection));
+  SelectionLayout->addRow(tr("&Explorer-style selection:"), FExplorerSelection);
+  PanelsLayout->addLayout(SelectionLayout);
   FSwappedPanels = new QCheckBox(tr("S&wap panels (local on right, remote on left)"), Panels);
   FSwappedPanels->setChecked(Preferences.SwappedPanels);
   PanelsLayout->addWidget(FSwappedPanels);
@@ -905,6 +978,17 @@ TPreferences PreferencesDialog::Preferences() const
   Result.ShowHiddenFiles = FShowHiddenFiles->isChecked();
   Result.DefaultDirIsHome = FDefaultDirIsHome->isChecked();
   Result.RenameWholeName = FRenameWholeName->isChecked();
+  Result.PreservePanelState = FPreservePanelState->isChecked();
+  Result.FullRowSelect = FFullRowSelect->isChecked();
+  Result.PanelSearch = static_cast<TPreferences::TPanelSearch>(FPanelSearch->currentIndex());
+  Result.DoubleClickAction = static_cast<TPreferences::TDoubleClick>(FDoubleClickAction->currentIndex());
+  Result.CopyOnDoubleClickConfirmation = FCopyOnDoubleClickConfirmation->isChecked();
+  Result.PanelFontName = FPanelFontCheck->isChecked() ? FPanelFont.family().toStdString() : std::string();
+  Result.PanelFontSize = FPanelFontCheck->isChecked() ? FPanelFont.pointSize() : 0;
+  Result.PanelFontBold = FPanelFontCheck->isChecked() && FPanelFont.bold();
+  Result.PanelFontItalic = FPanelFontCheck->isChecked() && FPanelFont.italic();
+  // The combo's order (NortonLikeModeCombo): Never, Mouse only, Mouse and Keyboard.
+  Result.ExplorerSelection = static_cast<TPreferences::TExplorerSelection>(FExplorerSelection->currentIndex());
   Result.NaturalOrderNumericalSorting = FNaturalSorting->isChecked();
   Result.AlwaysSortDirectoriesByName = FDirectoriesByName->isChecked();
   Result.SizeFormat = static_cast<TPreferences::TSizeFormat>(FSizeFormat->currentIndex());

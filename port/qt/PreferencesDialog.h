@@ -8,6 +8,7 @@
 #define LINSCP_QT_PREFERENCES_DIALOG_H
 
 #include <QDialog>
+#include <QFont>
 
 #include <vector>
 
@@ -174,6 +175,15 @@ private:
   QComboBox * FSizeFormat = nullptr;
   QCheckBox * FSwappedPanels = nullptr;
   QComboBox * FIconSet = nullptr;
+  QCheckBox * FPreservePanelState = nullptr;
+  QCheckBox * FFullRowSelect = nullptr;
+  QComboBox * FPanelSearch = nullptr;
+  QComboBox * FDoubleClickAction = nullptr;
+  QCheckBox * FCopyOnDoubleClickConfirmation = nullptr;
+  QCheckBox * FPanelFontCheck = nullptr;
+  class QLabel * FPanelFontLabel = nullptr;
+  QFont FPanelFont;
+  QComboBox * FExplorerSelection = nullptr;
   QCheckBox * FCompareByTime = nullptr;
   QCheckBox * FCompareBySize = nullptr;
   QComboBox * FKeyboardShortcuts = nullptr;

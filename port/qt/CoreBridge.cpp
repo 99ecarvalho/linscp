@@ -245,6 +245,18 @@ TPreferences Preferences()
   Result.NaturalOrderNumericalSorting = Settings.NaturalOrderNumericalSorting;
   Result.AlwaysSortDirectoriesByName = Settings.AlwaysSortDirectoriesByName;
   Result.RenameWholeName = Settings.RenameWholeName;
+  Result.PanelSearch = static_cast<TPreferences::TPanelSearch>(std::clamp(Settings.PanelSearch, 0, 2));
+  Result.PreservePanelState = Settings.PreservePanelState;
+  Result.FullRowSelect = Settings.FullRowSelect;
+  Result.DoubleClickAction = static_cast<TPreferences::TDoubleClick>(std::clamp(Settings.DoubleClickAction, 0, 2));
+  Result.CopyOnDoubleClickConfirmation = Settings.CopyOnDoubleClickConfirmation;
+  Result.PanelFontName = Utf8(Settings.PanelFontName);
+  Result.PanelFontSize = Settings.PanelFontSize;
+  Result.PanelFontBold = FLAGSET(Settings.PanelFontStyle, 1);
+  Result.PanelFontItalic = FLAGSET(Settings.PanelFontStyle, 2);
+  // TNortonLikeMode: nlOn, nlOff, nlKeyboard.
+  Result.ExplorerSelection = (Settings.NortonLikeMode == 0) ? TPreferences::TExplorerSelection::Never :
+    ((Settings.NortonLikeMode == 1) ? TPreferences::TExplorerSelection::MouseAndKeyboard : TPreferences::TExplorerSelection::MouseOnly);
   Result.DefaultDirIsHome = Settings.DefaultDirIsHome;
   Result.SwappedPanels = Settings.SwappedPanels;
   Result.ExplorerKeyboardShortcuts = Settings.ExplorerKeyboardShortcuts;
@@ -568,6 +580,16 @@ void SetPreferences(const TPreferences & Preferences)
   Settings.NaturalOrderNumericalSorting = Preferences.NaturalOrderNumericalSorting;
   Settings.AlwaysSortDirectoriesByName = Preferences.AlwaysSortDirectoriesByName;
   Settings.RenameWholeName = Preferences.RenameWholeName;
+  Settings.PanelSearch = static_cast<int>(Preferences.PanelSearch);
+  Settings.PreservePanelState = Preferences.PreservePanelState;
+  Settings.FullRowSelect = Preferences.FullRowSelect;
+  Settings.DoubleClickAction = static_cast<int>(Preferences.DoubleClickAction);
+  Settings.CopyOnDoubleClickConfirmation = Preferences.CopyOnDoubleClickConfirmation;
+  Settings.PanelFontName = FromUtf8(Preferences.PanelFontName);
+  Settings.PanelFontSize = Preferences.PanelFontSize;
+  Settings.PanelFontStyle = FLAGMASK(Preferences.PanelFontBold, 1) | FLAGMASK(Preferences.PanelFontItalic, 2);
+  Settings.NortonLikeMode = (Preferences.ExplorerSelection == TPreferences::TExplorerSelection::Never) ? 0 :
+    ((Preferences.ExplorerSelection == TPreferences::TExplorerSelection::MouseAndKeyboard) ? 1 : 2);
   Settings.DefaultDirIsHome = Preferences.DefaultDirIsHome;
   Settings.SwappedPanels = Preferences.SwappedPanels;
   Settings.ExplorerKeyboardShortcuts = Preferences.ExplorerKeyboardShortcuts;
@@ -1018,6 +1040,7 @@ std::string Text(TText Text)
     case TText::EditFilePrompt: Ident = EDIT_FILE_PROMPT; break;
     case TText::CreateFileError: Ident = CREATE_FILE_ERROR; break;
     case TText::UnsafeSession: Ident = UNSAFE_SESSION; break;
+    case TText::IncrementalSearch: Ident = INC_SEARCH; break;
     case TText::MaskHint: Ident = MASK_HINT2; break;
     case TText::FileMaskExHint: Ident = FILE_MASK_EX_HINT; break;
     case TText::CombiningMasksHint: Ident = COMBINING_MASKS_HINT; break;

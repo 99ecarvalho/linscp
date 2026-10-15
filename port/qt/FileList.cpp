@@ -1,4 +1,6 @@
 #include "FileList.h"
+#include <QMouseEvent>
+#include <QStyledItemDelegate>
 #include "HintButton.h"
 #include "EditMaskDialog.h"
 
@@ -135,9 +137,29 @@ QVariant RemoteFileDrag::retrieveData(const QString & MimeType, QMetaType Type) 
   return Urls;
 }
 
+// Full row select off (WinSCP's default): only the name shows selected.
+class TPanelDelegate : public QStyledItemDelegate
+{
+public:
+  using QStyledItemDelegate::QStyledItemDelegate;
+  bool FullRow = false;
+
+protected:
+  void initStyleOption(QStyleOptionViewItem * Option, const QModelIndex & Index) const override
+  {
+    QStyledItemDelegate::initStyleOption(Option, Index);
+    if (!FullRow && (Index.column() != FileListModel::NameColumn))
+    {
+      Option->state &= ~QStyle::State_Selected;
+    }
+  }
+};
+
 FileView::FileView(QWidget * Parent) :
   QTreeView(Parent)
 {
+  FDelegate = new TPanelDelegate(this);
+  setItemDelegate(FDelegate);
   setDragEnabled(true);
   setAcceptDrops(true);
   setDropIndicatorShown(true);
@@ -587,6 +609,36 @@ void FileView::keyPressEvent(QKeyEvent * Event)
 {
   const Qt::KeyboardModifiers Modifiers = Event->modifiers() & ~Qt::KeypadModifier;
   const bool Keypad = (Event->modifiers() & Qt::KeypadModifier) != 0;
+  // While searching: Backspace takes the last character back, Esc ends it;
+  // any other key but a character typed ends it too.
+  if (!FSearch.isEmpty())
+  {
+    if ((Event->key() == Qt::Key_Backspace) && (Modifiers == Qt::NoModifier))
+    {
+      const QString Text = FSearch.chopped(1);
+      FSearch.clear();
+      if (!Text.isEmpty())
+      {
+        keyboardSearch(Text);
+      }
+      else
+      {
+        emit SearchChanged(QString());
+      }
+      Event->accept();
+      return;
+    }
+    if (Event->key() == Qt::Key_Escape)
+    {
+      EndSearch();
+      Event->accept();
+      return;
+    }
+    if (Event->text().isEmpty() || !Event->text().at(0).isPrint() || (Modifiers & ~Qt::ShiftModifier))
+    {
+      EndSearch();
+    }
+  }
   if ((Event->key() == Qt::Key_Insert) && (Modifiers == Qt::NoModifier))
   {
     ToggleCurrent();
@@ -1089,3 +1141,114 @@ QVariant FileListModel::headerData(int Section, Qt::Orientation Orientation, int
   return QVariant();
 }
 
+
+// --- Selection and incremental search (P3-16) ------------------------------------
+
+void FileView::SetExplorerSelection(CoreBridge::TPreferences::TExplorerSelection Selection)
+{
+  FExplorerSelection = Selection;
+}
+
+void FileView::SetFullRowSelect(bool FullRow)
+{
+  FDelegate->FullRow = FullRow;
+  // The row painted as the cells say.
+  setSelectionBehavior(QAbstractItemView::SelectRows);
+  viewport()->update();
+}
+
+// As TNortonLikeListView: in its modes the arrows (and, Never, plain clicks)
+// move the focus and leave the selection; Shift and Ctrl as usual.
+QItemSelectionModel::SelectionFlags FileView::selectionCommand(const QModelIndex & Index, const QEvent * Event) const
+{
+  using TSelection = CoreBridge::TPreferences::TExplorerSelection;
+  if (Event != nullptr)
+  {
+    const bool KeyEvent = (Event->type() == QEvent::KeyPress);
+    const bool MouseEvent = (Event->type() == QEvent::MouseButtonPress) || (Event->type() == QEvent::MouseMove);
+    Qt::KeyboardModifiers Modifiers = Qt::NoModifier;
+    if (KeyEvent)
+    {
+      Modifiers = static_cast<const QKeyEvent *>(Event)->modifiers() & ~Qt::KeypadModifier;
+    }
+    else if (MouseEvent)
+    {
+      Modifiers = static_cast<const QMouseEvent *>(Event)->modifiers();
+    }
+    const bool Plain = !(Modifiers & (Qt::ShiftModifier | Qt::ControlModifier));
+    if (KeyEvent && Plain && (FExplorerSelection != TSelection::MouseAndKeyboard))
+    {
+      return QItemSelectionModel::NoUpdate;
+    }
+    if (MouseEvent && Plain && (FExplorerSelection == TSelection::Never))
+    {
+      return QItemSelectionModel::NoUpdate;
+    }
+  }
+  return QTreeView::selectionCommand(Index, Event);
+}
+
+// As TCustomScpExplorerForm's incremental search: typed on, the next entry
+// that matches focused (by the name's start, any part of it, or any
+// column, as Preferences say); the panel's status says what is typed.
+void FileView::keyboardSearch(const QString & Search)
+{
+  QString Text = FSearch + Search;
+  const int Rows = model()->rowCount();
+  if (Rows == 0)
+  {
+    return;
+  }
+  const int Start = currentIndex().isValid() ? currentIndex().row() : 0;
+  auto Matches = [this, &Text](int Row)
+  {
+    if (FPanelSearch == CoreBridge::TPreferences::TPanelSearch::AllColumns)
+    {
+      for (int Column = 0; Column < model()->columnCount(); Column++)
+      {
+        if (!isColumnHidden(Column) && model()->index(Row, Column).data().toString().contains(Text, Qt::CaseInsensitive))
+        {
+          return true;
+        }
+      }
+      return false;
+    }
+    const QString Name = model()->index(Row, FileListModel::NameColumn).data().toString();
+    return (FPanelSearch == CoreBridge::TPreferences::TPanelSearch::AnyPart) ? Name.contains(Text, Qt::CaseInsensitive) :
+      Name.startsWith(Text, Qt::CaseInsensitive);
+  };
+  // The current one still matching stays; else the next that does.
+  for (int Offset = 0; Offset < Rows; Offset++)
+  {
+    const int Row = (Start + Offset) % Rows;
+    if ((EntryAt(Row) != nullptr) && Matches(Row))
+    {
+      FSearch = Text;
+      setCurrentIndex(model()->index(Row, FileListModel::NameColumn));
+      if (FExplorerSelection == CoreBridge::TPreferences::TExplorerSelection::MouseAndKeyboard)
+      {
+        selectionModel()->select(currentIndex(), QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+      }
+      scrollTo(currentIndex());
+      emit SearchChanged(FSearch);
+      return;
+    }
+  }
+  // Nothing matches what is typed: kept as it was, as WinSCP beeps.
+  QApplication::beep();
+}
+
+void FileView::EndSearch()
+{
+  if (!FSearch.isEmpty())
+  {
+    FSearch.clear();
+    emit SearchChanged(QString());
+  }
+}
+
+void FileView::focusOutEvent(QFocusEvent * Event)
+{
+  EndSearch();
+  QTreeView::focusOutEvent(Event);
+}

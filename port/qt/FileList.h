@@ -200,6 +200,16 @@ public:
   void SetupColumns();
   // MenuCaptions: the main menu's names for them, else the headers'.
   QMenu * ColumnsMenu(bool MenuCaptions = false);
+  // Preferences > Panels and Commander (P3-16): Explorer-style selection
+  // (Never: the focus alone moves with the keys and plain clicks; MouseOnly,
+  // WinSCP's default: with the keys only), full row selection,
+  // incremental search (by name's start, any part of it, all columns).
+  void SetExplorerSelection(CoreBridge::TPreferences::TExplorerSelection Selection);
+  void SetFullRowSelect(bool FullRow);
+  void SetPanelSearch(CoreBridge::TPreferences::TPanelSearch Search) { FPanelSearch = Search; }
+  // What incremental search has typed (empty: none).
+  QString SearchText() const { return FSearch; }
+  void keyboardSearch(const QString & Search) override;
   // The columns' layout as WinSCP keeps it (TIEListViewColProperties'
   // params: "sort;ascending|width,visible;...;@ppi|order"), over WinSCP's
   // columns: Map gives each of the model's columns its WinSCP index (-1:
@@ -209,6 +219,8 @@ public:
   QString ColumnsParams(const std::vector<int> & Map, int Count) const;
 
 signals:
+  // Incremental search's text changed (empty: it ended).
+  void SearchChanged(const QString & Text);
   void Dropped(const QMimeData * Data, const QString & OnDirectory, Qt::DropAction Action);
   // Tab: to the other panel, as WinSCP's Commander.
   void SwitchPanel();
@@ -216,6 +228,8 @@ signals:
 protected:
   bool event(QEvent * Event) override;
   void keyPressEvent(QKeyEvent * Event) override;
+  QItemSelectionModel::SelectionFlags selectionCommand(const QModelIndex & Index, const QEvent * Event = nullptr) const override;
+  void focusOutEvent(QFocusEvent * Event) override;
   void startDrag(Qt::DropActions Actions) override;
   void dragEnterEvent(QDragEnterEvent * Event) override;
   void dragMoveEvent(QDragMoveEvent * Event) override;
@@ -228,6 +242,11 @@ private:
   // As WinSCP's Select dialog remembers them (WinConfiguration's
   // SelectMask and SelectDirectories), for the session.
   static QString FLastMask;
+  CoreBridge::TPreferences::TExplorerSelection FExplorerSelection = CoreBridge::TPreferences::TExplorerSelection::MouseOnly;
+  CoreBridge::TPreferences::TPanelSearch FPanelSearch = CoreBridge::TPreferences::TPanelSearch::NameStart;
+  QString FSearch;
+  class TPanelDelegate * FDelegate = nullptr;
+  void EndSearch();
   static bool FLastDirectories;
   // WinSCP's entries as last given, for the columns the view does not have.
   QStringList FColumnEntries;

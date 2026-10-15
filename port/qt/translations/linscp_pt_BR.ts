@@ -2330,6 +2330,78 @@ Local: %2</translation>
         <source>Icon &amp;set:</source>
         <translation>&amp;Conjunto de ícones:</translation>
     </message>
+    <message>
+        <source>&amp;Remember panels&apos; state when switching sessions</source>
+        <translation>Lembrar estado dos painéis quando alternar entre sessões</translation>
+    </message>
+    <message>
+        <source>&amp;Full row select</source>
+        <translation>Selecionar toda a linha</translation>
+    </message>
+    <message>
+        <source>Beginning of name only</source>
+        <translation>Somente o começo do nome</translation>
+    </message>
+    <message>
+        <source>Any part of name</source>
+        <translation>Qualquer parte do nome</translation>
+    </message>
+    <message>
+        <source>All columns</source>
+        <translation>Todas as colunas</translation>
+    </message>
+    <message>
+        <source>&amp;Incremental search:</source>
+        <translation>Busca &amp;Incremental:</translation>
+    </message>
+    <message>
+        <source>Double-click</source>
+        <translation>Duplo-clique</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>Abrir</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>Copiar</translation>
+    </message>
+    <message>
+        <source>Edit</source>
+        <translation>Editar</translation>
+    </message>
+    <message>
+        <source>&amp;Operation to perform on double-click:</source>
+        <translation>&amp;Operação a fazer ao duplo-clique</translation>
+    </message>
+    <message>
+        <source>&amp;Confirm copy on double-click operation</source>
+        <translation>&amp;Confirmar cópia ao duplo-clique</translation>
+    </message>
+    <message>
+        <source>Panel font</source>
+        <translation>Fonte do painel</translation>
+    </message>
+    <message>
+        <source>&amp;Use custom font</source>
+        <translation>Usar fonte personalizada</translation>
+    </message>
+    <message>
+        <source>Select fon&amp;t...</source>
+        <translation>Selecionar fon&amp;te...</translation>
+    </message>
+    <message>
+        <source>Mouse only</source>
+        <translation>Apenas o mouse</translation>
+    </message>
+    <message>
+        <source>Mouse and Keyboard</source>
+        <translation>Mouse e teclado</translation>
+    </message>
+    <message>
+        <source>&amp;Explorer-style selection:</source>
+        <translation>Seleção estilo &amp;Explorer</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

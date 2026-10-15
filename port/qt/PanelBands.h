@@ -7,6 +7,7 @@
 #ifndef LINSCP_QT_PANEL_BANDS_H
 #define LINSCP_QT_PANEL_BANDS_H
 
+#include <QStringList>
 #include <QToolBar>
 
 class QLineEdit;
@@ -21,6 +22,15 @@ struct TPanelBands
   // Made, Parent's; laid out in Layout around Path.
   void Make(QWidget * Parent);
   void LayOut(QVBoxLayout * Layout, QLineEdit * Path);
+};
+
+// A panel's focused entry, selection and scroll, as "remember panels' state
+// when switching sessions" keeps them (PreservePanelState).
+struct TPanelState
+{
+  QString Focused;
+  QStringList Selected;
+  int Scroll = 0;
 };
 
 #endif

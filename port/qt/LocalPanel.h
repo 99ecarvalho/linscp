@@ -75,10 +75,16 @@ public:
   void SetFilter(const QString & Mask);
   QString Filter() const;
   QStringList Selected() const;
+  // The selection alone (Selected: else the focused entry, as commands take it).
+  QStringList Selection() const;
   void Select(const QStringList & Names);
   // The entries shown (filtered, hidden files as the setting says), in the
   // panel's order; and a directory's size, calculated, shown.
   std::vector<CoreBridge::TRemoteEntry> Entries() const;
+  // Its focused entry, selection and scroll (PreservePanelState's), and
+  // them back, as far as the entries still are.
+  TPanelState State() const;
+  void RestoreState(const TPanelState & State);
   void SetDirectorySize(const QString & Name, std::int64_t Size);
   QStringList Names() const;
   // The directory shown, with '/' separators (Qt's), as the panel works in it.

@@ -26,6 +26,23 @@ struct TShellSettings
   // Window: the current directory in the title (TPathInCaption: picShort,
   // picFull, picNone); the window kept when the last session closes.
   int PathInCaption = 0;
+  // Panels: incremental search (TIncrementalSearch: isNameStartOnly,
+  // isName, isAll), panels' state kept per session, full row, the
+  // double-click (TDoubleClickAction: dcaOpen, dcaCopy, dcaEdit; its key
+  // CopyOnDoubleClick) and its confirmation, the panels' font (none: the
+  // system's).
+  int PanelSearch = 0;
+  bool PreservePanelState = true;
+  bool FullRowSelect = false;
+  int DoubleClickAction = 2;
+  bool CopyOnDoubleClickConfirmation = false;
+  UnicodeString PanelFontName;
+  int PanelFontSize = 0;
+  int PanelFontStyle = 0;
+  int PanelFontCharset = 1;
+  // ScpCommander.NortonLikeMode (TNortonLikeMode: nlOn, nlOff, nlKeyboard;
+  // its key ExplorerStyleSelection).
+  int NortonLikeMode = 2;
   // linscp's: the icon set (IconSet.h's ids); empty for the platform's default.
   UnicodeString IconSet;
   bool KeepOpenWhenNoSession = true;
