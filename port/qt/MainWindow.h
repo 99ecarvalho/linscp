@@ -170,8 +170,12 @@ public:
   // Files > Edit Link (Alt+F6), as WinSCP's AddEditLink: a link in the
   // active panel's directory, to its focused entry, or that entry edited
   // when it is a link. Locally, the system's (a symbolic link, a shortcut
-  // on Windows). False when none was made.
-  bool AddEditLink();
+  // on Windows). False when none was made. Add (Files > New > Link,
+  // NewLinkAction): a new link in any case, never an edit.
+  bool AddEditLink(bool Add = false);
+  // Files > Locking > Lock and Unlock: the remote panel's selection (or its
+  // focused entry). False when not done.
+  bool LockSelected(bool Lock);
   // Files > Duplicate and Move To (Shift+F5, Shift+F6), as WinSCP's: the
   // remote panel's selection within the server, after its dialog. False
   // when nothing was done in full.
@@ -430,6 +434,14 @@ private:
   QAction * FLocalStatusBarAction = nullptr;
   QAction * FRemoteStatusBarAction = nullptr;
   QAction * FTabsAction = nullptr;
+  // Files > Upload/Download (CurrentCopyItem): the active side's transfer,
+  // in the background, and moving; Files > Locking.
+  QMenu * FCurrentCopyMenu = nullptr;
+  QAction * FCurrentCopyAction = nullptr;
+  QAction * FCurrentCopyQueueAction = nullptr;
+  QAction * FCurrentMoveAction = nullptr;
+  QMenu * FLockingMenu = nullptr;
+  void UpdateFilesMenu();
   QAction * FQueueToolbarAction = nullptr;
   bool FTabsShown = true;
   TOnceEmpty FOnceEmpty = TOnceEmpty::Idle;

@@ -177,6 +177,9 @@
 #include <QSpinBox>
 #include <QTreeWidget>
 
+// The menu bar's action at Path (captions without their & and ...).
+QAction * MenuAction(QMainWindow & Window, const QStringList & Path);
+
 namespace
 {
 
@@ -2737,6 +2740,49 @@ void Properties(const char * Port)
       QFileInfo(QDir(LocalDirectory.path()).filePath(LinkName)).symLinkTarget().endsWith(QStringLiteral("target.txt")),
       "pointing to the file");
     Responder.Custom = nullptr;
+    // P3-15: Files > New > Link makes a new link even on a link (Alt+F6
+    // would edit it).
+#if !defined(_WIN32)
+    Local->Refresh();
+    Local->Select({ LinkName });
+    Window.ActivatePanel(true);
+    bool Asked = false;
+    Responder.Custom = [&LinkName, &Asked](QWidget * Modal)
+    {
+      LinkDialog * Dialog = qobject_cast<LinkDialog *>(Modal);
+      if (Dialog == nullptr)
+      {
+        return false;
+      }
+      Asked = true;
+      Check(!Dialog->FileNameEdit()->isReadOnly() && Dialog->FileNameEdit()->text().isEmpty() &&
+        (Dialog->PointToEdit()->text() == LinkName), "New > Link: a new link to the focused one, not an edit");
+      Dialog->reject();
+      return true;
+    };
+    QAction * NewLink = MenuAction(Window, { "Files", "New", "Link" });
+    Check(NewLink != nullptr, "Files > New > Link");
+    if (NewLink != nullptr)
+    {
+      NewLink->trigger();
+    }
+    Check(Asked, "asks for the link");
+    Responder.Custom = nullptr;
+#endif
+    // Files > Upload/Download, as the active side is; Locking not for FTP.
+    {
+      QAction * Files = MenuAction(Window, { "Files" });
+      Window.ActivatePanel(true);
+      emit Files->menu()->aboutToShow();
+      Check(MenuAction(Window, { "Files", "Upload" }) != nullptr &&
+        MenuAction(Window, { "Files", "Upload", "Upload in Background" }) != nullptr, "the local side's Upload submenu");
+      Window.ActivatePanel(false);
+      emit Files->menu()->aboutToShow();
+      Check(MenuAction(Window, { "Files", "Download" }) != nullptr &&
+        MenuAction(Window, { "Files", "Download", "Download and Delete" }) != nullptr, "the remote side's Download");
+      Check(!Session->CanLock() && !MenuAction(Window, { "Files", "Locking" })->isEnabled() && !Window.LockSelected(true),
+        "FTP locks nothing: Locking disabled");
+    }
 
     // Duplicate and Move To.
     {

@@ -2273,6 +2273,49 @@ bool TSession::CanHardLink() const
   return Active() && F->Terminal->IsCapable[fcHardLink];
 }
 
+bool TSession::CanLock() const
+{
+  return Active() && F->Terminal->IsCapable[fcLocking];
+}
+
+void TSession::Lock(const std::vector<std::string> & Names)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TStringList> Files(new TStringList());
+    for (const std::string & Name : Names)
+    {
+      TRemoteFile * File = FindFile(F->Terminal.get(), Name);
+      Files->AddObject(File->FileName, File);
+    }
+    F->Terminal->LockFiles(Files.get());
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void TSession::Unlock(const std::vector<std::string> & Names)
+{
+  try
+  {
+    CheckActive(*this);
+    std::unique_ptr<TStringList> Files(new TStringList());
+    for (const std::string & Name : Names)
+    {
+      TRemoteFile * File = FindFile(F->Terminal.get(), Name);
+      Files->AddObject(File->FileName, File);
+    }
+    F->Terminal->UnlockFiles(Files.get());
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 bool TSession::CanEditLinks() const
 {
   return Active() && F->Terminal->SessionData->ResolveSymlinks;

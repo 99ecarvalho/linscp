@@ -19,6 +19,10 @@ EXTRA = {
 }
 # WinSCP's captions that linscp's shell gives otherwise.
 RENAMES = {'LocalX': 'Left', 'RemoteX': 'Right'}
+# Captions WinSCP sets as the active panel changes (CurrentCopyItem: its
+# form has the remote panel's), as linscp's may show them: theirs for ours.
+ALIASES = {'Upload': 'Download', 'Upload in Background': 'Download in Background',
+           'Upload and Delete': 'Download and Delete'}
 
 
 def clean(caption):
@@ -107,6 +111,7 @@ def compare(path, ours, theirs):
     for caption, children in ours:
         if caption == '----':
             continue
+        caption = ALIASES.get(caption, caption)
         if (path[-1] if path else '', caption) in EXTRA:
             continue
         try:

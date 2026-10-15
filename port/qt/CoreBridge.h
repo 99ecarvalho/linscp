@@ -1762,6 +1762,12 @@ public:
   bool CanLink() const;
   bool CanHardLink() const;
   bool CanEditLinks() const;
+  // Files > Locking (LockAction, UnlockAction): entries of the current
+  // directory locked or unlocked, where the protocol locks (fcLocking:
+  // WebDAV). Throw TCoreError.
+  bool CanLock() const;
+  void Lock(const std::vector<std::string> & Names);
+  void Unlock(const std::vector<std::string> & Names);
   // Duplicate and Move to (Shift+F5, Shift+F6), as WinSCP's
   // RemoteTransferFiles: entries of the current directory to Target
   // (a directory) under FileMask ("*.*", or a new name). A direct copy is

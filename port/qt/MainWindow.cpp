@@ -2853,7 +2853,67 @@ bool MainWindow::Properties()
   return Result;
 }
 
-bool MainWindow::AddEditLink()
+void MainWindow::UpdateFilesMenu()
+{
+  const bool Local = LocalBrowser();
+  const bool Upload = FLocalActive;
+  FCurrentCopyMenu->menuAction()->setVisible(!Local);
+  FCurrentCopyMenu->setTitle(Upload ? tr("&Upload") : tr("Downlo&ad"));
+  FCurrentCopyAction->setText(Upload ? tr("Up&load...") : tr("Down&load..."));
+  FCurrentCopyQueueAction->setText(Upload ? tr("Upload in &Background...") : tr("Download in &Background..."));
+  FCurrentMoveAction->setText(Upload ? tr("Upload and Dele&te...") : tr("Download and Dele&te..."));
+  const bool Transfer = !FBusy && FSession && FSession->Active();
+  for (QAction * Action : { FCurrentCopyAction, FCurrentCopyQueueAction, FCurrentMoveAction })
+  {
+    Action->setEnabled(Transfer);
+  }
+  FCopyAction->setVisible(Local);
+  FMoveAction->setVisible(Local);
+  const bool Lock = !FBusy && !FLocalActive && !Local && FSession && FSession->CanLock();
+  FLockingMenu->setEnabled(Lock);
+}
+
+bool MainWindow::LockSelected(bool Lock)
+{
+  if (FBusy || !FSession || !FSession->CanLock() || FLocalActive || LocalBrowser())
+  {
+    return false;
+  }
+  QStringList Names = FPanel->Selected();
+  if (Names.isEmpty() && (FPanel->View()->CurrentEntry() != nullptr))
+  {
+    Names.append(QString::fromStdString(FPanel->View()->CurrentEntry()->Name));
+  }
+  if (Names.isEmpty())
+  {
+    return false;
+  }
+  std::vector<std::string> List;
+  for (const QString & Name : Names)
+  {
+    List.push_back(Name.toStdString());
+  }
+  try
+  {
+    if (Lock)
+    {
+      FSession->Lock(List);
+    }
+    else
+    {
+      FSession->Unlock(List);
+    }
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+  FPanel->Refresh();
+  return true;
+}
+
+bool MainWindow::AddEditLink(bool Add)
 {
   // The local panel's (either, in a local tab), else the remote one's.
   LocalPanel * Panel = SideLocal(FLocalActive);
@@ -2870,7 +2930,7 @@ bool MainWindow::AddEditLink()
   if (Entry != nullptr)
   {
     const QString Name = QString::fromStdString(Entry->Name);
-    Edit = Entry->Link && (IsLocal || FSession->CanEditLinks());
+    Edit = !Add && Entry->Link && (IsLocal || FSession->CanEditLinks());
     if (Edit)
     {
       FileName = Name;
@@ -4213,14 +4273,26 @@ void MainWindow::BuildMenus()
   QMenu * New = Files->addMenu(tr("&New"));
   FNewFileAction = New->addAction(tr("&File..."), this, [this]() { NewFile(); });
   Iconize(New->addAction(tr("&Directory..."), this, OnActive(&LocalPanel::NewFolderAction, &RemotePanel::NewFolderAction)), "new-folder");
+  QAction * NewLink = New->addAction(tr("&Link..."), this, [this]() { AddEditLink(true); });
+  NewLink->setStatusTip(tr("Create new link/shortcut"));
+  connect(New, &QMenu::aboutToShow, this, [this, NewLink]() { NewLink->setEnabled(FLinkAction->isEnabled()); });
   Files->addSeparator();
   Files->addAction(FOpenCurrentAction);
   Files->addAction(FEditAction);
   Files->addMenu(FEditWithMenu);
   Files->addAction(FLinkAction);
   Files->addSeparator();
+  // As CurrentCopyItem: the active panel's Upload or Download, its
+  // background and moving variants; in a local tab, Copy and Move instead.
+  FCurrentCopyMenu = Files->addMenu(tr("Downlo&ad"));
+  FCurrentCopyAction = FCurrentCopyMenu->addAction(tr("Down&load..."), this, [this]() { TransferSelected(false, true, false); });
+  FCurrentCopyQueueAction = FCurrentCopyMenu->addAction(tr("Download in &Background..."), this,
+    [this]() { TransferSelected(false, true, true); });
+  FCurrentCopyMenu->addSeparator();
+  FCurrentMoveAction = FCurrentCopyMenu->addAction(tr("Download and Dele&te..."), this, [this]() { TransferSelected(true, true); });
   Files->addAction(FCopyAction);
   Files->addAction(FMoveAction);
+  connect(Files, &QMenu::aboutToShow, this, &MainWindow::UpdateFilesMenu);
   Files->addAction(FDuplicateAction);
   Files->addAction(FMoveToAction);
   Iconize(Files->addAction(tr("&Delete"), this, OnActive(&LocalPanel::DeleteAction, &RemotePanel::DeleteAction)), "delete");
@@ -4236,6 +4308,10 @@ void MainWindow::BuildMenus()
   Names->addAction(tr("Copy to &Clipboard"), this, [this]() { CopyFileNames(FLocalActive, false); });
   Names->addAction(tr("Copy to Clipboard (Include &Paths)"), this, [this]() { CopyFileNames(FLocalActive, true); });
   Names->addAction(FGenerateFileUrlAction);
+  // As LockAction and UnlockAction: where the protocol locks (WebDAV).
+  FLockingMenu = Files->addMenu(tr("Loc&king"));
+  FLockingMenu->addAction(tr("&Lock"), this, [this]() { LockSelected(true); })->setStatusTip(tr("Lock selected file(s)"));
+  FLockingMenu->addAction(tr("&Unlock"), this, [this]() { LockSelected(false); })->setStatusTip(tr("Unlock selected file(s)"));
   Files->addSeparator();
   Files->addAction(FPropertiesAction);
   FDirectorySizesAction = Files->addAction(tr("&Calculate Directory Sizes"), this, [this]() { CalculateDirectorySizes(); });

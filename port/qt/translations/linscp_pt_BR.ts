@@ -1911,6 +1911,46 @@ Local: %2</translation>
         <source>Shut down the computer once the queue is empty</source>
         <translation>Desligar o computador quando a fila estiver vazia</translation>
     </message>
+    <message>
+        <source>&amp;Upload</source>
+        <translation>&amp;Upload</translation>
+    </message>
+    <message>
+        <source>Downlo&amp;ad</source>
+        <translation>Downlo&amp;ad</translation>
+    </message>
+    <message>
+        <source>Upload in &amp;Background...</source>
+        <translation>Upload em &amp;Plano de fundo</translation>
+    </message>
+    <message>
+        <source>Download in &amp;Background...</source>
+        <translation>Baixar em &amp;Plano de Fundo</translation>
+    </message>
+    <message>
+        <source>Create new link/shortcut</source>
+        <translation>Criar um novo link/atalho</translation>
+    </message>
+    <message>
+        <source>Loc&amp;king</source>
+        <translation>Blo&amp;queio</translation>
+    </message>
+    <message>
+        <source>&amp;Lock</source>
+        <translation>&amp;Travar</translation>
+    </message>
+    <message>
+        <source>Lock selected file(s)</source>
+        <translation>Travar o(s) arquivo(s) selecionado(s)</translation>
+    </message>
+    <message>
+        <source>&amp;Unlock</source>
+        <translation>&amp;Destravar</translation>
+    </message>
+    <message>
+        <source>Unlock selected file(s)</source>
+        <translation>Destravar o(s) arquivo(s) selecionado(s)</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>
