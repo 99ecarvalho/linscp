@@ -64,12 +64,12 @@ The shell's texts are `tr()` strings in `port/qt`, with the `.ts` files in
 `port/qt/translations`. The build machine's `lupdate` and `lrelease` are used
 for both targets: Debian's `qt6-l10n-tools`, which `qt6-tools-dev-tools`
 brings. They compile each `.ts` to a `.qm`, embedded with Qt's resource
-compiler. Brazilian Portuguese (`linscp_pt_BR.ts`) is the first translation.
-It follows the terms of WinSCP's own Brazilian translation, so the shell
-reads like the rest of WinSCP. Most of the shell's strings are WinSCP's
-captions, so `port/tools/winscp_ts_suggest.py <ts> <LANG> --write` fills a
-`.ts` file's unfinished strings from WinSCP's translation of the same
-English text: by the WinSCP form the shell's dialog follows when that form
+compiler. Brazilian Portuguese (`linscp_pt_BR.ts`) was the first translation;
+the others followed (P3-25). Each follows the terms of WinSCP's own
+translation into its language, so the shell reads like the rest of WinSCP. Most of the shell's strings are WinSCP's
+captions and hints, so `port/tools/winscp_ts_suggest.py <ts> <LANG> --write`
+fills a `.ts` file's unfinished strings from WinSCP's translation of the
+same English text: by the WinSCP form the shell's dialog follows when that form
 has it, else where every occurrence agrees. A text with Qt's `%1`, `%2`
 matches WinSCP's with printf's `%s`, `%d` in the same places, and takes its
 translation with them turned back. What it cannot place is left for a
@@ -89,13 +89,44 @@ the `<translation>` element, and commit the `.ts` with the change. ctest
 `translations_current` fails while a `.ts` lacks a text the sources have,
 or keeps one they dropped. Untranslated texts are reported, not failed.
 
-To add a language for the shell:
+To add a language for the shell (`<locale>` as Qt names it, `<LANG>` as
+WinSCP does):
 
 ```sh
-printf '<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE TS>\n<TS version="2.1" language="de_DE">\n</TS>\n' \
-  > port/qt/translations/linscp_de_DE.ts
-cmake -S . -B build/linux && cmake --build build/linux --target update_translations
+port/tools/ts_language.py new <locale> <LANG>       # linscp_<locale>.ts, WinSCP's texts in it
+port/tools/ts_language.py export port/qt/translations/linscp_<locale>.ts todo.json
+# ... a translator fills todo.json's "translation"s, with its glossary ...
+port/tools/ts_language.py import port/qt/translations/linscp_<locale>.ts todo.json
+cmake -S . -B build/linux                           # the build picks the new file up
 ```
+
+`new` copies the shell's texts from an existing `.ts`, lets lupdate lay out
+the language's plural forms, and fills what WinSCP's translation has.
+`export` writes the rest as JSON, with the texts already translated as a
+glossary of WinSCP's terms. `import` takes back each translation that fits
+its English text (see below) and reports the others.
+
+The file is named after the language alone (`linscp_de.ts`) unless WinSCP
+has two of it: `pt_BR` and `pt_PT`, `zh_CN` and `zh_TW`. Also `sr_Latn`
+(WinSCP's Serbian is in Latin script), `nb` (`NO`), `fil` (`FP`), `my`
+(`MYA`), `id` (`IN`), `ja` (`JP`). The shell loads the file from core's
+locale, falling back from `de_AT` to `de`.
+
+ctest `translations_current` also refuses a translation that does not fit
+its text: a `%1` or `%n` lost or added, more than one `&` mnemonic, other
+HTML tags, other leading or trailing spaces. `winscp_ts_suggest.py` leaves
+out WinSCP's translations that would fail it, for a person to do.
+
+### Which languages
+
+Every language WinSCP has, except Esperanto and Kabyle, which core cannot
+choose yet (above). WinSCP's translations cover about 850 of the shell's
+1,121 texts: its captions, hints and messages. The other 270 or so are
+linscp's own, or worded differently from WinSCP's. They are translated
+for linscp with WinSCP's terms, in batches, the languages most used on the
+web first (W3Techs' content languages); TRACKER's P3-25 lists them. Those
+texts have not been reviewed by native speakers. Corrections are welcome:
+edit the `<translation>`, or open the file in Qt Linguist.
 
 Core's languages need nothing: every language WinSCP has is generated.
 

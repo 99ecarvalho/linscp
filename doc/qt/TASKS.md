@@ -148,6 +148,7 @@ Goal: one codebase, core + CLI, Linux and Windows. No GUI.
 | P3-22 | Windows: the taskbar's jump list of recent sites and workspaces (WinSCP's AddSessionToJumpList, UpdateJumpList), opened through `/JumpList` | S | P3-13 | Raised 2026-10-15 by the user |
 | P3-23 | Windows: the local panel's system context menu (Panels > Local's "Use system file context menu", the shell's IContextMenu) | S | P3-19 | Raised 2026-10-15 by the user |
 | P3-24 | Windows: WinSCP's drag & drop shell extension (DragExt, its copy hook) and the fake-file drag (DDFakeFile): remote files dropped straight onto Explorer's folders, downloaded there; built from the pinned source, registered by the installer | M | P3-07 | Raised 2026-10-15 by the user |
+| P3-25 | The shell's texts in WinSCP's other languages (52 besides pt_BR): each `.ts` filled from WinSCP's own translation of the same text, the rest translated with WinSCP's terms; in batches, the most used languages first | L | P2-09 | Raised 2026-10-15 by the user |
 
 ## P4 — Cleanup
 

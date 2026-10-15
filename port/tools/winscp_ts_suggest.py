@@ -3,17 +3,21 @@
 of the same English text, where WinSCP has it (doc/qt/translations.md).
 
 The shell's dialogs follow WinSCP's, captions included, so most of their
-strings are WinSCP's: a form's caption (forms/*.dfm) or a string-table entry
-(resource/*.rc). Each English text found there is looked up in WinSCP's
+strings are WinSCP's: a form's caption or hint (forms/*.dfm; a hint's
+"short|long" parts each) or a string-table entry (resource/*.rc). Each English text found there is looked up in WinSCP's
 translation of the language (translations/<LANG>.ini, by form and object
 path, or by resource name), and taken when every occurrence agrees.
 
   winscp_ts_suggest.py port/qt/translations/linscp_pt_BR.ts PT [--write]
 
-Without --write, prints what it would fill; strings it cannot find, or
-finds translated differently in different places, are left for a person.
+Without --write, prints what it would fill; strings it cannot find, finds
+translated differently in different places, or finds translated in a way
+check_ts_current.py refuses, are left for a person.
 """
 import argparse, glob, html, os, re, sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from check_ts_current import problems  # noqa: E402
 
 ROOT = os.path.join(os.path.dirname(__file__), '..', '..', '3rd-party', 'winscp')
 
@@ -30,8 +34,11 @@ def delphi_string(text):
 
 
 def dfm_captions(path):
-    """(object path, English text) for each Caption and Items.Strings."""
+    """(object path, English text) for each Caption, Hint and Items.Strings."""
     names = []
+    # A collection's items (a list view's columns...) are keyed item0,
+    # item1... in the translations; one counter per open collection.
+    items = []
     lines = open(path, encoding='utf-8', errors='replace').read().replace('\r', '').split('\n')
     i = 0
     while i < len(lines):
@@ -40,23 +47,27 @@ def dfm_captions(path):
         if m:
             # An object with no name ("object TTBXItem") has no keys.
             names.append(m.group(1) if m.group(2) else None)
-        elif line in ('item', '<item') or line.endswith('= <') or line.endswith('<item'):
-            # A collection's item (list view columns...): its end is not an
-            # object's.
-            if line.endswith('<item') or line in ('item', '<item'):
-                names.append(None)
+        elif line.endswith('= <') or line.endswith('<item') or (line == 'item'):
+            if not line.startswith('item'):
+                items.append(0)
+            if line.endswith('item'):
+                names.append(f'item{items[-1]}' if items else None)
+                if items:
+                    items[-1] += 1
         elif line in ('end', 'end>'):
             if names:
                 names.pop()
+            if (line == 'end>') and items:
+                items.pop()
         else:
             m = re.match(r'(Caption|Hint) = (.*)', line)
-            if m and m.group(1) == 'Caption':
+            if m:
                 value = m.group(2)
                 while value.endswith('+'):
                     i += 1
                     value = value[:-1] + lines[i].strip()
                 if None not in names:
-                    yield '.'.join(names[1:] + ['Caption']), delphi_string(value)
+                    yield '.'.join(names[1:] + [m.group(1)]), delphi_string(value)
             elif line.startswith('Items.Strings = ('):
                 index = 0
                 while True:
@@ -131,6 +142,10 @@ CONTEXT_FORMS = {
 }
 
 
+# English text -> the forms that have it, translated or not.
+PRESENT = {}
+
+
 def candidates(lang):
     """English text -> {source file: set of the language's translations}."""
     ini = ini_sections(os.path.join(ROOT, 'translations', lang + '.ini'))
@@ -139,8 +154,17 @@ def candidates(lang):
         name = os.path.basename(dfm)
         section = ini.get(name, {})
         for key, english in dfm_captions(dfm):
+            if english:
+                PRESENT.setdefault(english, set()).add(name)
             if key in section and english:
-                found.setdefault(english, {}).setdefault(name, []).append(section[key])
+                pairs = [(english, section[key])]
+                if key.endswith('.Hint') and ('|' in english):
+                    # "Short|Long": the menu's text and its tooltip.
+                    english_parts, translated_parts = english.split('|'), section[key].split('|')
+                    pairs = list(zip(english_parts, translated_parts)) if len(english_parts) == len(translated_parts) else []
+                for english_part, translation in pairs:
+                    if english_part:
+                        found.setdefault(english_part, {}).setdefault(name, []).append(translation)
     for rc in glob.glob(os.path.join(ROOT, 'source', 'resource', '*.rc')):
         name = os.path.basename(rc)
         section = ini.get(name, {})
@@ -185,6 +209,11 @@ def choose(found, context, english):
     if preferred:
         # The form's own wording; where it has two, the one it uses most.
         return max(sorted(set(preferred)), key=preferred.count), set()
+    if any(form in PRESENT.get(english, ()) for form in CONTEXT_FORMS.get(context, [])):
+        # The form the dialog follows keeps the English ("R", "W", "X" of
+        # the permissions): another form's translation would be another
+        # meaning.
+        return None, set()
     everyone = set(t for ts in by_source.values() for t in ts)
     if len(everyone) == 1:
         return next(iter(everyone)), set()
@@ -209,6 +238,12 @@ def main():
             translation, options = choose(found, context, english.rstrip(':'))
             if translation is not None:
                 translation += ':'
+        if (translation is not None) and problems(english, translation):
+            # A translator's slip (a placeholder lost, a stray space): left
+            # for a person, as check_ts_current would refuse it.
+            print(f'  ?? {english!r} (WinSCP\'s does not fit: {translation!r})')
+            left += 1
+            return m.group(0)
         if translation is not None:
             filled += 1
             print(f'  {english!r} -> {translation!r}')

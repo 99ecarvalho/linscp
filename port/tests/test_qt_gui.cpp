@@ -126,6 +126,7 @@
 
 #include <QLabel>
 #include <QLineEdit>
+#include <QTranslator>
 #include <QTreeView>
 #include "SiteManager.h"
 #include "CopyLocalDialog.h"
@@ -368,6 +369,14 @@ void Language(const QString & Translations)
   Check(Language.CoreCode == QStringLiteral("PT"), "core's texts are WinSCP's PT translation");
   Check(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::NewSiteNode)) != QStringLiteral("New Site"),
     "which core's own strings come from");
+  // Each language's file is built in and loads.
+  const QStringList Files = QDir(QStringLiteral(":/i18n")).entryList({ QStringLiteral("linscp_*.qm") });
+  Check(Files.size() > 1, "the shell has its translations built in");
+  for (const QString & File : Files)
+  {
+    QTranslator Translator;
+    Check(Translator.load(File, QStringLiteral(":/i18n")) && !Translator.isEmpty(), qPrintable(File + QStringLiteral(" loads")));
+  }
   CoreBridge::Finalize();
 }
 
@@ -4484,8 +4493,9 @@ void ExplorerTest(const char * Port, const QString & Directory)
 // The README's screenshots (doc/screenshots): the Commander and the
 // Explorer on a session with plausible files, the Site Manager, Preferences;
 // the light theme, at a fixed size. Not a ctest: run by hand,
-//   run_qt_session.py test_qt_gui screenshots /ini=nul {port} {tmp}/local <out> -platform offscreen
-void Screenshots(const char * Port, const QString & Directory, const QString & Out)
+//   run_qt_session.py test_qt_gui screenshots /ini=nul {port} {tmp}/local <out> [<locale> <core's translations>] -platform offscreen
+// With a locale, in that language (to look a translation over).
+void Screenshots(const char * Port, const QString & Directory, const QString & Out, const QString & Locale, const QString & Translations)
 {
   QDir().mkpath(Out);
   const QDir Root(QDir(Directory).filePath(QStringLiteral("../root")));
@@ -4536,6 +4546,11 @@ void Screenshots(const char * Port, const QString & Directory, const QString & O
 
   QtFrontend Frontend;
   CoreBridge::Initialize(&Frontend);
+  if (!Locale.isEmpty())
+  {
+    CoreBridge::SetLanguage(std::string(), Translations.toStdString());
+    SetUpLanguage(Locale);
+  }
   Theme::Apply(CoreBridge::TPreferences::TAutoSwitch::Off);
   // Sites in folders, for the Site Manager.
   for (const auto & Each : { std::make_pair("Work/Web server", "www.example.com"), std::make_pair("Work/Backup storage", "backup.example.com"),
@@ -7162,7 +7177,9 @@ int main(int argc, char ** argv)
   }
   else if ((argc >= 6) && (std::strcmp(argv[1], "screenshots") == 0))
   {
-    Screenshots(argv[3], QString::fromLocal8Bit(argv[4]), QString::fromLocal8Bit(argv[5]));
+    Screenshots(argv[3], QString::fromLocal8Bit(argv[4]), QString::fromLocal8Bit(argv[5]),
+      (argc >= 8) && (argv[6][0] != '-') ? QString::fromLocal8Bit(argv[6]) : QString(),
+      (argc >= 8) && (argv[6][0] != '-') ? QString::fromLocal8Bit(argv[7]) : QString());
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "explorer") == 0))
   {
