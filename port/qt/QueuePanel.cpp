@@ -6,6 +6,7 @@
 #include <QHeaderView>
 #include <QLocale>
 #include <QMenu>
+#include <QSplitter>
 #include <QStyle>
 #include <QToolBar>
 #include <QTreeWidget>
@@ -93,6 +94,15 @@ QueuePanel::QueuePanel(QWidget * Parent) :
   FList->header()->setSectionResizeMode(SourceColumn, QHeaderView::Stretch);
   FList->header()->setSectionResizeMode(DestinationColumn, QHeaderView::Stretch);
   FDefaultColumns = FList->header()->saveState();
+  // The file list, beside the queue.
+  QSplitter * Split = new QSplitter(Qt::Horizontal, this);
+  FFiles = new QTreeWidget(Split);
+  FFiles->setAccessibleName(tr("Queue file list"));
+  FFiles->setRootIsDecorated(false);
+  FFiles->setUniformRowHeights(true);
+  FFiles->setHeaderHidden(true);
+  FFiles->setVisible(false);
+  connect(FList, &QTreeWidget::itemSelectionChanged, this, &QueuePanel::UpdateFileList);
   connect(FList, &QTreeWidget::itemSelectionChanged, this, &QueuePanel::UpdateActions);
   // As the queue list's default operation: the entry's question, if any.
   connect(FList, &QTreeWidget::itemDoubleClicked, this, [this]()
@@ -110,7 +120,11 @@ QueuePanel::QueuePanel(QWidget * Parent) :
     AddCommands(&Menu);
     Menu.exec(FList->viewport()->mapToGlobal(Position));
   });
-  Layout->addWidget(FList, 1);
+  FList->setParent(Split);
+  Split->insertWidget(0, FList);
+  Split->setStretchFactor(0, 3);
+  Split->setStretchFactor(1, 1);
+  Layout->addWidget(Split, 1);
   UpdateActions();
 }
 
@@ -152,6 +166,7 @@ void QueuePanel::Update()
     }
   }
   UpdateActions();
+  UpdateFileList();
 }
 
 std::uintptr_t QueuePanel::SelectedId() const
@@ -168,6 +183,44 @@ void QueuePanel::SetToolbarVisible(bool Visible)
 bool QueuePanel::ToolbarVisible() const
 {
   return !FBar->isHidden();
+}
+
+void QueuePanel::SetFileListVisible(bool Visible)
+{
+  FFiles->setVisible(Visible);
+  UpdateFileList();
+}
+
+bool QueuePanel::FileListVisible() const
+{
+  return !FFiles->isHidden();
+}
+
+void QueuePanel::UpdateFileList()
+{
+  if (FFiles->isHidden() || (FSession == nullptr))
+  {
+    FFiles->clear();
+    return;
+  }
+  std::vector<CoreBridge::TSession::TQueueFile> Files;
+  try
+  {
+    Files = FSession->QueueFiles(SelectedId());
+  }
+  catch (const CoreBridge::TCoreError &)
+  {
+  }
+  const QColor Done = palette().color(QPalette::Disabled, QPalette::Text);
+  FFiles->clear();
+  for (const CoreBridge::TSession::TQueueFile & File : Files)
+  {
+    QTreeWidgetItem * Item = new QTreeWidgetItem(FFiles, { QString::fromStdString(File.Name) });
+    if (File.Processed)
+    {
+      Item->setForeground(0, Done);
+    }
+  }
 }
 
 void QueuePanel::ResetColumnsLayout()

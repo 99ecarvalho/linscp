@@ -140,6 +140,7 @@ struct TShellSettings
   bool LocalPanelStatusBar = true;
   bool RemotePanelStatusBar = true;
   bool QueueViewToolBar = true;
+  bool QueueViewFileList = false;
   // Interface's ConfirmExitOnCompletion (TCustomWinConfiguration's).
   bool ConfirmExitOnCompletion = true;
   // Interface's DefaultToNewRemoteTab (TWinConfiguration's).

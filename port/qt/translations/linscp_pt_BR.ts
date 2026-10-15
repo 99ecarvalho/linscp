@@ -2075,6 +2075,90 @@ Local: %2</translation>
         <source>Hide/show command line</source>
         <translation>Ocultar/mostrar a linha de comando</translation>
     </message>
+    <message>
+        <source>F5 Copy</source>
+        <translation>F5 Copiar</translation>
+    </message>
+    <message>
+        <source>F5 Upload</source>
+        <translation>F5 Upload</translation>
+    </message>
+    <message>
+        <source>F5 Download</source>
+        <translation>F5 Download</translation>
+    </message>
+    <message>
+        <source>F6 Move</source>
+        <translation>F6 Mover</translation>
+    </message>
+    <message>
+        <source>F6 Upload and Delete</source>
+        <translation>F6 Upload e apagar</translation>
+    </message>
+    <message>
+        <source>F6 Download and Delete</source>
+        <translation>F6 Download e apagar</translation>
+    </message>
+    <message>
+        <source>&amp;File List</source>
+        <translation>&amp;Lista de arquivo</translation>
+    </message>
+    <message>
+        <source>Hide/show full queue file list</source>
+        <translation>Ocultar/mostrar a lista completa de arquivos da fila</translation>
+    </message>
+    <message>
+        <source>Updates</source>
+        <translation>Atualizações</translation>
+    </message>
+    <message>
+        <source>&amp;Check for Updates</source>
+        <translation>&amp;Checar por atualizações</translation>
+    </message>
+    <message>
+        <source>&amp;Download</source>
+        <translation>&amp;Download</translation>
+    </message>
+    <message>
+        <source>Hot Keys</source>
+        <translation>Atalhos</translation>
+    </message>
+    <message>
+        <source>F2 Rename</source>
+        <translation>F2 Renomear</translation>
+    </message>
+    <message>
+        <source>F4 Edit</source>
+        <translation>F4 Editar</translation>
+    </message>
+    <message>
+        <source>F7 Create Directory</source>
+        <translation>F7 Criar diretório</translation>
+    </message>
+    <message>
+        <source>F8 Delete</source>
+        <translation>F8 Apagar</translation>
+    </message>
+    <message>
+        <source>F9 Properties</source>
+        <translation>F9 Propriedades</translation>
+    </message>
+    <message>
+        <source>F10 Quit</source>
+        <translation>F10 Sair</translation>
+    </message>
+    <message>
+        <source>&amp;Update Button</source>
+        <translation>Botão de at&amp;ualização</translation>
+    </message>
+    <message>
+        <source>&amp;Hot Keys Toolbar</source>
+        <translation>Barra de &amp;Atalhos</translation>
+    </message>
+    <message>
+        <source>Hide/show hot keys toolbar</source>
+        <translation>Ocultar/mostrar a barra de atalhos</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>
@@ -3238,6 +3322,10 @@ Local: %2</translation>
     <message>
         <source>&amp;All</source>
         <translation>&amp;Tudo</translation>
+    </message>
+    <message>
+        <source>Queue file list</source>
+        <translation>Lista de arquivos da fila</translation>
     </message>
 </context>
 <context>

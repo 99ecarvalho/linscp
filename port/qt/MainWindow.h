@@ -455,6 +455,10 @@ private:
   QAction * FDefaultRemoteTabAction = nullptr;
   QAction * FChangeLocalPathAction = nullptr;
   QAction * FCommandLineAction = nullptr;
+  QToolBar * FHotKeysBar = nullptr;
+  QAction * FHotKeyCopy = nullptr;
+  QAction * FHotKeyMove = nullptr;
+  void UpdateHotKeys();
   QToolBar * FCommandLineBar = nullptr;
   class QComboBox * FCommandLine = nullptr;
   class QLabel * FCommandPrompt = nullptr;
@@ -475,6 +479,7 @@ private:
   QMenu * FLockingMenu = nullptr;
   void UpdateFilesMenu();
   QAction * FQueueToolbarAction = nullptr;
+  QAction * FQueueFileListAction = nullptr;
   bool FTabsShown = true;
   TOnceEmpty FOnceEmpty = TOnceEmpty::Idle;
   QAction * FOnceEmptyActions[4] = {};

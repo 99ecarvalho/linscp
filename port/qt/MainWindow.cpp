@@ -1300,6 +1300,7 @@ void MainWindow::ActivatePanel(bool Local)
   FLocalActive = Local;
   UpdateTreeShortcut();
   UpdateCommandLine();
+  UpdateHotKeys();
   LocalPanel * Panel = SideLocal(Local);
   ((Panel != nullptr) ? static_cast<QWidget *>(Panel->View()) : static_cast<QWidget *>(FPanel->View()))->setFocus();
 }
@@ -2293,6 +2294,7 @@ void MainWindow::UpdateActions()
     FColorMenu->menuAction()->setEnabled(!FBusy && FSession);
   }
   UpdateCommandLine();
+  UpdateHotKeys();
   if (FRenameTabAction != nullptr)
   {
     const bool Active = FSession && FSession->Active();
@@ -3096,6 +3098,19 @@ bool MainWindow::Properties()
   FPanel->Refresh();
   UpdateActions();
   return Result;
+}
+
+void MainWindow::UpdateHotKeys()
+{
+  if (FHotKeyCopy == nullptr)
+  {
+    return;
+  }
+  const bool Local = LocalBrowser();
+  FHotKeyCopy->setText(Local ? tr("F5 Copy") : (FLocalActive ? tr("F5 Upload") : tr("F5 Download")));
+  FHotKeyMove->setText(Local ? tr("F6 Move") : (FLocalActive ? tr("F6 Upload and Delete") : tr("F6 Download and Delete")));
+  FHotKeyCopy->setEnabled(FCopyAction->isEnabled());
+  FHotKeyMove->setEnabled(FMoveAction->isEnabled());
 }
 
 void MainWindow::UpdateFilesMenu()
@@ -4751,6 +4766,14 @@ void MainWindow::BuildMenus()
     FQueue->SetToolbarVisible(Shown);
     StoreLayoutChoice([Shown](CoreBridge::TLayout & Layout) { Layout.QueueToolbar = Shown; });
   });
+  FQueueFileListAction = QueueMenu->addAction(tr("&File List"));
+  FQueueFileListAction->setCheckable(true);
+  FQueueFileListAction->setStatusTip(tr("Hide/show full queue file list"));
+  connect(FQueueFileListAction, &QAction::triggered, this, [this](bool Shown)
+  {
+    FQueue->SetFileListVisible(Shown);
+    StoreLayoutChoice([Shown](CoreBridge::TLayout & Layout) { Layout.QueueFileList = Shown; });
+  });
   QueueMenu->addSeparator();
   QueueMenu->addAction(tr("&Reset Columns Layout"), this, [this]() { FQueue->ResetColumnsLayout(); })
     ->setStatusTip(tr("Reset to the default layout of list columns"));
@@ -4802,6 +4825,8 @@ void MainWindow::BuildMenus()
     FTabsAction->setChecked(Layout.Tabs);
     FQueueToolbarAction->setChecked(Layout.QueueToolbar);
     FQueue->SetToolbarVisible(Layout.QueueToolbar);
+    FQueueFileListAction->setChecked(Layout.QueueFileList);
+    FQueue->SetFileListVisible(Layout.QueueFileList);
   }
 
   FRemoteMenu = PanelMenu(false);
@@ -6308,6 +6333,56 @@ void MainWindow::BuildToolbars(QMenu * Options)
   FCustomCommandsBar = MainBand(QStringLiteral("CustomCommands"), tr("Custom Commands"));
   UpdateCustomCommands();
 
+  // As UpdatesToolbar: Check for Updates, its menu the project's pages.
+  QToolBar * Updates = MainBand(QStringLiteral("Updates"), tr("Updates"));
+  QAction * UpdatesButton = new QAction(tr("&Check for Updates"), this);
+  Iconize(UpdatesButton, "download");
+  connect(UpdatesButton, &QAction::triggered, this, [this]() { CheckForUpdates(); });
+  QMenu * UpdatesMenu = new QMenu(this);
+  UpdatesMenu->addAction(tr("&Check for Updates"), this, [this]() { CheckForUpdates(); });
+  UpdatesMenu->addSeparator();
+  UpdatesMenu->addAction(tr("Product &Homepage"), this,
+    [this]() { OpenWebPage(QStringLiteral("https://github.com/99ecarvalho/linscp")); });
+  UpdatesMenu->addAction(tr("&Download"), this,
+    [this]() { OpenWebPage(QStringLiteral("https://github.com/99ecarvalho/linscp/releases/latest")); });
+  UpdatesMenu->addAction(tr("&Support Forum"), this,
+    [this]() { OpenWebPage(QStringLiteral("https://github.com/99ecarvalho/linscp/issues")); });
+  UpdatesMenu->addAction(tr("&Version History"), this,
+    [this]() { OpenWebPage(QStringLiteral("https://github.com/99ecarvalho/linscp/releases")); });
+  UpdatesButton->setMenu(UpdatesMenu);
+  BandAction(Updates, UpdatesButton);
+
+  // As Toolbar2Toolbar ("Hot Keys"), at the bottom: the F-keys' commands,
+  // the copy and move ones the active side's.
+  FHotKeysBar = new QToolBar(tr("Hot Keys"), this);
+  FHotKeysBar->setObjectName(QStringLiteral("Toolbar2"));
+  FHotKeysBar->setToolButtonStyle(Qt::ToolButtonTextOnly);
+  addToolBar(Qt::BottomToolBarArea, FHotKeysBar);
+  {
+    auto OnActiveSide = [this](QAction * (LocalPanel::*LocalAction)() const, QAction * (RemotePanel::*RemoteAction)() const)
+    {
+      return [this, LocalAction, RemoteAction]()
+      {
+        LocalPanel * Panel = SideLocal(FLocalActive);
+        ((Panel != nullptr) ? (Panel->*LocalAction)() : (FPanel->*RemoteAction)())->trigger();
+      };
+    };
+    FHotKeysBar->addAction(tr("F2 Rename"), this, OnActiveSide(&LocalPanel::RenameAction, &RemotePanel::RenameAction));
+    FHotKeysBar->addAction(tr("F4 Edit"), this, [this]() { FEditAction->trigger(); });
+    FHotKeyCopy = FHotKeysBar->addAction(tr("F5 Copy"), this, [this]() { FCopyAction->trigger(); });
+    FHotKeyMove = FHotKeysBar->addAction(tr("F6 Move"), this, [this]() { FMoveAction->trigger(); });
+    FHotKeysBar->addAction(tr("F7 Create Directory"), this, OnActiveSide(&LocalPanel::NewFolderAction, &RemotePanel::NewFolderAction));
+    FHotKeysBar->addAction(tr("F8 Delete"), this, OnActiveSide(&LocalPanel::DeleteAction, &RemotePanel::DeleteAction));
+    FHotKeysBar->addAction(tr("F9 Properties"), this, [this]() { FPropertiesAction->trigger(); });
+    FHotKeysBar->addAction(tr("F10 Quit"), this, [this]() { FQuitAction->trigger(); });
+  }
+  {
+    TBand Band;
+    Band.Name = QStringLiteral("Toolbar2");
+    Band.Bar = FHotKeysBar;
+    FBands.push_back(Band);
+  }
+
   // The command line, at the bottom (WinSCP's BottomDock), as a band.
   FCommandLineBar = new QToolBar(tr("Command Line"), this);
   FCommandLineBar->setObjectName(QStringLiteral("CommandLine"));
@@ -6456,7 +6531,7 @@ void MainWindow::BuildToolbars(QMenu * Options)
   QMenu * RightPanel = new QMenu(tr("&Right Panel"), this);
   const std::pair<const char *, QString> Toggles[] = {
     { "Commands", tr("&Commands Buttons") }, { "Session", tr("Sessio&ns and Tabs Buttons") },
-    { "Preferences", tr("&Preferences Buttons") }, { "Sort", tr("So&rt Buttons") },
+    { "Preferences", tr("&Preferences Buttons") }, { "Sort", tr("So&rt Buttons") }, { "Updates", tr("&Update Button") },
     { "Transfer", tr("&Transfer Settings") }, { "CustomCommands", tr("Custom Co&mmand Buttons") },
     { "LocalHistory", tr("&History Buttons") }, { "LocalNavigation", tr("&Navigation Buttons") },
     { "LocalFile", tr("&File Buttons") }, { "LocalSelection", tr("Se&lection Buttons") },
@@ -6486,6 +6561,23 @@ void MainWindow::BuildToolbars(QMenu * Options)
       }
     }
   }
+  // As ToolBar2Action: the Hot Keys toolbar.
+  Toolbars->addSeparator();
+  QAction * HotKeys = Toolbars->addAction(tr("&Hot Keys Toolbar"));
+  HotKeys->setCheckable(true);
+  HotKeys->setStatusTip(tr("Hide/show hot keys toolbar"));
+  for (TBand & Band : FBands)
+  {
+    if (Band.Name == QStringLiteral("Toolbar2"))
+    {
+      Band.Toggle = HotKeys;
+    }
+  }
+  connect(HotKeys, &QAction::triggered, this, [this](bool Shown)
+  {
+    FHotKeysBar->setVisible(Shown);
+    SaveToolbarSettings();
+  });
   Toolbars->addSeparator();
   FLockToolbarsAction = Toolbars->addAction(tr("&Lock Toolbars"));
   FLockToolbarsAction->setCheckable(true);

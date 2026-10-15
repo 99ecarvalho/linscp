@@ -43,6 +43,11 @@ public:
   // (QueueResetLayoutColumnsAction: the columns' default widths and order).
   void SetToolbarVisible(bool Visible);
   bool ToolbarVisible() const;
+  // Options > Queue > File List (QueueFileListAction): beside the queue,
+  // the selected entry's files, those done grayed.
+  void SetFileListVisible(bool Visible);
+  bool FileListVisible() const;
+  QTreeWidget * FileList() const { return FFiles; }
   void ResetColumnsLayout();
   // The icons, of the set chosen (IconSet).
   void ApplyIcons();
@@ -55,6 +60,8 @@ private:
   CoreBridge::TSession * FSession = nullptr;
   QTreeWidget * FList = nullptr;
   class QToolBar * FBar = nullptr;
+  QTreeWidget * FFiles = nullptr;
+  void UpdateFileList();
   QByteArray FDefaultColumns;
   QAction * FCancelAction = nullptr;
   QAction * FPauseAction = nullptr;

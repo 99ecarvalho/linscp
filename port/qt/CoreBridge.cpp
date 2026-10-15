@@ -713,6 +713,7 @@ TLayout Layout()
   Result.LocalStatusBar = Settings.LocalPanelStatusBar;
   Result.RemoteStatusBar = Settings.RemotePanelStatusBar;
   Result.QueueToolbar = Settings.QueueViewToolBar;
+  Result.QueueFileList = Settings.QueueViewFileList;
   Result.ConfirmExitOnCompletion = Settings.ConfirmExitOnCompletion;
   Result.DefaultToNewRemoteTab = Settings.DefaultToNewRemoteTab;
   Result.LockToolbars = Settings.LockToolbars;
@@ -768,6 +769,7 @@ void SetLayout(const TLayout & Layout)
   Settings.LocalPanelStatusBar = Layout.LocalStatusBar;
   Settings.RemotePanelStatusBar = Layout.RemoteStatusBar;
   Settings.QueueViewToolBar = Layout.QueueToolbar;
+  Settings.QueueViewFileList = Layout.QueueFileList;
   Settings.ConfirmExitOnCompletion = Layout.ConfirmExitOnCompletion;
   Settings.DefaultToNewRemoteTab = Layout.DefaultToNewRemoteTab;
   Settings.LockToolbars = Layout.LockToolbars;

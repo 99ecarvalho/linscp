@@ -388,6 +388,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteInteger(L"HeightPixelsPerInch", FSettings.QueueViewHeightPixelsPerInch);
     Storage->WriteInteger(L"Show", FSettings.QueueViewShow);
     Storage->WriteBool(L"ToolBar", FSettings.QueueViewToolBar);
+    Storage->WriteBool(L"FileList", FSettings.QueueViewFileList);
   }
 }
 
@@ -676,6 +677,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
       Storage->ReadInteger(L"HeightPixelsPerInch", FSettings.QueueViewHeightPixelsPerInch);
     FSettings.QueueViewShow = Storage->ReadInteger(L"Show", FSettings.QueueViewShow);
     FSettings.QueueViewToolBar = Storage->ReadBool(L"ToolBar", FSettings.QueueViewToolBar);
+    FSettings.QueueViewFileList = Storage->ReadBool(L"FileList", FSettings.QueueViewFileList);
   }
 }
 

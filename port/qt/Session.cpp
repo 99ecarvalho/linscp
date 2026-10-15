@@ -60,6 +60,8 @@ struct TSession::TImpl
   // taken, and whether its threads said it changed since.
   std::unique_ptr<TTerminalQueue> Queue;
   TTerminalQueueStatus * QueueStatus = NULL;
+  // Options > Queue > File List's (UpdateFileList fills it).
+  std::unique_ptr<TQueueFileList> QueueFileList;
   std::atomic<bool> QueueChanged{false};
   // Items added; those no longer listed have finished (done, or removed:
   // core drops done items at once unless told to keep them).
@@ -987,6 +989,36 @@ bool TSession::QueueResume(std::uintptr_t Id)
 {
   TQueueItemProxy * Item = FindItem(F->QueueStatus, Id);
   return (Item != NULL) && Item->Resume();
+}
+
+std::vector<TSession::TQueueFile> TSession::QueueFiles(std::uintptr_t Id)
+{
+  std::vector<TQueueFile> Result;
+  TQueueItemProxy * Item = FindItem(F->QueueStatus, Id);
+  if (Item == NULL)
+  {
+    return Result;
+  }
+  if (!F->QueueFileList)
+  {
+    F->QueueFileList.reset(new TQueueFileList());
+  }
+  try
+  {
+    F->QueueStatus->UpdateFileList(Item, F->QueueFileList.get());
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+  for (int Index = 0; Index < F->QueueFileList->GetCount(); Index++)
+  {
+    TQueueFile File;
+    File.Name = Utf8(F->QueueFileList->GetFileName(Index));
+    File.Processed = (F->QueueFileList->GetState(Index) == qfsProcessed);
+    Result.push_back(File);
+  }
+  return Result;
 }
 
 bool TSession::QueueAllows(TQueueOperation Operation, std::uintptr_t Id) const

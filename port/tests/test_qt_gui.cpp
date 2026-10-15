@@ -984,6 +984,11 @@ void Transfer(const char * Port, const QString & Directory)
       Queue->Action(TOperation::Up)->trigger();
       Check(WaitFor([&Source]() { return Source(0).endsWith(QStringLiteral("held2.txt")); }),
         "Move Up puts it first");
+      // File List: a single file's upload lists none (parallel ones do).
+      Queue->SetFileListVisible(true);
+      Check(Queue->FileList()->isVisible() && (Queue->FileList()->topLevelItemCount() == 0),
+        "the file list beside the queue, empty for a single file");
+      Queue->SetFileListVisible(false);
       Queue->Action(TOperation::DeleteAll)->trigger();
       Check(WaitFor([Queue]() { return Queue->List()->topLevelItemCount() == 0; }), "Cancel All empties the queue");
       Window.Session()->SetQueueEnabled(true);
@@ -4986,6 +4991,11 @@ void OptionsHelpTest(const QString & Directory)
     Check((QueueToolbar != nullptr) && QueueToolbar->isChecked() && Window.Queue()->ToolbarVisible(), "the queue's toolbar shown");
     QueueToolbar->trigger();
     Check(!Window.Queue()->ToolbarVisible() && !CoreBridge::Layout().QueueToolbar, "Queue > Toolbar hides it, and is kept");
+    QAction * FileList = MenuAction(Window, { "Options", "Queue", "File List" });
+    Check((FileList != nullptr) && !FileList->isChecked() && !Window.Queue()->FileListVisible(), "the queue's file list hidden at first");
+    FileList->trigger();
+    Check(Window.Queue()->FileListVisible() && CoreBridge::Layout().QueueFileList, "Queue > File List shows it, and is kept");
+    FileList->trigger();
     Check(MenuAction(Window, { "Options", "Queue", "Reset Columns Layout" }) != nullptr &&
       MenuAction(Window, { "Options", "Queue", "Customize" }) != nullptr, "Queue's Reset Columns Layout and Customize");
   }
@@ -5009,6 +5019,30 @@ void ToolbarsTest()
     {
       Check((Bar(Name) != nullptr) && !Bar(Name)->isVisible(), "and its hidden ones hidden");
     }
+    // P3-15: the Update button shown, the Hot Keys toolbar not, as WinSCP's
+    // defaults; Toolbars > Hot Keys Toolbar shows it, its F5 the side's.
+    Check((Bar(QStringLiteral("Updates")) != nullptr) && Bar(QStringLiteral("Updates"))->isVisible(), "the Update button shown");
+    Check((Bar(QStringLiteral("Toolbar2")) != nullptr) && !Bar(QStringLiteral("Toolbar2"))->isVisible(), "the Hot Keys toolbar hidden");
+    QAction * HotKeys = MenuAction(Window, { "Options", "Toolbars", "Hot Keys Toolbar" });
+    Check((HotKeys != nullptr) && !HotKeys->isChecked(), "Toolbars > Hot Keys Toolbar unchecked");
+    HotKeys->trigger();
+    Check(Bar(QStringLiteral("Toolbar2"))->isVisible(), "and shows it");
+    {
+      QStringList Texts;
+      for (QAction * Action : Bar(QStringLiteral("Toolbar2"))->actions())
+      {
+        Texts.append(Action->text());
+      }
+      Window.ActivatePanel(true);
+      QStringList Local;
+      for (QAction * Action : Bar(QStringLiteral("Toolbar2"))->actions())
+      {
+        Local.append(Action->text());
+      }
+      Check(Texts.contains(QStringLiteral("F2 Rename")) && Texts.contains(QStringLiteral("F10 Quit")) &&
+        Local.contains(QStringLiteral("F5 Upload")), "F2 to F10, the local side's F5 Upload");
+    }
+    HotKeys->trigger();
     for (TPanelBand Band : { TPanelBand::Path, TPanelBand::History, TPanelBand::Navigation, TPanelBand::File, TPanelBand::Selection })
     {
       Check(Window.Local()->Band(Band)->isVisible() && Window.Panel()->Band(Band)->isVisible() &&

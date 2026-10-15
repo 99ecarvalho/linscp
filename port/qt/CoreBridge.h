@@ -659,6 +659,8 @@ struct TLayout
   bool LocalStatusBar = true;
   bool RemoteStatusBar = true;
   bool QueueToolbar = true;
+  // Options > Queue > File List (QueueView.FileList).
+  bool QueueFileList = false;
   // Whether to ask before the application exits once a queue's operation
   // completes (Interface's ConfirmExitOnCompletion).
   bool ConfirmExitOnCompletion = true;
@@ -2036,6 +2038,14 @@ public:
     PauseAll, ResumeAll, DeleteAllDone, DeleteAll };
   bool QueueAllows(TQueueOperation Operation, std::uintptr_t Id) const;
   void QueueExecute(TQueueOperation Operation, std::uintptr_t Id);
+  // Options > Queue > File List, as UpdateQueueFileList: the files of the
+  // entry Id (TQueueFileList), and whether each was processed already.
+  struct TQueueFile
+  {
+    std::string Name;
+    bool Processed = false;
+  };
+  std::vector<TQueueFile> QueueFiles(std::uintptr_t Id);
   void Close();
 
 private:
