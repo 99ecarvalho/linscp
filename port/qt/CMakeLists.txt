@@ -12,12 +12,14 @@ add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp AboutDialog.cpp 
   FileList.cpp RemotePanel.cpp LocalPanel.cpp
   TransferDialog.cpp QueuePanel.cpp SynchronizeDialog.cpp PreferencesDialog.cpp TransferSettingsDialog.cpp
   RightsFrame.cpp PropertiesDialog.cpp CreateDirectoryDialog.cpp LinkDialog.cpp RemoteTransferDialog.cpp OpenDirectoryDialog.cpp LocationProfilesDialog.cpp FindFilesDialog.cpp EditMaskDialog.cpp ServerInfoDialog.cpp RtfText.cpp GenerateUrlDialog.cpp ConsoleDialog.cpp SiteRawDialog.cpp ImportSitesDialog.cpp CustomCommandDialog.cpp KeepUpToDateDialog.cpp LicenseDialog.cpp CleanupDialog.cpp TagDialog.cpp ShortCutDialog.cpp EditorPreferencesDialog.cpp Integration.cpp SaveWorkspaceDialog.cpp
-  CopyLocalDialog.cpp KeyVerify.cpp SaveSiteDialog.cpp IconSet.cpp PanelBands.cpp WindowParams.cpp HintButton.cpp SingleInstance.cpp MasterPasswordDialog.cpp SshHostCADialog.cpp DirectoryTree.cpp Theme.cpp ExtensionOptionsDialog.cpp CoreBridge.h)
+  CopyLocalDialog.cpp KeyVerify.cpp SaveSiteDialog.cpp IconSet.cpp PanelBands.cpp WindowParams.cpp HintButton.cpp SingleInstance.cpp MasterPasswordDialog.cpp SshHostCADialog.cpp DirectoryTree.cpp Theme.cpp ExtensionOptionsDialog.cpp DragExtClient.cpp CoreBridge.h)
 set_target_properties(linscp-qt-ui PROPERTIES AUTOMOC ON)
 target_link_libraries(linscp-qt-ui PUBLIC Qt6::Widgets Qt6::Svg Qt6::Network)
 if(WIN32)
   # Integration's shortcuts (IShellLink), local files' properties (the shell's).
   target_link_libraries(linscp-qt-ui PUBLIC ole32 uuid shell32 advapi32 user32 propsys)
+  # The drag & drop shell extension's protocol (DragExt.h), as WinSCP's.
+  target_include_directories(linscp-qt-ui PRIVATE "${CMAKE_SOURCE_DIR}/3rd-party/winscp/source/dragext")
 else()
   # Local files' properties: the desktop's file manager (FileManager1).
   find_package(Qt6 REQUIRED COMPONENTS DBus)
@@ -139,7 +141,7 @@ if(WIN32 AND LINSCP_QT_PREFIX)
   set(LINSCP_HOST_DOTNET "${CMAKE_BINARY_DIR}/tools/dotnet/dotnet" CACHE FILEPATH
       "the build host's .NET SDK, to build WinSCP's .NET assembly into the deploy folder")
   set(_deploy_winscpnet)
-  set(_deploy_depends linscp linscp-cli core-translations)
+  set(_deploy_depends linscp linscp-cli core-translations DragExt64)
   if(EXISTS "${LINSCP_HOST_DOTNET}")
     set(_winscpnet "${CMAKE_BINARY_DIR}/winscpnet-net40/bin/WinSCPnet.dll")
     add_custom_command(OUTPUT "${_winscpnet}"
@@ -160,6 +162,7 @@ if(WIN32 AND LINSCP_QT_PREFIX)
             --objdump "${LINSCP_TARGET_OBJDUMP}" --qt-prefix "${LINSCP_QT_PREFIX}"
             --dest "${CMAKE_BINARY_DIR}/deploy" --translations "${_translations_dir}"
             ${_deploy_winscpnet}
+            --extra "$<TARGET_FILE:DragExt64>"
             "$<TARGET_FILE:linscp>" "$<TARGET_FILE:linscp-cli>"
     DEPENDS ${_deploy_depends}
     COMMENT "Assembling a runnable Windows folder in ${CMAKE_BINARY_DIR}/deploy"

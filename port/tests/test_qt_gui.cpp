@@ -110,6 +110,7 @@
 #include "LocalPanel.h"
 #include "QueryDialog.h"
 #include "Theme.h"
+#include "DragExtClient.h"
 #include "ExtensionOptionsDialog.h"
 #include "QueuePanel.h"
 #include "TransferDialog.h"
@@ -4098,6 +4099,44 @@ void EnvironmentTest(const char * Port, const QString & Directory)
       Check((SystemMenu == Integration::HasSystemContextMenu()) && Properties, "the local file menu's System Menu and Properties");
       delete Menu;
     }
+
+    // The drag & drop shell extension's fake-file drag (P3-24), where it is
+    // registered (Windows): a remote file dragged as WinSCP drags it, the
+    // fake directory copied by the shell as Explorer copies a drop (the
+    // extension's copy hook stops it and says where), the drag over: the
+    // file downloaded there.
+    {
+      PreferencesDialog Dialog(&Window);
+      Check(Dialog.DDFakeFileButton()->isEnabled() == Integration::HasSystemContextMenu(), "the fake file offered on Windows only");
+      std::printf("drag & drop shell extension: %s\n", Dialog.DragExtStatusLabel()->text().toUtf8().constData());
+    }
+#if defined(_WIN32)
+    if (DragExt::Installed())
+    {
+      Check(CoreBridge::Preferences().DDFakeFile, "the fake file, by default");
+      const QDir Target(Dir.filePath(QStringLiteral("ddtarget")));
+      QDir().mkpath(Target.path());
+      Remote->Select({ QStringLiteral("e3.txt") });
+      std::unique_ptr<QMimeData> Data(Remote->MakeDrag(TFileDrag{ false, Remote->Path(), { QStringLiteral("e3.txt") } }));
+      const QList<QUrl> Urls = (Data != nullptr) ? Data->urls() : QList<QUrl>();
+      Check((Urls.size() == 1) && QFileInfo(Urls[0].toLocalFile()).fileName().startsWith(QStringLiteral("scp")),
+        "a fake directory dragged");
+      if (Urls.size() == 1)
+      {
+        const std::wstring From = QDir::toNativeSeparators(Urls[0].toLocalFile()).toStdWString() + L'\0';
+        const std::wstring To = QDir::toNativeSeparators(Target.path()).toStdWString() + L'\0';
+        SHFILEOPSTRUCTW Operation = {};
+        Operation.wFunc = FO_COPY;
+        Operation.pFrom = From.c_str();
+        Operation.pTo = To.c_str();
+        Operation.fFlags = FOF_NOCONFIRMATION | FOF_SILENT | FOF_NOERRORUI;
+        SHFileOperationW(&Operation);
+        Check(!Target.exists(QFileInfo(Urls[0].toLocalFile()).fileName()), "the copy hook stopped it");
+        Remote->OnDragFinished(Qt::IgnoreAction);
+        Check(Target.exists(QStringLiteral("e3.txt")), "and the file downloaded where it was dropped");
+      }
+    }
+#endif
     QObject::disconnect(Counting);
 
     // Closing with a session: asked, and cancelled, nothing closes.

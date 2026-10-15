@@ -114,6 +114,13 @@ RemotePanel::RemotePanel(QWidget * Parent) :
     const TFileDrag Drag{ false, FCurrent, Names };
     return MakeDrag ? MakeDrag(Drag) : MakeFileDrag(Drag);
   };
+  FView->OnDragFinished = [this](Qt::DropAction Action)
+  {
+    if (OnDragFinished)
+    {
+      OnDragFinished(Action);
+    }
+  };
   // After the editor has closed: renaming lists the directory again.
   connect(FModel, &FileListModel::RenameRequested, this, [this](const QString & Name, const QString & NewName)
   {

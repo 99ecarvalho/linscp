@@ -111,6 +111,8 @@ public:
   // The drag of the selection, for other programs too: the main window's
   // (RemoteFileDrag); without it, a drag for the panels only.
   std::function<QMimeData *(const TFileDrag & Drag)> MakeDrag;
+  // Its drag over, as FileView's OnDragFinished.
+  std::function<void(Qt::DropAction)> OnDragFinished;
   QLineEdit * PathEdit() const { return FPath; }
   QLabel * Status() const { return FStatus; }
 

@@ -177,6 +177,8 @@ public:
   // A drag started is given here instead of to the system (tests), which
   // owns the data.
   std::function<void(QMimeData *)> OnDragStarted;
+  // Once a drag it started is over: how it ended (the drop's action).
+  std::function<void(Qt::DropAction)> OnDragFinished;
 
   // WinSCP's selection commands, as its keys do them: Insert, the
   // focused entry's selection toggled and the focus down; the keypad's *,

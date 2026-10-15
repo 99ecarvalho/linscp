@@ -19,6 +19,7 @@
 
 #include "CoreBridge.h"
 #include "PanelBands.h"
+#include "DragExtClient.h"
 
 class EditorWindow;
 class QAction;
@@ -715,6 +716,16 @@ private:
   QueuePanel * FQueue = nullptr;
   QTimer * FQueueTimer = nullptr;
   std::vector<std::unique_ptr<QTemporaryDir>> FDragDirectories;
+  // A fake-file drag under way (P3-24): its directory, the shell
+  // extension's answer, the files.
+  struct TFakeDrag
+  {
+    std::unique_ptr<QTemporaryDir> Directory;
+    DragExt::TDrag Drag;
+    QStringList Names;
+    bool DroppedHere = false;
+  };
+  std::unique_ptr<TFakeDrag> FFakeDrag;
   int FDragOuts = 0;
   int FQueueDone = 0;
 };

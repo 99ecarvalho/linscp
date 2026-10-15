@@ -922,6 +922,10 @@ enum class TText
   ExtensionUntrusted,   // "The extension does not come from a trusted source. ..."
   ExtensionNotLatest,   // "Using the last compatible and trusted version ..." (unformatted)
   NoSiteForCommand,     // "No session is opened ... site-specific options ..." (unformatted)
+  DragExtNotInstalled,  // "Shell extension is not installed."
+  DragExtNotRunning,    // "Shell extension is installed, but is not loaded."
+  DragExtRunning,       // "Shell extension is installed and loaded."
+  DragExtBroken,        // "Shell extension cannot work on this system."
   JumpListRecent,       // "Recent Sites"
   JumpListWorkspaces,   // "Recent Workspaces"
   NewFileName, // "New file"

@@ -2195,6 +2195,10 @@ Local: %2</translation>
         <source>&amp;Do not show this dialog box again</source>
         <translation>Não mostrar esse diálogo novamente</translation>
     </message>
+    <message>
+        <source>&amp;System Menu</source>
+        <translation>Menu do &amp;Sistema</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>
@@ -3222,10 +3226,6 @@ Local: %2</translation>
         <translation>Determina o destino de soltar arrastando um arquivo &amp;falso</translation>
     </message>
     <message>
-        <source>Needs WinSCP&apos;s shell extension, which linscp does not have.</source>
-        <translation>Requer a extensão de shell do WinSCP, que o linscp não tem.</translation>
-    </message>
-    <message>
         <source>Allows direct downloads to regular local folders (e.g. Windows File Explorer). Does not allow downloads to other destinations (ZIP archives,  FTP, etc.). Uses drag&amp;&amp;drop shell extension, when available.</source>
         <translation>Permite downloads diretos para pastas locais (p.e. Windows Explorer). Não permite downloads para outros destinos (arquivos ZIP,  FTP, etc.). Usa a extensão de arrastar e soltar, quando disponível.</translation>
     </message>
@@ -3324,6 +3324,10 @@ Local: %2</translation>
     <message>
         <source>&amp;Configure...</source>
         <translation>&amp;Configurar...</translation>
+    </message>
+    <message>
+        <source>Use &amp;system file context menu</source>
+        <translation>Usar menu de contexto do sistema de arquivos</translation>
     </message>
 </context>
 <context>

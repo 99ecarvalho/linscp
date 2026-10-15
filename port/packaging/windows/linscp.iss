@@ -118,8 +118,15 @@ Name: urlhandler; Description: "{cm:UrlHandlerTask}"
 Name: searchpath; Description: "{cm:SearchPathTask}"; Flags: unchecked; Check: IsAdminInstallMode
 
 [Files]
-Source: "{#SourceDir}\*"; Excludes: "\Translations"; DestDir: "{app}"; Components: main; \
+Source: "{#SourceDir}\*"; Excludes: "\Translations,\DragExt64.dll"; DestDir: "{app}"; Components: main; \
   Flags: ignoreversion recursesubdirs createallsubdirs
+; WinSCP's drag & drop shell extension (the fake-file drag), registered as
+; WinSCP's installer registers it, unless WinSCP's own copy is: it is the
+; same extension, which serves both.
+Source: "{#SourceDir}\DragExt64.dll"; DestDir: "{app}"; Components: main; \
+  Flags: regserver restartreplace uninsrestartdelete ignoreversion; Check: ShouldRegisterDragExt
+Source: "{#SourceDir}\DragExt64.dll"; DestDir: "{app}"; Components: main; \
+  Flags: restartreplace uninsrestartdelete ignoreversion; Check: not ShouldRegisterDragExt
 Source: "{#SourceDir}\Translations\*"; DestDir: "{app}\Translations"; Components: transl; \
   Flags: ignoreversion
 Source: "{#LicensesDir}\*"; DestDir: "{app}\licenses"; Components: main; Flags: ignoreversion
@@ -153,4 +160,16 @@ begin
   if Name = 'full' then Result := SetupMessage(msgFullInstallation)
   else if Name = 'compact' then Result := SetupMessage(msgCompactInstallation)
   else Result := SetupMessage(msgCustomInstallation);
+end;
+
+// The shell extension's class (DragExt.h's CLSID_ShellExtension): not
+// registered yet, or by this installation.
+function ShouldRegisterDragExt: Boolean;
+var
+  Path: string;
+begin
+  if not RegQueryStringValue(HKCR64, 'CLSID\{E15E1D68-0D1C-49F7-BEB8-812B1E00FA60}\InProcServer32', '', Path) then
+    Result := True
+  else
+    Result := (CompareText(Path, ExpandConstant('{app}\DragExt64.dll')) = 0);
 end;

@@ -207,7 +207,8 @@ def main():
             verdict = f'Failed (rc {rc})'
         print(f'{name:40} {verdict} {took:.1f} s', flush=True)
         if verdict.startswith('Failed') or a.verbose:
-            print('  ' + '\n  '.join(out.strip().splitlines()[-25:]))
+            lines = out.strip().splitlines()
+            print('  ' + '\n  '.join(lines if a.verbose else lines[-25:]))
     client.close()
     print(f'{len(passed)} passed, {len(failed)} failed, {len(skipped)} skipped of {len(tests)}')
     if failed:

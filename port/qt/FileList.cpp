@@ -222,7 +222,11 @@ void FileView::startDrag(Qt::DropActions /*Actions*/)
   }
   QDrag * Drag = new QDrag(this);
   Drag->setMimeData(Data);
-  Drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
+  const Qt::DropAction Action = Drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::CopyAction);
+  if (OnDragFinished)
+  {
+    OnDragFinished(Action);
+  }
 }
 
 // A panel's drag, or files from elsewhere: copy, or move with Shift, as

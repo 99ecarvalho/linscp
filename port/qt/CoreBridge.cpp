@@ -1702,6 +1702,10 @@ std::string Text(TText Text)
     case TText::ExtensionNotLatest: return Utf8(UnformatMessage(LoadStr(EXTENSION_NOT_LATEST)));
     case TText::NoSiteForCommand: return Utf8(UnformatMessage(LoadStr(NO_SITE_FOR_COMMAND)));
     case TText::JumpListRecent: Ident = JUMPLIST_RECENT; break;
+    case TText::DragExtNotInstalled: Ident = PREFERENCES_DRAGEXT_NOT_INSTALLED; break;
+    case TText::DragExtNotRunning: Ident = PREFERENCES_DRAGEXT_NOT_RUNNING; break;
+    case TText::DragExtRunning: Ident = PREFERENCES_DRAGEXT_RUNNING; break;
+    case TText::DragExtBroken: Ident = PREFERENCES_DRAGEXT_BROKEN; break;
     case TText::JumpListWorkspaces: Ident = JUMPLIST_WORKSPACES; break;
     case TText::NewFileName: Ident = NEW_FILE; break;
     case TText::EditFileCaption: Ident = EDIT_FILE_CAPTION; break;

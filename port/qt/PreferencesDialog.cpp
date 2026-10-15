@@ -9,6 +9,7 @@
 
 #include "TransferSettingsDialog.h"
 #include "ExtensionOptionsDialog.h"
+#include "DragExtClient.h"
 #include <QToolButton>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -400,6 +401,9 @@ void PreferencesDialog::UpdateControls()
   FConfirmDDTransfer->setEnabled(FConfirmTransferring->isChecked());
   FBeepOnFinishAfter->setEnabled(FBeepOnFinish->isChecked());
   FRefreshRemotePanelInterval->setEnabled(FRefreshRemotePanel->isChecked());
+  // As UpdateControls: the warning for the temporary folder's way only.
+  FDDWarnLackOfTempSpace->setEnabled(!FDDFakeFile->isChecked());
+  FDragExtStatus->setEnabled(FDDFakeFile->isEnabled() && FDDFakeFile->isChecked());
   FUpdatesProxyHost->setEnabled(FUpdatesProxy->isChecked());
   FUpdatesProxyPort->setEnabled(FUpdatesProxy->isChecked());
   // As UpdateControls' editors.
@@ -1323,6 +1327,10 @@ TPreferences PreferencesDialog::Preferences() const
   Result.FlashTaskbar = FFlashTaskbar->isChecked();
   Result.DarkTheme = AutoSwitchOfIndex(FTheme->currentIndex());
   Result.DDWarnLackOfTempSpace = FDDWarnLackOfTempSpace->isChecked();
+  if (FDDFakeFile->isEnabled())
+  {
+    Result.DDFakeFile = FDDFakeFile->isChecked();
+  }
   Result.ShowInaccesibleDirectories = FShowInaccesibleDirectories->isChecked();
   Result.AutoReadDirectoryAfterOp = FAutoReadDirectoryAfterOp->isChecked();
   Result.RefreshRemotePanel = FRefreshRemotePanel->isChecked();
@@ -2619,25 +2627,36 @@ QWidget * PreferencesDialog::MakeLocalPage(const TPreferences & Preferences)
 }
 
 // Transfer > Drag & Drop, as WinSCP's DragDropSheet: remote files dragged
-// to other programs go through a temporary folder; the fake file needs
-// WinSCP's shell extension, which linscp does not have (ADR 0012).
+// to other programs go through a temporary folder, or on Windows to where
+// WinSCP's shell extension says the fake file was dropped.
 QWidget * PreferencesDialog::MakeDragDropPage(const TPreferences & Preferences)
 {
   QWidget * Page = new QWidget(this);
   QVBoxLayout * Layout = new QVBoxLayout(Page);
   QGroupBox * Group = new QGroupBox(tr("Drag && Drop downloads"), Page);
   QGridLayout * GroupLayout = new QGridLayout(Group);
-  QRadioButton * FakeFile = new QRadioButton(tr("Determine drop target by dragging a &fake file"), Group);
-  FakeFile->setEnabled(false);
-  FakeFile->setToolTip(tr("Needs WinSCP's shell extension, which linscp does not have."));
+  // The fake file: Windows only (WinSCP's shell extension, P3-24), its
+  // status as DragExtStatusLabel's.
+  const bool Windows = Integration::HasSystemContextMenu();
+  FDDFakeFile = new QRadioButton(tr("Determine drop target by dragging a &fake file"), Group);
+  QRadioButton * FakeFile = FDDFakeFile;
+  FakeFile->setEnabled(Windows);
   QLabel * FakeFileLabel = new QLabel(tr("Allows direct downloads to regular local folders (e.g. Windows File Explorer). "
     "Does not allow downloads to other destinations (ZIP archives,  FTP, etc.). Uses drag&&drop shell extension, when available.")
     .replace(QStringLiteral("&&"), QStringLiteral("&")), Group);
   FakeFileLabel->setWordWrap(true);
-  FakeFileLabel->setEnabled(false);
+  FakeFileLabel->setEnabled(Windows);
   FakeFileLabel->setProperty("literalText", true);
+  FDragExtStatus = new QLabel(Group);
+  FDragExtStatus->setWordWrap(true);
+  using CoreBridge::TText;
+  FDragExtStatus->setText(QString::fromStdString(CoreBridge::Text(
+    !Windows ? TText::DragExtNotInstalled : (DragExt::Broken() ? TText::DragExtBroken :
+      (!DragExt::Installed() ? TText::DragExtNotInstalled : (DragExt::Running() ? TText::DragExtRunning : TText::DragExtNotRunning))))));
   QRadioButton * Temporary = new QRadioButton(tr("Download files via &temporary folder"), Group);
-  Temporary->setChecked(true);
+  FDDFakeFile->setChecked(Windows && Preferences.DDFakeFile);
+  Temporary->setChecked(!FDDFakeFile->isChecked());
+  connect(Temporary, &QRadioButton::toggled, this, &PreferencesDialog::UpdateControls);
   QLabel * TemporaryLabel = new QLabel(tr("Allows downloads to any destinations (regular folders, ZIP archives,  FTP, etc.). "
     "Files are downloaded first to temporary folder, from where they are delivered to the destination."), Group);
   TemporaryLabel->setWordWrap(true);
@@ -2645,9 +2664,10 @@ QWidget * PreferencesDialog::MakeDragDropPage(const TPreferences & Preferences)
   FDDWarnLackOfTempSpace->setChecked(Preferences.DDWarnLackOfTempSpace);
   GroupLayout->addWidget(FakeFile, 0, 0, 1, 2);
   GroupLayout->addWidget(FakeFileLabel, 1, 1);
-  GroupLayout->addWidget(Temporary, 2, 0, 1, 2);
-  GroupLayout->addWidget(TemporaryLabel, 3, 1);
-  GroupLayout->addWidget(FDDWarnLackOfTempSpace, 4, 1);
+  GroupLayout->addWidget(FDragExtStatus, 2, 1);
+  GroupLayout->addWidget(Temporary, 3, 0, 1, 2);
+  GroupLayout->addWidget(TemporaryLabel, 4, 1);
+  GroupLayout->addWidget(FDDWarnLackOfTempSpace, 5, 1);
   GroupLayout->setColumnMinimumWidth(0, 16);
   GroupLayout->setColumnStretch(1, 1);
   Layout->addWidget(Group);

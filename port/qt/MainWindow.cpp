@@ -83,6 +83,7 @@
 #include "CopyLocalDialog.h"
 #include "IconSet.h"
 #include "Theme.h"
+#include "DragExtClient.h"
 #include "ExtensionOptionsDialog.h"
 #include "Integration.h"
 #include "MasterPasswordDialog.h"
@@ -207,6 +208,25 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   // deletes its after a delay; the program dropped on may still be copying).
   FPanel->MakeDrag = [this](const TFileDrag & Drag) -> QMimeData *
   {
+    // As DDFakeFileInitDrag (Drag & Drop's "Determine drop target by
+    // dragging a fake file", with WinSCP's shell extension there): a hidden
+    // "scp" directory dragged, which the extension's copy hook stops in
+    // Explorer, saying where; then downloaded straight there.
+    FFakeDrag.reset();
+    if (CoreBridge::Preferences().DDFakeFile && DragExt::Installed() && !DragExt::Broken())
+    {
+      auto Fake = std::make_unique<TFakeDrag>();
+      Fake->Directory = std::make_unique<QTemporaryDir>(
+        QDir(QString::fromStdString(CoreBridge::TemporaryDirectoryBase())).filePath(QStringLiteral("scpXXXXXX")));
+      Fake->Names = Drag.Names;
+      if (Fake->Directory->isValid() && Fake->Drag.Begin(Fake->Directory->path()))
+      {
+        QMimeData * Data = MakeFileDrag(Drag);
+        Data->setUrls({ QUrl::fromLocalFile(Fake->Directory->path()) });
+        FFakeDrag = std::move(Fake);
+        return Data;
+      }
+    }
     // Under Storage's temporary directory (else the system's), as WinSCP's
     // (TWinConfiguration::TemporaryDir: "scp" and a unique part).
     FDragDirectories.push_back(std::make_unique<QTemporaryDir>(
@@ -227,6 +247,21 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
       FDragOuts++;
       return WarnLackOfTempSpace(Directory, Size) && Download(Names, Directory, false);
     });
+  };
+  // As RemoteFileControlDDEnd: a fake directory's drop, where the extension
+  // said (none within linscp's own panels, which drop as usual).
+  FPanel->OnDragFinished = [this](Qt::DropAction Action)
+  {
+    if (FFakeDrag)
+    {
+      std::unique_ptr<TFakeDrag> Fake = std::move(FFakeDrag);
+      const QString Target = Fake->DroppedHere ? QString() : Fake->Drag.Target();
+      if (!Target.isEmpty())
+      {
+        // Prefer copy, for safety, unless it was a move.
+        Transfer(false, Fake->Names, Target, (Action == Qt::MoveAction), true, false, true);
+      }
+    }
   };
   // A file activated: the double-click action (FileActivated).
   FLocal->OpenFile = [this](const QString &) { FileActivated(true); };
@@ -2068,6 +2103,11 @@ static QString DropTarget(const QString & Path, const QString & OnDirectory, boo
 
 bool MainWindow::Drop(bool OnLocal, const QMimeData * Data, const QString & OnDirectory, bool Move, bool Confirm)
 {
+  // Our own drag dropped here: no fake directory's target to wait for.
+  if (FFakeDrag)
+  {
+    FFakeDrag->DroppedHere = true;
+  }
   if (FBusy)
   {
     return false;

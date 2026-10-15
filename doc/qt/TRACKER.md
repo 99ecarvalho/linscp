@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 11 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 32 | 35 | Parity on features users depend on |
+| P3 Qt parity | 33 | 35 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Dropped for now (2026-10-15); may be reopened |
-| **Total** | **109** | **122** | |
+| **Total** | **110** | **122** | |
 
 ## Next three actions
 
@@ -255,8 +255,9 @@ To and shortcuts, Keep Up To Date in a new window, S3 ACLs and more (the
 audit below); only custom command extensions are deferred.
 P2-10 and P2-11 waited, at the user's request, for P3.
 
-1. **P3-24**: the drag & drop shell extension.
-2. **P3-21**: the Explorer interface.
+1. **P3-21**: the Explorer interface.
+2. Release 0.4.0 (the user's call): the Preferences pages, extensions, the
+   Windows shell's parts and, once done, the Explorer interface.
 3. The upstream PRs for the carried patches (ADR 0006), waiting on WinSCP's
    maintainer: winscp/winscp#79 (portability), #80 (`LogEvent`), #81 (log
    file names), #82 (local EOL), #83 (OpenSSH import paths), #84, #85 (S3);
@@ -299,6 +300,7 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-15 | linscp's installer registers WinSCP's drag & drop shell extension (`DragExt64.dll`, from the pinned source) only when no other copy is registered | It is WinSCP's own extension, its class, mapping and protocol unchanged, so one registered copy serves both programs; registering over WinSCP's would leave WinSCP without it once linscp is uninstalled |
 | 2026-10-15 | linscp offers the Explorer interface (P3-21) and the Windows shell's jump list, system context menu and drag & drop shell extension (P3-22…24); WinSCP's own services (tips, usage statistics, the donors' automatic updates) stay out for now | The user's call (Q-13) |
 | 2026-10-15 | P2 exit gate (P2-11) passed: the user's daily work in linscp | The user's sign-off: it does the daily work |
 | 2026-10-15 | P3-20: extensions as WinSCP has them, its own code (`TCustomCommandType`, sliced) loading them; the lists, folders and keys of `TWinConfiguration` carried in `TShellConfiguration` (`common`: the program's folder; `commonext`: its Extensions, on POSIX `share/linscp/Extensions`; `userext`: the configuration's folder) | Extensions written for WinSCP install and run unchanged; the configuration keys (`ExtensionsOrder`, `ExtensionsDeleted`, `ExtensionsShortCuts`, `CustomCommandOptions`) carry over both ways |
@@ -880,7 +882,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-21 | Explorer interface | todo | |
 | P3-22 | Jump list | done | done 2026-10-15: the recent sites (on connecting) and workspaces (on opening), newest first, at most 30, under WinSCP's keys (`JumpList`, `JumpListWorkspaces`), dropped when deleted or removed from the taskbar's list; shown as the taskbar's Recent Sites and Recent Workspaces (ICustomDestinationList), each a link with `/JumpList` (a site's with `/UploadIfAny`), shown again at start. ctest `qt_gui_preferences` (on Windows 11, the link in the program's `.customDestinations-ms`) |
 | P3-23 | System context menu | done | done 2026-10-15: the Windows shell's context menu of the selected local files (as WinSCP's ShellDisplayContextMenu: IContextMenu from the folder's IShellFolder, IContextMenu2 drawing Open With and Send To through a callback window, Shift for extended verbs, a rename done in place by the panel), on a right click with Panels > Local's "Use system file context menu" (shown on Windows only) and from the local file menu's System Menu (with Properties, now there for local files too). ctest `qt_gui_environment` (Windows 11's own items) |
-| P3-24 | Drag & drop shell extension | todo | |
+| P3-24 | Drag & drop shell extension | done | done 2026-10-15: WinSCP's DragExt built from the pristine source (`port/dragext`, a wrapper for mingw's GUID operators) as `DragExt64.dll`, in the deploy folder, registered by the installer unless WinSCP's own copy is; remote files dragged as WinSCP's fake file (a hidden `scp…` directory, the shared WinSCPDragExtMapping), downloaded where the copy hook says the drop was, under drag & drop's confirmation; the temporary folder's way when the extension is not there; Drag & Drop's fake-file option and status (installed, loaded, broken builds) on Windows. ctest `qt_gui_environment` (on Windows 11, the shell's copy stopped by the real hook and the file downloaded there) |
 
 ### P4 — Cleanup
 | ID | Task | Status | Note |

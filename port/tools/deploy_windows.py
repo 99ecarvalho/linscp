@@ -42,6 +42,8 @@ def main():
     ap.add_argument('--dest', required=True)
     ap.add_argument('--translations')
     ap.add_argument('--winscpnet')
+    # Files copied as they are (the shell extension, which needs no DLLs).
+    ap.add_argument('--extra', action='append', default=[])
     ap.add_argument('--cli')
     ap.add_argument('programs', nargs='+')
     a = ap.parse_args()
@@ -82,6 +84,8 @@ def main():
                 copied.add(dll)
                 shutil.copy2(available[dll], a.dest)
                 todo.append(available[dll])
+    for extra in a.extra:
+        shutil.copy2(extra, a.dest)
     if a.winscpnet:
         # The assembly looks for winscp.exe beside itself.
         dotnet = os.path.join(a.dest, 'dotnet')

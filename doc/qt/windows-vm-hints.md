@@ -156,3 +156,12 @@ LINSCP_VM_PASSWORD=... python3 port/tools/vm_tests.py -R qt_gui   # some
 Tests that check the source tree, and the POSIX layer's own test, are not
 run there; those needing sshd or a container engine skip, as the VM has
 neither.
+
+`-V` prints each test's whole output. The drag & drop shell extension's test
+(`qt_gui_environment`) runs only where the extension is registered; on the
+VM it is, from the copy the suite pushes, which the copy hook the test
+drives is loaded from:
+
+```
+regsvr32 /s C:\temp\linscp-test\DragExt64.dll
+```
