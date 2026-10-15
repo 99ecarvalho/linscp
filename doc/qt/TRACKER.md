@@ -256,7 +256,7 @@ audit below); only custom command extensions are deferred.
 P2-10 and P2-11 waited, at the user's request, for P3.
 
 1. **P2-11**: the P2 exit gate, driven by the user: a day's work in linscp
-   from an installed package (0.2.0's).
+   from an installed package (0.3.0's).
 2. The Preferences pages WinSCP has and linscp lacks: Environment (confirmations and more), Interface, Updates, Drag & Drop, the panels' Remote and Local pages.
 3. Follow up the upstream PRs for the carried patches (ADR 0006): the
    portability series winscp/winscp#79, and #80 (`LogEvent`), #81 (log file
@@ -302,6 +302,7 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-15 | Version 0.3.0 tagged and published as a GitHub pre-release, with the CI packages and now the Windows portable zip | The user's call: it ships the Check for Updates crash fix (0.2.0 crashes there), the rest of the Commander menus (P3-15), thumbnails, the real-server tests, the Site Manager folders on save, the preset captions and Donate |
 | 2026-10-15 | Help > Donate offered, linscp's GitHub Sponsors page for now (one constant, `DonateUrl`) | The user's call: linscp's own donation pages come later |
 | 2026-10-15 | A portable package: on Windows a zip of the deploy folder with an empty `linscp.ini` (WinSCP's portable mode: an INI beside the program; `linscp-cli` shares it), on Linux the AppImage with a `WinSCP.ini` beside the `.AppImage` file | The user's call; WinSCP offers a portable package too |
 | 2026-10-15 | WinSCP's OpenSSL kept out of the programs' dynamic symbols on POSIX (`--exclude-libs,libssl.a:libcrypto.a`) | The system's libssl is loaded as well (Kerberos' libldap, Qt's TLS backend); with our OpenSSL exported, the two mixed and Help > Check for Updates crashed in SSL_CTX_new |
