@@ -4689,7 +4689,9 @@ void InstanceTest(const char * Port, const QString & Directory)
     const auto SendFrom = [&Suffix, &Url]()
     {
       QProcess Process;
-      Process.start(QCoreApplication::applicationFilePath(), { QStringLiteral("instancesend"), Suffix, Url });
+      // The same platform as this run (CI has no display).
+      Process.start(QCoreApplication::applicationFilePath(),
+        { QStringLiteral("instancesend"), Suffix, Url, QStringLiteral("-platform"), QGuiApplication::platformName() });
       Process.waitForStarted();
       WaitUntil([&Process]() { return Process.state() == QProcess::NotRunning; });
       const int Code = (Process.exitStatus() == QProcess::NormalExit) ? Process.exitCode() : -1;
@@ -4942,8 +4944,10 @@ void MasterPasswordTest(const QString & Ini)
     const auto Read = [&Ini](const char * Mode)
     {
       QProcess Process;
+      // The same platform as this run (CI has no display).
       Process.start(QCoreApplication::applicationFilePath(),
-        { QStringLiteral("masterpasswordread"), QStringLiteral("/ini=") + Ini, QString::fromLatin1(Mode) });
+        { QStringLiteral("masterpasswordread"), QStringLiteral("/ini=") + Ini, QString::fromLatin1(Mode),
+          QStringLiteral("-platform"), QGuiApplication::platformName() });
       Process.waitForStarted();
       WaitUntil([&Process]() { return Process.state() == QProcess::NotRunning; });
       const QString Output = QString::fromUtf8(Process.readAllStandardOutput()).trimmed();
