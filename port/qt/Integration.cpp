@@ -38,6 +38,23 @@ QString AppName()
   return QString::fromStdString(CoreBridge::Info().AppName);
 }
 
+// What starts linscp, as a desktop entry's Exec: the AppImage itself (not
+// its temporary mount), the Flatpak through flatpak run, else the program.
+QString ProgramCommand()
+{
+  const QString AppImage = qEnvironmentVariable("APPIMAGE");
+  if (!AppImage.isEmpty())
+  {
+    return QLatin1Char('"') + AppImage + QLatin1Char('"');
+  }
+  const QString Flatpak = qEnvironmentVariable("FLATPAK_ID");
+  if (!Flatpak.isEmpty())
+  {
+    return QStringLiteral("flatpak run ") + Flatpak;
+  }
+  return QLatin1Char('"') + QCoreApplication::applicationFilePath() + QLatin1Char('"');
+}
+
 // The desktop entry, as upstream's registration has the command: the
 // program with /Unsafe and the URL (RegisterAsUrlHandler).
 QString DesktopEntry(bool Handler)
@@ -47,17 +64,16 @@ QString DesktopEntry(bool Handler)
   {
     Types.append(QStringLiteral("x-scheme-handler/") + Scheme);
   }
-  const QString Exe = QCoreApplication::applicationFilePath();
   QString Result = QStringLiteral(
     "[Desktop Entry]\n"
     "Type=Application\n"
     "Name=%1\n"
     "Comment=%2\n"
-    "Exec=\"%3\"%4\n"
+    "Exec=%3%4\n"
     "Icon=linscp\n"
     "Terminal=false\n"
     "Categories=Network;FileTransfer;\n").arg(AppName(), QCoreApplication::translate("Integration", "SFTP, SCP, FTP, WebDAV and S3 client"),
-      Exe, Handler ? QStringLiteral(" /Unsafe %u") : QString());
+      ProgramCommand(), Handler ? QStringLiteral(" /Unsafe %u") : QString());
   if (Handler)
   {
     Result += QStringLiteral("MimeType=%1;\n").arg(Types.join(QLatin1Char(';')));
@@ -433,10 +449,10 @@ bool CreateShortcut(const CoreBridge::TShortcut & Shortcut, TShortcutFolder Fold
     "Type=Application\n"
     "Name=%1\n"
     "Comment=%2\n"
-    "Exec=\"%3\" %4\n"
+    "Exec=%3 %4\n"
     "Icon=linscp\n"
     "Terminal=false\n").arg(Name, QString(QString::fromStdString(Shortcut.Description)).replace(QLatin1Char('\n'), QLatin1Char(' ')),
-      QCoreApplication::applicationFilePath(), Exec.join(QLatin1Char(' ')));
+      ProgramCommand(), Exec.join(QLatin1Char(' ')));
   if (!WriteFile(Path, Entry.toUtf8(), Error))
   {
     Error = ShortcutError + QLatin1Char('\n') + Error;

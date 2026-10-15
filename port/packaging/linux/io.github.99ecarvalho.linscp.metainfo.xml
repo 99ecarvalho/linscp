@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.99ecarvalho.linscp</id>
+  <name>linscp</name>
+  <summary>SFTP, SCP, FTP, WebDAV and S3 client</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <developer id="io.github.99ecarvalho">
+    <name>Eduardo Correia</name>
+  </developer>
+  <description>
+    <p>
+      linscp is a Qt port of WinSCP: the same core, sessions and settings, with
+      WinSCP's two-panel Commander interface, for Linux and Windows.
+    </p>
+    <p>
+      It transfers files over SFTP, SCP, FTP (with TLS), WebDAV and Amazon S3,
+      synchronizes and compares directories, keeps a remote directory up to
+      date, edits remote files, and runs commands on the server.
+    </p>
+  </description>
+  <launchable type="desktop-id">io.github.99ecarvalho.linscp.desktop</launchable>
+  <url type="homepage">https://github.com/99ecarvalho/linscp</url>
+  <url type="bugtracker">https://github.com/99ecarvalho/linscp/issues</url>
+  <content_rating type="oars-1.1"/>
+  <categories>
+    <category>Network</category>
+    <category>FileTransfer</category>
+  </categories>
+  <releases>
+    <release version="0.1.0" date="2026-10-15"/>
+  </releases>
+</component>

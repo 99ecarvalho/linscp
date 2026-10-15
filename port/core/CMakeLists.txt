@@ -31,6 +31,14 @@ set_source_files_properties(${LINSCP_CORE_SOURCES} PROPERTIES GENERATED TRUE)
 
 add_library(linscp-core STATIC EXCLUDE_FROM_ALL ${LINSCP_CORE_SOURCES})
 add_dependencies(linscp-core transform)
+# A release build (the packages): core's BUILD_OFFICIAL, so its version
+# strings drop upstream's "Dev Build -- Do NOT distribute" marker, which is
+# for anyone's build of WinSCP from source. Only the version strings (and the
+# update check's "unofficial" flag) depend on it.
+option(LINSCP_RELEASE "A release build: what the packages ship" OFF)
+if(LINSCP_RELEASE)
+  target_compile_definitions(linscp-core PRIVATE BUILD_OFFICIAL)
+endif()
 # OpenSSL's headers come from the configured release (cmake/openssl.cmake),
 # not WinSCP's copy, whose configuration.h describes 32-bit Windows.
 target_link_libraries(linscp-core PUBLIC linscp-shim linscp-openssl)
