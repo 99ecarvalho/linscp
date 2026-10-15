@@ -1,64 +1,60 @@
 #!/usr/bin/env python3
-"""linscp's icon: WinSCP's application icon with an "L" on its padlock.
+"""linscp's application icon, rendered from assets/app/linscp.svg.
 
-  make_icon.py [--out port/qt/icons/linscp.ico]
+  make_icon.py [--svg assets/app/linscp.svg] [--out-dir assets/app]
+               [--ico port/qt/icons/linscp.ico]
 
-Reads the pinned submodule's Application.ico as it is, draws the letter on
-each of its sizes (supersampled, so small sizes stay clean), and writes a
-multi-size .ico. Needs Pillow. The output is committed; rerun after a pin
-bump that changes WinSCP's icon.
+The icon is linscp's own: an original tile around Lucide's ISC-licensed
+"folder-sync" glyph (assets/app/SOURCES.md). WinSCP's application icon may
+not be reused (its license.txt, part B), so nothing here derives from it.
+
+Writes the multi-size .ico (Windows' executable, installer and window icon)
+and the PNG sizes the Linux packages install (hicolor theme). Sizes up to
+24 pixels are drawn with thicker strokes on a full-bleed tile, so they stay
+legible. Needs rsvg-convert and Pillow; the outputs are committed.
 """
-import argparse, os, sys
+import argparse, io, os, re, subprocess, sys, tempfile
 
-from PIL import Image, ImageDraw
+from PIL import Image
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..')
-SOURCE = os.path.join(ROOT, '3rd-party', 'winscp', 'source', 'resource', 'Application.ico')
-
-# The letter's two bars on the 256-pixel image: on the padlock's body, left
-# of the green arrow.
-BARS = [(84, 110, 102, 178), (84, 160, 134, 178)]
-COLOUR = (52, 64, 78, 255)
-SUPERSAMPLE = 4
-# WinSCP draws its small sizes by hand, the padlock placed differently: the
-# letter's bars there are whole pixels (inclusive), fitted to each.
-PIXEL_BARS = {
-    16: [(5, 8, 5, 11), (5, 11, 7, 11)],
-    20: [(6, 9, 7, 14), (6, 13, 9, 14)],
-    24: [(7, 11, 8, 17), (7, 16, 11, 17)],
-    32: [(10, 16, 12, 23), (10, 21, 15, 23)],
-}
+ICO_SIZES = [16, 20, 24, 32, 40, 48, 64, 128, 256]
+PNG_SIZES = [16, 24, 32, 48, 64, 128, 256, 512]
 
 
-def with_letter(image):
-    size = image.size[0]
-    if size in PIXEL_BARS:
-        image = image.convert('RGBA')
-        draw = ImageDraw.Draw(image)
-        for bar in PIXEL_BARS[size]:
-            draw.rectangle(bar, fill=COLOUR)
-        return image
-    scale = size * SUPERSAMPLE / 256.0
-    layer = Image.new('RGBA', (size * SUPERSAMPLE, size * SUPERSAMPLE), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(layer)
-    for left, top, right, bottom in BARS:
-        draw.rectangle([round(left * scale), round(top * scale), round(right * scale) - 1, round(bottom * scale) - 1], fill=COLOUR)
-    layer = layer.resize((size, size), Image.LANCZOS)
-    return Image.alpha_composite(image.convert('RGBA'), layer)
+def svg_for(svg, size):
+    if size > 24:
+        return svg
+    # Small: the tile to the edge, the strokes heavier.
+    svg = svg.replace('x="8" y="8" width="240" height="240" rx="52"', 'x="0" y="0" width="256" height="256" rx="44"')
+    svg = svg.replace('stroke-width="2.1"', 'stroke-width="2.9"')
+    return svg
+
+
+def render(svg, size):
+    with tempfile.NamedTemporaryFile('w', suffix='.svg', delete=False) as f:
+        f.write(svg_for(svg, size))
+        path = f.name
+    try:
+        png = subprocess.run(['rsvg-convert', '-w', str(size), '-h', str(size), path],
+                             check=True, capture_output=True).stdout
+    finally:
+        os.unlink(path)
+    return Image.open(io.BytesIO(png)).convert('RGBA')
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--out', default=os.path.join(ROOT, 'port', 'qt', 'icons', 'linscp.ico'))
+    ap.add_argument('--svg', default=os.path.join(ROOT, 'assets', 'app', 'linscp.svg'))
+    ap.add_argument('--out-dir', default=os.path.join(ROOT, 'assets', 'app'))
+    ap.add_argument('--ico', default=os.path.join(ROOT, 'port', 'qt', 'icons', 'linscp.ico'))
     a = ap.parse_args()
-    source = Image.open(SOURCE)
-    frames = []
-    for size in sorted(source.info['sizes'], reverse=True):
-        source.size = size
-        source.load()
-        frames.append(with_letter(source.copy()))
-    frames[0].save(a.out, format='ICO', sizes=[f.size for f in frames], append_images=frames[1:])
-    print(a.out, [f.size[0] for f in frames])
+    svg = open(a.svg, encoding='utf-8').read()
+    for size in PNG_SIZES:
+        render(svg, size).save(os.path.join(a.out_dir, f'linscp-{size}.png'))
+    images = [render(svg, size) for size in ICO_SIZES]
+    images[-1].save(a.ico, format='ICO', sizes=[(s, s) for s in ICO_SIZES], append_images=images[:-1])
+    print(f'{a.ico}: {len(ICO_SIZES)} sizes; {len(PNG_SIZES)} PNGs in {a.out_dir}')
     return 0
 
 

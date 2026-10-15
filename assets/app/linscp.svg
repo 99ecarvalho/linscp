@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- linscp's application icon: an original tile (linscp's) around Lucide's
+     "folder-sync" glyph (lucide-static 1.49.0, ISC; see SOURCES.md). -->
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2f86f0"/>
+      <stop offset="1" stop-color="#1450ad"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="52" fill="url(#tile)"/>
+  <g transform="translate(26 26) scale(8.5)" fill="none" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke="#ffffff" d="M9 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v.5"/>
+    <g stroke="#ffc23d">
+      <path d="M12 10v4h4"/>
+      <path d="m12 14 1.535-1.605a5 5 0 0 1 8 1.5"/>
+      <path d="M22 22v-4h-4"/>
+      <path d="m22 18-1.535 1.605a5 5 0 0 1-8-1.5"/>
+    </g>
+  </g>
+</svg>

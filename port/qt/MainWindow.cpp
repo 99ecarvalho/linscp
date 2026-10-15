@@ -93,11 +93,20 @@ QString ShortPath(const QString & Path)
 
 }  // namespace
 
+// linscp's icon (port/qt/icons/linscp.ico), loaded once.
+const QIcon & MainWindow::AppIcon()
+{
+  static const QIcon Icon(QStringLiteral(":/icons/linscp.ico"));
+  return Icon;
+}
+
 MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   QMainWindow(Parent),
   FInfo(Info)
 {
   setWindowTitle(QString::fromStdString(FInfo.AppName));
+  // linscp's icon, every window's (the application's).
+  QApplication::setWindowIcon(AppIcon());
   // As TTerminalManager's OnMasterPasswordPrompt: over the window in front.
   CoreBridge::SetMasterPasswordPrompt([this]()
   {
@@ -769,9 +778,7 @@ void MainWindow::MinimizeToTray()
       }
     });
   }
-  // linscp has no icon of its own: the set's, else the style's.
-  QIcon Icon = IconSet::Icon(QStringLiteral("sites"));
-  FTrayIcon->setIcon(Icon.isNull() ? style()->standardIcon(QStyle::SP_DriveNetIcon) : Icon);
+  FTrayIcon->setIcon(AppIcon());
   FTrayIcon->setToolTip(windowTitle());
   FTrayIcon->show();
   // The dialogs open over it go with it (Keep Up To Date's, minimized).

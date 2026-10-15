@@ -4498,6 +4498,11 @@ void IconsTest(const QString & Out)
   QtFrontend Frontend;
   CoreBridge::Initialize(&Frontend);
   {
+    {
+      MainWindow Window(CoreBridge::Info());
+      Check(!QApplication::windowIcon().isNull() && !Window.windowIcon().isNull() &&
+        (QApplication::windowIcon().availableSizes().size() >= 8), "linscp's own icon, every size, on its windows");
+    }
     const QStringList Roles = QDir(QStringLiteral(":/iconsets/lucide")).entryList({ QStringLiteral("*.svg") });
     Check(Roles.size() >= 60, "the roles bundled");
     for (const QString & Set : { QStringLiteral("lucide"), QStringLiteral("tabler"), QStringLiteral("fluent") })

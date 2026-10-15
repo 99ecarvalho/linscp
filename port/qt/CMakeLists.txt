@@ -55,6 +55,9 @@ target_include_directories(linscp-qt-core PUBLIC "${LINSCP_GEN_SLICES}/windows" 
 target_compile_definitions(linscp-qt-core PRIVATE LINSCP_VERSION="${PROJECT_VERSION}")
 
 add_executable(linscp WIN32 EXCLUDE_FROM_ALL main.cpp)
+if(WIN32)
+  target_sources(linscp PRIVATE linscp.rc)
+endif()
 set_target_properties(linscp PROPERTIES AUTOMOC ON)
 if(NOT WIN32)
   target_compile_options(linscp PRIVATE -fno-short-wchar)
@@ -105,7 +108,7 @@ foreach(_ts ${_shell_ts})
 endforeach()
 qt_add_resources(linscp-qt-ui shell_translations
   PREFIX /i18n BASE "${CMAKE_CURRENT_BINARY_DIR}/i18n" FILES ${_shell_qm})
-# linscp's icon: WinSCP's with an "L" on the padlock (port/tools/make_icon.py).
+# linscp's own icon (assets/app/linscp.svg, rendered by port/tools/make_icon.py).
 qt_add_resources(linscp-qt-ui shell_icons
   PREFIX /icons BASE "${CMAKE_CURRENT_SOURCE_DIR}/icons" FILES "${CMAKE_CURRENT_SOURCE_DIR}/icons/linscp.ico")
 # The icon sets (P3-17, port/tools/import_icons.py): one SVG per role, each

@@ -6,6 +6,7 @@
 #define LINSCP_QT_MAIN_WINDOW_H
 
 #include <QDateTime>
+#include <QIcon>
 #include <QMainWindow>
 
 #include <QPointer>
@@ -230,6 +231,7 @@ public:
   // window hidden, the tray's icon (its tip the window's title) bringing
   // it back. Where the desktop has no tray, minimized as ever.
   void MinimizeToTray();
+  static const QIcon & AppIcon();
   // Options > Left (Left) or Right Panel > Tree.
   void SetTreeVisible(bool Left, bool Visible);
   QAction * TreeAction(bool Left) const { return Left ? FLocalTreeAction : FRemoteTreeAction; }
