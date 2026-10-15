@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 11 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 30 | 35 | Parity on features users depend on |
+| P3 Qt parity | 31 | 35 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Dropped for now (2026-10-15); may be reopened |
-| **Total** | **107** | **122** | |
+| **Total** | **108** | **122** | |
 
 ## Next three actions
 
@@ -255,7 +255,7 @@ To and shortcuts, Keep Up To Date in a new window, S3 ACLs and more (the
 audit below); only custom command extensions are deferred.
 P2-10 and P2-11 waited, at the user's request, for P3.
 
-1. **P3-22…24**: the Windows shell's parts: the jump list, the local panel's
+1. **P3-23, P3-24**: the Windows shell's parts left: the local panel's
    system context menu, the drag & drop shell extension.
 2. **P3-21**: the Explorer interface.
 3. The upstream PRs for the carried patches (ADR 0006), waiting on WinSCP's
@@ -879,7 +879,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-19 | The remaining Preferences pages | done | done 2026-10-15. Environment: the confirmations (transfers, with the Copy dialog's "Do not show this dialog box again"; drags', Auto until that is used; overwriting, resuming; deleting and moving to the trash, with "Never ask me again"; closing sessions, with WinSCP's workspace question; exiting on completion; the shell session; the synchronization summary; continue on error, errors collected into WinSCP's list) and the notifications (the beep after so many seconds; tray balloons, else the status bar; the taskbar flashed while elsewhere). Interface: the Commander (Explorer shown, not available) and the theme. Remote: inaccessible directories hidden in the panel and its tree, the refresh after operations left to core (Ctrl+Alt+R), the periodic refresh. Local: the local directory kept across tabs, deleting to the trash. Drag & Drop: the temporary folder and its free-space warning. Updates: the period checked at start, the result on startup or noted, beta versions, the proxy. ctests `qt_gui_preferences`, `qt_gui_environment`, `qt_gui_options`; Wine and the VM too. Not offered: the system context menu (the Windows shell's), the updates' e-mail and usage statistics |
 | P3-20 | Custom command extensions | done | done 2026-10-15. WinSCP's TCustomCommandType (sliced) loads them from the three folders, with their order, deletions and shortcuts kept; Preferences > Commands lists them after the custom commands: Add's split button (a custom command or an extension, from a file or a URL, winscp.net asked as WinSCP asks it, untrusted ones confirmed), Configure (the extension's options dialog, `ExtensionOptionsDialog`, and its keyboard shortcut), Remove, Up, Down; the menus and the Custom Commands toolbar; run with their options expanded, those asked on each run first and kept, per site where they say so; `@require` checked. The Windows packages' `dotnet` folder (WinSCP's .NET assembly, `linscp-cli` as `WinSCP.exe`), `WINSCP_PATH` set. ctest `qt_gui_extensions` (a local extension; on Windows a PowerShell one listing the server over the assembly); Linux, Wine and the VM |
 | P3-21 | Explorer interface | todo | |
-| P3-22 | Jump list | todo | |
+| P3-22 | Jump list | done | done 2026-10-15: the recent sites (on connecting) and workspaces (on opening), newest first, at most 30, under WinSCP's keys (`JumpList`, `JumpListWorkspaces`), dropped when deleted or removed from the taskbar's list; shown as the taskbar's Recent Sites and Recent Workspaces (ICustomDestinationList), each a link with `/JumpList` (a site's with `/UploadIfAny`), shown again at start. ctest `qt_gui_preferences` (on Windows 11, the link in the program's `.customDestinations-ms`) |
 | P3-23 | System context menu | todo | |
 | P3-24 | Drag & drop shell extension | todo | |
 

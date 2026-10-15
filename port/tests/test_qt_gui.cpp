@@ -2253,6 +2253,57 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
     Check((Saved(Commander, QStringLiteral("SwappedPanels")) == QStringLiteral("1")) &&
       (Saved(Commander, QStringLiteral("ExplorerKeyboardShortcuts")) == QStringLiteral("1")),
       "and Interface\\Commander's");
+    // The jump list's recent sites and workspaces (P3-22), as WinSCP keeps
+    // them: newest first, once each, at most 30; those the user removed
+    // from the taskbar's dropped.
+    {
+      CoreBridge::TJumpList Shown;
+      const auto Keep = [&Shown](CoreBridge::TJumpList & Lists) { Shown = Lists; };
+      CoreBridge::UpdateJumpList(CoreBridge::TJumpListEntry::Site, "first", true, Keep);
+      CoreBridge::UpdateJumpList(CoreBridge::TJumpListEntry::Site, "second", true, Keep);
+      CoreBridge::UpdateJumpList(CoreBridge::TJumpListEntry::Site, "first", true, Keep);
+      CoreBridge::UpdateJumpList(CoreBridge::TJumpListEntry::Workspace, "work", true, Keep);
+      Check((Shown.Sites == std::vector<std::string>({ "first", "second" })) &&
+        (Shown.Workspaces == std::vector<std::string>({ "work" })), "recent sites newest first, once each");
+      Check(Saved(QStringLiteral("Configuration"), QStringLiteral("JumpList")) == QStringLiteral("first,second"),
+        "kept under WinSCP's key");
+      for (int Index = 0; Index < 35; Index++)
+      {
+        CoreBridge::UpdateJumpList(CoreBridge::TJumpListEntry::Site, "site" + std::to_string(Index), true, Keep);
+      }
+      Check((Shown.Sites.size() == 30) && (Shown.Sites.front() == "site34"), "at most 30");
+      CoreBridge::UpdateJumpList(CoreBridge::TJumpListEntry::Site, "site34", false,
+        [](CoreBridge::TJumpList & Lists) { Lists.Sites.erase(Lists.Sites.begin()); });
+      CoreBridge::UpdateJumpList(CoreBridge::TJumpListEntry::Site, std::string(), true, Keep);
+      Check((Shown.Sites.size() == 28) && (Shown.Sites.front() == "site32") && (Shown.Workspaces.size() == 1),
+        "a deleted one out, and those removed from the taskbar's");
+      // The taskbar's own, on Windows (elsewhere nothing).
+      Integration::UpdateJumpList(CoreBridge::TJumpListEntry::Site, "user@example.com", true);
+      CoreBridge::UpdateJumpList(CoreBridge::TJumpListEntry::Site, std::string(), true, Keep);
+#if defined(_WIN32)
+      Check(!Shown.Sites.empty() && (Shown.Sites.front() == "user@example.com"), "shown in the taskbar's jump list");
+      // What Windows keeps of it (not Wine's): the program's
+      // .customDestinations-ms, the site's link's title in it.
+      if (GetProcAddress(GetModuleHandleW(L"ntdll.dll"), "wine_get_version") == nullptr)
+      {
+        const QDir Destinations(qEnvironmentVariable("APPDATA") + QStringLiteral("/Microsoft/Windows/Recent/CustomDestinations"));
+        bool Found = false;
+        for (const QFileInfo & File : Destinations.entryInfoList({ QStringLiteral("*.customDestinations-ms") }, QDir::Files))
+        {
+          QFile Data(File.filePath());
+          const QString Title = QStringLiteral("user@example.com");
+          if (Data.open(QIODevice::ReadOnly) &&
+              Data.readAll().contains(QByteArray(reinterpret_cast<const char *>(Title.utf16()), Title.size() * 2)))
+          {
+            Found = true;
+          }
+        }
+        Check(Found, "Windows has the link in the program's jump list");
+      }
+#else
+      Check(Shown.Sites.front() == "site32", "no jump list elsewhere");
+#endif
+    }
     Check(Saved(Interface, QStringLiteral("LocaleSafe")).toUInt() == CoreBridge::PreferredLocale(),
       "the language chosen too");
     Check((Saved(Interface, QStringLiteral("QueueTransfersLimit")) == QStringLiteral("3")) &&

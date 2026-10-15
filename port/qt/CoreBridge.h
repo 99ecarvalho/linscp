@@ -213,6 +213,19 @@ TShortcut SessionShortcut(const std::string & SessionName, TSessionShortcutKind 
 // The Send To shortcut's names: the program's (SENDTO_HOOK_NAME2) and a
 // site's (SESSION_SENDTO_HOOK_NAME2, with its local name).
 std::string SendToShortcutName();
+// The taskbar's jump list (Windows), as TWinConfiguration keeps it: the
+// recent sites and workspaces (its JumpList and JumpListWorkspaces, at most
+// 30 each, newest first), Name added first (Add) or removed, else as they
+// are; Apply then shows them (dropping from them those the user removed
+// from the list), and what it leaves is saved. Throws TCoreError
+// (JUMPLIST_ERROR's).
+struct TJumpList
+{
+  std::vector<std::string> Sites;
+  std::vector<std::string> Workspaces;
+};
+enum class TJumpListEntry { Site, Workspace };
+void UpdateJumpList(TJumpListEntry Kind, const std::string & Name, bool Add, const std::function<void(TJumpList &)> & Apply);
 std::string SiteSendToShortcutName(const std::string & SessionName);
 
 // The master password (Preferences > Security), as TWinConfiguration's:
@@ -909,6 +922,8 @@ enum class TText
   ExtensionUntrusted,   // "The extension does not come from a trusted source. ..."
   ExtensionNotLatest,   // "Using the last compatible and trusted version ..." (unformatted)
   NoSiteForCommand,     // "No session is opened ... site-specific options ..." (unformatted)
+  JumpListRecent,       // "Recent Sites"
+  JumpListWorkspaces,   // "Recent Workspaces"
   NewFileName, // "New file"
   EditFileCaption, // "Edit file"
   EditFilePrompt, // "&Enter file name:"

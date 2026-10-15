@@ -34,6 +34,10 @@ bool AddToSearchPath(QString & Error);
 // elsewhere. Its path in Path.
 enum class TShortcutFolder { Desktop, SendTo };
 bool CreateShortcut(const CoreBridge::TShortcut & Shortcut, TShortcutFolder Folder, QString & Path, QString & Error);
+// The taskbar's jump list of recent sites and workspaces (Windows; nothing
+// elsewhere): Name added first or removed, else shown again (at start).
+void UpdateJumpList(CoreBridge::TJumpListEntry Kind = CoreBridge::TJumpListEntry::Site, const std::string & Name = std::string(),
+  bool Add = true);
 // The folder (for tests).
 QString ShortcutFolder(TShortcutFolder Folder);
 // Local files' Properties, as the local panel's (DisplayPropertiesMenu): the

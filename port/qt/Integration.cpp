@@ -20,6 +20,10 @@
 #include <windows.h>
 #include <shlobj.h>
 #include <shobjidl.h>
+#include <objectarray.h>
+#include <propkey.h>
+#include <propsys.h>
+#include <propvarutil.h>
 #else
 #include <QDBusConnection>
 #include <QDBusMessage>
@@ -380,15 +384,15 @@ QString ShortcutFolder(TShortcutFolder Folder)
   return QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
 }
 
-bool CreateShortcut(const CoreBridge::TShortcut & Shortcut, TShortcutFolder Folder, QString & Path, QString & Error)
-{
-  const QString ShortcutError = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::CreateShortcutError));
-  const QString Directory = ShortcutFolder(Folder);
-  QDir().mkpath(Directory);
-  const QString Name = QString::fromStdString(Shortcut.Name);
 #if defined(Q_OS_WIN)
-  // As CreateDesktopShortCut: the program, its arguments quoted as its
-  // command line has them, its own icon.
+namespace
+{
+
+// As CreateDesktopShortCut: the program, its arguments quoted as its
+// command line has them, its own icon (which jump lists need set), and the
+// name as the title (which they show). Null when it cannot be made.
+IShellLinkW * MakeShellLink(const CoreBridge::TShortcut & Shortcut)
+{
   QStringList Quoted;
   for (const std::string & Argument : Shortcut.Arguments)
   {
@@ -399,21 +403,51 @@ bool CreateShortcut(const CoreBridge::TShortcut & Shortcut, TShortcutFolder Fold
     }
     Quoted.append(Text);
   }
-  Path = QDir(Directory).filePath(Name + QStringLiteral(".lnk"));
   const std::wstring Exe = QDir::toNativeSeparators(QCoreApplication::applicationFilePath()).toStdWString();
   const std::wstring Arguments = Quoted.join(QLatin1Char(' ')).toStdWString();
   const std::wstring Description = QString::fromStdString(Shortcut.Description).toStdWString();
+  const std::wstring Title = QString::fromStdString(Shortcut.Name).toStdWString();
+  IShellLinkW * Link = nullptr;
+  if (FAILED(CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLinkW, reinterpret_cast<void **>(&Link))))
+  {
+    return nullptr;
+  }
+  Link->SetPath(Exe.c_str());
+  Link->SetArguments(Arguments.c_str());
+  Link->SetDescription(Description.c_str());
+  Link->SetShowCmd(SW_SHOW);
+  Link->SetIconLocation(Exe.c_str(), 0);
+  IPropertyStore * Store = nullptr;
+  if (SUCCEEDED(Link->QueryInterface(IID_IPropertyStore, reinterpret_cast<void **>(&Store))))
+  {
+    PROPVARIANT Value;
+    if (SUCCEEDED(InitPropVariantFromString(Title.c_str(), &Value)))
+    {
+      Store->SetValue(PKEY_Title, Value);
+      Store->Commit();
+      PropVariantClear(&Value);
+    }
+    Store->Release();
+  }
+  return Link;
+}
+
+}  // namespace
+#endif
+
+bool CreateShortcut(const CoreBridge::TShortcut & Shortcut, TShortcutFolder Folder, QString & Path, QString & Error)
+{
+  const QString ShortcutError = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::CreateShortcutError));
+  const QString Directory = ShortcutFolder(Folder);
+  QDir().mkpath(Directory);
+  const QString Name = QString::fromStdString(Shortcut.Name);
+#if defined(Q_OS_WIN)
+  Path = QDir(Directory).filePath(Name + QStringLiteral(".lnk"));
   const std::wstring LinkPath = QDir::toNativeSeparators(Path).toStdWString();
   const HRESULT Init = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
   bool Result = false;
-  IShellLinkW * Link = nullptr;
-  if (SUCCEEDED(CoCreateInstance(CLSID_ShellLink, nullptr, CLSCTX_INPROC_SERVER, IID_IShellLinkW, reinterpret_cast<void **>(&Link))))
+  if (IShellLinkW * Link = MakeShellLink(Shortcut))
   {
-    Link->SetPath(Exe.c_str());
-    Link->SetArguments(Arguments.c_str());
-    Link->SetDescription(Description.c_str());
-    Link->SetShowCmd(SW_SHOW);
-    Link->SetIconLocation(Exe.c_str(), 0);
     IPersistFile * File = nullptr;
     if (SUCCEEDED(Link->QueryInterface(IID_IPersistFile, reinterpret_cast<void **>(&File))))
     {
@@ -675,6 +709,123 @@ bool ShutDownComputer(QString & Error)
   return true;
 #else
   return CallLogind(QStringLiteral("PowerOff"), Error);
+#endif
+}
+
+// As TWinConfiguration::UpdateEntryInJumpList and Setup.cpp's UpdateJumpList:
+// the recent workspaces and sites as the taskbar's categories, each a link
+// opening it (/JumpList; a site's /UploadIfAny takes files dropped on it),
+// those the user removed from the list dropped from it.
+void UpdateJumpList(CoreBridge::TJumpListEntry Kind, const std::string & Name, bool Add)
+{
+#if defined(Q_OS_WIN)
+  try
+  {
+    CoreBridge::UpdateJumpList(Kind, Name, Add, [](CoreBridge::TJumpList & Lists)
+    {
+      const HRESULT Init = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
+      ICustomDestinationList * List = nullptr;
+      if (SUCCEEDED(CoCreateInstance(CLSID_DestinationList, nullptr, CLSCTX_INPROC_SERVER, IID_ICustomDestinationList,
+            reinterpret_cast<void **>(&List))))
+      {
+        UINT MinSlots = 0;
+        IObjectArray * RemovedArray = nullptr;
+        if (SUCCEEDED(List->BeginList(&MinSlots, IID_IObjectArray, reinterpret_cast<void **>(&RemovedArray))))
+        {
+          QStringList Removed;
+          UINT Count = 0;
+          if (SUCCEEDED(RemovedArray->GetCount(&Count)))
+          {
+            for (UINT Index = 0; Index < Count; Index++)
+            {
+              IShellLinkW * Link = nullptr;
+              wchar_t Description[2048];
+              if (SUCCEEDED(RemovedArray->GetAt(Index, IID_IShellLinkW, reinterpret_cast<void **>(&Link))))
+              {
+                if (SUCCEEDED(Link->GetDescription(Description, 2047)))
+                {
+                  Removed.append(QString::fromWCharArray(Description));
+                }
+                Link->Release();
+              }
+            }
+          }
+          RemovedArray->Release();
+          struct TCategory
+          {
+            std::vector<std::string> * Names;
+            CoreBridge::TSessionShortcutKind Kind;
+            std::vector<std::string> Arguments;
+            CoreBridge::TText Title;
+          };
+          for (const TCategory & Category : std::initializer_list<TCategory>{
+                 { &Lists.Workspaces, CoreBridge::TSessionShortcutKind::Workspace, { "/JumpList" }, CoreBridge::TText::JumpListWorkspaces },
+                 { &Lists.Sites, CoreBridge::TSessionShortcutKind::Site, { "/UploadIfAny", "/JumpList" }, CoreBridge::TText::JumpListRecent } })
+          {
+            IObjectCollection * Collection = nullptr;
+            if (FAILED(CoCreateInstance(CLSID_EnumerableObjectCollection, nullptr, CLSCTX_INPROC_SERVER, IID_IObjectCollection,
+                  reinterpret_cast<void **>(&Collection))))
+            {
+              continue;
+            }
+            int Added = 0;
+            for (auto Each = Category.Names->begin(); Each != Category.Names->end();)
+            {
+              IShellLinkW * Link = nullptr;
+              try
+              {
+                Link = MakeShellLink(CoreBridge::SessionShortcut(*Each, Category.Kind, std::string(), Category.Arguments));
+              }
+              catch (const CoreBridge::TCoreError &)
+              {
+                Link = nullptr;
+              }
+              wchar_t Description[2048];
+              if ((Link != nullptr) && SUCCEEDED(Link->GetDescription(Description, 2047)) &&
+                  Removed.contains(QString::fromWCharArray(Description)))
+              {
+                Each = Category.Names->erase(Each);
+              }
+              else
+              {
+                if (Link != nullptr)
+                {
+                  Collection->AddObject(Link);
+                  Added++;
+                }
+                ++Each;
+              }
+              if (Link != nullptr)
+              {
+                Link->Release();
+              }
+            }
+            IObjectArray * Array = nullptr;
+            if ((Added > 0) && SUCCEEDED(Collection->QueryInterface(IID_IObjectArray, reinterpret_cast<void **>(&Array))))
+            {
+              List->AppendCategory(QString::fromStdString(CoreBridge::Text(Category.Title)).toStdWString().c_str(), Array);
+              Array->Release();
+            }
+            Collection->Release();
+          }
+          List->CommitList();
+        }
+        List->Release();
+      }
+      if (SUCCEEDED(Init))
+      {
+        CoUninitialize();
+      }
+    });
+  }
+  catch (const CoreBridge::TCoreError &)
+  {
+    // As SetupInitialize: not worth more than the log.
+  }
+#else
+  Q_UNUSED(Kind);
+  Q_UNUSED(Name);
+  Q_UNUSED(Add);
 #endif
 }
 

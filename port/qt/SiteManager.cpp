@@ -799,6 +799,7 @@ bool SiteManager::DeleteSelected(bool Confirm)
     try
     {
       CoreBridge::DeleteWorkspace(Workspace.toStdString());
+      Integration::UpdateJumpList(CoreBridge::TJumpListEntry::Workspace, Workspace.toStdString(), false);
     }
     catch (const CoreBridge::TCoreError & E)
     {
@@ -840,6 +841,8 @@ bool SiteManager::DeleteSelected(bool Confirm)
     for (const QString & Site : Sites)
     {
       CoreBridge::DeleteSite(Site.toStdString());
+      // As the Login dialog's: out of the jump list too.
+      Integration::UpdateJumpList(CoreBridge::TJumpListEntry::Site, Site.toStdString(), false);
     }
   }
   catch (const CoreBridge::TCoreError & E)

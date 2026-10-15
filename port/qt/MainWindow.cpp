@@ -1284,8 +1284,13 @@ void MainWindow::StartUp()
     StandaloneKeepUpToDate(KeepParams, KeepUseDefaults);
     return;
   }
-  // Preferences > Updates' periodic check, once the window is up.
-  QTimer::singleShot(0, this, [this]() { CheckForUpdatesIfDue(); });
+  // Preferences > Updates' periodic check, once the window is up; the jump
+  // list shown again, as SetupInitialize has it.
+  QTimer::singleShot(0, this, [this]()
+  {
+    CheckForUpdatesIfDue();
+    Integration::UpdateJumpList();
+  });
   bool CanOpen = false;
   std::unique_ptr<CoreBridge::TSession> Session;
   try
@@ -1433,6 +1438,11 @@ bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
       }
     }
     Result = true;
+    // As TTerminalManager's: the site first in the jump list (Windows).
+    if (!FStandalone)
+    {
+      Integration::UpdateJumpList(CoreBridge::TJumpListEntry::Site, FSession->Name(), true);
+    }
   }
   catch (const CoreBridge::TCoreError & E)
   {
@@ -4960,6 +4970,8 @@ bool MainWindow::OpenWorkspace(const QString & Name)
   {
     FLastWorkspace = Name;
     SwitchTab(First);
+    // As the Login dialog's: the workspace first in the jump list.
+    Integration::UpdateJumpList(CoreBridge::TJumpListEntry::Workspace, Name.toStdString(), true);
   }
   return Any;
 }

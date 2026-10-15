@@ -1308,6 +1308,79 @@ TShortcut AppShortcut(const std::string & Name, const std::vector<std::string> &
   return Result;
 }
 
+// As TWinConfiguration::UpdateEntryInJumpList.
+void UpdateJumpList(TJumpListEntry Kind, const std::string & AName, bool Add, const std::function<void(TJumpList &)> & Apply)
+{
+  try
+  {
+    const UnicodeString Name = FromUtf8(AName);
+    std::unique_ptr<THierarchicalStorage> Storage(Configuration->CreateConfigStorage());
+    Storage->AccessMode = smReadWrite;
+    // Initially (no name), the key not created if it does not exist yet.
+    if (Storage->OpenSubKey(Configuration->ConfigurationSubKey, !Name.IsEmpty()))
+    {
+      auto Load = [&Storage](const UnicodeString & Key)
+      {
+        std::unique_ptr<TStringList> List(new TStringList());
+        List->CaseSensitive = false;
+        List->CommaText = Storage->ReadString(Key, L"");
+        return List;
+      };
+      std::unique_ptr<TStringList> Sites = Load(L"JumpList");
+      std::unique_ptr<TStringList> Workspaces = Load(L"JumpListWorkspaces");
+      if (!Name.IsEmpty())
+      {
+        TStringList * List = ((Kind == TJumpListEntry::Site) ? Sites : Workspaces).get();
+        const int Index = List->IndexOf(Name);
+        if (Index >= 0)
+        {
+          List->Delete(Index);
+        }
+        if (Add)
+        {
+          List->Insert(0, Name);
+        }
+      }
+      TJumpList Lists;
+      for (TStringList * List : { Sites.get(), Workspaces.get() })
+      {
+        while (List->Count > 30)
+        {
+          List->Delete(List->Count - 1);
+        }
+        std::vector<std::string> & Names = (List == Sites.get()) ? Lists.Sites : Lists.Workspaces;
+        for (int Index = 0; Index < List->Count; Index++)
+        {
+          Names.push_back(Utf8(List->Strings[Index]));
+        }
+      }
+      if (Apply)
+      {
+        Apply(Lists);
+      }
+      auto Save = [&Storage](const UnicodeString & Key, const std::vector<std::string> & Names)
+      {
+        std::unique_ptr<TStringList> List(new TStringList());
+        for (const std::string & Each : Names)
+        {
+          List->Add(FromUtf8(Each));
+        }
+        if (List->CommaText != Storage->ReadString(Key, L""))
+        {
+          Storage->WriteString(Key, List->CommaText);
+        }
+      };
+      Save(L"JumpList", Lists.Sites);
+      Save(L"JumpListWorkspaces", Lists.Workspaces);
+    }
+  }
+  catch (Exception & E)
+  {
+    ExtException Error(&E, MainInstructions(LoadStr(JUMPLIST_ERROR)));
+    throw CoreErrorOf(Error);
+  }
+}
+
 TShortcut SessionShortcut(const std::string & SessionName, TSessionShortcutKind Kind, const std::string & Name,
   const std::vector<std::string> & Arguments)
 {
@@ -1628,6 +1701,8 @@ std::string Text(TText Text)
     case TText::ExtensionUntrusted: Ident = EXTENSION_UNTRUSTED; break;
     case TText::ExtensionNotLatest: return Utf8(UnformatMessage(LoadStr(EXTENSION_NOT_LATEST)));
     case TText::NoSiteForCommand: return Utf8(UnformatMessage(LoadStr(NO_SITE_FOR_COMMAND)));
+    case TText::JumpListRecent: Ident = JUMPLIST_RECENT; break;
+    case TText::JumpListWorkspaces: Ident = JUMPLIST_WORKSPACES; break;
     case TText::NewFileName: Ident = NEW_FILE; break;
     case TText::EditFileCaption: Ident = EDIT_FILE_CAPTION; break;
     case TText::EditFilePrompt: Ident = EDIT_FILE_PROMPT; break;
