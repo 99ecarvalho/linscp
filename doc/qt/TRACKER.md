@@ -303,6 +303,7 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-16 | winscp/winscp#82 and #83 choose the platform with `#ifdef _WIN32`, as the maintainer asked; linscp's carried patches keep the one-line `PathDelim` form of the same choice until a pin move brings the merged change in. #79's PuTTY line is tagged `// WINSCP`, carried the same | The maintainer prefers a compile-time condition; the patch series must keep every hunk's line count (patchset.py), which an `#ifdef` block cannot |
 | 2026-10-15 | Version 0.5.0 tagged and published as a GitHub pre-release, with the CI packages: the shell in all 53 of core's languages (P3-25) and the README's screenshots | The user's call |
 | 2026-10-15 | Left for later, none being worked on: P3-26 (mnemonic clashes in the translations), Q-14 (Serbian's locale), P0-04 (C++Builder check, Q-2), P0-20 (fork-branch generator, Q-7), Q-11, Q-12; outside the tracker, code signing, more distribution channels and platforms, a native-speaker review of the translations | The user's call: pending, not scheduled |
 | 2026-10-15 | P3-25: the shell's other languages filled first from WinSCP's own translation (its captions, hints and list columns), the rest translated with WinSCP's terms and checked by `translations_current` (placeholders, mnemonics, tags, spaces); in four batches by W3Techs' content-language ranking; not reviewed by native speakers, as `doc/qt/translations.md` says | The shell reads like WinSCP in each language; the most used languages first |

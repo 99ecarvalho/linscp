@@ -8,6 +8,10 @@ internal editor would have written them back so. The platform's delimiter
 tells the two apart in one expression both compilers take: a backslash on
 Windows, so upstream's behaviour is unchanged. Line counts are unchanged.
 
+Offered upstream as winscp/winscp#82, where it is an #ifdef _WIN32 at the
+maintainer's request: the same choice made at compile time, carried here
+as one line to keep the line count; dropped when a pin move brings it in.
+
 --- a/source/core/Configuration.cpp
 +++ b/source/core/Configuration.cpp
 @@ -2050,1 +2050,1 @@
