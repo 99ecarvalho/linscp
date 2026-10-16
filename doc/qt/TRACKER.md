@@ -259,8 +259,9 @@ P2-10 and P2-11 waited, at the user's request, for P3.
    maintainer: winscp/winscp#79 (portability), #80 (`LogEvent`), #81 (log
    file names), #82 (local EOL), #83 (OpenSSH import paths), #84, #85 (S3);
    each patch dropped when a pin move brings it in.
-2. Mnemonic clashes in the translated shell (P3-26), and Serbian's locale
-   (Q-14).
+2. Left for later (the user's call, 2026-10-15): mnemonic clashes in the
+   translated shell (P3-26), Serbian's locale (Q-14), code signing, more
+   distribution channels, a native-speaker review of the translations.
 3. Custom command extensions on POSIX (the user's call): WinSCP's own need
    Windows PowerShell; pwsh and the assembly with console pipes (P1-23)
    could run them there.
@@ -302,6 +303,8 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-15 | Version 0.5.0 tagged and published as a GitHub pre-release, with the CI packages: the shell in all 53 of core's languages (P3-25) and the README's screenshots | The user's call |
+| 2026-10-15 | Left for later, none being worked on: P3-26 (mnemonic clashes in the translations), Q-14 (Serbian's locale), P0-04 (C++Builder check, Q-2), P0-20 (fork-branch generator, Q-7), Q-11, Q-12; outside the tracker, code signing, more distribution channels and platforms, a native-speaker review of the translations | The user's call: pending, not scheduled |
 | 2026-10-15 | P3-25: the shell's other languages filled first from WinSCP's own translation (its captions, hints and list columns), the rest translated with WinSCP's terms and checked by `translations_current` (placeholders, mnemonics, tags, spaces); in four batches by W3Techs' content-language ranking; not reviewed by native speakers, as `doc/qt/translations.md` says | The shell reads like WinSCP in each language; the most used languages first |
 | 2026-10-15 | Version 0.4.0 tagged and published as a GitHub pre-release, with the CI packages | The user's call: the remaining Preferences pages (P3-19), custom command extensions (P3-20), the Windows shell's jump list, system context menu and drag & drop shell extension (P3-22…24), the Explorer interface (P3-21) |
 | 2026-10-15 | The Explorer interface is the same window and actions as the Commander's, laid out as TScpExplorerForm from the window's start; its own settings under `Interface\Explorer` | As WinSCP's: one set of commands, two layouts, the interface chosen in Preferences applying on the next start. The local panel stays, hidden, as where downloads go |
