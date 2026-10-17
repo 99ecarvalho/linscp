@@ -256,6 +256,10 @@ public:
   // Translations is given, the shell beside that folder (a test program
   // using the shell's translations).
   virtual UnicodeString __fastcall ModuleFileName();
+  // TWinConfiguration's DefaultKeyFile: the command line's /privatekey,
+  // for sites with none of their own (this run's).
+  virtual UnicodeString __fastcall GetDefaultKeyFile();
+  void SetDefaultKeyFile(const UnicodeString & KeyFile) { FDefaultKeyFile = KeyFile; }
   void SetTranslationsDirectory(const UnicodeString & Translations);
   // A locale for this run only (linscp's --lang): applied, but what is
   // saved stays the locale chosen before (or after, through
@@ -357,6 +361,7 @@ private:
   UnicodeString FModuleFileName;
   std::map<UnicodeString, std::vector<UnicodeString>> FHistory;
   TShellSettings FSettings;
+  UnicodeString FDefaultKeyFile;
   std::unique_ptr<TBookmarks> FBookmarks;
   std::unique_ptr<TCustomCommandList> FCustomCommandList;
   std::unique_ptr<TCustomCommandList> FExtensionList;

@@ -311,7 +311,8 @@ if(TARGET linscp)
   # F1: the GUI's logging switches (the log file is only named, not written).
   add_test(NAME qt_gui_logswitches COMMAND test_qt_gui logswitches "${CMAKE_CURRENT_BINARY_DIR}/gui-switches.log" /ini=nul
            "/log=${CMAKE_CURRENT_BINARY_DIR}/gui-switches.log" /loglevel=2* /logsize=3*1M
-           "/xmllog=${CMAKE_CURRENT_BINARY_DIR}/gui-switches.xml" -platform offscreen)
+           "/xmllog=${CMAKE_CURRENT_BINARY_DIR}/gui-switches.xml" /privatekey=/tmp/linscp-default.ppk
+           /rawtransfersettings PreserveTime=0 -platform offscreen)
   set_tests_properties(qt_gui_logswitches PROPERTIES DEPENDS qt_gui_build TIMEOUT 60)
   add_test(NAME qt_language COMMAND test_qt_gui language "${LINSCP_TRANSLATIONS_DIR}" -platform offscreen)
   set_tests_properties(qt_language PROPERTIES DEPENDS "qt_gui_build;gui_build" TIMEOUT 120)

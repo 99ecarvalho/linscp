@@ -1948,6 +1948,9 @@ void CleanupTemporaryFolders();
 // Configuration's DisablePasswordStoring (an administrator's): no password
 // is stored.
 bool PasswordStoringDisabled();
+// Configuration's DefaultKeyFile: a site's key when it names none (the
+// command line's /privatekey).
+std::string DefaultKeyFile();
 // Core's time texts: a span (FormatDateTimeSpan, "0:00:05"), and now's
 // time (TDateTime::TimeString).
 std::string TimeSpanText(double Seconds);
@@ -2165,6 +2168,13 @@ bool CommandLineKeepUpToDate(TKeepUpToDateParams & Params, bool & UseDefaults);
 bool CommandLineSynchronize(std::string & LocalDirectory, std::string & RemoteDirectory, bool & UseDefaults);
 // As pcEdit: /edit with the one remote file to edit. False without it.
 bool CommandLineEdit(std::string & FileName);
+// /defaults: an operation's dialog skipped.
+bool CommandLineUseDefaults();
+// As WinMain: /rawtransfersettings, this run's default transfer settings
+// (Initialize applies them).
+void ApplyRawTransferSettingsSwitch();
+// /help, /h, /?: the usage, as WinSCP shows its console's.
+bool CommandLineHelp();
 // As pcRefresh: /refresh [path], with the session (empty: every one)
 // named on the command line, or the Arguments given (another instance's).
 bool CommandLineRefresh(std::string & Session, std::string & Path, const std::vector<std::string> * Arguments = nullptr);
@@ -2207,6 +2217,11 @@ public:
   // password changed).
   static void RecryptPasswords();
   static std::unique_ptr<TSession> FromCommandLine(bool & CanOpen, const std::vector<std::string> * Arguments = nullptr);
+  // A download URL's file name (in the URL's directory), from
+  // FromCommandLine; empty for none. /explore (or /browse) [file]: the
+  // file focused rather than downloaded.
+  std::string DownloadFile() const;
+  static bool CommandLineExplore(std::string & FileName);
   static std::string CommandLineFolderOrWorkspace(const std::vector<std::string> * Arguments = nullptr);
   // A session on the same site, as it is now (TCustomScpExplorerForm's
   // DuplicateTab: CloneCurrentSessionData), not opened yet. Throws

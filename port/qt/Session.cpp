@@ -76,6 +76,8 @@ struct TSession::TImpl
   static std::set<TImpl *> & Live();
 
   std::unique_ptr<TSessionData> Data;
+  // A download URL's file (ParseUrl's DownloadFile), in its directory.
+  UnicodeString DownloadFile;
   std::unique_ptr<TTerminal> Terminal;
   // The background queue, made with its first item; its status as last
   // taken, and whether its threads said it changed since.
@@ -345,6 +347,63 @@ TProgramParams * ProgramParamsOf(const std::vector<std::string> * Arguments, std
 
 }  // namespace
 
+// As GetFolderOrWorkspaceName: a folder or workspace of that name, unless
+// a site has it too (with /workspace, the workspace first).
+static UnicodeString FolderOrWorkspaceName(const UnicodeString & SessionName, TOptions * Options)
+{
+  const UnicodeString Name = DecodeUrlChars(SessionName);
+  const bool PreferSite = !Options->FindSwitch(L"Workspace");
+  return ((!PreferSite || (StoredSessions->FindByName(Name) == NULL)) && StoredSessions->IsFolderOrWorkspace(Name)) ?
+    Name : UnicodeString();
+}
+
+std::string TSession::DownloadFile() const
+{
+  return Utf8(F->DownloadFile);
+}
+
+bool TSession::CommandLineExplore(std::string & FileName)
+{
+  UnicodeString Value;
+  TProgramParams * Params = TProgramParams::Instance();
+  if (Params->FindSwitch(L"Explore", Value) || Params->FindSwitch(L"Browse", Value))
+  {
+    FileName = Utf8(Value);
+    return true;
+  }
+  return false;
+}
+
+void ApplyRawTransferSettingsSwitch()
+{
+  try
+  {
+    // As WinMain: this run's default transfer settings.
+    std::unique_ptr<TStringList> Raw(new TStringList());
+    if (TProgramParams::Instance()->FindSwitch(RAWTRANSFERSETTINGS_SWITCH, Raw.get()))
+    {
+      std::unique_ptr<TOptionsStorage> Storage(new TOptionsStorage(Raw.get(), false));
+      GUIConfiguration->LoadDefaultCopyParam(Storage.get());
+    }
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+bool CommandLineHelp()
+{
+  TProgramParams * Params = TProgramParams::Instance();
+  return Params->FindSwitch(L"help") || Params->FindSwitch(L"h") || Params->FindSwitch(L"?");
+}
+
+bool CommandLineUseDefaults()
+{
+  UnicodeString Value;
+  return TProgramParams::Instance()->FindSwitch(L"Defaults", Value);
+}
+
 std::string TSession::CommandLineFolderOrWorkspace(const std::vector<std::string> * Arguments)
 {
   std::unique_ptr<TProgramParams> Owner;
@@ -353,9 +412,7 @@ std::string TSession::CommandLineFolderOrWorkspace(const std::vector<std::string
   {
     return std::string();
   }
-  const UnicodeString Name = DecodeUrlChars(Params->Param[1]);
-  return ((StoredSessions->FindByName(Name) == NULL) && StoredSessions->IsFolderOrWorkspace(Name)) ?
-    Utf8(Name) : std::string();
+  return Utf8(FolderOrWorkspaceName(Params->Param[1], Params));
 }
 
 std::unique_ptr<TSession> TSession::FromCommandLine(bool & CanOpen, const std::vector<std::string> * Arguments)
@@ -375,8 +432,7 @@ std::unique_ptr<TSession> TSession::FromCommandLine(bool & CanOpen, const std::v
     }
     const UnicodeString SessionName = Params->Param[1];
     // GetFolderOrWorkspaceName: several sites, which need tabs.
-    if ((StoredSessions->FindByName(DecodeUrlChars(SessionName)) == NULL) &&
-        StoredSessions->IsFolderOrWorkspace(DecodeUrlChars(SessionName)))
+    if (!FolderOrWorkspaceName(SessionName, Params).IsEmpty())
     {
       return nullptr;
     }
@@ -388,6 +444,7 @@ std::unique_ptr<TSession> TSession::FromCommandLine(bool & CanOpen, const std::v
     UnicodeString DownloadFile;
     std::unique_ptr<TSession> Result(new TSession());
     Result->F->Data.reset(StoredSessions->ParseUrl(SessionName, &Options, ParsedInfo, &DownloadFile, NULL, Flags));
+    Result->F->DownloadFile = DownloadFile;
     CanOpen = Result->F->Data->CanOpen && FLAGCLEAR(ParsedInfo, piDefaultsOnly);
     return Result;
   }

@@ -35,6 +35,7 @@
 #include <QEventLoop>
 #include <QFileInfo>
 #include <QMimeData>
+#include <QStandardPaths>
 #include <QUrl>
 #include <QActionGroup>
 #include <QColorDialog>
@@ -1502,9 +1503,33 @@ void MainWindow::StartUp()
   {
     return;
   }
+  const QString DownloadFile = Session ? QString::fromStdString(Session->DownloadFile()) : QString();
   if (!Session || !CanOpen || !Open(std::move(Session)))
   {
     NeedSession(true);
+    return;
+  }
+  if (!DownloadFile.isEmpty())
+  {
+    // As WinMain: a download URL's file focused (/explore), else
+    // downloaded (the Copy dialog unless /defaults), standalone.
+    std::string Explore;
+    if (CoreBridge::TSession::CommandLineExplore(Explore))
+    {
+      FPanel->Select({ Explore.empty() ? DownloadFile : QString::fromStdString(Explore) });
+    }
+    else
+    {
+      FStandalone = true;
+      // The site's local directory (Open has it), else the documents.
+      QString Target = FLocal->Path();
+      if (QString::fromStdString(FSession->LocalDirectory()).isEmpty())
+      {
+        Target = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+      }
+      Transfer(false, { DownloadFile }, QDir::toNativeSeparators(Target), false, !CoreBridge::CommandLineUseDefaults(), false);
+      close();
+    }
   }
 }
 

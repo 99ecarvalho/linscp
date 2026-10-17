@@ -72,6 +72,7 @@
 #include <QPushButton>
 #include <QTimer>
 #include <QClipboard>
+#include <QStandardPaths>
 #include <QStatusBar>
 #include <QToolBar>
 #include <QToolButton>
@@ -361,6 +362,10 @@ void LogSwitches(const QString & LogFile)
   Check((Preferences.LogLevel == 3) && Preferences.LogSensitive, "/loglevel=2*: debug 2, passwords included");
   Check((Preferences.LogMaxCount == 3) && (Preferences.LogMaxSize == 1024 * 1024), "/logsize=3*1M: rotated at 1 MB, three kept");
   Check(Preferences.LogActions && !Preferences.ActionsLogFileName.empty(), "/xmllog: the XML log on");
+  // F2: /privatekey, the sites' default key; /rawtransfersettings, this
+  // run's default transfer settings.
+  Check(CoreBridge::DefaultKeyFile() == "/tmp/linscp-default.ppk", "/privatekey: the default key");
+  Check(!CoreBridge::DefaultTransferSettings().PreserveTime, "/rawtransfersettings: the default transfer settings");
   CoreBridge::Finalize();
 }
 
@@ -6175,6 +6180,19 @@ void TabsTest(const char * Port, const QString & Directory)
     const std::vector<std::string> Workspaces = CoreBridge::WorkspaceNames();
     Check((Workspaces.size() == 1) && (QString::fromStdString(Workspaces[0]) == Name), "the workspace stored");
     Check(CoreBridge::WorkspaceSessionCount(Name.toStdString()) == 2, "with both tabs' sessions");
+    // F2: /workspace: a workspace before a site of the same name.
+    {
+      CoreBridge::TSite Same = CoreBridge::NewSite();
+      Same.Name = Name.toStdString();
+      Same.HostName = "same.example";
+      CoreBridge::SaveSite(Same);
+      const std::vector<std::string> Plain = { Name.toStdString() };
+      const std::vector<std::string> Preferring = { Name.toStdString(), "/workspace" };
+      Check(CoreBridge::TSession::CommandLineFolderOrWorkspace(&Plain).empty() &&
+        (CoreBridge::TSession::CommandLineFolderOrWorkspace(&Preferring) == Name.toStdString()),
+        "the site of the same name first, the workspace with /workspace");
+      CoreBridge::DeleteSite(Name.toStdString());
+    }
     Check(QString::fromStdString(CoreBridge::WorkspaceSettings().AutoWorkspace) == Name, "saved automatically from now on");
     Check(Window.WorkspaceName() == Name, "the name offered next time");
     Check(Window.CloseTab(1) && Window.CloseTab(0) && (Window.TabCount() == 0), "(both tabs closed)");
@@ -7850,6 +7868,32 @@ void UploadSwitchTest(const char * Port, const QString & Directory)
         Editor->close();
         QTest::qWait(100);
       }
+    }
+    // A download URL: /explore focuses its file; else it is downloaded
+    // (/defaults: no Copy dialog) to the documents, the window closing.
+    {
+      MainWindow Window(CoreBridge::Info());
+      Frontend.SetWindow(&Window);
+      Window.show();
+      CoreBridge::SetArguments({ "/ini=nul", (Url + QStringLiteral("sent.txt")).toStdString(), "/explore" });
+      Window.StartUp();
+      Check(Window.isVisible() && (Window.Panel()->Path() == QStringLiteral("/sub")) &&
+        (Window.Panel()->Selected() == QStringList({ QStringLiteral("sent.txt") })), "/explore: the URL's file focused");
+    }
+    {
+      QStandardPaths::setTestModeEnabled(true);
+      const QDir Documents(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
+      QDir().mkpath(Documents.path());
+      QFile::remove(Documents.filePath(QStringLiteral("sent.txt")));
+      MainWindow Window(CoreBridge::Info());
+      Frontend.SetWindow(&Window);
+      Window.show();
+      CoreBridge::SetArguments({ "/ini=nul", (Url + QStringLiteral("sent.txt")).toStdString(), "/defaults" });
+      Window.StartUp();
+      Check(QFileInfo::exists(Documents.filePath(QStringLiteral("sent.txt"))) && !Window.isVisible(),
+        "a download URL: the file downloaded to the documents, then the window closes");
+      QFile::remove(Documents.filePath(QStringLiteral("sent.txt")));
+      QStandardPaths::setTestModeEnabled(false);
     }
     std::string Session;
     std::string Path;

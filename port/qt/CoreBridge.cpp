@@ -1577,6 +1577,13 @@ void Initialize(IFrontend * AFrontend)
     HeadlessInitialize();
     // As WinMain: the command line's logging switches, for this run.
     ApplyLogSwitches(TProgramParams::Instance(), false);
+    ApplyRawTransferSettingsSwitch();
+    // As WinMain: /privatekey, the default key of sites with none.
+    UnicodeString KeyFile;
+    if (TProgramParams::Instance()->FindSwitch(L"PrivateKey", KeyFile))
+    {
+      ShellConfiguration()->SetDefaultKeyFile(KeyFile);
+    }
     ShellConfiguration()->OnMasterPasswordPrompt = MasterPasswordPrompt;
     ShellConfiguration()->OnMasterPasswordRecrypt = []() { TSession::RecryptPasswords(); };
   }

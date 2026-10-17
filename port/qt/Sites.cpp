@@ -757,6 +757,11 @@ std::string TimeSpanText(double Seconds)
   return Utf8(FormatDateTimeSpan(TDateTime(Seconds / SecsPerDay)));
 }
 
+std::string DefaultKeyFile()
+{
+  return Utf8(Configuration->DefaultKeyFile);
+}
+
 bool PasswordStoringDisabled()
 {
   return Configuration->DisablePasswordStoring;

@@ -149,6 +149,11 @@ UnicodeString TShellConfiguration::ExpandedTemporaryDirectory() const
   return Result;
 }
 
+UnicodeString __fastcall TShellConfiguration::GetDefaultKeyFile()
+{
+  return !FDefaultKeyFile.IsEmpty() ? FDefaultKeyFile : TGUIConfiguration::GetDefaultKeyFile();
+}
+
 // As TWinConfiguration::TemporaryDir.
 UnicodeString TShellConfiguration::TemporaryDir(bool Mask)
 {

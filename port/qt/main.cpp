@@ -5,6 +5,9 @@
 #include <QApplication>
 #include <QDir>
 #include <QMessageBox>
+#include <QFileInfo>
+#include <QProcess>
+#include <QStandardPaths>
 #include <QStatusBar>
 #include <QTimer>
 
@@ -88,6 +91,20 @@ int main(int argc, char ** argv)
 #endif
   // As WinMain: a session named goes to the window already running, if it
   // takes it (Shift held, as OpenInNewWindow, the other way round).
+  // As WinMain's cmHelp: the console's usage (linscp-cli's), printed.
+  if (!Smoke && CoreBridge::CommandLineHelp())
+  {
+#if defined(Q_OS_WIN)
+    const QString Cli = QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("linscp-cli.exe"));
+#else
+    const QString Cli = QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("linscp-cli"));
+#endif
+    // (Beside this program as installed; else the PATH's.)
+    const QString Program = QFileInfo::exists(Cli) ? Cli : QStandardPaths::findExecutable(QFileInfo(Cli).fileName());
+    const int Code = QProcess::execute(Program, { QStringLiteral("/help") });
+    CoreBridge::Finalize();
+    return (Code < 0) ? 1 : Code;
+  }
   // As WinMain's pcRefresh: to the instance running, nothing more.
   std::string RefreshSession;
   std::string RefreshPath;
