@@ -1003,6 +1003,13 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
         return Texts;
       };
       Check(Dialog.ManageButton()->menu() != nullptr, "a Manage button with its menu");
+      // A9: Login's drop-down.
+      QStringList LoginTexts;
+      for (QAction * Action : Dialog.LoginDropDown()->menu()->actions())
+      {
+        LoginTexts.append(Action->text());
+      }
+      Check(LoginTexts == QStringList({ SiteManager::tr("&Login"), SiteManager::tr("Open in &PuTTY") }), "Login drops down Open in PuTTY");
       Dialog.SelectSite(QStringLiteral("Tests/rclone"));
       const QStringList Site = MenuTexts();
       Check(Site.contains(QStringLiteral("&Edit")) && Site.contains(QStringLiteral("&Clone to New Site")) &&

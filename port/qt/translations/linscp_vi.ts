@@ -5031,6 +5031,10 @@ Vị trí: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>&amp;Hiển thị hộp thoại đăng nhập khi khởi động và khi đóng phiên cuối cùng</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Tùy chọn đăng nhập</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

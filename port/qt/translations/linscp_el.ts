@@ -5032,6 +5032,10 @@ Location: %2</source>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>&amp;Εμφάνιση του παραθύρου εισόδου κατά την εκκίνηση και όταν κλείσει η τελευταία συνεδρία</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Επιλογές σύνδεσης</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

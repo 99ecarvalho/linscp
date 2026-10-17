@@ -5036,6 +5036,10 @@ Location: %2</source>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>إ&amp;ظهار نافذة تسجيل الدخول عند بدء التشغيل وعند إغلاق آخر جلسة</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>خيارات تسجيل الدخول</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

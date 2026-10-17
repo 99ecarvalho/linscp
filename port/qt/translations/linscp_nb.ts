@@ -5032,6 +5032,10 @@ Plassering: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>&amp;Vis innloggingsdialog ved oppstart og når den siste økten er avsluttet</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Påloggingsalternativer</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

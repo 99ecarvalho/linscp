@@ -5031,6 +5031,10 @@ Hely: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>&amp;Megjelenítés induláskor és az utolsó munkamenet bezárásakor</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Bejelentkezési lehetőségek</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

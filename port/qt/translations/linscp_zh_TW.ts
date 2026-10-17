@@ -5031,6 +5031,10 @@ Location: %2</source>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>啟動或關閉最後一個工作階段時，顯示登入對話框(&amp;S)</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>登入選項</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -5033,6 +5033,10 @@ Umístění: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>&amp;Zobrazovat okno Přihlášení při spuštění a při zavření posledního spojení</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Možnosti přihlášení</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

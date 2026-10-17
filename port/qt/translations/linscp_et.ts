@@ -5032,6 +5032,10 @@ Asukoht: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>&amp;Kuva sisselogimise aken käivitamisel ja viimase seansi sulgemisel</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Sisselogimise valikud</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

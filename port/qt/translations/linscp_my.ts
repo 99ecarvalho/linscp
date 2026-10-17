@@ -5031,6 +5031,10 @@ Location: %2</source>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>စတင်ချိန်နှင့် နောက်ဆုံးကဏ္ဍ ပိတ်သည့်အခါ ဝင်ရောက်ခြင်း ဝင်းဒိုးကို ပြပါ(&amp;S)</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>ဝင်ရောက်မှု ရွေးစရာများ</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

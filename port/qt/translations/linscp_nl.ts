@@ -5032,6 +5032,10 @@ Locatie: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>&amp;Laat Login dialoog tijdens opstarten zien en wanneer de laatste sessie gesloten is</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Aanmeldopties</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

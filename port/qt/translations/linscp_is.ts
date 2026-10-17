@@ -5032,6 +5032,10 @@ Staðsetning: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>&amp;Sýna Innskráningarglugga við ræsingu og þegar síðustu lotu er lokað</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Innskráningarvalkostir</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

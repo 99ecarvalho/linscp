@@ -5032,6 +5032,10 @@ Local: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>E&amp;xibir diálogo de login durante a iniciação e quando a última sessão for fechada</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Opções de login</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

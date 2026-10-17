@@ -5032,6 +5032,10 @@ Ubicació: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>&amp;Mostra el diàleg Entra a l&apos;inici i quan es tanca la darrera sessió</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Opcions d&apos;inici de sessió</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

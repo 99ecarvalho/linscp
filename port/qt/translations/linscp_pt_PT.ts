@@ -5032,6 +5032,10 @@ Localização: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>Mo&amp;strar a caixa de início da sessão ao iniciar e quando a última sessão é terminada</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Opções de início de sessão</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

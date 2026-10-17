@@ -5032,6 +5032,10 @@ Location: %2</source>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>შესვლის დიალოგი&amp;ს ჩვენება გაშვებისას და როცა ბოლო სესია დაიხურება</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>შესვლის პარამეტრები</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

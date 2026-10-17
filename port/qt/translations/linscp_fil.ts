@@ -5032,6 +5032,10 @@ Lokasyon: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>&amp;Ipakita ang Login dialog sa pagsisimula at kapag isinara ang huling session</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Mga opsyon sa pag-login</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

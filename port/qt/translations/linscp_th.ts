@@ -5031,6 +5031,10 @@ Location: %2</source>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>&amp;แสดงกล่องโต้ตอบเข้าสู่ระบบเมื่อเริ่มโปรแกรมและเมื่อปิดเซสชั่นสุดท้าย</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>ตัวเลือกการเข้าสู่ระบบ</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

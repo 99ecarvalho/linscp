@@ -58,6 +58,7 @@ public:
   // Confirm is false. False when it did not save.
   bool SetDefaults(bool Confirm = true);
   QToolButton * SaveButton() const { return FSave; }
+  QToolButton * LoginDropDown() const { return FLoginDropDown; }
   // As ShowAgainPanel, when shown by itself: "Show Login dialog on startup
   // and when the last session is closed", unchecked only after asking.
   QCheckBox * ShowAgainCheck() const { return FShowAgain; }
@@ -209,6 +210,7 @@ private:
   QPushButton * FDelete = nullptr;
   QPushButton * FNewFolder = nullptr;
   QPushButton * FManage = nullptr;
+  QToolButton * FLoginDropDown = nullptr;
   QCheckBox * FShowAgain = nullptr;
   QMenu * FToolsMenu = nullptr;
   bool eventFilter(QObject * Watched, QEvent * Event) override;

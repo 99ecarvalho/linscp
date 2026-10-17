@@ -5032,6 +5032,10 @@ Vendndodhja: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>&amp;Shfaq dialogun e hyrjes në nisje dhe kur mbyllet seanca e fundit</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Opsionet e hyrjes</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

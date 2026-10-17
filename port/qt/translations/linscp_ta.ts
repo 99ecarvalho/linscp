@@ -5032,6 +5032,10 @@ Location: %2</source>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>&amp;தொடக்கத்தில் உள்நுழைவு உரையாடலைக் காட்டு மற்றும் கடைசி அமர்வு மூடப்படும் போது</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>உள்நுழைவு விருப்பங்கள்</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -5032,6 +5032,10 @@ Percorso: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>Vi&amp;sualizza finestra accesso all&apos;avvio e quando l&apos;ultima sessione è chiusa</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Opzioni di accesso</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -5031,6 +5031,10 @@ Konum: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>Açılışta oturum açma penceresi ve &amp;son oturumun ne zaman kapatıldığı görüntülensin</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Oturum açma seçenekleri</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

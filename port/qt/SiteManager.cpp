@@ -331,6 +331,24 @@ SiteManager::SiteManager(QWidget * Parent) :
   QDialogButtonBox * Box = new QDialogButtonBox(this);
   FLogin = Box->addButton(tr("&Login"), QDialogButtonBox::AcceptRole);
   FLogin->setDefault(true);
+  // As LoginButton's split part (LoginDropDownMenu): Login, Open in PuTTY.
+  // An arrow beside it, Login staying the default button.
+  FLoginDropDown = new QToolButton(this);
+  FLoginDropDown->setArrowType(Qt::DownArrow);
+  FLoginDropDown->setAccessibleName(tr("Login options"));
+  FLoginDropDown->setToolTip(tr("Login options"));
+  FLoginDropDown->setPopupMode(QToolButton::InstantPopup);
+  QMenu * LoginMenu = new QMenu(FLoginDropDown);
+  LoginMenu->addAction(tr("&Login"), this, &SiteManager::accept);
+  QAction * Putty = LoginMenu->addAction(tr("Open in &PuTTY"), QKeySequence(Qt::CTRL | Qt::Key_P), this, [this]() { OpenInPutty(); });
+  connect(LoginMenu, &QMenu::aboutToShow, this, [this, Putty]()
+  {
+    const QTreeWidgetItem * Item = FTree->currentItem();
+    const int Kind = (Item != nullptr) ? Item->data(0, KindRole).toInt() : NewSiteKind;
+    Putty->setEnabled((Kind == SiteKind) || (Kind == NewSiteKind));
+  });
+  FLoginDropDown->setMenu(LoginMenu);
+  Box->addButton(FLoginDropDown, QDialogButtonBox::AcceptRole);
   // As upstream's Save, its drop-down (SaveDropDownMenu): Save, Save As...,
   // Set Defaults.
   FSave = new QToolButton(this);
@@ -1938,6 +1956,7 @@ void SiteManager::UpdateButtons()
   // A workspace: logged in to or deleted, not edited.
   const bool Form = (Kind == SiteKind) || (Kind == NewSiteKind);
   FLogin->setEnabled(Kind != FolderKind);
+  FLoginDropDown->setEnabled(FLogin->isEnabled());
   FSave->setEnabled(Form);
   FAdvanced->setEnabled(Form);
   FRename->setEnabled((Kind == SiteKind) || (Kind == FolderKind) || (Kind == WorkspaceKind));

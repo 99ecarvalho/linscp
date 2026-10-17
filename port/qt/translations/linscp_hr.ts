@@ -5033,6 +5033,10 @@ Lokacija: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>&amp;Prikaži dijaloški okvir za prijavu pri pokretanju i kada se zatvori posljednja sesija</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Mogućnosti prijave</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

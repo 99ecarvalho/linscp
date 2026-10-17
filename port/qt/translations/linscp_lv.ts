@@ -5033,6 +5033,10 @@ Atrašanās vieta: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>&amp;Rādīt pieteikšanās logu, startējot un aizverot pēdējo sesiju</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Pieteikšanās opcijas</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

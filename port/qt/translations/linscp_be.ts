@@ -5033,6 +5033,10 @@ Location: %2</source>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>Паказваць акно ўваходу пры запуску і пасля &amp;закрыцця апошняга сеанса</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Параметры ўваходу</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

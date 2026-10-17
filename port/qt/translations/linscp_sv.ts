@@ -5032,6 +5032,10 @@ Plats: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>&amp;Visa inloggningsdialogrutan vid start och när den sista sessionen är stängd</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Inloggningsalternativ</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

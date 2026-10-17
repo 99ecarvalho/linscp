@@ -5031,6 +5031,10 @@ Location: %2</source>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>시작 및 마지막 세션이 닫힐 때 로그인 창 표시(&amp;S)</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>로그인 옵션</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

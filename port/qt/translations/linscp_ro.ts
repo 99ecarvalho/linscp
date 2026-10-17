@@ -5033,6 +5033,10 @@ Cale: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>Afișare Ferea&amp;stră conectare la start și la închiderea ultimei sesiuni</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Opțiuni de autentificare</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

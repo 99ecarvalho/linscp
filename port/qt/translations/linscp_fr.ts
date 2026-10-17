@@ -5032,6 +5032,10 @@ Emplacement : %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>Afficher la boîte de dialogue de connexion au démarrage et à la fermeture de la dernière session</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Options de connexion</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

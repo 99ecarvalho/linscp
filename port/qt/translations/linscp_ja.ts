@@ -5031,6 +5031,10 @@ Location: %2</source>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>最後のセッションを閉じた後の起動時にログインを表示(&amp;S)</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>ログイン オプション</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

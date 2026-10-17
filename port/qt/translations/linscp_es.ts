@@ -5032,6 +5032,10 @@ Ruta: %2</translation>
         <source>&amp;Show Login dialog on startup and when the last session is closed</source>
         <translation>Mostrar diálogo de conexión al &amp;inicio y cuando se cierre la última sesión.</translation>
     </message>
+    <message>
+        <source>Login options</source>
+        <translation>Opciones de inicio de sesión</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>
