@@ -4827,6 +4827,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>デフォルトの設定として使う(&amp;F)</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>管理(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>PuTTY を開く(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>編集(&amp;E)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>リセット(&amp;R)</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>名前の変更(&amp;R)</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>新しいサイトとして複製(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>セッション URL/コードの生成(&amp;G)...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4828,6 +4828,34 @@ Lokasyon: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>I-save bilang de&amp;fault</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;i-Manage</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Buksan sa &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>Ay&amp;usin</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>I-&amp;Reset</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>Palitan ang Pa&amp;ngalan</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>I-&amp;clone sa Bagong Site</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Gumawa ng Session URL/Code...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

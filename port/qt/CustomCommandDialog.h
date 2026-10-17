@@ -70,6 +70,10 @@ private:
 
 // TCustomCommandPromptsDialog: each prompt with its default; false when
 // cancelled.
+// The prompts a command asks in a window: CustomCommandPrompts for its
+// !?prompt?default! patterns, a !`command` pattern's command run locally
+// (Windows: cmd.exe, else /bin/sh), its output taken.
+CoreBridge::TCustomCommandPrompts WindowCommandPrompts(QWidget * Parent);
 bool CustomCommandPrompts(QWidget * Parent, const std::string & Name,
   const std::vector<std::pair<std::string, std::string>> & Prompts, std::vector<std::string> & Values);
 

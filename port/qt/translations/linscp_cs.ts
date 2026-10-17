@@ -4829,6 +4829,34 @@ Umístění: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Jako &amp;výchozí</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Spravovat</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Otevřít v &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Editovat</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Vymazat</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Přejmenovat</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Kopírovat jako nové místo</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Generovat URL/kód spojení...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

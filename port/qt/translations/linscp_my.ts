@@ -4827,6 +4827,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>မူလအဖြစ် သတ်မှတ်ပါ(&amp;F)</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>စီမံပါ(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>PuTTY တွင် ဖွင့်ပါ(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>ပြင်ဆင်ပါ(&amp;E)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>ပြန်သတ်မှတ်ပါ(&amp;R)</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>အမည်ပြောင်းပါ(&amp;R)</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>ဆိုက်အသစ်သို့ ပွားယူပါ(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>ဆက်ရှင် URL/ကုဒ် ထုတ်ပါ(&amp;G)...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

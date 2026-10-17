@@ -4827,6 +4827,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>ตั้งค่าเริ่มต้น</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>จัดการ</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>&amp;เปิดใน PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>แก้ไข</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>รีเซ็ต</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>เปลี่ยนชื่อ</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>โคลนไปที่เว็บไซต์ใหม่</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;สร้าง URL/โค้ดของเซสชัน...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

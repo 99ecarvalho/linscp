@@ -693,6 +693,13 @@ void SaveSite(const TSite & Site, const std::string & BaseName)
   }
 }
 
+std::string UniqueSiteName(const std::string & Name)
+{
+  std::unique_ptr<TSessionData> Data(new TSessionData(FromUtf8(Name)));
+  Data->MakeUniqueIn(StoredSessions);
+  return Utf8(Data->Name);
+}
+
 void SaveDefaultSite(const TSite & Site)
 {
   try

@@ -2462,24 +2462,7 @@ bool MainWindow::Synchronize(bool Confirm)
 // patterns run here, their output taken.
 CoreBridge::TCustomCommandPrompts MainWindow::CommandPrompts()
 {
-  CoreBridge::TCustomCommandPrompts Prompts;
-  Prompts.Prompt = [this](const std::string & Name, const std::vector<std::pair<std::string, std::string>> & Asked,
-    std::vector<std::string> & Values)
-  {
-    return CustomCommandPrompts(this, Name, Asked, Values);
-  };
-  Prompts.Execute = [](const std::string & Line)
-  {
-    QProcess Process;
-#if defined(_WIN32)
-    Process.start(QStringLiteral("cmd.exe"), { QStringLiteral("/c"), QString::fromStdString(Line) });
-#else
-    Process.start(QStringLiteral("/bin/sh"), { QStringLiteral("-c"), QString::fromStdString(Line) });
-#endif
-    Process.waitForFinished(-1);
-    return QString::fromLocal8Bit(Process.readAllStandardOutput()).toStdString();
-  };
-  return Prompts;
+  return WindowCommandPrompts(this);
 }
 
 // What runs a local custom command's programs: on Windows the command line

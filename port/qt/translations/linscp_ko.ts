@@ -4827,6 +4827,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>기본으로(&amp;F)</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>관리(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>PuTTY에서 열기(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>편집(&amp;E)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>초기화(&amp;R)</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>이름 바꾸기(&amp;R)</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>새 사이트로 복제(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>세션 URL/코드 생성(&amp;G)...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

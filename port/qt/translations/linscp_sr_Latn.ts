@@ -4829,6 +4829,34 @@ Lokacija: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Pod&amp;razumevano</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Upravljaj</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Otvori u &amp;PuTTY-ju</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>Ur&amp;edi</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Resetuj</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>Preime&amp;nuj</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Kloniraj na novo mesto</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Generiši URL/kod sesije...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

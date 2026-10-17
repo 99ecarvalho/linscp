@@ -4829,6 +4829,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>По умолчанию</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Управление</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Открыть в &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Изменить</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Очистить поля</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>Пере&amp;именовать</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Клонировать для нового подключения</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>Сформировать URL или код соединения…</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4828,6 +4828,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>இயல்புநிலைகள் அமை</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;நிர்வகி</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>&amp;புட்டி திற</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;திருத்து</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;மீட்டமை</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;மறுபெயரிடு</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;புதிய தளத்திற்கு நகலி</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;அமர்வு முகவரி/குறியீட்டை உருவாக்குங்கள்...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

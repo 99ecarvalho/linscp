@@ -4828,6 +4828,34 @@ Asukoht: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Vaikes&amp;äteteks</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Halda</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Ava PuTT&amp;Y-s</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Redigeeri</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Lähtesta</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Nimeta ümber</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Klooni uueks saidiks</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Genereeri seansi URL/kood...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

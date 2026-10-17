@@ -10,6 +10,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QProcess>
 #include <QPushButton>
 #include <QToolTip>
 #include <QRadioButton>
@@ -254,4 +255,26 @@ bool CustomCommandPrompts(QWidget * Parent, const std::string & Name,
     Values.push_back(Edit->text().toStdString());
   }
   return true;
+}
+
+CoreBridge::TCustomCommandPrompts WindowCommandPrompts(QWidget * Parent)
+{
+  CoreBridge::TCustomCommandPrompts Prompts;
+  Prompts.Prompt = [Parent](const std::string & Name, const std::vector<std::pair<std::string, std::string>> & Asked,
+    std::vector<std::string> & Values)
+  {
+    return CustomCommandPrompts(Parent, Name, Asked, Values);
+  };
+  Prompts.Execute = [](const std::string & Line)
+  {
+    QProcess Process;
+#if defined(_WIN32)
+    Process.start(QStringLiteral("cmd.exe"), { QStringLiteral("/c"), QString::fromStdString(Line) });
+#else
+    Process.start(QStringLiteral("/bin/sh"), { QStringLiteral("-c"), QString::fromStdString(Line) });
+#endif
+    Process.waitForFinished(-1);
+    return QString::fromLocal8Bit(Process.readAllStandardOutput()).toStdString();
+  };
+  return Prompts;
 }

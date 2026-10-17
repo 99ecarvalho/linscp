@@ -4828,6 +4828,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>Սահմանել &amp;լռելյայն</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Կառավարել</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Բացել &amp;PuTTY-ում</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Խմբագրել</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Վերակայել</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Վերանվանել</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Կլոնավորել նոր կայքում</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Ստեղծել աշխատաշրջանի URL/կոդ...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

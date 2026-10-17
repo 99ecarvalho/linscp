@@ -24,8 +24,10 @@ public:
   // Paths: files' full remote paths, for their URLs; empty for the
   // session's.
   // Transfer: the Copy dialog's transfer's code (no URL page).
+  // Site: the Login dialog's, a site's code without a session (Session
+  // null, no Paths).
   GenerateUrlDialog(CoreBridge::TSession * Session, const std::vector<std::string> & Paths, QWidget * Parent = nullptr,
-    const CoreBridge::TSession::TTransferCode * Transfer = nullptr);
+    const CoreBridge::TSession::TTransferCode * Transfer = nullptr, const CoreBridge::TSite * Site = nullptr);
 
   // What it shows, as text (Copy to Clipboard's).
   QString Text() const;
@@ -45,6 +47,8 @@ private:
   void Generate();
 
   CoreBridge::TSession * FSession;
+  bool FHasSite = false;
+  CoreBridge::TSite FSite;
   std::vector<std::string> FPaths;
   bool FHasTransfer = false;
   CoreBridge::TSession::TTransferCode FTransfer;

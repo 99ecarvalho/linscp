@@ -4828,6 +4828,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>ਡਿਫੌਲਟ ਸੈਟ ਕਰੋ</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>ਪ੍ਰਬੰਧਨ</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>PuTTY ਵਿੱਚ ਖੋਲ੍ਹੋ(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>ਸੈਸ਼ਨ ਸਵੇਧਿਤ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>ਰੀਸੈਟ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>ਨਾਮ ਬਦਲੋ</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>ਨਵੇਂ ਸਾਈਟ ਵਿੱਚ ਕਲੋਨ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>ਸੈਸ਼ਨ URL/ਕੋਡ ਬਣਾਓ...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

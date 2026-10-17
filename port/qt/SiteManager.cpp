@@ -29,6 +29,8 @@
 #include "SiteRawDialog.h"
 #include "ImportSitesDialog.h"
 #include "CleanupDialog.h"
+#include "CustomCommandDialog.h"
+#include "GenerateUrlDialog.h"
 #include <QMenu>
 #include <QToolButton>
 
@@ -82,7 +84,29 @@ SiteManager::SiteManager(QWidget * Parent) :
     }
   });
   TreeLayout->addWidget(FTree, 1);
+  // As upstream's: the item's menu, on the tree and its Manage button.
+  FTree->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(FTree, &QTreeWidget::customContextMenuRequested, this, [this](const QPoint & Pos)
+  {
+    QTreeWidgetItem * Item = FTree->itemAt(Pos);
+    if (Item != nullptr)
+    {
+      FTree->setCurrentItem(Item);
+    }
+    QMenu Menu(this);
+    FillManageMenu(&Menu);
+    Menu.exec(FTree->viewport()->mapToGlobal(Pos));
+  });
   QHBoxLayout * TreeButtons = new QHBoxLayout();
+  FManage = new QPushButton(tr("&Manage"), TreePanel);
+  QMenu * ManageMenu = new QMenu(FManage);
+  connect(ManageMenu, &QMenu::aboutToShow, this, [this, ManageMenu]()
+  {
+    ManageMenu->clear();
+    FillManageMenu(ManageMenu);
+  });
+  FManage->setMenu(ManageMenu);
+  TreeButtons->addWidget(FManage);
   FNewFolder = new QPushButton(tr("Ne&w Folder..."), TreePanel);
   FRename = new QPushButton(tr("Re&name..."), TreePanel);
   FDelete = new QPushButton(tr("&Delete"), TreePanel);
@@ -90,26 +114,8 @@ SiteManager::SiteManager(QWidget * Parent) :
   TreeButtons->addWidget(FRename);
   TreeButtons->addWidget(FDelete);
   TreeLayout->addLayout(TreeButtons);
-  connect(FNewFolder, &QPushButton::clicked, this, [this]()
-  {
-    bool OK = false;
-    const QString Name = QInputDialog::getText(this, CoreText(CoreBridge::TText::NewFolderCaption),
-      CoreText(CoreBridge::TText::NewFolderPrompt), QLineEdit::Normal, QString(), &OK).trimmed();
-    if (OK && !Name.isEmpty())
-    {
-      NewFolder(Name);
-    }
-  });
-  connect(FRename, &QPushButton::clicked, this, [this]()
-  {
-    const QString Current = !SelectedName().isEmpty() ? SelectedName() : SelectedFolder();
-    bool OK = false;
-    const QString Name = QInputDialog::getText(this, tr("Rename"), tr("New &name:"), QLineEdit::Normal, Current, &OK).trimmed();
-    if (OK && !Name.isEmpty() && (Name != Current))
-    {
-      RenameSelected(Name);
-    }
-  });
+  connect(FNewFolder, &QPushButton::clicked, this, &SiteManager::AskNewFolder);
+  connect(FRename, &QPushButton::clicked, this, &SiteManager::AskRename);
   connect(FDelete, &QPushButton::clicked, this, [this]() { DeleteSelected(true); });
 
   QWidget * FormPanel = new QWidget(Splitter);
@@ -455,6 +461,7 @@ void SiteManager::CurrentChanged()
     else if (Kind == NewSiteKind)
     {
       Load(CoreBridge::NewSite());
+      FNewSiteName.clear();
     }
   }
   catch (const CoreBridge::TCoreError & E)
@@ -711,6 +718,136 @@ bool SiteManager::VerifyKey()
   return true;
 }
 
+void SiteManager::AskNewFolder()
+{
+  bool OK = false;
+  const QString Name = QInputDialog::getText(this, CoreText(CoreBridge::TText::NewFolderCaption),
+    CoreText(CoreBridge::TText::NewFolderPrompt), QLineEdit::Normal, QString(), &OK).trimmed();
+  if (OK && !Name.isEmpty())
+  {
+    NewFolder(Name);
+  }
+}
+
+void SiteManager::AskRename()
+{
+  const QString Current = !SelectedName().isEmpty() ? SelectedName() : SelectedFolder();
+  bool OK = false;
+  const QString Name = QInputDialog::getText(this, tr("Rename"), tr("New &name:"), QLineEdit::Normal, Current, &OK).trimmed();
+  if (OK && !Name.isEmpty() && (Name != Current))
+  {
+    RenameSelected(Name);
+  }
+}
+
+void SiteManager::FillManageMenu(QMenu * Menu)
+{
+  const QTreeWidgetItem * Item = FTree->currentItem();
+  const int Kind = (Item != nullptr) ? Item->data(0, KindRole).toInt() : NewSiteKind;
+  const bool Form = (Kind == SiteKind) || (Kind == NewSiteKind);
+  QAction * Login = Menu->addAction(tr("&Login"), this, &SiteManager::accept);
+  Login->setEnabled(FLogin->isEnabled());
+  if (Kind != WorkspaceKind)
+  {
+    Menu->addAction(tr("Open in &PuTTY"), QKeySequence(Qt::CTRL | Qt::Key_P), this, [this]() { OpenInPutty(); })->setEnabled(Form);
+  }
+  Menu->addSeparator();
+  if (Kind == SiteKind)
+  {
+    // The form is always editable here: Edit goes to it.
+    Menu->addAction(tr("&Edit"), this, [this]()
+    {
+      FHostName->setFocus();
+      FHostName->selectAll();
+    });
+  }
+  if (Kind == NewSiteKind)
+  {
+    Menu->addAction(tr("Save &As..."), this, [this]() { SaveAsDialog(true); });
+    Menu->addAction(tr("&Reset"), this, &SiteManager::ResetNewSite);
+  }
+  else
+  {
+    Menu->addAction(tr("&Delete"), this, [this]() { DeleteSelected(true); });
+    Menu->addAction(tr("&Rename"), this, &SiteManager::AskRename)->setEnabled(FRename->isEnabled());
+  }
+  if (Kind == SiteKind)
+  {
+    Menu->addAction(tr("&Clone to New Site"), this, &SiteManager::CloneToNewSite);
+  }
+  if (Form)
+  {
+    Menu->addAction(tr("&Generate Session URL/Code..."), this, &SiteManager::GenerateUrl);
+    Menu->addSeparator();
+    Menu->addAction(tr("Set De&faults"), this, [this]() { SetDefaults(); });
+  }
+  if (Kind != WorkspaceKind)
+  {
+    Menu->addSeparator();
+    Menu->addAction(tr("Ne&w Folder..."), this, &SiteManager::AskNewFolder);
+  }
+  if (Kind != NewSiteKind)
+  {
+    Menu->addAction(tr("Desktop &Icon"), this, [this]() { CreateSessionShortcut(false); });
+#if defined(Q_OS_WIN)
+    if (Kind == SiteKind)
+    {
+      Menu->addAction(tr("Explorer's 'Send To' Shortcut"), this, [this]() { CreateSessionShortcut(true); });
+    }
+#endif
+  }
+}
+
+// As TLoginDialog::CloneToNewSite.
+void SiteManager::CloneToNewSite()
+{
+  const QString Name = SelectedName();
+  if (Name.isEmpty())
+  {
+    return;
+  }
+  CoreBridge::TSite Site = Edited();
+  SelectNewSite();
+  Site.Name.clear();
+  Load(Site);
+  FNewSiteName = QString::fromStdString(CoreBridge::UniqueSiteName(Name.toStdString()));
+  FHostName->setFocus();
+}
+
+// As ResetNewSessionActionExecute.
+void SiteManager::ResetNewSite()
+{
+  SelectNewSite();
+  Load(CoreBridge::NewSite());
+  FNewSiteName.clear();
+}
+
+// As GenerateUrlAction2Execute.
+void SiteManager::GenerateUrl()
+{
+  CoreBridge::TSite Site = Edited();
+  Site.Name = SelectedName().toStdString();
+  GenerateUrlDialog Dialog(nullptr, {}, this, nullptr, &Site);
+  Dialog.exec();
+}
+
+// As PuttyActionExecute; this dialog stays.
+bool SiteManager::OpenInPutty()
+{
+  CoreBridge::TSite Site = Edited();
+  Site.Name = SelectedName().toStdString();
+  try
+  {
+    CoreBridge::OpenSiteInPutty(Site, WindowCommandPrompts(this));
+    return true;
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+}
+
 void SiteManager::accept()
 {
   if (!SelectedWorkspace().isEmpty() || VerifyKey())
@@ -808,7 +945,7 @@ void SiteManager::SaveAsDialog(bool Force)
   CoreBridge::TSession::TSaveAsSite Defaults;
   const QString Suggested =
     QString::fromStdString(Site.UserName.empty() ? Site.HostName : Site.UserName + "@" + Site.HostName);
-  Defaults.Name = !Name.isEmpty() ? Name.toStdString() :
+  Defaults.Name = !Name.isEmpty() ? Name.toStdString() : !FNewSiteName.isEmpty() ? FNewSiteName.toStdString() :
     (Folder.isEmpty() ? Suggested : (Folder + QLatin1Char('/') + Suggested)).toStdString();
   Defaults.CanSavePassword = !FPassword->text().isEmpty();
   QStringList Folders;

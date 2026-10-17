@@ -4828,6 +4828,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>Θέσε τις αρχικές ρυθμίσεις</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>Διαχείριση</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Άνοιγμα σε PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>Επεξεργασία</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>Διαγραφή</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>Μετονομασία</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>Κλωνοποίησe το νέο site</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>Δη&amp;μιουργία URL/κώδικα συνεδρίας...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

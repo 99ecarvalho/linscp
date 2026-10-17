@@ -4829,6 +4829,34 @@ Atrašanās vieta: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Iestatīt &amp;noklusējumu</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Pārvaldīt</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Atvērt &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Labot</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Atiestatīt</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Pārdēvēt</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Klonēt uz jaunu vietni</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Ģenerēt sesijas URL/kodu...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

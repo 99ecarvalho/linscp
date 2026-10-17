@@ -4829,6 +4829,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>Постави &amp;стандардни вредности</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Управувај</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Отвори во &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Уреди</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Ресетирај</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>Пре&amp;именувај</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Клонирај во нова локација</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Генерирај URL/код на сесија...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

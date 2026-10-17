@@ -4828,6 +4828,34 @@ Sijainti: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Aseta &amp;oletukset</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Hallinta</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Avaa &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Muokkaa</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>Tyhjennä</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>Nimeä &amp;uudelleen</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>Kloonaa uudeksi kohteeksi</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Luo istunto-URL/-koodi...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

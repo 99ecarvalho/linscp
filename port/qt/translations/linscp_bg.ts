@@ -4828,6 +4828,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>Под&amp;разбирана</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Управление</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Отваряне в &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>Об&amp;работка</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Нулиране</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>Пре&amp;именуване</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Клониране като нов сайт</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Генериране на URL/код на сесията...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

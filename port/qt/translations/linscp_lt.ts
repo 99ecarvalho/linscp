@@ -4829,6 +4829,34 @@ Vieta: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Numatytieji</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Tvarkyti</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Atverti per „&amp;PuTTY“</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Redaguoti</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Atkurti</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Pervadinti</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Kopijuoti kaip naują tinklavietę</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Kurti seanso URL/Kodą...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4828,6 +4828,34 @@ Vendndodhja: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Cakto si &amp;parazgjedhje</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Menaxho</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Hap në &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Redakto</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Rivendos</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Riemërto</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Klono në sajt të ri</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Gjenero URL/kodin e seancës...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

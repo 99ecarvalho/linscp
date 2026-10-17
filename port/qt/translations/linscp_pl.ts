@@ -4829,6 +4829,34 @@ Lokalizacja: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Us&amp;taw domyślne</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Zarządzaj</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Otwórz w &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Edytuj</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Resetuj</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Zmień nazwę</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>S&amp;klonuj do nowego połączenia</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Generowanie adresu URL/kodu sesji...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

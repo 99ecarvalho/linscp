@@ -4827,6 +4827,34 @@ Konum: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>&amp;Varsayılan olarak ayarla</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Yönet</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>&amp;PuTTY ile aç</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>Düz&amp;enle</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Sıfırla</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>Yeniden adlandı&amp;r</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>Ye&amp;ni bağlantıya kopyala</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Oturum adresi ya da kodu oluştur...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

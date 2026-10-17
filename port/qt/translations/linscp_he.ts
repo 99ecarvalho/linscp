@@ -4828,6 +4828,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>&amp;קבע ברירות מחדל</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;ניהול</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>פתח ב-&amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;ערוך</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;אפס</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;שנה שם</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;שכפל לאתר חדש</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;צור כתובת URL/קוד להפעלה...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

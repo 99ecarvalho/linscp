@@ -3618,6 +3618,23 @@ TGeneratedCode TSession::GenerateCode(const TGenerateCodeOptions & Options)
   }
 }
 
+// As TLoginDialog::GenerateUrlAction2Execute.
+TGeneratedCode GenerateSiteCode(const TSite & Site, const TGenerateCodeOptions & Options)
+{
+  try
+  {
+    std::unique_ptr<TSessionData> Data(SessionDataOf(Site, Site.Name));
+    Data->Name = FromUtf8(Site.Name);
+    Data->LookupLastFingerprint();
+    Data->IsWorkspace = false;
+    return GenerateSessionCode(Data.get(), Options, CodeCli());
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 // As TCopyDialog::GenerateCode and TGenerateUrlDialog's constructor.
 TGeneratedCode TSession::GenerateTransferCode(const TGenerateCodeOptions & Options, const TTransferCode & Transfer)
 {
@@ -4557,6 +4574,27 @@ void TSession::OpenInPutty(const TCustomCommandPrompts & Prompts)
     {
       Data->ConfigureTunnel(Terminal->TunnelLocalPortNumber);
     }
+    struct TPrompts
+    {
+      explicit TPrompts(const TCustomCommandPrompts & Prompts) { SetPuttyCommandPrompts(Prompts); }
+      ~TPrompts() { SetPuttyCommandPrompts(TCustomCommandPrompts()); }
+    } PromptsInUse(Prompts);
+    OpenSessionInPutty(Data.get());
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+// As TLoginDialog::PuttyActionExecute.
+void OpenSiteInPutty(const TSite & Site, const TCustomCommandPrompts & Prompts)
+{
+  try
+  {
+    Configuration->Usage->Inc(L"OpenInPutty");
+    std::unique_ptr<TSessionData> Data(SessionDataOf(Site, Site.Name));
+    Data->Name = FromUtf8(Site.Name);
     struct TPrompts
     {
       explicit TPrompts(const TCustomCommandPrompts & Prompts) { SetPuttyCommandPrompts(Prompts); }

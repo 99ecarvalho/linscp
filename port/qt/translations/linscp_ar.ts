@@ -4832,6 +4832,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>تعيين الا&amp;فتراضي</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>ادارة</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>فتح في &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;تعديل</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>إعادة تعيين</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>إعادة تسمية</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>استنساخ لموقع جديد</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>إن&amp;شاء عنوان URL/رمز الجلسة...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

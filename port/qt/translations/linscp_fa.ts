@@ -4827,6 +4827,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>انتخاب به عنوان پیش فرض</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>مدیریت</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>&amp;PuTTY بازکردن در</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>ویرایش</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>ریست</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>تغییرنام</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>رونوشت به تارنما تازه</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;آفریدن جلسه آدرس/کد...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

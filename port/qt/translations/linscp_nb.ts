@@ -4828,6 +4828,34 @@ Plassering: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Sett s&amp;tandarder</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>Ad&amp;ministrer</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Åpne i &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Rediger</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>Til&amp;Bakestill</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Omdøp</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Klon til nytt nettsted</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Generer økt URL/kode...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

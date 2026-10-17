@@ -19,11 +19,17 @@
 #include "RtfText.h"
 
 GenerateUrlDialog::GenerateUrlDialog(CoreBridge::TSession * Session, const std::vector<std::string> & Paths, QWidget * Parent,
-  const CoreBridge::TSession::TTransferCode * Transfer) :
+  const CoreBridge::TSession::TTransferCode * Transfer, const CoreBridge::TSite * Site) :
   QDialog(Parent),
   FSession(Session),
   FPaths(Paths)
 {
+  if (Site != nullptr)
+  {
+    FHasSite = true;
+    FSite = *Site;
+    FPaths.clear();
+  }
   if (Transfer != nullptr)
   {
     FHasTransfer = true;
@@ -147,7 +153,8 @@ void GenerateUrlDialog::Generate()
   CoreBridge::TGeneratedCode Code;
   try
   {
-    Code = FHasTransfer ? FSession->GenerateTransferCode(Options(), FTransfer) : FSession->GenerateCode(Options());
+    Code = FHasSite ? CoreBridge::GenerateSiteCode(FSite, Options()) :
+      FHasTransfer ? FSession->GenerateTransferCode(Options(), FTransfer) : FSession->GenerateCode(Options());
   }
   catch (const CoreBridge::TCoreError & E)
   {

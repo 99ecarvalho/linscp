@@ -1401,6 +1401,12 @@ struct TGeneratedCode
   bool CanSaveExtension = false;
   bool CanRawSettings = false;
 };
+struct TSite;
+// The Login dialog's Generate Session URL/Code: a site's, unconnected
+// (with the host key last accepted for it).
+TGeneratedCode GenerateSiteCode(const TSite & Site, const TGenerateCodeOptions & Options);
+// The Login dialog's Open in PuTTY: a site, unconnected.
+void OpenSiteInPutty(const TSite & Site, const TCustomCommandPrompts & Prompts);
 
 // --- Bookmarks (P3-06b) -------------------------------------------------------
 
@@ -1877,6 +1883,9 @@ int TunnelLocalPortNumberHigh();
 // asking before overwriting another is the dialog's (SiteExists). Throws
 // TCoreError: no name, a special site, a storage error.
 void SaveSite(const TSite & Site, const std::string & BaseName = std::string());
+// Name, or with " (n)" after it, as TNamedObject::MakeUniqueIn: no stored
+// site's.
+std::string UniqueSiteName(const std::string & Name);
 // The Login dialog's Set Defaults: Site as the new sites' settings
 // (StoredSessions->DefaultSettings), stored.
 void SaveDefaultSite(const TSite & Site);

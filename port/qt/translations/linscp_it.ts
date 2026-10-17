@@ -4828,6 +4828,34 @@ Percorso: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Valori prede&amp;finiti</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>Gestione</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Apri in &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Modifica</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Reimposta</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Rinomina</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Clona in nuovo sito</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Genera URL sessione/codice...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

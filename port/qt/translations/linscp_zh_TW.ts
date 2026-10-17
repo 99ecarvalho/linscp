@@ -4827,6 +4827,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>設為預設值(&amp;F)</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>管理(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>於 &amp;PuTTY 開啟</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>編輯(&amp;E)</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>重置(&amp;R)</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>重新命名(&amp;R)</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>複製成新站台(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>產生工作階段網址/程式碼(&amp;G)...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

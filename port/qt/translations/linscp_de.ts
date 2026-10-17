@@ -4828,6 +4828,34 @@ Ort: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>&amp;Als Standard</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Verwalten</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>In &amp;PuTTY öffnen</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Bearbeiten</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Zurücksetzen</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Umbenennen</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>In neues Verbindungsziel &amp;kopieren</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>Sitzungs-URL/-Code &amp;erzeugen …</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

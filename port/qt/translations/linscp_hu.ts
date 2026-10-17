@@ -4827,6 +4827,34 @@ Hely: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>A&amp;lapértelmezettnek beállítás</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>Ke&amp;zelés</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Megnyitás &amp;PuTTY-ban</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Módosítás</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Reszet</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>Át&amp;nevezés</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Klónozás az Új webhelyre</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>Munkamenet URL/Kód &amp;generálása...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

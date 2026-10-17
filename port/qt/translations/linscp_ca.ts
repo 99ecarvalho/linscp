@@ -4828,6 +4828,34 @@ Ubicació: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Estableix per &amp;defecte</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Gestiona</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Obre a &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Edita</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Reinicialitza</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>Canvia el &amp;nom</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>C&amp;lona al nou lloc</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Genera URL/Codi de la sessió...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

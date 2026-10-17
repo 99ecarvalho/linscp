@@ -4828,6 +4828,34 @@ Staðsetning: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Stilla &amp;sjálfgilt</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Stjórna</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Opna í &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Breyta</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Frumstilla</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Endurnefna</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Einrækta í nýtt setur</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Framleiða lotuvefslóð/kóða…</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

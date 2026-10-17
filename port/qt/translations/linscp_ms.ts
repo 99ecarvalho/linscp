@@ -4827,6 +4827,34 @@ Lokasi: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Laras de&amp;fault</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Urus</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Buka dalam &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Edit</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Tetap semula</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>Tuka&amp;r nama</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Klon ke Tapak Baharu</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Jana URL/Kod Sesi...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

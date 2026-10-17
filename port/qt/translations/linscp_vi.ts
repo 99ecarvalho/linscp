@@ -4827,6 +4827,34 @@ Vị trí: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Đặt làm &amp;mặc định</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Quản lý</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Mở bằng &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Chỉnh sửa</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Đặt lại</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Đổi tên</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Sao chép sang trang mới</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Tạo URL/Mã phiên...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

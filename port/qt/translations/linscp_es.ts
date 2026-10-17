@@ -4828,6 +4828,34 @@ Ruta: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>&amp;Predeterminado</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>A&amp;dministrar</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Abrir en &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Editar</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Reiniciar</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Renombrar</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Clonar como nuevo sitio</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Generar URL/código de sesión...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

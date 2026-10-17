@@ -16,6 +16,7 @@
 class QCheckBox;
 class QComboBox;
 class QLabel;
+class QMenu;
 class QLineEdit;
 class QPushButton;
 class QSpinBox;
@@ -95,6 +96,22 @@ public:
   CoreBridge::TSite Edited() const;
   void SetEdited(const CoreBridge::TSite & Site);
 
+  // Manage's menu, and the tree's context menu (ManageSitePopupMenu,
+  // ManageFolderPopupMenu, ManageNewSitePopupMenu,
+  // ManageWorkspacePopupMenu): the item under the cursor's actions,
+  // filled into Menu.
+  void FillManageMenu(QMenu * Menu);
+  QPushButton * ManageButton() const { return FManage; }
+  // Clone to New Site: the selected site's settings in the new site, its
+  // name kept (made unique) for Save.
+  void CloneToNewSite();
+  // Reset: the new site from the defaults.
+  void ResetNewSite();
+  // Generate Session URL/Code, for the site as edited.
+  void GenerateUrl();
+  // Open in PuTTY, the site as edited.
+  bool OpenInPutty();
+
   // Tools > Desktop Icon, and Explorer's 'Send To' Shortcut (SendTo,
   // Windows): the selected site's, folder's or workspace's, after asking.
   bool CreateSessionShortcut(bool SendTo);
@@ -134,6 +151,11 @@ private:
   QPushButton * FRename = nullptr;
   QPushButton * FDelete = nullptr;
   QPushButton * FNewFolder = nullptr;
+  QPushButton * FManage = nullptr;
+  void AskNewFolder();
+  void AskRename();
+  // The new site's name from Clone to New Site, for Save; empty otherwise.
+  QString FNewSiteName;
   QToolButton * FAdvanced = nullptr;
   // The site under the cursor, with what the form does not show.
   CoreBridge::TSite FSite;

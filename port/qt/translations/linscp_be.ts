@@ -4829,6 +4829,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>Задаць прад&amp;вызначаным</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Кіраванне</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Адкрыць у &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Рэдагаваць</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Скінуць</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Перайменаваць</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Кланіраваць у новы сайт</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Згенерыраваць URL-адрас/код сеанса...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

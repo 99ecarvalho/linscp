@@ -654,6 +654,78 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
       Dialog.SetDefaults(false);
       Check(CoreBridge::NewSite().UserName == OriginalUser.toStdString(), "and set back");
     }
+    // A4/A11: Manage's menu, the tree's context menu, per item; A5: Clone to
+    // New Site; Reset; Generate Session URL/Code for a site.
+    {
+      SiteManager Dialog(&Window);
+      auto MenuTexts = [&Dialog]()
+      {
+        QMenu Menu;
+        Dialog.FillManageMenu(&Menu);
+        QStringList Texts;
+        for (QAction * Action : Menu.actions())
+        {
+          if (!Action->isSeparator())
+          {
+            Texts.append(Action->text());
+          }
+        }
+        return Texts;
+      };
+      Check(Dialog.ManageButton()->menu() != nullptr, "a Manage button with its menu");
+      Dialog.SelectSite(QStringLiteral("Tests/rclone"));
+      const QStringList Site = MenuTexts();
+      Check(Site.contains(QStringLiteral("&Edit")) && Site.contains(QStringLiteral("&Clone to New Site")) &&
+        Site.contains(QStringLiteral("&Generate Session URL/Code...")) && Site.contains(QStringLiteral("Open in &PuTTY")) &&
+        !Site.contains(QStringLiteral("&Reset")), "a site's menu");
+      Dialog.SelectFolder(QStringLiteral("Tests"));
+      const QStringList Folder = MenuTexts();
+      Check(Folder.contains(QStringLiteral("&Rename")) && Folder.contains(QStringLiteral("Ne&w Folder...")) &&
+        !Folder.contains(QStringLiteral("&Clone to New Site")) && !Folder.contains(QStringLiteral("Set De&faults")), "a folder's menu");
+      Dialog.SelectNewSite();
+      const QStringList New = MenuTexts();
+      Check(New.contains(QStringLiteral("Save &As...")) && New.contains(QStringLiteral("&Reset")) &&
+        !New.contains(QStringLiteral("&Delete")) && !New.contains(QStringLiteral("Desktop &Icon")), "the new site's menu");
+
+      Dialog.SelectSite(QStringLiteral("Tests/rclone"));
+      Dialog.CloneToNewSite();
+      Check((Dialog.Tree()->currentItem() == Dialog.Tree()->topLevelItem(0)) && (Dialog.HostName()->text() == QStringLiteral("127.0.0.1")) &&
+        (Dialog.UserName()->text() == QStringLiteral("linscp")), "Clone to New Site: the site's settings in the new site");
+      QString Suggested;
+      Responder.Custom = [&Suggested](QWidget * Modal)
+      {
+        SaveSiteDialog * Save = qobject_cast<SaveSiteDialog *>(Modal);
+        if (Save == nullptr)
+        {
+          return false;
+        }
+        Suggested = Save->FolderCombo()->currentText() + QLatin1Char('/') + Save->NameEdit()->text();
+        Save->reject();
+        return true;
+      };
+      Dialog.Save();
+      Responder.Custom = nullptr;
+      Check(Suggested == QStringLiteral("Tests/rclone (1)"), "saved under its name made unique");
+      Dialog.ResetNewSite();
+      Check(Dialog.HostName()->text().isEmpty(), "Reset: the new site from the defaults");
+
+      Dialog.SelectSite(QStringLiteral("Tests/rclone"));
+      QString Url;
+      Responder.Custom = [&Url](QWidget * Modal)
+      {
+        GenerateUrlDialog * Generate = qobject_cast<GenerateUrlDialog *>(Modal);
+        if (Generate == nullptr)
+        {
+          return false;
+        }
+        Url = Generate->Text();
+        Generate->reject();
+        return true;
+      };
+      Dialog.GenerateUrl();
+      Responder.Custom = nullptr;
+      Check(Url.contains(QStringLiteral("linscp@127.0.0.1")), "Generate Session URL/Code, the site's, unconnected");
+    }
     {
       SiteManager Dialog(&Window);
       Check(Dialog.SelectSite(QStringLiteral("Tests/rclone")), "a new site manager has it");

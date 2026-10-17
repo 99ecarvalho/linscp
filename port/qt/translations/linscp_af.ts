@@ -4828,6 +4828,34 @@ Ligging: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Stel &amp;verstekwaardes</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Bestuur</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Maak in &amp;PuTTY oop</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>R&amp;edigeer</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Herstel</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Hernoem</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Kloon na nuwe werf</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Genereer sessie-URL/kode...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

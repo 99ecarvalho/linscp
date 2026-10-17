@@ -4829,6 +4829,34 @@ Cale: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Con&amp;figurează ca implicit</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Gestionare</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Deschidere în &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Editare</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;Resetare</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Redenumire</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Clonează într-un Site Nou</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Generare URL de Sesiune sau Cod...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

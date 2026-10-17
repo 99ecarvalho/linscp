@@ -4828,6 +4828,34 @@ Plats: %2</translation>
         <source>Set De&amp;faults</source>
         <translation>Sä&amp;tt som standard</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;Hantera</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>Öppna session i &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;Redigera</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>Å&amp;terställ</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;Byt namn</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>&amp;Klona till ny webbplats</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>&amp;Skapa sessions-URL/kod...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

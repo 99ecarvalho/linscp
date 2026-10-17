@@ -4828,6 +4828,34 @@ Location: %2</source>
         <source>Set De&amp;faults</source>
         <translation>ნაგულის&amp;ხმევების დაყენება</translation>
     </message>
+    <message>
+        <source>&amp;Manage</source>
+        <translation>&amp;მართვა</translation>
+    </message>
+    <message>
+        <source>Open in &amp;PuTTY</source>
+        <translation>გახსნა &amp;Putty-ში</translation>
+    </message>
+    <message>
+        <source>&amp;Edit</source>
+        <translation>&amp;ჩასწორება</translation>
+    </message>
+    <message>
+        <source>&amp;Reset</source>
+        <translation>&amp;საწყისი მნიშვნელობებზე დაბრუნება</translation>
+    </message>
+    <message>
+        <source>&amp;Rename</source>
+        <translation>&amp;სახელის გადარქმევა</translation>
+    </message>
+    <message>
+        <source>&amp;Clone to New Site</source>
+        <translation>და&amp;კლონვა ახალ საიტში</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Session URL/Code...</source>
+        <translation>სესიის URL-ის/კოდის &amp;გენეერაცია...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>
