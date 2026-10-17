@@ -198,19 +198,21 @@ void AccessibilityAudit::AuditMenu(QMenu * Menu, const QString & Where)
     {
       continue;
     }
-    const QChar Key = Mnemonic(Action->text());
+    // Without a shortcut shown after a tab, as QMenu draws it.
+    const QString Text = Action->text().section(QLatin1Char('\t'), 0, 0);
+    const QChar Key = Mnemonic(Text);
     if (!Key.isNull())
     {
       if (Used.contains(Key))
       {
-        if (!WinScpClash(Used[Key], Action->text()))
+        if (!WinScpClash(Used[Key], Text))
         {
-          Issue(Where, QStringLiteral("'%1' and '%2' share the mnemonic '%3'").arg(Used[Key], Action->text(), Key));
+          Issue(Where, QStringLiteral("'%1' and '%2' share the mnemonic '%3'").arg(Used[Key], Text, Key));
         }
       }
       else
       {
-        Used[Key] = Action->text();
+        Used[Key] = Text;
       }
     }
     if (Action->menu() != nullptr)

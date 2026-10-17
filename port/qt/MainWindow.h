@@ -245,6 +245,17 @@ public:
   // as WinSCP's DoOpenDirectoryDialog for the active panel: the directory
   // chosen opened, the dialog again when it cannot be. False when none was.
   bool OpenDirectory(bool AddBookmark = false);
+  // As GoToTreeAction (Ctrl+Alt+T: the active side's tree, shown, focused),
+  // GoToCommandLineAction (Ctrl+Shift+M: the command line, the same),
+  // GoToAddressAction (Ctrl+L, Alt+D: Open Directory in the Commander, the
+  // address bar in the Explorer), IncrementalSearchStartAction (Ctrl+F: the
+  // panel's search started). WinSCP's action list runs these first, before
+  // the toggles with the same keys.
+  void GoToTree();
+  void GoToCommandLine();
+  void GoToAddressBar();
+  void IncrementalSearchStart();
+  QAction * GoToTreeAction() const { return FGoToTreeAction; }
   // A shared bookmark's keyboard shortcut pressed: its directory opened on
   // the active panel's side. False when none has it, or no directory there.
   bool OpenBookmarkShortCut(unsigned ShortCut);
@@ -467,6 +478,7 @@ private:
   void ShowError(const CoreBridge::TCoreError & E);
   void UpdateActions();
   void TransferPresetAutoSelect();
+  // The Go to actions' keys, shown on the toggles they share them with.
   void UpdateTreeShortcut();
   bool RunLocalCustomCommand(const CoreBridge::TCustomCommandDefinition & Command);
   void StandaloneUpload(const std::vector<std::string> & Files, bool UseDefaults);
@@ -499,6 +511,7 @@ private:
   QAction * FNewFileAction = nullptr;
   QAction * FProcessQueueAction = nullptr;
   QAction * FLocalTreeAction = nullptr;
+  QAction * FGoToTreeAction = nullptr;
   QAction * FLocalStatusBarAction = nullptr;
   QAction * FRemoteStatusBarAction = nullptr;
   QAction * FTabsAction = nullptr;

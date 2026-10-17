@@ -242,8 +242,11 @@ public:
   void SetExplorerSelection(CoreBridge::TPreferences::TExplorerSelection Selection);
   void SetFullRowSelect(bool FullRow);
   void SetPanelSearch(CoreBridge::TPreferences::TPanelSearch Search) { FPanelSearch = Search; }
-  // What incremental search has typed (empty: none).
+  // What incremental search has typed (empty: none); searching, from
+  // Ctrl+F (IncrementalSearchStart) with nothing typed yet too.
   QString SearchText() const { return FSearch; }
+  bool Searching() const { return FSearching || !FSearch.isEmpty(); }
+  void StartSearch();
   void keyboardSearch(const QString & Search) override;
   // The columns' layout as WinSCP keeps it (TIEListViewColProperties'
   // params: "sort;ascending|width,visible;...;@ppi|order"), over WinSCP's
@@ -284,6 +287,7 @@ private:
   CoreBridge::TPreferences::TExplorerSelection FExplorerSelection = CoreBridge::TPreferences::TExplorerSelection::MouseOnly;
   CoreBridge::TPreferences::TPanelSearch FPanelSearch = CoreBridge::TPreferences::TPanelSearch::NameStart;
   QString FSearch;
+  bool FSearching = false;
   class TPanelDelegate * FDelegate = nullptr;
   QByteArray FDefaultLayout;
   QStringList FSavedNames;

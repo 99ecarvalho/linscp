@@ -2616,6 +2616,38 @@ void Keys(const QString & Directory)
       Frontend.SetStartProgram(nullptr);
       Shown->trigger();
       Check(!Window.CommandLine()->isVisible(), "Command Line hides it again");
+      // D6: Ctrl+Shift+M goes to it, shown, as GoToCommandLineAction.
+      Check(Shown->shortcut().isEmpty() && Shown->text().endsWith(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_M).toString(QKeySequence::NativeText)),
+        "the toggle shows Go to Command Line's key");
+      Window.GoToCommandLine();
+      Check(Shown->isChecked() && Window.CommandLine()->isVisible(), "Go to Command Line shows it");
+      Window.GoToCommandLine();
+      Check(Window.CommandLine()->isVisible(), "and does not hide it");
+      Shown->trigger();
+      // D7: Ctrl+F starts the panel's search; Ctrl+L, Open Directory.
+      Window.ActivatePanel(true);
+      Window.IncrementalSearchStart();
+      Check(Local->View()->Searching() && Local->View()->SearchText().isEmpty(), "Ctrl+F: the search started, nothing typed");
+      QTest::keyClick(Local->View(), Qt::Key_Escape);
+      Check(!Local->View()->Searching(), "Escape ends it");
+      bool Asked = false;
+      Responder.Custom = [&Asked](QWidget * Modal)
+      {
+        OpenDirectoryDialog * Open = qobject_cast<OpenDirectoryDialog *>(Modal);
+        if (Open == nullptr)
+        {
+          return false;
+        }
+        Asked = true;
+        Open->reject();
+        return true;
+      };
+      Window.GoToAddressBar();
+      Responder.Custom = nullptr;
+      Check(Asked, "Ctrl+L: Open Directory, in the Commander");
+      // (The window active again after the dialog.)
+      Window.activateWindow();
+      QApplication::setActiveWindow(&Window);
     }
     // P3-15: Local > View > Thumbnails: a grid over the same selection, an
     // image's preview loaded in the background; Details back.
@@ -7234,11 +7266,22 @@ void TreesTest(const char * Port, const QString & Directory)
     Window.SaveLayout();
     Check(CoreBridge::Layout().LocalTree && CoreBridge::Layout().RemoteTree, "kept, as DriveView");
     Window.ActivatePanel(false);
-    Check(Window.TreeAction(false)->shortcut() == QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_T) &&
-      Window.TreeAction(true)->shortcut().isEmpty(), "Ctrl+Alt+T the active side's");
     Window.SetTreeVisible(true, false);
     Window.SetTreeVisible(false, false);
     Check(!Window.Local()->TreeVisible() && !Window.Panel()->TreeVisible(), "hidden again");
+    // D5: Ctrl+Alt+T goes to the active side's tree, shown, as WinSCP's
+    // GoToTreeAction; the toggles only show the key.
+    const QString TreeKey = QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_T).toString(QKeySequence::NativeText);
+    Check((Window.GoToTreeAction()->shortcut() == QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_T)) &&
+      Window.TreeAction(false)->shortcut().isEmpty() && Window.TreeAction(false)->text().endsWith(TreeKey) &&
+      Window.TreeAction(true)->text().endsWith(TreeKey), "Ctrl+Alt+T: Go to Tree's, shown on the toggles");
+    Window.ActivatePanel(false);
+    Window.GoToTree();
+    Check(Window.Panel()->TreeVisible() && !Window.Local()->TreeVisible() && Window.TreeAction(false)->isChecked(),
+      "Go to Tree shows the active side's");
+    Window.GoToTree();
+    Check(Window.Panel()->TreeVisible(), "and does not hide it");
+    Window.SetTreeVisible(false, false);
   }
   CoreBridge::Finalize();
 }

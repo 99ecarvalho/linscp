@@ -797,11 +797,11 @@ void FileView::keyPressEvent(QKeyEvent * Event)
   const bool Keypad = (Event->modifiers() & Qt::KeypadModifier) != 0;
   // While searching: Backspace takes the last character back, Esc ends it;
   // any other key but a character typed ends it too.
-  if (!FSearch.isEmpty())
+  if (Searching())
   {
     if ((Event->key() == Qt::Key_Backspace) && (Modifiers == Qt::NoModifier))
     {
-      const QString Text = FSearch.chopped(1);
+      const QString Text = FSearch.isEmpty() ? QString() : FSearch.chopped(1);
       FSearch.clear();
       if (!Text.isEmpty())
       {
@@ -809,6 +809,7 @@ void FileView::keyPressEvent(QKeyEvent * Event)
       }
       else
       {
+        FSearching = false;
         emit SearchChanged(QString());
       }
       Event->accept();
@@ -1443,9 +1444,19 @@ void FileView::keyboardSearch(const QString & Search)
 
 void FileView::EndSearch()
 {
-  if (!FSearch.isEmpty())
+  if (Searching())
   {
     FSearch.clear();
+    FSearching = false;
+    emit SearchChanged(QString());
+  }
+}
+
+void FileView::StartSearch()
+{
+  if (!Searching())
+  {
+    FSearching = true;
     emit SearchChanged(QString());
   }
 }

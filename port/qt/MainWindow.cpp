@@ -68,6 +68,7 @@
 #include "PropertiesDialog.h"
 #include "LinkDialog.h"
 #include "RemoteTransferDialog.h"
+#include "DirectoryTree.h"
 #include "OpenDirectoryDialog.h"
 #include "LocationProfilesDialog.h"
 #include "FindFilesDialog.h"
@@ -389,6 +390,22 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
     }
     UpdateTreeShortcut();
   });
+  const std::pair<QList<QKeySequence>, void (MainWindow::*)()> GoTo[] = {
+    { { QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_T) }, &MainWindow::GoToTree },
+    { { QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_M) }, &MainWindow::GoToCommandLine },
+    { { QKeySequence(Qt::CTRL | Qt::Key_L), QKeySequence(Qt::ALT | Qt::Key_D) }, &MainWindow::GoToAddressBar },
+    { { QKeySequence(Qt::CTRL | Qt::Key_F) }, &MainWindow::IncrementalSearchStart } };
+  for (const auto & Each : GoTo)
+  {
+    QAction * Action = new QAction(this);
+    Action->setShortcuts(Each.first);
+    connect(Action, &QAction::triggered, this, Each.second);
+    addAction(Action);
+    if (Each.second == &MainWindow::GoToTree)
+    {
+      FGoToTreeAction = Action;
+    }
+  }
 
   QMenu * FilesMenu = new QMenu(this);
   FEditAction = FilesMenu->addAction(tr("&Edit"), this, [this]() { EditCurrent(); });
@@ -1743,15 +1760,85 @@ bool MainWindow::Download(const QStringList & Names, const QString & Target, boo
   return Result;
 }
 
-// Ctrl+Alt+T: the active side's tree (the two actions share it in WinSCP).
+// The trees' toggles and the command line's show the keys of the Go to
+// actions, which have them (as WinSCP's LocalTreeAction, RemoteTreeAction
+// and CommandLinePanelAction, after GoToTreeAction and GoToCommandLineAction
+// in its action list).
 void MainWindow::UpdateTreeShortcut()
 {
-  if ((FLocalTreeAction != nullptr) && (FRemoteTreeAction != nullptr))
+  const QString Tree = QLatin1Char('\t') + QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_T).toString(QKeySequence::NativeText);
+  for (QAction * Action : { FLocalTreeAction, FRemoteTreeAction })
   {
-    const QKeySequence Key(Qt::CTRL | Qt::ALT | Qt::Key_T);
-    FLocalTreeAction->setShortcut(FLocalActive ? Key : QKeySequence());
-    FRemoteTreeAction->setShortcut(FLocalActive ? QKeySequence() : Key);
+    if ((Action != nullptr) && !Action->text().contains(QLatin1Char('\t')))
+    {
+      Action->setText(Action->text() + Tree);
+    }
   }
+  if ((FCommandLineAction != nullptr) && !FCommandLineAction->text().contains(QLatin1Char('\t')))
+  {
+    FCommandLineAction->setText(FCommandLineAction->text() + QLatin1Char('\t') +
+      QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_M).toString(QKeySequence::NativeText));
+  }
+}
+
+void MainWindow::GoToTree()
+{
+  const bool Left = FLocalActive && !FExplorer;
+  SetTreeVisible(Left, true);
+  if (Left)
+  {
+    FLocal->Tree()->setFocus();
+  }
+  else if (LocalBrowser())
+  {
+    FOtherLocal->Tree()->setFocus();
+  }
+  else
+  {
+    FPanel->Tree()->setFocus();
+  }
+}
+
+void MainWindow::GoToCommandLine()
+{
+  if (FCommandLineAction == nullptr)
+  {
+    return;
+  }
+  if (!FCommandLineAction->isChecked())
+  {
+    FCommandLineAction->trigger();
+  }
+  else
+  {
+    UpdateCommandLine();
+    if (FCommandLine->isEnabled())
+    {
+      FCommandLine->setFocus();
+    }
+  }
+}
+
+void MainWindow::GoToAddressBar()
+{
+  if (FExplorer && (FAddress != nullptr))
+  {
+    FAddress->setFocus();
+    FAddress->lineEdit()->selectAll();
+  }
+  else if (!FBusy)
+  {
+    OpenDirectory();
+  }
+}
+
+// As TCustomScpExplorerForm::IncrementalSearchStart.
+void MainWindow::IncrementalSearchStart()
+{
+  LocalPanel * Local = SideLocal(FLocalActive);
+  FileView * View = (Local != nullptr) ? Local->View() : FPanel->View();
+  View->setFocus();
+  View->StartSearch();
 }
 
 void MainWindow::ActivatePanel(bool Local)
@@ -7087,7 +7174,6 @@ void MainWindow::BuildToolbars(QMenu * Options)
   connect(Tab, &QShortcut::activated, this, [this]() { ActivatePanel(FLocalActive); });
   FCommandLineAction = new QAction(tr("Comma&nd Line"), this);
   FCommandLineAction->setCheckable(true);
-  FCommandLineAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_M));
   FCommandLineAction->setStatusTip(tr("Hide/show command line"));
   connect(FCommandLineAction, &QAction::triggered, this, [this](bool Shown)
   {

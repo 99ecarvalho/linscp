@@ -635,10 +635,12 @@ QString RemotePanel::Path() const
 void RemotePanel::UpdateActions()
 {
   // While searching, what is typed (FormatIncrementalSearchStatus).
-  if (!FView->SearchText().isEmpty())
+  if (FView->Searching())
   {
+    // "(start typing)" when nothing is yet.
     FStatus->setText(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::IncrementalSearch))
-      .replace(QStringLiteral("%s"), FView->SearchText()));
+      .replace(QStringLiteral("%s"), !FView->SearchText().isEmpty() ? FView->SearchText() :
+        QString::fromStdString(CoreBridge::Text(CoreBridge::TText::IncrementalSearchType))));
   }
   else
   {
