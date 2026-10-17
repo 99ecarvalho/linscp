@@ -131,6 +131,18 @@ Lokasi: %2</translation>
         <source>Output</source>
         <translation>Output</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>Salin</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Pilih semu&amp;a</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Betulkan &amp;Tingkap</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

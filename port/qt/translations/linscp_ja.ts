@@ -131,6 +131,18 @@ Location: %2</source>
         <source>Output</source>
         <translation>出力</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>コピー(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>すべて選択(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>ウィンドウにあわせる(&amp;W)</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

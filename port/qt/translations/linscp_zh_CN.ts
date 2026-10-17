@@ -131,6 +131,18 @@ Location: %2</source>
         <source>Output</source>
         <translation>输出</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>复制(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>全选(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>调整窗口(&amp;W)</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

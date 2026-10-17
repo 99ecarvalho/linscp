@@ -131,6 +131,18 @@ Location: %2</source>
         <source>Output</source>
         <translation>Изход</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Запомняне</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Избиране на вси&amp;чко</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Настройка на &amp;прозореца</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

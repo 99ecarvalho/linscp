@@ -131,6 +131,18 @@ Location: %2</source>
         <source>Output</source>
         <translation>Ելք</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Պատճենել</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Ընտրել &amp;բոլորը</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Հարմարեցնել &amp;պատուհանը</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

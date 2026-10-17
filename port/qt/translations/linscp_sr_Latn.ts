@@ -131,6 +131,18 @@ Lokacija: %2</translation>
         <source>Output</source>
         <translation>Izlaz</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopiraj</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Od&amp;aberi sve</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>P&amp;odesi prozor</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

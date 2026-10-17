@@ -131,6 +131,18 @@ Vị trí: %2</translation>
         <source>Output</source>
         <translation>Kết quả</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Sao chép</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Chọn &amp;Tất cả</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Điều chỉnh &amp;Cửa sổ</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

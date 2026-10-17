@@ -131,6 +131,18 @@ Location: %2</source>
         <source>Output</source>
         <translation>المخرجات</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;نسخ</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;اختيار الكل</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>تعديل النا&amp;فذة</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

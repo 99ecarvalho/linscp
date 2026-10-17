@@ -131,6 +131,18 @@ Location: %2</source>
         <source>Output</source>
         <translation>আউটপুট</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>কপি(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>সব নির্বাচন(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>উইন্ডো সামঞ্জস্য করুন(&amp;W)</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

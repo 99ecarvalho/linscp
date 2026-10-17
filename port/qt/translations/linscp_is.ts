@@ -131,6 +131,18 @@ Staðsetning: %2</translation>
         <source>Output</source>
         <translation>Úttak</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Afrita</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Velja &amp;allt</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Hagræða &amp;glugga</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

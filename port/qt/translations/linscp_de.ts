@@ -131,6 +131,18 @@ Ort: %2</translation>
         <source>Output</source>
         <translation>Ausgabe</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopieren</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Alle auswählen</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>&amp;Fenster anpassen</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

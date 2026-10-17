@@ -131,6 +131,18 @@ Umiestnenie: %2</translation>
         <source>Output</source>
         <translation>Výstup</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopírovať</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Vybr&amp;ať všetko</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Prispôsobiť &amp;okno</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

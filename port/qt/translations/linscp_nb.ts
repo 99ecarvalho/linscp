@@ -131,6 +131,18 @@ Plassering: %2</translation>
         <source>Output</source>
         <translation>Utdata</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopier</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Velg &amp;Alt</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Justere &amp;Vinduet</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

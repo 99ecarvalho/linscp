@@ -131,6 +131,18 @@ Location: %2</source>
         <source>Output</source>
         <translation>Έξοδος</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>Αντιγραφή</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Επιλογή όλων</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Προσαρμογή παραθύρου</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

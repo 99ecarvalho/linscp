@@ -131,6 +131,18 @@ Hely: %2</translation>
         <source>Output</source>
         <translation>Kimenet</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Másolás</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Összes kijelölése</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>A&amp;blak megadása</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

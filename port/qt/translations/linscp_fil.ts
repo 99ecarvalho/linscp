@@ -131,6 +131,18 @@ Lokasyon: %2</translation>
         <source>Output</source>
         <translation>Output</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopyahin</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Piliin &amp;Lahat</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Baguhin ang &amp;Window</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

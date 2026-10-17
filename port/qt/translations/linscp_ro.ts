@@ -131,6 +131,18 @@ Cale: %2</translation>
         <source>Output</source>
         <translation>Ieșire</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copiere</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Selectare &amp;totală</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Redimensionare &amp;fereastră</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

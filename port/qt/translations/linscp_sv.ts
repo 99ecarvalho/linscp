@@ -131,6 +131,18 @@ Plats: %2</translation>
         <source>Output</source>
         <translation>Utdata</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopiera</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Markera allt</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Anpassa &amp;fönster</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

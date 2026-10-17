@@ -131,6 +131,18 @@ Location: %2</source>
         <source>Output</source>
         <translation>வெளியீடு</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;நகல்</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>அனைத்தையும் தெரிவுசெய்</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>&amp;சாளரம் சரிசெய்</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

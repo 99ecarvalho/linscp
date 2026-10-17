@@ -4132,6 +4132,21 @@ void Properties(const char * Port)
       Console.Execute(QStringLiteral("PWD"));
       Check(Console.CommandCombo()->count() == 2, "the commands kept, each once");
       Check(Console.size() == QSize(570, 430), "WinSCP's default size");
+      // C4: its output's menu; Adjust Window to the longest line.
+      std::unique_ptr<QMenu> Menu(Console.OutputMenu());
+      QStringList Texts;
+      for (QAction * Action : Menu->actions())
+      {
+        if (!Action->isSeparator())
+        {
+          Texts.append(Action->text());
+        }
+      }
+      Check(Texts == QStringList({ ConsoleDialog::tr("&Copy"), ConsoleDialog::tr("Select &All"), ConsoleDialog::tr("Adjust &Window") }),
+        "the output's menu: Copy, Select All, Adjust Window");
+      Console.AddOutput({ QString(150, QLatin1Char('x')) });
+      Console.AdjustWindow();
+      Check(Console.width() > 570, "Adjust Window: wide enough for the longest line");
       Console.resize(611, 433);
     }
     Check(QString::fromStdString(CoreBridge::Layout().ConsoleWindowSize).startsWith(QStringLiteral("611,433,")),

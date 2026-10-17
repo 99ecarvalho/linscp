@@ -34,6 +34,12 @@ public:
   QLabel * DirectoryLabel() const { return FDirectory; }
   QPushButton * ExecuteButton() const { return FExecute; }
 
+  // The output's menu, as PopupMenu: Copy, Select All, Adjust Window
+  // (DoAdjustWindow: the window sized to the output's longest line and
+  // its lines, within the screen).
+  class QMenu * OutputMenu();
+  void AdjustWindow();
+
   void reject() override;
 
 private:

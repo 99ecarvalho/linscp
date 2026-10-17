@@ -131,6 +131,18 @@ Ligging: %2</translation>
         <source>Output</source>
         <translation>Afvoer</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopieer</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Kies &amp;alles</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Pas &amp;venster aan</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

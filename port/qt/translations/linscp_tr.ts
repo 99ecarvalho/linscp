@@ -131,6 +131,18 @@ Konum: %2</translation>
         <source>Output</source>
         <translation>Çıktı</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>K&amp;opyala</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Tümünü seç</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>&amp;Pencereyi ayarla</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

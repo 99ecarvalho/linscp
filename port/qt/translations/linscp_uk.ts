@@ -131,6 +131,18 @@ Location: %2</source>
         <source>Output</source>
         <translation>Вивід</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>Копіювати</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Обрати &amp;все</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Підігнати &amp;вікно</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

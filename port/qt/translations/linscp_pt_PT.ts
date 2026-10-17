@@ -131,6 +131,18 @@ Localização: %2</translation>
         <source>Output</source>
         <translation>Saída</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copiar</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Selecionar &amp;Tudo</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Ajustar &amp;Janela</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

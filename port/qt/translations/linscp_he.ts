@@ -131,6 +131,18 @@ Location: %2</source>
         <source>Output</source>
         <translation>פלט</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>ה&amp;עתק</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>בחר &amp;הכל</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>התאם &amp;חלון</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

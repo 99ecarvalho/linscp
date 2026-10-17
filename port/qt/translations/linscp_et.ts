@@ -131,6 +131,18 @@ Asukoht: %2</translation>
         <source>Output</source>
         <translation>Väljund</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopeeri</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Vali kõik</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Kohenda &amp;akent</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

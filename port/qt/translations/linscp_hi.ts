@@ -131,6 +131,18 @@ Location: %2</source>
         <source>Output</source>
         <translation>आउटपुट</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>कॉपी करें(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>सभी का चयन करें(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>विंडो समायोजित करें(&amp;W)</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

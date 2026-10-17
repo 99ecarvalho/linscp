@@ -1,4 +1,6 @@
 #include "ConsoleDialog.h"
+
+#include <algorithm>
 #include "WindowParams.h"
 
 #include <QApplication>
@@ -10,6 +12,9 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPlainTextEdit>
+#include <QFontMetrics>
+#include <QScreen>
+#include <QMenu>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -48,6 +53,13 @@ ConsoleDialog::ConsoleDialog(CoreBridge::TSession * Session, QWidget * Parent) :
   Palette.setColor(QPalette::Base, Qt::black);
   Palette.setColor(QPalette::Text, QColor(0xBB, 0xBB, 0xBB));
   FOutput->setPalette(Palette);
+  FOutput->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(FOutput, &QWidget::customContextMenuRequested, this, [this](const QPoint & Pos)
+  {
+    QMenu * Menu = OutputMenu();
+    Menu->setAttribute(Qt::WA_DeleteOnClose);
+    Menu->popup(FOutput->viewport()->mapToGlobal(Pos));
+  });
   Layout->addWidget(FOutput, 1);
   QDialogButtonBox * Buttons = new QDialogButtonBox(QDialogButtonBox::Close, this);
   FClose = Buttons->button(QDialogButtonBox::Close);
@@ -148,4 +160,35 @@ void ConsoleDialog::AddOutput(const QStringList & Lines)
   {
     FOutput->appendPlainText(Line);
   }
+}
+
+QMenu * ConsoleDialog::OutputMenu()
+{
+  QMenu * Menu = new QMenu(this);
+  Menu->addAction(tr("&Copy"), QKeySequence::Copy, FOutput, &QPlainTextEdit::copy)->setEnabled(FOutput->textCursor().hasSelection());
+  Menu->addAction(tr("Select &All"), QKeySequence::SelectAll, FOutput, &QPlainTextEdit::selectAll);
+  Menu->addSeparator();
+  Menu->addAction(tr("Adjust &Window"), this, &ConsoleDialog::AdjustWindow);
+  return Menu;
+}
+
+void ConsoleDialog::AdjustWindow()
+{
+  const QFontMetrics Metrics(FOutput->font());
+  const QStringList Lines = FOutput->toPlainText().split(QLatin1Char('\n'));
+  int Columns = 0;
+  for (const QString & Line : Lines)
+  {
+    Columns = std::max(Columns, static_cast<int>(Line.size()));
+  }
+  // 10: what borders take, as upstream's surplus; a line more, as it has.
+  const int RequiredWidth = Metrics.averageCharWidth() * Columns + 10;
+  const int RequiredHeight = Metrics.lineSpacing() * (static_cast<int>(Lines.size()) + 1) + 10;
+  const QSize Viewport = FOutput->viewport()->size();
+  QSize Size(width() + (RequiredWidth - Viewport.width()), height() + (RequiredHeight - Viewport.height()));
+  if (QScreen * Screen = screen())
+  {
+    Size = Size.boundedTo(Screen->availableGeometry().size());
+  }
+  resize(Size.expandedTo(minimumSizeHint()));
 }

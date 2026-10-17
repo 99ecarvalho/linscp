@@ -131,6 +131,18 @@ Vieta: %2</translation>
         <source>Output</source>
         <translation>Išvestis</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopijuoti</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Pažymėti &amp;viską</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Sureguliuoti &amp;langą</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

@@ -131,6 +131,18 @@ Atrašanās vieta: %2</translation>
         <source>Output</source>
         <translation>Izvade</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopēt</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Iezīmēt &amp;visu</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Pielāgot &amp;logu</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

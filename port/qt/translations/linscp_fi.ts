@@ -131,6 +131,18 @@ Sijainti: %2</translation>
         <source>Output</source>
         <translation>Tuloste</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>K&amp;opioi</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Valitse &amp;kaikki</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Muokkaa &amp;ikkunaa</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

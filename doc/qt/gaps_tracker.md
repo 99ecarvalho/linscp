@@ -13,12 +13,12 @@ Last updated: **2026-10-17**
 |---|---|---|
 | A. Site Manager | 15 | 17 |
 | B. Password prompt and banner | 3 | 3 |
-| C. Progress and synchronization dialogs | 3 | 4 |
+| C. Progress and synchronization dialogs | 4 | 4 |
 | D. Main window | 6 | 9 |
 | E. Preferences | 9 | 10 |
 | F. Command line | 2 | 3 |
 | G. Known before | 0 | 1 |
-| **Total** | **38** | **47** |
+| **Total** | **39** | **47** |
 
 ## Items
 
@@ -47,7 +47,7 @@ Last updated: **2026-10-17**
 | C1 | Transfer progress: times, Skip, Background, Once Finished, Minimize, speed limit | High | done | 2026-10-17. Proceed in Background for the panels' uploads and downloads (`TMoveToQueue`, Session.cpp), as upstream for its ExecuteFileOperation; ctest `qt_gui_transfer` (times, speed limit, skip, background, once finished), `qt_gui_progress` (the queue resumes and completes the part, OpenSSH) |
 | C2 | Synchronization progress: times, Minimize | Medium | done | 2026-10-17. With the progress bar and the percentage; the time left from upstream's directory statistics cache (`SyncCollect`'s `OnProgress`), kept only with a real storage; ctest `qt_gui_sync` |
 | C3 | Synchronization checklist context menu | Medium | done | 2026-10-17. `SynchronizeDialog::PopupMenu`; the remote directory's Explore waits for `/explore` (F2); ctest `qt_gui_sync` |
-| C4 | Console: Adjust Window, Copy/Select All menu | Low | todo | |
+| C4 | Console: Adjust Window, Copy/Select All menu | Low | done | 2026-10-17. `ConsoleDialog::OutputMenu`, `AdjustWindow` (to the longest line and the lines, within the screen); ctest `qt_gui_properties` |
 | D1 | Column header menu: sort asc/desc, hide, size format, ... | High | done | 2026-10-17. `FileView::HeaderMenu`; ctest `qt_gui_panel` |
 | D2 | Customize Toolbar | Medium | done | 2026-10-17. In the toolbars' context menus (the main ones' and the panels' bands', as CommanderBarPopup, LocalPanelPopup, RemotePanelPopup); WinSCP's item names, kept in `ToolbarsButtons` (Commander and Explorer); a hidden button leaves the band (its action stays in the menus), back in place with its drop-down; ctest `qt_gui_keys`, `qt_gui_explorer` |
 | D3 | Back/Forward history drop-downs | Medium | done | 2026-10-17. Both panels: `HistoryGo`, `FillHistoryMenu` (ten at most, `CoreBridge::MinimizeName`, the full path as tip); ctest `qt_gui_panel`, `qt_gui_local` |

@@ -131,6 +131,18 @@ Locatie: %2</translation>
         <source>Output</source>
         <translation>Uitvoer</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopieer</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Alles selecteren</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>&amp;Venster aanpassen</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

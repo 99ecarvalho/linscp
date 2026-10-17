@@ -131,6 +131,18 @@ Location: %2</source>
         <source>Output</source>
         <translation>გამოტანა</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;კოპირება</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>ყველაფრის &amp;მონიშვნა</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>ფანჯრის &amp;ზომის გასწორება</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

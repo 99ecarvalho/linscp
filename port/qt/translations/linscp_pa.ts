@@ -131,6 +131,18 @@ Location: %2</source>
         <source>Output</source>
         <translation>ਆਉਟਪੁੱਟ</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>ਕਾਪੀ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>ਸਭ ਚੁਣੋ</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>ਵਿੰਡੋ ਐਡਜਸਟ ਕਰੋ</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

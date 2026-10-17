@@ -131,6 +131,18 @@ Ruta: %2</translation>
         <source>Output</source>
         <translation>Salida</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copiar</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Seleccionar &amp;todo</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Ajustar &amp;Ventana</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>

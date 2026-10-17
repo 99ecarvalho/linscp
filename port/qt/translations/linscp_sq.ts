@@ -131,6 +131,18 @@ Vendndodhja: %2</translation>
         <source>Output</source>
         <translation>Dalja</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopjo</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Përzgjidh të &amp;gjitha</translation>
+    </message>
+    <message>
+        <source>Adjust &amp;Window</source>
+        <translation>Përshtat &amp;dritaren</translation>
+    </message>
 </context>
 <context>
     <name>CopyLocalDialog</name>
