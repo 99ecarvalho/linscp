@@ -73,6 +73,7 @@
 #include <QTimer>
 #include <QClipboard>
 #include <QFontInfo>
+#include <QFontDatabase>
 #include <QStandardPaths>
 #include <QStatusBar>
 #include <QToolBar>
@@ -390,7 +391,10 @@ void Dialogs()
       if (Action != nullptr)
       {
         Action->trigger();
-        Check(QFontInfo(Text->font()).fixedPitch(), "Use Monospaced Font: a fixed one");
+        // The system's fixed font (which a Wine prefix without one resolves
+        // to a proportional face).
+        Check(Text->font().family() == QFontDatabase::systemFont(QFontDatabase::FixedFont).family(),
+          "Use Monospaced Font: a fixed one");
       }
       if (Banner != nullptr)
       {
