@@ -5177,10 +5177,6 @@ Location: %2</source>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>المقارنة</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>محلي:</translation>
     </message>
@@ -5191,6 +5187,22 @@ Location: %2</source>
     <message>
         <source>Cancel</source>
         <translation>إلغاء الأمر</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>الوقت المتبقي:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>وقت البدء:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>الوقت المنقضي:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;تصغير</translation>
     </message>
 </context>
 <context>

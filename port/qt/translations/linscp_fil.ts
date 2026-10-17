@@ -5173,10 +5173,6 @@ Lokasyon: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Inihahambing</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Lokal:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Lokasyon: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Kanselahin</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Natitirang oras:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Oras ng simula:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Oras na nakalipas:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>I-mi&amp;nimize</translation>
     </message>
 </context>
 <context>

@@ -5172,10 +5172,6 @@ Location: %2</source>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>กำลังเปรียบเทียบ</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>ภายในเครื่อง:</translation>
     </message>
@@ -5186,6 +5182,22 @@ Location: %2</source>
     <message>
         <source>Cancel</source>
         <translation>ยกเลิก</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>เวลาที่เหลือ:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>เวลาเริ่มต้น:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>เวลาที่ใช้ไป:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;ย่อหน้าต่าง</translation>
     </message>
 </context>
 <context>

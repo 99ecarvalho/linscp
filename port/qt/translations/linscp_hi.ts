@@ -5173,10 +5173,6 @@ Location: %2</source>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>तुलना की जा रही है</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>स्थानीय:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Location: %2</source>
     <message>
         <source>Cancel</source>
         <translation>रद्द करें</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>शेष समय:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>प्रारंभ समय:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>बीता समय:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>छोटा करें(&amp;M)</translation>
     </message>
 </context>
 <context>

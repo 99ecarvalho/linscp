@@ -8,6 +8,7 @@
 #define LINSCP_QT_SYNCHRONIZE_DIALOG_H
 
 #include <QDialog>
+#include <QElapsedTimer>
 
 #include <functional>
 
@@ -101,13 +102,35 @@ public:
   explicit SynchronizeProgress(QWidget * Parent = nullptr);
   // Core's directory callback: false once cancelled.
   bool Directory(const QString & Local, const QString & Remote);
+  // With the files compared so far, of how many the last time (-1 not
+  // known): the progress and the time left, as TSynchronizeProgressForm.
+  bool Progress(const CoreBridge::TSession::TSyncCollectProgress & Progress);
   bool Cancelled() const { return FCancelled; }
   QPushButton * CancelButton() const { return FCancel; }
+  QPushButton * MinimizeButton() const { return FMinimize; }
+  QLabel * TimeLeft() const { return FTimeLeft; }
+  QLabel * StartTime() const { return FStartTime; }
+  QLabel * TimeElapsed() const { return FTimeElapsed; }
+  class QProgressBar * Bar() const { return FBar; }
+  // Called each second while shown: the times.
+  void UpdateControls();
 
 private:
+  void Start(int TotalFiles);
+
   QLabel * FLocal = nullptr;
   QLabel * FRemote = nullptr;
+  QLabel * FTimeLeftLabel = nullptr;
+  QLabel * FTimeLeft = nullptr;
+  QLabel * FStartTimeLabel = nullptr;
+  QLabel * FStartTime = nullptr;
+  QLabel * FTimeElapsed = nullptr;
+  class QProgressBar * FBar = nullptr;
   QPushButton * FCancel = nullptr;
+  QPushButton * FMinimize = nullptr;
+  class QTimer * FTimer = nullptr;
+  QElapsedTimer FElapsed;
+  bool FStarted = false;
   bool FCancelled = false;
 };
 

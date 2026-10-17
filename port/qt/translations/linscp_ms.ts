@@ -5172,10 +5172,6 @@ Lokasi: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Membandingkan</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Lokal:</translation>
     </message>
@@ -5186,6 +5182,22 @@ Lokasi: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Batal</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Masa berbaki:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Masa mula:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Masa digunakan:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimumkan</translation>
     </message>
 </context>
 <context>

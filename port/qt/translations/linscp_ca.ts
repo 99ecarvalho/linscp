@@ -5173,10 +5173,6 @@ Ubicació: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Comparant</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Local:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Ubicació: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Cancel·la</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Temps restant:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Hora d&apos;inici:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Temps transcorregut:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimitza</translation>
     </message>
 </context>
 <context>

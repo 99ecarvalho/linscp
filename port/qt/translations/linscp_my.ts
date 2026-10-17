@@ -5172,10 +5172,6 @@ Location: %2</source>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>နှိုင်းယှဉ်နေသည်</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>အနီး:</translation>
     </message>
@@ -5186,6 +5182,22 @@ Location: %2</source>
     <message>
         <source>Cancel</source>
         <translation>ပယ်ဖျက်ပါ</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>ကျန်ရှိသောအချိန်:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>စတင်ချိန်:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>ကြာမြင့်ချိန်:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>ချုံ့ထားပါ(&amp;M)</translation>
     </message>
 </context>
 <context>

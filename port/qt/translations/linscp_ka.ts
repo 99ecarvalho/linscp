@@ -5173,10 +5173,6 @@ Location: %2</source>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>შედარება</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>ლოკალური:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Location: %2</source>
     <message>
         <source>Cancel</source>
         <translation>გაუქმება</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>დარჩენილი დრო:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>დაწყების დრო:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>გასული დრო:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;ჩაკეცვა</translation>
     </message>
 </context>
 <context>

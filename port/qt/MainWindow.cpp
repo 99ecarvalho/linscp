@@ -2656,11 +2656,8 @@ bool MainWindow::SynchronizeDirectories(const QString & LocalDirectory, const QS
     Progress.show();
     try
     {
-      Checklist = FSession->SyncCollect(LocalDirectory.toStdString(), RemoteDirectory.toStdString(), Params,
-        [&Progress](const std::string & Local, const std::string & Remote)
-        {
-          return Progress.Directory(QString::fromStdString(Local), QString::fromStdString(Remote));
-        }, Settings);
+      Checklist = FSession->SyncCollect(LocalDirectory.toStdString(), RemoteDirectory.toStdString(), Params, nullptr, Settings,
+        [&Progress](const CoreBridge::TSession::TSyncCollectProgress & Data) { return Progress.Progress(Data); });
     }
     catch (const CoreBridge::TCoreError & E)
     {

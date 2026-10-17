@@ -5174,10 +5174,6 @@ Location: %2</source>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Порівняння</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Локально:</translation>
     </message>
@@ -5188,6 +5184,22 @@ Location: %2</source>
     <message>
         <source>Cancel</source>
         <translation>Скасувати</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Залишилось часу:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Час старту:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Пройшло часу:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>Мінімізувати</translation>
     </message>
 </context>
 <context>

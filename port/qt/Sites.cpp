@@ -751,6 +751,16 @@ bool HostNameIsUrl(const std::string & HostName)
   }
 }
 
+std::string TimeSpanText(double Seconds)
+{
+  return Utf8(FormatDateTimeSpan(TDateTime(Seconds / SecsPerDay)));
+}
+
+std::string NowTimeText()
+{
+  return Utf8(Now().TimeString());
+}
+
 std::string ConfigurationExportPath()
 {
   return Utf8(Configuration->GetDefaultIniFileExportPath());

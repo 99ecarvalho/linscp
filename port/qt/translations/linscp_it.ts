@@ -5173,10 +5173,6 @@ Percorso: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Confronto</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Locale:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Percorso: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Annulla</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Tempo rimasto:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Ora inizio:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Tempo trascorso:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>Riduci a icona</translation>
     </message>
 </context>
 <context>

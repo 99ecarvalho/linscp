@@ -5173,10 +5173,6 @@ Location: %2</source>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>তুলনা করা হচ্ছে</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>লোকাল:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Location: %2</source>
     <message>
         <source>Cancel</source>
         <translation>বাতিল</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>অবশিষ্ট সময়:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>শুরুর সময়:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>অতিবাহিত সময়:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>ছোট করুন(&amp;M)</translation>
     </message>
 </context>
 <context>

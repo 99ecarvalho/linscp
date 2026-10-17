@@ -5173,10 +5173,6 @@ Placering: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Sammenligning</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Lokal:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Placering: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Annullere</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Tid tilbage:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Starttidspunkt:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Tid der Gået:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>Minimer</translation>
     </message>
 </context>
 <context>

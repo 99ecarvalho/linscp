@@ -13,12 +13,12 @@ Last updated: **2026-10-17**
 |---|---|---|
 | A. Site Manager | 15 | 17 |
 | B. Password prompt and banner | 1 | 3 |
-| C. Progress and synchronization dialogs | 2 | 4 |
+| C. Progress and synchronization dialogs | 3 | 4 |
 | D. Main window | 1 | 9 |
 | E. Preferences | 0 | 10 |
 | F. Command line | 0 | 3 |
 | G. Known before | 0 | 1 |
-| **Total** | **19** | **47** |
+| **Total** | **20** | **47** |
 
 ## Items
 
@@ -45,7 +45,7 @@ Last updated: **2026-10-17**
 | B2 | Banner: Use Monospaced Font | Low | todo | |
 | B3 | Banner: clickable links, Open Link | Low | todo | |
 | C1 | Transfer progress: times, Skip, Background, Once Finished, Minimize, speed limit | High | done | 2026-10-17. Proceed in Background for the panels' uploads and downloads (`TMoveToQueue`, Session.cpp), as upstream for its ExecuteFileOperation; ctest `qt_gui_transfer` (times, speed limit, skip, background, once finished), `qt_gui_progress` (the queue resumes and completes the part, OpenSSH) |
-| C2 | Synchronization progress: times, Minimize | Medium | todo | |
+| C2 | Synchronization progress: times, Minimize | Medium | done | 2026-10-17. With the progress bar and the percentage; the time left from upstream's directory statistics cache (`SyncCollect`'s `OnProgress`), kept only with a real storage; ctest `qt_gui_sync` |
 | C3 | Synchronization checklist context menu | Medium | done | 2026-10-17. `SynchronizeDialog::PopupMenu`; the remote directory's Explore waits for `/explore` (F2); ctest `qt_gui_sync` |
 | C4 | Console: Adjust Window, Copy/Select All menu | Low | todo | |
 | D1 | Column header menu: sort asc/desc, hide, size format, ... | High | done | 2026-10-17. `FileView::HeaderMenu`; ctest `qt_gui_panel` |

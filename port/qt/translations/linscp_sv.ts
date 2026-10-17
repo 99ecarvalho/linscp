@@ -5173,10 +5173,6 @@ Plats: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Jämför</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Lokal:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Plats: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Avbryt</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Tid kvar:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Start tid:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Förfluten tid:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimera</translation>
     </message>
 </context>
 <context>

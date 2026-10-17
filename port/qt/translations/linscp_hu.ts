@@ -5172,10 +5172,6 @@ Hely: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Összehasonlítás</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Helyi:</translation>
     </message>
@@ -5186,6 +5182,22 @@ Hely: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Megszakítás</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Hátra lévő idő:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Kezdés ideje:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Eltelt idő:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>Kis &amp;méret</translation>
     </message>
 </context>
 <context>

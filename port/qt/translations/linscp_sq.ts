@@ -5173,10 +5173,6 @@ Vendndodhja: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Po krahasohet</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Lokale:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Vendndodhja: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Anulo</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Koha e mbetur:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Koha e fillimit:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Koha e kaluar:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimizo</translation>
     </message>
 </context>
 <context>

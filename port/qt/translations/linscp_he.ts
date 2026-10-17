@@ -5173,10 +5173,6 @@ Location: %2</source>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>משווה</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>מקומי:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Location: %2</source>
     <message>
         <source>Cancel</source>
         <translation>ביטול</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>זמן שנותר:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>שעת התחלה:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>זמן שחלף:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;צמצם</translation>
     </message>
 </context>
 <context>

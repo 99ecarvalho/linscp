@@ -5174,10 +5174,6 @@ Umiestnenie: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Porovnáva sa</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Lokálny:</translation>
     </message>
@@ -5188,6 +5184,22 @@ Umiestnenie: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Zrušiť</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Zostávajúci čas:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Čas spustenia:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Uplynulý čas:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>Mi&amp;nimalizovať</translation>
     </message>
 </context>
 <context>

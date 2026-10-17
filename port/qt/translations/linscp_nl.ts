@@ -5173,10 +5173,6 @@ Locatie: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Vergelijken</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Lokaal:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Locatie: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Annuleren</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Tijd resterend:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Start tijd:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Tijd verstreken:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimaliseren</translation>
     </message>
 </context>
 <context>

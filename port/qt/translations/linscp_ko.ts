@@ -5172,10 +5172,6 @@ Location: %2</source>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>비교 중</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>로컬:</translation>
     </message>
@@ -5186,6 +5182,22 @@ Location: %2</source>
     <message>
         <source>Cancel</source>
         <translation>취소</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>남은 시간:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>시작 시간:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>예상 시간:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>최소화(&amp;M)</translation>
     </message>
 </context>
 <context>

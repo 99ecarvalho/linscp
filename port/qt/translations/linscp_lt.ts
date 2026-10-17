@@ -5174,10 +5174,6 @@ Vieta: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Lyginama</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Vietinis:</translation>
     </message>
@@ -5188,6 +5184,22 @@ Vieta: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Atšaukti</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Likęs laikas:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Pradžios laikas:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Praėjęs laikas:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Suskleisti langą</translation>
     </message>
 </context>
 <context>

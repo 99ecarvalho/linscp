@@ -5173,10 +5173,6 @@ Location: %2</source>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Համեմատում</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Տեղային:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Location: %2</source>
     <message>
         <source>Cancel</source>
         <translation>Չեղարկել</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Մնացած ժամանակ:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Մեկնարկի ժամանակ:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Անցած ժամանակ:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>Ն&amp;վազեցնել</translation>
     </message>
 </context>
 <context>

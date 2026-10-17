@@ -5173,10 +5173,6 @@ Staðsetning: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Samanberandi</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Staðarbundið:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Staðsetning: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Hætta við</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Tími eftir:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Upphafstími:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Tími liðinn:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Lágmarka</translation>
     </message>
 </context>
 <context>

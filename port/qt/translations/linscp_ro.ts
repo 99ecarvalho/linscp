@@ -5174,10 +5174,6 @@ Cale: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Comparare</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Local:</translation>
     </message>
@@ -5188,6 +5184,22 @@ Cale: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Anulare</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Timp rămas:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Ora de începere:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Timp scurs:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimizare</translation>
     </message>
 </context>
 <context>

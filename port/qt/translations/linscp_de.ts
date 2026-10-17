@@ -5173,10 +5173,6 @@ Ort: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Vergleich läuft</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Lokal</translation>
     </message>
@@ -5187,6 +5183,22 @@ Ort: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Verbleibende Zeit:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Startzeit:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Verstrichene Zeit:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimieren</translation>
     </message>
 </context>
 <context>

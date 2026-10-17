@@ -16,6 +16,8 @@
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QProgressBar>
+#include <QTimer>
 #include <QLabel>
 #include <QLineEdit>
 #include <QLocale>
@@ -267,26 +269,123 @@ void SynchronizeDialog::accept()
 SynchronizeProgress::SynchronizeProgress(QWidget * Parent) :
   QDialog(Parent)
 {
-  setWindowTitle(tr("Comparing"));
+  setWindowTitle(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::SynchronizeCompare)));
   QGridLayout * Layout = new QGridLayout(this);
   Layout->addWidget(new QLabel(tr("Local:"), this), 0, 0);
   FLocal = new QLabel(this);
   FLocal->setMinimumWidth(380);
-  Layout->addWidget(FLocal, 0, 1);
+  Layout->addWidget(FLocal, 0, 1, 1, 3);
   Layout->addWidget(new QLabel(tr("Remote:"), this), 1, 0);
   FRemote = new QLabel(this);
-  Layout->addWidget(FRemote, 1, 1);
+  Layout->addWidget(FRemote, 1, 1, 1, 3);
+  // As SynchronizeProgress.dfm: the time left once the count is known from
+  // the last time, else the start time; the time elapsed.
+  FTimeLeftLabel = new QLabel(tr("Time left:"), this);
+  FTimeLeft = new QLabel(this);
+  FStartTimeLabel = new QLabel(tr("Start time:"), this);
+  FStartTime = new QLabel(this);
+  Layout->addWidget(FTimeLeftLabel, 2, 0);
+  Layout->addWidget(FTimeLeft, 2, 1);
+  Layout->addWidget(FStartTimeLabel, 2, 0);
+  Layout->addWidget(FStartTime, 2, 1);
+  Layout->addWidget(new QLabel(tr("Time elapsed:"), this), 2, 2);
+  FTimeElapsed = new QLabel(this);
+  Layout->addWidget(FTimeElapsed, 2, 3);
+  FTimeLeftLabel->hide();
+  FTimeLeft->hide();
+  FBar = new QProgressBar(this);
+  FBar->setRange(0, 0);
+  FBar->setTextVisible(false);
+  Layout->addWidget(FBar, 3, 0, 1, 4);
+  QHBoxLayout * Buttons = new QHBoxLayout();
   FCancel = new QPushButton(tr("Cancel"), this);
-  connect(FCancel, &QPushButton::clicked, this, [this]() { FCancelled = true; });
-  Layout->addWidget(FCancel, 2, 1, Qt::AlignRight);
+  connect(FCancel, &QPushButton::clicked, this, [this]()
+  {
+    FCancelled = true;
+    UpdateControls();
+  });
+  FMinimize = new QPushButton(tr("&Minimize"), this);
+  connect(FMinimize, &QPushButton::clicked, this, [this]()
+  {
+    // As GlobalMinimize: the application, not only this window.
+    QWidget * Window = (parentWidget() != nullptr) ? parentWidget()->window() : this;
+    Window->showMinimized();
+  });
+  Buttons->addWidget(FCancel);
+  Buttons->addWidget(FMinimize);
+  Buttons->addStretch(1);
+  Layout->addLayout(Buttons, 4, 0, 1, 4);
+  Layout->setColumnStretch(1, 1);
+  Layout->setColumnStretch(3, 1);
+  FTimer = new QTimer(this);
+  FTimer->setInterval(1000);
+  connect(FTimer, &QTimer::timeout, this, &SynchronizeProgress::UpdateControls);
+  UpdateControls();
+}
+
+// As TSynchronizeProgressForm::Start.
+void SynchronizeProgress::Start(int TotalFiles)
+{
+  FStarted = true;
+  FElapsed.start();
+  FStartTime->setText(QString::fromStdString(CoreBridge::NowTimeText()));
+  const bool Knows = (TotalFiles >= 0);
+  FBar->setRange(0, Knows ? std::max(TotalFiles, 1) : 0);
+  FBar->setValue(0);
+  FTimeLeftLabel->setVisible(Knows);
+  FTimeLeft->setVisible(Knows);
+  FStartTimeLabel->setVisible(!Knows);
+  FStartTime->setVisible(!Knows);
+  FTimer->start();
 }
 
 bool SynchronizeProgress::Directory(const QString & Local, const QString & Remote)
 {
-  FLocal->setText(Local);
-  FRemote->setText(Remote);
+  CoreBridge::TSession::TSyncCollectProgress Data;
+  Data.Local = Local.toStdString();
+  Data.Remote = Remote.toStdString();
+  return Progress(Data);
+}
+
+bool SynchronizeProgress::Progress(const CoreBridge::TSession::TSyncCollectProgress & Data)
+{
+  if (!FStarted)
+  {
+    Start(Data.TotalFiles);
+  }
+  FLocal->setText(QString::fromStdString(Data.Local));
+  FRemote->setText(QString::fromStdString(Data.Remote));
+  if (FBar->maximum() > 0)
+  {
+    FBar->setValue(std::min(Data.Files, FBar->maximum()));
+  }
+  UpdateControls();
   QApplication::processEvents();
   return !FCancelled;
+}
+
+// As TSynchronizeProgressForm::UpdateControls: the percentage in the title,
+// the time elapsed, the time left from it (after three seconds).
+void SynchronizeProgress::UpdateControls()
+{
+  QString Caption = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::SynchronizeCompare));
+  const double Elapsed = FStarted ? (FElapsed.elapsed() / 1000.0) : 0;
+  const bool Knows = (FBar->maximum() > 0);
+  if (FStarted && Knows)
+  {
+    Caption = QStringLiteral("%1% %2").arg(FBar->value() * 100 / FBar->maximum()).arg(Caption);
+  }
+  setWindowTitle(Caption);
+  FTimeElapsed->setText(QString::fromStdString(CoreBridge::TimeSpanText(Elapsed)));
+  if (FStarted && Knows && (Elapsed >= 3) && (FBar->value() > 0))
+  {
+    FTimeLeft->setText(QString::fromStdString(CoreBridge::TimeSpanText(Elapsed * (FBar->maximum() - FBar->value()) / FBar->value())));
+  }
+  else
+  {
+    FTimeLeft->setText(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::TimeLeftCalculating)));
+  }
+  FCancel->setEnabled(!FCancelled);
 }
 
 namespace

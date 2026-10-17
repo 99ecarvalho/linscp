@@ -84,6 +84,7 @@
 #include <QComboBox>
 #include <QHeaderView>
 #include <QMenu>
+#include <QProgressBar>
 #include <QMenuBar>
 #include <QRadioButton>
 #include <QDragEnterEvent>
@@ -2090,6 +2091,33 @@ void Synchronization(const char * Port, const QString & Directory)
     Local->ChangeDirectory(Directory);
     Remote->ChangeDirectory(QStringLiteral("/sub"));
 
+    // C2: the comparison's progress: the start time, then (with the count
+    // of the last time) the time left; Minimize.
+    {
+      using TProgress = CoreBridge::TSession::TSyncCollectProgress;
+      std::vector<TProgress> Seen;
+      Window.Session()->SyncCollect(Directory.toStdString(), "/sub", TSyncParams(), nullptr, nullptr,
+        [&Seen](const TProgress & Progress) { Seen.push_back(Progress); return true; });
+      // (Under /ini=nul no count is kept for the next time.)
+      Check(!Seen.empty() && (Seen.front().TotalFiles < 0) && (QDir(QString::fromStdString(Seen.front().Local)) == QDir(Directory)) &&
+        QString::fromStdString(Seen.front().Remote).startsWith(QStringLiteral("/sub")) && (Seen.back().Files >= 0),
+        "each directory compared reported, with the files so far");
+      SynchronizeProgress Unknown;
+      TProgress First;
+      First.Local = "/l";
+      First.Remote = "/r";
+      Check(Unknown.Progress(First) && Unknown.StartTime()->isVisibleTo(&Unknown) && !Unknown.TimeLeft()->isVisibleTo(&Unknown) &&
+        !Unknown.StartTime()->text().isEmpty() && (Unknown.Bar()->maximum() == 0), "the start time, while the count is not known");
+      SynchronizeProgress Known;
+      TProgress Half = First;
+      Half.Files = 5;
+      Half.TotalFiles = 10;
+      Check(Known.Progress(Half) && Known.TimeLeft()->isVisibleTo(&Known) && !Known.StartTime()->isVisibleTo(&Known) &&
+        Known.windowTitle().startsWith(QStringLiteral("50% ")) && !Known.TimeElapsed()->text().isEmpty() &&
+        (Known.MinimizeButton() != nullptr), "the time left and the percentage, with it");
+      Known.CancelButton()->click();
+      Check(!Known.Progress(Half) && !Known.CancelButton()->isEnabled(), "Cancel stops the comparison");
+    }
     // The checklist, over what the session collects.
     {
       std::unique_ptr<CoreBridge::TSyncChecklist> List =

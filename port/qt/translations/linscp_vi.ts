@@ -5172,10 +5172,6 @@ Vị trí: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Đang so sánh</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Cục bộ:</translation>
     </message>
@@ -5186,6 +5182,22 @@ Vị trí: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Hủy</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Thời gian còn lại:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Thời gian bắt đầu:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Thời gian đã trôi qua:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Thu nhỏ</translation>
     </message>
 </context>
 <context>

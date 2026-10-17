@@ -5173,10 +5173,6 @@ Ligging: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Vergelyk tans</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Plaaslik:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Ligging: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Kanselleer</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Tyd oor:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Begintyd:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Tyd verstreke:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimeer</translation>
     </message>
 </context>
 <context>

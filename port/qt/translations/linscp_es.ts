@@ -5173,10 +5173,6 @@ Ruta: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Comparando</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Local:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Ruta: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Cancelar</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Tiempo restante:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Hora de inicio:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Tiempo transcurrido:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimizar</translation>
     </message>
 </context>
 <context>

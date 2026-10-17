@@ -5174,10 +5174,6 @@ Atrašanās vieta: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Salīdzina</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Lokālā:</translation>
     </message>
@@ -5188,6 +5184,22 @@ Atrašanās vieta: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Atcelt</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Atlikušais laiks:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Sākuma laiks:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Pagājušais laiks:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimizēt</translation>
     </message>
 </context>
 <context>

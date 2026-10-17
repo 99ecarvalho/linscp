@@ -5172,10 +5172,6 @@ Location: %2</source>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>比對中</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>本機:</translation>
     </message>
@@ -5186,6 +5182,22 @@ Location: %2</source>
     <message>
         <source>Cancel</source>
         <translation>取消</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>剩餘時間:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>開始時間:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>已用時間:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>最小化(&amp;M)</translation>
     </message>
 </context>
 <context>

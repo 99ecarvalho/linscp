@@ -5175,10 +5175,6 @@ Lokacija: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Primerjanje</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Lokalno:</translation>
     </message>
@@ -5189,6 +5185,22 @@ Lokacija: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Prekliči</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Preostali čas:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Čas začetka:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Pretečeni čas:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimiraj</translation>
     </message>
 </context>
 <context>

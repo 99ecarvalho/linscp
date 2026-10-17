@@ -1890,6 +1890,8 @@ std::string Text(TText Text)
     case TText::IncrementalSearchType: Ident = INC_SEARCH_TYPE; break;
     case TText::IncrementalSearchNext: Ident = INC_NEXT_SEARCH; break;
     case TText::ExecuteAppError: Ident = EXECUTE_APP_ERROR; break;
+    case TText::TimeLeftCalculating: Ident = PROGRESS_TIME_LEFT_CALCULATING; break;
+    case TText::SynchronizeCompare: Ident = SYNCHRONIZE_PROGRESS_COMPARE; break;
     case TText::ExportConfigurationTitle: Ident = EXPORT_CONF_TITLE; break;
     case TText::ImportConfigurationTitle: Ident = IMPORT_CONF_TITLE; break;
     case TText::ConfigurationFilter: Ident = EXPORT_CONF_FILTER; break;

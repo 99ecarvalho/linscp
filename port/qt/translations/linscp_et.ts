@@ -5173,10 +5173,6 @@ Asukoht: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Võrdlemine</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Kohalik:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Asukoht: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>Loobu</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Aega jäänud:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Algusaeg:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Aega kulunud:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimeeri</translation>
     </message>
 </context>
 <context>

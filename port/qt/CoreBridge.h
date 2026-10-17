@@ -1119,6 +1119,8 @@ enum class TText
   IncrementalSearchType, // "(start typing)"
   IncrementalSearchNext, // "(press Tab for next)"
   ExecuteAppError,      // "Cannot execute '%s'."
+  TimeLeftCalculating,  // "Calculating..."
+  SynchronizeCompare,   // "Comparing"
   ExportConfigurationTitle, // "Select file to export configuration to"
   ImportConfigurationTitle, // "Select file to import configuration from"
   ConfigurationFilter,  // "INI files (*.ini)|*.ini|All files (*.*)|*.*"
@@ -1902,6 +1904,10 @@ bool HostNameIsUrl(const std::string & HostName);
 // Name, or with " (n)" after it, as TNamedObject::MakeUniqueIn: no stored
 // site's.
 std::string UniqueSiteName(const std::string & Name);
+// Core's time texts: a span (FormatDateTimeSpan, "0:00:05"), and now's
+// time (TDateTime::TimeString).
+std::string TimeSpanText(double Seconds);
+std::string NowTimeText();
 // The Login dialog's Tools > Export/Backup Configuration and
 // Import/Restore Configuration (TConfiguration::Export, Import): the
 // preferences and sites to an INI file, or from one into the storage in
@@ -2353,10 +2359,21 @@ public:
   // checklist (OnDirectory is told each pair compared; false from it
   // cancels, and nothing is returned); then applied, here or in the queue.
   // Throws TCoreError.
+  // OnProgress, in OnDirectory's place: the files compared so far too, and
+  // how many there were the last time (TotalFiles, -1 unknown: upstream's
+  // directory statistics cache, kept when the site caches directories).
+  struct TSyncCollectProgress
+  {
+    std::string Local;
+    std::string Remote;
+    int Files = 0;
+    int TotalFiles = -1;
+  };
   std::unique_ptr<TSyncChecklist> SyncCollect(const std::string & LocalDirectory, const std::string & RemoteDirectory,
     const TSyncParams & Params,
     const std::function<bool(const std::string & Local, const std::string & Remote)> & OnDirectory = nullptr,
-    const TTransferSettings * Settings = nullptr);
+    const TTransferSettings * Settings = nullptr,
+    const std::function<bool(const TSyncCollectProgress & Progress)> & OnProgress = nullptr);
   // The checked entries. False when it was cancelled or core skipped some.
   bool SyncApply(TSyncChecklist & Checklist, TSyncStatistics * Statistics = nullptr);
   // Each checked entry as its own queue item (TTerminal::SynchronizeToQueue).

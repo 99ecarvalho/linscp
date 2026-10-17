@@ -5173,10 +5173,6 @@ Location: %2</source>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>ஒப்பிடுதல்</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>உள்ளகம்:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Location: %2</source>
     <message>
         <source>Cancel</source>
         <translation>ரத்துசெய்</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>மீத நேரம்:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>தொடக்க நேரம்:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>கடந்த நேரம்:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;குறைத்தல்</translation>
     </message>
 </context>
 <context>

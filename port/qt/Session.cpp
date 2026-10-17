@@ -1590,11 +1590,25 @@ class TSyncDirectoryHandler
 {
 public:
   std::function<bool(const std::string &, const std::string &)> OnDirectory;
+  std::function<bool(const TSession::TSyncCollectProgress &)> OnProgress;
+  int TotalFiles = -1;
 
   void __fastcall Handle(const UnicodeString & LocalDirectory, const UnicodeString & RemoteDirectory,
-    bool & Continue, bool /*Collect*/, const TSynchronizeOptions * /*Options*/)
+    bool & Continue, bool /*Collect*/, const TSynchronizeOptions * Options)
   {
-    if (OnDirectory && !OnDirectory(Utf8(LocalDirectory), Utf8(RemoteDirectory)))
+    if (OnProgress)
+    {
+      TSession::TSyncCollectProgress Progress;
+      Progress.Local = Utf8(LocalDirectory);
+      Progress.Remote = Utf8(RemoteDirectory);
+      Progress.Files = (Options != NULL) ? Options->Files : 0;
+      Progress.TotalFiles = TotalFiles;
+      if (!OnProgress(Progress))
+      {
+        Continue = false;
+      }
+    }
+    else if (OnDirectory && !OnDirectory(Utf8(LocalDirectory), Utf8(RemoteDirectory)))
     {
       Continue = false;
     }
@@ -1992,7 +2006,8 @@ void SetSyncDefaults(const TSyncParams & Params, bool SaveMode)
 // default transfer settings, rooted at the two directories.
 std::unique_ptr<TSyncChecklist> TSession::SyncCollect(const std::string & LocalDirectory,
   const std::string & RemoteDirectory, const TSyncParams & Params,
-  const std::function<bool(const std::string &, const std::string &)> & OnDirectory, const TTransferSettings * Settings)
+  const std::function<bool(const std::string &, const std::string &)> & OnDirectory, const TTransferSettings * Settings,
+  const std::function<bool(const TSyncCollectProgress &)> & OnProgress)
 {
   try
   {
@@ -2007,6 +2022,20 @@ std::unique_ptr<TSyncChecklist> TSession::SyncCollect(const std::string & LocalD
     Impl->CopyParam.IncludeFileMask.SetRoots(Local, Remote);
     TSyncDirectoryHandler Handler;
     Handler.OnDirectory = OnDirectory;
+    Handler.OnProgress = OnProgress;
+    // As DoSynchronizeDirectories: the last count of the files, for the
+    // time left.
+    TTerminal * Terminal = F->Terminal.get();
+    const UnicodeString SessionKey = Terminal->SessionData->SessionKey;
+    std::unique_ptr<TStrings> DataList(Configuration->LoadDirectoryStatisticsCache(SessionKey, Remote, Impl->CopyParam));
+    if (DataList->Count >= 1)
+    {
+      Handler.TotalFiles = StrToIntDef(DataList->Strings[0], -1);
+    }
+    else
+    {
+      DataList->Add(UnicodeString());
+    }
     TSynchronizeOptions Options;
     // As GetSynchronizeOptions: the panels' selection, by name.
     if (Params.SelectedOnly && !Params.Selected.empty())
@@ -2022,6 +2051,11 @@ std::unique_ptr<TSyncChecklist> TSession::SyncCollect(const std::string & LocalD
     }
     Impl->Checklist.reset(F->Terminal->SynchronizeCollect(Local, Remote, Impl->Mode, &Impl->CopyParam,
       Impl->Params, CLOSURE_OF(&Handler, Handle), &Options));
+    if (Terminal->SessionData->CacheDirectories)
+    {
+      DataList->Strings[0] = IntToStr(Options.Files);
+      Configuration->SaveDirectoryStatisticsCache(SessionKey, Remote, Impl->CopyParam, DataList.get());
+    }
     return std::unique_ptr<TSyncChecklist>(new TSyncChecklist(Impl.release()));
   }
   catch (Exception & E)

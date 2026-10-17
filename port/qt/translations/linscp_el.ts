@@ -5173,10 +5173,6 @@ Location: %2</source>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Σύγκριση</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Τοπικό:</translation>
     </message>
@@ -5187,6 +5183,22 @@ Location: %2</source>
     <message>
         <source>Cancel</source>
         <translation>Ακύρωση</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Χρόνος που απομένει:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Χρόνος έναρξης:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Χρόνος που χρειάστηκε:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>Ελαχιστοποίηση</translation>
     </message>
 </context>
 <context>

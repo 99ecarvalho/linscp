@@ -5172,10 +5172,6 @@ Konum: %2</translation>
 <context>
     <name>SynchronizeProgress</name>
     <message>
-        <source>Comparing</source>
-        <translation>Karşılaştırılıyor</translation>
-    </message>
-    <message>
         <source>Local:</source>
         <translation>Yerel:</translation>
     </message>
@@ -5186,6 +5182,22 @@ Konum: %2</translation>
     <message>
         <source>Cancel</source>
         <translation>İptal</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Kalan süre:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Başlangıç zamanı:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Geçen süre:</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Küçült</translation>
     </message>
 </context>
 <context>
