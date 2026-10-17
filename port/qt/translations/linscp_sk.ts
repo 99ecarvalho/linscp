@@ -3939,14 +3939,6 @@ Umiestnenie: %2</translation>
         <translation>Pokročilé nastavenia lokality</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>&amp;Vzdialený priečinok:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>P&amp;rehľadávať...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Lokálny priečinok</translation>
     </message>
@@ -3957,10 +3949,6 @@ Umiestnenie: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Priečinky</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> sekúnd</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3983,40 +3971,20 @@ Umiestnenie: %2</translation>
         <translation>&amp;Typ proxy:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Názov hostiteľa pro&amp;xy:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Čís&amp;lo portu:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>Meno po&amp;užívateľa:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Heslo:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Zvážiť použitie proxy pre &amp;lokálne adresy</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Proxy</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Pokúsiť sa o overenie prostredníctvom &amp;Pageant alebo ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Povoliť &amp;odosielanie ďalej agentom</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>P&amp;rehľadávať...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4031,16 +3999,656 @@ Umiestnenie: %2</translation>
         <translation>Súbor s privátnym &amp;kľúčom:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>Overovanie SSH</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>Zapa&amp;mätať naposledy použitý priečinok</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Pokúsiť sa o overenie &apos;s &amp;interaktívnou klávesnicou&apos;</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Stránky</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>F&amp;arba</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Prostredie</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Prostredie servera</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>Znaky &amp;konca riadku (pokiaľ nie sú určené serverom):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>UTF-8 kó&amp;dovanie pre názvy súborov:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Časový posun:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>hodín</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Časový posun (hodiny)</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Časový posun (minúty)</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>minút</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Detegovať &amp;automaticky</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>Deli&amp;ť čísla verzií VMS</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Letný čas</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Prispôsobiť vzdialenú časovú pečiatku &amp;miestnym pravidlám (Unix)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Prispôsobiť vzdial. časovú pečiatku let&amp;nému času</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>Syn&amp;chronizovať prehliadanie</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;Vzdialený priečinok:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Lokálny priečinok sa nepoužíva v rozhraní Prieskumníka.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Možnosti čítania priečinkov</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Ukladať &amp;navštívené vzdialené priečinky do vyrov. pamäte</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Ukladať &amp;zmeny do vyrov. pamäte</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>S&amp;tála vyrov. pamäť</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Dohľadávať &amp;symbolické odkazy</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>S&amp;ledovať symbolické odkazy na priečinky</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Kôš</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;Zachovať vymazané vzdialené súbory v koši</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Zachovať &amp;prepísané vzdialené súbory v koši (iba SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>&amp;Vzdialený kôš:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Šifrovanie</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>Za&amp;šifrovať súbory</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Možnosti šifrovania</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>Šifrovací &amp;kľúč:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>Zobra&amp;ziť kľúč</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>Vy&amp;generovať kľúč</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Možnosti protokolu</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Predvolený</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>&amp;Server SFTP:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Automaticky</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>&amp;Preferovaná verzia protokolu SFTP:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>Previesť cesty na serveri do kanoni&amp;ckého tvaru</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Povoliť &amp;núdzové SCP</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>Použiť p&amp;remenovanie v režime POSIX</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Detekcia známych chýb SFTP serverov</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>O&amp;brátené poradie argumentov tvorby symb. odkazu:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>Zlá interpretácia &amp;čas. razítok súborov spred roku 1970:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Shell</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>S&amp;hell:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Autodetekcia</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>&amp;Kód návratu premennej:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Výpis priečinka</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>Príkaz pre &amp;výpis:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>&amp;Ignorovať varovania LS</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Pokú&amp;siť sa o úplnú čas. pečiatku</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Ďalšie voľby</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Zistiť skupiny používa&amp;teľov</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Vyčistiť a&amp;liasy</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Vyčistiť &amp;národné premenné</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Použiť SCP&amp;2 kompatibilne s SCP1</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>&amp;Príkazy pre prihlásenie:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>Ko&amp;nto:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>Podpora výpisu &amp;skrytých súborov:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Použiť príkaz &amp;MLSD pre vytvorenie zoznamu z priečinka</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>Vynútiť IP adresu pre pripo&amp;jenia v pasívnom režime:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Na výber hostiteľa na serveri použite príkaz &amp;HOST</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Zobraziť všetky &amp;revízie súboru na serveroch VMS</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>Pre&amp;dvolený región:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Virtuálny hostiteľ</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Cesta</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>Štýl &amp;URL:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>&amp;Platí žiadateľ</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Overovanie</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>Token r&amp;elácie:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Rola ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>Tolerovať nekódované špeciálne znaky v názvoch súborov</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>Povoliť presmerovani&amp;a na iných hostiteľov</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Optimalizovať veľkosť vy&amp;rovnávacej pamäte pripojenia</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Časové limity</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>sek.</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Udržiavanie pripojenia</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Vypnuté</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>&amp;Odosielanie prázdnych SSH paketov</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Spúšťanie &amp;fingovaných príkazov protokolu</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>&amp;Sekundy medzi príkazmi na udržiavanie:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;A dodatočné čítanie aktuálneho priečinka</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Verzia IP protokolu</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>&amp;Automaticky</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Lokálny</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;Automatické detegovanie</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Názov hostiteľa pro&amp;xy:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>Meno po&amp;užívateľa:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Nastavenia proxy</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>vzory</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Príkaz Telnet</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Príkaz lokálneho proxy</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>Zvážiť použitie proxy pre lokálne pripojenia</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Nie</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Áno</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Vykonávať dohľadanie &amp;DNS na strane proxy:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Tunel</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>Pripojiť cez SSH &amp;tunel</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Hostiteľ, na ktorom sa má vytvoriť tunel</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>&amp;Hostiteľ:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Možnosti tunela</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Automaticky</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>&amp;Lokálny port tunela:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Parametre overovania tunela</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>Vlastnosti TLS</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Mi&amp;nimálna verzia TLS:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Ma&amp;ximálna verzia TLS:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>Znovu použiť ID TLS relácie pre dátové pripojenia</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Parametre overovania</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>Súbor &amp;certifikátu klienta:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Súbor certifikátu klienta</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Súbory certifikátov (*.pfx *.p12 *.pem *.crt *.key);;Všetky súbory (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>Povoliť &amp;kompresiu</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>Postup pri &amp;výbere šifry:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Postup pri výbere šifry</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>Na&amp;hor</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>Na&amp;dol</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Povoliť zastaralú šifru &amp;single-DES</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Výmena kľúča</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Možnosti algoritmu výmeny kľúča</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>Postup pri &amp;výbere algoritmu:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Postup pri výbere algoritmu</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Pokúsiť sa o výmenu kľuča &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Nastavenia opakovanej výmeny kľúča</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Maximum &amp;minút pred výmenou (0 = žiadny limit):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Ma&amp;ximum dát pred výmenou (0 = žiadny limit):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>O&amp;bísť celé overovanie</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Nastavenia overovania</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>Pokúsiť sa o overenie prostredníctvom &amp;agenta</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Odpovedať &amp;heslom na prvú výzvu</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>Z&amp;obraziť verejný kľúč</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Certifikát používaný s privátnym kľúčom:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Certifikát</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>Certifikáty OpenSSH (*-cert.pub);;Všetky súbory (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Pokúsiť sa o overenie &amp;GSSAPI/SSPI</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Povoliť udelenie &amp;povolenia cez GSSAPI</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Chyby</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Rozpoznávanie známych chyb SSH serverov</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Nesprávny výpočet kľúčov SSH H&amp;MAC:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Nesprávny výpočet &amp;šifrovacích kľúčov SSH:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Vyžadovanie &amp;zarovnania signatúr SSH RSA:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Nesprávne použitie &amp;ID relácie pri SSH PK:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Nesprávne spracov. opak. výmeny SSH &amp;kľúča:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Ignorovať ma&amp;ximálnu veľkosť paketu SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Zahltenie správami o i&amp;gnorovaní SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Zahlteníe požiadavkami na WinSCP&apos; SSH &apos;winadj&apos;</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Poznámka</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Príkaz &amp;lokálneho proxy:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Prí&amp;kaz Telnet:</translation>
     </message>
 </context>
 <context>

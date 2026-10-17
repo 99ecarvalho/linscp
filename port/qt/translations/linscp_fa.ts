@@ -3937,14 +3937,6 @@ Location: %2</source>
         <translation>تنظیمات پیشرفته تارنما</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>&amp;پوشه راه دور:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>مرور...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>پوشه محلی</translation>
     </message>
@@ -3955,10 +3947,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>پوشه ها</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> ثانیه</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3981,40 +3969,20 @@ Location: %2</source>
         <translation>&amp;نوع پراکسی</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>&amp;نام میزبان پراکسی:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>شماره &amp;درگاه:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;نام کاربری:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>گذرواژه</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>&amp;استفاده از پراکسی برای آدرس های محلی</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>پراکسی</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>&amp;تلاش برای احراز هویت با استفاده از Pageant یا ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>اجازه به فروارد عامل</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>&amp;کاوش...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4029,16 +3997,656 @@ Location: %2</source>
         <translation>پرونده کلید خصوصی</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>احراز هویت SSH</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>به یاد داشتن آخرین پوشه مورد استفاده</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>تلاش برای احرازهویت &apos;صفحه کلید-تعاملی&apos;</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>صفحه ها</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;رنگ</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>محیط</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>محیط ارتباط راه دور</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>کاراکتر پایان خط - اگر از ارتباط راه دور مشخص نباشد</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>انکودینگ UTF-8</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>جبران منطقه زمانی</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>ساعت</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>جبران منطقه زمانی (ساعت)</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>جبران منطقه زمانی (دقیقه)</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>دقیقه</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>شناسای خودکار</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>اصلاح شماره های نسخه VMS</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>صرفه جویی در زمان روزنور</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>پیکربندی مهرزمان ارتباط راه دور به کنوانسیون های محلی</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>پیکربندی مهرزمان ارتباط راه دور به DST</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>مرور همگام</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;پوشه ارتباط راه دور</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>استفاده نکردن از پوشه محلی با رابط کاربری کاوشگر</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>خواندن فهرست پوشه</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>ذخیره پوشه های ارتباط راه دور بازدید شده</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>ذخیره تغییرات پوشه</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>حافظه دائمی</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>حل پیوند های نمادین</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>دنبال کردن پیوند های نمادین به پوشه ها</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>سطل زباله</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>بازیافت پرونده های حذف شده ارتباط راه دور به سطل رباله</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>بازیافت پرونده های حذف شده و جایگزینی با فیلهای قدیمی ارتباط راه دور به سطل رباله (فقط SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>سطل زباله ارتباط راه دور</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>رمزگذاری</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>رمزگذاری پرونده ها</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>گزینه های رمزگذاری</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>&amp;کلید رمزگذاری:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>نمایش &amp;کلید:</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;آفریدن کلید</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>گزینه های پروتکل</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>پیش فرض</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>ارتباط راه دور SFTP</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>خودکار</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>نسخه پروتکل SFTP پیشنهادی:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>قانونی کردن مسیرها بر روی کارگزار</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>اجازه عقب گردی SCP</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>استفاده از تغییر نام پازیکس؟</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>تشخیص اشکالات شناخته شده در ارتباط راه دور SFTP</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>مرتب سازی معکوس آرگومان های دستور پیوند</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>تفسیر اشتباه مهرزمان پروندههای پیش از 1970</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>پوسته</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>پوسته:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>تشخیص خودکار</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>بازگشت متغییر کد:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>فهرست پوشه ای</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>دستور لیست</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>نادیده گرفتن خطاهای LS</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>تلاش برای گرفتن مهرزمان کامل</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>سایر گزینه ها</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>ارزیابی گروه های کاربری</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>پاک کردن نامهای مستعار</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>پاک کردن متغییر های ملی</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>استفاده از سازگازی scp&amp;2 با scp1</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>دستورات پس از ورود</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>حساب کاربری</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>:پشتیبانی از لیست پروندههای مخفی</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>استفاده از دستور &amp;MLSD برای لیست کردن پوشه ها</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>اجبار به استفاده از آدرس IP برای اتصالات حالت منفعل(Passive):</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>استفاده از دستور &amp;HOST برای انتخاب ارتباط راه دور</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>نمایش تمامس نسخه های پرونده بر روی کارگزار VMS</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>منطقه پیش فرض:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>میزبان مجازی</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>مسیر</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>قالب پیوند:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>درخواست کننده &amp;پرداخت می کند</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>احرازهویت</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>توکن جلسه:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;ARN نقش:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>تحمل کاراکترهای خاص انکد نشده در نام پروندهها</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;اجازه تغییر مسیر به میزبان های دیگر</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>بهینه سازی اندازه &amp;حافظه اتصال</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>مهلت</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>ثانیه</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Keepalives</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>خاموش</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>ارسال بسته های SSH خالی</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>اجرای دستورات پروتکل ساختگی</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>ثانیه بین keepalives:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;و افزون بر آن دایرکتوری فعلی را می خواند</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>نسخه پروتکل اینترنت</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>خودکار</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>محلی</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>تشخیص خودکار</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>نام میزبان پ&amp;راکسی</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;نام کاربری</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>تنطیمات پراکسی</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>الگوها</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>دستور Telnet</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>دستور پراکسی محلی</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>درنظر گرفتن پراکسی بر ارتباط میزبان محلی</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>نه</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>بله</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>انجام جستجو و نام DNS در پایان پروکسی:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>تونل</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>ارتباط از طریق تونل SSH</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>میزبان برای ایجاد تونل</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>نام میزبان:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>گزینه های تونل</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>انتخاب خودکار</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>درگاه تونل محلی</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>مولفه های احرازهویت تونل</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>تنظیمات تی ال اس</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>&amp;حداقل نسخه تی ال اس:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>حداک&amp;ثر نسخه تی ال اس:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>استفاده &amp;مجدد از آی دی جلسه تی ال اس برای اتصالات داده</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>مولفه های تأیید هویت</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>پرونده گواهینامه &amp;سرویس گیرنده:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>پرونده گواهینامه سرویس گیرنده</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>پرونده های گواهینامه (*.pfx *.p12 *.pem *.crt *.key);;همه پرونده ها (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>فعال کردن &amp;فشرده سازی</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>انتخاب و سیاست رمزگذاری گذرواژه:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>سیاست انتخاب الگوریتم رمزگذاری</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;بالا</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;پایین</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>فعال کردن استفاده قدیمی از single &amp; DES در SSH-2</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>مبادله کلید</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>گزینه های الگوریتم تبادل کلیدی</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>&amp;سیاست انتخاب الگوریتم:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>سیاست انتخاب الگوریتم</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>تلاش برای تبادل کلید GSSAPI</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>گزینه های کنترل کلید تبادل مجدد</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>حداکثر دقیقه قبل از کلید دوباره (0 بدون محدودیت):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>حداکثر داده ها قبل از کلید دوباره (0 بدون محدودیت):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>کنار گذاشتن احرازهویت بطور کامل</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>گزینه های تأیید هویت</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>تلاش برای احرازهویت با استفاده از &amp;عامل</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>پاسخ با گذرواژه با اولین اعلان</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;نمایش کلید عمومی</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>اعتبارنامه برای &amp;استفاده با کلید خصوصی:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>اعتبارنامه</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>اعتبارنامه های OpenSSH (*-cert.pub);;همه پرونده ها (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>تلاش برای احرازهویت &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>اجازه به GSSAPI در نمایندگی اعتبارسنجی</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>اشکالات</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>شناسایی اشکالات شناخته شده در کارگزارهای SSH</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>اشتباهات کلید های SSH-2 H&amp;MAC:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>اشتباهات رمزگذاری کلیدهای SSH-2:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>نیازمند لایه گذاری در امضاهای SSH-2 RSA:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>اشتباهات شناسه جلسه در SSH-2 PK auth:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>مدیریت بد کلیدهای تبادل مجدد SSH-2:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>نادیده گرفتن حداکثر اندازه بسته SSH-2:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>انسداد در SSH- &amp; 2 نادیده گرفتن پیام ها:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>انسدادرخواستهای &apos;winadj&apos; SSH-2 WinSCP</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>یادداشت</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>دستورات پراکسی محلی</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>دستور Telnet:</translation>
     </message>
 </context>
 <context>

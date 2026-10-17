@@ -3938,14 +3938,6 @@ Vendndodhja: %2</translation>
         <translation>Cilësimet e avancuara të sajtit</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>&amp;Direktoria në distancë:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Shfleto...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Direktoria lokale</translation>
     </message>
@@ -3956,10 +3948,6 @@ Vendndodhja: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Direktoritë</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> sekonda</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3982,40 +3970,20 @@ Vendndodhja: %2</translation>
         <translation>&amp;Lloji i proxy-t:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Emri i &amp;hostit të proxy-t:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Numri i po&amp;rtës:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;Emri i përdoruesit:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Fjalëkalimi:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Konsulto proxy-n për adresat lo&amp;kale</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Proxy</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Provo vërtetimin me &amp;Pageant ose ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Lejo për&amp;cjelljen e agjentit</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>Sh&amp;fleto...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4030,16 +3998,656 @@ Vendndodhja: %2</translation>
         <translation>Skedari i &amp;çelësit privat:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>Vërtetimi SSH</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>Mbaj &amp;mend direktorinë e përdorur së fundi</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Provo vërtetimin &apos;keyboard-&amp;interactive&apos;</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Faqet</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Ngjyra</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Mjedisi</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Mjedisi i serverit</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>Karakteret e &amp;fundit të rreshtit (nëse nuk tregohen nga serveri):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>Kodimi &amp;UTF-8 për emrat e skedarëve:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Zhvendosja e &amp;zonës kohore:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>orë</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Zhvendosja e zonës kohore në orë</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Zhvendosja e zonës kohore në minuta</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>minuta</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Zbulo &amp;automatikisht</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;Shkurto numrat e versioneve VMS</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Ora verore</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Përshtat vulën kohore në distancë me &amp;konventat lokale</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Përshtat vulën kohore në distancë me &amp;orën verore</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>&amp;Sinkronizo shfletimin</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>Direktoria në &amp;distancë:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Direktoria lokale nuk përdoret me ndërfaqen Explorer.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Opsionet e leximit të direktorive</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Ruaj në memorien e fshehtë direktoritë e &amp;vizituara në distancë</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Ruaj në memorien e fshehtë &amp;ndryshimet e direktorive</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>Memorie e fshehtë e &amp;përhershme</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Zgjidh lidhjet sim&amp;bolike</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>Ndiq lidhjet simbolike &amp;te direktoritë</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Koshi i riciklimit</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;Ruaj skedarët e fshirë në distancë në kosh riciklimi</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Ruaj skedarët e &amp;mbishkruar në distancë në kosh riciklimi (vetëm SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>&amp;Koshi i riciklimit në distancë:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Enkriptimi</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;Enkripto skedarët</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Opsionet e enkriptimit</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>&amp;Çelësi i enkriptimit:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;Shfaq çelësin</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Gjenero çelës</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Opsionet e protokollit</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Parazgjedhje</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>Ser&amp;veri SFTP:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Automatik</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>Versioni i pr&amp;eferuar i protokollit SFTP:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>&amp;Kanonizo shtigjet në server</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Lejo &amp;rikthimin në SCP</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;Përdor riemërtimin POSIX</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Zbulimi i gabimeve të njohura në serverët SFTP</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>Për&amp;mbys rendin e argumenteve të komandës së lidhjes:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>&amp;Interpreton gabim vulat kohore të skedarëve para vitit 1970:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Shell</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>S&amp;hell-i:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Zbulo automatikisht</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>&amp;Variabli i kodit të kthimit:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Listimi i direktorisë</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>&amp;Komanda e listimit:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Shpërfill &amp;paralajmërimet e LS</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Provo të &amp;marrësh vulën kohore të plotë</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Opsione të tjera</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Kërko &amp;grupet e përdoruesit</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Pastro ps&amp;eudonimet</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Pastro variablat kom&amp;bëtare</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Përdor scp&amp;2 me përputhshmëri scp1</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>&amp;Komandat pas hyrjes:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Llogaria:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>Mbështetja për listimin e skedarëve të &amp;fshehur:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Përdor komandën &amp;MLSD për listimin e direktorive</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>&amp;Detyro adresën IP për lidhjet në mënyrën pasive:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Përdor komandën &amp;HOST për të zgjedhur hostin në server</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Shfaq të gjitha &amp;rishikimet e skedarëve në serverët VMS</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;Rajoni i parazgjedhur:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Host virtual</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Shtegu</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>Stili i &amp;URL-së:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>&amp;Paguan kërkuesi</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Vërtetimi</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;Tokeni i seancës:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>Ro&amp;li ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Toleroji karakteret speciale të pakoduara në emrat e skedarëve</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;Lejo ridrejtimet te hostë të tjerë</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Optimizo madhësinë e &amp;buferit të lidhjes</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Kohët e pritjes</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>sekonda</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Mbajtja e lidhjes gjallë</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Joaktiv</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>Dërgimi i paketave SSH &amp;boshe</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Ekzekutimi i komandave &amp;fiktive të protokollit</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Sekonda &amp;ndërmjet sinjaleve të mbajtjes gjallë:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;Dhe duke lexuar gjithashtu direktorinë aktuale</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Versioni i protokollit të internetit</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>A&amp;utomatik</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Lokal</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>Zbulo &amp;automatikisht</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Emri i &amp;hostit të proxy-t:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;Emri i përdoruesit:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Cilësimet e proxy-t</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>modele</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Komanda Telnet</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Komanda e proxy-t lokal</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>&amp;Konsidero kalimin përmes proxy-t të lidhjeve me hostin lokal</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Jo</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Po</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Kërkimi i emrit &amp;DNS në anën e proxy-t:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Tuneli</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>Lidhu &amp;përmes tunelit SSH</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Hosti ku ngrihet tuneli</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>Emri i &amp;hostit:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Opsionet e tunelit</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Përzgjidh automatikisht</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>Porta &amp;lokale e tunelit:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Parametrat e vërtetimit të tunelit</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>Opsionet e TLS</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Versioni mi&amp;nimal i TLS:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Versioni ma&amp;ksimal i TLS:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Ripërdor ID-në e seancës TLS për lidhjet e të dhënave</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Parametrat e vërtetimit</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>Skedari i &amp;certifikatës së klientit:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Skedari i certifikatës së klientit</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Skedarë certifikatash (*.pfx *.p12 *.pem *.crt *.key);;Të gjithë skedarët (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>&amp;Aktivizo ngjeshjen</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>&amp;Politika e përzgjedhjes së shifrave të enkriptimit:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Politika e përzgjedhjes së shifrave të enkriptimit</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Lart</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>Posh&amp;të</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Aktivizo përdorimin e vjetër të &amp;DES të thjeshtë</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Shkëmbimi i çelësave</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Opsionet e algoritmit të shkëmbimit të çelësave</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>&amp;Politika e përzgjedhjes së algoritmit:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Politika e përzgjedhjes së algoritmit</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Provo shkëmbimin e çelësave &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Opsionet që kontrollojnë rishkëmbimin e çelësave</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Maks. &amp;minuta para rishkëmbimit të çelësave (0 pa kufi):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Maks. të &amp;dhëna para rishkëmbimit të çelësave (0 pa kufi):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;Anashkalo plotësisht vërtetimin</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Opsionet e vërtetimit</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>&amp;Provo vërtetimin duke përdorur agjentin</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Përgjigju me &amp;fjalëkalim në kërkesën e parë</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;Shfaq çelësin publik</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Certifikata për t&apos;u përdo&amp;rur me çelësin privat:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Certifikata</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>Certifikata OpenSSH (*-cert.pub);;Të gjithë skedarët (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Provo vërtetimin &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Lejo &amp;delegimin e kredencialeve GSSAPI</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Gabimet</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Zbulimi i gabimeve të njohura në serverët SSH</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Llogarit gabim çelësat H&amp;MAC të SSH:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Llogarit gabim çelësat e &amp;enkriptimit të SSH:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Kërkon &amp;plotësim te nënshkrimet SSH RSA:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Keqpërdor ID-në e &amp;seancës në vërtetimin SSH PK:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Trajton keq &amp;rishkëmbimin e çelësave SSH:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Shpërfill madhësinë ma&amp;ksimale të paketës SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Bllokohet nga mesazhet SSH &amp;ignore:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Bllokohet nga kërkesat SSH &apos;&amp;winadj&apos; të WinSCP</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Shënim</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>&amp;Komanda e proxy-t lokal:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>&amp;Komanda Telnet:</translation>
     </message>
 </context>
 <context>

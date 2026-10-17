@@ -3939,14 +3939,6 @@ Location: %2</source>
         <translation>Напредни поставки на локацијата</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>Од&amp;далечен директориум:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Прелистај...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Локален директориум</translation>
     </message>
@@ -3957,10 +3949,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>Директориуми</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> секунди</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3983,40 +3971,20 @@ Location: %2</source>
         <translation>&amp;Тип на прокси:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Име на &amp;хост за прокси:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Број на &amp;порта:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;Корисничко име:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Лозинка:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Консултирај прокси за &amp;локални адреси</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Прокси</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Обиди автентикација со &amp;Pageant или ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Дозволи пре&amp;насочување на агент</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>Пре&amp;листај...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4031,16 +3999,656 @@ Location: %2</source>
         <translation>Датотека со приватен &amp;клуч:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH автентикација</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>За&amp;помни последно користен директориум</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Обиди &apos;keyboard-&amp;interactive&apos; автентикација</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Страници</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Боја</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Опкружување</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Опкружување на серверот</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>Знаци за &amp;крај на линија (ако не е наведено од серверот):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>&amp;UTF-8 кодирање за имиња на датотеки:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Поместување на временска &amp;зона:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>часови</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Поместување на временска зона (часови)</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Поместување на временска зона (минути)</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>минути</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>&amp;Автоматски откриј</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;Отстрани броеви на верзии од VMS</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Летно сметање на времето</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Прилагоди оддалечен временски печат кон локални ко&amp;нвенции</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Прилагоди со &amp;летно време</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>Усо&amp;гласи прелистување</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;Оддалечен директориум:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Локален директориум не се користи со Explorer интерфејс.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Опции за читање директориуми</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Кеширај посетени оддале&amp;чени директориуми</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Кеширај промени во &amp;директориуми</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>&amp;Траен кеш</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Разреши симболички &amp;врски</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>&amp;Следи симболички врски кон директориуми</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Корпа за отпадоци</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;Зачувај избришани оддалечени датотеки во корпа за отпадоци</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Зачувај &amp;препишани оддалечени датотеки во корпа за отпадоци (само SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>&amp;Оддалечена корпа за отпадоци:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Шифрирање</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;Шифрирај датотеки</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Опции за шифрирање</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>&amp;Клуч за шифрирање:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;Прикажи клуч</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Создади клуч</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Опции на протокол</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Стандардно</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP сер&amp;вер:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Автоматски</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>Пре&amp;тпочитана верзија на SFTP протокол:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>Поедно&amp;стави патеки на серверот</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Дозволи SCP &amp;резервен режим</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>Користи &amp;POSIX преименување</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Детекција на познати грешки во SFTP сервери</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>&amp;Обратен редослед на аргументи на команда за врска:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>&amp;Погрешно толкува временски печати на датотеки пред 1970:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Школка</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>&amp;Школка:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Автоматски откриј</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>Променлива за по&amp;вратен код:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Листање директориуми</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>&amp;Команда за листање:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Игнорирај LS &amp;предупредувања</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Обиди се да добиеш &amp;целосен временски печат</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Други опции</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Побарај &amp;кориснички групи</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Исчисти а&amp;лијаси</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Исчисти &amp;национални променливи</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Користи scp&amp;2 со scp1 компатибилност</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>Команди по &amp;најава:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Сметка:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>&amp;Поддршка за листање скриени датотеки:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Користи &amp;MLSD команда за листање директориуми</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>Приси&amp;ли IP адреса за пасивни конекции:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Користи &amp;HOST команда за избор на хост на серверот</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Прикажи сите &amp;ревизии на датотеки на VMS сервери</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;Стандарден регион:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Виртуелен хост</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Патека</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>&amp;URL стил:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>Барателот &amp;плаќа</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Автентикација</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;Токен на сесијата:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Role ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Толерирај некодирани специјални знаци во имиња на датотеки</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;Дозволи пренасочувања кон други домаќини</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Оптимизирај големина на &amp;бафер за врска</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Временски истеци</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>секунди</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Одржување активност</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Исклучено</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>Праќање &amp;нулти SSH пакети</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Извршување &amp;лажни команди на протокол</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Секунди &amp;меѓу одржување активност:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>И дополнително &amp;читање на тековниот директориум</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Верзија на интернет протокол</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>А&amp;втоматски</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Локален</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;Автоматски откриј</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Име на &amp;хост за прокси:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;Корисничко име:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Поставки на прокси</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>шаблони</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet команда</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Локална прокси команда</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>Раз&amp;гледај проксирање на врски кон локален хост</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Не</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Да</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>На крајот на прокси побарај име за &amp;DNS:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Тунел</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>&amp;Поврзи се преку SSH тунел</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Хост за поставување на тунел</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>Име на &amp;хост:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Опции на тунел</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Автоматски избери</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>Порта на &amp;локален тунел:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Параметри за автентикација на тунел</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS опции</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Ми&amp;нимална TLS верзија:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Ма&amp;ксимална TLS верзија:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Повторно користи TLS ID на сесијата за податочни врски</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Параметри за автентикација</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>Датотека со к&amp;лиентски цертификат:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Датотека со клиентски цертификат</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Датотеки со цертификати (*.pfx *.p12 *.pem *.crt *.key);;Сите датотеки (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>Овозможи &amp;компресија</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>&amp;Политика за избор на шифра за шифрирање:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Политика за избор на шифра за шифрирање</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Горе</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;Долу</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Овозможи застарена употреба на single-&amp;DES</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Размена на клучеви</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Опции за алгоритам за размена на клучеви</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>&amp;Политика за избор на алгоритам:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Политика за избор на алгоритам</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Обиди &amp;GSSAPI размена на клучеви</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Опции за контрола на повторна размена на клучеви</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Макс &amp;минути пред повторна размена (0 за без лимит):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Ма&amp;кс податоци пред повторна размена (0 за без лимит):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>Целосно &amp;заобиколи автентикација</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Опции за автентикација</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>Обиди автентикација користејќи &amp;агент</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Одгово&amp;ри со лозинка на првата порака</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;Прикажи јавен клуч</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Цертификат за &amp;употреба со приватниот клуч:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Цертификат</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH цертификати (*-cert.pub);;Сите датотеки (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Обиди &amp;GSSAPI автентикација</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Дозволи &amp;пренос на акредитиви за GSSAPI</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Грешки</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Детекција на познати грешки во SSH сервери</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Погрешно пресметува SSH H&amp;MAC клучеви:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Погрешно пресметува SSH клучеви за &amp;шифрирање:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Бара &amp;дополнување на SSH RSA потписи:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Погрешно користи ID на сеси&amp;ја во SSH PK автентикација:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Лошо се справува со повторна размена на SSH &amp;клучеви:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Игнорира макси&amp;мална големина на SSH пакети:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Се гуши на SSH пораки за и&amp;гнорирање:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Се гуши на WinSCP SSH &apos;&amp;winadj&apos; барања</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Забелешка</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Локална прокси ко&amp;манда:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telnet &amp;команда:</translation>
     </message>
 </context>
 <context>

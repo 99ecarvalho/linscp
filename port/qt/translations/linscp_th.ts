@@ -3937,14 +3937,6 @@ Location: %2</source>
         <translation>การตั้งค่าเว็บไซต์ขั้นสูง</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>&amp;ไดเรกทอรีระยะไกล:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;เรียกดู...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>ไดเรกทอรีภายในเครื่อง</translation>
     </message>
@@ -3955,10 +3947,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>ไดเรกทอรี</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> วินาที</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3981,40 +3969,20 @@ Location: %2</source>
         <translation>&amp;ประเภทพร็อกซี:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>&amp;ชื่อโฮสต์ของพร็อกซี:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>&amp;พอร์ต:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;ชื่อผู้ใช้:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;รหัสผ่าน:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>&amp;ใช้พร็อกซีสำหรับที่อยู่ภายในเครื่อง</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>พร็อกซี</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>&amp;พยายามยืนยันตัวตนโดยใช้ Pageant หรือ ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>&amp;อนุญาตการส่งต่อตัวแทน</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>&amp;เรียกดู...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4029,16 +3997,656 @@ Location: %2</source>
         <translation>&amp;ไฟล์ไพรเวตคีย์:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>การยืนยันตัวตน SSH</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>&amp;จำไดเรกทอรีที่ใช้ล่าสุด</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>&amp;พยายามยืนยันตัวตนแบบ &apos;keyboard-interactive&apos;</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>หน้า</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;สี</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>สภาพแวดล้อม</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>สภาพแวดล้อมของเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>&amp;อักขระสิ้นสุดบรรทัด (หากเซิร์ฟเวอร์ไม่ได้ระบุ):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>&amp;การเข้ารหัส UTF-8 สำหรับชื่อไฟล์:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>&amp;ค่าชดเชยเขตเวลา:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>ชั่วโมง</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>ค่าชดเชยเขตเวลา (ชั่วโมง)</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>ค่าชดเชยเขตเวลา (นาที)</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>นาที</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>&amp;ตรวจหาโดยอัตโนมัติ</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;ตัดหมายเลขเวอร์ชั่น VMS</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>เวลาออมแสง</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>&amp;ปรับเวลาประทับระยะไกลตามรูปแบบภายในเครื่อง</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>ปรับเวลาประทับระยะไกลด้วย &amp;DST</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>&amp;ซิงโครไนซ์การเรียกดู</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;ไดเรกทอรีระยะไกล:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>ไม่ใช้ไดเรกทอรีภายในเครื่องกับส่วนติดต่อ Explorer</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>ตัวเลือกการอ่านไดเรกทอรี</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>&amp;แคชไดเรกทอรีระยะไกลที่เคยเข้า</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>แคชการ&amp;เปลี่ยนไดเรกทอรี</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>แคช&amp;ถาวร</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>&amp;หาเป้าหมายของซิมโบลิกลิงก์</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>&amp;ติดตามซิมโบลิกลิงก์ไปยังไดเรกทอรี</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>ถังรีไซเคิล</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;เก็บไฟล์ระยะไกลที่ลบไว้ในถังรีไซเคิล</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>เก็บไฟล์ระยะไกลที่ถูกเขียน&amp;ทับไว้ในถังรีไซเคิล (SFTP เท่านั้น)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>&amp;ถังรีไซเคิลระยะไกล:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>การเข้ารหัสลับ</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;เข้ารหัสไฟล์</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>ตัวเลือกการเข้ารหัสลับ</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>&amp;คีย์เข้ารหัสลับ:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;แสดงคีย์</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;สร้างคีย์</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>ตัวเลือกโพรโทคอล</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>ค่าเริ่มต้น</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>&amp;เซิร์ฟเวอร์ SFTP:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>อัตโนมัติ</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>&amp;เวอร์ชั่นโพรโทคอล SFTP ที่ต้องการ:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>&amp;ทำพาธให้เป็นรูปแบบมาตรฐานบนเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>&amp;อนุญาตให้ใช้ SCP สำรอง</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;ใช้การเปลี่ยนชื่อแบบ POSIX</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>การตรวจหาบั๊กที่รู้จักในเซิร์ฟเวอร์ SFTP</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>&amp;กลับลำดับอาร์กิวเมนต์ของคำสั่งลิงก์:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>&amp;ตีความเวลาประทับของไฟล์ก่อนปี 1970 ผิด:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>เชลล์</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>&amp;เชลล์:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>ตรวจหาอัตโนมัติ</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>&amp;ตัวแปรรหัสส่งคืน:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>การแสดงรายการไดเรกทอรี</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>&amp;คำสั่งแสดงรายการ:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>&amp;ละเว้นคำเตือนของ LS</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>&amp;พยายามรับเวลาประทับแบบเต็ม</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>ตัวเลือกอื่น ๆ</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>&amp;ค้นหากลุ่มผู้ใช้</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>ล้าง&amp;นามแฝง</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>ล้างตัวแปร&amp;ภาษาประจำชาติ</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>ใช้ scp&amp;2 ที่เข้ากันได้กับ scp1</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>&amp;คำสั่งหลังเข้าสู่ระบบ:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;บัญชี:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>&amp;รองรับการแสดงรายการไฟล์ที่ซ่อน:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>ใช้คำสั่ง &amp;MLSD สำหรับแสดงรายการไดเรกทอรี</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>&amp;บังคับที่อยู่ IP สำหรับการเชื่อมต่อโหมดพาสซีฟ:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>ใช้คำสั่ง &amp;HOST เพื่อเลือกโฮสต์บนเซิร์ฟเวอร์</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>&amp;แสดงรุ่นแก้ไขทั้งหมดของไฟล์บนเซิร์ฟเวอร์ VMS</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;ภูมิภาคเริ่มต้น:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>โฮสต์เสมือน</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>พาธ</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>&amp;รูปแบบ URL:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>&amp;ผู้ร้องขอเป็นผู้ชำระเงิน</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>การยืนยันตัวตน</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;โทเค็นเซสชั่น:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;ARN ของบทบาท:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;ยอมรับอักขระพิเศษที่ไม่ได้เข้ารหัสในชื่อไฟล์</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;อนุญาตการเปลี่ยนเส้นทางไปยังโฮสต์อื่น</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>&amp;ปรับขนาดบัฟเฟอร์การเชื่อมต่อให้เหมาะสม</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>การหมดเวลา</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>วินาที</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>การรักษาการเชื่อมต่อ</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;ปิด</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>&amp;ส่งแพ็กเก็ต SSH ว่าง</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>&amp;เรียกใช้คำสั่งโพรโทคอลจำลอง</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>&amp;จำนวนวินาทีระหว่างการรักษาการเชื่อมต่อ:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;และอ่านไดเรกทอรีปัจจุบันเพิ่มเติม</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>เวอร์ชั่นอินเทอร์เน็ตโพรโทคอล</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>&amp;อัตโนมัติ</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>ภายในเครื่อง</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;ตรวจหาอัตโนมัติ</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>&amp;ชื่อโฮสต์ของพร็อกซี:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>ชื่อ&amp;ผู้ใช้:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>การตั้งค่าพร็อกซี</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>รูปแบบ</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>คำสั่ง Telnet</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>คำสั่งพร็อกซีภายในเครื่อง</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>&amp;ใช้พร็อกซีกับการเชื่อมต่อไปยังโฮสต์ภายในเครื่องด้วย</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>ไม่</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>ใช่</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>ค้นหาชื่อ &amp;DNS ที่ฝั่งพร็อกซี:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>ทันเนล</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>&amp;เชื่อมต่อผ่านทันเนล SSH</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>โฮสต์ที่จะตั้งค่าทันเนล</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>&amp;ชื่อโฮสต์:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>ตัวเลือกทันเนล</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>เลือกอัตโนมัติ</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>&amp;พอร์ตทันเนลภายในเครื่อง:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>พารามิเตอร์การยืนยันตัวตนของทันเนล</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>ตัวเลือก TLS</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>เวอร์ชั่น TLS &amp;ต่ำสุด:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>เวอร์ชั่น TLS &amp;สูงสุด:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;ใช้ ID เซสชั่น TLS ซ้ำสำหรับการเชื่อมต่อข้อมูล</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>พารามิเตอร์การยืนยันตัวตน</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>&amp;ไฟล์ใบรับรองไคลเอนต์:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>ไฟล์ใบรับรองไคลเอนต์</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>ไฟล์ใบรับรอง (*.pfx *.p12 *.pem *.crt *.key);;ไฟล์ทั้งหมด (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>&amp;เปิดใช้งานการบีบอัด</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>&amp;นโยบายการเลือกวิธีเข้ารหัสลับ:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>นโยบายการเลือกวิธีเข้ารหัสลับ</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;ขึ้น</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;ลง</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>เปิดใช้งาน single-&amp;DES แบบเดิม</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>การแลกเปลี่ยนคีย์</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>ตัวเลือกอัลกอริทึมการแลกเปลี่ยนคีย์</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>&amp;นโยบายการเลือกอัลกอริทึม:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>นโยบายการเลือกอัลกอริทึม</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>พยายามแลกเปลี่ยนคีย์ด้วย &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>ตัวเลือกควบคุมการแลกเปลี่ยนคีย์ใหม่</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>จำนวน&amp;นาทีสูงสุดก่อนเปลี่ยนคีย์ใหม่ (0 = ไม่จำกัด):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>ปริมาณ&amp;ข้อมูลสูงสุดก่อนเปลี่ยนคีย์ใหม่ (0 = ไม่จำกัด):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;ข้ามการยืนยันตัวตนทั้งหมด</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>ตัวเลือกการยืนยันตัวตน</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>&amp;พยายามยืนยันตัวตนโดยใช้ตัวแทน</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>ตอบพร้อมท์แรกด้วย&amp;รหัสผ่าน</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;แสดงพับลิกคีย์</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>&amp;ใบรับรองที่จะใช้กับไพรเวตคีย์:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>ใบรับรอง</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>ใบรับรอง OpenSSH (*-cert.pub);;ไฟล์ทั้งหมด (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>พยายามยืนยันตัวตนด้วย &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>&amp;อนุญาตการมอบสิทธิ์ข้อมูลประจำตัว GSSAPI</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>บั๊ก</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>การตรวจหาบั๊กที่รู้จักในเซิร์ฟเวอร์ SSH</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>คำนวณคีย์ H&amp;MAC ของ SSH ผิด:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>คำนวณคีย์&amp;เข้ารหัสลับของ SSH ผิด:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>&amp;ต้องการ padding บนลายเซ็น RSA ของ SSH:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>ใช้ ID เซสชั่น&amp;ผิดในการยืนยันตัวตน PK ของ SSH:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>จัดการการแลกเปลี่ยน&amp;คีย์ใหม่ของ SSH ไม่ถูกต้อง:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>ละเว้นขนาดแพ็กเก็ต&amp;สูงสุดของ SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>ค้างเมื่อได้รับข้อความ i&amp;gnore ของ SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>ค้างเมื่อได้รับคำขอ &apos;&amp;winadj&apos; ของ SSH จาก WinSCP</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>หมายเหตุ</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>&amp;คำสั่งพร็อกซีภายในเครื่อง:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>&amp;คำสั่ง Telnet:</translation>
     </message>
 </context>
 <context>

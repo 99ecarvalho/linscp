@@ -3937,14 +3937,6 @@ Location: %2</source>
         <translation>高度なサイトの設定</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>リモート ディレクトリ(&amp;D):</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>参照(&amp;R)...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>ローカル ディレクトリ</translation>
     </message>
@@ -3955,10 +3947,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>ディレクトリ</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> 秒</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3981,40 +3969,20 @@ Location: %2</source>
         <translation>プロキシ形式(&amp;T):</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>プロキシ ホスト名(&amp;X):</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>ポート番号(&amp;R)</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>ユーザ名(&amp;U):</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>パスワード(&amp;P)</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>ローカル アドレスにもプロキシを使用する(&amp;L)</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>プロキシ</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Pageant または ssh-agent による認証を試行する(&amp;P)</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>エージェントの転送を許可する(&amp;F)</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>参照(&amp;R)...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4029,16 +3997,656 @@ Location: %2</source>
         <translation>秘密鍵(&amp;K)</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH 認証</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>最後に使用したディレクトリを記憶する(&amp;M)</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>SSH2 でキーボードによる認証を許可する(&amp;I)</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>ページ</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>色(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>環境</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>サーバ環境</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>行端文字(サーバから指定されなかった場合)(&amp;E):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>ファイル名を UTF-8 でエンコード(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>タイムゾーン補正(&amp;Z):</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>時間</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>タイムゾーン補正 (時間)</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>タイムゾーン補正 (分)</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>分</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>自動認識(&amp;A)</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>VMS バージョン番号をトリムする(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>夏時間(DST)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>リモートのタイムスタンプをローカルの仕様に合わせる(Unix)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>リモートのタイムスタンプを夏時間(DST)に合わせる(Windows)(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>ローカルとリモートのディレクトリ移動を同期する(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>リモート ディレクトリ(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>※エクスプローラー風インターフェイスではローカル ディレクトリは使用しません</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>ディレクトリ読み込みオプション</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>移動したリモート ディレクトリをキャッシュする(&amp;V)</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>ディレクトリの移動をキャッシュする(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>常にキャッシュする(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>シンボリック リンクをたどる(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>ディレクトリのシンボリック リンクをたどる(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>ごみ箱</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>リモート ファイルの削除時にごみ箱を使う(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>リモート ファイルの上書き時にごみ箱を使う(&amp;O)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>ごみ箱として利用するリモート ディレクトリ(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>暗号化</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>ファイルの暗号化(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>暗号化オプション</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>暗号鍵(&amp;K):</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>鍵を表示(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>鍵を生成(&amp;G)</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>プロトコル オプション</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>デフォルト</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP サーバ(&amp;V):</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>自動</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>優先する SFTP のプロトコル バージョン(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>サーバー上のパスを正規化する(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>SCP へのフォールバックを許可する(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>POSIX リネームを使用する(&amp;X)</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>SFTP サーバの既知のバグ検出</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>シンボリック コマンドの引数を逆順にする(&amp;R)</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>ファイルのタイムスタンプを 1970 年以前に誤解する(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>シェル</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>シェル(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>自動判別</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>終了コードの変数(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>ディレクトリ一覧</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>コマンド一覧(&amp;C):</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>ls の警告を無視する(&amp;W)</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>詳細なタイムスタンプの取得を試みる(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>その他のオプション</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>グループを参照する(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>エイリアスをクリアする(&amp;L)</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>環境変数をクリアする(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>SCP1 互換の SCP2 を使用する(&amp;2)</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>ログイン コマンドの送信(&amp;C):</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>アカウント(&amp;A)</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>隠しファイルを表示(&amp;S):</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>ディレクトリ一覧に MLSD コマンドを使用する(&amp;M)</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>パッシブ モード接続で IP アドレスを強制する(&amp;F):</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>HOST コマンドを使ってホストを選択する(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>VMS サーバー上の全てのファイル リビジョンを表示する(&amp;R)</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>デフォルト リージョン(&amp;D):</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>バーチャル ホスト</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>パス</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>URL スタイル(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>リクエスタ支払い(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>認証</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>セッション トークン(&amp;S):</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>ロール ARN(R):</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>ファイル名の未エンコード特殊文字を許容する(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>他ホストへのリダイレクトを許可する(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>接続バッファ サイズを最適化する(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>タイムアウト</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>秒</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>接続の保持</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>オフ(&amp;O)</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>null パケットを送信する(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>ダミー コマンドを送信する(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>送信間隔(秒)</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>ダミー コマンド＋ディレクトリの変更を監視する(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>IP バージョン</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>自動(&amp;U)</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>ローカル</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>自動認識(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>プロキシ ホスト名(&amp;X)</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>ユーザ名(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>プロキシ設定</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>パターン(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet コマンド</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>ローカル プロキシ コマンド</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>ローカル ホストからもプロキシ接続を行う(&amp;X)</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>いいえ</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>はい</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>リモートで DNS 名前解決を行う(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>トンネル</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>SSH トンネルを経由して接続する(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>トンネルするホストの設定</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>ホスト名(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>トンネル オプション</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>自動選択</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>ローカル トンネル ポート(&amp;L)</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>トンネル認証のパラメータ</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS オプション</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>TLS の最小バージョン(&amp;N):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>TLS の最大バージョン(&amp;X):</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>データ接続に TLS セッション ID を再利用する(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>認証条件</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>クライアント証明(&amp;C):</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>クライアント証明書ファイル</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>証明書ファイル (*.pfx *.p12 *.pem *.crt *.key);;すべてのファイル (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>通信を圧縮する(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>暗号化鍵の使用優先度</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>暗号化鍵の使用優先度</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>上へ(&amp;U)</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>下へ(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>SSH2 で DES (古い仕様) を許可する</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>鍵交換</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>鍵交換アルゴリズム オプション</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>アルゴリズムの使用優先度</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>アルゴリズムの使用優先度</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>GSSAPI 鍵交換を試行する(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>鍵の再交換オプション</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>指定時間(分)(&amp;M) (0 は期限なし)</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>指定データ量(&amp;X) (0 は期限なし)</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>常に SSH2 の認証をバイパスする(&amp;B):</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>認証オプション</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>エージェントによる認証を試行する(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>パスワードを自動送信する(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>公開鍵を表示(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>秘密鍵に対して使用する証明書(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>証明書</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH 証明書 (*-cert.pub);;すべてのファイル (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>GSSAPI/SSPI 認証を許可する (SSH-2)(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>GSSAPI/SSPI 証明書の権利委譲を許可する(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>バグ対策</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>SSH サーバの既知のバグ検出</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>SSH2 の HMAC の計算ミス(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>SSH2 の暗号鍵の計算ミス(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>SSH2 の RSA 署名でパッディングの要求(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>公開鍵認証でのセッション ID の誤用(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>不当な鍵の再交換を行う(&amp;K)</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>SSH2 最大パケットサイズを無視(&amp;X)</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>SSH2 のメッセージ無視の拒否(&amp;2)</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>WinSCP の SSH2 で &apos;winadj&apos; 要求を拒否</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>メモ</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>ローカル プロキシ コマンド(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telnet コマンド(&amp;M)</translation>
     </message>
 </context>
 <context>

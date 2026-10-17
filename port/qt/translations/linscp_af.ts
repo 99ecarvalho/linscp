@@ -3938,14 +3938,6 @@ Ligging: %2</translation>
         <translation>Gevorderde werfinstellings</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>Afgeleë &amp;gids:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Blaai...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Plaaslike gids</translation>
     </message>
@@ -3956,10 +3948,6 @@ Ligging: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Gidse</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> sekondes</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3982,40 +3970,20 @@ Ligging: %2</translation>
         <translation>Instaanbediener-&amp;tipe:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Instaanbediener-&amp;gasheernaam:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Poo&amp;rtnommer:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>Gebr&amp;uikernaam:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Wagwoord:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Raadpleeg instaanbediener vir &amp;plaaslike adresse</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Instaanbediener</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Probeer stawing met &amp;Pageant of ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Laat agent-&amp;aanstuur toe</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>B&amp;laai...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4030,16 +3998,656 @@ Ligging: %2</translation>
         <translation>Privaat &amp;sleutellêer:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH-stawing</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>&amp;Onthou laaste gebruikte gids</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Probeer &apos;sleutelbord-&amp;interaktiewe&apos; stawing</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Bladsye</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Kleur</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Omgewing</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Bedieneromgewing</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>Reël&amp;eindkarakters (indien nie deur bediener aangedui nie):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>&amp;UTF-8-enkodering vir lêername:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Tyd&amp;soneverskuiwing:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>uur</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Tydsoneverskuiwing in ure</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Tydsoneverskuiwing in minute</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>minute</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Bespeur &amp;outomaties</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;Knip VMS-weergawenommers</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Somertyd</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Pas afgeleë tydstempel aan by plaaslike ko&amp;nvensies</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Pas afgeleë tydstempel aan met somer&amp;tyd</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>Sinchroniseer &amp;blaai</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;Afgeleë gids:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Plaaslike gids word nie met die Explorer-koppelvlak gebruik nie.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Opsies vir gidslees</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Stoor besoekte afgeleë gidse in &amp;kasgeheue</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Stoor gids&amp;veranderinge in kasgeheue</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>P&amp;ermanente kasgeheue</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Ontleed simboliese &amp;skakels</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>Vol&amp;g simboliese skakels na gidse</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Asblik</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;Bewaar geskrapte afgeleë lêers in asblik</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Bewaar &amp;oorgeskryfde afgeleë lêers in asblik (slegs SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>&amp;Afgeleë asblik:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Enkripsie</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;Enkripteer lêers</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Enkripsie-opsies</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>Enkripsie&amp;sleutel:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;Wys sleutel</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Genereer sleutel</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Protokolopsies</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Verstek</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP-be&amp;diener:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Outo</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>&amp;Voorkeur-SFTP-protokolweergawe:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>&amp;Kanoniseer paaie op die bediener</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Laat &amp;terugval na SCP toe</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;Gebruik POSIX-hernoem</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Bespeuring van bekende foute in SFTP-bedieners</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>Keer v&amp;olgorde van skakelopdrag-argumente om:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>&amp;Interpreteer lêertydstempels voor 1970 verkeerd:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Dop</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>&amp;Dop:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Outomaties bespeur</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>&amp;Terugkeerkode-veranderlike:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Gidslys</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>Lys&amp;opdrag:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Ignoreer LS-&amp;waarskuwings</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Probeer &amp;volle tydstempel kry</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Ander opsies</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Soek &amp;gebruikersgroepe op</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Maak &amp;aliasse skoon</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Maak &amp;nasionale veranderlikes skoon</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Gebruik scp&amp;2 met scp1-versoenbaarheid</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>&amp;Opdragte ná aanmelding:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Rekening:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>&amp;Steun vir lys van versteekte lêers:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Gebruik &amp;MLSD-opdrag vir gidslys</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>&amp;Dwing IP-adres af vir passiewe-modus-verbindings:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Gebruik &amp;HOST-opdrag om gasheer op die bediener te kies</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Wys alle lêer&amp;weergawes op VMS-bedieners</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;Verstekstreek:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Virtuele gasheer</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Pad</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>&amp;URL-styl:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>Versoeker &amp;betaal</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Stawing</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;Sessietoken:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Rol-ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Duld ongeënkodeerde spesiale karakters in lêername</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;Laat herleidings na ander gashere toe</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Optimaliseer &amp;buffergrootte van verbinding</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Uitteltye</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>sekondes</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Lewendighouding</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Af</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>Stuur van &amp;nul-SSH-pakkies</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Uitvoer van &amp;skyn-protokolopdragte</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Sekondes &amp;tussen lewendighoudings:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;En lees boonop die huidige gids</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Internetprotokolweergawe</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>O&amp;uto</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Plaaslik</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>Bespeur &amp;outomaties</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Instaanbediener-&amp;gasheernaam:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>Gebr&amp;uikernaam:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Instaanbediener-instellings</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>patrone</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet-opdrag</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Plaaslike instaanbediener-opdrag</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>Oorweeg i&amp;nstaanbediening van plaaslike gasheerverbindings</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Nee</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Ja</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Doen &amp;DNS-naamopsoek by instaanbediener-kant:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Tonnel</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>Koppel &amp;deur SSH-tonnel</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Gasheer waarop die tonnel opgestel word</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>&amp;Gasheernaam:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Tonnel-opsies</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Kies outomaties</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>&amp;Plaaslike tonnelpoort:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Tonnel-stawingsparameters</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS-opsies</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Mi&amp;nimum TLS-weergawe:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Ma&amp;ksimum TLS-weergawe:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Hergebruik TLS-sessie-ID vir dataverbindings</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Stawingsparameters</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>&amp;Kliëntsertifikaatlêer:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Kliëntsertifikaatlêer</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Sertifikaatlêers (*.pfx *.p12 *.pem *.crt *.key);;Alle lêers (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>&amp;Aktiveer kompressie</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>&amp;Beleid vir keuse van enkripsiesyfer:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Beleid vir keuse van enkripsiesyfer</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Op</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>A&amp;f</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Aktiveer verouderde gebruik van enkel-&amp;DES</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Sleuteluitruiling</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Opsies vir sleuteluitruilingsalgoritme</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>&amp;Beleid vir algoritmekeuse:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Beleid vir algoritmekeuse</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Probeer &amp;GSSAPI-sleuteluitruiling</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Opsies wat sleutelheruitruiling beheer</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Maks. &amp;minute voor hersleuteling (0 vir geen limiet):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Maks. &amp;data voor hersleuteling (0 vir geen limiet):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;Omseil stawing heeltemal</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Stawingsopsies</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>&amp;Probeer stawing met agent</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Antwoord die eerste versoek met &apos;n &amp;wagwoord</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;Vertoon publieke sleutel</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Sertifikaat om saam met die privaat sleutel te gebr&amp;uik:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Sertifikaat</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH-sertifikate (*-cert.pub);;Alle lêers (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Probeer &amp;GSSAPI-stawing</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Laat GSSAPI-geloofsbrief&amp;delegering toe</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Foute</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Bespeuring van bekende foute in SSH-bedieners</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Bereken SSH-H&amp;MAC-sleutels verkeerd:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Bereken SSH-&amp;enkripsiesleutels verkeerd:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Vereis &amp;opvulling op SSH-RSA-handtekeninge:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Misbruik die sessie-&amp;ID in SSH-PK-stawing:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Hanteer SSH-&amp;sleutelheruitruiling swak:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Ignoreer SSH se maksimum &amp;pakkiegrootte:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Verstik op SSH-i&amp;gnore-boodskappe:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Verstik op WinSCP se SSH-&apos;&amp;winadj&apos;-versoeke</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Nota</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>P&amp;laaslike instaanbediener-opdrag:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>T&amp;elnet-opdrag:</translation>
     </message>
 </context>
 <context>

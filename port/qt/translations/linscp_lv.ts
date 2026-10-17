@@ -3939,14 +3939,6 @@ Atrašanās vieta: %2</translation>
         <translation>Vietnes papildu iestatījumi</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>Attālinātā &amp;mape:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Pārlūkot...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Lokālā mape</translation>
     </message>
@@ -3957,10 +3949,6 @@ Atrašanās vieta: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Mapes</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> sekundes</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3983,40 +3971,20 @@ Atrašanās vieta: %2</translation>
         <translation>Starpniekservera &amp;tips:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Starpniekservera &amp;resursdators:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Po&amp;rta numurs:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;Lietotājvārds:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>Pa&amp;role:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Izmantot starpniekserveri &amp;lokālajām adresēm</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Starpniekserveris</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Mēģināt autentificēties, izmantojot &amp;Pageant vai ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Atļaut aģenta &amp;pāradresāciju</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>Uz&amp;rādīt</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4031,16 +3999,656 @@ Atrašanās vieta: %2</translation>
         <translation>Privātās &amp;atslēgas fails:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH autentifikācija</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>Atcerēties pēdējo &amp;izmantoto mapi</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Mēģināt &apos;keyboard-&amp;interactive&apos; autentifikāciju</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Lapas</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Krāsa</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Vide</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Servera vide</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>Rindas &amp;beigu rakstzīmes (ja serveris tās nenorāda):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>&amp;UTF-8 kodējums failu nosaukumiem:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Laika &amp;joslas nobīde:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>stundas</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Laika joslas nobīde stundās</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Laika joslas nobīde minūtēs</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>minūtes</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Noteikt &amp;automātiski</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>No&amp;griezt VMS versiju numurus</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Vasaras laiks</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Pielāgot attālināto laikspiedolu lokālajām k&amp;onvencijām</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Pielāgot attālināto laikspiedolu &amp;vasaras laikam</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>&amp;Saskaņot pārlūkošanu</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;Attālinātā mape:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Lokālā mape netiek izmantota Explorer saskarnē.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Mapju lasīšanas opcijas</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>&amp;Kešot apmeklētās attālinātās mapes</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Kešot &amp;mapju izmaiņas</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>&amp;Pastāvīga kešatmiņa</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Atrisināt simboliskās sai&amp;tes</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>S&amp;ekot simboliskajām saitēm uz mapēm</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Atkritne</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;Saglabāt dzēstos attālinātos failus atkritnē</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Saglabāt &amp;pārrakstītos attālinātos failus atkritnē (tikai SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>&amp;Attālinātā atkritne:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Šifrēšana</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>Šifrēt &amp;failus</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Šifrēšanas opcijas</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>Šifrēšanas &amp;atslēga:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;Rādīt atslēgu</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>Ģe&amp;nerēt atslēgu</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Protokola opcijas</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Noklusējums</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP ser&amp;veris:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Automātiski</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>Vēlamā SFTP protokola ver&amp;sija:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>&amp;Kanonizēt ceļus serverī</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Atļaut SCP &amp;rezerves variantu</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;Izmantot POSIX pārdēvēšanu</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Zināmu SFTP serveru kļūdu noteikšana</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>&amp;Apgriež saites komandas argumentu secību:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>&amp;Nepareizi interpretē failu laikspiedolus pirms 1970:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Čaula</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>Ča&amp;ula:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Noteikt automātiski</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>&amp;Atgriešanas koda mainīgais:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Mapes saraksts</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>Saraksta &amp;komanda:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Ignorēt LS &amp;brīdinājumus</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Mēģināt iegūt &amp;pilnu laikspiedolu</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Citas opcijas</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Noteikt &amp;lietotāju grupas</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Notīrīt a&amp;izstājvārdus</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Notīrīt &amp;nacionālos mainīgos</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Izmantot scp&amp;2 ar scp1 savietojamību</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>Pēcpieteikšanās &amp;komandas:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>Ko&amp;nts:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>&amp;Atbalsts slēpto failu sarakstam:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Izmantot &amp;MLSD komandu mapju sarakstam</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>&amp;Piespiedu IP adrese pasīvā režīma savienojumiem:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Izmantot &amp;HOST komandu resursdatora izvēlei serverī</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Rādīt visas failu &amp;revīzijas VMS serveros</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;Noklusējuma reģions:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Virtuālais resursdators</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Ceļš</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>&amp;URL stils:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>Maksā &amp;pieprasītājs</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Autentifikācija</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;Sesijas marķieris:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Lomas ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Pieļaut nekodētas īpašās rakstzīmes failu nosaukumos</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;Atļaut pāradresāciju uz citiem resursdatoriem</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Optimizēt savienojuma &amp;bufera izmēru</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Noildzes</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>sekundes</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Savienojuma uzturēšana</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Izslēgts</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>&amp;Tukšu SSH pakešu sūtīšana</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>&amp;Fiktīvu protokola komandu izpilde</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Sekundes &amp;starp uzturēšanas signāliem:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;Un papildus nolasot pašreizējo mapi</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Interneta protokola versija</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>Auto&amp;mātiski</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Lokālais</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>Noteikt &amp;automātiski</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>&amp;Starpniekservera resursdatora nosaukums:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;Lietotājvārds:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Starpniekservera iestatījumi</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>šabloni</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet komanda</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Lokālā starpniekservera komanda</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>&amp;Izmantot starpniekserveri arī lokālā resursdatora savienojumiem</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Nē</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Jā</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Veikt &amp;DNS vārdu meklēšanu starpniekserverī:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Tunelis</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>Savienoties &amp;caur SSH tuneli</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Resursdators, kurā izveidot tuneli</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>Resursdatora &amp;nosaukums:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Tuneļa opcijas</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Izvēlēties automātiski</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>Lokālais tuneļa &amp;ports:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Tuneļa autentifikācijas parametri</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS opcijas</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Mi&amp;nimālā TLS versija:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Ma&amp;ksimālā TLS versija:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Atkārtoti izmantot TLS sesijas ID datu savienojumiem</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Autentifikācijas parametri</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>Klienta &amp;sertifikāta fails:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Klienta sertifikāta fails</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Sertifikātu faili (*.pfx *.p12 *.pem *.crt *.key);;Visi faili (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>&amp;Iespējot saspiešanu</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>Šifrēšanas algoritma izvēles &amp;politika:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Šifrēšanas algoritma izvēles politika</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Augšup</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;Lejup</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Iespējot novecojušo vienkāršā &amp;DES lietošanu</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Atslēgu apmaiņa</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Atslēgu apmaiņas algoritma opcijas</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>Algoritma izvēles &amp;politika:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Algoritma izvēles politika</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Mēģināt &amp;GSSAPI atslēgu apmaiņu</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Atslēgu atkārtotas apmaiņas opcijas</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Maks. &amp;minūtes līdz atslēgu atjaunošanai (0 – bez ierobežojuma):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Maks. datu &amp;apjoms līdz atslēgu atjaunošanai (0 – bez ierobežojuma):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;Pilnībā apiet autentifikāciju</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Autentifikācijas opcijas</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>&amp;Mēģināt autentificēties ar aģentu</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Atbildēt uz pirmo uzvedni ar pa&amp;roli</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>Rādīt p&amp;ublisko atslēgu</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>&amp;Sertifikāts lietošanai ar privāto atslēgu:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Sertifikāts</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH sertifikāti (*-cert.pub);;Visi faili (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Mēģināt &amp;GSSAPI autentifikāciju</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Atļaut GSSAPI akreditācijas datu &amp;deleģēšanu</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Kļūdas</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Zināmu SSH serveru kļūdu noteikšana</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Nepareizi aprēķina SSH H&amp;MAC atslēgas:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Nepareizi aprēķina SSH &amp;šifrēšanas atslēgas:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Pieprasa SSH RSA parakstu &amp;papildināšanu:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Nepareizi lieto sesija&amp;s ID SSH PK autentifikācijā:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Slikti apstrādā SSH &amp;atslēgu atkārtotu apmaiņu:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Ignorē SSH ma&amp;ksimālo paketes izmēru:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Neapstrādā SSH &amp;ignore ziņojumus:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Neapstrādā WinSCP SSH &apos;&amp;winadj&apos; pieprasījumus</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Piezīme</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Lokālā starpniekservera &amp;komanda:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telnet &amp;komanda:</translation>
     </message>
 </context>
 <context>

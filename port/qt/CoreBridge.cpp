@@ -1815,6 +1815,17 @@ std::string Text(TText Text)
     case TText::ColorDefaultHint: Ident = COLOR_DEFAULT_HINT; break;
     case TText::ColorPick: Ident = COLOR_PICK_CAPTION; break;
     case TText::ColorPickHint: Ident = COLOR_PICK_HINT; break;
+    case TText::AutoSwitchAuto: Ident = AUTO_SWITCH_AUTO; break;
+    case TText::AutoSwitchOff: Ident = AUTO_SWITCH_OFF; break;
+    case TText::AutoSwitchOn: Ident = AUTO_SWITCH_ON; break;
+    case TText::FtpPasvModeRequired: Ident = FTP_PASV_MODE_REQUIRED; break;
+    case TText::ProxyCommandPatternsHint: Ident = LOGIN_PROXY_COMMAND_PATTERNS_HINT; break;
+    case TText::ShellPage: Ident = LOGIN_SHELL_PAGE; break;
+    case TText::ScpShellPage: Ident = LOGIN_SCP_SHELL_PAGE; break;
+    case TText::EncryptKeyGenerated: return Utf8(UnformatMessage(LoadStr(ENCRYPT_KEY_GENERATED)));
+    case TText::CopyKeyButton: Ident = COPY_KEY_BUTTON; break;
+    case TText::AuthorizedKeys: return Utf8(UnformatMessage(LoadStr(LOGIN_AUTHORIZED_KEYS)));
+    case TText::KeyWithCertificate: return Utf8(UnformatMessage(LoadStr(LOGIN_KEY_WITH_CERTIFICATE)));
     case TText::SpecialFolderDocuments: Ident = SPECIAL_FOLDER_MY_DOCUMENTS; break;
     case TText::SpecialFolderDesktop: Ident = SPECIAL_FOLDER_DESKTOP; break;
     case TText::CommandLineLabel: Ident = COMMAND_LINE_LABEL; break;

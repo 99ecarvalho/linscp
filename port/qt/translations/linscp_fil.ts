@@ -3938,14 +3938,6 @@ Lokasyon: %2</translation>
         <translation>Mga Advanced na Setting ng Site</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>Remote na &amp;direktoryo:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>Mang&amp;inain...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Lokal na direktoryo</translation>
     </message>
@@ -3956,10 +3948,6 @@ Lokasyon: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Mga Direktoryo</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> segundo</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3982,40 +3970,20 @@ Lokasyon: %2</translation>
         <translation>Uri ng &amp;proxy:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Host name ng pro&amp;xy:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Number ng Po&amp;rt:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;User name:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Password:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Konsultahin ang proxy para sa mga &amp;lokal na address</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Proxy</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Subukan ang pagpapatunay gamit ang &amp;Pageant o ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Payagan ang agent &amp;forwarding</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>Mag-b&amp;rowse...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4030,16 +3998,656 @@ Lokasyon: %2</translation>
         <translation>Private &amp;key file:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>Pagpapatunay ng SSH</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>Ta&amp;ndaan ang huling ginamit na direktoryo</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Subukan ang &apos;keyboard-&amp;interactive&apos; na pagpapatunay</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Mga Pahina</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Kulay</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Kapaligiran</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Kapaligiran ng server</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>Mga character sa &amp;dulo ng linya (kung hindi isinaad ng server):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>&amp;UTF-8 encoding para sa mga pangalan ng file:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Offset ng time &amp;zone:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>oras</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Mga oras ng offset ng time zone</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Mga minuto ng offset ng time zone</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>minuto</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>&amp;Awtomatikong tukuyin</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;Tanggalin ang mga numero ng bersyon ng VMS</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Daylight saving time</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>I-adjust ang remote na timestamp sa mga lokal na kumbe&amp;nsyon</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>I-adjust ang remote na timestamp gamit ang &amp;DST</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>I-&amp;synchronize ang pag-browse</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;Malayong direktoryo</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Hindi ginagamit ang lokal na direktoryo sa Explorer interface.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Mga opsyon sa pagbasa ng direktoryo</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>I-cache ang mga &amp;binisitang remote na direktoryo</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>I-cache ang mga pagbabago ng &amp;direktoryo</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>&amp;Permanenteng cache</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Lutasin ang mga symbolic li&amp;nk</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>&amp;Sundan ang mga symbolic link papunta sa direktoryo</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Recycle bin</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;Panatilihin ang mga binurang remote na file sa recycle bin</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Panatilihin ang mga na-&amp;overwrite na remote na file sa recycle bin (SFTP lamang)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>&amp;Remote na recycle bin:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Encryption</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>I-&amp;encrypt ang mga file</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Mga opsyon sa encryption</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>&amp;Key ng encryption:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>Ipa&amp;kita ang key</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Bumuo ng Key</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Mga opsyon ng protocol</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Default</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP ser&amp;ver:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Awto</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>&amp;Gustong bersyon ng SFTP protocol:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>I-ca&amp;nonicalize ang mga path sa server</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Payagan ang SCP &amp;fallback</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;Gamitin ang POSIX rename</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Pagtukoy ng mga kilalang surot sa mga SFTP server</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>&amp;Binabaligtad ang pagkakasunod ng mga argumento ng link command:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>&amp;Mali ang pagbasa sa mga timestamp ng file bago ang 1970:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Shell</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>S&amp;hell:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Awtomatikong tukuyin</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>Variable ng &amp;return code:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Listahan ng direktoryo</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>&amp;Command sa paglista:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Huwag pansinin ang mga &amp;babala ng LS</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Subukang kunin ang &amp;buong timestamp</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Ibang mga opsiyon</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Hanapin ang mga grupo ng &amp;user</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Burahin ang mga a&amp;lias</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Burahin ang mga &amp;pambansang variable</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Gamitin ang scp&amp;2 na may compatibility sa scp1</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>Mga &amp;command pagkatapos mag-login:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Account:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>&amp;Suporta sa paglista ng mga nakatagong file:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Gamitin ang &amp;MLSD command sa paglista ng direktoryo</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>&amp;Ipilit ang IP address para sa mga koneksyong passive mode:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Gamitin ang &amp;HOST command para pumili ng host sa server</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Ipakita ang lahat ng &amp;rebisyon ng file sa mga VMS server</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;Default na rehiyon:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Virtual Host</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Path</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>Estilo ng &amp;URL:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>Ang requester ang &amp;nagbabayad</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Pagpapatunay</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;Session token:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Role ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Tanggapin ang mga hindi naka-encode na espesyal na character sa pangalan ng file</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;Payagan ang mga redirect sa ibang host</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>I-optimize ang laki ng &amp;buffer ng koneksyon</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Mga timeout</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>mga segundo</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Mga keepalive</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>Naka-&amp;off</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>Pagpapadala ng mga &amp;null na SSH packet</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Pagpapatakbo ng mga &amp;dummy na protocol command</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Mga segundo sa &amp;pagitan ng keepalive:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;At dagdag na pagbasa sa kasalukuyang direktoryo</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Bersyon ng internet protocol</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>A&amp;wto</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Lokal</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;Awtomatikong tukuyin</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Hostname ng pro&amp;xy:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;Username:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Mga setting ng proxy</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>mga pattern</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet command</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Lokal na proxy command</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>Isaalang-ala&amp;ng ang pag-proxy sa mga koneksyon sa lokal na host</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Hindi</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Oo</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Gawin ang &amp;DNS name lookup sa panig ng proxy:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Tunnel</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>Kumonekta sa &amp;pamamagitan ng SSH tunnel</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Host kung saan itatayo ang tunnel</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>&amp;Hostname:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Mga opsyon ng tunnel</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Awto-piliin</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>&amp;Lokal na port ng tunnel:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Mga parameter ng pagpapatunay ng tunnel</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>Mga opsyon ng TLS</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Mi&amp;nimum na bersyon ng TLS:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Ma&amp;ximum na bersyon ng TLS:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Muling gamitin ang TLS session ID para sa mga koneksyon ng data</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Mga parameter ng pagpapatunay</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>&amp;Client certificate file:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Client certificate file</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Mga Certificate File (*.pfx *.p12 *.pem *.crt *.key);;Lahat ng File (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>&amp;Paganahin ang compression</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>Patakaran sa pagpili ng encryption &amp;cipher:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Patakaran sa pagpili ng encryption cipher</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>Pa&amp;taas</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>Pa&amp;baba</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Paganahin ang lumang paggamit ng single-&amp;DES</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Key exchange</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Mga opsyon ng algorithm ng key exchange</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>&amp;Patakaran sa pagpili ng algorithm:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Patakaran sa pagpili ng algorithm</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Subukan ang &amp;GSSAPI key exchange</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Mga opsyon na kumokontrol sa key re-exchange</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Max na &amp;minuto bago mag-rekey (0 kung walang limitasyon):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Ma&amp;x na data bago mag-rekey (0 kung walang limitasyon):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;Lampasan nang buo ang pagpapatunay</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Mga opsyon sa pagpapatunay</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>&amp;Subukan ang pagpapatunay gamit ang agent</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Sumagot gamit ang pass&amp;word sa unang prompt</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>Ipakita ang Public &amp;Key</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Certificate na &amp;gagamitin kasama ng private key:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Certificate</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>Mga OpenSSH certificate (*-cert.pub);;Lahat ng File (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Subukan ang &amp;GSSAPI na pagpapatunay</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Payagan ang GSSAPI c&amp;redential delegation</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Mga surot</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Pagtukoy ng mga kilalang surot sa mga SSH server</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Mali ang pagkalkula sa mga SSH H&amp;MAC key:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Mali ang pagkalkula sa mga SSH &amp;encryption key:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Nangangailangan ng &amp;padding sa mga SSH RSA signature:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Mali ang paggamit sa sessio&amp;n ID sa SSH PK auth:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Hindi maayos ang paghawak sa SSH &amp;key re-exchange:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Binabalewala ang ma&amp;ximum na laki ng SSH packet:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Nabibigo sa mga SSH i&amp;gnore message:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Nabibigo sa mga SSH &apos;&amp;winadj&apos; request ng WinSCP</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Talaan</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Lokal na proxy co&amp;mmand:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telnet co&amp;mmand:</translation>
     </message>
 </context>
 <context>

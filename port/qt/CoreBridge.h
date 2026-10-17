@@ -1034,6 +1034,18 @@ enum class TText
   ColorDefaultHint,     // "Reset session (panel) color to system default"
   ColorPick,            // "&More Colors..."
   ColorPickHint,        // "Choose any session (panel) color"
+  // Site Advanced's.
+  AutoSwitchAuto,       // "Auto"
+  AutoSwitchOff,        // "Off"
+  AutoSwitchOn,         // "On"
+  FtpPasvModeRequired,  // "Passive mode must be enabled when FTP connection through proxy is selected."
+  ProxyCommandPatternsHint, // "Patterns:\n\\n for new line..."
+  ShellPage,            // "Shell"
+  ScpShellPage,         // "SCP/Shell"
+  EncryptKeyGenerated,  // "**Encryption key was generated.**..." (unformatted)
+  CopyKeyButton,        // "&Copy Key"
+  AuthorizedKeys,       // "Public key for pasting into OpenSSH authorized_keys file:" (unformatted)
+  KeyWithCertificate,   // the same for a key with its certificate (unformatted)
   SpecialFolderDocuments, // "My documents"
   SpecialFolderDesktop, // "Desktop"
   CommandLineLabel,     // "Command"
@@ -1489,8 +1501,15 @@ struct TSite
   // FTP: implicit TLS (ftps://) or explicit (ftpes://); WebDAV and S3: TLS
   // or not (Implicit = TLS).
   enum class TEncryption { None, Implicit, Explicit };
-  // core's TProxyMethod, those the dialog offers.
-  enum class TProxy { None, Socks4, Socks5, Http };
+  // core's TProxyMethod, those the dialog offers (in its order: the SSH
+  // proxy combo's).
+  enum class TProxy { None, Socks4, Socks5, Http, Telnet, Command };
+  // core's TAutoSwitch, in its order.
+  enum class TAutoSwitch { On, Off, Auto };
+  enum class TPing { Off, NullPacket, DummyCommand };
+  enum class TFtpPing { Off, DummyCommand, DirectoryListing };
+  enum class TAddressFamily { Auto, IPv4, IPv6 };
+  enum class TTls { Tls10, Tls11, Tls12, Tls13 };
 
   // The site's path in the tree: "Folder/Subfolder/Site".
   std::string Name;
@@ -1527,6 +1546,117 @@ struct TSite
   bool TryAgent = true;
   bool KeyboardInteractive = true;
   bool AgentForwarding = false;
+
+  // The rest of Site Advanced's pages, as its LoadSession and SaveSession
+  // read and write TSessionData (forms/SiteAdvanced.cpp).
+  // Environment > Directories.
+  bool SynchronizeBrowsing = false;
+  bool CacheDirectories = true;
+  bool CacheDirectoryChanges = true;
+  bool PreserveDirectoryChanges = true;
+  bool ResolveSymlinks = true;
+  bool FollowDirectorySymlinks = false;
+  // Environment: CR/LF (else LF) where the server does not say; DST as
+  // Windows' (else Unix's, "adjust to local conventions"); the time zone
+  // offset in minutes.
+  bool EolCrLf = false;
+  bool DstWindows = false;
+  TAutoSwitch Utf = TAutoSwitch::Auto;
+  int TimeDifferenceMinutes = 0;
+  bool TimeDifferenceAuto = true;
+  bool TrimVMSVersions = false;
+  bool VMSAllRevisions = false;
+  // Environment > Recycle bin.
+  bool DeleteToRecycleBin = false;
+  bool OverwrittenToRecycleBin = false;
+  std::string RecycleBinPath;
+  // Environment > Encryption: the key in hex, empty for none.
+  std::string EncryptKey;
+  // Environment > SFTP: the server (empty: the default); SCP as the
+  // fallback (fsSFTP, else fsSFTPonly); the version, -1 for automatic.
+  std::string SftpServer;
+  bool AllowScpFallback = true;
+  bool UsePosixRename = false;
+  int SftpMaxVersion = -1;
+  TAutoSwitch SftpRealPath = TAutoSwitch::Auto;
+  TAutoSwitch SftpBugSymlink = TAutoSwitch::Auto;
+  TAutoSwitch SftpBugSignedTS = TAutoSwitch::Auto;
+  // Environment > SCP/Shell: the shell and the return code variable,
+  // empty for the default and autodetected.
+  std::string Shell;
+  std::string ReturnVar;
+  std::string ListingCommand = "ls -la";
+  TAutoSwitch LookupUserGroups = TAutoSwitch::Auto;
+  bool ClearAliases = true;
+  bool IgnoreLsWarnings = true;
+  bool Scp1Compatibility = false;
+  bool UnsetNationalVars = true;
+  bool ScpLsFullTime = true;
+  // Environment > FTP.
+  std::string FtpAccount;
+  std::string PostLoginCommands;
+  TAutoSwitch FtpListAll = TAutoSwitch::Auto;
+  TAutoSwitch FtpUseMlsd = TAutoSwitch::Auto;
+  TAutoSwitch FtpForcePasvIp = TAutoSwitch::Auto;
+  TAutoSwitch FtpHost = TAutoSwitch::Auto;
+  // Environment > S3.
+  std::string S3DefaultRegion;
+  bool S3UrlStylePath = false;
+  bool S3RequesterPays = false;
+  std::string S3SessionToken;
+  std::string S3RoleArn;
+  // Environment > WebDAV.
+  bool WebDavLiberalEscaping = false;
+  bool WebDavCrossDomainRedirects = false;
+  // Connection: "Optimize connection buffer size" (SendBuf and SshSimple).
+  bool OptimizeBuffers = true;
+  TPing Ping = TPing::Off;
+  int PingInterval = 30;
+  TFtpPing FtpPing = TFtpPing::DummyCommand;
+  int FtpPingInterval = 30;
+  TAddressFamily AddressFamily = TAddressFamily::Auto;
+  // Connection > Proxy, beyond the fields above: FTP's logon type (1 to 8,
+  // FtpProxyMethodCombo's items after HTTP; 0 none).
+  int FtpProxyLogonType = 0;
+  std::string ProxyTelnetCommand = "connect %host %port\\n";
+  std::string ProxyLocalCommand;
+  TAutoSwitch ProxyDns = TAutoSwitch::Auto;
+  // Connection > Tunnel: the local port, 0 to choose one.
+  bool Tunnel = false;
+  std::string TunnelHostName;
+  int TunnelPortNumber = 22;
+  std::string TunnelUserName;
+  std::string TunnelPassword;
+  std::string TunnelPrivateKeyFile;
+  int TunnelLocalPortNumber = 0;
+  // Connection > TLS/SSL.
+  TTls MinTls = TTls::Tls12;
+  TTls MaxTls = TTls::Tls13;
+  bool SslSessionReuse = true;
+  std::string TlsCertificateFile;
+  // SSH: the ciphers and key exchanges in order of preference, core's
+  // TCipher and TKex values (CipherNames, KexNames).
+  bool Compression = false;
+  bool Ssh2DES = false;
+  std::vector<int> Ciphers;
+  std::vector<int> Kex;
+  bool AuthGSSAPIKEX = false;
+  int RekeyTime = 60;
+  std::string RekeyData = "1G";
+  // SSH > Authentication, beyond the fields above.
+  bool SshNoUserAuth = false;
+  bool KeyboardInteractivePassword = true;
+  bool AuthGSSAPI = true;
+  bool GSSAPIFwdTGT = false;
+  std::string DetachedCertificate;
+  // SSH > Bugs, in the page's order: HMAC2, DeriveKey2, RSAPad2,
+  // PKSessID2, Rekey2, MaxPkt2, Ignore2, WinAdj.
+  static constexpr int SshBugCount = 8;
+  std::vector<TAutoSwitch> SshBugs = std::vector<TAutoSwitch>(SshBugCount, TAutoSwitch::Auto);
+  // Note; the session color (a TColor, 0x00BBGGRR; 0 none).
+  std::string Note;
+  int Color = 0;
+
   // Raw settings, once edited (Edit Raw Settings): the site's settings in
   // core's options ("Name=Value" lines), replacing the base's under the
   // fields above.
@@ -1637,6 +1767,34 @@ struct TUrlInfo
   bool UnsafeSettings = false;
 };
 TUrlInfo UrlInfo(const std::string & Text);
+// Site Advanced's lists: the ciphers' and key exchanges' names (core's
+// texts), indexed by core's TCipher and TKex values; the first, the
+// "warn below here" line.
+std::vector<std::string> CipherNames();
+std::vector<std::string> KexNames();
+// What S3's authentication shows for Site, as LoadSession: with automatic
+// credentials (no access key given) the token and role from the
+// environment, not editable; Amazon's own S3 has a role ARN.
+struct TS3Credentials
+{
+  bool Automatic = false;
+  bool Amazon = false;
+  std::string SessionToken;
+  std::string RoleArn;
+};
+TS3Credentials S3Credentials(const TSite & Site);
+// Whether a private key file carries its certificate (GetPublicKeyLine's),
+// false when it cannot be read; the key's public line (OpenSSH format),
+// TCoreError when it cannot be read.
+bool KeyHasCertificate(const std::string & FileName);
+std::string PublicKeyLine(const std::string & FileName);
+// Encryption: a new key (hex), and a key's check (TCoreError: not one).
+std::string GenerateEncryptKey();
+void ValidateEncryptKey(const std::string & HexKey);
+// The tunnel's local ports to choose from (core's configuration).
+int TunnelLocalPortNumberLow();
+int TunnelLocalPortNumberHigh();
+
 // Saves Site under Site.Name, as upstream's Login dialog does: its other
 // settings taken from the site BaseName (empty: a new site, from the default
 // settings), which stays as it is -- saving under another name is "save as".

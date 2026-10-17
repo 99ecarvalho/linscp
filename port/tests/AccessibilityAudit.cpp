@@ -116,6 +116,11 @@ bool WinScpClash(const QString & One, const QString & Other)
     { QStringLiteral("&Toolbars"), QStringLiteral("Lis&t") },
     { QStringLiteral("&Toolbars"), QStringLiteral("&Thumbnails") },
     { QStringLiteral("&Small Icons"), QStringLiteral("&Sort") },
+    // SiteAdvanced.dfm: the Color button and its pages; Connection.
+    { QStringLiteral("&Color"), QStringLiteral("Post login &commands:") },
+    { QStringLiteral("&Color"), QStringLiteral("Listing &command:") },
+    { QStringLiteral("&Color"), QStringLiteral("&Client certificate file:") },
+    { QStringLiteral("Optimize connection &buffer size"), QStringLiteral("Seconds &between keepalives:") },
     // A default custom command's name and the Enter... item.
     { QStringLiteral("&Execute"), QStringLiteral("&Enter...") },
   };

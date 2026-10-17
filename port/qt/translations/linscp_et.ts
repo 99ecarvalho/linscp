@@ -3938,14 +3938,6 @@ Asukoht: %2</translation>
         <translation>Seansi täpsemad sätted</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>&amp;Kaugkataloog:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>Si&amp;rvi</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Kohalik kataloog</translation>
     </message>
@@ -3956,10 +3948,6 @@ Asukoht: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Kataloogid</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> sekundit</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3982,40 +3970,20 @@ Asukoht: %2</translation>
         <translation>&amp;Puhverserveri liik:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Pu&amp;hverserveri hostinimi:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>P&amp;ort</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;Kasutajanimi:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Parool</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Kasuta puhverserverit ka &amp;kohalike aadresside puhul</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Puhverserver</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Proovi kasutajatuvastust &amp;Pageanti või ssh-agendi abil</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Või&amp;maldatakse Pageanti agendiedastus</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>Si&amp;rvi...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4030,16 +3998,656 @@ Asukoht: %2</translation>
         <translation>Privaatvõt&amp;me fail</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH kasutajatuvastus</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>Vii&amp;mati kasutatud kataloog jäetakse meelde</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Proovitakse kasutaja tuvastamist &amp;klaviatuuri vahendusel (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Lehed</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Värv</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Keskkond</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Serveri keskkond</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>&amp;Realõpusümbol (kui serveri poolt osutamata)</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>&amp;UTF-8 kodeering failinimedele</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>&amp;Ajavööndi nihe</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>tundi</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Ajavööndi nihe tundides</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Ajavööndi nihe minutites</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>minutit</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Määratakse &amp;automaatselt</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;VMS-i versiooninumbrid eemaldatakse</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>&amp;Suveaeg</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>&amp;Korrigeeri serveri ajatemplit vastavalt kohalikule tavale (Unix)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>K&amp;orrigeeri serveri ajatemplit vastavalt suveajale (Windows)</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>&amp;Paralleelne sirvimine</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;Kaugkataloog</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Exploreri-tüüpi kasutajaliideses kohalikku kataloogi pole.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Kaustade lugemine</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>V&amp;aadatud kaugkaustad puhverdatakse</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Katal&amp;oogivahetused puhverdatakse</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>&amp;püsivalt</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Süm&amp;boolsed viidad lahendatakse</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>Kataloogidele osutavaid sümboolseid viitu &amp;järgitakse</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Prügikast</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;Kustutatud kaugfailid säilitatakse prügikastis</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>&amp;Üle kirjutatud kaugfailid säilitatakse prügikastis (ainult SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>K&amp;aug-prügikast:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Krüpteerimine</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;Failid krüpteeritakse</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Krüpteerimissätted</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>Krüpteerimis&amp;võti:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;Näita võtit</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Genereeri võti</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Protokollisuvandid</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Vaikimisi</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>S&amp;FTP server:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Autom.</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>SF&amp;TP protokolli eelistatud versioon</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>Teed &amp;normaliseeritakse serveris</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Varuvariandina S&amp;CP</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;Kasutatakse POSIX-i ümbernimetamist</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Abinõude rakendamine SFTP serveri võimalike vigade vastu</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>&amp;Eeldab käsu &apos;symlink&apos; argumente vales järjekorras</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>Tõlge&amp;ndab 1970-eelseid ajatempleid valesti</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Kest (shell)</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>S&amp;hell:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Leia automaatselt</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>V&amp;astuskood-muutuja:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Kataloogilisting</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>&amp;Listingukäsk:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>&amp;Eiratakse ls-käsu vigu</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>&amp;Püütakse pärida kogu ajatempel</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Muud suvandid</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>&amp;Kasutajagruppide otsing</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Käs&amp;usünonüüme ei kasut.</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Listi&amp;ng ilma keelekohandusteta</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>scp&amp;2 kasut. scp1-ühilduvusrežiimis</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>Siss&amp;elogimisjärgsed käsud:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>K&amp;onto:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>Või&amp;maldatakse ka peidetud failide kuvamine:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Kataloogilistinguks kasutatakse &amp;MLSD-käsku</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>&amp;Passiivühenduse korral kasutatakse välist IP-aadressi</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Serveri valimiseks kasutatakse &amp;HOST-käsku</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>VMS-serverites kuvatakse kõik faili&amp;versioonid</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;Vaikepiirkond:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Virtuaalserver</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Tee</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>&amp;URL-i stiil:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>&amp;Päringu esitaja maksab</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Kasutajatuvastus</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;Seansitõend:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Rolli ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>Failinimedes &amp;lubatakse kodeerimata erimärke</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;Lubatakse ümbersuunamine teistele serveritele</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Valitakse &amp;optimaalse suurusega puhver</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Ooteajad</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>sekundit</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Värskenduskäsud (ühenduse hoidmiseks avatuna)</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>V&amp;äljas</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>&amp;Tühjade SSH pakettide saatmine</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Eri&amp;nevate tühikäskude kasutamine</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>V&amp;ärskenduskäskude intervall:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;Ja lisaks loetakse jooksvat kataloogi</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Internetiprotokolli versioon</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>A&amp;utom.</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Kohalik</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;Leia automaatselt</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>S&amp;erver:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;Kasutajanimi</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Puhverserveri seadistus</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>&amp;mustrid</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telneti-käsk</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Käsk puhverteenuse käivitamiseks</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>Ka lo&amp;calhosti poole pöördutakse läbi puhverserveri</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Ei</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Jah</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>D&amp;NS-nimelahenduse eest hoolitseb puhverserver:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Tunnel</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>&amp;Ühendus luuakse läbi SSH tunneli</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Tunnelserveri sätted</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>S&amp;erver</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Tunnelisätted</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Automaatne</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>Kohalik tu&amp;nneliport:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Tunneli kasutajatuvastuse parameetrid</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS-sätted</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Mi&amp;nimaalne TLS-versioon:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Ma&amp;ksimaalne TLS-versioon:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>Andmeühendustes &amp;taaskasutatakse TLS-seansi ID-d</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Kasutajatuvastuse parameetrid</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>&amp;Kliendisertifikaadi fail:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Kliendisertifikaadi fail</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Sertifikaadifailid (*.pfx *.p12 *.pem *.crt *.key);;Kõik failid (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>Või&amp;maldatakse andmete pakkimine</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>&amp;Krüptoifrid eelistuse järjekorras:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Krüptoifrid eelistuse järjekorras</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Üles</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;Alla</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>SS&amp;H-2 puhul lubatakse ka vana single-DES ifrit kasutada</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Võtmevahetus</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Võtmevahetusalgoritm</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>Algoritmid &amp;eelistuse järjekorras:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Algoritmid eelistuse järjekorras</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Proovitakse &amp;GSSAPI võtmevahetust</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Võtme uuendamine</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Võtme maks. &amp;kehtivusaeg minutites (0 = piiramatu):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>&amp;Maks. andmemaht ühe võtmega (0 = piiramatu):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;Jäta kasutajatuvastus täielikult vahele (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Kasutajatuvastus</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>Proovitakse kasutaja tuvastamist &amp;agendi abil</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>&amp;Esimesele küsimisele vastatakse parooliga</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;Näita avalikku võtit</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Privaatvõtmega &amp;kasutatav sertifikaat:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Sertifikaat</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH sertifikaadid (*-cert.pub);;Kõik failid (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Proovitakse kasutaja tuvastamist &amp;GSSAPI/SSPI-ga (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>GSSAPI kasutajatunnuste &amp;delegeerimine lubatud</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Vead</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Abinõude rakendamine SSH serveri võimalike vigade vastu</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Arvutab SSH-2 &amp;HMAC võtmeid valesti:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>&amp;Arvutab SSH-2 krüpteerimisvõtmeid valesti:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>&amp;Vajab SSH-2 RSA signatuurile täidise lisamist:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Kas&amp;utab seansitunnust SSH-2 kas.tuvastuses valesti:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Vii&amp;b SSH-2 võtmete uuestivahetamist halvasti läbi</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>&amp;Eirab SSH-2 paketi suuruspiirangut</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Takerdub SSH-&amp;2 eiramissõnumite tagajärjel:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Takerdub WinSCP SSH &apos;&amp;winadj&apos; päringute tagajärjel</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Märkus</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>K&amp;äsk puhverteenuse käivitamiseks:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>&amp;Telneti-käsk ühenduse loomiseks:</translation>
     </message>
 </context>
 <context>

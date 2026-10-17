@@ -3942,14 +3942,6 @@ Location: %2</source>
         <translation>إعدادات الاتصال المتقدمة</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>الدليل ال&amp;بعيد:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>ت&amp;صفح</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>الدليل المحلي</translation>
     </message>
@@ -3960,10 +3952,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>المسارات</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> ثانية</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3986,40 +3974,20 @@ Location: %2</source>
         <translation>نوع خادم البروكسي</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>اسم مضيف البرو&amp;كسي:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>ر&amp;قم المنفذ</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>اسم ال&amp;مستخدم:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;كلمة المرور</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>استشارة البروكسي للعناوين ال&amp;محلية</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>البروكسي</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>محاولة المصادقة باستخدام &amp;Pageant أو ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>السماح لوكيل الشحن</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>ت&amp;صفح...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4034,16 +4002,656 @@ Location: %2</source>
         <translation>ملف المف&amp;تاح الخاص</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>مصادقة SSH</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>ت&amp;ذكرالدليل الذي تم استخدامه مؤخراً</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>محاولة المصادقة &apos;التفاعلية بلوحة الم&amp;فاتيح&apos;</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>الصفحات</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;الالوان</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>البيئة</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>الاتصال بـ الخادم</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>نهاية خط حرفا (لم يحددها الخادم):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>لاسماء الملفات &amp;UTF-8 ترميز:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>تحول المنطقة الزمنية:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>ساعات</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>تحول المنطقة الزمنية (ساعات)</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>تحول المنطقة الزمنية (دقائق)</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>دقائق</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>يمكنك الكشف تلقائياً</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>اقتطاع أرقام إ&amp;صدارات VMS</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>التوقيت الصيفي</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>يتم تعيين الطابع الزمني بكثير بالتوقيت المحلي</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>الحصول الآن على تعديل الطابع الزمني في فصل الصيف</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>فحص في وقت واحد</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>الدليل ال&amp;بعيد</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>الدليل المحلي لا يعمل مع الواجهة الشبيهة بإكسبلورر.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>قراءة إعدادات المجلد</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>تخزين مؤ&amp;قت للأدلة البعيدة التي تم زيارتها</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>تخزين مؤقت لت&amp;غيرات الدليل</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>ذاكرة التخزين مؤق&amp;تة دائمة</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>حل الو&amp;صلات الرمزية</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>&amp;اتباع الوصلات الرمزية إلى الأدلة</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>سلة المحذوفات</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>اب&amp;قاء الملفات البعيدة المحذوفة في سلة المحذوفات</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>(فقط SFTP)ابقاء الملفات البعيدة التي تم ال&amp;كتابة فوقها في سلة المحذوفات</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>سلة المحذوفات ال&amp;بعيدة</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>التشفير</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;تشفير الملفات</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>إعدادات التشفير</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>&amp;مفتاح التشفير:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>إ&amp;ظهار المفتاح</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>إ&amp;نشاء مفتاح</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>خيارات البروتوكول</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>افتراضي</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP خادم:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>تلقائي</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>إصدار بروتوكول SFTP المف&amp;ضل</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>توحيد المسارات على ال&amp;خادم</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>SCP السماح بالعودة</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>استخدام إعادة تسمية &amp;POSIX</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>اكتشاف عيوب برمجية معروفة في مزودات SFTP</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>ق&amp;لب ترتيب مدخلات أوامر الوصلة الرمزية</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>ال&amp;طوابع الزمنية للملف قبل 1970 تم تفسيرها بشكل خاطئ</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>القشرة</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>القشرة</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>كشف البروكسي تلقائي</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>كود متغير العودة</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>قائمة الأدلة</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>عرض الاوامر</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>تجاهل &amp;تحذيرات LS</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>حاول الحصول على &amp;طابع زمني كامل</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>خيارات أخرى</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>بحث عن م&amp;جموعات المستخدم</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>م&amp;سح الأسماء المستعارة</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>&amp;مسح المتغيرات الوطنية</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>استخدام scp&amp;2 مع توافق scp1</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTPملقم</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>اوامر الدخول:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;حساب:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>دعم لقائمة الملفات المخفية</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>لقائمة الدليل MLSD استخدم الامر</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>يقوم بفرض النمط السلبي للاتصالات IPاستخدم عنوان</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>&amp;HOST لتحديد المضيف على الملقم استخدم الأمر</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>عرض جميع &amp;مراجعات الملفات على خوادم VMS</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>المنطقة الا&amp;فتراضية:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>مضيف ظاهري</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>المسار</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>نمط &amp;URL:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>الدفع على ال&amp;طالب</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>المصادقة</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>رمز ال&amp;جلسة:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>ARN ال&amp;دور:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;تقبل الأحرف الخاصة غير المرمزة في أسماء الملفات</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>السماح بإ&amp;عادة التوجيه إلى مضيفين آخرين</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>تحسين حجم الروابط المخزنة مؤقتا</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>انقضاء الوقت</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>ثانية</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>حزم القناة مباشر</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>إي&amp;قاف</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>إرسال ح&amp;زم SSH فارغة</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>تنفيذ أوامر بروتوكول و&amp;همية</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>المحافظة على الحياة بال&amp;ثواني</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>وأي&amp;ضًا قراءة الدليل الحالي</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>إصدار بروتوكول الانترنت</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>ت&amp;لقائي</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>محلي</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>يمكن الكشف عن</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>اسم مضيف البروك&amp;سي</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;اسم المستخدم</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>إعدادات البروكسي</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>ا&amp;نماط</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>أوامر Telnet</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>أمر بروكسي محلي</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>استخ&amp;دم البروكسى لاتصالات المضيف المحلي</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>لا</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>نعم</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>ال&amp;بحث عن اسم DNS في نهاية البروكسي:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>النفق</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>SSH &amp;الاتصال عبر قناة</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>إعدادات الخادم</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>اسم الخادم:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Tunnel خيارات</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>تلقائي</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>ألمنفذ المحلي:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>إعدادات المصادقة</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>خيارات TLS</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>الإصدار الأ&amp;دنى لـ TLS:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>الإصدار الأ&amp;قصى لـ TLS:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>إ&amp;عادة استخدام معرف جلسة TLS لاتصالات البيانات</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>معلمات المصادقة</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>&amp;ملف شهادة العميل:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>ملف شهادة العميل</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>ملفات الشهادات (*.pfx *.p12 *.pem *.crt *.key);;كل الملفات (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>مضغوط</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>التشفير سياسة اختيار الشفرات:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>سياسة اختيار الشفرات</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;إعلى</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;أسفل</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>تمكين الاستخدام القديم لـ single-&amp;DES</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>تغير لوحة المفاتيح</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>تغيير لوحة المفاتيح خيارات الخوارزمية</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>خيارات اختيار خوارزمية</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>سياسة اختيار الخوارزمية</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>محاولة تبادل المفاتيح عبر &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>خيارات التحكم بإعادة تبديل المفتاح</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>(غير محدود, 0 دقيقة)مفتاح الحد الاقصى للوقت بين اثنين</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>الحد الأقصى لل&amp;بيانات قبل إعادة تبديل المفتاح (0 بلا حد):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>تخطي المصادقة  (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>خيارات المصادقة</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>محاولة المصادقة باستخدام ال&amp;وكيل</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>الرد ب&amp;كلمة المرور على أول طلب</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>عرض المفتاح ال&amp;عام</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>ال&amp;شهادة المستخدمة مع المفتاح الخاص:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>الشهادة</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>شهادات OpenSSH (*-cert.pub);;كل الملفات (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>محاولة مصادقة &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>GSSAPI &amp;السماح بتفويض بيانات اعتماد</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>أخطأ</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>اكتشاف عيوب برمجية معروفة في مزودات SSH</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>يحسب مفاتيح H&amp;MAC لـ SSH بشكل خاطئ:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>يحسب مفاتيح ت&amp;شفير SSH بشكل خاطئ:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>يتطلب &amp;حشوًا في تواقيع SSH RSA:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>يسيء استخدام م&amp;عرف الجلسة في مصادقة SSH PK:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>يتعامل بشكل سيئ مع إعادة تبديل م&amp;فاتيح SSH:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>يتجاهل الحجم الأ&amp;قصى لحزمة SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>يتعطل عند رسائل ت&amp;جاهل SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>يتعطل عند طلبات SSH &apos;&amp;winadj&apos; من WinSCP</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>الملاحظات</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>امر بروكسي محلي:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>أوا&amp;مر Telnet</translation>
     </message>
 </context>
 <context>

@@ -3937,14 +3937,6 @@ Vị trí: %2</translation>
         <translation>Cài đặt nâng cao cho Site</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>Thư mục &amp;từ xa:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Duyệt...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Thư mục cục bộ</translation>
     </message>
@@ -3955,10 +3947,6 @@ Vị trí: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Thư mục</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> giây</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3981,40 +3969,20 @@ Vị trí: %2</translation>
         <translation>&amp;Loại proxy:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Tên &amp;host proxy:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Số &amp;cổng:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;Tên người dùng:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Mật khẩu:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Xem xét proxy cho địa chỉ &amp;cục bộ</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Proxy</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Thử xác thực qua &amp;Pageant hoặc ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Cho phép &amp;chuyển tiếp agent</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>&amp;Duyệt...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4029,16 +3997,656 @@ Vị trí: %2</translation>
         <translation>&amp;Tập tin khóa riêng:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>Xác thực SSH</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>Nhớ &amp;thư mục đã sử dụng lần trước</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Thử xác thực &apos;keyboard-&amp;interactive&apos;</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Trang</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Màu</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Môi trường</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Môi trường máy chủ</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>Ký tự &amp;kết thúc dòng (nếu máy chủ không xác định):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>Mã hóa &amp;UTF-8 cho tên tập tin:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Chênh lệch &amp;múi giờ:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>giờ</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Chênh lệch múi giờ (giờ)</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Chênh lệch múi giờ (phút)</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>phút</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Phát hiện &amp;tự động</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;Cắt số phiên bản VMS</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Giờ mùa hè</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Điều chỉnh thời gian từ xa theo quy &amp;ước địa phương</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Điều chỉnh thời gian từ xa theo &amp;DST</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>Đồng &amp;bộ duyệt thư mục</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>Thư mục &amp;từ xa:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Thư mục cục bộ không sử dụng với giao diện Explorer.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Tùy chọn đọc thư mục</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Lưu &amp;bộ nhớ thư mục từ xa đã truy cập</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Lưu &amp;thay đổi thư mục</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>Lưu &amp;vĩnh viễn</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Giải quyết &amp;liên kết biểu tượng</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>&amp;Theo liên kết biểu tượng đến thư mục</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Thùng rác</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>Lưu tập tin xóa vào &amp;thùng rác từ xa</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Lưu tập tin &amp;ghi đè vào thùng rác (chỉ SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>&amp;Thùng rác từ xa:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Mã hóa</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;Mã hóa tập tin</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Tùy chọn mã hóa</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>&amp;Khóa mã hóa:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;Hiển thị khóa</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Tạo khóa</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Tùy chọn giao thức</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Mặc định</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>Máy chủ S&amp;FTP:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Tự động</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>Phiên bản SFTP &amp;ưu tiên:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>&amp;Chuẩn hóa đường dẫn trên server</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Cho phép &amp;SCP dự phòng</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;Sử dụng đổi tên POSIX</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Phát hiện lỗi đã biết trên server SFTP</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>&amp;Đảo thứ tự các đối số lệnh link:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>&amp;Hiển thị sai dấu thời gian tập tin trước năm 1970:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Shell</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>S&amp;hell:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Tự động phát hiện</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>&amp;Biến mã trả về:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Liệt kê thư mục</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>Lệnh &amp;liệt kê:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Bỏ qua cảnh báo LS</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Cố gắng lấy dấu thời gian &amp;đầy đủ</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Tùy chọn khác</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Tra cứu &amp;nhóm người dùng</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Xóa &amp;bí danh</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Xóa &amp;biến quốc gia</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Sử dụng scp&amp;2 tương thích scp1</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>Lệnh &amp;sau đăng nhập:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Tài khoản:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>&amp;Hỗ trợ liệt kê tập tin ẩn:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Sử dụng lệnh &amp;MLSD để liệt kê thư mục</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>&amp;Buộc địa chỉ IP khi kết nối chế độ passive:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Sử dụng lệnh &amp;HOST để chọn host trên server</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Hiển thị tất cả phiên bản &amp;tập tin trên server VMS</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;Vùng mặc định:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Virtual Host</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Path</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>&amp;Kiểu URL:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>Người &amp;yêu cầu trả phí</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Xác thực</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;Mã phiên:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Role ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Chấp nhận ký tự đặc biệt không mã hóa trong tên tập tin</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>Cho phép chuyển hướng tới máy chủ &amp;khác</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Tối ưu &amp;kích thước bộ đệm</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Thời gian chờ</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>giây</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Giữ kết nối</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Tắt</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>Gửi gói SSH &amp;null</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Thực thi lệnh &amp;giả lập giao thức</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Giây &amp;giữa các lần giữ kết nối:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;Và đọc thêm thư mục hiện tại</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Phiên bản giao thức Internet</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>Tự &amp;động</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Cục bộ</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;Tự phát hiện</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Tên &amp;host proxy:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;Tên người dùng:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Cài đặt Proxy</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>mẫu</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Lệnh Telnet</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Lệnh proxy cục bộ</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>Xem xét kết nối &amp;host cục bộ qua proxy</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Không</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Có</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Tra cứu &amp;DNS tại đầu proxy:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Tunnel</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>&amp;Kết nối qua SSH tunnel</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Máy chủ tạo tunnel</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>&amp;Tên host:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Tùy chọn tunnel</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Tự chọn</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>Cổng tunnel &amp;cục bộ:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Tham số xác thực tunnel</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>Tùy chọn TLS</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Phiên bản TLS &amp;tối thiểu:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Phiên bản TLS &amp;tối đa:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Tái sử dụng ID phiên TLS cho kết nối dữ liệu</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Tham số xác thực</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>Tập tin &amp;chứng chỉ client:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Tập tin chứng chỉ client</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Tập tin chứng chỉ (*.pfx *.p12 *.pem *.crt *.key);;Tất cả tệp (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>Bật &amp;nén dữ liệu</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>Chính sách &amp;lựa chọn thuật toán mã hóa:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Chính sách lựa chọn thuật toán mã hóa</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Lên</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;Xuống</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Cho phép sử dụng DES cũ</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Trao đổi khóa</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Tùy chọn thuật toán trao đổi khóa</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>Chính sách &amp;lựa chọn thuật toán:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Chính sách lựa chọn thuật toán</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Thử &amp;trao đổi khóa GSSAPI</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Tùy chọn kiểm soát trao đổi lại khóa</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Tối đa &amp;phút trước khi trao đổi lại khóa (0 = không giới hạn):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Dữ liệu tối đa trước khi trao đổi lại khóa (0 = không giới hạn):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;Bỏ qua hoàn toàn xác thực</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Tùy chọn xác thực</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>&amp;Thử xác thực qua agent</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Đáp &amp;mật khẩu cho lời nhắc đầu tiên</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;Hiển thị Public Key</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Chứng chỉ &amp;kèm theo khóa riêng:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Chứng chỉ</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>Chứng chỉ OpenSSH (*-cert.pub);;Tất cả tệp (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Thử xác thực &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Cho phép ủy quyền &amp;credential GSSAPI</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Lỗi</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Phát hiện các lỗi đã biết trên SSH server</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Tính sai khóa SSH H&amp;MAC:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Tính sai khóa SSH &amp;mã hóa:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Yêu cầu &amp;padding cho chữ ký SSH RSA:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Sử dụng sai ID phiên trong xác thực SSH PK:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Xử lý trao đổi lại SSH &amp;key sai:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Bỏ qua kích thước gói tối đa SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Lỗi khi nhận tin &amp;ignore SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Lỗi khi nhận yêu cầu SSH &apos;&amp;winadj&apos; của WinSCP</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Ghi chú</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Lệnh proxy cục bộ:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Lệnh Telnet c&amp;ho proxy:</translation>
     </message>
 </context>
 <context>

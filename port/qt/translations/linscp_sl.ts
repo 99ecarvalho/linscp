@@ -3940,14 +3940,6 @@ Lokacija: %2</translation>
         <translation>Napredne nastavitve strani</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>O&amp;ddaljeni imenik:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>B&amp;rskaj...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Lokalni imenik</translation>
     </message>
@@ -3958,10 +3950,6 @@ Lokacija: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Imeniki</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> sekund</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3984,40 +3972,20 @@ Lokacija: %2</translation>
         <translation>&amp;Vrsta proxyja:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Gostiteljsko ime pro&amp;xyja:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Številka v&amp;rat:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;Uporabniško ime:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>G&amp;eslo:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Uporabi proxy za &amp;lokalne naslove</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Proxy</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Poskusi preverjanje pristnosti s &amp;Pageant ali ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Omogoči posr&amp;edovalnega agenta</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>B&amp;rskaj...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4032,16 +4000,656 @@ Lokacija: %2</translation>
         <translation>Datoteka privatnega &amp;ključa:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>Preverjanje pristnosti SSH</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>Zapomni si zadnje uporabljeni imenik</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Poskusi z &apos;keyboard-&amp;interactive&apos; preverjanjem pristnosti (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Strani</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Barva</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Okolje</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Strežniško okolje</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>Oznake zaključka vrstice (če niso podane od strežnika):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>&amp;UTF-8 kodiranje za imena datotek:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Časovna &amp;cona:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>ur</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Časovna cona (ure)</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Časovna cona (minute)</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>minut</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Samodejno &amp;odkrij</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;Trimanje številk verzij VMS</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Poletni čas</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Nastavi časov&amp;ni žig oddaljenih datotek po lokalnem času (Unix)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Nastavi časov&amp;ni žig oddaljenih datotek glede na poletni čas (Windows)</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>Sinhroniziraj &amp;brskanje</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>O&amp;ddaljeni imenik:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Lokalni imenik ni uporabljen v pogledu Raziskovalca.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Možnosti branja imenika</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Predpomnenje obiskanih oddaljenih imeniko&amp;v</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Predpomnenje sprememb imenika</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>Trajno &amp;predpomnenje</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Popravi simbolične povezave</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>&amp;Sledi simboličnim povezavam do direktorijev</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Koš</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>Brisane oddaljene datoteke zadrži v Košu</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>&amp;Ohrani prepisane oddaljene datoteke v Košu (samo v SFTP načinu)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>Oddaljeni koš:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Šifriranje</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;Šifriraj datoteke</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Možnosti šifriranja</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>Šifrirni &amp;ključ:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;Prikaži ključ</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Generiraj ključ</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Možnosti protokola</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Privzeto</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP stre&amp;žnik:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Samodejno</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>&amp;Predpostavi SFTP različico protokola:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>&amp;Kanoniziraj poti na strežniku</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Dovoli SCP &amp;nazaj</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;Uporabi POSIX preimenovanje</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Zaznavanje znanih napak v SFTP strežnikih</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>Zamenjaj argumenta simboličnih povezav:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>Napačno pojmovanje časovnih žigov datotek pred 1970:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Lupina</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>Lu&amp;pina:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Samozaznavanje</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>Vrni kodo sp&amp;remenljivko:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Izpis imenikov</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>Izpis u&amp;kazov:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Prezri LS opo&amp;zorila</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Poskusi pridobiti &amp;celoten časovni žig</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Ostale možnosti</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Poišči &amp;uporabniške skupine</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Počisti p&amp;sevdonime</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Počisti &amp;nacionalne oznake</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Uporabi scp&amp;2 z scp1 združljivostjo</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>Pošlji vpisne u&amp;kaze:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Račun:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>Podpora za izpis &amp;skritih datotek:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Uporabi &amp;MLSD ukaz za naštevanje direktorijev</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>Vs&amp;ili IP naslov za povezave v pasivnem načinu:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Uporabi &amp;HOST ukaz za izbiro strežnika</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Prikaži vse različice datotek na VMS strežnikih</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;Privzeta regija:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Virtualni gostitelj</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Pot</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>&amp;Slog URL:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>Zahteva &amp;plača</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Preverjanje pristnosti</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;Žeton seje:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Vloga ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Toleriraj nekodirane posebne znake v imenih datotek</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;Dovoli preusmeritve na druge gostitelje</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Optimiziraj velikost &amp;predpomnilnika povezave</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Prekinitve</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>sekund</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Ohranjanje povezave</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>Izključen&amp;o</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>Pošiljanje praz&amp;nih SSH paketkov</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Izvajanje &amp;butastih protokolnih ukazov</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Sekund me&amp;d signali ohranjanja povezave:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;In dodatno branje trenutnega direktorija</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Verzija internetnega protokola</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>Sa&amp;modejno</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Lokalno</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;Samodejno odkrij</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Gostiteljsko ime proxyja:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;Uporabniško ime:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Nastavitve proxyja</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>&amp;vzorci</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet ukaz</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Lokalni proxy ukaz</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>Zaobidi uporabo proxyja pri  lokal&amp;nih povezavah</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Ne</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Da</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Na koncu proxyja izvedi poizvedbo &amp;DNS imena:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Tunel</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>Poveži pre&amp;ko SSH tunela</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Nastavi povezovanje preko tunela</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>Ime &amp;gostitelja:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Možnosti tunela</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Samoizbiranje</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>Vrata &amp;lokalnega tunela:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Parametri avtentikacije tunela</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS možnosti</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Mi&amp;nimalna različica TLS:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Ma&amp;ksimalna različica TLS:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Ponovno uporabi ID seje TLS za podatkovne povezave</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Parametri preverjanja pristnosti</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>&amp;Datoteka odjemalskega certifikata:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Datoteka odjemalskega certifikata</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Datoteke certifikatov (*.pfx *.p12 *.pem *.crt *.key);;Vse datoteke (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>Omogoči &amp;stiskanje</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>&amp;Politika izbire šifrirnega algoritma:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Politika izbire šifrirnega algoritma</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Gor</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;Dol</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Omogoči podedovano uporabo  single-&amp;DES v SSH-2</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Izmenjava ključa</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Možnosti algoritma izmenjave ključa</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>Politika izbire algoritma:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Politika izbire algoritma</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Poskusi &amp;GSSAPI izmenjavo ključev</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>MOžnosti nadzora ponovne izmenjave</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Največ &amp;minut pred novo izmenjavo ključa (0 za neomejeno):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Največ &amp;podatkov pred novo izmenjavo ključa (0 za neomejeno):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>Zao&amp;bidi celotno preverjanje pristnosti (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Možnosti preverjanja pristnosti</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>&amp;Poskusi avtentikacijo z uporabo agenta</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Odgovori z geslo&amp;m na prvi poziv</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;Prikaži Javni Ključ</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Certifikat za &amp;uporabo z zasebnim ključem:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Certifikat</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>Certifikati OpenSSH (*-cert.pub);;Vse datoteke (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Poskusite &amp;GSSAPI avtentikacijo</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Dovolite GSSAPI &amp;delegacijo poverilnic</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Napake</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Zaznavanje znanih napak v SSH strežnikih</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Napačno izračunani SSH-2 H&amp;MAC ključi:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Napačno izračunani SSH-2 šifrirni ključi:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Zahtevano vstavljanje pri SSH2 RSA podpisih:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Zlorabe ID se&amp;je v SSH-2 PK overitvi:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Slaba ponovna izmenjava kjuča pri rokovanju z SSH-2:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Prezri največjo velikost SSH-2 paketkov:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Zahteva za SSH i&amp;gnoriranje sporočil:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Zahteva za SSH &apos;&amp;winadj&apos; v WinSCP</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Opomba</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Lo&amp;kalni proxy ukaz:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telnet &amp;ukaz:</translation>
     </message>
 </context>
 <context>

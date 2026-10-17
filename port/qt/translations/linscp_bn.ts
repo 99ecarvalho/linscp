@@ -3938,14 +3938,6 @@ Location: %2</source>
         <translation>উন্নত সাইট সেটিংস</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>রিমোট ডিরেক্টরি(&amp;D):</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>ব্রাউজ(&amp;B)...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>লোকাল ডিরেক্টরি</translation>
     </message>
@@ -3956,10 +3948,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>ডিরেক্টরিসমূহ</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> সেকেন্ড</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3982,40 +3970,20 @@ Location: %2</source>
         <translation>প্রক্সির ধরন(&amp;T):</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>প্রক্সি হোস্টের নাম(&amp;X):</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>পোর্ট নম্বর(&amp;R):</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>ব্যবহারকারীর নাম(&amp;U):</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>পাসওয়ার্ড(&amp;P):</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>লোকাল ঠিকানার জন্য প্রক্সি ব্যবহার করুন(&amp;L)</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>প্রক্সি</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Pageant বা ssh-agent ব্যবহার করে প্রমাণীকরণের চেষ্টা করুন(&amp;P)</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>এজেন্ট ফরওয়ার্ডিং অনুমোদন করুন(&amp;F)</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>ব্রাউজ(&amp;R)...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4030,16 +3998,656 @@ Location: %2</source>
         <translation>প্রাইভেট কী ফাইল(&amp;K):</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH প্রমাণীকরণ</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>সর্বশেষ ব্যবহৃত ডিরেক্টরি মনে রাখুন(&amp;M)</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>&apos;keyboard-interactive&apos; প্রমাণীকরণের চেষ্টা করুন(&amp;I)</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>পেজ</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>রং(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>পরিবেশ</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>সার্ভার পরিবেশ</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>লাইন-শেষের অক্ষর (সার্ভার নির্দেশ না করলে)(&amp;O):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>ফাইলের নামের জন্য UTF-8 এনকোডিং(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>সময় অঞ্চল অফসেট(&amp;Z):</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>ঘণ্টা</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>সময় অঞ্চল অফসেট ঘণ্টা</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>সময় অঞ্চল অফসেট মিনিট</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>মিনিট</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>স্বয়ংক্রিয়ভাবে সনাক্ত করুন(&amp;A)</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>VMS সংস্করণ নম্বর ছেঁটে ফেলুন(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>দিবালোক সংরক্ষণ সময়</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>রিমোট টাইমস্ট্যাম্প লোকাল রীতিতে সামঞ্জস্য করুন(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>রিমোট টাইমস্ট্যাম্প DST অনুযায়ী সামঞ্জস্য করুন(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>ব্রাউজিং সিঙ্ক্রোনাইজ করুন(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>রিমোট ডিরেক্টরি(&amp;R):</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>এক্সপ্লোরার ইন্টারফেসে লোকাল ডিরেক্টরি ব্যবহৃত হয় না।</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>ডিরেক্টরি পড়ার অপশন</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>পরিদর্শিত রিমোট ডিরেক্টরি ক্যাশে করুন(&amp;V)</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>ডিরেক্টরির পরিবর্তন ক্যাশে করুন(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>স্থায়ী ক্যাশে(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>সিম্বলিক লিংক নির্ণয় করুন(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>ডিরেক্টরির সিম্বলিক লিংক অনুসরণ করুন(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>রিসাইকেল বিন</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>মুছে ফেলা রিমোট ফাইল রিসাইকেল বিনে সংরক্ষণ করুন(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>ওভাররাইট করা রিমোট ফাইল রিসাইকেল বিনে সংরক্ষণ করুন (শুধুমাত্র SFTP)(&amp;O)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>রিমোট রিসাইকেল বিন(&amp;R):</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>এনক্রিপশন</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>ফাইল এনক্রিপ্ট করুন(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>এনক্রিপশন অপশন</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>এনক্রিপশন কী(&amp;K):</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>কী দেখান(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>কী তৈরি করুন(&amp;G)</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>প্রোটোকল অপশন</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>ডিফল্ট</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP সার্ভার(&amp;V):</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>স্বয়ংক্রিয়</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>পছন্দের SFTP প্রোটোকল সংস্করণ(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>সার্ভারে পথ মানক রূপে আনুন(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>SCP বিকল্প পথের অনুমতি দিন(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>POSIX নাম পরিবর্তন ব্যবহার করুন(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>SFTP সার্ভারে পরিচিত বাগ সনাক্তকরণ</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>লিংক কমান্ডের আর্গুমেন্টের ক্রম উল্টে দেয়(&amp;R):</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>1970-এর আগের ফাইল টাইমস্ট্যাম্প ভুল বোঝে(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>শেল</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>শেল(&amp;H):</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>স্বয়ংক্রিয় সনাক্তকরণ</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>রিটার্ন কোড ভেরিয়েবল(&amp;R):</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>ডিরেক্টরি তালিকা</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>তালিকা কমান্ড(&amp;C):</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>LS সতর্কবার্তা উপেক্ষা করুন(&amp;W)</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>সম্পূর্ণ টাইমস্ট্যাম্প পাওয়ার চেষ্টা করুন(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>অন্যান্য অপশন</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>ব্যবহারকারীর গ্রুপ অনুসন্ধান করুন(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>উপনাম মুছুন(&amp;L)</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>জাতীয় ভেরিয়েবল মুছুন(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>scp1 সামঞ্জস্যতা সহ scp2 ব্যবহার করুন(&amp;2)</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>লগইনের পরের কমান্ড(&amp;C):</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>অ্যাকাউন্ট(&amp;A):</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>লুকানো ফাইল তালিকাভুক্তির সমর্থন(&amp;S):</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>ডিরেক্টরি তালিকার জন্য MLSD কমান্ড ব্যবহার করুন(&amp;M)</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>প্যাসিভ মোড সংযোগের জন্য IP ঠিকানা বাধ্যতামূলক করুন(&amp;F):</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>সার্ভারে হোস্ট নির্বাচনের জন্য HOST কমান্ড ব্যবহার করুন(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>VMS সার্ভারে ফাইলের সব সংস্করণ দেখান(&amp;R)</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>ডিফল্ট অঞ্চল(&amp;D):</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>ভার্চুয়াল হোস্ট</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>পথ</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>URL শৈলী(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>অনুরোধকারী অর্থ প্রদান করে(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>প্রমাণীকরণ</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>সেশন টোকেন(&amp;S):</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>রোল ARN(&amp;R):</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>ফাইলের নামে এনকোড না করা বিশেষ অক্ষর সহ্য করুন(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>অন্য হোস্টে রিডাইরেক্টের অনুমতি দিন(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>সংযোগের বাফার আকার অপ্টিমাইজ করুন(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>সময়সীমা</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>সেকেন্ড</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>কিপঅ্যালাইভ</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>বন্ধ(&amp;O)</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>শূন্য SSH প্যাকেট পাঠানো(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>ডামি প্রোটোকল কমান্ড চালানো(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>কিপঅ্যালাইভের মধ্যে সেকেন্ড(&amp;B):</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>এবং অতিরিক্তভাবে বর্তমান ডিরেক্টরি পড়া(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>ইন্টারনেট প্রোটোকল সংস্করণ</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>স্বয়ংক্রিয়(&amp;U)</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>লোকাল</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>স্বয়ংক্রিয় সনাক্তকরণ(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>প্রক্সি হোস্টনাম(&amp;X):</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>ব্যবহারকারীর নাম(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>প্রক্সি সেটিংস</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>প্যাটার্ন</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet কমান্ড</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>লোকাল প্রক্সি কমান্ড</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>লোকাল হোস্ট সংযোগ প্রক্সির মাধ্যমে বিবেচনা করুন(&amp;N)</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>না</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>হ্যাঁ</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>প্রক্সি প্রান্তে DNS নাম অনুসন্ধান করুন(&amp;D):</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>টানেল</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>SSH টানেলের মাধ্যমে সংযোগ করুন(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>যে হোস্টে টানেল স্থাপন করা হবে</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>হোস্টনাম(&amp;H):</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>টানেল অপশন</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>স্বয়ংক্রিয় নির্বাচন</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>লোকাল টানেল পোর্ট(&amp;L):</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>টানেল প্রমাণীকরণের প্যারামিটার</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS অপশন</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>সর্বনিম্ন TLS সংস্করণ(&amp;N):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>সর্বোচ্চ TLS সংস্করণ(&amp;X):</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>ডেটা সংযোগের জন্য TLS সেশন ID পুনঃব্যবহার করুন(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>প্রমাণীকরণের প্যারামিটার</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>ক্লায়েন্ট সার্টিফিকেট ফাইল(&amp;C):</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>ক্লায়েন্ট সার্টিফিকেট ফাইল</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>সার্টিফিকেট ফাইল (*.pfx *.p12 *.pem *.crt *.key);;সব ফাইল (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>কম্প্রেশন সক্রিয় করুন(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>এনক্রিপশন সাইফার নির্বাচন নীতি(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>এনক্রিপশন সাইফার নির্বাচন নীতি</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>উপরে(&amp;U)</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>নিচে(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>একক-DES-এর পুরোনো ব্যবহার সক্রিয় করুন(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>কী বিনিময়</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>কী বিনিময় অ্যালগরিদম অপশন</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>অ্যালগরিদম নির্বাচন নীতি(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>অ্যালগরিদম নির্বাচন নীতি</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>GSSAPI কী বিনিময়ের চেষ্টা করুন(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>কী পুনর্বিনিময় নিয়ন্ত্রণের অপশন</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>পুনঃকী-র আগে সর্বোচ্চ মিনিট (0 = কোনো সীমা নেই)(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>পুনঃকী-র আগে সর্বোচ্চ ডেটা (0 = কোনো সীমা নেই)(&amp;X):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>প্রমাণীকরণ সম্পূর্ণ এড়িয়ে যান(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>প্রমাণীকরণ অপশন</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>এজেন্ট ব্যবহার করে প্রমাণীকরণের চেষ্টা করুন(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>প্রথম প্রম্পটে পাসওয়ার্ড দিয়ে উত্তর দিন(&amp;W)</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>পাবলিক কী দেখান(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>প্রাইভেট কী-এর সাথে ব্যবহারের সার্টিফিকেট(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>সার্টিফিকেট</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH সার্টিফিকেট (*-cert.pub);;সব ফাইল (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>GSSAPI প্রমাণীকরণের চেষ্টা করুন(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>GSSAPI ক্রেডেনশিয়াল অর্পণের অনুমতি দিন(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>বাগ</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>SSH সার্ভারে পরিচিত বাগ সনাক্তকরণ</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>SSH HMAC কী ভুল গণনা করে(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>SSH এনক্রিপশন কী ভুল গণনা করে(&amp;E):</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>SSH RSA স্বাক্ষরে প্যাডিং প্রয়োজন(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>SSH PK প্রমাণীকরণে সেশন ID-র অপব্যবহার করে(&amp;N):</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>SSH কী পুনর্বিনিময় ঠিকমতো সামলায় না(&amp;K):</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>SSH সর্বোচ্চ প্যাকেট আকার উপেক্ষা করে(&amp;X):</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>SSH ignore বার্তায় আটকে যায়(&amp;G):</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>WinSCP-এর SSH &apos;winadj&apos; অনুরোধে আটকে যায়(&amp;W)</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>নোট</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>লোকাল প্রক্সি কমান্ড(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telnet কমান্ড(&amp;M):</translation>
     </message>
 </context>
 <context>

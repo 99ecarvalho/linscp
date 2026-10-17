@@ -3938,14 +3938,6 @@ Plassering: %2</translation>
         <translation>Avanserte innstillinger for nettsted</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>Ekstern &amp;katalog:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Se etter...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Lokal katalog</translation>
     </message>
@@ -3956,10 +3948,6 @@ Plassering: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Kataloger</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> sekunder</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3982,40 +3970,20 @@ Plassering: %2</translation>
         <translation>Proxy &amp;type</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Pro&amp;xy vertsnavn:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Po&amp;rt nummer:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;Brukernavn:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Passord:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Spør proxy for &amp;lokale adresser</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Proxy</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Forsøk autentisering ved å benytte &amp;Pageant eller ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Tillat agent &amp;fremsending</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>B&amp;la gjennom...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4030,16 +3998,656 @@ Plassering: %2</translation>
         <translation>Privat &amp;nøkkel fil:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH-autentisering</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>Hu&amp;sk sist brukte katalog</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Forsøk &apos;tastatur-&amp;interaktiv&apos; autentisering (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Sider</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Farge</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Miljø</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Tjener miljø</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>&amp;End-of-line tegn (hvis dette ikke spesifisert av server)</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>&amp;UTF-8 koding for filnavn:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Tids&amp;sone avvik</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>timer</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Tidssoneavvik, timer</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Tidssoneavvik, minutter</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>minutter</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Oppdag &amp;automatisk</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;Trim VMS versjonsnumre</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Sommertid</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Juster eksternt tidsstempel til lokale ko&amp;nvensjoner (Unix)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Juster eksternt tidsstempel med &amp;DST (Windows)</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>Syn&amp;kroniser browsing</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;Ekstern katalog:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Lokal katalog benyttes ikke med Utforsker grensesnitt.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Valg for katalogvisning</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Lagre &amp;besøkte ekstene kataloger</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Lagre &amp;katalog endringer</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>&amp;Permanent mellomlager</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Løs opp symbolske lenker</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>&amp;Følg symbolske lenker til kataloger</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Søppelbøtte</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;Ta vare på eksternt slettede filer i søppelbøtta</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Ta vare på &amp;overskrevne eksterne filer i søppelbøtta (kun fo SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>&amp;Ekstern søppelbøtte</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Kryptering</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;Krypter filer</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Krypterings innstillinger</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>Krypterings-&amp;nøkkel:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;Vis nøkkel</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Generer nøkkel</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Alternativ for protokoll</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Standard</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP &amp;tjener:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Auto</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>&amp;Foretrukket SFTP protokoll versjon:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>&amp;Kanoniser stier på serveren</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Tillat SCP &amp;reserve</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>Br&amp;uk POSIX omdøp</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Oppdag kjente feil på SFTP tjenere</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>&amp;Reverserer rekkefølgen på symlink kommando argumenter:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>&amp;Reverserer rekkefølgen på symlink kommando argumenter:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Skall</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>S&amp;kall</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Automatisk søk</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>&amp;Returkode variabel:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Katalogliste</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>Liste &amp;kommando</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Overse LS &amp;advarsler</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Forsøk å hente &amp;komplett tidsstempel</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Andre alternativer</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Slå opp br&amp;ukergrupper</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Slett a&amp;liaser</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Slett &amp;nasjonale variable</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Bruk scp&amp;2 med scp1 kompatibilitet</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>Pre logginn &amp;kommandoer:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Konto:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>&amp;Støtte for visning av skjulte filer:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Bruk &amp;MSLD kommando for kataloglisting</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>&amp;Tving IP adresse for passiv-modus tilkoblinger</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Bruk &amp;HOST kommando for å velge vert på tjeneren</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Vis alle fil&amp;revisjoner på VMS-servere</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;Standard region:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Virtuell vert</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Bane</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>URL stil:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>Forespørrer &amp;betaler</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Autentisering</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;Økt-token:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Rolle ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Tillat ikke-kodede spesialtegn i filnavn</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;Tillat omdirigeringer til andre verter</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Optimaliser størrelse på tilkoblings&amp;buffer</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Tidsavbrudd</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>sekunder</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Holde i live</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Av</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>Sending av &amp;null SSH pakker</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Utfører &amp;test protokoll komandoer</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Sekunder &amp;mellom hold i live:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;Og leser i tillegg gjeldende katalog</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Internet protokoll versjon</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>A&amp;utomatisk</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Lokal</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;Autooppdag</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Pro&amp;xy værtsnavn:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;Bruker navn:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Proxy innstillinger</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>mønster</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet kommando</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Lokal proxy kommando</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>Vu&amp;rder å kjøre proxy på lokal vert</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Nei</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Ja</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Gjør &amp;DNS navn oppslag ved proxy avbrudd:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Tunnel</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>&amp;Koble til igjennom SSH tunnel</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Vert du ønsker å sette opp tunnel på</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>&amp;Vertsnavn</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Tunnel innstillinger</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Velg automatisk</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>&amp;Lokal tunnel port:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Parametre for tunnel-autentisering</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS alternativer</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Mi&amp;nimum TLS versjon:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Ma&amp;ksimum TLS versjon:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Gjenbruk TLS-økt-ID for datatilkoblinger</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Autentiseringsparametere</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>Fil med klientsertifikat:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Fil med klientsertifikat</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Sertifikatfiler (*.pfx *.p12 *.pem *.crt *.key);;Alle filer (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>Slå på &amp;komprimering</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>Krypterings kodenøkkel innstillings &amp;grunnregel</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Grunnregel for valg av krypteringskoder</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Opp</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;Ned</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Slå på legal bruk av enkel_&amp;DES i SSH-2</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Nøkkel utveksling</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Nøkkel utvekslings algoritme innstillinger</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>Grunnregel for algoritme &amp;valg:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Grunnregel for algoritmevalg</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Forsøk &amp;GSSAPI nøkkel-utveksling</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Innstillineg for kontoll av ny-utveksling av nøkkel</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Maks &amp;minutter før ny-utveksling av nøkkel (0 for ingen grense):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Maks &amp;data før ny-utveksling av nøkkel (0 for ingen grense):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;Omgå autentisering fullstendig (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Autentiserings innstillinger</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>Forsøk autentisering med &amp;agent</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Responder med pass&amp;ord for første påminnelse</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;Vis offentlig nøkkel</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Sertifikat som skal br&amp;ukes med den private nøkkelen:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Sertifikat</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH-sertifikater (*-cert.pub);;Alle filer (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Forsøk &amp;GSSAPI/SSPI autentisering (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Tillat delegering av GSSAPI akkreditiver</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Bugs</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Oppdagelse av kjente feil i SSH tjenere</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Feilberegner SSH-2 H&amp;MAC nøkler:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Feilberegner SSH-2 &amp;krypteringsnøkler:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Krever &amp;padding på SSH-2 RSA signaturer:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Misbruker sesjo&amp;ns-ID i SSH-2 PK auth:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Behandler SSH-2 nøkkel re-utveksling dårlig:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Ignorerer SSH-2 ma&amp;ksimum pakkestørrelse:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Reagerer feil på SSH-2 &amp;ignore meldinger:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Reagerer feil på WinSCP&apos;s SSH-2 &apos;winadj&apos; forespørsler</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Merknad</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Lokal proxy ko&amp;mmando:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telnet ko&amp;mmando:</translation>
     </message>
 </context>
 <context>

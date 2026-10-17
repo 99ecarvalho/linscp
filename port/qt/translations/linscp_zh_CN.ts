@@ -3937,14 +3937,6 @@ Location: %2</source>
         <translation>高级站点设置</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>远程目录(&amp;D)：</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>浏览(&amp;R)</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>本地目录</translation>
     </message>
@@ -3955,10 +3947,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>目录</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> 秒</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3981,40 +3969,20 @@ Location: %2</source>
         <translation>代理类型(&amp;T)：</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>代理服务器名(&amp;X)：</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>端口号(&amp;R)</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>用户名(&amp;U)：</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>密码(&amp;P)</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>考虑代理本地主机连接(&amp;L)</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>代理</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>尝试使用Pageant或ssh-agent进行验证(&amp;P)</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>允许代理转发</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>浏览(&amp;R)...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4029,16 +3997,656 @@ Location: %2</source>
         <translation>密钥文件(&amp;K)</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH验证</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>记住上次使用的目录(&amp;M)</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>尝试&apos;键盘交互&apos;身份验证(&amp;I)</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>页面</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>颜色(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>环境</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>服务器环境</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>EOL(end-of-line)字符(如果服务器未指定时使用)(&amp;E)：</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>文件名UTF-8编码(&amp;U)：</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>时区偏移(&amp;Z)：</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>小时</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>时区偏移（小时）</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>时区偏移（分钟）</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>分钟</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>自动检测(&amp;A)</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>截取VMS版本号</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>夏令时</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>根据本地调整远端时间戳(Unix)(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>根据DST调整远端时间戳(Windows)(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>同步浏览(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>远程目录(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>在类似Explorer的界面中不使用本地目录。</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>目录读取选项</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>缓存访问过的远程目录(&amp;V)</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>缓存目录变化(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>永久缓存(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>解析符号链接(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>进入符号链接指向的目录(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>回收站</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>在远程回收站中保留远程删除的文件(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>在远程回收站中保留覆盖的远程文件，只对SFTP有效(&amp;O)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>远程回收站(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>加密</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>加密文件(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>加密选项</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>加密密钥(&amp;K)：</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>显示密钥(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>生成密钥(&amp;G)</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>协议选项</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>默认</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP服务器(&amp;V)：</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>自动</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>优先使用SFTP协议版本</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>标准化服务器上的路径(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>允许SCP反馈(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>使用POSIX重命名</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>在SFTP服务器上检测已知漏洞</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>逆转链接命令参数的顺序(&amp;R)：</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>曲解1970年前的文件时间戳</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Shell</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>Shell(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>自动侦测</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>返回code变量</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>目录监听</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>Listing命令(&amp;C)：</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>忽略LS警告(&amp;W)</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>尝试获取完整的时间戳(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>其他选项</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>查找用户组(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>清除别名(&amp;L)</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>清除国家变量(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>使用带SCP1兼容的SCP2(&amp;2)。</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>登录后执行命令(&amp;C)：</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>账户(&amp;A)：</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>支持显示隐藏文件(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>使用MLSD命令罗列目录(&amp;M)</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>使用被动方式连接时强制使用原IP(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>使用HOST命令在服务器上选择主机(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>显示VMS服务器上的所有版本(&amp;R)</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>默认区域(&amp;D)：</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>虚拟主机</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>路径</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>URL风格(&amp;U)：</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>请求者付费(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>验证</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>会话令牌(&amp;S)：</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>角色 ARN（&amp;R）：</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>文件名中允许未编码的特殊字符(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>允许重定向到其他主机（&amp;A）</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>优化连接缓冲大小(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>超时</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>秒</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Keepalives</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>关闭(&amp;O)</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>发送空SSH包(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>执行哑命令(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Keepalives的间隔秒数(&amp;B)</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>额外读取当前目录(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>IP协议版本</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>自动(&amp;U)</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>本地</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>自动检测(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>代理服务器名(&amp;X)</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>用户名(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>代理选项</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>样式(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet命令</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>本地代理命令</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>考虑代理本地主机连接(&amp;N)</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>否</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>是</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>在代理结束时执行DNS域名查找(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>隧道</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>通过SSH隧道进行连接(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>使用隧道的主机</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>主机名(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>隧道选项</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>自动选择</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>本地隧道端口(&amp;L)</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>隧道身份验证参数</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS选项</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>最低TLS版本(&amp;N)：</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>最高TLS版本(&amp;X)：</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>数据连接复用TLS会话ID(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>验证参数</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>客户端证书文件(&amp;C)：</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>客户端证书文件</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>证书文件 (*.pfx *.p12 *.pem *.crt *.key);;所有文件 (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>开启压缩功能(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>加密密码选择策略(&amp;P)：</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>加密密码选择策略</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>上移(&amp;U)</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>下移(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>开启SSH2中的单DES(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>密钥交换</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>交换算法选项</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>算法选择策略(&amp;P)：</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>算法选择策略</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>尝试GSSAPI密钥交换(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>密钥再次交换控制选项</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>密钥再次交换间隔最大分钟数，0代表无限制(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>密钥再次交换间隔数据量，0代表无限制(&amp;X)</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>完全绕过身份验证(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>验证选项</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>尝试使用代理进行认证（&amp;A）</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>在首次提示中对密码做出响应(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>显示公钥(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>使用私钥的证书(&amp;U)：</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>证书</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH证书 (*-cert.pub);;所有文件 (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>尝试GSSAPI身份验证(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>允许GSSAPI凭证代理(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>漏洞检测</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>在SSH服务器上检测已知漏洞</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>SSH2 HMAC键值计算错误(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>SSH2密钥计算错误(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>要求填充SSH2 RSA签名(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>在PK验证时滥用会话ID(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>密钥再次交换处理不当(&amp;K)</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>忽略SSH-2最大包大小(&amp;X)</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>SSH-2忽略消息时阻塞(&amp;2)</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>收到WinSCP的SSH-2 &apos;winadj&apos;请求时阻塞</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>提示</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>本地代理命令(&amp;M)：</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telnet命令(&amp;M)</translation>
     </message>
 </context>
 <context>

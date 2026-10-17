@@ -3939,14 +3939,6 @@ Vieta: %2</translation>
         <translation>Išplėstinės tinklavietės parinktys</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>Nuotolinis &amp;katalogas:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Naršyti...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Vietinis katalogas</translation>
     </message>
@@ -3957,10 +3949,6 @@ Vieta: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Katalogai</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> sek.</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3983,40 +3971,20 @@ Vieta: %2</translation>
         <translation>&amp;Tipas:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Įgaliotojo &amp;serverio pavadinimas:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Pr&amp;ievadas:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;Vartotojo vardas:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Slaptažodis:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>La&amp;ikyti įgaliotojo vietinio serverio ryšį</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Įgaliotasis serveris</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Mėginti autentifikuotis naudojant &amp;Pageant arba ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Leisti agento &amp;perdavimą</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>N&amp;aršyti...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4031,16 +3999,656 @@ Vieta: %2</translation>
         <translation>Privataus &amp;rakto failas:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH autentifikavimas</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>Pr&amp;isiminti paskutinį kartą naudotą katalogą.</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Mėginti &apos;interaktyvios-klaviatūros&apos; atpažinimą</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Puslapiai</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Spalva</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Aplinka</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Serverio aplinka</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>&amp;Eilutės pabaigos simboliai (jei nenurodyta serverio):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>&amp;UTF-8 koduotė failų pavadinimams:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Laiko &amp;zonos poslinkis:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>valandos</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Laiko zonos poslinkis, valandos</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Laiko zonos poslinkis, minutės</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>minutės</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Aptikti &amp;automatiškai</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;Pašalinti VMS versijų numerius</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Vasaros laikas</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Pritaikyti nuotolinę laiko žymą vietinėms konvencijoms</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Pritaikyti nuotolinę laiko žymą su &amp;DST</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>&amp;Sinchronizuoti naršymą</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;Nuotolinis katalogas:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Vietinis katalogas yra nenaudojamas su Explorer sąsajos aplinka.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Katalogo skaitymo parinktys</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Laikyti &amp;aplankytus nuotolinius katalogus</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Laikyti &amp;katalogo pakeitimus</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>&amp;Nuolatinis laikymas</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Nustatyti virtualiuosius ka&amp;talogus</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>&amp;Sekti simbolines nuorodas į katalogus</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Šiukšlinė</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>Išlaikyti pašalintus nuotolinius failus šiukšlinėje</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Išlaikytid &amp;perrašytus nuotolinius failus šiukšlinėje (tik SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>&amp;Nuotolinė šiukšlinė:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Šifravimas</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;Šifruoti failus</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Užšifravimo parinktys</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>Šifravimo &amp;raktas:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>Rodyti raktą</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>Generuoti raktą</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Protokolo parinktys</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Numatytasis</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP ser&amp;veris:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Auto</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>&amp;Pageidautina SFTP protokolo versija:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>&amp;Kanonizuoti kelius serveryje</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Leisti SCP &amp;surogatą</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;Naudoti „POSIX“ pervadinimą</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Žinomų SFTP serverių klaidų aptikimas</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>&amp;Saugo symlink tvarką komandos argumentuose:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>&amp;Klaidingai supranta failo žymą prieš 1970:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Apvalkalas</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>A&amp;pvalkalas:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Aptikti autom.</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>Grįžties kodo kintamasis:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Katalogo sąrašas</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>Sąrašo &amp;komanda:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Ignoruoti LS &amp;įspėjimus</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Mėginti gauti &amp;visą laiko žymą</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Kitos parinktys</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Ieškoti &amp;vartotojo grupių</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Išvalyti sla&amp;pyvardžius</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Išvalyti &amp;nacionalinius kintamuosius</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Naudoti scp&amp;2-scp1 suderinamumą</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>Siųsti prisijungimo &amp;komandas:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Paskyra:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>Sąrašo &amp;palaikymas paslėptiems failams:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Naudoti &amp;MLSD komandą katalogo sąrašui</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>&amp;Primesti IP adresą pasyvios veiksenos ryšiui</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Naudoti &amp;HOST komandą, kad pasirinktumėte kompiuterį serveryje</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Rodyti visas failų &amp;versijas VMS serveriuose</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;Numatytasis regionas:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Virtualus serveris</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Kelias</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>&amp;URL stilius:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>&amp;Moka užsakovas</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Atpažinimas</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;Seanso raktas:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>ARN &amp;rolė:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Toleruoti nešifruotus specialiuosius simbolius failų pavadinimuose</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;Leisti nukreipimus į kitus serverius</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Optimizuoti ryšio &amp;buferio dydį</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Laukimo laikai</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>sekundės</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Aktyvus prisijungimas</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Atjungta</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>&amp;Nulinių SSH paketų siuntimas</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Vykdomos &amp;fiktyvios protokolo komandos</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Sekundės &amp;tarp aktyvių prisijungimų:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;Ir papildomai nuskaitant dabartinį katalogą</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Interneto protokolo versija</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>A&amp;uto</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Vietinis</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;Automatiškai aptikti</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Įgaliotojo serverio pavadinimas:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;Vartotojas:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Įgaliotojo serverio nuostatos</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>šablonai</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telneto komanda</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Vietinė įgaliotojo serverio komanda</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>La&amp;ikyti įgaliotojo vietinio serverio ryšį</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Ne</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Taip</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Atlikti &amp;DNS vardų paiešką:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>SSH Tunelis</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>&amp;Prisijungti per SSH tunelį</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>SSH Tunelis</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>&amp;Serveris:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Tunelio parinktys</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Automatinis žymėjimas</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>&amp;Vietinis tunelio prievadas:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Tunelio atpažinimo parametrai</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS nuostatos</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Ma&amp;žiausia TLS versija:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Di&amp;džiausia TLS versija:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Pakartotinai naudoti TLS seanso ID duomenų ryšiams</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Atpažinimo parametrai</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>&amp;Kliento liudijimo failas:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Kliento liudijimo failas</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Liudijimo failai (*.pfx *.p12 *.pem *.crt *.key);;Visi failai (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>Naudoti &amp;glaudinimą</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>Užšifravimo algoritmo &amp;pasirinkimas:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Užšifravimo algoritmo pasirinkimas</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Aukštyn</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;Žemyn</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Įgalinti seną single-&amp;DES SSH-2 naudojimą</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Rakto mainai</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Rakto mainų algoritmo parinktys</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>Užšifravimo algoritmo &amp;pasirinkimas:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Algoritmo pasirinkimas</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Bandyti &amp;GSSAPI raktų mainus</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Rakto atsimainymo parinktys</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Maksimalus &amp;laikas iki atsimainymo (0 - be limito):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Mak&amp;simalus duomenų kiekis iki atsimainymo (0 - be limito):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;Apeiti atpažinimą išimtinai</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Atpažinimo parinktys</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>Mėginti &amp;autentifikuotis naudojant agentą</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Atsakyti su slapta&amp;žodžiu pirmame raginime</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;Rodyti viešąjį raktą</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Sertifikatas, skirtas &amp;naudojimui su privačiu raktu:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Sertifikatas</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH sertifikatai (*-cert.pub);;Visi failai (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Mėginti &amp;GSSAPI atpažinimą (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Leisti GSSAPI &amp;credential delegation</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Klaidos</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Žinomų klaidų aptikimas SSH serveriuose</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Neteisingai apskaičiuoti SSH-2 H&amp;MAC raktai:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Neteisingai apskaičiuoti SSH-2 &amp;užšifravimo raktai:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Reikalauja užpildymo SSH-2 RSA parašuose:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Netinkamai naudoja seanso ID SSH-2 PK atpažinime:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Apdoroja SSH-2 &amp;raktą blogame atsimainyme:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Ignoruoja SSH-2 &amp;didžiausią paketo dydį:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Springimai SSH-&amp;2 ignoravimo žinutėse:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Springimai WinSCP&apos;s SSH-&amp;2 &apos;winadj&apos; užklausose</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Pastaba</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Vietinė įgaliotojo serverio ko&amp;manda:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telneto ko&amp;manda:</translation>
     </message>
 </context>
 <context>

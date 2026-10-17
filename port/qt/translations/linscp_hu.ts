@@ -3937,14 +3937,6 @@ Hely: %2</translation>
         <translation>Haladó webhely-beállítások</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>Távoli &amp;mappa:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Tallózás...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Helyi mappa</translation>
     </message>
@@ -3955,10 +3947,6 @@ Hely: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Mappák</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> másodperc</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3981,40 +3969,20 @@ Hely: %2</translation>
         <translation>Proxy &amp;típusa:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Proxy &amp;kiszolgálónév:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>&amp;Port száma:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;Felhasználónév:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Jelszó:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Proxy használata &amp;helyi címekhez is</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Proxy</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Hitelesítés megkísérlése &amp;Pageanttal vagy ssh-agenttel</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>&amp;Ügynöktovábbítás engedélyezése</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>&amp;Tallózás...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4029,16 +3997,656 @@ Hely: %2</translation>
         <translation>Egyéni &amp;kulcsfájl</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH hitelesítés</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>Emlékezzen a legutóbbi használt mappára</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>„Billentyűzet-&amp;interaktív” hitelesítés kísérlete (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Lapok</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>S&amp;zín</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Környezet</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Kiszolgáló környezete</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>Sorvég karakterek (ha a kiszolgáló nem jelzi)</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>Fájlnevek UTF-8 kódolásban</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Időzóna eltolódás:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>óra</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Időzóna eltolódás (óra)</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Időzóna eltolódás (perc)</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>perc</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Automatikus érzékelés</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;VMS verziószám levágása</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Nyári időszámítás</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Módosítsa a távoli időt a helyi időzónára (Unix)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>&amp;Módosítsa az időt az időszámításnak megfelelően (Windows)</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>Tallózás szinkronizálása</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>Táv&amp;oli mappa</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Intéző felület esetén a helyi mappát nem használjuk.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Mappaolvasási beállítások</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Megnyitott &amp;távoli mappák gyorsítótárazása</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Mappa&amp;módosítások gyorsítótárazása</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>Á&amp;llandó gyorsítótárazás</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Oldja fel a szimbolikus li&amp;nkeket</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>Szimbolikus linkek &amp;követése a mappájába</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Lomtár</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>Távoli törölt fájlok elhelyezése a lomtárban</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Felülírt távoli fájlok elhelyezése a lomtárban (csak SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>Távoli lomtá&amp;r:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Titkosítás</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>Fájlok &amp;titkosítása</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Titkosítási beállítások</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>Titkosító &amp;kulcs:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>Kulcs meg&amp;jelenítése</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>Kulcs &amp;generálása</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Protokoll beállítások</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Alapértelmezett</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP &amp;kiszolgáló:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Auto</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>&amp;Előnyben részesített SFTP protokoll verzió</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>Az elérési útvonalak &amp;kanonizálása a szerveren</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>&amp;SCP-re átváltás engedélyezése</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>POSIX átnevezés &amp;használata</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>SFTP kiszolgálóban az ismert hibák felderítése</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>Fordított sorrendű a symlink paraméterezése</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>1970 előtti időbélyegek &amp;félreértelmezése</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Parancsértelmező</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>Parancs&amp;értelmező</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>autofelismerés</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>Visszatérési érték változó</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Mappalistázás</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>Listázó parancs:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>&amp;Nincs LS figyelmeztetés</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Teljes időbélyeg kérése</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Egyéb beállítások</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>&amp;Csoportok kikeresése</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Á&amp;lnevek törlése</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>&amp;Nemzeti változók törlése</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>SCP&amp;2 használata SCP1 kompat.</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>Bejelentkezés utáni parancsok:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>F&amp;iók:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>Listázza a &amp;rejtett fájlokat:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>&amp;MLSD parancs használata mappák listázásához</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>Megadott IP cím használata &amp;passzív FTPhez</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>&amp;HOST parancs használata a kiszolgáló kiválasztására a szerveren</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Az összes fájl&amp;revízió megjelenítése VMS szervereken</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>Alapértelmezett &amp;régió:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Virtuális kiszolgáló</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Útvonal</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>&amp;URL stílus:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>&amp;Fizetések kérelmezése</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Hitelesítés</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;Munkamenet token:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>ARN &amp;szerepkör:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>Nemkódolt speciális karakterek &amp;tolerálása fájlnevekben</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>További kiszolgálókra átirányítás &amp;engedélyezése</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Optimalizálja a csatlakozási puffer méretét</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Időtúllépés</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>másodperc</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Kapcsolatfenntartás</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Ki</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>&amp;Üres SSH csomag küldése</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>&amp;Kamu protokollparancsok futtatása</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Kapcsolatfenntartások közötti &amp;másodpercek</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>É&amp;s emellett az aktuális könyvtár olvasása</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Internet Protokoll verzió</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>A&amp;utomatikus</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Helyi</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;Autofelismerés</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Proxy &amp;kiszolgálónév:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;Felhasználónév:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Proxy beállítások</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>m&amp;inták</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet parancs</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Helyi proxy utasítás</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>Helyi kapcsolatok tűzfalas védelmének feltételezése</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Nem</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Igen</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>&amp;DNS névkeresés a proxyn keresztül:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Csatorna</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>Csatlakozás SSH csatornán keresztül</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Csatorna másik végén lévő kiszolgáló</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>Kiszolgáló neve:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Csatorna beállítások</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Autokijelölés</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>Helyi csatorna port:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Csatorna hitelesítési paraméterek</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS beállítások</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Mi&amp;nimális TLS verzió:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Ma&amp;ximális TLS verzió:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>A TLS munkamenet-azonosító újbóli felhasználása az adatkapcsolatokhoz</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Hitelesítés paraméterei</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>&amp;Kliens tanúsítványfájl:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Kliens tanúsítványfájl</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Tanúsítványfájlok (*.pfx *.p12 *.pem *.crt *.key);;Összes fájl (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>Tömörítés &amp;engedélyezése</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>Titkosítási mód kiválasztási sorre&amp;ndje:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Titkosítási mód kiválasztási sorrendje</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Fel</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;Le</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Single-&amp;DES öröklés engedélyezése SSH-2-ben</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Kulcscsere</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Kulcscsere-algoritmus beállításai</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>Algoritmus ki&amp;választás sorrendje:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Algoritmus kiválasztás sorrendje</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Kísérlet a &amp;GSSAPI kulcs cseréjére</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Kulcs újracserét vezérlő beállítások</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Kulcs újracsere időköz percekben (0: nincs korlát)</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Kulcs újracsere adatforgalom köz (0: nincs korlát)</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>Hitelesítés teljes kihagyása (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Hitelesítési beállítások</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>&amp;Hitelesítési kísérlet ügynök használatával</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Válaszoljon &amp;jelszóval a legelső promptra</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>Nyilvános kulcs meg&amp;jelenítése</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>A privát kulccsal &amp;használható tanúsítvány:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Tanúsítvány</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH tanúsítványok (*-cert.pub);;Összes fájl (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Hitelesítés &amp;GSSAPI/SSPI segítségével (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Engedélyezi a GSSAPI alapú azonosítást</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Hibák</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Az ismert hibák detektálása az SSH kiszolgálókon</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>SSH-2 H&amp;MAC kulcsok elszámolása</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>SSH2 titkosítókulcsainak &amp;elszámolása</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>SSH-2 RSA aláírások &amp;felduzzasztása</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Munkamenet ID téves használata PK hitelesítéskor</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>A &amp;kulcs újracserét rosszul kezeli le</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Figyelmen kívül hagyja az SSH-2 maximum csomag méretet:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>SSH-2 ignoráló üzenetek elfojtása:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>WinSCP&apos;s SSH-2 &apos;winadj&apos; kérésekre elfojtása</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Megjegyzés</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Helyi proxy utasítás:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telnet &amp;parancs:</translation>
     </message>
 </context>
 <context>

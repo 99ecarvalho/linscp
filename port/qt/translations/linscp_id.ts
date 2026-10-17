@@ -3937,14 +3937,6 @@ Lokasi: %2</translation>
         <translation>Pengaturan Situs Tingkat Lanjut</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>Direktori &amp;remote:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>J&amp;elajah</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Direktori lokal</translation>
     </message>
@@ -3955,10 +3947,6 @@ Lokasi: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Direktori</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> detik</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3981,40 +3969,20 @@ Lokasi: %2</translation>
         <translation>&amp;Tipe proksi:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Nama host pro&amp;ksi:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Nomor Po&amp;rt</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>Nama &amp;pengguna:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Password</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Konsultasikan proksi untuk alamat &amp;lokal</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Proxy</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Coba otentikasi menggunakan &amp;Pageant atau ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Mengijinkan agent &amp;forwarding</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>&amp;Jelajah...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4029,16 +3997,656 @@ Lokasi: %2</translation>
         <translation>File Private &amp;Key</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>Otentikasi SSH</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>In&amp;gat direktori treakhir digunakan</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Mencoba &apos;keyboard-&amp;interactive&apos; authentication (SSH2)</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Halaman</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Warna</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Lingkungan</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Lingkungan Server</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>Karakter akhir-baris (jika tidak ditentukan oleh server):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>Enkoding &amp;UTF-8 untuk nama berkas:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Ofset &amp;zona waktu</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>jam</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Ofset zona waktu (jam)</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Ofset zona waktu (menit)</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>menit</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Deteksi otom&amp;atis</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;Pangkas nomor versi VMS</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Waktu musim panas</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Sesuaikan cap waktu remote ke ko&amp;nvensi lokal</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Sesuaikan cap waktu remote dengan waktu musim panas</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>Sinkronisasi penjelajahan</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>Direktori &amp;remote</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Direktori lokal tidak digunakan oleh antarmuka sejenis explorer.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Opsi pembacaan direktori</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Cache dari direktori remote yang &amp;dikunjungi</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>&amp;Direktori chace berubah</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>Cache &amp;Permanen</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Li&amp;nk simbolik ditetapkan</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>Ikuti tautan &amp;simbolik ke direktori</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Tempat sampah</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;Pertahankan berkas remote yg dihapus di tempat sampah</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Masukkan &amp;penumpukan file remote ke recycle bin (hanya SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>Tempat sampah &amp;remote</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Enkripsi</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;Enkripsi berkas</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Pilihan enkripsi</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>&amp;Kunci enkripsi:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;Tampilkan kunci</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Buat Kunci</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Opsi protokol</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Default</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>Ser&amp;ver SFTP:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Auto</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>Versi protokol SFTP &amp;pilihan:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>Ka&amp;nonisasi jalur di server</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Izinkan &amp;fallback ke SCP</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>G&amp;unakan ganti nama POSIX</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Deteksi cacat yang diketahui pada server SFTP</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>Reservasi urutan dari argumen perintah tautan:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>&amp;Misinterpretasikan cap waktu berkas sebelum 1970:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Shell</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>S&amp;hell:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Deteksi otomatis</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>Variabel kode &amp;kembali:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Daftar direktori</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>&amp;Perintah daftar:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Abaikan pe&amp;ringatan LS</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Coba dapatkan cap waktu len&amp;gkap</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Pilihan lainnya</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Pencarian &amp;user groups</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Bersihkan a&amp;liases</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Hilangkan variabel &amp;national</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Scp&amp;2 kompatibel dengan scp1.</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>&amp;Perintah setelah login:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Akun:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>Duku&amp;ngan daftar berkas tersembunyi:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Gunakan perintah &amp;MLSD untuk daftar direktori</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>Pa&amp;ksa alamat IP untuk koneksi mode pasif:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Gunakan perintah &amp;HOST untuk memilih host di server</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Tampilkan semua &amp;revisi berkas di server VMS</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>Wilayah &amp;default:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Host Virtual</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Jalur</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>Gaya &amp;URL:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>Peminta &amp;membayar</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Otentikasi</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>Token &amp;sesi:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>ARN &amp;peran:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Toleransi karakter khusus tanpa enkode pada nama berkas</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;Izinkan pengalihan ke host lain</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Optimalkan ukuran &amp;buffer koneksi</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Batas Waktu</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>detik</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Keepalives</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Tidak Aktif</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>Mengirimkan paket SSH &amp;null</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Menjalankan perintah protokol &amp;dummy</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Detik &amp;antara keepalives</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>Dan juga mem&amp;baca direktori saat ini</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Versi protokol internet</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>A&amp;uto</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Lokal</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>Deteksi &amp;otomatis</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Pro&amp;xy nama host</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;User name</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Seting proxy</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>pola</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Perintah telnet</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Perintah proxy lokal</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>Gu&amp;nakan koneksi pada proxy local host</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Tidak</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Ya</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Lakukan pencarian nama &amp;DNS pada proxy akhir:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Tunnel</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>Koneksi &amp;melalui tunnel SSH</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Host untuk membuat tunnel</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>Nama &amp;Host</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Opsi tunnel</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Pilih otomatis</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>Port tunnel &amp;lokal:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Parameter otentikasi tunnel</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>Opsi TLS</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Versi TLS mi&amp;nimum:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Versi TLS maksi&amp;mum:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>Gunakan &amp;ulang ID sesi TLS untuk koneksi data</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Parameter otentikasi</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>Berkas sertifikat &amp;klien:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Berkas sertifikat klien</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Berkas Sertifikat (*.pfx *.p12 *.pem *.crt *.key);;Semua Berkas (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>Aktifkan &amp;kompresi</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>&amp;Pilihan kebijakan cipher enkripsi</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Pilihan kebijakan cipher enkripsi</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Atas</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;Bawah</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Aktifkan single-&amp;DES yang sudah kadaluwarsa di SSH2</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Pertukaran kunci</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Opsi algoritma pertukaran kunci</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>&amp;Kebijakan pemilihan algoritma:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Kebijakan pemilihan algoritma</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Coba pertukaran kunci &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Opsi pengendalian pertukaran ulang kunci</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Maks. &amp;menit sebelum pertukaran ulang kunci (0 tanpa batas):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Maks. &amp;data sebelum pertukaran ulang kunci (0 tanpa batas):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;Lewati otentikasi sepenuhnya</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Pilihan otentikasi</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>&amp;Coba otentikasi menggunakan agen</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Respon dengan &amp;password pada awal tindakan</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>Tampilkan Kunci Pu&amp;blik</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Sertifikat yang &amp;digunakan dengan kunci privat:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Sertifikat</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>Sertifikat OpenSSH (*-cert.pub);;Semua Berkas (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Coba otentikasi &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Izinkan delegasi k&amp;redensial GSSAPI</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Gangguan</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Terdeteksi gangguan di server SSH</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Salah hitung SSH2 H&amp;MAC keys</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Salah hitung SSH2 &amp;encryption keys</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Memerlukan &amp;lapisan pada SSH2 RSA signatures</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Salah penggunaan ID sesi pada PK auth</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Buruk menangani pertukaran ulang &amp;kunci SSH:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Mengabaikan &amp;ukuran paket maksimum SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Gagal pada pesan i&amp;gnore SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Gagal pada permintaan SSH &apos;&amp;winadj&apos; WinSCP</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Catatan</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Perintah proxy lo&amp;kal:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Pe&amp;rintah telnet</translation>
     </message>
 </context>
 <context>

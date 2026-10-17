@@ -3938,14 +3938,6 @@ Location: %2</source>
         <translation>மேம்பட்ட தள அமைப்புகள்</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>தொலை &amp;அடைவு:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;உலாவு...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>உள்ளக அடைவு</translation>
     </message>
@@ -3956,10 +3948,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>கோப்பகங்கள்</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> நொடிகள்</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3982,40 +3970,20 @@ Location: %2</source>
         <translation>பதிலி &amp;வகை:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>பதிலி &amp;புரவலன் பெயர்:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>துறைமுக எண்:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;பயனர் பெயர்:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;கடவுச்சொல்:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>&amp;உள்ளக முகவரிகளுக்கு பதிலியை அணுகு</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>பதிலி</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>&amp;Pageant அல்லது ssh-agent பயன்படுத்தி அங்கீகாரத்தை முயற்சி</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>முகவர் பகிர்தலை இசைவு</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>உலாவு...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4030,16 +3998,656 @@ Location: %2</source>
         <translation>தனியார் திறவுகோல் கோப்பு:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH அங்கீகாரம்</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>கடைசியாக பயன்படுத்தப்பட்ட கோப்பகம் நினைவில் கொள்ளுங்கள்</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>&apos;விசைப்பலகை- &amp;ஊடாடும்&apos; அங்கீகாரத்தை முயற்சி</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>பக்கங்கள்</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;வண்ணம்</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>சூழல்</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>சேவையக சூழல்</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>வரிமுடிவு எழுத்துக்கள் (சேவையகத்தால் குறிக்கப்படவில்லை என்றால்):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>&amp;ஒபசெ-8 குறியாக்கம் கோப்பு பெயர்களுக்கான குறியாக்கம்:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>நேர மண்டல ஈடுசெய்தல்:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>மணிநேரம்</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>நேர மண்டல வேறுபாடு மணிநேரம்</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>நேர மண்டல வேறுபாடு மணித்துளி</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>மணித்துளி</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>&amp;தானாக கண்டறிதல்</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;ஒழுங்கமை விஎம்எச் பதிப்பு எண்கள்</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>பகல்ஒளி சேமிப்பு நேரம்</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>தொலை நேர முத்திரையை உள்ளக மரபுகளுக்கு சரிசெய்யவும்</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>தொலை நேர முத்திரையை &amp;டிஎச்டியுடன் சரிசெய்யவும்</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>ஒத்திசைவு உலாவல்</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;தொலை அடைவு:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>உள்ளக அடைவு உலாவி இடைமுகத்துடன் பயன்படுத்தப்படவில்லை.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>அடைவு வாசிப்பு விருப்பங்கள்</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>தற்காலிக சேமிப்பு &amp;பார்வையிட்ட தொலை கோப்பகங்கள்</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>தற்காலிக சேமிப்பு &amp;அடைவு மாற்றங்கள்</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>&amp;நிரந்தர தற்காலிக சேமிப்பு</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>குறியீட்டு இணைப்புகளைத் தீர்க்கவும்</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>&amp;கோப்பகங்களுக்கான குறியீட்டு இணைப்புகளைப் பின்பற்றுங்கள்</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>மறுசுழற்சி தொட்டி</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;நீக்கப்பட்ட தொலை கோப்புகளை மறுசுழற்சி தொட்டிக்கு பாதுகாக்கவும்</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>தொலை கோப்புகளை மறுசுழற்சி செய்ய மற்றும் மேலெழுதப்பட்ட தொலை கோப்புகளை (பாகோபநெ மட்டும்) பாதுகாக்கவும்</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>&amp;தொலை மறுசுழற்சி தொட்டி:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>குறியாக்கம்</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;கோப்புகளை குறியாக்கம்</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>குறியாக்க விருப்பங்கள்</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>குறியாக்கம் &amp;திறவுகோல்:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;திறவுகோலை காட்டு</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;திறவுகோலை உருவாக்கு</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>பாகோபநெ</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>நெறிமுறை விருப்பங்கள்</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>இயல்புநிலை</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>பாகோபநெ சேவையகம்:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>தானி</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>&amp;விருப்பமான பாகோபநெ நெறிமுறை பதிப்பு:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>&amp;சேவையகத்தில் பாதைகளை நியமிக்கவும்</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>பாநகல் &amp;பின்னடைவாக இசைவு</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>போசிக்ச் மறுபெயரைப் பயன்படுத்து</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>பாகோபநெ சேவையகங்களில் அறியப்பட்ட பிழைகள் கண்டறிதல்</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>&amp;இணைப்பு கட்டளை வாதங்களின் வரிசையை மாற்றியமைக்கிறது:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>&amp;1970 க்கு முன்னர் நேர முத்திரைகளை தவறாகப் பயன்படுத்துகிறது:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>ஓடு</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>ஓடு:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>தானாகக் கண்டறிதல்</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>&amp;திரும்பும் குறியீடு மாறி:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>அடைவு பட்டியல்</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>பட்டியல் &amp;கட்டளை:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>பட்டியல் &amp;எச்சரிக்கைகளை புறக்கணி</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>&amp;முழு நேர முத்திரை பெற முயற்சி</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>பிற விருப்பங்கள்</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>தேடல் &amp;பயனர் குழுக்கள்</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>மாற்றுப்பெயர்கள் அழி</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>&amp;நாட்டு மாறிகள் நீக்கு</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>பாநகல்1 பொருந்தக்கூடிய தன்மையுடன் பாநகல்&amp;2ஐப் பயன்படுத்தவும்</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>கோபநெ</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>உள்நுழைவுக்கு பின்  &amp;கட்டளைகள்:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;கணக்கு:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>&amp;மறைக்கப்பட்ட கோப்புகளை பட்டியலிடுவதற்கான ஆதரவு:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>அடைவு பட்டியலுக்கு &amp;எம்எல்எச்டி கட்டளையைப் பயன்படுத்தவும்</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>&amp;செயலற்ற பயன்முறை இணைப்புகளுக்கான இநெ முகவரியை கட்டாயப்படுத்துங்கள்:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>சேவையகத்தில் புரவலனைத் தேர்ந்தெடுக்க &amp;புரவலன் கட்டளையைப் பயன்படுத்தவும்</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>விஎம்எச் சேவையகங்களில் அனைத்து கோப்பு மற்றும் திருத்தங்களையும் காண்பி</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;இயல்புநிலை பகுதி:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>மெய்நிகர் புரவலன்</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>பாதை</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>&amp;முகவரி பாணி:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>கோரிக்கையாளர் &amp; கட்டுவார்</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>அங்கீகாரம்</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;அமர்வு அடையாளக்குறி:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>A&amp;RN பாத்திரம்:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;கோப்பு பெயர்களில் குறியிடப்படாத சிறப்பு எழுத்துக்களை பொறுத்துக்கொள்ளுங்கள்</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>பிற வழங்கிகளுக்கு வழிமாற்றங்களை இசைவுசெய்யவும்</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>இணைப்பு இடையக அளவை மேம்படுத்தவும்</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>முடிவுநேரங்கள்</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>நொடிகள்</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>உயிரோடு வைத்திரு</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;அணை</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>&amp;சுழி பாஓடு சிறுகட்டுகளை அனுப்புதல்</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>&amp;போலி நெறிமுறை கட்டளைகளை இயக்குதல்</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>நொடிகள் உயிரோடு வைத்திரு இடையே:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;கூடுதலாக தற்போதைய கோப்பகத்தைப் படித்தல்</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>இணைய நெறிமுறை பதிப்பு</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>தானி</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>இநெப&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>இநெப&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>உள்ளகம்</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;தானாகக் கண்டறிதல்</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>பதிலி புரவலன் பெயர்:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;பயனர் பெயர்:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>பதிலி அமைப்புகள்</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>வடிவங்கள்</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>தொலைவலை கட்டளை</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>உள்ளக பதிலி கட்டளை</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>உள்ளக புரவலன் இணைப்புகளை முன்னணிபடுத்துவதைக் கவனியுங்கள்</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>இல்லை</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>ஆம்</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>பதிலியில் &amp;டிஎன்எச் பெயர் தேடல் செய்:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>சுரங்கப்பாதை</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>&amp;பாஓடு சுரங்கப்பாதை மூலம் இணை</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>மீது சுரங்கத்தை அமைக்க புரவலன்</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>&amp;புரவலன் பெயர்:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>சுரங்கப்பாதை விருப்பங்கள்</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>தானிதேர்வு</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>உள்ளக சுரங்கப்பாதை துறைமுகம்:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>சுரங்கப்பாதை அங்கீகார அளவுருக்கள்</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>பஅபா விருப்பங்கள்</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>குறைந்த பஅபா பதிப்பு:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>அதிக பஅபா பதிப்பு:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;தரவு இணைப்புகளுக்கான பஅபா அமர்வு அடையாளத்தை மீண்டும் பயன்படுத்தவும்</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>அங்கீகார அளவுருக்கள்</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>&amp;வாடிக்கையாளர் சான்றிதழ் கோப்பு:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>வாடிக்கையாளர் சான்றிதழ் கோப்பு</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>சான்றிதழ் கோப்புகள் (*.pfx *.p12 *.pem *.crt *.key);;அனைத்து கோப்புகளும் (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>பாஓடு</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>&amp;சுருக்கம் இயக்கு</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>குறியாக்க சைபர் தேர்வு மற்றும் கொள்கை:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>குறியாக்க சைபர் தேர்வு கொள்கை</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;மேலே</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;கீழ்</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>ஒற்றை-&amp;டெச்சின் மரபு பயன்பாட்டை இயக்கு</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>திறவுகோல் பரிமாற்றம்</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>திறவுகோல் பரிமாற்ற வழிமுறை விருப்பங்கள்</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>வழிமுறை தேர்வு மற்றும் கொள்கை:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>வழிமுறை தேர்வு கொள்கை</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>முயற்சி &amp;சிஎச்எச்பநிஇ திறவுகோல் பரிமாற்றம்</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>திறவுகோல் மறு-பரிமாற்றத்தை கட்டுப்படுத்தும் விருப்பங்கள்</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>அதிக மணித்துளிகளுக்கு மறுதிறவுகோலுக்கு முன் (0 இல்லை வரம்புக்கு):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>மறுதிறவுகோலுக்கு முன் அதிக தரவு (0 இல்லை வரம்புக்கு):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;அங்கீகாரத்தை முழுவதுமாக தவிர்</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>அங்கீகார விருப்பங்கள்</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>முகவரைப் பயன்படுத்தி உறுதிப்பாட்டை முயற்சி</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>முதல் தூண்டுதலில் ஒரு கடவுசொல்லுடன் பதிலளி</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;பொது திறவுகோலை காண்பி</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>தனிப்பட்ட திறவுகோலுடன் சான்றிதழ் &amp;பயன்படுத்த:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>சான்றிதழ்</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH சான்றிதழ்கள் (*-cert.pub);;அனைத்து கோப்புகளும் (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>&amp;சிஎச்எச்பநிஇ அங்கீகாரம் முயற்சி</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>சிஎச்எச்பநிஇ நற்சான்றிதழ் பிரதிநிதிகளை இசைவு</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>பிழைகள்</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>பாஓடு சேவையகங்களில் அறியப்பட்ட பிழைகள் கண்டறிதல்</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>தவறான எண்ணிக்கை பாஓடு எச்&amp;எம்ஏசி திறவுகோல்கள்:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>தவறான எண்ணிக்கை பாஓடு &amp;குறியாக்க திறவுகோல்கள்:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>பாஓடு ஆர்எச்ஏ கையொப்பங்களில் திணிப்பு தேவைப்படுகிறது:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>பாஓடு பிகே அங்கிகாரத்தில் அமர்வு அடையாளத்தை தவறாகப் பயன்படுத்துகிறது:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>பாஓடு திறவுகோலை மீண்டும் பரிமாற்றம் தவறாக கையாளுகிறது:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>பாஓடு அதிக சிறுகட்டு அளவை புறக்கணிக்கிறது:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>பாஓடு இல் திணறல் செய்திகளை புறக்கணி:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>சாளரபாநகல் இன் பாஓடு &apos;&amp;சாளரஏடிசே&apos; கோரிக்கைகளில் திணறல்</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>குறிப்பு</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>உள்ளக பதிலி கட்டளை:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>தொலைவலை கட்டளை:</translation>
     </message>
 </context>
 <context>

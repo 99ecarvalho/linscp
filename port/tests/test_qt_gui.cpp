@@ -728,6 +728,109 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
         (Saved.ProxyHost == "proxy.example.com"), "and they persist");
       CoreBridge::DeleteSite("Advanced");
     }
+    // The rest of Site Advanced's pages, as WinSCP's: what is set persists.
+    {
+      using TSite = CoreBridge::TSite;
+      // A site made from nothing is core's defaults (SessionDataOf applies
+      // every field).
+      const TSite Defaults = CoreBridge::NewSite();
+      const TSite Blank;
+      Check((Blank.ListingCommand == Defaults.ListingCommand) && (Blank.ProxyTelnetCommand == Defaults.ProxyTelnetCommand) &&
+        (Blank.RekeyData == Defaults.RekeyData) && (Blank.CacheDirectories == Defaults.CacheDirectories) &&
+        (Blank.OptimizeBuffers == Defaults.OptimizeBuffers) && (Blank.FtpPing == Defaults.FtpPing) &&
+        (Blank.MinTls == Defaults.MinTls) && (Blank.AuthGSSAPI == Defaults.AuthGSSAPI) &&
+        (Blank.TunnelPortNumber == Defaults.TunnelPortNumber) && (Blank.ClearAliases == Defaults.ClearAliases),
+        "a blank site's settings are core's defaults");
+      SiteManager Dialog(&Window);
+      Dialog.SelectNewSite();
+      Dialog.HostName()->setText(QStringLiteral("example.com"));
+      {
+        SiteAdvanced Advanced(Dialog.Edited(), &Dialog);
+        Check(Advanced.ShowPage(QStringLiteral("SFTP")) && Advanced.ShowPage(QStringLiteral("Key exchange")) &&
+          !Advanced.ShowPage(QStringLiteral("FTP")) && !Advanced.ShowPage(QStringLiteral("TLS/SSL")),
+          "an SFTP site's pages, not FTP's");
+        Advanced.EolType()->setCurrentIndex(1);
+        Advanced.Utf()->setCurrentIndex(1);
+        Advanced.DeleteToRecycleBin()->setChecked(true);
+        Check(Advanced.RecycleBinPath()->isEnabled() && (Advanced.RecycleBinPath()->text() == QStringLiteral("/tmp")),
+          "the recycle bin's path, /tmp by default, opens with it");
+        Advanced.RecycleBinPath()->setText(QStringLiteral("/trash"));
+        Advanced.SftpServer()->setCurrentText(QStringLiteral("sudo su -c /bin/sftp-server"));
+        Check(!Advanced.AllowScpFallback()->isEnabled(), "SCP fallback only with the default SFTP server");
+        Advanced.SftpMaxVersion()->setCurrentIndex(4);
+        Advanced.Shell()->setCurrentText(QStringLiteral("/bin/ksh"));
+        Advanced.PingNullPacket()->setChecked(true);
+        Check(Advanced.PingInterval()->isEnabled(), "keepalives' interval with keepalives");
+        Advanced.PingInterval()->setValue(17);
+        Advanced.IPv6()->setChecked(true);
+        Advanced.ShowPage(QStringLiteral("Proxy"));
+        Advanced.Proxy()->setCurrentIndex(Advanced.Proxy()->findText(QStringLiteral("Local")));
+        Check(!Advanced.ProxyHost()->isEnabled() && Advanced.ProxyLocalCommand()->isVisibleTo(&Advanced),
+          "a local proxy command, without a host unless it uses %proxyhost");
+        Advanced.ProxyLocalCommand()->setText(QStringLiteral("nc %proxyhost %port"));
+        Check(Advanced.ProxyHost()->isEnabled(), "which opens the host");
+        Advanced.Tunnel()->setChecked(true);
+        Advanced.TunnelHostName()->setText(QStringLiteral("jump.example.com"));
+        Advanced.TunnelLocalPort()->setCurrentText(QStringLiteral("50123"));
+        Advanced.Compression()->setChecked(true);
+        Advanced.Ciphers()->setCurrentRow(1);
+        Check(Advanced.CipherUp()->isEnabled(), "a cipher moves up");
+        Advanced.CipherUp()->click();
+        Advanced.BugRekey()->setCurrentIndex(2);
+        Check(!Advanced.KexReexchange()->isEnabled(), "no rekey options for a server that cannot rekey");
+        Advanced.SshNoUserAuth()->setChecked(true);
+        Check(!Advanced.TryAgent()->isEnabled(), "bypassed authentication closes its options");
+        Advanced.SshNoUserAuth()->setChecked(false);
+        Advanced.KeyboardInteractive()->setChecked(false);
+        Check(!Advanced.KeyboardInteractivePassword()->isEnabled(), "a keyboard-interactive password only with it");
+        Advanced.AuthGSSAPI()->setChecked(true);
+        Advanced.GSSAPIFwdTGT()->setChecked(true);
+        Advanced.EncryptFiles()->setChecked(true);
+        Advanced.EncryptKey()->setText(QStringLiteral("123"));
+        Responder.AcceptDialogs = true;
+        Advanced.accept();
+        Responder.AcceptDialogs = false;
+        Check(Advanced.result() != QDialog::Accepted, "an encryption key that is none is refused");
+        Advanced.EncryptKey()->setText(QString::fromStdString(CoreBridge::GenerateEncryptKey()));
+        Advanced.Note()->setPlainText(QStringLiteral("A note"));
+        Advanced.SetColor(0x99CCFF);
+        Dialog.SetEdited(Advanced.Site());
+      }
+      Check(Dialog.SaveAs(QStringLiteral("Advanced2"), false), "a site with every page's settings saves");
+      const TSite Saved = CoreBridge::LoadSite("Advanced2");
+      const TSite Edited = Dialog.Edited();
+      Check(Saved.EolCrLf && (Saved.Utf == TSite::TAutoSwitch::Off) && Saved.DeleteToRecycleBin &&
+        (Saved.RecycleBinPath == "/trash") && (Saved.SftpServer == "sudo su -c /bin/sftp-server") &&
+        (Saved.SftpMaxVersion == 3) && (Saved.Shell == "/bin/ksh"), "Environment's pages persist");
+      Check((Saved.Ping == TSite::TPing::NullPacket) && (Saved.PingInterval == 17) &&
+        (Saved.AddressFamily == TSite::TAddressFamily::IPv6) && (Saved.Proxy == TSite::TProxy::Command) &&
+        (Saved.ProxyLocalCommand == "nc %proxyhost %port") && Saved.Tunnel && (Saved.TunnelHostName == "jump.example.com") &&
+        (Saved.TunnelLocalPortNumber == 50123), "Connection's pages persist");
+      Check(Saved.Compression && (Saved.Ciphers == Edited.Ciphers) && (Saved.Ciphers != Defaults.Ciphers) &&
+        (Saved.SshBugs[4] == TSite::TAutoSwitch::On) && !Saved.KeyboardInteractive && Saved.GSSAPIFwdTGT,
+        "SSH's pages persist");
+      Check(!Saved.EncryptKey.empty() && (Saved.Note == "A note") && (Saved.Color == 0x99CCFF), "the key, note and color too");
+      CoreBridge::DeleteSite("Advanced2");
+      // FTP's pages: the proxy's logon types, MLSD and hidden files.
+      TSite Ftp = CoreBridge::NewSite();
+      Ftp.Protocol = TSite::TProtocol::Ftp;
+      Ftp.Encryption = TSite::TEncryption::Explicit;
+      {
+        SiteAdvanced Advanced(Ftp, &Dialog);
+        Check(Advanced.ShowPage(QStringLiteral("FTP")) && Advanced.ShowPage(QStringLiteral("TLS/SSL")) &&
+          !Advanced.ShowPage(QStringLiteral("SFTP")) && !Advanced.ShowPage(QStringLiteral("SSH")),
+          "an FTPS site's pages, not SSH's");
+        Advanced.FtpUseMlsd()->setCurrentIndex(1);
+        Check(Advanced.FtpListAll()->isEnabled(), "hidden files' listing without MLSD");
+        Advanced.Proxy()->setCurrentIndex(Advanced.Proxy()->findText(QStringLiteral("OPEN %host")));
+        Check(Advanced.ProxyHost()->isEnabled() && !Advanced.ProxyUserName()->isEnabled(), "OPEN's logon needs no user");
+        Advanced.MinTls()->setCurrentIndex(3);
+        Check(Advanced.MaxTls()->currentIndex() == 3, "TLS's maximum follows its minimum");
+        Ftp = Advanced.Site();
+      }
+      Check((Ftp.FtpUseMlsd == TSite::TAutoSwitch::Off) && (Ftp.Proxy == TSite::TProxy::None) && (Ftp.FtpProxyLogonType == 3) &&
+        (Ftp.MinTls == TSite::TTls::Tls13), "and they are the site's");
+    }
     {
       SiteManager Dialog(&Window);
       Dialog.SelectNewSite();
@@ -4927,9 +5030,9 @@ void Tags(const char * Port, bool Acl)
     Site.Port = QString::fromLatin1(Port).toInt();
     Site.UserName = "linscp";
     Site.Password = "secret";
-    // Plain HTTP, and path-style URLs, as an IP address needs.
-    Site.HasRawSettings = true;
-    Site.RawSettings = "Ftps=0\nS3UrlStyle=1";
+    // Plain HTTP, and path-style URLs, as an IP address needs: raw
+    // settings as Edit Raw Settings applies them, the fields with them.
+    Site = CoreBridge::ApplySiteRawSettings(Site, std::string(), "Ftps=0\nS3UrlStyle=1");
     Check(Window.OpenSite(Site), "an S3 session");
     CoreBridge::TSession * Session = Window.Session();
     Check(Window.Panel()->ChangeDirectory(QStringLiteral("/bucket")), "in the bucket");
@@ -5468,12 +5571,26 @@ void AccessibilityTest(const char * Port, const QString & Locale, const QString 
         }
       }
     }
+    // Site Advanced: each protocol's pages (TLS/SSL's with TLS).
+    for (const auto Protocol : { CoreBridge::TSite::TProtocol::Sftp, CoreBridge::TSite::TProtocol::Scp,
+           CoreBridge::TSite::TProtocol::Ftp, CoreBridge::TSite::TProtocol::WebDav, CoreBridge::TSite::TProtocol::S3 })
     {
-      SiteAdvanced Dialog(CoreBridge::NewSite(), &Window);
-      for (int Page = 0; Page < Dialog.Pages()->count(); Page++)
+      CoreBridge::TSite Site = CoreBridge::NewSite();
+      Site.Protocol = Protocol;
+      Site.Encryption = (Protocol == CoreBridge::TSite::TProtocol::Ftp) ? CoreBridge::TSite::TEncryption::Explicit :
+        CoreBridge::TSite::TEncryption::Implicit;
+      SiteAdvanced Dialog(Site, &Window);
+      const QString Shots = qEnvironmentVariable("LINSCP_SHOTS");
+      for (int Page = 0; Page < Dialog.PageCount(); Page++)
       {
-        Dialog.Pages()->setCurrentIndex(Page);
+        Dialog.ShowPageAt(Page);
         Audit(Dialog);
+        if (!Shots.isEmpty())
+        {
+          QDir().mkpath(Shots);
+          Dialog.grab().save(QDir(Shots).filePath(QStringLiteral("SiteAdvanced_%1_%2.png")
+            .arg(static_cast<int>(Protocol)).arg(Page, 2, 10, QLatin1Char('0'))));
+        }
       }
     }
     Check(GAudit->Issues() == Before, "every dialog accessible");

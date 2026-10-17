@@ -3939,14 +3939,6 @@ Cale: %2</translation>
         <translation>Setări avansate de site</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>Di&amp;rector la distanță:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Răsfoire...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Director local</translation>
     </message>
@@ -3957,10 +3949,6 @@ Cale: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Directoare</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> secunde</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3983,40 +3971,20 @@ Cale: %2</translation>
         <translation>&amp;Tip de proxy:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Gazdă pro&amp;xy:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Număr po&amp;rt</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>Nume &amp;utilizator:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Parolă</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Co&amp;nsideră trecerea conexiunilor locale prin proxy</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Proxy</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Încearcă autentificarea prin &amp;Pageant sau ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Permite redirecțio&amp;nare de agent</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>&amp;Răsfoire...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4031,16 +3999,656 @@ Cale: %2</translation>
         <translation>Fișier c&amp;heie privat</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>Autentificare SSH</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>Ține &amp;minte ultimul director folosit</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Încercare autentificare &apos;&amp;interactivă&apos; (SSH2)</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Pagini</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Culoare</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Mediu de lucru</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Mediu de lucru al serverului</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>Caract&amp;ere de sfârșit de linie (dacă serverul nu le indică):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>Codare &amp;UTF-8 pentru numele fișierelor:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Diferență de fus orar:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>ore</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Diferență de fus orar (ore)</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Diferență de fus orar (minute)</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>minute</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Detectare &amp;automată</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>E&amp;limină numărul versiunii creată de VMS</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Ora de vară (DST)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Ajustează amprentele temporale în acord cu co&amp;nvențiile locale</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Ajustează amprentele temporale la ora de &amp;vară</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>Navigare sin&amp;cronizată</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>Director la dis&amp;tanță</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Directorul local nu este folosit in interfața Explorer</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Opțiuni de citire a directoarelor</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Stochează directoarele la distanță &amp;vizitate</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Stochează modificările &amp;directoarelor</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>Stocare &amp;permanentă</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Rezolvă legăturile &amp;simbolice</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>&amp;Redirecționează legăturile simbolice către directoare</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Coș de reciclare</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>Ț&amp;ine fișiere la distanță în coșul de reciclare, după ștergere</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Ține fișiere la distanță suprascrise, în c&amp;oșul de reciclare (SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>Coș de reciclare pentru fișiere la distanță</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Criptare</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>Criptar&amp;e fișiere</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Opțiuni de criptare</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>&amp;Cheie de criptare:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;Afișare cheie</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Generare Cheie</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Opțiuni protocol</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Implicit</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>Ser&amp;ver SFTP:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Automat</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>Versiunea de protocol SFTP &amp;preferată:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>&amp;Canonicalizare căi pe server</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Permite SCP ca &amp;alternativă</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;Utilizare redenumire POSIX</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Detectarea problemelor cunoscute în serverele FTP</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>Inve&amp;rsare ordine argumente la legături:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>Interpretare greșită de &amp;marcaje temporale până în 1970:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Shell</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>S&amp;hell</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Autodetectare</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>Va&amp;riabilă cod comandă ieșire</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Listare directoare</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>&amp;Comandă de listare</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>&amp;Ignorare atenționări LS</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>P&amp;reia amprentă temporală completă</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Alte opțiuni</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Căutare grupuri &amp;utilizatori</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Ștergere &amp;pseudonime</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Ștergere variabile &amp;naționale</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Uz de scp2 cu compatibilitate scp1</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>&amp;Comenzi după conectare:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Cont</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>&amp;Sprijin pentru listare fișiere ascunse:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Utilizare comandă &amp;MLSD pentru listare director</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>&amp;Forțare adresă IP pentru conexiuni în mod pasiv</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Utilizare comandă &amp;HOST pentru selectare gazdă pe server</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Afișează toate &amp;revizuirile de fișier pe servere VMS</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>Re&amp;giune implicită:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Gazdă Virtuală</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Cale</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>Stil &amp;URL:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>Solicitantul &amp;plătește transferul și costurile de solicitare</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Autentificare</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>Token de &amp;sesiune:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Rol ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>Admi&amp;tere caractere speciale necodificate în numele fișierelor</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>Permite redirecțion&amp;area către alte gazde</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Optimizare mărime memorie tampon</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Întârzieri în primire răspuns</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>secunde</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Menținere conexiune activă</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Inactiv</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>Tri&amp;mitere pachete SSH goale</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Executare comenzi false de protocol</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>&amp;Secunde între 2 transmisii</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>Și citire supliment&amp;ară a directorului curent</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Versiune protocol internet</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>A&amp;utomat</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Local</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;Autodetectare</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Gazdă pro&amp;xy</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>Nume &amp;utilizator</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Configurare proxy</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>exemple</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Comandă telnet</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Comandă proxy locală</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>Co&amp;nsideră trecerea conexiunilor locale prin proxy</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Nu</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Da</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Verificare &amp;DNS la ieșire din proxy:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Tunel</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>&amp;Conexiune prin tunel SSH</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Gazdă pentru configurare tunel</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>&amp;Gazdă</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Opțiuni tunel</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Autoselecție</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>Port &amp;local pentru tunel:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Parametri autentificare prin tunel</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>Opțiuni TLS</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Versiune mi&amp;nimă TLS:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Versiune ma&amp;ximă TLS:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Reutilizare ID sesiune TLS pentru conexiuni de date</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Parametri de autentificare</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>Certificat &amp;client:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Fișier certificat client</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Fișiere certificat (*.pfx *.p12 *.pem *.crt *.key);;Toate fișierele (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>Activare &amp;compresie</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>&amp;Politica de selectare a cifrului de criptare:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Politica de selectare a cifrului de criptare</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>S&amp;us</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;Jos</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Folosire metodă veche de criptare single-DES</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Schimb de chei</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Opțiuni pentru algoritmul de schimbare a cheilor</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>&amp;Politica de selectare a algoritmului:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Politica de selectare a algoritmului</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Încercare schimb de chei &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Opțiuni de control pentru reschimbare chei</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Maximum de &amp;min. pt. reschimbare cheie(0-fără limită):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Ma&amp;ximum de date pt. reschimbare cheie(0-fără limită):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;Evită complet autentificarea</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Opțiuni autentificare</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>Încearcă &amp;autentificarea prin agent</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>&amp;Răspunde cu parolă la primul prompt</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;Afișare Cheie Publică</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Certificat&amp;ul de folosit cu cheia privată:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Certificat</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>Certificate OpenSSH (*-cert.pub);;Toate fișierele (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Încercare autentificare &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Permite delegarea datelor de autentifi&amp;care GSSAPI</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Probleme cunoscute</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Detectarea automată a problemelor cunoscute în serverele SSH</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Erori de calcul al cheilor H&amp;MAC:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Erori de calcul al ch&amp;eilor de criptare:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Cerere de com&amp;pletare la semnăturile RSA:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Folosire greșită ID sesiu&amp;ne in autentif. PK:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Interpretare greșită a reschimbului de c&amp;hei SSH:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Ignoră mărimea ma&amp;ximă a pachetului:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Întreruperi în timpul mesajelor de ignorare:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Înreruperi în timpul cererilor SSH &apos;winadj&apos; făcute de WinSCP:</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Informare</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Co&amp;mandă proxy locală:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Co&amp;mandă telnet</translation>
     </message>
 </context>
 <context>

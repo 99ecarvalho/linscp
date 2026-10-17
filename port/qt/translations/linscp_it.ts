@@ -3938,14 +3938,6 @@ Percorso: %2</translation>
         <translation>Impostazioni avanzate sito</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>Cartella &amp;remota:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>Sfoglia...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Cartella locale</translation>
     </message>
@@ -3956,10 +3948,6 @@ Percorso: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Cartelle</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> secondi</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3982,40 +3970,20 @@ Percorso: %2</translation>
         <translation>&amp;Tipo proxy:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Nome host pro&amp;xy:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Numero po&amp;rta:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>Nome &amp;utente:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Password:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Co&amp;nsidera il proxying di connessioni locali</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Proxy</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Tenta autenticazione usando &amp;Pageant o ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Consenti inoltro a&amp;gente</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>Sfoglia...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4030,16 +3998,656 @@ Percorso: %2</translation>
         <translation>File chiave privata:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>Autenticazione SSH</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>Ricorda l&apos;ultima cartella usata</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Tenta autenticazione &apos;tastiera &amp;interattiva&apos;</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Pagine</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Colore</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Ambiente</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Ambiente server</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>Caratteri &amp;end-of-line (se non indicati dal server)</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>Codifica &amp;UTF-8 per i nomi di file:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Offset fuso orario:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>ore</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Offset fuso orario (ore)</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Offset fuso orario (minuti)</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>minuti</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Rileva &amp;automaticamente</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;Tronca numeri di versione di VMS</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Ora legale</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Adatta data/ora file remoti co&amp;n convenzioni locali (Unix)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Adatta data/ora file remoti con &amp;DST (Windows)</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>Navigazione sin&amp;cronizzata</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>Cartella &amp;remota:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Cartella locale non usata con interfaccia tipo Explorer.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Opzioni lettura cartella</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Copia in cache cartelle remote &amp;visitate</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Copia in cache mo&amp;difiche cartelle</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>Cache &amp;permanente</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Risolvi collegame&amp;nti simbolici</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>Segui collegamenti simbolici a cartelle</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Cestino</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>Conserva nel Cestino i file remoti eliminati</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Conserva nel Cestino i file remoti s&amp;ovrascritti (solo SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>Cestino &amp;remoto:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Crittografia</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>Cripta fil&amp;e</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Opzioni criptazione</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>Chiave di crittografia:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>Mo&amp;stra chiave</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Genera Chiave</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Opzioni protocollo</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Predefinito</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>Ser&amp;ver SFTP:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Automatico</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>Versione protocollo SFTP &amp;preferita:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>Chiedi al server di &amp;convertire percorsi in modo canonico</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Consenti SCP &amp;fallback</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;Usa rinomina POSIX</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Rilevazione bug noti nei server SFTP</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>Inve&amp;rti ordine argomenti comando link simbolico:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>Interpreta male data/ora file prima del 1970:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Interprete comandi</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>S&amp;hell:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Rilevazione automatica</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>Va&amp;riabile codice restituita:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Elenco cartelle</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>&amp;Comando elenco:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Ignora avvisi LS</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Prova a ricevere data/ora completa</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Altre opzioni</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Ricerca gruppi &amp;utente</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Cancella a&amp;lias</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Cancella variabili &amp;nazionali</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Usa SCP&amp;2 con compatibilità SCP1</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>&amp;Comandi post accesso:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Account:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>&amp;Supporto elenco file nascosti:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Usa comando &amp;MLSD per elenco cartelle</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>&amp;Forza indirizzo IP per connessioni in modalità passiva:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Usa comando &amp;HOST per selezionare host nel server</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Visualizza nei server VMS tutti i file e le revisioni</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>Regione pre&amp;definita:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Host virtuale</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Percorso</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>Stile &amp;URL:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>Richiedente &amp;pagamenti</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Autenticazione</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>Token &amp;sessione:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Ruolo ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Tollera nel nome file caratteri speciali non codificati</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;Consenti reindirizzamenti ad altri host</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Ottimizza dimensione &amp;buffer di connessione</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Timeout</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>secondi</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Mantieni attivo</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>Disattivato</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>Invio di pacchetti SSH &amp;null</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Esecuzione comandi &amp;di protocollo finti</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Secondi tra comandi per mantenere attivo:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>E inoltre leggendo la cartella &amp;attuale</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Versione Internet Protocol</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>A&amp;utomatico</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Locale</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>Rileva &amp;automaticamente</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Nome host pro&amp;xy:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>Nome &amp;utente:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Impostazioni proxy</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>modelli</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Comando telnet</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Comando proxy locale</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>Co&amp;nsidera il proxying di connessioni locali</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>No</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Sì</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Ricerca nome &amp;DNS alla fine del proxy:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Tunnel</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>Connetti usando tunnel SSH</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Host sul quale impostare il tunnel</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>Nome &amp;host:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Opzioni tunnel</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Selezione automatica</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>Porta locale tunnel:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Parametri di autenticazione tunnel</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>Opzioni TLS</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Versione mi&amp;nima TLS:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Versione ma&amp;ssima TLS:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Riusa ID sessione TLS per connessioni dati</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Parametri di autenticazione</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>File certificato &amp;client:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>File certificato client</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>File certificato (*.pfx *.p12 *.pem *.crt *.key);;Tutti i file (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>Abilita &amp;compressione</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>&amp;Policy selezione numero di criptazione:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Policy selezione cifratura</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>Sposta s&amp;u</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>Sposta &amp;giù</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Abilita uso ereditato del &amp;DES singolo in SSH-2</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Scambio chiave</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Opzioni algoritmo scambio chiave</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>&amp;Policy selezione algoritmo:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Policy selezione algoritmo</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Tentativo di scambio chiavi &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Opzioni di controllo ri-scambio chiave</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>&amp;Minuti max prima di scambio chiave (0 per illimitato)</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Dati ma&amp;x prima di scambio chiave (0 per illimitato)</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;Bypassa completamente l&apos;autenticazione</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Opzioni autenticazione</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>Tentativo &amp;autenticazione usando l&apos;agente</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Rispondi con &amp;password alla prima richiesta</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>Mostra Chiave Pubblica</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Certificato da usare con la chiave privata:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Certificato</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>Certificati OpenSSH (*-cert.pub);;Tutti i file (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Tenta autenticazione &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Permetti delega &amp;credenziali GSSAPI</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Bug</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Rilevazione bug noti nei server SSH</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Calcola erroneamente chiavi H&amp;MAC in SSH-2:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Calcola &amp;erroneamente chiavi di cifratura SSH-2:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Richiede riem&amp;pimento firme RSA in SSH-2:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Usa erroneamente ID sessio&amp;ne in SSH-2 PK auth:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Gestisce male ri-scambio chiave SSH-2:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Ignora dimensione massima pacchetto SSH-2:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Blocco messaggi &apos;ignore&apos; di SSH-&amp;2:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Blocco richieste SSH-2 &apos;winadj&apos; di WinSCP</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Nota</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Co&amp;mando proxy locale:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Co&amp;mando telnet:</translation>
     </message>
 </context>
 <context>

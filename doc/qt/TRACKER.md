@@ -11,9 +11,9 @@ Legend: `todo` · `wip` · `blocked` · `done` · `dropped`
 | P0 Foundation | 32 | 35 | `core/Common.cpp` compiles on Linux clang; VCL build green (R1) |
 | P1 Headless core | 37 | 38 | Golden suite green, six protocols, both platforms |
 | P2 Qt shell | 11 | 11 | A user can do a day's work in it |
-| P3 Qt parity | 35 | 37 | Parity on features users depend on |
+| P3 Qt parity | 36 | 38 | Parity on features users depend on |
 | P4 Cleanup | 0 | 4 | Dropped for now (2026-10-15); may be reopened |
-| **Total** | **112** | **124** | |
+| **Total** | **113** | **125** | |
 
 ## Next three actions
 
@@ -303,6 +303,7 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-16 | Site Advanced carries every TSessionData setting its pages show through `TSite` (typed fields, as LoadSession and SaveSession convert them), applied after a site's raw settings, so the dialog's edits win over earlier raw ones; a site's raw settings are taken through `ApplySiteRawSettings`, which sets the fields from them | Raw options would carry core's storage quirks (bug flags as 2 - value, the ping interval split); typed fields keep the dialog as upstream's |
 | 2026-10-16 | winscp/winscp#82 and #83 choose the platform with `#ifdef _WIN32`, as the maintainer asked; linscp's carried patches keep the one-line `PathDelim` form of the same choice until a pin move brings the merged change in. #79's PuTTY line is tagged `// WINSCP`, carried the same | The maintainer prefers a compile-time condition; the patch series must keep every hunk's line count (patchset.py), which an `#ifdef` block cannot |
 | 2026-10-15 | Version 0.5.0 tagged and published as a GitHub pre-release, with the CI packages: the shell in all 53 of core's languages (P3-25) and the README's screenshots | The user's call |
 | 2026-10-15 | Left for later, none being worked on: P3-26 (mnemonic clashes in the translations), Q-14 (Serbian's locale), P0-04 (C++Builder check, Q-2), P0-20 (fork-branch generator, Q-7), Q-11, Q-12; outside the tracker, code signing, more distribution channels and platforms, a native-speaker review of the translations | The user's call: pending, not scheduled |
@@ -895,6 +896,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P3-24 | Drag & drop shell extension | done | done 2026-10-15: WinSCP's DragExt built from the pristine source (`port/dragext`, a wrapper for mingw's GUID operators) as `DragExt64.dll`, in the deploy folder, registered by the installer unless WinSCP's own copy is; remote files dragged as WinSCP's fake file (a hidden `scp…` directory, the shared WinSCPDragExtMapping), downloaded where the copy hook says the drop was, under drag & drop's confirmation; the temporary folder's way when the extension is not there; Drag & Drop's fake-file option and status (installed, loaded, broken builds) on Windows. ctest `qt_gui_environment` (on Windows 11, the shell's copy stopped by the real hook and the file downloaded there) |
 | P3-25 | The shell in WinSCP's languages | done | done 2026-10-15, in four batches: es, de, ja, fr, ru, pt_PT, it, nl, pl, tr; zh_CN, zh_TW, fa, vi, id, cs, ko, uk, ar, hu; el, sv, ro, da, fi, sk, he, th, sr_Latn, nb, bg, hr; lt, sl, ca, et, lv, hi, ms, be, bn, sq, mk, ka, hy, gl, is, af, ta, pa, fil, my. With pt_BR, the 53 languages core can choose, each `.ts` complete; WinSCP's own texts where it has them (none for hi, sq, hy). Not reviewed by native speakers. Serbian is not reachable yet (Q-14); mnemonic clashes are P3-26 |
 | P3-26 | Mnemonic clashes in the translations | todo | |
+| P3-27 | Site Advanced's pages | done | done 2026-10-16: upstream's tree of 18 pages (Environment: Directories, Recycle bin, Encryption, SFTP, SCP/Shell, FTP, S3, WebDAV; Connection: Proxy, Tunnel, TLS/SSL; SSH: Key exchange, Authentication, Bugs; Note), each shown for the protocols upstream enables it for, its controls enabled as UpdateControls does, and the site color (`ColorMenu`, shared with Tabs > Color); `TSite` carries every setting, read and written as LoadSession and SaveSession do (the tunnel password and encryption key as the passwords). Not offered: PuTTY's terminal settings (Edit in PuTTY), the private key's Tools menu. ctest `qt_gui_sites` (settings of each page persist; an FTPS site's pages), `qt_gui_accessibility` (each protocol's pages); the 53 languages' texts |
 
 ### P4 — Cleanup
 | ID | Task | Status | Note |

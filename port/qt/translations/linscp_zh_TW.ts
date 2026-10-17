@@ -3937,14 +3937,6 @@ Location: %2</source>
         <translation>進階站台設定</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>遠端目錄(&amp;D):</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>瀏覽(&amp;B)...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>本機目錄</translation>
     </message>
@@ -3955,10 +3947,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>目錄</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> 秒</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3981,40 +3969,20 @@ Location: %2</source>
         <translation>Proxy 類型(&amp;T):</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Proxy 主機名稱(&amp;X):</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>連接埠(&amp;R):</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>使用者名稱(&amp;U):</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>密碼(&amp;P):</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>本機端使用代理伺服器連線(&amp;L)</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Proxy 伺服器</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>嘗試使用 &amp;Pageant 或 ssh-agent 進行身分核對</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>允許代理轉交(&amp;F)</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>瀏覽(&amp;R)...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4029,16 +3997,656 @@ Location: %2</source>
         <translation>私鑰檔案(&amp;K):</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH 身分核對</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>記住上次使用的目錄(&amp;M)</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>嘗試以「鍵盤互動」進行身分核對(&amp;I)</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>頁面</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>色彩(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>環境設定</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>伺服器環境</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>換行字元 (如果伺服器未指定)(&amp;E):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>&amp;UTF-8 檔案名稱編碼:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>時區(&amp;Z):</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>小時</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>時區偏移 (小時)</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>時區偏移 (分鐘)</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>分鐘</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>自動偵測(&amp;A)</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>略去 VMS 版本號碼(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>日光節約時間</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>將遠端時間戳記調整為本機標準(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>將遠端時間戳記調整為日光節約時間(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>同步瀏覽(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>遠端目錄(&amp;R):</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>本機目錄不使用類似檔案總管的介面</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>目錄讀取選項</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>快取瀏覽過的遠端目錄(&amp;V)</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>快取目錄變更(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>永久的快取(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>解析符號連結(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>跟蹤符號連結(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>資源回收筒</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>將刪除的遠端檔案，保留在資源回收筒(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>將被覆寫的遠端檔案，保留在資源回收筒 (僅對 SFTP 有效)(&amp;O)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>遠端資源回收筒(&amp;R):</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>加密</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>將檔案加密(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>加密選項</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>加密金鑰(&amp;K):</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>顯示金鑰(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>產生金鑰(&amp;G)</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>協定選項</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>預設</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP 伺服器(&amp;V):</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>自動</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>首選 SFTP 協定版本(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>規範化服務器上的路徑(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>允許使用舊版本的 SCP (&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>在 &apos;POSIX&apos; 模式下使用重新命名</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>偵測 SFTP 伺服器的已知錯誤</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>顛倒連結指令引數順序(&amp;R):</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>錯誤解讀 1970 年之前檔案的時間戳記(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Shell</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>Shell(&amp;H):</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>自動偵測</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>傳回代碼變數(&amp;R):</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>目錄清單</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>清單指令(&amp;C):</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>忽略 LS 警告(&amp;W)</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>試著取得完整的時間戳記(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>其他選項</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>查詢使用者群組(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>清除別名(&amp;L)</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>清除國家變數(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>使用與 scp1 相容的 scp&amp;2</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>登入後要執行的指令(&amp;C):</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>帳號(&amp;A):</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>支援列出隱藏檔案(&amp;S):</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>使用 &amp;MLSD 指令列出資料夾內容</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>強制 IP 位址以被動模式連線(&amp;F):</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>使用 &amp;HOST 指令選取伺服器的主機</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>顯示全部檔案修訂在 VMS 伺服器(&amp;R)</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>預設區域(&amp;D):</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>虛擬主機</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>路徑</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>&amp;URL 樣式:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>請求者並付款(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>身分核對</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>期間代碼(&amp;S):</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>角色 ARN(&amp;R):</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>在檔案名稱容忍未編碼特殊字元(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>允許重新導向至其他主機(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>最佳化連線暫存區大小(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>逾時</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>秒</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>保持活躍</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>關閉(&amp;O)</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>送出空的 SSH 封包(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>模擬執行指令(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>保持活躍間隔秒數(&amp;B):</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>並且另外讀取當前目錄(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>IP 協定版本</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>自動(&amp;U)</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>本機</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>自動偵測(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Proxy 主機名稱(&amp;X):</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>使用者名稱(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Proxy 設定</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>樣板</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet 指令</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>本機 Proxy 指令</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>本機端使用代理伺服器連線(&amp;N)</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>否</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>是</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>在 Proxy 端進行 &amp;DNS 名稱解析:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>通道</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>經由 SSH 通道連線(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>主機設定通道開啟</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>主機名稱(&amp;H):</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>通道選項</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>自動選擇</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>本機通道連接埠(&amp;L):</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>通道身分核對參數</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS 選項</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>最小 TLS 版本(&amp;N):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>最大 TLS 版本(&amp;X):</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>重複使用 TLS 會話 ID 進行資料連線(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>身分核對參數</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>客戶端憑證檔案(&amp;C):</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>客戶端憑證檔案</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>憑證檔案 (*.pfx *.p12 *.pem *.crt *.key);;全部檔案 (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>啟用壓縮(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>加密碼選擇方針(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>加密碼選擇方針</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>往上(&amp;U)</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>往下(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>啟用 SSH-2 的原有「單一 &amp;DES」</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>金鑰交換</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>金鑰交換演算法選項</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>演算法選擇方針(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>演算法選擇方針</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>嘗試 GSSAPI 金鑰交換(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>控制金鑰重新交換的選項</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>重新交換金鑰前最長分鐘數 (0 代表無限制)(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>重新交換金鑰前最大資料量 (0 代表無限制)(&amp;X):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>完全繞過身分核對(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>身分核對選項</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>嘗試使用代理程式進行驗證(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>對首個提示以密碼回應(&amp;W)</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>顯示公鑰(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>與私鑰一起使用的憑證(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>憑證</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH 憑證 (*-cert.pub);;全部檔案 (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>嘗試 &amp;GSSAPI 身分核對</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>允許 GSSAPI 憑據委任(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>錯誤</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>偵測 SSH 伺服器的已知錯誤</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>SSH-2 HMAC 運算出錯(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>SSH-2 加密金鑰運算出錯(&amp;E):</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>SSH-2 RSA 簽名需要補上空白(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>於 SSH-2 PK 進行身分核對時，誤用了工作階段 ID (&amp;N):</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>重新交換 SSH-2 金鑰時，處理得不正確(&amp;K):</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>忽略 SSH-2 最大的封包大小(&amp;X):</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>在 SSH-2 忽略訊息時阻塞(&amp;2):</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>在 WinSCP&apos;s SSH-2 &apos;winadj&apos; 要求時阻塞:</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>記事</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>本機 Proxy 指令(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telnet 指令(&amp;M):</translation>
     </message>
 </context>
 <context>

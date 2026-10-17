@@ -3938,14 +3938,6 @@ Sijainti: %2</translation>
         <translation>Kohteen lisäasetukset</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>&amp;Etäkansio:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Selaa</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Paikallinen kansio</translation>
     </message>
@@ -3956,10 +3948,6 @@ Sijainti: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Kansiot</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> sekuntia</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3982,40 +3970,20 @@ Sijainti: %2</translation>
         <translation>Välityspalvelimen t&amp;yyppi:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>&amp;Välityspalvelimen nimi:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Po&amp;rtti</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;Käyttäjätunnus:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Salasana</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>&amp;Käytä välitystä myös paikallisyhteyksille</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Välityspalvelin</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Yritä todennusta &amp;Pageantin tai ssh-agentin avulla</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Salli agentin &amp;välitys</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>&amp;Selaa...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4030,16 +3998,656 @@ Sijainti: %2</translation>
         <translation>Yksityinen &amp;avaintiedosto</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH-todennus</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>&amp;Muista viimeksi käytetty kansio</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Kokeile &apos;keyboard-&amp;interactive&apos; -todennusta</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Sivut</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Väri</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Ympäristö</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Palvelinympäristö</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>&amp;Rivinvaihtomerkit (ellei palvelin ilmoita):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>Tiedostonimet &amp;UTF-8-koodattuja:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Aika&amp;vyöhyke-ero:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>tuntia</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Aikavyöhyke-ero, tunnit</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Aikavyöhyke-ero, minuutit</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>minuuttia</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Tunnista automaattisesti</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>Siis&amp;ti VMS-versionumeroita</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Kesäaika</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Mukauta etäaikaleima &amp;paikalliseen käytäntöön</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Mukauta etäaikaleima &amp;kesäaikaan</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>Synkronoi selaus</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;Etäkansio:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Paikallista kansiota ei käytetä Resurssienhallinnan kaltaisessa käyttöliittymässä.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Kansion lukuasetukset</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Muista &amp;käydyt etäkansiot</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Muista &amp;kansion muutokset</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>P&amp;ysyvä välimuisti</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Selvitä symboliset &amp;linkit</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>Seuraa sym&amp;bolisia linkkejä kansioihin</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Roskakori</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;Säilytä poistetut etätiedostot roskakorissa</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Säilytä &amp;ylikirjoitetut etätiedostot roskakorissa (vain SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>&amp;Etäroskakori</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Salaus</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>Salaa ti&amp;edostot</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Salausvaihtoehdot</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>Salausa&amp;vain:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>Näytä &amp;avain</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Muodosta avain</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Protokollavalinnat</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Oletus</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP-palvelin:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Automaattinen</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>&amp;Ensisijainen SFTP-protokollaversio:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>&amp;Säännönmukaista polut palvelimella</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Salli &amp;SCP varamenetelmänä</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;Käytä POSIX-uudelleennimeämistä</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Tunnettujen SFTP-palvelinvirheiden tunnistus</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>Vaihtaa symlink-komennon argumenttien &amp;järjestyksen</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>Tulkitsee &amp;vuotta 1970 edeltävät aikaleimat väärin</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Komentotulkki</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>K&amp;omentotulkki:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Tunnista automaattisesti</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>&amp;Paluukoodimuuttuja:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Kansioluettelo</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>Luettelokomento:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Älä huomioi LS:n &amp;varoituksia</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Yritä saada koko &amp;aikaleima</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Muut valinnat</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Hae k&amp;äyttäjäryhmät</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Tyhjennä a&amp;liakset</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Tyhjennä maakohtaiset &amp;muuttujat</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Scp&amp;2 scp1 yhteensopivuus.</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>Kirjautumisen jälkeiset &amp;komennot:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>Tili:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>Piilotiedostojen luettelointi:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Käytä &amp;MLSD-komentoa kansioluetteloon</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>Pakota IP-osoite passiivitilan yhteyksille:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Valitse palvelimen isäntä HOST-komennolla</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Näytä kaikki tiedosto&amp;versiot VMS-palvelimista</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>Oletusalue:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Virtuaali-isäntä</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Polku</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>&amp;URL-tyyli</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>&amp;Pyytäjä maksaa</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Todennus</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>I&amp;stuntotunnus:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Roolin ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>Salli koodaama&amp;ttomat erikoismerkit tiedostonimissä</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;Salli uudelleenohjaukset muihin palvelimiin</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Optimoi yhteyden puskurin koko</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Aikakatkaisu</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>Sekuntia</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Yhteyden elossapito</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Ei käytössä</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>&amp;Lähettää tyhjiä SSH-paketteja</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Suorittaa t&amp;yhjiä protokollakomentoja</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Sekuntia &amp;elossapitoviestien välillä:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>J&amp;a lisäksi nykyisen kansion lukeminen</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Internet-protokollan versio</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>A&amp;utomaattinen</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Paikallinen</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>Tunnista automaattisesti</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>&amp;Välityspalvelimen nimi:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;Käyttäjätunnus:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Välityspalvelimen asetukset</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>määreet</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet-komento</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Paikallinen välityskomento</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>&amp;Käytä välitystä myös paikallisyhteyksille</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Ei</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Kyllä</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Tee &amp;DNS-kysely välityspalvelimessa:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Tunneli</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>Avaa &amp;yhteys SSH-tunnelin kautta</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Tunnelointipalvelin</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>&amp;Palvelimen nimi:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Tunnelin asetukset</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Automaattinen</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>Tunnelin pa&amp;ikallinen portti</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Tunnelin todennustiedot</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS-asetukset</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>TLS-version &amp;vähimmäisversio:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>TLS-version &amp;enimmäisversio:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>Hyödynnä TLS-istunnon ID:tä datayhteyksissä</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Todennustiedot</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>Asiakas&amp;varmennetiedosto:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Asiakasvarmennetiedosto</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Varmennetiedostot (*.pfx *.p12 *.pem *.crt *.key);;Kaikki tiedostot (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>Käytä &amp;pakkausta</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>&amp;Salausvalinnan käytäntö:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Salausvalinnan käytäntö</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Ylös</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;Alas</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Salli D&amp;ES-salaus SSH-2:ssa</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Avaintenvaihto</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Avaintenvaihdon asetukset</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>Algoritmin &amp;valinta:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Algoritmin valinta</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Yritä &amp;GSSAPI-avaimen vaihtoa</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Avaimen uusiminen</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>&amp;Enimmäisminuutit ennen avaimen uusimista:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>D&amp;atan enimmäismäärä ennen avaimen uusimista:</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>Ohita to&amp;dennus kokonaan</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Todennusasetukset</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>Yritä todennusta &amp;agentin avulla</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Käytä &amp;salasanaa ensimmäiseen kyselyyn</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>Näytä &amp;julkinen avain</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>&amp;Yksityisen avaimen kanssa käytettävä varmenne:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Varmenne</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH-varmenteet (*-cert.pub);;Kaikki tiedostot (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Kokeile &amp;GSSAPI-todennusta</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Salli GSSAPI-tunnisteen välitys</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Virheet</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Tunnettujen SSH-palvelinvirheiden tunnistus</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Laskee SSH-2:n H&amp;MAC-avaimet väärin</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Laskee SSH-2:n &amp;salausavaimet väärin</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Vaatii täytteen SSH-2:n RSA-a&amp;llekirjoituksissa</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Käyttää istunnon tunnistetta väärin SSH-2:n P&amp;K-todennuksessa</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Käsittelee SSH-2 &amp;avaimen uusinnan huonosti</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Ei huomioi SSH-2:n pak&amp;etin enimmäiskokoa</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Jumiutuu SSH-&amp;2:n ignore-viesteihin</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Jumiutuu WinSCP:n SSH-2:n &apos;winadj&apos;-pyyntöihin</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Huom</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Paikallinen välityskomento:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telnet-k&amp;omento</translation>
     </message>
 </context>
 <context>

@@ -14,6 +14,10 @@
 #include <Configuration.h>
 #include <HierarchicalStorage.h>
 #include <Common.h>
+#include <Cryptography.h>
+#include <PuttyTools.h>
+#include <S3FileSystem.h>
+#include <TextsCore.h>
 
 #include <memory>
 
@@ -82,8 +86,10 @@ TSite::TProxy ProxyOf(TProxyMethod Method)
     case pmSocks4: return TSite::TProxy::Socks4;
     case pmSocks5: return TSite::TProxy::Socks5;
     case pmHTTP: return TSite::TProxy::Http;
-    // Telnet, local command and SSH tunnel proxies are not offered; such a
-    // site's method is kept (SessionDataOf leaves it alone).
+    case pmTelnet: return TSite::TProxy::Telnet;
+    case pmCmd: return TSite::TProxy::Command;
+    // The SSH tunnel's internal method is not offered; such a site's
+    // method is kept (SessionDataOf leaves it alone).
     default: return TSite::TProxy::None;
   }
 }
@@ -95,7 +101,46 @@ TProxyMethod ProxyMethodOf(TSite::TProxy Proxy)
     case TSite::TProxy::Socks4: return pmSocks4;
     case TSite::TProxy::Socks5: return pmSocks5;
     case TSite::TProxy::Http: return pmHTTP;
+    case TSite::TProxy::Telnet: return pmTelnet;
+    case TSite::TProxy::Command: return pmCmd;
     default: return pmNone;
+  }
+}
+
+TSite::TAutoSwitch AutoSwitchOf(TAutoSwitch Value)
+{
+  return static_cast<TSite::TAutoSwitch>(Value);
+}
+
+TAutoSwitch AutoSwitchOf(TSite::TAutoSwitch Value)
+{
+  return static_cast<TAutoSwitch>(Value);
+}
+
+// Site Advanced's SSH bugs, in its page's order.
+const TSshBug SshBugs[TSite::SshBugCount] =
+  { sbHMAC2, sbDeriveKey2, sbRSAPad2, sbPKSessID2, sbRekey2, sbMaxPkt2, sbIgnore2, sbWinAdj };
+
+// IndexToTlsVersion and TlsVersionToIndex.
+TSite::TTls TlsOf(TTlsVersion Version)
+{
+  switch (Version)
+  {
+    case tls11: return TSite::TTls::Tls11;
+    case tls12: return TSite::TTls::Tls12;
+    case tls13: return TSite::TTls::Tls13;
+    default: return TSite::TTls::Tls10;
+  }
+}
+
+TTlsVersion TlsVersionOf(TSite::TTls Tls)
+{
+  switch (Tls)
+  {
+    case TSite::TTls::Tls11: return tls11;
+    case TSite::TTls::Tls12: return tls12;
+    case TSite::TTls::Tls13: return tls13;
+    default: return tls10;
   }
 }
 
@@ -123,6 +168,8 @@ TSite SiteOf(const TSessionData * Data)
     {
       Site.Password = Utf8(Data->Password);
       Site.ProxyPassword = Utf8(Data->ProxyPassword);
+      Site.TunnelPassword = Utf8(Data->TunnelPassword);
+      Site.EncryptKey = Utf8(Data->EncryptKey);
     }
     catch (...)
     {
@@ -135,6 +182,8 @@ TSite SiteOf(const TSessionData * Data)
     {
       Site.Password.clear();
       Site.ProxyPassword.clear();
+      Site.TunnelPassword.clear();
+      Site.EncryptKey.clear();
       Site.PasswordsLocked = true;
     }
   }
@@ -152,7 +201,228 @@ TSite SiteOf(const TSessionData * Data)
   Site.TryAgent = Data->TryAgent;
   Site.KeyboardInteractive = Data->AuthKI;
   Site.AgentForwarding = Data->AgentFwd;
+  // The rest of Site Advanced's pages, as its LoadSession.
+  Site.SynchronizeBrowsing = Data->SynchronizeBrowsing;
+  Site.CacheDirectories = Data->CacheDirectories;
+  Site.CacheDirectoryChanges = Data->CacheDirectoryChanges;
+  Site.PreserveDirectoryChanges = Data->PreserveDirectoryChanges;
+  Site.ResolveSymlinks = Data->ResolveSymlinks;
+  Site.FollowDirectorySymlinks = Data->FollowDirectorySymlinks;
+  // dstmKeep is deprecated: read as Unix's.
+  Site.DstWindows = (Data->DSTMode == dstmWin);
+  Site.EolCrLf = (Data->EOLType != eolLF);
+  Site.Utf = AutoSwitchOf(Data->NotUtf);
+  Site.TimeDifferenceMinutes = TimeToMinutes(Data->TimeDifference);
+  Site.TimeDifferenceAuto = Data->TimeDifferenceAuto;
+  Site.TrimVMSVersions = Data->TrimVMSVersions;
+  Site.VMSAllRevisions = Data->VMSAllRevisions;
+  Site.DeleteToRecycleBin = Data->DeleteToRecycleBin;
+  Site.OverwrittenToRecycleBin = Data->OverwrittenToRecycleBin;
+  Site.RecycleBinPath = Utf8(Data->RecycleBinPath);
+  Site.SftpServer = Utf8(Data->SftpServer);
+  Site.AllowScpFallback = (Data->FSProtocol != fsSFTPonly);
+  Site.UsePosixRename = Data->UsePosixRename;
+  Site.SftpMaxVersion = (Data->SFTPMaxVersion < 0) ? -1 : Data->SFTPMaxVersion;
+  Site.SftpRealPath = AutoSwitchOf(Data->SFTPRealPath);
+  Site.SftpBugSymlink = AutoSwitchOf(Data->SFTPBug[sbSymlink]);
+  Site.SftpBugSignedTS = AutoSwitchOf(Data->SFTPBug[sbSignedTS]);
+  Site.Shell = Data->DefaultShell ? std::string() : Utf8(Data->Shell);
+  Site.ReturnVar = Data->DetectReturnVar ? std::string() : Utf8(Data->ReturnVar);
+  Site.ListingCommand = Utf8(Data->ListingCommand);
+  Site.LookupUserGroups = AutoSwitchOf(Data->LookupUserGroups);
+  Site.ClearAliases = Data->ClearAliases;
+  Site.IgnoreLsWarnings = Data->IgnoreLsWarnings;
+  Site.Scp1Compatibility = Data->Scp1Compatibility;
+  Site.UnsetNationalVars = Data->UnsetNationalVars;
+  Site.ScpLsFullTime = (Data->SCPLsFullTime != asOff);
+  Site.FtpAccount = Utf8(Data->FtpAccount);
+  Site.PostLoginCommands = Utf8(Data->PostLoginCommands);
+  Site.FtpListAll = AutoSwitchOf(Data->FtpListAll);
+  Site.FtpUseMlsd = AutoSwitchOf(Data->FtpUseMlsd);
+  Site.FtpForcePasvIp = AutoSwitchOf(Data->FtpForcePasvIp);
+  Site.FtpHost = AutoSwitchOf(Data->FtpHost);
+  Site.S3DefaultRegion = Utf8(Data->S3DefaultRegion);
+  Site.S3UrlStylePath = (Data->S3UrlStyle == s3usPath);
+  Site.S3RequesterPays = Data->S3RequesterPays;
+  Site.S3SessionToken = Utf8(Data->S3SessionToken);
+  Site.S3RoleArn = Utf8(Data->S3RoleArn);
+  Site.WebDavLiberalEscaping = Data->WebDavLiberalEscaping;
+  Site.WebDavCrossDomainRedirects = Data->WebDavCrossDomainRedirects;
+  Site.OptimizeBuffers = (Data->SendBuf > 0) && Data->SshSimple;
+  Site.Ping = static_cast<TSite::TPing>(Data->PingType);
+  Site.PingInterval = Data->PingInterval;
+  switch (Data->FtpPingType)
+  {
+    case fptDummyCommand0:
+    case fptDummyCommand: Site.FtpPing = TSite::TFtpPing::DummyCommand; break;
+    case fptDirectoryListing: Site.FtpPing = TSite::TFtpPing::DirectoryListing; break;
+    default: Site.FtpPing = TSite::TFtpPing::Off; break;
+  }
+  Site.FtpPingInterval = Data->FtpPingInterval;
+  Site.AddressFamily = static_cast<TSite::TAddressFamily>(Data->AddressFamily);
+  Site.FtpProxyLogonType = Data->FtpProxyLogonType;
+  Site.ProxyTelnetCommand = Utf8(Data->ProxyTelnetCommand);
+  Site.ProxyLocalCommand = Utf8(Data->ProxyLocalCommand);
+  Site.ProxyDns = AutoSwitchOf(Data->ProxyDNS);
+  Site.Tunnel = Data->Tunnel;
+  Site.TunnelHostName = Utf8(Data->TunnelHostName);
+  Site.TunnelPortNumber = Data->TunnelPortNumber;
+  Site.TunnelUserName = Utf8(Data->TunnelUserName);
+  Site.TunnelPrivateKeyFile = Utf8(Data->TunnelPublicKeyFile);
+  Site.TunnelLocalPortNumber = Data->TunnelAutoassignLocalPortNumber ? 0 : Data->TunnelLocalPortNumber;
+  Site.MinTls = TlsOf(Data->MinTlsVersion);
+  Site.MaxTls = TlsOf(Data->MaxTlsVersion);
+  Site.SslSessionReuse = Data->SslSessionReuse;
+  Site.TlsCertificateFile = Utf8(Data->TlsCertificateFile);
+  Site.Compression = Data->Compression;
+  Site.Ssh2DES = Data->Ssh2DES;
+  Site.Ciphers.clear();
+  for (int Index = 0; Index < CIPHER_COUNT; Index++)
+  {
+    Site.Ciphers.push_back(Data->Cipher[Index]);
+  }
+  Site.Kex.clear();
+  for (int Index = 0; Index < KEX_COUNT; Index++)
+  {
+    Site.Kex.push_back(Data->Kex[Index]);
+  }
+  Site.AuthGSSAPIKEX = Data->AuthGSSAPIKEX;
+  Site.RekeyTime = Data->RekeyTime;
+  Site.RekeyData = Utf8(Data->RekeyData);
+  Site.SshNoUserAuth = Data->SshNoUserAuth;
+  Site.KeyboardInteractivePassword = Data->AuthKIPassword;
+  Site.AuthGSSAPI = Data->AuthGSSAPI;
+  Site.GSSAPIFwdTGT = Data->GSSAPIFwdTGT;
+  Site.DetachedCertificate = Utf8(Data->DetachedCertificate);
+  for (int Index = 0; Index < TSite::SshBugCount; Index++)
+  {
+    Site.SshBugs[Index] = AutoSwitchOf(Data->Bug[SshBugs[Index]]);
+  }
+  Site.Note = Utf8(Data->Note);
+  Site.Color = Data->Color;
   return Site;
+}
+
+// Site Advanced's SaveSession, on Data: the settings of its pages.
+void ApplyAdvanced(TSessionData * Data, const TSite & Site)
+{
+  Data->SynchronizeBrowsing = Site.SynchronizeBrowsing;
+  Data->CacheDirectories = Site.CacheDirectories;
+  Data->CacheDirectoryChanges = Site.CacheDirectoryChanges;
+  Data->PreserveDirectoryChanges = Site.PreserveDirectoryChanges;
+  Data->ResolveSymlinks = Site.ResolveSymlinks;
+  Data->FollowDirectorySymlinks = Site.FollowDirectorySymlinks;
+  Data->DSTMode = Site.DstWindows ? dstmWin : dstmUnix;
+  Data->EOLType = Site.EolCrLf ? eolCRLF : eolLF;
+  Data->NotUtf = AutoSwitchOf(Site.Utf);
+  Data->TimeDifference = double(Site.TimeDifferenceMinutes) / MinsPerDay;
+  Data->TimeDifferenceAuto = Site.TimeDifferenceAuto;
+  Data->TrimVMSVersions = Site.TrimVMSVersions;
+  Data->VMSAllRevisions = Site.VMSAllRevisions;
+  Data->DeleteToRecycleBin = Site.DeleteToRecycleBin;
+  Data->OverwrittenToRecycleBin = Site.OverwrittenToRecycleBin;
+  Data->RecycleBinPath = FromUtf8(Site.RecycleBinPath);
+  // SFTP: SCP as its fallback, or SFTP only.
+  if ((Data->FSProtocol == fsSFTP) || (Data->FSProtocol == fsSFTPonly))
+  {
+    Data->FSProtocol = Site.AllowScpFallback ? fsSFTP : fsSFTPonly;
+  }
+  Data->SftpServer = FromUtf8(Site.SftpServer);
+  Data->UsePosixRename = Site.UsePosixRename;
+  Data->SFTPMaxVersion = (Site.SftpMaxVersion < 0) ? SFTPMaxVersionAuto : Site.SftpMaxVersion;
+  Data->SFTPRealPath = AutoSwitchOf(Site.SftpRealPath);
+  Data->SFTPBug[sbSymlink] = AutoSwitchOf(Site.SftpBugSymlink);
+  Data->SFTPBug[sbSignedTS] = AutoSwitchOf(Site.SftpBugSignedTS);
+  Data->DefaultShell = Site.Shell.empty();
+  Data->Shell = FromUtf8(Site.Shell);
+  Data->DetectReturnVar = Site.ReturnVar.empty();
+  Data->ReturnVar = FromUtf8(Site.ReturnVar);
+  Data->ListingCommand = FromUtf8(Site.ListingCommand);
+  Data->LookupUserGroups = AutoSwitchOf(Site.LookupUserGroups);
+  Data->ClearAliases = Site.ClearAliases;
+  Data->IgnoreLsWarnings = Site.IgnoreLsWarnings;
+  Data->Scp1Compatibility = Site.Scp1Compatibility;
+  Data->UnsetNationalVars = Site.UnsetNationalVars;
+  Data->SCPLsFullTime = Site.ScpLsFullTime ? asAuto : asOff;
+  Data->FtpAccount = FromUtf8(Site.FtpAccount);
+  Data->PostLoginCommands = FromUtf8(Site.PostLoginCommands);
+  Data->FtpListAll = AutoSwitchOf(Site.FtpListAll);
+  Data->FtpUseMlsd = AutoSwitchOf(Site.FtpUseMlsd);
+  Data->FtpForcePasvIp = AutoSwitchOf(Site.FtpForcePasvIp);
+  Data->FtpHost = AutoSwitchOf(Site.FtpHost);
+  Data->S3DefaultRegion = FromUtf8(Site.S3DefaultRegion);
+  Data->S3UrlStyle = Site.S3UrlStylePath ? s3usPath : s3usVirtualHost;
+  Data->S3RequesterPays = Site.S3RequesterPays;
+  // With automatic credentials the token is the environment's, not kept;
+  // trimmed not to authenticate with a stray new line.
+  Data->S3SessionToken = Data->HasAutoCredentials() ? UnicodeString() : FromUtf8(Site.S3SessionToken).Trim();
+  Data->S3RoleArn = FromUtf8(Site.S3RoleArn);
+  Data->WebDavLiberalEscaping = Site.WebDavLiberalEscaping;
+  Data->WebDavCrossDomainRedirects = Site.WebDavCrossDomainRedirects;
+  Data->SendBuf = Site.OptimizeBuffers ? DefaultSendBuf : 0;
+  Data->SshSimple = Site.OptimizeBuffers;
+  Data->PingType = static_cast<TPingType>(Site.Ping);
+  Data->PingInterval = Site.PingInterval;
+  switch (Site.FtpPing)
+  {
+    case TSite::TFtpPing::DummyCommand: Data->FtpPingType = fptDummyCommand; break;
+    case TSite::TFtpPing::DirectoryListing: Data->FtpPingType = fptDirectoryListing; break;
+    default: Data->FtpPingType = fptOff; break;
+  }
+  Data->FtpPingInterval = Site.FtpPingInterval;
+  Data->AddressFamily = static_cast<TAddressFamily>(Site.AddressFamily);
+  Data->FtpProxyLogonType = Site.FtpProxyLogonType;
+  Data->ProxyTelnetCommand = FromUtf8(Site.ProxyTelnetCommand);
+  Data->ProxyLocalCommand = FromUtf8(Site.ProxyLocalCommand);
+  Data->ProxyDNS = AutoSwitchOf(Site.ProxyDns);
+  Data->Tunnel = Site.Tunnel;
+  Data->TunnelHostName = FromUtf8(Site.TunnelHostName);
+  Data->TunnelPortNumber = Site.TunnelPortNumber;
+  Data->TunnelUserName = FromUtf8(Site.TunnelUserName);
+  if (!Site.PasswordsLocked || !Site.TunnelPassword.empty())
+  {
+    Data->TunnelPassword = FromUtf8(Site.TunnelPassword);
+  }
+  Data->TunnelPublicKeyFile = FromUtf8(Site.TunnelPrivateKeyFile);
+  Data->TunnelLocalPortNumber = Site.TunnelLocalPortNumber;
+  Data->MinTlsVersion = TlsVersionOf(Site.MinTls);
+  Data->MaxTlsVersion = TlsVersionOf(Site.MaxTls);
+  Data->SslSessionReuse = Site.SslSessionReuse;
+  Data->TlsCertificateFile = FromUtf8(Site.TlsCertificateFile);
+  Data->Compression = Site.Compression;
+  Data->Ssh2DES = Site.Ssh2DES;
+  if (Site.Ciphers.size() == CIPHER_COUNT)
+  {
+    for (int Index = 0; Index < CIPHER_COUNT; Index++)
+    {
+      Data->Cipher[Index] = static_cast<TCipher>(Site.Ciphers[Index]);
+    }
+  }
+  if (Site.Kex.size() == KEX_COUNT)
+  {
+    for (int Index = 0; Index < KEX_COUNT; Index++)
+    {
+      Data->Kex[Index] = static_cast<TKex>(Site.Kex[Index]);
+    }
+  }
+  Data->AuthGSSAPIKEX = Site.AuthGSSAPIKEX;
+  Data->RekeyTime = Site.RekeyTime;
+  Data->RekeyData = FromUtf8(Site.RekeyData);
+  Data->SshNoUserAuth = Site.SshNoUserAuth;
+  Data->AuthKIPassword = Site.KeyboardInteractivePassword;
+  Data->AuthGSSAPI = Site.AuthGSSAPI;
+  Data->GSSAPIFwdTGT = Site.GSSAPIFwdTGT;
+  Data->DetachedCertificate = FromUtf8(Site.DetachedCertificate);
+  for (int Index = 0; (Index < TSite::SshBugCount) && (Index < static_cast<int>(Site.SshBugs.size())); Index++)
+  {
+    Data->Bug[SshBugs[Index]] = AutoSwitchOf(Site.SshBugs[Index]);
+  }
+  Data->Note = FromUtf8(Site.Note);
+  Data->Color = Site.Color;
+  if (!Site.PasswordsLocked || !Site.EncryptKey.empty())
+  {
+    Data->EncryptKey = FromUtf8(Site.EncryptKey);
+  }
 }
 
 }  // namespace
@@ -214,6 +484,7 @@ TSessionData * SessionDataOf(const TSite & Site, const std::string & BaseName)
   Data->TryAgent = Site.TryAgent;
   Data->AuthKI = Site.KeyboardInteractive;
   Data->AgentFwd = Site.AgentForwarding;
+  ApplyAdvanced(Data.get(), Site);
   if (!Site.Name.empty())
   {
     Data->Name = FromUtf8(Site.Name);
@@ -713,6 +984,111 @@ std::vector<std::string> TImportSites::Import(int Source)
   {
     throw CoreErrorOf(E);
   }
+}
+
+std::vector<std::string> CipherNames()
+{
+  std::vector<std::string> Result;
+  for (int Index = 0; Index < CIPHER_COUNT; Index++)
+  {
+    Result.push_back(Utf8(LoadStr(CIPHER_NAME_WARN + Index)));
+  }
+  return Result;
+}
+
+std::vector<std::string> KexNames()
+{
+  std::vector<std::string> Result;
+  for (int Index = 0; Index < KEX_COUNT; Index++)
+  {
+    Result.push_back(Utf8(LoadStr(KEX_NAME_WARN + Index)));
+  }
+  return Result;
+}
+
+TS3Credentials S3Credentials(const TSite & Site)
+{
+  TS3Credentials Result;
+  try
+  {
+    std::unique_ptr<TSessionData> Data(SessionDataOf(Site, std::string()));
+    Result.Automatic = Data->HasAutoCredentials();
+    Result.Amazon = IsAmazonS3SessionData(Data.get());
+    Result.SessionToken = Utf8(Data->S3SessionToken);
+    Result.RoleArn = Utf8(Data->S3RoleArn);
+    if (Result.Automatic)
+    {
+      // As LoadSession: what the environment gives, if anything.
+      try
+      {
+        Result.SessionToken = Utf8(S3EnvSessionToken(Data->S3Profile));
+        Result.RoleArn = Utf8(S3EnvRoleArn(Data->S3Profile));
+      }
+      catch (...)
+      {
+      }
+    }
+  }
+  catch (Exception &)
+  {
+  }
+  return Result;
+}
+
+bool KeyHasCertificate(const std::string & FileName)
+{
+  bool Result = false;
+  try
+  {
+    UnicodeString Comment;
+    GetPublicKeyLine(FromUtf8(FileName), Comment, Result);
+  }
+  catch (...)
+  {
+    Result = false;
+  }
+  return Result;
+}
+
+std::string PublicKeyLine(const std::string & FileName)
+{
+  try
+  {
+    UnicodeString Comment;
+    bool HasCertificate;
+    return Utf8(GetPublicKeyLine(FromUtf8(FileName), Comment, HasCertificate));
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+std::string GenerateEncryptKey()
+{
+  return Utf8(BytesToHex(::GenerateEncryptKey()));
+}
+
+void ValidateEncryptKey(const std::string & HexKey)
+{
+  try
+  {
+    ::ValidateEncryptKey(HexToBytes(FromUtf8(HexKey)));
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+int TunnelLocalPortNumberLow()
+{
+  return Configuration->TunnelLocalPortNumberLow;
+}
+
+int TunnelLocalPortNumberHigh()
+{
+  return Configuration->TunnelLocalPortNumberHigh;
 }
 
 }  // namespace CoreBridge

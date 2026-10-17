@@ -3937,14 +3937,6 @@ Location: %2</source>
         <translation>고급 사이트 설정</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>원격 디렉터리(&amp;D):</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>찾아보기(&amp;B)...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>로컬 디렉터리</translation>
     </message>
@@ -3955,10 +3947,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>디렉터리</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> 초</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3981,40 +3969,20 @@ Location: %2</source>
         <translation>프록시 유형(&amp;T)</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>프록시 호스트 이름(&amp;X):</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>포트 번호(&amp;R):</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>사용자 이름(&amp;U):</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>비밀번호(&amp;P):</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>로컬 주소에도 프록시 사용(&amp;L)</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>프록시</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Pageant 또는 ssh-agent를 사용한 인증 시도(&amp;P)</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>에이전트 포워딩 허용(&amp;F)</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>찾아보기(&amp;R)...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4029,16 +3997,656 @@ Location: %2</source>
         <translation>개인키 파일(&amp;K):</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH 인증</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>마지막으로 사용한 디렉터리 기억(&amp;M)</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>&apos;키보드 입력&apos; 인증 시도(SSH-2)(&amp;I)</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>페이지</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>색상(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>환경</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>서버 환경</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>줄 종료 문자(서버에서 지정되지 않은 경우)(&amp;E)</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>파일 이름을 UTF-8 인코딩(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>시간대 간격(&amp;Z):</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>시</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>시간대 오프셋 (시)</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>시간대 오프셋 (분)</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>분</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>자동 감지(&amp;A)</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>VMS 버전 숫자 잘라내기(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>일광 절약 시간</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>지역 시간으로 원격 시간 조정(Unix)(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>DST로 원격 시간 조정(Windows)(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>동기화 탐색(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>원격 디렉터리(&amp;R):</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>탐색기 형태일 경우 로컬 디렉터리는 사용 안됨</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>디렉터리 읽기 옵션</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>방문했던 원격 디렉터리를 캐시(&amp;V)</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>디렉터리 변경을 캐시(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>캐시 영구 보존(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>심볼릭 링크 연결(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>디렉터리의 심볼릭 링크로 이동(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>휴지통</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>삭제된 원격 파일을 휴지통에 보관(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>덮어쓴 원격 파일을 휴지통에 보관(SFTP만 가능)(&amp;O)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>원격 휴지통(&amp;R):</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>암호화</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>파일 암호화(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>암호화 옵션</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>암호화 키(&amp;K):</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>키 표시(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>키 생성(&amp;G)</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>프로토콜 설정</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>기본</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP 서버(&amp;V):</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>자동</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>우선 순위 SFTP 프로토콜 버전(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>서버 경로 정규화(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>SCP 대체 허용(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>P&amp;OSIX rename 사용</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>SFTP 서버의 알려진 버그 발견</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>심볼릭 링크 명령 인자 역순 처리(&amp;R):</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>1970년 이전 파일 시간 정정 여부(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>쉘</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>쉘(&amp;H):</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>자동 감지</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>반환 코드 값(&amp;R):</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>디렉터리 목록 명령</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>목록 명령(&amp;C):</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>LS 경고 무시(&amp;W)</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>전체 시간 획득 시도(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>기타 옵션</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>사용자 그룹 검사(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>별칭 초기화(&amp;L)</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>국가 설정값 초기화(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>SCP1 호환 모드로 SCP2 사용(&amp;2)</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>로그인 후 명령(&amp;C):</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>계정(&amp;A):</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>숨김 파일 목록 표시(&amp;S):</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>디렉터리 목록 표시를 위해 MLSD 명령 사용(&amp;M)</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>패시브 모드 연결을 위해 IP 주소 고정(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>HOST 명령을 사용하여 서버에서 호스트를 선택하십시오(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>VMS 서버의 모든 파일 개정판 표시(&amp;R)</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>기본 지역(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>가상 호스트</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>경로</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>URL 스타일(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>요청자 지불(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>인증</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>세션 토큰(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>Role ARN(&amp;R):</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>파일 이름에 인코딩되지 않은 특수 문자 허용(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>다른 호스트로 리디렉션 허용(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>접속 버퍼 길이 최적화(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>제한 시간</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>초</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>연결 유지</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>사용 안함(&amp;O)</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>빈 SSH 패킷 전송(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>더미 프로토콜 명령 실행(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>연결 유지 시간(&amp;B)</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>추가로 현재 디렉터리 읽기(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>인터넷 프로토콜 버전</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>자동(&amp;U)</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv4(&amp;4)</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv6(&amp;6)</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>로컬</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>자동 감지(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>프록시 서버 이름(&amp;X):</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>사용자 이름(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>프록시 설정</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>패턴</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>텔넷 명령</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>로컬 프록시 명령</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>로컬 호스트 연결이 프록시인 경우 고려(&amp;N)</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>아니요</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>예</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>프록시 연결에 DNS 이름 찾기(&amp;D):</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>터널링</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>SSH 터널링을 통한 접속(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>터널링 설정 호스트</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>호스트 이름(&amp;H):</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>터널링 옵션</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>자동선택</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>로컬 터널링 포트(&amp;L):</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>터널링 인증 매개변수</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS 옵션</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>최소 TLS 버전(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>최대 TLS 버전(&amp;X)</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>데이터 연결에 TLS 세션 ID 재사용(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>인증 매개변수</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>클라이언트 인증서 파일(&amp;C):</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>클라이언트 인증서 파일</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>인증서 파일 (*.pfx *.p12 *.pem *.crt *.key);;모든 파일 (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>압축하기(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>암호화 알고리즘 선택 정책(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>암호화 알고리즘 선택 정책</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>위로(&amp;U)</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>아래로(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>SSH-2에서 DES 알고리즘 사용(하위호환성)(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>키 교환</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>키 교환 알고리즘 옵션</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>알고리즘 선택 정책(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>알고리즘 선택 정책</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>GSSAPI 키 교환 시도(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>키 재교환 제어 옵션</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>다음 시간(분) 이 후 키 재교환(0: 무제한)(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>다음 데이터 이 후 키 재교환(0: 무제한)(&amp;X)</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>모든 인증 건너 뜀(SSH-2)(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>인증 옵션</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>에이전트를 사용한 인증 시도(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>초기 메시지에 암호로 응답(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>공개 키 표시(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>개인 키와 함께 사용할 인증서(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>인증서</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH 인증서 (*-cert.pub);;모든 파일 (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>GSSAPI/SSPI 인증 시도(SSH-2)(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>GSSAPI 인증 위임 허용(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>버그</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>SSH 서버의 알려진 버그 탐지</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>SSH-2 HMAC 키 계산 오류(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>SSH-2 암호 키 계산 오류(&amp;E):</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>SSH-2 RSA 전자서명에 패딩 요구(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>SSH-2 공개키 인증에서 세션 ID 오용(&amp;N):</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>잘못된 SSH-2 키 재교환 처리(&amp;K):</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>SSH-2 최대 허용 패킷 길이 무시(&amp;X):</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>SSH-2 무시 메시지 제한(&amp;2):</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>WinSCP의 SSH-2 &apos;winadj&apos; 요청 제한</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>노트</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>로컬 프록시 명령(&amp;C):</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>텔넷 명령(&amp;M):</translation>
     </message>
 </context>
 <context>

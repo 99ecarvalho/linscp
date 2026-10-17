@@ -3938,14 +3938,6 @@ Ubicació: %2</translation>
         <translation>Configuració avançada del lloc</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>Directori &amp;remot:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Navega...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Directori local</translation>
     </message>
@@ -3956,10 +3948,6 @@ Ubicació: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Directoris</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> segons</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3982,40 +3970,20 @@ Ubicació: %2</translation>
         <translation>&amp;Tipus de servidor:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>&amp;Nom del servidor intermediari:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>&amp;Port:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>Nom d&apos;&amp;usuari:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Contrasenya:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Pa&amp;ssa pel servidor intermediari les adreces locals</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Servidor intermediari</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Intenta l&apos;autenticació amb &amp;Pageant o ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Permet &amp;reenviament d&apos;agent</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>&amp;Navega...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4030,16 +3998,656 @@ Ubicació: %2</translation>
         <translation>&amp;Fitxer de clau privada:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>Autenticació SSH</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>Recorda l&apos;últim directori &amp;utilitzat</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Intenta l&apos;autenticació &apos;&amp;interactiva amb teclat&apos;</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation type="unfinished">Pàgines</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation type="unfinished">&amp;Color</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation type="unfinished">Entorn</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Entorn del servidor</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>&amp;Caràcters de fi de línia (si no ho indica el servidor):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>Codificació &amp;UTF-8 per als noms de fitxers:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Diferència de &amp;zona horària:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>hores</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>minuts</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>&amp;Detecta automàticament</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>Retalla números de versió del &amp;VMS</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Horari d&apos;estiu (DST)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Ajusta marca horària remota a convenció &amp;local</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Ajusta marca horària &amp;remota a horari d&apos;estiu (DST)</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>&amp;Navegació sincronitzada</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation type="unfinished">Directori &amp;remot:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>El directori local no s&apos;utilitza a la interfície tipus Explorador.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Opcions de lectura del directori</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Desa a memòria cau els directoris remots &amp;visitats</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Desa a memòria cau els &amp;canvis de directori</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>Memòria cau &amp;permanent</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Resol &amp;enllaços simbòlics</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>&amp;Segueix enllaços simbòlics a directoris</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Paperera de reciclatge</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>Preserva els fitxers remots s&amp;uprimits a la paperera de reciclatge</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Preserva fitxers remots s&amp;obreescrits a paperera reciclatge (només SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>Paperera de reciclatge &amp;remota:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Encriptació</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;Encripta fitxers</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Opcions d&apos;encriptació</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>&amp;Clau d&apos;encriptació:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;Mostra la clau</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Genera la clau</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Opcions de protocol</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Per defecte</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>&amp;Servidor SFTP:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished">Auto</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>&amp;Versió preferida del protocol SFTP:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>&amp;Canonitzar camins en el servidor</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>&amp;Permet mètode alternatiu SCP</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;Utilitza el canvi de nom del POSIX</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Detecció d&apos;errors coneguts en servidors SFTP</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>&amp;Inverteix l&apos;ordre dels paràmetres en crear enllaços simbòlics:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>Interpreta &amp;malament les marques de temps anteriors a 1970:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Intèrpret d&apos;ordres</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>&amp;Intèrpret d&apos;ordres:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Autodetecta</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>&amp;Variable codi de retorn:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Llistat de directoris</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>&amp;Ordre de llistat:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Ignora &amp;avisos de LS</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Provar d&apos;aconseguir la marca horària &amp;completa</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Altres opcions</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Cerca grups d&apos;&amp;usuari</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Neteja à&amp;lies</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Neteja variables &amp;nacionals</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Utilitza scp&amp;2 amb compatibilitat de scp1</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>&amp;Ordres posteriors a l&apos;entrada:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Compte:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>&amp;Suport per a llistar els fitxers amagats:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Utilitza l&apos;ordre &amp;MLSD per al llistat de directoris</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>&amp;Força l&apos;adreça IP per a les connexions en mode passiu:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Utilitza l&apos;ordre &amp;HOST per a seleccionar l&apos;amfitrió en el servidor</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Mostra totes les &amp;revisions de fitxers en els servidors VMS</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>Regió per &amp;defecte:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Amfitrió virtual</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Camí</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>Estil &amp;URL:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>El sol·licitant &amp;paga</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation type="unfinished">Autenticació</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>Token de &amp;sessió:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Rol ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Tolerar caràcters especials no codificats en els noms de fitxer</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;Permetre redireccions a altres amfitrions</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Optimitza la mida de la &amp;memòria intermèdia de connexió</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Temps d&apos;espera</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>segons</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Manteniment de connexió</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Desactivat</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>Envia paquets SSH &amp;nuls</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>E&amp;xecuta ordres de protocol falses</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>&amp;Segons entre manteniments de connexió:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>I &amp;addicionalment llegint el directori actual</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Versió de protocol d&apos;Internet</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>&amp;Auto</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation type="unfinished">Local</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;Autodetecta</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>&amp;Nom del servidor intermediari:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;Usuari:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Paràmetres del servidor intermediari</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>patrons</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>Pa&amp;ssa pel servidor intermediari les connexions de l&apos;ordinador local</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished">No</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished">Sí</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Resolució de &amp;DNS amb el servidor intermediari:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Túnel</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>Connecta a través de &amp;túnel SSH</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Amfitrió on configurar el túnel</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>&amp;Nom de l&apos;amfitrió:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Opcions de túnel</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Autoselecciona</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>Port de túnel &amp;local:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Paràmetres d&apos;autenticació del túnel</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>Opcions TLS</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Versió TLS mí&amp;nima:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Versió TLS mà&amp;xima:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Reutilitzar l&apos;ID de la sessió TLS per a connexions de dades</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Paràmetres d&apos;autenticació</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>Fitxer de certificat del &amp;client:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>&amp;Habilita compressió</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>&amp;Política de selecció de l&apos;algorisme d&apos;encriptació:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation type="unfinished">Am&amp;unt</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation type="unfinished">A&amp;vall</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Permet l&apos;ús de &amp;DES senzill</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Intercanvi de claus</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Opcions de l&apos;algorisme d&apos;intercanvi de claus</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>&amp;Política de selecció de l&apos;algorisme:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Intentar l&apos;intercanvi de clau &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Opcions pel control del reintercanvi de claus</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Màxim de &amp;minuts abans de renegociar (0 sense límit):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Màxim de &amp;dades abans de renegociar (0 sense límit):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;Evita del tot l&apos;autenticació</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Opcions d&apos;autenticació</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>Intenta l&apos;&amp;autenticació amb l&apos;agent</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Respon amb &amp;contrasenya a la primera sol·licitud</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;Mostra la clau pública</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Certificat per &amp;usar amb la clau privada:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Intenta autenticació &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Permet &amp;delegació de credencials GSSAPI</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Errors</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Detecció d&apos;errors coneguts en servidors SSH</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Càlcul erroni de claus &amp;HMAC SSH2:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>&amp;Càlcul erroni de claus d&apos;encriptació:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Requereix &amp;separació a les signatures RSA SSH:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>&amp;Mal ús de la ID de sessió en l&apos;autenticació SSH PK:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Gestiona malament el &amp;reintercanvi de claus SSH:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Ignora la mida mà&amp;xima de paquet de SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Es penja en missatges i&amp;gnorats SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Es penja en peticions SSH &apos;winadj&apos; del WinSCP</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Nota</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Ordre del servidor &amp;local:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>&amp;Ordre Telnet:</translation>
     </message>
 </context>
 <context>

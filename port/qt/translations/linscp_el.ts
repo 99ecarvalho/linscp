@@ -3938,14 +3938,6 @@ Location: %2</source>
         <translation>Προχωρημένες ρυθμίσεις χώρου</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>Απομακρυσμένος &amp;κατάλογος:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>Αναζήτηση</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Τοπικός κατάλογος</translation>
     </message>
@@ -3956,10 +3948,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>Κατάλογοι</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> δευτερόλεπτα</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3982,40 +3970,20 @@ Location: %2</source>
         <translation>&amp;Τύπος διακομιστή μεσολάβησης:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Όνομα &amp;διακομιστή μεσολάβησης:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Αριθμός &amp;πόρτας:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>Όνομα &amp;χρήστη:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Κωδικός:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Χρήση διακομιστή μεσολάβησης για &amp;τοπικές διευθύνσεις</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Διακομιστής μεσολάβησης</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Απόπειρα πιστοποίησης με &amp;Pageant ή ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Να επιτρέπεται η &amp;προώθηση πράκτορα</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>Α&amp;ναζήτηση...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4030,16 +3998,656 @@ Location: %2</source>
         <translation>Αρχείο ιδιωτικού &amp;κλειδιού:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>Πιστοποίηση SSH</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>&amp;Απομνημόνευση του τελευταίου καταλόγου</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Απόπειρα πιστοποίησης &apos;keyboard-&amp;interactive&apos;</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Σελίδες</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Χρώμα</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Περιβάλλον</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Περιβάλλον διακομιστή</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>Χαρακτήρες τέλους &amp;γραμμής (αν δεν υποδεικνύονται από τον διακομιστή):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>Κωδικοποίηση &amp;UTF-8 για τα ονόματα αρχείων:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Διαφορά &amp;ζώνης ώρας:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>ώρες</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Διαφορά ζώνης ώρας σε ώρες</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Διαφορά ζώνης ώρας σε λεπτά</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>λεπτά</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>&amp;Αυτόματος εντοπισμός</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;Περικοπή αριθμών έκδοσης VMS</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Θερινή ώρα</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Προσαρμογή απομακρυσμένης χρονοσφραγίδας στις τοπικές &amp;συμβάσεις</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Προσαρμογή απομακρυσμένης χρονοσφραγίδας με &amp;θερινή ώρα</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>Σ&amp;υγχρονισμός περιήγησης</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;Απομακρυσμένος κατάλογος:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Ο τοπικός κατάλογος δεν χρησιμοποιείται με τη διεπαφή Explorer.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Επιλογές ανάγνωσης καταλόγων</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Προσωρινή αποθήκευση &amp;επισκεφθέντων απομακρυσμένων καταλόγων</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Προσωρινή αποθήκευση α&amp;λλαγών καταλόγων</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>&amp;Μόνιμη προσωρινή μνήμη</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Επίλυση συμβολικών &amp;συνδέσμων</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>Ακολούθηση συμβολικών συνδέσμων σε &amp;καταλόγους</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Κάδος ανακύκλωσης</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;Διατήρηση διαγραμμένων απομακρυσμένων αρχείων στον κάδο ανακύκλωσης</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Διατήρηση &amp;αντικατεστημένων απομακρυσμένων αρχείων στον κάδο ανακύκλωσης (μόνο SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>Απομακρυσμένος &amp;κάδος ανακύκλωσης:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Κρυπτογράφηση</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;Κρυπτογράφηση αρχείων</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Επιλογές κρυπτογράφησης</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>Κ&amp;λειδί κρυπτογράφησης:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;Εμφάνιση κλειδιού</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Δημιουργία κλειδιού</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Επιλογές πρωτοκόλλου</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Προεπιλογή</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>&amp;Διακομιστής SFTP:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Αυτόματο</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>&amp;Προτιμώμενη έκδοση πρωτοκόλλου SFTP:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>&amp;Κανονικοποίηση διαδρομών στον διακομιστή</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Να επιτρέπεται η &amp;εναλλακτική χρήση SCP</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;Χρήση μετονομασίας POSIX</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Εντοπισμός γνωστών σφαλμάτων σε διακομιστές SFTP</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>&amp;Αντιστρέφει τη σειρά των ορισμάτων της εντολής συνδέσμου:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>Πα&amp;ρερμηνεύει τις χρονοσφραγίδες αρχείων πριν από το 1970:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Κέλυφος</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>&amp;Κέλυφος:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Αυτόματος εντοπισμός</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>Μεταβλητή κωδικού &amp;επιστροφής:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Λίστα καταλόγων</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>Ε&amp;ντολή λίστας:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Παράβλεψη &amp;προειδοποιήσεων LS</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Απόπειρα λήψης πλήρους &amp;χρονοσφραγίδας</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Άλλες επιλογές</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Αναζήτηση &amp;ομάδων χρήστη</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Εκκαθάριση &amp;ψευδωνύμων</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Εκκαθάριση εθνικών &amp;μεταβλητών</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Χρήση scp&amp;2 με συμβατότητα scp1</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>&amp;Εντολές μετά τη σύνδεση:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Λογαριασμός:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>&amp;Υποστήριξη λίστας κρυφών αρχείων:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Χρήση της εντολής &amp;MLSD για τη λίστα καταλόγων</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>Επι&amp;βολή διεύθυνσης IP για συνδέσεις παθητικής λειτουργίας:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Χρήση της εντολής &amp;HOST για επιλογή κεντρικού υπολογιστή στον διακομιστή</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Εμφάνιση όλων των &amp;αναθεωρήσεων αρχείων σε διακομιστές VMS</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;Προεπιλεγμένη περιοχή:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Εικονικός κεντρικός υπολογιστής</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Διαδρομή</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>Στυλ &amp;URL:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>Πληρώνει ο &amp;αιτών</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Πιστοποίηση</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>Διακριτικό &amp;συνεδρίας:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>ARN &amp;ρόλου:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Ανοχή μη κωδικοποιημένων ειδικών χαρακτήρων στα ονόματα αρχείων</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>Να &amp;επιτρέπονται ανακατευθύνσεις σε άλλους κεντρικούς υπολογιστές</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Βελτιστοποίηση μεγέθους &amp;προσωρινής μνήμης σύνδεσης</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Χρονικά όρια</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>δευτερόλεπτα</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Διατήρηση σύνδεσης</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Ανενεργό</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>Αποστολή κενών &amp;πακέτων SSH</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Εκτέλεση &amp;εικονικών εντολών πρωτοκόλλου</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Δευτερόλεπτα &amp;μεταξύ αποστολών:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;Και επιπλέον ανάγνωση του τρέχοντος καταλόγου</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Έκδοση πρωτοκόλλου διαδικτύου</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>Αυτόμα&amp;το</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Τοπικό</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;Αυτόματος εντοπισμός</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>&amp;Όνομα διακομιστή μεσολάβησης:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>Όνομα &amp;χρήστη:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Ρυθμίσεις διακομιστή μεσολάβησης</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>μοτίβα</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Εντολή Telnet</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Τοπική εντολή διακομιστή μεσολάβησης</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>Να &amp;εξετάζεται η χρήση διακομιστή μεσολάβησης για συνδέσεις στον τοπικό υπολογιστή</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Όχι</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Ναι</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Αναζήτηση ονομάτων &amp;DNS στον διακομιστή μεσολάβησης:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Σήραγγα</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>Σύνδεση &amp;μέσω σήραγγας SSH</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Κεντρικός υπολογιστής για τη δημιουργία της σήραγγας</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>Όνομα &amp;κεντρικού υπολογιστή:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Επιλογές σήραγγας</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Αυτόματη επιλογή</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>&amp;Τοπική θύρα σήραγγας:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Παράμετροι πιστοποίησης σήραγγας</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>Επιλογές TLS</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>&amp;Ελάχιστη έκδοση TLS:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Μέ&amp;γιστη έκδοση TLS:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>Επανα&amp;χρησιμοποίηση του αναγνωριστικού συνεδρίας TLS για συνδέσεις δεδομένων</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Παράμετροι πιστοποίησης</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>Αρχείο &amp;πιστοποιητικού πελάτη:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Αρχείο πιστοποιητικού πελάτη</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Αρχεία πιστοποιητικών (*.pfx *.p12 *.pem *.crt *.key);;Όλα τα αρχεία (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>&amp;Ενεργοποίηση συμπίεσης</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>Πολιτική επιλογής &amp;αλγορίθμου κρυπτογράφησης:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Πολιτική επιλογής αλγορίθμου κρυπτογράφησης</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Πάνω</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;Κάτω</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Ενεργοποίηση παλαιάς χρήσης απλού &amp;DES</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Ανταλλαγή κλειδιών</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Επιλογές αλγορίθμου ανταλλαγής κλειδιών</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>&amp;Πολιτική επιλογής αλγορίθμου:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Πολιτική επιλογής αλγορίθμου</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Απόπειρα ανταλλαγής κλειδιών &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Επιλογές ελέγχου επανανταλλαγής κλειδιών</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Μέγιστα &amp;λεπτά πριν από την επανανταλλαγή κλειδιών (0 για χωρίς όριο):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Μέγιστα &amp;δεδομένα πριν από την επανανταλλαγή κλειδιών (0 για χωρίς όριο):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;Πλήρης παράκαμψη πιστοποίησης</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Επιλογές πιστοποίησης</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>&amp;Απόπειρα πιστοποίησης μέσω πράκτορα</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Απάντηση με κω&amp;δικό στην πρώτη ερώτηση</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;Εμφάνιση δημόσιου κλειδιού</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Πιστοποιητικό για &amp;χρήση με το ιδιωτικό κλειδί:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Πιστοποιητικό</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>Πιστοποιητικά OpenSSH (*-cert.pub);;Όλα τα αρχεία (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Απόπειρα πιστοποίησης &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Να επιτρέπεται η εκχώ&amp;ρηση διαπιστευτηρίων GSSAPI</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Σφάλματα</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Εντοπισμός γνωστών σφαλμάτων σε διακομιστές SSH</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Λάθος υπολογισμός κλειδιών H&amp;MAC του SSH:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Λάθος υπολογισμός κλειδιών &amp;κρυπτογράφησης του SSH:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Απαιτεί συμπλήρωση στις &amp;υπογραφές RSA του SSH:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Λάθος χρήση του αναγνωριστικού &amp;συνεδρίας στην πιστοποίηση PK του SSH:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Κακός χειρισμός της &amp;επανανταλλαγής κλειδιών του SSH:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Αγνοεί το &amp;μέγιστο μέγεθος πακέτου του SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Κολλάει με τα μηνύματα &amp;ignore του SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Κολλάει με τις αιτήσεις &apos;&amp;winadj&apos; του SSH του WinSCP</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Σημείωση</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Τοπική &amp;εντολή διακομιστή μεσολάβησης:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>&amp;Εντολή Telnet:</translation>
     </message>
 </context>
 <context>

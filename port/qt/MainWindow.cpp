@@ -1,5 +1,7 @@
 #include "MainWindow.h"
 
+#include "ColorMenu.h"
+
 #include <QApplication>
 #include <QClipboard>
 #include <QCloseEvent>
@@ -1948,64 +1950,10 @@ void MainWindow::NewDefaultTab(bool Reverse)
   }
 }
 
-// As CreateSessionColorMenu: the default, WinSCP's standard session colors
-// (GetStandardSessionColorInfo), and any other.
+// As CreateSessionColorMenu (ColorMenu.h).
 void MainWindow::FillColorMenu()
 {
-  FColorMenu->clear();
-  const int Current = FSession ? FSession->Color() : 0;
-  const auto Swatch = [](int Color)
-  {
-    QPixmap Pixmap(16, 16);
-    Pixmap.fill(QColor(Color & 0xFF, (Color >> 8) & 0xFF, (Color >> 16) & 0xFF));
-    return QIcon(Pixmap);
-  };
-  QActionGroup * Group = new QActionGroup(FColorMenu);
-  QAction * Default = FColorMenu->addAction(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ColorDefault)));
-  Default->setStatusTip(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ColorDefaultHint)));
-  Default->setCheckable(true);
-  Default->setChecked(Current == 0);
-  Group->addAction(Default);
-  connect(Default, &QAction::triggered, this, [this]() { SetSessionColor(0); });
-  FColorMenu->addSeparator();
-  static const std::pair<const char *, int> Standard[] = {
-    { QT_TR_NOOP("Rose"), 0xCC99FF }, { QT_TR_NOOP("Tan"), 0x99CCFF }, { QT_TR_NOOP("Light Yellow"), 0x99FFFF },
-    { QT_TR_NOOP("Light Green"), 0xCCFFCC }, { QT_TR_NOOP("Light Turquoise"), 0xFFFFCC }, { QT_TR_NOOP("Pale Blue"), 0xFFCC99 },
-    { QT_TR_NOOP("Lavender"), 0xFF99CC }, { QT_TR_NOOP("Light Orange"), 0xB5D5FB }, { QT_TR_NOOP("Darker White"), 0xD8D8D8 },
-    { QT_TR_NOOP("Darker Tan"), 0x97BDC4 }, { QT_TR_NOOP("Lighter Blue"), 0xE2B38D }, { QT_TR_NOOP("Light Blue"), 0xE4CCB8 },
-    { QT_TR_NOOP("Lighter Red"), 0xB7B9E5 }, { QT_TR_NOOP("Light Olive Green"), 0xBCE3D7 }, { QT_TR_NOOP("Light Purple"), 0xD9C1CC },
-    { QT_TR_NOOP("Light Aqua"), 0xE8DDB7 } };
-  bool Known = (Current == 0);
-  for (const auto & Color : Standard)
-  {
-    QAction * Action = FColorMenu->addAction(Swatch(Color.second), tr(Color.first));
-    Action->setCheckable(true);
-    Action->setChecked(Current == Color.second);
-    Known = Known || (Current == Color.second);
-    Group->addAction(Action);
-    const int Value = Color.second;
-    connect(Action, &QAction::triggered, this, [this, Value]() { SetSessionColor(Value); });
-  }
-  if (!Known)
-  {
-    QAction * Other = FColorMenu->addAction(Swatch(Current), tr("Custom"));
-    Other->setCheckable(true);
-    Other->setChecked(true);
-    Group->addAction(Other);
-  }
-  FColorMenu->addSeparator();
-  QAction * Pick = FColorMenu->addAction(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ColorPick)), this, [this, Current]()
-  {
-    const QColor Initial = (Current != 0) ? QColor(Current & 0xFF, (Current >> 8) & 0xFF, (Current >> 16) & 0xFF) : QColor(Qt::white);
-    const QColor Chosen = QColorDialog::getColor(Initial, this);
-    if (Chosen.isValid())
-    {
-      // A TColor; black would read as none, so the nearest other.
-      const int Value = std::max(1, Chosen.red() | (Chosen.green() << 8) | (Chosen.blue() << 16));
-      SetSessionColor(Value);
-    }
-  });
-  Pick->setStatusTip(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ColorPickHint)));
+  FillSessionColorMenu(FColorMenu, FSession ? FSession->Color() : 0, this, [this](int Color) { SetSessionColor(Color); });
 }
 
 void MainWindow::SetSessionColor(int Color)

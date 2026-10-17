@@ -3938,14 +3938,6 @@ Location: %2</source>
         <translation>გაფართოებული საიტის პარამეტრები</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>დაშო&amp;რებული საქაღალდე:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;მოძებნა...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>ლოკალური საქაღალდე</translation>
     </message>
@@ -3956,10 +3948,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>საქაღალდეები</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> წამი</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3982,40 +3970,20 @@ Location: %2</source>
         <translation>პროქსის &amp;ტიპი:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>პროქსის &amp;ჰოსტის სახელი:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>პო&amp;რტის ნომერი:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>მომ&amp;ხმარებლის სახელი:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;პაროლი:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>პროქსის გამოყენება &amp;ლოკალური მისამართებისთვის</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>პროქსი</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>&amp;Pageant-ით ან ssh-agent-ით ავთენტიკაციის ცდა</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>აგენტის &amp;გადაგზავნის დაშვება</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>არჩე&amp;ვა...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4030,16 +3998,656 @@ Location: %2</source>
         <translation>პირადი გასაღების &amp;ფაილი:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH ავთენტიკაცია</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>ბოლოს გა&amp;მოყენებული საქაღალდის დამახსოვრება</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>&apos;კლავიატურით-&amp;ინტერაქტიური&apos; ავთენტიკაციის ცდა</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>გვერდები</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;ფერი</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>გარემო</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>სერვერული გარემო</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>ხაზის დასრ&amp;ულების სიმბოლოები (თუ სერვერი არ მიუთითებს):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>&amp;UTF-8 კოდირება ფაილის სახელებისთვის:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>დროის სარტ&amp;ყელის წანაცვლება:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>საათი</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>დროის სარტყელის წანაცვლება, საათი</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>დროის სარტყელის წანაცვლება, წუთი</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>წუთი</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>&amp;ავტომატურად დადგენა</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>VMS-ის ვერსიის ნომრების &amp;წაკვეთა</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>დროის გადაწევის წესები</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>დაშორებული დროის შტამპის გასწორება &amp;ლოკალურ პარამეტრზე</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>დაშორებული დროის შტამპის გასწორება &amp;DST-ზე</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>ბრაუზერის სინ&amp;ქრონიზაცია</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>დაშო&amp;რებული საქაღალდე:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Explorer-ის ინტერფეისში ლოკალური საქაღალდე არ გამოიყენება.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>საქაღალდის წაკითხვის პარამეტრები</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>&amp;ნანახი დაშორებული საქაღალდეების დაკეშვა</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>საქაღალ&amp;დის ცვლილებების დაკეშვა</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>მუდმივი &amp;კეში</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>სიმბმუ&amp;ლების ამოხსნა</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>სიმბმულების გაყოლა სა&amp;ქაღალდეებამდე</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>ნაგვის ყუთი</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;წაშლილი დაშორებული ფაილების ნაგვის ყუთში შენახვა</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>&amp;გადაწერილი დაშორებული ფაილების ნაგვის ყუთში შენახვა (მხოლოდ SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>დაშო&amp;რებული ნაგვის ყუთი:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>დაშიფვრა</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>ფაილებ&amp;ის დაშიფვრა</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>დაშიფვრის მორგება</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>დაშიფვრის გა&amp;საღები:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>გასაღები&amp;ს ჩვენება</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;გასაღების გენერაცია</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>პროტოკოლის მორგება</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>ნაგულისხმევი</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP სერ&amp;ვერი:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>ავტო</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>SFTP &amp;პროტოკოლის სასურველი ვერსია:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>ბილიკების &amp;კანონიკალიზაცია სერვერზე</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>SCP &amp;გადართვის დაშვება</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>POSIX-ის სახელის გადარქმევის &amp;გამოყენება</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>ცნობილი შეცდომების გამოვლენა SFTP სერვერებზე</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>ბმულის ბრძანების არგუმენტების &amp;შებრუნებული რიგი:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>1970-მდე ფაილის დროის შტამპებს &amp;არასწორად აღიქვამს:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>გარსი</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>&amp;გარსი:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>ავტოამოცნობა</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>დაბ&amp;რუნებული კოდის ცვლადი:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>საქაღალდის ჩამონათვალი</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>ჩამო&amp;ნათვლის ბრძანება:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>LS გაფრთხილებების &amp;გამოტოვება</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>სრული დროის &amp;შტამპის მიღების ცდა</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>სხვა პარამეტრები</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>მომხმარებლის ჯგ&amp;უფების ძებნა</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>ფსევდონიმების გას&amp;უფთავება</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>&amp;ნაციონალური ცვლადების გასუფთავება</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>scp&amp;2-ის გამოყენება scp1-თან თავსებადობით</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>შესვლისშემდეგი &amp;ბრძანებები:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;ანგარიში:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>დამალული ფაილები&amp;ს ჩამოთვლის მხარდაჭერა:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>&amp;MLSD ბრძანების გამოყენება საქაღალდის ჩამოთვლის მისაღებად</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>IP მისამართის &amp;იძულება პასიური რეჟიმის კავშირებისთვის:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>&amp;HOST ბრძანების გამოყენება სერვერზე ჰოსტის ასარჩევად</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>ყველა ფაილის &amp;რევიზიის ჩვენება VMS სერვერებზე</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>ნაგულისხმევი რე&amp;გიონი:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>ვირტუალური ჰოსტი</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>ბილიკი</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>&amp;URL-ის სტილი:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>მომთხოვნი &amp;იხდის</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>ავთენტიკაცია</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;სესიის კოდი:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;როლის ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>ფაილის სახელებში არაკოდირებული სპეციალური სიმბოლოების &amp;დაშვება</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>სხვა ჰოსტებზე &amp;გადამისამართების დაშვება</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>კავშირის &amp;ბუფერის ზომის ოპტიმიზაცია</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>მოლოდინის დროები</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>წამი</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>საკონტროლო შეტყობინებები</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;გამორთ</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>&amp;ნულოვანი SSH პაკეტების გაგზავნა</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>&amp;სულელური პროტოკოლის ბრძანებების შესრულება</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>&amp;წამები keepalive-ებს შორის:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;და დამატებით მიმდინარე საქაღალდის წაკითხვა</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>ინტერნეტის პროტოკოლის ვერსია</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>&amp;ავტომატური</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>ლოკალური</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;ავტოამოცნობა</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>&amp;პროქსის ჰოსტის სახელი:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;მომხმარებლის სახელი:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>პროქსის მორგება</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>შაბლონები</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>ტელნეტის ბრძანება</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>ლოკალური პროქსის ბრძანება</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>პროქსის გამოყე&amp;ნება ლოკალურ ჰოსტთან დასაკავშირებად</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>არა</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>კი</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>&amp;DNS-ის ამოხსნა პროქსიზე:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>გვირაბი</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>და&amp;კავშირება SSH გვირაბის გავლით</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>მასპინძელი გვირაბის დასაყენებლად</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>&amp;ჰოსტის სახელი:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>გვირაბის პარამეტრები</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>ავტოარჩევა</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>&amp;ლოკალური გვირაბის პორტი:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>გვირაბის ავთენტიკაციის მორგება</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS-ის მორგება</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>მი&amp;ნიმალური TLS ვერსია:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>მა&amp;ქსიმალური TLS ვერსია:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>TLS-ის სესიის ID-ის თავიდან გამოყენება მონაცემთა კავში&amp;რებისთვის</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>ავთენტიკაციის მორგება</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>&amp;კლიენტის სერტიფიკატის ფაილი:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>კლიენტის სერტიფიკატის ფაილი</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>სერტიფიკატის ფაილები (*.pfx *.p12 *.pem *.crt *.key);;ყველა ფაილი (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>შე&amp;კუმშვის ჩართვა</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>დაშიფვრის არჩევის &amp;პოლიტიკა:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>დაშიფვრის არჩევის პოლიტიკა</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;მაღლა</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;ქვემოთ</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>1-&amp;DES-ის გამოყენების დაშვება</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>გასაღებების მიმოცვლა</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>გასაღებების მიმოცვლის ალგორითმის პარამეტრები</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>ალგორითმის არჩევის &amp;პოლიტიკა:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>ალგორითმის არჩევის პოლიტიკა</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>&amp;GSSAPI-ით გასაღებების მიმოცვლის ცდა</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>გასაღებების თავიდან მიმოცვლის მაკონტროლებელი პარამეტრები</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>მაქს. &amp;წუთები გასაღების განახლებამდე (0 — შეზღუდვის გარეშე):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>მაქს. მო&amp;ნაცემები გასაღების განახლებამდე (0 — შეზღუდვის გარეშე):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>ავთენტიკაციის ს&amp;რულად გვერდის ავლა</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>ავთენტიკაციის პარამეტრები</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>&amp;აგენტით ავთენტიკაციის ცდა</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>პირველ მოთხოვნაზე &amp;პაროლით პასუხი</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>საჯარო &amp;გასაღების ჩვენება</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>პირად გასაღებთან გამოსაყენებელი &amp;სერტიფიკატი:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>სერტიფიკატი</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH სერტიფიკატები (*-cert.pub);;ყველა ფაილი (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>&amp;GSSAPI-ით ავთენტიკაციის ცდა</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>GSSAPI-ის ავტორიზაციის მონაცემების დე&amp;ლეგირების დაშვება</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>შეცდომები</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>ცნობილი შეცდომების გამოვლენა SSH სერვერებზე</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>არასწორად ითვლის SSH-ის H&amp;MAC გასაღებებს:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>არასწორად ითვლის SSH-ის &amp;დაშიფვრის გასაღებებს:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>SSH RSA ხელმოწერებს სჭირდება &amp;შევსება:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>SSH PK ავთენტიკაციისას არასწორად იყენებს &amp;სესიის ID-ს:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>ცუდად ამუშავებს SSH-ის გასაღებების &amp;თავიდან მიმოცვლას:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>გამოტოვებს SSH-ის მა&amp;ქსიმალური პაკეტის ზომას:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>ვერ უმკლავდება SSH-ის &amp;იგნორირების შეტყობინებებს:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>ვერ უმკლავდება WinSCP-ის SSH &apos;&amp;winadj&apos; მოთხოვნებს</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>შენიშვნა</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>ლოკალური პროქსის ბრ&amp;ძანება:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>ტელნეტის &amp;ბრძანება:</translation>
     </message>
 </context>
 <context>

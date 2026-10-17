@@ -3938,14 +3938,6 @@ Location: %2</source>
         <translation>उन्नत साइट सेटिंग्स</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>दूरस्थ निर्देशिका(&amp;D):</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>ब्राउज़ करें(&amp;B)...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>स्थानीय निर्देशिका</translation>
     </message>
@@ -3956,10 +3948,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>निर्देशिकाएँ</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> सेकंड</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3982,40 +3970,20 @@ Location: %2</source>
         <translation>प्रॉक्सी प्रकार(&amp;T):</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>प्रॉक्सी होस्ट नाम(&amp;X):</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>पोर्ट संख्या(&amp;R):</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>उपयोगकर्ता नाम(&amp;U):</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>पासवर्ड(&amp;P):</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>स्थानीय पतों के लिए प्रॉक्सी से परामर्श करें(&amp;L)</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>प्रॉक्सी</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Pageant या ssh-agent का उपयोग करके प्रमाणीकरण का प्रयास करें(&amp;P)</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>एजेंट अग्रेषण की अनुमति दें(&amp;F)</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>ब्राउज़ करें(&amp;R)...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4030,16 +3998,656 @@ Location: %2</source>
         <translation>निजी कुंजी फ़ाइल(&amp;K):</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH प्रमाणीकरण</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>अंतिम उपयोग की गई निर्देशिका याद रखें(&amp;M)</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>&apos;keyboard-interactive&apos; प्रमाणीकरण का प्रयास करें(&amp;I)</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>पृष्ठ</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>रंग(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>परिवेश</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>सर्वर परिवेश</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>पंक्ति-अंत वर्ण (यदि सर्वर द्वारा इंगित न हो)(&amp;O):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>फ़ाइल नामों के लिए UTF-8 एन्कोडिंग(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>समय क्षेत्र ऑफ़सेट(&amp;Z):</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>घंटे</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>समय क्षेत्र ऑफ़सेट घंटे</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>समय क्षेत्र ऑफ़सेट मिनट</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>मिनट</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>स्वचालित रूप से पहचानें(&amp;A)</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>VMS संस्करण संख्याएँ हटाएँ(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>डेलाइट सेविंग समय</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>दूरस्थ टाइमस्टैम्प को स्थानीय परिपाटी के अनुसार समायोजित करें(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>दूरस्थ टाइमस्टैम्प को DST के साथ समायोजित करें(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>ब्राउज़िंग सिंक्रनाइज़ करें(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>दूरस्थ निर्देशिका(&amp;R):</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>एक्सप्लोरर इंटरफ़ेस में स्थानीय निर्देशिका का उपयोग नहीं होता।</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>निर्देशिका पढ़ने के विकल्प</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>देखी गई दूरस्थ निर्देशिकाओं को कैश करें(&amp;V)</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>निर्देशिका परिवर्तनों को कैश करें(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>स्थायी कैश(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>प्रतीकात्मक लिंक हल करें(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>निर्देशिकाओं के प्रतीकात्मक लिंक का अनुसरण करें(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>रीसायकल बिन</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>हटाई गई दूरस्थ फ़ाइलें रीसायकल बिन में सुरक्षित रखें(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>अधिलेखित दूरस्थ फ़ाइलें रीसायकल बिन में सुरक्षित रखें (केवल SFTP)(&amp;O)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>दूरस्थ रीसायकल बिन(&amp;R):</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>एन्क्रिप्शन</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>फ़ाइलें एन्क्रिप्ट करें(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>एन्क्रिप्शन विकल्प</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>एन्क्रिप्शन कुंजी(&amp;K):</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>कुंजी दिखाएँ(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>कुंजी जनरेट करें(&amp;G)</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>प्रोटोकॉल विकल्प</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>डिफ़ॉल्ट</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP सर्वर(&amp;V):</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>स्वतः</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>पसंदीदा SFTP प्रोटोकॉल संस्करण(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>सर्वर पर पथों को मानकीकृत करें(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>SCP फ़ॉलबैक की अनुमति दें(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>POSIX नाम-परिवर्तन का उपयोग करें(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>SFTP सर्वरों में ज्ञात बग की पहचान</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>लिंक आदेश के तर्कों का क्रम उलट देता है(&amp;R):</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>1970 से पहले के फ़ाइल टाइमस्टैम्प की गलत व्याख्या करता है(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>शेल</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>शेल(&amp;H):</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>स्वतः पहचानें</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>रिटर्न कोड चर(&amp;R):</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>निर्देशिका सूची</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>सूची आदेश(&amp;C):</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>LS चेतावनियों को अनदेखा करें(&amp;W)</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>पूर्ण टाइमस्टैम्प प्राप्त करने का प्रयास करें(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>अन्य विकल्प</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>उपयोगकर्ता समूह खोजें(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>उपनाम साफ़ करें(&amp;L)</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>राष्ट्रीय चर साफ़ करें(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>scp1 संगतता के साथ scp2 का उपयोग करें(&amp;2)</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>लॉगिन के बाद के आदेश(&amp;C):</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>खाता(&amp;A):</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>छिपी हुई फ़ाइलों की सूची का समर्थन(&amp;S):</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>निर्देशिका सूची के लिए MLSD आदेश का उपयोग करें(&amp;M)</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>निष्क्रिय मोड कनेक्शनों के लिए IP पता बाध्य करें(&amp;F):</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>सर्वर पर होस्ट चुनने के लिए HOST आदेश का उपयोग करें(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>VMS सर्वरों पर सभी फ़ाइल संशोधन दिखाएँ(&amp;R)</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>डिफ़ॉल्ट क्षेत्र(&amp;D):</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>वर्चुअल होस्ट</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>पथ</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>URL शैली(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>अनुरोधकर्ता भुगतान करता है(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>प्रमाणीकरण</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>सत्र टोकन(&amp;S):</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>भूमिका ARN(&amp;R):</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>फ़ाइल नामों में बिना एन्कोड किए विशेष वर्ण सहन करें(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>अन्य होस्ट पर रीडायरेक्ट की अनुमति दें(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>कनेक्शन बफ़र आकार अनुकूलित करें(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>समयसीमाएँ</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>सेकंड</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>कीपअलाइव</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>बंद(&amp;O)</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>शून्य SSH पैकेट भेजना(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>डमी प्रोटोकॉल आदेश निष्पादित करना(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>कीपअलाइव के बीच सेकंड(&amp;B):</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>और साथ ही वर्तमान निर्देशिका पढ़ना(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>इंटरनेट प्रोटोकॉल संस्करण</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>स्वतः(&amp;U)</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>स्थानीय</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>स्वतः पहचानें(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>प्रॉक्सी होस्टनाम(&amp;X):</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>उपयोगकर्ता नाम(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>प्रॉक्सी सेटिंग्स</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>पैटर्न</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet आदेश</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>स्थानीय प्रॉक्सी आदेश</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>स्थानीय होस्ट कनेक्शनों को प्रॉक्सी करने पर विचार करें(&amp;N)</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>नहीं</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>हाँ</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>प्रॉक्सी की ओर DNS नाम लुकअप करें(&amp;D):</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>टनल</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>SSH टनल के माध्यम से कनेक्ट करें(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>टनल स्थापित करने हेतु होस्ट</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>होस्टनाम(&amp;H):</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>टनल विकल्प</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>स्वतः चयन</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>स्थानीय टनल पोर्ट(&amp;L):</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>टनल प्रमाणीकरण पैरामीटर</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS विकल्प</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>न्यूनतम TLS संस्करण(&amp;N):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>अधिकतम TLS संस्करण(&amp;X):</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>डेटा कनेक्शनों के लिए TLS सत्र ID का पुनः उपयोग करें(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>प्रमाणीकरण पैरामीटर</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>क्लाइंट प्रमाणपत्र फ़ाइल(&amp;C):</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>क्लाइंट प्रमाणपत्र फ़ाइल</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>प्रमाणपत्र फ़ाइलें (*.pfx *.p12 *.pem *.crt *.key);;सभी फ़ाइलें (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>संपीड़न सक्षम करें(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>एन्क्रिप्शन सिफ़र चयन नीति(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>एन्क्रिप्शन सिफ़र चयन नीति</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>ऊपर(&amp;U)</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>नीचे(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>एकल-DES का पुराना उपयोग सक्षम करें(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>कुंजी विनिमय</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>कुंजी विनिमय एल्गोरिदम विकल्प</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>एल्गोरिदम चयन नीति(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>एल्गोरिदम चयन नीति</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>GSSAPI कुंजी विनिमय का प्रयास करें(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>कुंजी पुनर्विनिमय नियंत्रित करने वाले विकल्प</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>पुनः कुंजीकरण से पहले अधिकतम मिनट (0 = कोई सीमा नहीं)(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>पुनः कुंजीकरण से पहले अधिकतम डेटा (0 = कोई सीमा नहीं)(&amp;X):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>प्रमाणीकरण पूरी तरह छोड़ दें(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>प्रमाणीकरण विकल्प</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>एजेंट का उपयोग करके प्रमाणीकरण का प्रयास करें(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>पहले संकेत का उत्तर पासवर्ड से दें(&amp;W)</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>सार्वजनिक कुंजी दिखाएँ(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>निजी कुंजी के साथ उपयोग हेतु प्रमाणपत्र(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>प्रमाणपत्र</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH प्रमाणपत्र (*-cert.pub);;सभी फ़ाइलें (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>GSSAPI प्रमाणीकरण का प्रयास करें(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>GSSAPI क्रेडेंशियल प्रत्यायोजन की अनुमति दें(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>बग</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>SSH सर्वरों में ज्ञात बग की पहचान</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>SSH HMAC कुंजियों की गलत गणना करता है(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>SSH एन्क्रिप्शन कुंजियों की गलत गणना करता है(&amp;E):</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>SSH RSA हस्ताक्षरों पर पैडिंग आवश्यक(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>SSH PK प्रमाणीकरण में सत्र ID का गलत उपयोग करता है(&amp;N):</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>SSH कुंजी पुनर्विनिमय ठीक से नहीं संभालता(&amp;K):</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>SSH अधिकतम पैकेट आकार को अनदेखा करता है(&amp;X):</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>SSH ignore संदेशों पर अटक जाता है(&amp;G):</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>WinSCP के SSH &apos;winadj&apos; अनुरोधों पर अटक जाता है(&amp;W)</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>टिप्पणी</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>स्थानीय प्रॉक्सी आदेश(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telnet आदेश(&amp;M):</translation>
     </message>
 </context>
 <context>

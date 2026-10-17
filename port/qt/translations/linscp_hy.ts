@@ -3938,14 +3938,6 @@ Location: %2</source>
         <translation>Կայքի լրացուցիչ կարգավորումներ</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>Հեռակա &amp;գրացուցակ:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Զննել...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Տեղային գրացուցակ</translation>
     </message>
@@ -3956,10 +3948,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>Գրացուցակներ</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> վայրկյան</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3982,40 +3970,20 @@ Location: %2</source>
         <translation>Պրոքսիի &amp;տեսակ:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Պրոքսիի &amp;հոսթի անուն:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Պո&amp;րտի համար:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;Օգտվողի անուն:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Գաղտնաբառ:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>&amp;Դիմել պրոքսիին տեղային հասցեների համար</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Պրոքսի</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Փորձել նույնականացում &amp;Pageant-ի կամ ssh-agent-ի միջոցով</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Թույլատրել գործակալի &amp;վերահասցեավորում</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>&amp;Զննել...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4030,16 +3998,656 @@ Location: %2</source>
         <translation>Փակ &amp;բանալու ֆայլ:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH նույնականացում</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>&amp;Հիշել վերջին օգտագործված գրացուցակը</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Փորձել &apos;keyboard-&amp;interactive&apos; նույնականացում</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Էջեր</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Գույն</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Միջավայր</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Սերվերի միջավայր</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>Տողի &amp;վերջի նիշեր (եթե սերվերը չի նշում):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>&amp;UTF-8 կոդավորում ֆայլերի անունների համար:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Ժամային &amp;գոտու շեղում:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>ժամ</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Ժամային գոտու շեղման ժամեր</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Ժամային գոտու շեղման րոպեներ</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>րոպե</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Հայտնաբերել &amp;ավտոմատ</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;Կտրել VMS տարբերակների համարները</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Ամառային ժամանակ</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Հարմարեցնել հեռակա ժամանակադրոշմը տեղային կա&amp;նոններին</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Հարմարեցնել հեռակա ժամանակադրոշմը ամառային &amp;ժամանակով</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>Համաժամեցնել &amp;զննումը</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>Հեռակա &amp;գրացուցակ:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Տեղային գրացուցակը չի օգտագործվում Explorer միջերեսում։</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Գրացուցակների ընթերցման ընտրանքներ</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>&amp;Քեշավորել այցելված հեռակա գրացուցակները</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Քեշավորել գրացուցակի &amp;փոփոխությունները</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>&amp;Մշտական քեշ</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Լուծել &amp;սիմվոլիկ հղումները</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>&amp;Անցնել գրացուցակների սիմվոլիկ հղումներով</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Աղբարկղ</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;Պահպանել ջնջված հեռակա ֆայլերը աղբարկղում</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Պահպանել &amp;վերագրված հեռակա ֆայլերը աղբարկղում (միայն SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>&amp;Հեռակա աղբարկղ:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Գաղտնագրում</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;Գաղտնագրել ֆայլերը</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Գաղտնագրման ընտրանքներ</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>Գաղտնագրման &amp;բանալի:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;Ցույց տալ բանալին</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Ստեղծել բանալի</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Արձանագրության ընտրանքներ</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Լռելյայն</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP &amp;սերվեր:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Ավտոմատ</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>&amp;Նախընտրելի SFTP արձանագրության տարբերակ:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>&amp;Կանոնականացնել ուղիները սերվերում</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Թույլատրել &amp;անցում SCP-ի</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;Օգտագործել POSIX վերանվանում</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>SFTP սերվերների հայտնի սխալների հայտնաբերում</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>&amp;Շրջում է հղման հրամանի արգումենտների հերթականությունը:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>Սխալ է &amp;մեկնաբանում ֆայլերի ժամանակադրոշմները մինչև 1970-ը:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Shell</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>&amp;Shell:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Ավտոմատ հայտնաբերում</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>&amp;Վերադարձի կոդի փոփոխական:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Գրացուցակի ցուցակագրում</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>Ցուցակագրման &amp;հրաման:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Անտեսել LS-ի &amp;զգուշացումները</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Փորձել ստանալ &amp;ամբողջական ժամանակադրոշմը</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Այլ ընտրանքներ</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Որոնել &amp;օգտվողի խմբերը</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Մաքրել &amp;փոխանունները</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>&amp;Մաքրել ազգային փոփոխականները</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Օգտագործել scp&amp;2 scp1-ի հետ համատեղելիությամբ</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>Մուտքից հետո հ&amp;րամաններ:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Հաշիվ:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>Թաքնված ֆայլերի ցուցակագրման &amp;աջակցում:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Օգտագործել &amp;MLSD հրամանը գրացուցակի ցուցակագրման համար</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>Պարտադրել IP հասցե պասիվ ռեժիմի &amp;միացումների համար:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Օգտագործել &amp;HOST հրամանը սերվերում հոսթ ընտրելու համար</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Ցուցադրել ֆայլերի բոլոր &amp;տարբերակները VMS սերվերներում</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;Լռելյայն տարածաշրջան:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Վիրտուալ հոսթ</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Ուղի</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>&amp;URL ոճ:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>&amp;Վճարում է հարցողը</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Նույնականացում</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>Աշխատաշրջանի &amp;տոկեն:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Դերի ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Թույլատրել չկոդավորված հատուկ նիշերը ֆայլերի անուններում</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>Թույլատրել &amp;վերահղումներ այլ հոսթերի</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Օպտիմալացնել միացման &amp;բուֆերի չափը</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Սպասման ժամանակներ</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>վայրկյան</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Կապի պահպանում</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Անջատված</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>&amp;Դատարկ SSH փաթեթների ուղարկում</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Արձանագրության &amp;կեղծ հրամանների կատարում</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>&amp;Վայրկյաններ կապի պահպանման ազդանշանների միջև:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;Եվ լրացուցիչ ընթերցել ընթացիկ գրացուցակը</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Ինտերնետ արձանագրության տարբերակ</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>Ավտո&amp;մատ</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Տեղային</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;Ավտոմատ հայտնաբերում</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Պրոքսիի &amp;հոսթի անուն:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;Օգտվողի անուն:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Պրոքսիի կարգավորումներ</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>ձևանմուշներ</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet հրաման</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Տեղային պրոքսիի հրաման</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>&amp;Դիտարկել տեղային հոսթի միացումների պրոքսավորումը</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Ոչ</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Այո</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>&amp;DNS անունների որոնում պրոքսիի կողմում:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Թունել</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>&amp;Միանալ SSH թունելի միջոցով</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Հոսթ, որի վրա ստեղծվում է թունելը</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>&amp;Հոսթի անուն:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Թունելի ընտրանքներ</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Ավտոմատ ընտրություն</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>&amp;Տեղային թունելի պորտ:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Թունելի նույնականացման պարամետրեր</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS ընտրանքներ</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>&amp;Նվազագույն TLS տարբերակ:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>&amp;Առավելագույն TLS տարբերակ:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Վերօգտագործել TLS աշխատաշրջանի ID-ն տվյալների միացումների համար</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Նույնականացման պարամետրեր</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>&amp;Հաճախորդի սերտիֆիկատի ֆայլ:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Հաճախորդի սերտիֆիկատի ֆայլ</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Սերտիֆիկատի ֆայլեր (*.pfx *.p12 *.pem *.crt *.key);;Բոլոր ֆայլերը (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>&amp;Միացնել սեղմումը</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>Գաղտնագրման ալգորիթմի ընտրության &amp;քաղաքականություն:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Գաղտնագրման ալգորիթմի ընտրության քաղաքականություն</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Վերև</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;Ներքև</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Միացնել հնացած միակ &amp;DES-ի օգտագործումը</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Բանալիների փոխանակում</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Բանալիների փոխանակման ալգորիթմի ընտրանքներ</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>Ալգորիթմի ընտրության &amp;քաղաքականություն:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Ալգորիթմի ընտրության քաղաքականություն</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Փորձել &amp;GSSAPI բանալիների փոխանակում</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Բանալիների վերափոխանակումը կառավարող ընտրանքներ</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Առավելագույն &amp;րոպեներ մինչև վերափոխանակումը (0՝ առանց սահմանափակման):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Առավելագույն &amp;տվյալներ մինչև վերափոխանակումը (0՝ առանց սահմանափակման):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;Ամբողջությամբ շրջանցել նույնականացումը</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Նույնականացման ընտրանքներ</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>&amp;Փորձել նույնականացում գործակալի միջոցով</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Պատասխանել առաջին հարցմանը &amp;գաղտնաբառով</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;Ցուցադրել հանրային բանալին</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>&amp;Սերտիֆիկատ՝ փակ բանալու հետ օգտագործելու համար:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Սերտիֆիկատ</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH սերտիֆիկատներ (*-cert.pub);;Բոլոր ֆայլերը (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Փորձել &amp;GSSAPI նույնականացում</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Թույլատրել GSSAPI &amp;հավատարմագրերի պատվիրակում</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Սխալներ</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>SSH սերվերների հայտնի սխալների հայտնաբերում</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Սխալ է հաշվարկում SSH &amp;HMAC բանալիները:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Սխալ է հաշվարկում SSH &amp;գաղտնագրման բանալիները:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Պահանջում է SSH RSA ստորագրությունների &amp;լրացում:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Սխալ է օգտագործում աշխատաշրջանի &amp;ID-ն SSH PK նույնականացման ժամանակ:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Վատ է մշակում SSH &amp;բանալիների վերափոխանակումը:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Անտեսում է SSH փաթեթի &amp;առավելագույն չափը:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Խափանվում է SSH ignore &amp;հաղորդագրություններից:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Խափանվում է WinSCP-ի SSH &apos;&amp;winadj&apos; հարցումներից</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Նշում</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Տեղային պրոքսիի հրա&amp;ման:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telnet հրա&amp;ման:</translation>
     </message>
 </context>
 <context>

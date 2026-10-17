@@ -3938,14 +3938,6 @@ Staðsetning: %2</translation>
         <translation>Ítarlegar setursstillingar</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>Fjarrænt &amp;skráasafn:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Vafra…</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Staðarbundið skráasafn</translation>
     </message>
@@ -3956,10 +3948,6 @@ Staðsetning: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Skráasöfn</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> sekúndur</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3982,40 +3970,20 @@ Staðsetning: %2</translation>
         <translation>Staðgengils&amp;tegund:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Staðgengils&amp;hýsilnafn:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>&amp;Hafnarnúmer</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;Notandanafn:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Aðgangsorð</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Spyrja staðgengil fyrir &amp;staðarbundin staðföng</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Staðgengill</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Reyna sannreyningu notandi &amp;Pageant eða ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Leyfa útsendara&amp;áframsendingu</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>&amp;Vafra…</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4030,16 +3998,656 @@ Staðsetning: %2</translation>
         <translation>Einka&amp;lykilskrá:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH-sannreyning</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>&amp;Muna síðasta notaða skráasafnið</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Reyna ‚lyklaborð-gagnvirka‘ sannreyningu (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Síður</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Litur</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Umhverfi</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Þjónsumhverfi</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>&amp;Línuendarittákn (ef ekki gefið til kynna af þjóni):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>&amp;UTF-8 kóðun fyrir skráarnöfn:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Tíma&amp;beltisafsetning:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>klukkutímar</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Tímabeltisafsetning, klukkutímar</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Tímabeltisafsetning, mínútur</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>mínútur</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Greina &amp;sjálfvirkt</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>&amp;Klippa af VMS-útgáfunúmer</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Sumartími</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Stilla fjarræna tímastimpilinn samkvæmt staðarbundnum &amp;venjum</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Stilla fjarræna tímastimpilinn með &amp;sumartíma</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>&amp;Samstilla vafur</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;Fjarrænt skráasafn:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Staðarbundið skráasafn er ekki notað með Explorer-viðmóti.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Valmöguleikar skráasafnslesturs</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Skyndivista &amp;heimsótt fjarræn skráasafn</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Skyndivista &amp;skráasafnsbreytingar</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>&amp;Varanlegt skyndiminni</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Útkljá mjúk&amp;tengla</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>&amp;Fylgja mjúktenglum í skráasöfn</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Endurvinnslutunna</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;Geyma eyddar fjarrænar skrár í endurvinnslutunnu</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Geyma &amp;yfirritaðar fjarrænar skrár í endurvinnslutunnu (SFTP einungis)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>&amp;Fjarræn endurvinnslutunna:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Dulkóðun</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;Dulkóðunarskrár</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Dulkóðunarvalmöguleikar</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>Dulkóðunar&amp;lykill:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;Sýna lykil</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Framleiða lykil</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Samskiptaregluvalmöguleikar</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Sjálfgildi</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP-&amp;þjónn:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Sjálfvirkt</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>&amp;Ákjósanleg SFTP-samskiptaregluútgáfa:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>&amp;Staðla slóðir á þjóninum</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Leyfa SCP-&amp;afturfall</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;Nota POSIX-endurnefningu</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Greining þekktra padda í SFTP-þjónum</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>&amp;Viðsnýr röð tengilskipunarfrumbreytna:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>&amp;Mistúlkar skráartímastimpla fyrir 1970:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Skel</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>&amp;Skel:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Sjálfgreina</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>&amp;Skilakóðabreyta:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Skráasafnslistun</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>Listunar&amp;skipun:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Hunsa LS-&amp;viðvaranir</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Reyna að fá &amp;fullan tímastimpil</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Aðrir valmöguleikar</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Uppfletta &amp;notendahópum</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Hreinsa &amp;samnefni</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Hreinsa &amp;landsbreytur</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Nota scp&amp;2 með scp1-samrýmanleika</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>&amp;Skipanir eftir innskráningu:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Aðgangur:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>&amp;Stuðningur við listun falinna skráa:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Nota &amp;MLSD-skipun fyrir skráasafnslistun</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>&amp;Neyða IP-netfang fyrir tengingar í ógagnvirkum ham:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Nota &amp;HOST-skipun til að velja hýsil á þjóninum</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Birta allar skráa&amp;útgáfur á VMS-þjónum</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;Sjálfgefið svæði:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Sýndarhýsill</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Slóð</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>&amp;Vefslóðarstíll:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>&amp;Beiðandi greiðir</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Sannreyning</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;Lotuteikn:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Hlutverks-ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Leyfa ókóðaða sérstafi í skráarnöfnum</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;Leyfa endurbeiningar til annarra hýsla</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Hagræða &amp;biðminnnisstærð tengingar</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Tímamörk</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>sekúndur</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>‚keepalive‘</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Af</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>Sendandi SSH-&amp;núllpakka</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Keyrandi &amp;gerviskipanir samskiptareglu</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Sekúndur &amp;milli ‚keepalive‘:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;Og auk þess lesa núverandi skráasafn</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Alnetssamskiptaregluútgáfa</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>&amp;Sjálfvirkt</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Staðarbundið</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;Sjálfgreina</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>&amp;Staðgengilshýsilnafn:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;Notandanafn</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Staðgengilsstillingar</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>mynstur</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet-skipun</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Skipun staðarbundins staðgengils</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>&amp;Íhuga að nota staðgengla fyrir staðarbundnar hýsiltengingar</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Nei</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Já</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Gera &amp;LHK-uppflettingu staðgengils megin:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Göng</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>&amp;Tengjast gegnum SSH-göng</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Hýsill til að uppsetja göng á</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>&amp;Hýsilnafn:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Gangavalmöguleikar</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Sjálfval</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>&amp;Staðarbundin gangahöfn:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Sannreyningarfæribreytur ganga</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS-valmöguleikar</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>&amp;Lágmarksútgáfa TLS:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>&amp;Hámarksútgáfa TLS:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Endurnota lotuauðkenni TLS fyrir gagnatengingar</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Sannreyningarfæribreytur</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>&amp;Biðlaraskírteinisskrá:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Biðlaraskírteinisskrá</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Skírteinisskrár (*.pfx *.p12 *.pem *.crt *.key);;Allar skrár (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>Virkja &amp;þjöppun</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>Val&amp;stefna dulkóðunaraðferðar:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Valstefna dulkóðunaraðferðar</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Upp</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;Niður</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Virkja arfnotkun einfalds &amp;DES í SSH-2</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Lyklaskipti</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Valmöguleikar lyklaskiptareiknirits</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>Val&amp;stefna reiknirits:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Valstefna reiknirits</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Reyna &amp;GSSAPI-lyklaskipti</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Valmöguleikar stjórnandi endurskiptum</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Hámark &amp;mínútna áður en endurlyklun (0 fyrir ekkert takmark):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>&amp;Hámark gagna áður en endurlyklun (0 fyrir ekkert takmark):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;Fara framhjá sannreyningu algjörlega (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Sannreyningvalmöguleikar</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>Reyna sannreyningu með &amp;útsendara</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Svara með aðgangs&amp;orði við fyrstu kvaðningu</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;Birta dreifilykill</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Skírteini til &amp;notkunar með einkalyklinum:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Skírteini</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH-skírteini (*-cert.pub);;Allar skrár (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Reyna &amp;GSSAPI-sannreyningu (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Leyfa GSSAPI-&amp;skilríkisframsal</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Pöddur</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Greining þekktra padda í SSH-þjónum</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Misreiknar H&amp;MAC-lykla SSH-2:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Misreiknar &amp;dulkóðunarlykla SSH-2:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Krefst &amp;fyllingar í RSA-auðkenni SSH-2:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Misnotar &amp;lotuauðkenni í dreifilykilssannreyningu SSH-2:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Meðhöndlar &amp;lyklaendurskipti SSH-2 illa:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Hunsar &amp;hámarkspakkastærð SSH-2:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Kafnar á &amp;hunsunarskilaboðum SSH-2:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Kafnar á SSH-2-‚winadj‘-beiðnum WinSCP</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Athugasemd</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>&amp;Skipun staðarbundins staðgengils:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telnet-&amp;skipun:</translation>
     </message>
 </context>
 <context>

@@ -3939,14 +3939,6 @@ Location: %2</source>
         <translation>Пашыраныя налады сайта</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>&amp;Аддалены каталог:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>А&amp;гляд...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Лакальны каталог</translation>
     </message>
@@ -3957,10 +3949,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>Каталогі</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> секунд</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3983,40 +3971,20 @@ Location: %2</source>
         <translation>&amp;Тып проксі:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Проксі-&amp;сервер:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>&amp;Порт:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;Імя карыстальніка:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>П&amp;ароль:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>&amp;Нават лакальныя злучэнні праз проксі</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Проксі</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Спрабаваць аўтэнтыфікацыю праз &amp;Pageant або ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>&amp;Дазволіць пераадрасацыю агента</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>А&amp;гляд...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4031,16 +3999,656 @@ Location: %2</source>
         <translation>&amp;Файл прыватнага ключа:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>Аўтэнтыфікацыя SSH</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>&amp;Запамінаць апошні каталог</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Спроба аўтэнтыфікацыі з узаемадзеяннем праз &amp;клавіятуру</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Старонкі</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Колер</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Асяроддзе</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Асяроддзе сервера</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>&amp;Сімвалы канца радка (калі не абазначаны серверам):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>&amp;Кадзіроўка UTF-8 для назваў файлаў:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>&amp;Зрух часавога пояса:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>гадз</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Зрух часавога пояса, гадзіны</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Зрух часавога пояса, хвіліны</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>хв</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Вызначаць &amp;аўтаматычна</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>Абразаць &amp;нумары версій VMS</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Летні час</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Дапасоўваць аддаленую пазнаку часу да лакальных &amp;правілаў (Unix)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Дапасоўваць аддаленую пазнаку часу да ле&amp;тняга часу (Windows)</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>&amp;Сінхранізаваць прагляд</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;Аддалены каталог:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Лакальны каталог не выкарыстоўваецца ў інтэрфейсе «Праваднік».</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Параметры чытання каталогаў</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>&amp;Кэшаваць наведаныя аддаленыя каталогі</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Кэ&amp;шаваць змяненні каталога</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>&amp;Сталы кэш</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>&amp;Распазнаваць сімвалічныя спасылкі</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>&amp;Пераходзіць па сімвалічных спасылках да каталогаў</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Сметніца</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>&amp;Перамяшчаць выдаленыя файлы ў сметніцу</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Перамяшчаць пера&amp;запісаныя аддаленыя файлы ў сметніцу (SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>&amp;Аддаленая сметніца:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Шыфраванне</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>&amp;Шыфраваць файлы</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Параметры шыфравання</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>&amp;Ключ шыфравання:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>&amp;Паказваць ключ</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>&amp;Згенерыраваць ключ</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Параметры пратакола</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Прадвызначаная</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>&amp;Сервер SFTP:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Аўта</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>&amp;Прыярытэтная версія пратакола SFTP:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>&amp;Кананічныя шляхі на серверы</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Дазво&amp;ліць SCP як рэзерв</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;Выкарыстоўваць перайменаванне POSIX</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Выяўляць вядомыя памылкі ў серверах SFTP</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>&amp;Адваротны парадак аргументаў каманды стварэння спасылак:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>Па&amp;мылковая інтэрпрэтацыя пазнак часу да 1970 г.:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Абалонка</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>&amp;Абалонка:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Аўтаматычна вызначаная</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>Пераменная &amp;коду вяртання:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Паказ змесціва каталогаў</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>Каманда паказу &amp;змесціва:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>&amp;Ігнараваць папярэджанні LS</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>&amp;Спрабаваць вызначыць поўную пазнаку часу</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Іншыя</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>&amp;Групы карыстальнікаў</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Ачысціць &amp;псеўданімы</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>А&amp;чысціць рэгіянальныя пераменныя</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Выкарыстоўваць сумяшчальнасць scp&amp;2 з scp1</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>&amp;Каманды пасля ўваходу:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Уліковы запіс:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>&amp;Падтрымка паказу схаваных файлаў:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Каманда &amp;MLSD для паказу змесціва каталога:</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>Прымусовы IP-адрас для &amp;злучэнняў у пасіўным рэжыме:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Каманда &amp;HOST для выбару хоста на серверы:</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Паказваць усе &amp;версіі файлаў на серверах VMS</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;Прадвызначаны рэгіён:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Віртуальны хост</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Шлях</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>Стыль &amp;URL:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>Плаціць той, хто &amp;запытвае</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Аўтэнтыфікацыя</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>Токен &amp;сеанса:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;ARN ролі:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Дапускаць незакадзіраваныя спецыяльныя сімвалы ў назвах файлаў</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>Дазваляць &amp;перанакіроўванні на іншыя хосты</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Аптымізаваць памер &amp;буфера злучэння</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Час чакання</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>с</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Пакеты падтрымкі злучэння</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Выкл</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>Адпраўляць пустыя &amp;пакеты SSH</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Выконваць &amp;каманды-пустышкі</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>&amp;Секунд паміж пакетамі:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;І дадаткова паказваць змесціва бягучага каталога</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Версія IP</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>&amp;Аўта</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Лакальны</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>Аўтавы&amp;значэнне</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>&amp;Проксі-сервер:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;Імя карыстальніка:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Налады проксі</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>узоры</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Каманда Telnet</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Каманда лакальнага проксі</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>&amp;Нават лакальныя злучэнні праз проксі</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Не</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Так</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Выконваць пошук назваў &amp;DNS на баку проксі:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Тунэль</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>&amp;Злучацца праз тунэль SSH</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Хост для тунэлю</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>&amp;Хост:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Параметры тунэлю</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Аўтавыбар</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>&amp;Лакальны порт тунэлю:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Параметры аўтэнтыфікацыі тунэлю</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>Параметры TLS</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Мі&amp;німальная версія TLS:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Ма&amp;ксімальная версія TLS:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Паўторна выкарыстоўваць ID сеанса TLS для перадачы даных</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Параметры аўтэнтыфікацыі</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>&amp;Файл сертыфіката кліента:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Файл сертыфіката кліента</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Файлы сертыфікатаў (*.pfx *.p12 *.pem *.crt *.key);;Усе файлы (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>Уключыць &amp;сцісканне</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>Палітыка выбару &amp;шыфравання:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Палітыка выбару шыфравання</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>У&amp;верх</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>У&amp;ніз</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Уключыць выкарыстанне single-&amp;DES</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Абмен ключамі</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Параметры алгарытму абмену ключамі</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>&amp;Палітыка выбару алгарытму:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Палітыка выбару алгарытму</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Спрабаваць абмен ключамі &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Параметры кіравання паўторным абменам ключоў</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Абмен не радзей за, &amp;хв (0 — неабмежавана):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Абмен пасля перадачы аб&apos;ёму &amp;даных (0 — неабмежавана):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>&amp;Цалкам абходзіць аўтэнтыфікацыю</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Параметры аўтэнтыфікацыі</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>Спрабаваць аўтэнтыфікацыю з дапамогай &amp;агента</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>На першы запыт адказаць &amp;паролем</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>Пака&amp;заць адкрыты ключ</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Сертыфікат для &amp;выкарыстання з прыватным ключом:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Сертыфікат</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>Сертыфікаты OpenSSH (*-cert.pub);;Усе файлы (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Спроба аўтэнтыфікацыі &amp;GSSAPI</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Дазволіць дэлегаванне &amp;ўліковых даных GSSAPI</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Памылкі</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Выяўленне вядомых памылак у серверах SSH</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Няслушны разлік H&amp;MAC ключоў SSH:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Няслушны разлік ключоў &amp;шыфравання SSH:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Патрабуецца &amp;запаўненне подпісаў SSH RSA:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Няслушнае ўжыванне ID &amp;сеанса пры SSH PK аўтэнтыфікацыі:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Дрэнная падтрымка паўторнага абмену &amp;ключамі SSH:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Ігнаруецца &amp;максімальны памер пакета SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Збой пры паведамленнях &amp;ігнаравання SSH:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Збой пры запытах SSH «&amp;winadj» ад WinSCP:</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Нататка</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Каманда &amp;лакальнага проксі:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>&amp;Каманда Telnet:</translation>
     </message>
 </context>
 <context>

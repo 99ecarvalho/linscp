@@ -3937,14 +3937,6 @@ Konum: %2</translation>
         <translation>Gelişmiş bağlantı ayarları</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>&amp;Uzak klasör:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Göz at...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Yerel klasör</translation>
     </message>
@@ -3955,10 +3947,6 @@ Konum: %2</translation>
     <message>
         <source>Directories</source>
         <translation>Klasörler</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> saniye</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3981,40 +3969,20 @@ Konum: %2</translation>
         <translation>Vekil sunucu &amp;türü:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>V&amp;ekil sunucu adı:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Bağlantı n&amp;oktası:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;Kullanıcı adı:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>&amp;Parola:</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Yerel su&amp;nuculara vekil sunucudan bağlanmak değerlendirilsin</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Vekil sunucu</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>&amp;Pageant ya da ssh-agent ile kimlik doğrulaması denensin</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>A&amp;racı iletilebilsin</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>&amp;Göz at...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4029,16 +3997,656 @@ Konum: %2</translation>
         <translation>&amp;Kişisel anahtar dosyası:</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH kimlik doğrulaması</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>Son kullanılan klasör &amp;hatırlansın</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Kimlik, &apos;tuş takımı ile &amp;etkileşimli&apos; doğrulansın (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Sayfalar</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Renk</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Ortam</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Sunucu ortamı</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>Satır sonu &amp;karakterleri (sunucu tarafından belirtilmemişse):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>Dosya adları için &amp;UTF-8 kodlaması:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>&amp;Saat dilimi kayması:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>saat</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Saat dilimi kayması (saat)</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Saat dilimi kayması (dakika)</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>dakika</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Otomatik &amp;algılansın</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>VMS sürüm numaraları &amp;budansın</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Yaz saati</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>U&amp;zak zaman damgası yerel saate göre ayarlansın</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Uzak zaman damgası &amp;yaz saatine göre ayarlansın</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>Eş zamanlı &amp;gezinme</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;Uzak klasör:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Yerel klasör Windows Dosya Gezgini arayüzüyle kullanılamaz.</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Klasör okuma ayarları</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>&amp;Gezilen uzak klasörler ön belleğe alınsın</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>&amp;Klasör değişiklikleri ön belleğe alınsın</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>Kalıcı ö&amp;n bellek</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>&amp;Sembolik bağlantılar çözülsün</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>Sembolik klasör bağlantıları i&amp;zlensin</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Geri dönüşüm kutusu</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>Silinen u&amp;zak dosyalar geri dönüşüm kutusunda korunsun</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Üzerine yazılan uzak d&amp;osyalar G.D. kutusunda korunsun (yalnızca SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>&amp;Uzak geri donüşüm kutusu:</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Şifreleme</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>D&amp;osyaları şifrele</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Şifreleme ayarları</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>Şifreleme ana&amp;htarı:</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>Anahtarı &amp;görüntüle</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>Anahta&amp;r üret</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>İletişim kuralı ayarları</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>Varsayılan</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP sunu&amp;cusu:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Otomatik</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>Yeğlenen &amp;SFTP iletişim kuralı sürümü:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>Sunucudaki yollar &amp;kanonikleştirilsin</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>SCP dönüşüne izin &amp;verilsin</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>&amp;POSIX adlandırması kullanılsın</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>SFTP sunucularında bilinen hatalar algılansın</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>Sembolik bağlantı komutu değişkenlerinin te&amp;rsten sıralanması:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>1970 yılından önceki za&amp;man damgalarının yanlış yorumlanması:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Kabuk</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>Ka&amp;buk:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Otomatik algılansın</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>Ge&amp;ri dönen kod değişkeni:</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Klasör listeleme</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>Listeleme &amp;komutu:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>LS uyarıları &amp;yok sayılsın</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Tüm &amp;zaman damgası alınmaya çalışılsın</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Diğer ayarlar</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>K&amp;ullanıcı gruplarına bakılsın</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Kısa&amp;ltmalar temizlensin</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Ulusal değişke&amp;nler temizlensin</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>scp&amp;2 ile scp1 uyumluluğu kullanılsın</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>O&amp;turum açma sonrası komutları:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>&amp;Hesap:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>Gizli do&amp;syaları listeleme desteği:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Klasör listelemesinde &amp;MLSD komutu kullanılsın</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>Pasi&amp;f kip bağlantıları için dayatılacak IP adresi:</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Sunucu üzerinde host seçmek için &amp;HOST komutu kullanılsın</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>&amp;VMS sunucularındaki tüm dosya revizyonları görüntülensin</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>&amp;Varsayılan bölge:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Sanal sunucu</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Yol</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>&amp;Adres biçemi:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>İsteye&amp;n öder</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Kimlik doğrulama</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;Oturum kodu:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Rol ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>&amp;Dosya adlarındaki kodlanmamış özel karakterler hoş görülsün</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>Diğer &amp;sunuculara yönlendirme yapılabilsin</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>&amp;Bağlantı ara belleği boyutu iyileştirilsin</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Zaman aşımları</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>saniye</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Canlı kal paketleri</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>&amp;Kapalı</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>&amp;Null SSH paketleri gönderilsin</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>&amp;Boş iletişim kuralı komutları yürütülsün</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>&amp;Canlı kal paketleri arasındaki süre(sn):</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;Ve ek olarak geçerli klasör okunsun</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>İnternet iletişim kuralı sürümü</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>&amp;Otomatik</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Yerel</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>&amp;Algılansın</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>V&amp;ekil sunucu adı:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>&amp;Kullanıcı adı:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Vekil sunucu ayarları</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>kodlar</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet komutu</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Yerel vekil sunucu komutu</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>Yerel su&amp;nuculara vekil sunucudan bağlanmak değerlendirilsin</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Hayır</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Evet</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>DNS adına vekil sunucu tarafında bakılsın:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Tünel</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>SSH &amp;tüneli ile bağlanılsın</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Tünelin açılacağı sunucu</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>Sunucu a&amp;dı:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Tünel ayarları</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Otomatik</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>Yere&amp;l tünel bağlantı noktası:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Tünel kimlik doğrulama ayarları</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS seçenekleri</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>En &amp;düşük TLS sürümü:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>En &amp;yüksek TLS sürümü:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Veri bağlantılarında TLS oturumu kimliği yeniden kullanılsın</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Kimlik doğrulama parametreleri</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>İstem&amp;ci sertifika dosyası:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>İstemci sertifika dosyası</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Sertifika dosyaları (*.pfx *.p12 *.pem *.crt *.key);;Tüm dosyalar (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>Sı&amp;kıştırılsın</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>Şi&amp;freleyici seçim ilkesi:</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Şifreleyici seçim ilkesi</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Yukarı</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>&amp;Aşağı</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>SSH-2 içinde eski single-&amp;DES kullanılsın</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Anahtar alış verişi</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Anahtar alış veriş algoritması ayarları</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>Al&amp;goritma seçim ilkesi:</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Algoritma seçim ilkesi</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>&amp;GSSAPI anahtar alış verişi denensin</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Anahtar alış veriş denetimi ayarları</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>İki anahtar arası en uzun süre (dakika, 0 sınırsız)</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>İki anahtar arası en çok veri (0 sınırsız)</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>Kimlik doğrulama &amp;tamamen atlansın (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Kimlik doğrulama ayarları</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>&amp;Aracı ile kimlik doğrulaması denensin</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>İlk bilgi isteminde &amp;parola yazılsın</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>&amp;Herkese açık anahtarı görüntüle</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>Kişisel &amp;anahtar ile kullanılacak sertifika:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Sertifika</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH sertifikaları (*-cert.pub);;Tüm dosyalar (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Kimlik, &amp;GSSAPI ile doğrulansın (SSH-2)</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>GSSAPI &amp;doğrulaması yapılabilsin</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Sorunlar</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Bilinen SSH sunucu sorunları algılansın</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Hatalı hesaplanan SSH H&amp;MAC anahtarları:</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>&amp;Hatalı hesaplanan SSH-2 şifreleme anahtarları:</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>SSH2 RSA i&amp;mzalarında yastıklama zorunluluğu:</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>SSH-2 PK doğrulamasında oturum kodunun hatalı kullanımı:</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>&amp;Kötü SSH-2 anahtar alış verişi:</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>SSH-2 en büyük paket boyutunun y&amp;oksayılması:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>SSH-&amp;2 yok sayma ileti tıkanmaları:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>WinSCP SSH-2 &apos;winadj&apos; isteklerindeki tıkanmalar</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Not</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Yerel vekil sunucu ko&amp;mutu:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telnet ko&amp;mutu:</translation>
     </message>
 </context>
 <context>

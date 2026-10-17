@@ -8,7 +8,7 @@
 # every core unit has. Nothing wide crosses CoreBridge.h. Windows' wchar_t is
 # 2 bytes either way. See ADR 0001.
 add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp AboutDialog.cpp EditorWindow.cpp QtFrontend.cpp QueryDialog.cpp
-  PromptDialog.cpp Language.cpp SiteManager.cpp SiteAdvanced.cpp
+  PromptDialog.cpp Language.cpp SiteManager.cpp SiteAdvanced.cpp ColorMenu.cpp
   FileList.cpp RemotePanel.cpp LocalPanel.cpp
   TransferDialog.cpp QueuePanel.cpp SynchronizeDialog.cpp PreferencesDialog.cpp TransferSettingsDialog.cpp
   RightsFrame.cpp PropertiesDialog.cpp CreateDirectoryDialog.cpp LinkDialog.cpp RemoteTransferDialog.cpp OpenDirectoryDialog.cpp LocationProfilesDialog.cpp FindFilesDialog.cpp EditMaskDialog.cpp ServerInfoDialog.cpp RtfText.cpp GenerateUrlDialog.cpp ConsoleDialog.cpp SiteRawDialog.cpp ImportSitesDialog.cpp CustomCommandDialog.cpp KeepUpToDateDialog.cpp LicenseDialog.cpp CleanupDialog.cpp TagDialog.cpp ShortCutDialog.cpp EditorPreferencesDialog.cpp Integration.cpp SaveWorkspaceDialog.cpp

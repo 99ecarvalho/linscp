@@ -3937,14 +3937,6 @@ Location: %2</source>
         <translation>အဆင့်မြင့် ဆိုက် ဆက်တင်များ</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>အဝေးလမ်းညွှန်(&amp;D):</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>နေရာအတွင်းကြည့်(&amp;B)...</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>အနီးလမ်းညွှန်</translation>
     </message>
@@ -3955,10 +3947,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>လမ်းညွှန်နေရာများ</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> စက္ကန့်</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3981,40 +3969,20 @@ Location: %2</source>
         <translation>Proxy အမျိုးအစား(&amp;T):</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>Proxy လက်ခံစက်အမည်(&amp;X):</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Port နံပါတ်(&amp;R):</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>သုံးစွဲသူအမည်(&amp;U):</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>စကားဝှက်(&amp;P):</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>အနီး လိပ်စာများအတွက် proxy ကို သုံးပါ(&amp;L)</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Proxy</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Pageant သို့မဟုတ် ssh-agent ဖြင့် အထောက်အထားစိစစ်ရန် ကြိုးစားပါ(&amp;P)</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Agent forwarding ကို ခွင့်ပြုပါ(&amp;F)</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>နေရာအတွင်းကြည့်</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4029,16 +3997,656 @@ Location: %2</source>
         <translation>ကိုယ်ပိုင် ကီး ဖိုင်(&amp;K):</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH အထောက်အထားစိစစ်ခြင်း</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>နောက်ဆုံးသုံးခဲ့သော လမ်းညွှန်နေရာကို မှတ်ထားပါ(&amp;M)</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>&apos;keyboard-interactive&apos; အထောက်အထားစိစစ်ခြင်းကို ကြိုးစားပါ(&amp;I)</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>စာမျက်နှာများ</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>အရောင်(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>ပတ်ဝန်းကျင်</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>ဆာဗာ ပတ်ဝန်းကျင်</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>စာကြောင်းအဆုံး အက္ခရာများ (ဆာဗာက မဖော်ပြပါက)(&amp;O):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>ဖိုင်အမည်များအတွက် UTF-8 စာဝှက်(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>အချိန်ဇုန် ကွာဟချက်(&amp;Z):</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>နာရီ</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>အချိန်ဇုန် ကွာဟချက် နာရီ</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>အချိန်ဇုန် ကွာဟချက် မိနစ်</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>မိနစ်</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>အလိုအလျောက် ရှာဖွေပါ(&amp;A)</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>VMS ဗားရှင်းနံပါတ်များကို ဖြတ်ပါ(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>နေ့အလင်းရောင် ချွေတာချိန်</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>အဝေး အချိန်တံဆိပ်ကို အနီး ဓလေ့များအတိုင်း ညှိပါ(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>အဝေး အချိန်တံဆိပ်ကို DST ဖြင့် ညှိပါ(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>ထပ်တူပြု ကြည့်ရှုခြင်း(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>အဝေးလမ်းညွှန်(&amp;R):</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Explorer မျက်နှာပြင်တွင် အနီးလမ်းညွှန်ကို မသုံးပါ။</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>လမ်းညွှန်နေရာ ဖတ်ခြင်း ရွေးစရာများ</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>ဝင်ရောက်ခဲ့သော အဝေးလမ်းညွှန်များကို ကက်ရှ်လုပ်ပါ(&amp;V)</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>လမ်းညွှန်နေရာ ပြောင်းလဲမှုများကို ကက်ရှ်လုပ်ပါ(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>အမြဲတမ်း ကက်ရှ်(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>symbolic လင့်ခ်များကို ဖြေရှင်းပါ(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>လမ်းညွှန်နေရာများသို့ symbolic လင့်ခ်များကို လိုက်ပါ(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>အမှိုက်ပုံး</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>ဖျက်ထားသော အဝေးဖိုင်များကို အမှိုက်ပုံးတွင် ထိန်းသိမ်းပါ(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>ထပ်ရေးခံရသော အဝေးဖိုင်များကို အမှိုက်ပုံးတွင် ထိန်းသိမ်းပါ (SFTP သာ)(&amp;O)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>အဝေး အမှိုက်ပုံး(&amp;R):</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>စာဝှက်ခြင်း</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>ဖိုင်များကို စာဝှက်ပါ(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>စာဝှက်ခြင်း ရွေးစရာများ</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>စာဝှက် ကီး(&amp;K):</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>ကီး ပြပါ(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>ကီး ထုတ်ပါ(&amp;G)</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>ပရိုတိုကော ရွေးစရာများ</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>မူလ</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP ဆာဗာ(&amp;V):</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>အလိုအလျောက်</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>နှစ်သက်သော SFTP ပရိုတိုကော ဗားရှင်း(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>ဆာဗာပေါ်ရှိ လမ်းကြောင်းများကို စံပုံစံပြုပါ(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>SCP သို့ ပြန်လှည့်သုံးခြင်းကို ခွင့်ပြုပါ(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>POSIX အမည်ပြောင်းခြင်း သုံးပါ(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>SFTP ဆာဗာများရှိ သိရှိပြီး ချို့ယွင်းချက်များ ရှာဖွေခြင်း</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>လင့်ခ် အမိန့် အငြင်းအခုံများ၏ အစီအစဉ်ကို ပြောင်းပြန်လုပ်သည်(&amp;R):</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>1970 မတိုင်မီ ဖိုင် အချိန်တံဆိပ်များကို မှားယွင်း အဓိပ္ပာယ်ကောက်သည်(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Shell</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>Shell(&amp;H):</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>အလိုအလျောက် ရှာဖွေ</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>ပြန်ပေးကုဒ် ကိန်းရှင်(&amp;R):</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>လမ်းညွှန်နေရာ စာရင်း</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>စာရင်းပြ အမိန့်(&amp;C):</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>LS သတိပေးချက်များကို လျစ်လျူရှုပါ(&amp;W)</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>အချိန်တံဆိပ် အပြည့်အစုံ ရယူရန် ကြိုးစားပါ(&amp;F)</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>အခြား ရွေးစရာများ</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>သုံးစွဲသူ အုပ်စုများကို ရှာဖွေပါ(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>alias များကို ရှင်းပါ(&amp;L)</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>နိုင်ငံဆိုင်ရာ ကိန်းရှင်များကို ရှင်းပါ(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>scp1 နှင့် ကိုက်ညီမှုဖြင့် scp2 ကို သုံးပါ(&amp;2)</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>ဝင်ရောက်ပြီးနောက် အမိန့်များ(&amp;C):</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>အကောင့်(&amp;A):</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>ဝှက်ထားသော ဖိုင်များ စာရင်းပြခြင်း ပံ့ပိုးမှု(&amp;S):</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>လမ်းညွှန်နေရာ စာရင်းအတွက် MLSD အမိန့်ကို သုံးပါ(&amp;M)</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>passive mode ချိတ်ဆက်မှုများအတွက် IP လိပ်စာကို အတင်းသုံးပါ(&amp;F):</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>ဆာဗာပေါ်ရှိ လက်ခံစက်ကို ရွေးရန် HOST အမိန့်ကို သုံးပါ(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>VMS ဆာဗာများပေါ်ရှိ ဖိုင် တည်းဖြတ်မူ အားလုံးကို ပြပါ(&amp;R)</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>မူလ ဒေသ(&amp;D):</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Virtual Host</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>လမ်းကြောင်း</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>URL ပုံစံ(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>တောင်းဆိုသူက ပေးချေသည်(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>အထောက်အထားစိစစ်ခြင်း</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>ကဏ္ဍ token(&amp;S):</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>Role ARN(&amp;R):</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>ဖိုင်အမည်များတွင် စာဝှက်မထားသော အထူးအက္ခရာများကို လက်ခံပါ(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>အခြား လက်ခံစက်များသို့ လမ်းလွှဲခြင်းကို ခွင့်ပြုပါ(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>ချိတ်ဆက်မှု buffer အရွယ်အစားကို အကောင်းဆုံးပြုပါ(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>အချိန်ကန့်သတ်ချက်များ</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>စက္ကန့်</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>ချိတ်ဆက်မှု ထိန်းထားခြင်း</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>ပိတ်(&amp;O)</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>ဗလာ SSH packet များ ပို့ခြင်း(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>ဒမ်မီ ပရိုတိုကော အမိန့်များ လုပ်ဆောင်ခြင်း(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>ချိတ်ဆက်မှု ထိန်းထားခြင်းကြား စက္ကန့်(&amp;B):</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>ထို့အပြင် လက်ရှိ လမ်းညွှန်နေရာကိုပါ ဖတ်ခြင်း(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>အင်တာနက် ပရိုတိုကော ဗားရှင်း</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>အလိုအလျောက်(&amp;U)</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv4(&amp;4)</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv6(&amp;6)</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>အနီး</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>အလိုအလျောက် ရှာဖွေ(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Proxy လက်ခံစက်အမည်(&amp;X):</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>သုံးစွဲသူအမည်(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Proxy ဆက်တင်များ</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>ပုံစံများ</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Telnet အမိန့်</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>အနီး proxy အမိန့်</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>အနီး လက်ခံစက် ချိတ်ဆက်မှုများကိုလည်း proxy ဖြင့် ချိတ်ဆက်ပါ(&amp;N)</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>မဟုတ်ပါ</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>ဟုတ်ကဲ့</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>DNS အမည်ရှာဖွေမှုကို proxy ဘက်တွင် လုပ်ပါ(&amp;D):</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Tunnel</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>SSH tunnel မှတစ်ဆင့် ချိတ်ဆက်ပါ(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>tunnel တည်ဆောက်မည့် လက်ခံစက်</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>လက်ခံစက်အမည်(&amp;H):</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Tunnel ရွေးစရာများ</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>အလိုအလျောက် ရွေးချယ်</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>အနီး tunnel port(&amp;L):</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Tunnel အထောက်အထားစိစစ်ရေး သတ်မှတ်ချက်များ</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>TLS ရွေးစရာများ</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>အနိမ့်ဆုံး TLS ဗားရှင်း(&amp;N):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>အမြင့်ဆုံး TLS ဗားရှင်း(&amp;X):</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>ဒေတာ ချိတ်ဆက်မှုများအတွက် TLS ကဏ္ဍ ID ကို ပြန်သုံးပါ(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>အထောက်အထားစိစစ်ရေး သတ်မှတ်ချက်များ</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>client လက်မှတ် ဖိုင်(&amp;C):</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>client လက်မှတ် ဖိုင်</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>လက်မှတ် ဖိုင်များ (*.pfx *.p12 *.pem *.crt *.key);;ဖိုင်အားလုံး (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>ချုံ့ခြင်းကို ဖွင့်ပါ(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>စာဝှက် cipher ရွေးချယ်ရေး မူဝါဒ(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>စာဝှက် cipher ရွေးချယ်ရေး မူဝါဒ</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>အပေါ်(&amp;U)</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>အောက်(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>single-DES ၏ ရှေးဟောင်း အသုံးပြုမှုကို ဖွင့်ပါ(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>ကီး ဖလှယ်ခြင်း</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>ကီး ဖလှယ်ခြင်း အယ်လဂိုရီသမ် ရွေးစရာများ</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>အယ်လဂိုရီသမ် ရွေးချယ်ရေး မူဝါဒ(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>အယ်လဂိုရီသမ် ရွေးချယ်ရေး မူဝါဒ</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>GSSAPI ကီး ဖလှယ်ခြင်းကို ကြိုးစားပါ(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>ကီး ပြန်လည်ဖလှယ်ခြင်းကို ထိန်းချုပ်သော ရွေးစရာများ</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>ကီး ပြန်ဖလှယ်မီ အများဆုံး မိနစ် (0 ဆိုလျှင် ကန့်သတ်ချက်မရှိ)(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>ကီး ပြန်ဖလှယ်မီ အများဆုံး ဒေတာ (0 ဆိုလျှင် ကန့်သတ်ချက်မရှိ)(&amp;X):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>အထောက်အထားစိစစ်ခြင်းကို လုံးဝ ကျော်ပါ(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>အထောက်အထားစိစစ်ခြင်း ရွေးစရာများ</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>agent ကို သုံး၍ အထောက်အထားစိစစ်ခြင်းကို ကြိုးစားပါ(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>ပထမ မေးခွန်းကို စကားဝှက်ဖြင့် တုံ့ပြန်ပါ(&amp;W)</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>အများသုံး ကီး ပြပါ(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>ကိုယ်ပိုင် ကီးနှင့် သုံးမည့် လက်မှတ်(&amp;U):</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>လက်မှတ်</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>OpenSSH လက်မှတ်များ (*-cert.pub);;ဖိုင်အားလုံး (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>GSSAPI အထောက်အထားစိစစ်ခြင်းကို ကြိုးစားပါ(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>GSSAPI အထောက်အထား လွှဲအပ်ခြင်းကို ခွင့်ပြုပါ(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>ချို့ယွင်းချက်များ</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>SSH ဆာဗာများရှိ သိရှိပြီး ချို့ယွင်းချက်များ ရှာဖွေခြင်း</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>SSH HMAC ကီးများကို မှားယွင်း တွက်ချက်သည်(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>SSH စာဝှက် ကီးများကို မှားယွင်း တွက်ချက်သည်(&amp;E):</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>SSH RSA လက်မှတ်ရေးထိုးချက်များတွင် padding လိုအပ်သည်(&amp;P):</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>SSH PK အထောက်အထားစိစစ်ရာတွင် ကဏ္ဍ ID ကို အလွဲသုံးသည်(&amp;N):</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>SSH ကီး ပြန်လည်ဖလှယ်ခြင်းကို မှားယွင်းစွာ ကိုင်တွယ်သည်(&amp;K):</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>SSH အများဆုံး packet အရွယ်အစားကို လျစ်လျူရှုသည်(&amp;X):</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>SSH ignore မက်ဆေ့ချ်များတွင် ပိတ်မိသည်(&amp;G):</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>WinSCP ၏ SSH &apos;winadj&apos; တောင်းဆိုမှုများတွင် ပိတ်မိသည်(&amp;W)</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>မှတ်စု</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>အနီး proxy အမိန့်(&amp;M):</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Telnet အမိန့်(&amp;M):</translation>
     </message>
 </context>
 <context>

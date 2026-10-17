@@ -3939,14 +3939,6 @@ Location: %2</source>
         <translation>Додаткові налаштування сайту</translation>
     </message>
     <message>
-        <source>Remote &amp;directory:</source>
-        <translation>Віддалена &amp;тека:</translation>
-    </message>
-    <message>
-        <source>&amp;Browse...</source>
-        <translation>Огляд</translation>
-    </message>
-    <message>
         <source>Local directory</source>
         <translation>Локальна тека</translation>
     </message>
@@ -3957,10 +3949,6 @@ Location: %2</source>
     <message>
         <source>Directories</source>
         <translation>Теки</translation>
-    </message>
-    <message>
-        <source> seconds</source>
-        <translation> секунд</translation>
     </message>
     <message>
         <source>Server &amp;response timeout:</source>
@@ -3983,40 +3971,20 @@ Location: %2</source>
         <translation>Тип проксі:</translation>
     </message>
     <message>
-        <source>Pro&amp;xy host name:</source>
-        <translation>&amp;Вузол проксі:</translation>
-    </message>
-    <message>
         <source>Po&amp;rt number:</source>
         <translation>Номер порту:</translation>
-    </message>
-    <message>
-        <source>&amp;User name:</source>
-        <translation>&amp;Ім&apos;я користувача:</translation>
     </message>
     <message>
         <source>&amp;Password:</source>
         <translation>Пароль</translation>
     </message>
     <message>
-        <source>Consult proxy for &amp;local addresses</source>
-        <translation>Використовувати проксі для &amp;локальних адрес</translation>
-    </message>
-    <message>
         <source>Proxy</source>
         <translation>Проксі</translation>
     </message>
     <message>
-        <source>Attempt authentication using &amp;Pageant or ssh-agent</source>
-        <translation>Спроба автентифікації через &amp;Pageant або ssh-agent</translation>
-    </message>
-    <message>
         <source>Allow agent &amp;forwarding</source>
         <translation>Дозволити перенаправлення агента</translation>
-    </message>
-    <message>
-        <source>B&amp;rowse...</source>
-        <translation>О&amp;гляд...</translation>
     </message>
     <message>
         <source>Private key file</source>
@@ -4031,16 +3999,656 @@ Location: %2</source>
         <translation>Файл приватного ключа</translation>
     </message>
     <message>
-        <source>SSH Authentication</source>
-        <translation>SSH автентифікація</translation>
-    </message>
-    <message>
         <source>Re&amp;member last used directory</source>
         <translation>пам&apos;ятати останню використану теку</translation>
     </message>
     <message>
         <source>Attempt &apos;keyboard-&amp;interactive&apos; authentication</source>
         <translation>Спроба &apos;клавіатурно-інтерактивної&apos; автентифікації</translation>
+    </message>
+    <message>
+        <source>Pages</source>
+        <translation>Сторінки</translation>
+    </message>
+    <message>
+        <source>&amp;Color</source>
+        <translation>&amp;Колір</translation>
+    </message>
+    <message>
+        <source>Environment</source>
+        <translation>Оточення</translation>
+    </message>
+    <message>
+        <source>Server environment</source>
+        <translation>Оточення сервера</translation>
+    </message>
+    <message>
+        <source>End-&amp;of-line characters (if not indicated by server):</source>
+        <translation>Символ кінця строки (якщо не надано сервером):</translation>
+    </message>
+    <message>
+        <source>&amp;UTF-8 encoding for filenames:</source>
+        <translation>&amp;UTF-8 кодування для назв файлів:</translation>
+    </message>
+    <message>
+        <source>Time &amp;zone offset:</source>
+        <translation>Зсув часової зони:</translation>
+    </message>
+    <message>
+        <source>hours</source>
+        <translation>год.</translation>
+    </message>
+    <message>
+        <source>Time zone offset hours</source>
+        <translation>Зсув часової зони, години</translation>
+    </message>
+    <message>
+        <source>Time zone offset minutes</source>
+        <translation>Зсув часової зони, хвилини</translation>
+    </message>
+    <message>
+        <source>minutes</source>
+        <translation>хв.</translation>
+    </message>
+    <message>
+        <source>Detect &amp;automatically</source>
+        <translation>Визначати автоматично</translation>
+    </message>
+    <message>
+        <source>&amp;Trim VMS version numbers</source>
+        <translation>Обрізати VMS версії файлів</translation>
+    </message>
+    <message>
+        <source>Daylight saving time</source>
+        <translation>Літній час</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp to local co&amp;nventions</source>
+        <translation>Підігнати віддалений час до локальних установок (Unix)</translation>
+    </message>
+    <message>
+        <source>Adjust remote timestamp with &amp;DST</source>
+        <translation>Підігнати віддалений час до літнього часу  (Windows)</translation>
+    </message>
+    <message>
+        <source>&amp;Synchronize browsing</source>
+        <translation>Синхронізована навігація</translation>
+    </message>
+    <message>
+        <source>&amp;Remote directory:</source>
+        <translation>&amp;Віддалена тека:</translation>
+    </message>
+    <message>
+        <source>Local directory is not used with Explorer interface.</source>
+        <translation>Локальна тека не викорис. з Еxplorer-подібним інтерфейсом</translation>
+    </message>
+    <message>
+        <source>Directory reading options</source>
+        <translation>Опції читання теки</translation>
+    </message>
+    <message>
+        <source>Cache &amp;visited remote directories</source>
+        <translation>Кеш відвіданих віддалених тек</translation>
+    </message>
+    <message>
+        <source>Cache &amp;directory changes</source>
+        <translation>Кеш змін тек</translation>
+    </message>
+    <message>
+        <source>&amp;Permanent cache</source>
+        <translation>Постійний кеш</translation>
+    </message>
+    <message>
+        <source>Resolve symbolic li&amp;nks</source>
+        <translation>Розпізнавати символічні посилання</translation>
+    </message>
+    <message>
+        <source>&amp;Follow symbolic links to directories</source>
+        <translation>Переходити за символічними посиланням до тек</translation>
+    </message>
+    <message>
+        <source>Recycle bin</source>
+        <translation>Кошик</translation>
+    </message>
+    <message>
+        <source>&amp;Preserve deleted remote files to recycle bin</source>
+        <translation>Зберігати видалені віддалені файли в Кошику</translation>
+    </message>
+    <message>
+        <source>Preserve &amp;overwritten remote files to recycle bin (SFTP only)</source>
+        <translation>Зберігати перезапис. віддал. файли в Кошику (тільки SFTP)</translation>
+    </message>
+    <message>
+        <source>&amp;Remote recycle bin:</source>
+        <translation>Віддалений Кошик</translation>
+    </message>
+    <message>
+        <source>Encryption</source>
+        <translation>Шифрування</translation>
+    </message>
+    <message>
+        <source>&amp;Encrypt files</source>
+        <translation>Шифрування файлів</translation>
+    </message>
+    <message>
+        <source>Encryption options</source>
+        <translation>Опції шифрування</translation>
+    </message>
+    <message>
+        <source>Encryption &amp;key:</source>
+        <translation>Ключ шифрування</translation>
+    </message>
+    <message>
+        <source>&amp;Show key</source>
+        <translation>Показати ключ</translation>
+    </message>
+    <message>
+        <source>&amp;Generate Key</source>
+        <translation>Створити ключ</translation>
+    </message>
+    <message>
+        <source>SFTP</source>
+        <translation>SFTP</translation>
+    </message>
+    <message>
+        <source>Protocol options</source>
+        <translation>Опції протоколу</translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation>По замовчуванню</translation>
+    </message>
+    <message>
+        <source>SFTP ser&amp;ver:</source>
+        <translation>SFTP сервер:</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Авто</translation>
+    </message>
+    <message>
+        <source>&amp;Preferred SFTP protocol version:</source>
+        <translation>Переважна версія протоколу SFTP:</translation>
+    </message>
+    <message>
+        <source>Ca&amp;nonicalize paths on the server</source>
+        <translation>Канонізувати шляхи на сервері</translation>
+    </message>
+    <message>
+        <source>Allow SCP &amp;fallback</source>
+        <translation>Можна SCP &amp;fallback</translation>
+    </message>
+    <message>
+        <source>&amp;Use POSIX rename</source>
+        <translation>Використовувати перейменування &amp;POSIX</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SFTP servers</source>
+        <translation>Визначення відомих помилок у SFTP серверах</translation>
+    </message>
+    <message>
+        <source>&amp;Reverses order of link command arguments:</source>
+        <translation>Обертає порядок аргументів команд:</translation>
+    </message>
+    <message>
+        <source>&amp;Misinterprets file timestamps prior to 1970:</source>
+        <translation>Спотворення часових міток файлів раніше 1970:</translation>
+    </message>
+    <message>
+        <source>Shell</source>
+        <translation>Оболонка</translation>
+    </message>
+    <message>
+        <source>S&amp;hell:</source>
+        <translation>Оболонка:</translation>
+    </message>
+    <message>
+        <source>Autodetect</source>
+        <translation>Автовизначення</translation>
+    </message>
+    <message>
+        <source>&amp;Return code variable:</source>
+        <translation>Змінна коду повернення</translation>
+    </message>
+    <message>
+        <source>Directory listing</source>
+        <translation>Вміст теки</translation>
+    </message>
+    <message>
+        <source>Listing &amp;command:</source>
+        <translation>Команда лістингу:</translation>
+    </message>
+    <message>
+        <source>Ignore LS &amp;warnings</source>
+        <translation>Ігнор. попереджень LS</translation>
+    </message>
+    <message>
+        <source>Try to get &amp;full timestamp</source>
+        <translation>Спроба отримати повний час</translation>
+    </message>
+    <message>
+        <source>Other options</source>
+        <translation>Інші опції</translation>
+    </message>
+    <message>
+        <source>Lookup &amp;user groups</source>
+        <translation>Шукати групи корист.</translation>
+    </message>
+    <message>
+        <source>Clear a&amp;liases</source>
+        <translation>Очистити псевдоніми</translation>
+    </message>
+    <message>
+        <source>Clear &amp;national variables</source>
+        <translation>Очистити національні змінні</translation>
+    </message>
+    <message>
+        <source>Use scp&amp;2 with scp1 compatibility</source>
+        <translation>Викор. scp&amp;2, сумісний з scp1</translation>
+    </message>
+    <message>
+        <source>FTP</source>
+        <translation>FTP</translation>
+    </message>
+    <message>
+        <source>Post login &amp;commands:</source>
+        <translation>Команди після логіну:</translation>
+    </message>
+    <message>
+        <source>&amp;Account:</source>
+        <translation>Обліковий запис:</translation>
+    </message>
+    <message>
+        <source>&amp;Support for listing of hidden files:</source>
+        <translation>Підтримка лістингу прихованих файлів:</translation>
+    </message>
+    <message>
+        <source>Use &amp;MLSD command for directory listing</source>
+        <translation>Використовувати команди &amp;MLSD для перегляду тек</translation>
+    </message>
+    <message>
+        <source>&amp;Force IP address for passive mode connections:</source>
+        <translation>Форсувати IP адресу для пас.режиму з&apos;єднань</translation>
+    </message>
+    <message>
+        <source>Use &amp;HOST command to select host on the server</source>
+        <translation>Використати команду &amp;HOST, щоб вибрати хост на сервері</translation>
+    </message>
+    <message>
+        <source>Display all file &amp;revisions on VMS servers</source>
+        <translation>Відобразити всі редакції файлів на серверах VMS</translation>
+    </message>
+    <message>
+        <source>S3</source>
+        <translation>S3</translation>
+    </message>
+    <message>
+        <source>&amp;Default region:</source>
+        <translation>За замовчуванням:</translation>
+    </message>
+    <message>
+        <source>Virtual Host</source>
+        <translation>Віртуальний хост</translation>
+    </message>
+    <message>
+        <source>Path</source>
+        <translation>Шлях</translation>
+    </message>
+    <message>
+        <source>&amp;URL style:</source>
+        <translation>Стиль &amp;URL-адреси:</translation>
+    </message>
+    <message>
+        <source>Requester &amp;pays</source>
+        <translation>&amp;Оплачує запитувач</translation>
+    </message>
+    <message>
+        <source>Authentication</source>
+        <translation>Аутентифікація</translation>
+    </message>
+    <message>
+        <source>&amp;Session token:</source>
+        <translation>&amp;Session token:</translation>
+    </message>
+    <message>
+        <source>&amp;Role ARN:</source>
+        <translation>&amp;Роль ARN:</translation>
+    </message>
+    <message>
+        <source>WebDAV</source>
+        <translation>WebDAV</translation>
+    </message>
+    <message>
+        <source>&amp;Tolerate non-encoded special characters in filenames</source>
+        <translation>Дозвіл на використання не кодованих спеціальних символів в іменах файлів</translation>
+    </message>
+    <message>
+        <source>&amp;Allow redirects to other hosts</source>
+        <translation>&amp;Дозволити перенаправлення на інші хости</translation>
+    </message>
+    <message>
+        <source>Optimize connection &amp;buffer size</source>
+        <translation>Оптимізація розміру буфера з&apos;єднання</translation>
+    </message>
+    <message>
+        <source>Timeouts</source>
+        <translation>Тайм-аути</translation>
+    </message>
+    <message>
+        <source>seconds</source>
+        <translation>секунд</translation>
+    </message>
+    <message>
+        <source>Keepalives</source>
+        <translation>Підтр. з&apos;єднання</translation>
+    </message>
+    <message>
+        <source>&amp;Off</source>
+        <translation>Вимкнути</translation>
+    </message>
+    <message>
+        <source>Sending of &amp;null SSH packets</source>
+        <translation>Посилати порожні SSH-пакети</translation>
+    </message>
+    <message>
+        <source>Executing &amp;dummy protocol commands</source>
+        <translation>Виконувати холості (dummy) команди</translation>
+    </message>
+    <message>
+        <source>Seconds &amp;between keepalives:</source>
+        <translation>Секунд між командами підтримки:</translation>
+    </message>
+    <message>
+        <source>&amp;And additionally reading the current directory</source>
+        <translation>&amp;А також читати поточну теку</translation>
+    </message>
+    <message>
+        <source>Internet protocol version</source>
+        <translation>Версія протоколу IP</translation>
+    </message>
+    <message>
+        <source>A&amp;uto</source>
+        <translation>Авто</translation>
+    </message>
+    <message>
+        <source>IPv&amp;4</source>
+        <translation>IPv&amp;4</translation>
+    </message>
+    <message>
+        <source>IPv&amp;6</source>
+        <translation>IPv&amp;6</translation>
+    </message>
+    <message>
+        <source>Local</source>
+        <translation>Локальний</translation>
+    </message>
+    <message>
+        <source>&amp;Autodetect</source>
+        <translation>Автовизначення</translation>
+    </message>
+    <message>
+        <source>Pro&amp;xy hostname:</source>
+        <translation>Вузол проксі:</translation>
+    </message>
+    <message>
+        <source>&amp;Username:</source>
+        <translation>Логін:</translation>
+    </message>
+    <message>
+        <source>Proxy settings</source>
+        <translation>Налаштування проксі</translation>
+    </message>
+    <message>
+        <source>patterns</source>
+        <translation>шаблони</translation>
+    </message>
+    <message>
+        <source>Telnet command</source>
+        <translation>Команда Telnet</translation>
+    </message>
+    <message>
+        <source>Local proxy command</source>
+        <translation>Команда локального проксі</translation>
+    </message>
+    <message>
+        <source>Co&amp;nsider proxying local host connections</source>
+        <translation>Враховувати проксіювання локальних з&apos;єднань</translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation>Ні</translation>
+    </message>
+    <message>
+        <source>Yes</source>
+        <translation>Так</translation>
+    </message>
+    <message>
+        <source>Do &amp;DNS name lookup at proxy end:</source>
+        <translation>Виконувати &amp;DNS визначення назв на проксі:</translation>
+    </message>
+    <message>
+        <source>Tunnel</source>
+        <translation>Тунель</translation>
+    </message>
+    <message>
+        <source>Connect &amp;through SSH tunnel</source>
+        <translation>з&apos;єднуватися через SSH тунель</translation>
+    </message>
+    <message>
+        <source>Host to setup tunnel on</source>
+        <translation>Вузол для встановлення тунелю</translation>
+    </message>
+    <message>
+        <source>&amp;Hostname:</source>
+        <translation>Адреса вузла:</translation>
+    </message>
+    <message>
+        <source>Tunnel options</source>
+        <translation>Опції тунелю</translation>
+    </message>
+    <message>
+        <source>Autoselect</source>
+        <translation>Автовибір</translation>
+    </message>
+    <message>
+        <source>&amp;Local tunnel port:</source>
+        <translation>Локальний порт тунелю:</translation>
+    </message>
+    <message>
+        <source>Tunnel authentication parameters</source>
+        <translation>Параметри аутентифікації тунелю</translation>
+    </message>
+    <message>
+        <source>TLS/SSL</source>
+        <translation>TLS/SSL</translation>
+    </message>
+    <message>
+        <source>TLS options</source>
+        <translation>Опції TLS</translation>
+    </message>
+    <message>
+        <source>Mi&amp;nimum TLS version:</source>
+        <translation>Мі&amp;німальна версія TLS:</translation>
+    </message>
+    <message>
+        <source>Ma&amp;ximum TLS version:</source>
+        <translation>Ма&amp;ксимальна версія TLS:</translation>
+    </message>
+    <message>
+        <source>&amp;Reuse TLS session ID for data connections</source>
+        <translation>&amp;Повторно використовувати ID сесії TLS для з&apos;єднань даних</translation>
+    </message>
+    <message>
+        <source>Authentication parameters</source>
+        <translation>Параметри аутентифікації</translation>
+    </message>
+    <message>
+        <source>&amp;Client certificate file:</source>
+        <translation>Клієнтській файл сертифікат:</translation>
+    </message>
+    <message>
+        <source>Client certificate file</source>
+        <translation>Файл сертифіката клієнта</translation>
+    </message>
+    <message>
+        <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
+        <translation>Файли сертифікатів (*.pfx *.p12 *.pem *.crt *.key);;Всі файли (*)</translation>
+    </message>
+    <message>
+        <source>SSH</source>
+        <translation>SSH</translation>
+    </message>
+    <message>
+        <source>&amp;Enable compression</source>
+        <translation>Використовувати стиснення</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection &amp;policy:</source>
+        <translation>Правила вибору шифрування</translation>
+    </message>
+    <message>
+        <source>Encryption cipher selection policy</source>
+        <translation>Правила вибору шифрування</translation>
+    </message>
+    <message>
+        <source>&amp;Up</source>
+        <translation>&amp;Вгору</translation>
+    </message>
+    <message>
+        <source>&amp;Down</source>
+        <translation>В&amp;низ</translation>
+    </message>
+    <message>
+        <source>Enable legacy use of single-&amp;DES</source>
+        <translation>Застосувати законне використання single-&amp;DES в SSH-2</translation>
+    </message>
+    <message>
+        <source>Key exchange</source>
+        <translation>Обмін ключами</translation>
+    </message>
+    <message>
+        <source>Key exchange algorithm options</source>
+        <translation>Опції алгоритму обміну ключами</translation>
+    </message>
+    <message>
+        <source>Algorithm selection &amp;policy:</source>
+        <translation>Правила вибору алгоритму</translation>
+    </message>
+    <message>
+        <source>Algorithm selection policy</source>
+        <translation>Правила вибору алгоритму</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI key exchange</source>
+        <translation>Спроба та обмін ключами GSSAPI</translation>
+    </message>
+    <message>
+        <source>Options controlling key re-exchange</source>
+        <translation>Опції контролю повторного обміну ключами</translation>
+    </message>
+    <message>
+        <source>Max &amp;minutes before rekey (0 for no limit):</source>
+        <translation>Макс. хвилин до пере обміну (0 - безліміт):</translation>
+    </message>
+    <message>
+        <source>Ma&amp;x data before rekey (0 for no limit):</source>
+        <translation>Макс. даних до пере обміну (0 - безліміт):</translation>
+    </message>
+    <message>
+        <source>&amp;Bypass authentication entirely</source>
+        <translation>Повний пропуск автентифікації</translation>
+    </message>
+    <message>
+        <source>Authentication options</source>
+        <translation>Опції аутентифікації</translation>
+    </message>
+    <message>
+        <source>&amp;Attempt authentication using agent</source>
+        <translation>Спроба автентифікації за допомогою &amp;агента</translation>
+    </message>
+    <message>
+        <source>Respond with a pass&amp;word to the first prompt</source>
+        <translation>Відповісти з паролем на перше запрошення</translation>
+    </message>
+    <message>
+        <source>&amp;Display Public Key</source>
+        <translation>Відображення відкритого ключа</translation>
+    </message>
+    <message>
+        <source>Certificate to &amp;use with the private key:</source>
+        <translation>&amp;Сертифікат для використання з приватним ключем:</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>Сертифікат</translation>
+    </message>
+    <message>
+        <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
+        <translation>Сертифікати OpenSSH (*-cert.pub);;Всі файли (*)</translation>
+    </message>
+    <message>
+        <source>GSSAPI</source>
+        <translation>GSSAPI</translation>
+    </message>
+    <message>
+        <source>Attempt &amp;GSSAPI authentication</source>
+        <translation>Спроба автентифікації &amp;GSSAPI/SSPI</translation>
+    </message>
+    <message>
+        <source>Allow GSSAPI c&amp;redential delegation</source>
+        <translation>Дозволити засвідчення GSSAPI</translation>
+    </message>
+    <message>
+        <source>Bugs</source>
+        <translation>Дефекти</translation>
+    </message>
+    <message>
+        <source>Detection of known bugs in SSH servers</source>
+        <translation>Визначення відомих дефектів в SSH серверах</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH H&amp;MAC keys:</source>
+        <translation>Невірне обчислення ключів SSH-2 H&amp;MAC</translation>
+    </message>
+    <message>
+        <source>Miscomputes SSH &amp;encryption keys:</source>
+        <translation>Невірне обчислення ключів шифрування SSH-2</translation>
+    </message>
+    <message>
+        <source>Requires &amp;padding on SSH RSA signatures:</source>
+        <translation>Вимагати доповнення в SSH-2 RSA підписах</translation>
+    </message>
+    <message>
+        <source>Misuses the sessio&amp;n ID in SSH PK auth:</source>
+        <translation>Невживання ID сесії при SSH-2 PK аутентифікації</translation>
+    </message>
+    <message>
+        <source>Handles SSH &amp;key re-exchange badly:</source>
+        <translation>Обробка поганих пере обмінів ключами SSH-2</translation>
+    </message>
+    <message>
+        <source>Ignores SSH ma&amp;ximum packet size:</source>
+        <translation>Ігнорувати макс. розмір пакету SSH-2:</translation>
+    </message>
+    <message>
+        <source>Chokes on SSH i&amp;gnore messages:</source>
+        <translation>Заповнювати при повідомленнях що ігноруються SSH-&amp;2:</translation>
+    </message>
+    <message>
+        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Придушувати у протоколах SSH-2 запити &apos;winadj&apos; для WinSCP</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Замітка</translation>
+    </message>
+    <message>
+        <source>Local proxy co&amp;mmand:</source>
+        <translation>Команда локального проксі:</translation>
+    </message>
+    <message>
+        <source>Telnet co&amp;mmand:</source>
+        <translation>Команди Telnet:</translation>
     </message>
 </context>
 <context>
