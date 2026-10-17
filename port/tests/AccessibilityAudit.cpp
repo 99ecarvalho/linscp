@@ -96,6 +96,11 @@ bool WinScpClash(const QString & One, const QString & Other)
     { QStringLiteral("B&rowse..."), QStringLiteral("&Remember session password and pass it to PuTTY (SSH)") },
     { QStringLiteral("&Tabulator size:"), QStringLiteral("&Text color") },
     { QStringLiteral("Add upload shortcut to Explorer's '&Send to' context menu"), QStringLiteral("Add linscp to &search path") },
+    // CopyParamPreset.dfm with CopyParams.dfm's frame.
+    { QStringLiteral("Preset &description:"), QStringLiteral("Preserve rea&d-only") },
+    { QStringLiteral("File &mask:"), QStringLiteral("Hostna&me mask:") },
+    { QStringLiteral("&Encrypt new files"), QStringLiteral("Us&ername mask:") },
+    { QStringLiteral("Rep&lace '\\:*?'..."), QStringLiteral("&Local directory mask:") },
     // Login.dfm: Save and the ShowAgainPanel's check.
     { QStringLiteral("&Save"), QStringLiteral("&Show Login dialog on startup and when the last session is closed") },
     // Preferences.dfm: Storage.

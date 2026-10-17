@@ -5035,6 +5035,10 @@ Location: %2</source>
         <source>Login options</source>
         <translation>گزینه‌های ورود</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>قانون تنظیمات انتقال...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

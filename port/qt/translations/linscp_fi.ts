@@ -5036,6 +5036,10 @@ Sijainti: %2</translation>
         <source>Login options</source>
         <translation>Kirjautumisasetukset</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>Siirtoasetusten &amp;sääntö...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

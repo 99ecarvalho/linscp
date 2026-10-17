@@ -5037,6 +5037,10 @@ Atrašanās vieta: %2</translation>
         <source>Login options</source>
         <translation>Pieteikšanās opcijas</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>Pārsūtīšanas iestatījumu &amp;kārtula...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

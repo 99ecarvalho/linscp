@@ -5037,6 +5037,10 @@ Umiestnenie: %2</translation>
         <source>Login options</source>
         <translation>Možnosti prihlásenia</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>P&amp;ravidlo pre prenos súborov...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

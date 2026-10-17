@@ -5035,6 +5035,10 @@ Lokasi: %2</translation>
         <source>Login options</source>
         <translation>Opsi login</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>Ketentuan Pengatu&amp;ran Transfer...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

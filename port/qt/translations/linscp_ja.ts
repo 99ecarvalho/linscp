@@ -5035,6 +5035,10 @@ Location: %2</source>
         <source>Login options</source>
         <translation>ログイン オプション</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>転送設定ルール(&amp;R)....</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

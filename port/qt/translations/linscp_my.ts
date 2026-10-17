@@ -5035,6 +5035,10 @@ Location: %2</source>
         <source>Login options</source>
         <translation>ဝင်ရောက်မှု ရွေးစရာများ</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>လွှဲပြောင်းမှု ဆက်တင် စည်းမျဉ်း(&amp;R)...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

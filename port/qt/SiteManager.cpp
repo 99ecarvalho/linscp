@@ -30,6 +30,7 @@
 #include "ImportSitesDialog.h"
 #include "CleanupDialog.h"
 #include "ColorMenu.h"
+#include "TransferSettingsDialog.h"
 #include "PreferencesDialog.h"
 #include "CustomCommandDialog.h"
 #include "GenerateUrlDialog.h"
@@ -270,6 +271,7 @@ SiteManager::SiteManager(QWidget * Parent) :
   QMenu * AdvancedMenu = new QMenu(FAdvanced);
   AdvancedMenu->addAction(tr("A&dvanced..."), this, &SiteManager::Advanced);
   AdvancedMenu->addAction(tr("Edit &Raw Settings..."), this, [this]() { RawSettings(); });
+  AdvancedMenu->addAction(tr("Transfer Settings &Rule..."), this, [this]() { TransferSettingsRule(); });
   // Global Preferences.
   AdvancedMenu->addSeparator();
   QAction * Logging = AdvancedMenu->addAction(tr("&Logging..."), this, [this]()
@@ -1593,6 +1595,65 @@ void SiteManager::ParseHostName()
   {
     ParseUrl(HostName);
   }
+}
+
+bool SiteManager::TransferSettingsRule()
+{
+  const CoreBridge::TSite Site = Edited();
+  CoreBridge::TTransferPresetRule Data;
+  Data.HostName = Site.HostName;
+  Data.UserName = Site.UserName;
+  bool Found = false;
+  std::string Name = CoreBridge::FindTransferPreset(Data, Found);
+  if (!Found)
+  {
+    CoreBridge::TTransferPresetRule HostOnly;
+    HostOnly.HostName = Site.HostName;
+    Name = CoreBridge::FindTransferPreset(HostOnly, Found);
+  }
+  std::vector<CoreBridge::TTransferPreset> Presets = CoreBridge::TransferPresets();
+  auto Preset = std::find_if(Presets.begin(), Presets.end(),
+    [&Name](const CoreBridge::TTransferPreset & Each) { return Each.Name == Name; });
+  // cpmEdit, or cpmAddCurrent with the defaults and the site's rule.
+  const bool Edit = Found && (Preset != Presets.end());
+  QString PresetName = Edit ? QString::fromStdString(Name) : QString();
+  TransferSettingsDialog Dialog(Edit ? Preset->Settings : CoreBridge::TTransferSettings(), &PresetName, this);
+  Dialog.SetRule(Edit ? Preset->HasRule : true, Edit ? Preset->Rule : Data, &Data);
+  if (Dialog.exec() != QDialog::Accepted)
+  {
+    return false;
+  }
+  CoreBridge::TTransferPreset Result;
+  Result.Name = Dialog.PresetName().toStdString();
+  Result.Settings = Dialog.Settings();
+  Result.HasRule = Dialog.HasRule();
+  Result.Rule = Dialog.Rule();
+  if (Edit)
+  {
+    *Preset = Result;
+  }
+  else
+  {
+    for (const CoreBridge::TTransferPreset & Each : Presets)
+    {
+      if (QString::fromStdString(Each.Name).compare(Dialog.PresetName(), Qt::CaseInsensitive) == 0)
+      {
+        ShowMessage(CoreBridge::TQueryType::Error, CoreText(CoreBridge::TText::CopyParamDuplicate, Dialog.PresetName()));
+        return false;
+      }
+    }
+    Presets.push_back(Result);
+  }
+  try
+  {
+    CoreBridge::SetTransferPresets(Presets);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+  return true;
 }
 
 // As ResetNewSessionActionExecute.

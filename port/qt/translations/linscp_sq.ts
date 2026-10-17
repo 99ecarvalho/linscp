@@ -5036,6 +5036,10 @@ Vendndodhja: %2</translation>
         <source>Login options</source>
         <translation>Opsionet e hyrjes</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>&amp;Rregulli i cilësimeve të transferimit...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

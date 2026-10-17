@@ -5036,6 +5036,10 @@ Location: %2</source>
         <source>Login options</source>
         <translation>உள்நுழைவு விருப்பங்கள்</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>பரிமாற்ற அமைப்புகள் &amp;விதி...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

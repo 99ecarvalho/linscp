@@ -5036,6 +5036,10 @@ Ubicació: %2</translation>
         <source>Login options</source>
         <translation>Opcions d&apos;inici de sessió</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>&amp;Regla de paràmetres de transferència...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

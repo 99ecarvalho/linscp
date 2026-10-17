@@ -5036,6 +5036,10 @@ Local: %2</translation>
         <source>Login options</source>
         <translation>Opções de login</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>Transferir &amp;Regras de Configuração...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

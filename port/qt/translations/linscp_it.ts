@@ -5036,6 +5036,10 @@ Percorso: %2</translation>
         <source>Login options</source>
         <translation>Opzioni di accesso</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>&amp;Regola impostazioni trasferimento...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

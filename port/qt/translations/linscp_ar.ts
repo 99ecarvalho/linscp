@@ -5040,6 +5040,10 @@ Location: %2</source>
         <source>Login options</source>
         <translation>خيارات تسجيل الدخول</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>نقل الاعدادات</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

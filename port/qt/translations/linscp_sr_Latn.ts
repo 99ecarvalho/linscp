@@ -5037,6 +5037,10 @@ Lokacija: %2</translation>
         <source>Login options</source>
         <translation>Opcije prijave</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>Pravilo &amp;podešavanja prenosa...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

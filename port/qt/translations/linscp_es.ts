@@ -5036,6 +5036,10 @@ Ruta: %2</translation>
         <source>Login options</source>
         <translation>Opciones de inicio de sesión</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>Prea&amp;justes de transferencia...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

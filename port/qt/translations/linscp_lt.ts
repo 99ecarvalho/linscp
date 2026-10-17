@@ -5037,6 +5037,10 @@ Vieta: %2</translation>
         <source>Login options</source>
         <translation>Prisijungimo parinktys</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>Perduoti nuostatos &amp;taisyklę</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

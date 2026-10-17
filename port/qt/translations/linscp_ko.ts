@@ -5035,6 +5035,10 @@ Location: %2</source>
         <source>Login options</source>
         <translation>로그인 옵션</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>전송 설정 규칙(&amp;R)...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -5036,6 +5036,10 @@ Emplacement : %2</translation>
         <source>Login options</source>
         <translation>Options de connexion</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>Règle des paramètres de transfert...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

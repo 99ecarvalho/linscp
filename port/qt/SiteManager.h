@@ -144,6 +144,10 @@ public:
   QLabel * SiteSearchStatus() const { return FSearchStatus; }
   // Search > Options: what the search matches (LoginDialog.SiteSearch).
   void SetSiteSearch(CoreBridge::TPreferences::TPanelSearch Search);
+  // A7, Advanced's Transfer Settings Rule (CopyParamRuleAction): the preset
+  // whose rule matches the site's host and user (else its host) edited,
+  // else one added with that rule. False when cancelled.
+  bool TransferSettingsRule();
   // Reset: the new site from the defaults.
   void ResetNewSite();
   // Generate Session URL/Code, for the site as edited.

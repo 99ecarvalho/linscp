@@ -5036,6 +5036,10 @@ Lokasyon: %2</translation>
         <source>Login options</source>
         <translation>Mga opsyon sa pag-login</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>&amp;Patakaran sa Mga Setting ng Paglilipat...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

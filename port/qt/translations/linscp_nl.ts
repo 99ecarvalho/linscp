@@ -5036,6 +5036,10 @@ Locatie: %2</translation>
         <source>Login options</source>
         <translation>Aanmeldopties</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>Instellings&amp;regel overdragen...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

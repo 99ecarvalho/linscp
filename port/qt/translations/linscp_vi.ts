@@ -5035,6 +5035,10 @@ Vị trí: %2</translation>
         <source>Login options</source>
         <translation>Tùy chọn đăng nhập</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>&amp;Quy tắc cài đặt truyền...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

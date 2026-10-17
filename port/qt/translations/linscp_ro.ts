@@ -5037,6 +5037,10 @@ Cale: %2</translation>
         <source>Login options</source>
         <translation>Opțiuni de autentificare</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>&amp;Regulă pentru Opțiunile de Transfer...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

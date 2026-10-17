@@ -5037,6 +5037,10 @@ Location: %2</source>
         <source>Login options</source>
         <translation>Параметры ўваходу</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>&amp;Правіла налад перадачы...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -5036,6 +5036,10 @@ Location: %2</source>
         <source>Login options</source>
         <translation>Επιλογές σύνδεσης</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>&amp;Κανόνας ρυθμίσεων μεταφοράς...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

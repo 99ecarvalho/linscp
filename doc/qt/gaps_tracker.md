@@ -11,14 +11,14 @@ Last updated: **2026-10-17**
 
 | Area | Done | Total |
 |---|---|---|
-| A. Site Manager | 16 | 17 |
+| A. Site Manager | 17 | 17 |
 | B. Password prompt and banner | 3 | 3 |
 | C. Progress and synchronization dialogs | 4 | 4 |
 | D. Main window | 9 | 9 |
 | E. Preferences | 9 | 10 |
 | F. Command line | 2 | 3 |
 | G. Known before | 0 | 1 |
-| **Total** | **43** | **47** |
+| **Total** | **44** | **47** |
 
 ## Items
 
@@ -30,7 +30,7 @@ Last updated: **2026-10-17**
 | A4 | Manage button and menu | High | done | 2026-10-17. `SiteManager::FillManageMenu`, also the tree's (A11); Generate Session URL/Code and Open in PuTTY for an unconnected site (`CoreBridge::GenerateSiteCode`, `OpenSiteInPutty`); Paste Session URL comes with A6, Transfer Settings Rule with A7, Search with A10; ctest `qt_gui_sites` |
 | A5 | Clone to New Site | Medium | done | 2026-10-17. The name made unique for Save (`CoreBridge::UniqueSiteName`); ctest `qt_gui_sites` |
 | A6 | Paste Session URL | Medium | done | 2026-10-17. In the new site's Manage menu (Ctrl+V), `CoreBridge::ParseSiteUrl`; ctest `qt_gui_sites` |
-| A7 | Transfer Settings Rule... | Low | todo | |
+| A7 | Transfer Settings Rule... | Low | done | 2026-10-17. In Advanced's drop-down, as upstream's: the preset matching the site's host and user (else host) edited, else one added with that rule; ctest `qt_gui_sites` |
 | A8 | Tools: Run Pageant/PuTTYgen, Import/Export Configuration, Preferences, Check for Updates, About | Medium | done | 2026-10-17. `SiteManager::FindTool`, `RunTool`, `ExportConfiguration`, `ImportConfiguration` (restarts with the same /ini); the main window's dialogs through `OnPreferences`, `OnCheckForUpdates`, `OnAbout`; ctest `qt_gui_sites` |
 | A9 | Login drop-down: Open in PuTTY | Low | done | 2026-10-17. An arrow beside Login (which stays the default button): Login, Open in PuTTY; ctest `qt_gui_sites` |
 | A10 | Site search (three modes, Find Site) | High | done | 2026-10-17. Typed in the tree, Tab/Shift+Tab, Escape, Backspace; Search in the Manage menus; `Interface\LoginDialog\SiteSearch`; the tree's Delete and F2 keys, and the actions' keys (Ctrl+F, Ctrl+P, Ctrl+V, Alt+A); ctest `qt_gui_sites` |

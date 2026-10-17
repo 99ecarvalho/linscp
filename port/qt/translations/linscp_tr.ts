@@ -5035,6 +5035,10 @@ Konum: %2</translation>
         <source>Login options</source>
         <translation>Oturum açma seçenekleri</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>Aktarım ayarları ku&amp;ralı...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

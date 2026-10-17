@@ -5036,6 +5036,10 @@ Staðsetning: %2</translation>
         <source>Login options</source>
         <translation>Innskráningarvalkostir</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>Flutningsstillinga&amp;regla…</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

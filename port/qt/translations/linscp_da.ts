@@ -5036,6 +5036,10 @@ Placering: %2</translation>
         <source>Login options</source>
         <translation>Logon-indstillinger</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>Overfør Indstillinger &amp;Regel...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -5037,6 +5037,10 @@ Umístění: %2</translation>
         <source>Login options</source>
         <translation>Možnosti přihlášení</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>Pravidlo &amp;automatického výběru...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

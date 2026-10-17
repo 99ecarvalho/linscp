@@ -5036,6 +5036,10 @@ Ligging: %2</translation>
         <source>Login options</source>
         <translation>Aanmeldopsies</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>Oordraginstellings-&amp;reël...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

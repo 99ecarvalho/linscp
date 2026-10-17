@@ -5035,6 +5035,10 @@ Location: %2</source>
         <source>Login options</source>
         <translation>ตัวเลือกการเข้าสู่ระบบ</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>&amp;กฎการตั้งค่าการถ่ายโอน...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

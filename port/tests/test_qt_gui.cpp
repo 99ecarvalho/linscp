@@ -872,6 +872,40 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
         "Import/Restore Configuration: the sites back, the application restarted");
       CoreBridge::DeleteSite("backedup");
     }
+    // A7: Advanced's Transfer Settings Rule: a preset with the site's
+    // rule added, then that one edited.
+    {
+      SiteManager Dialog(&Window);
+      Dialog.SelectNewSite();
+      Dialog.HostName()->setText(QStringLiteral("rule.example"));
+      Dialog.UserName()->setText(QStringLiteral("ruler"));
+      const std::vector<CoreBridge::TTransferPreset> Before = CoreBridge::TransferPresets();
+      QString Shown;
+      Responder.Custom = [&Shown](QWidget * Modal)
+      {
+        TransferSettingsDialog * Rule = qobject_cast<TransferSettingsDialog *>(Modal);
+        if (Rule == nullptr)
+        {
+          return false;
+        }
+        Shown = Rule->NameEdit()->text() + QLatin1Char('|') + Rule->RuleEdit(0)->text() + QLatin1Char('|') + Rule->RuleEdit(1)->text() +
+          QLatin1Char('|') + (Rule->HasRuleCheck()->isChecked() ? QStringLiteral("rule") : QString());
+        if (Rule->NameEdit()->text().isEmpty())
+        {
+          Rule->NameEdit()->setText(QStringLiteral("Rule test"));
+        }
+        Rule->accept();
+        return true;
+      };
+      Check(Dialog.TransferSettingsRule() && (Shown == QStringLiteral("|rule.example|ruler|rule")),
+        "Transfer Settings Rule: a new preset, with the site's host and user");
+      const std::vector<CoreBridge::TTransferPreset> After = CoreBridge::TransferPresets();
+      Check((After.size() == Before.size() + 1) && (After.back().Name == "Rule test") && (After.back().Rule.HostName == "rule.example"),
+        "added to the presets");
+      Check(Dialog.TransferSettingsRule() && Shown.startsWith(QStringLiteral("Rule test|rule.example")), "then that one, edited");
+      Responder.Custom = nullptr;
+      CoreBridge::SetTransferPresets(Before);
+    }
     // A10: the site search, typed in the tree; Tab for the next match; its
     // three modes.
     {

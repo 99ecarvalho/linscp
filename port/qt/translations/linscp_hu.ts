@@ -5035,6 +5035,10 @@ Hely: %2</translation>
         <source>Login options</source>
         <translation>Bejelentkezési lehetőségek</translation>
     </message>
+    <message>
+        <source>Transfer Settings &amp;Rule...</source>
+        <translation>Átviteli Beállítási &amp;Szabályok...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>
