@@ -113,6 +113,7 @@ CONTEXT_FORMS = {
     'SynchronizeDialog': ['FullSynchronize.dfm'],
     'SynchronizeProgress': ['SynchronizeProgress.dfm'],
     'TransferDialog': ['Progress.dfm'],
+    'PromptDialog': ['Authenticate.dfm'],
     'SyncChecklistDialog': ['SynchronizeChecklist.dfm'],
     'SiteManager': ['Login.dfm'],
     'SiteAdvanced': ['SiteAdvanced.dfm'],

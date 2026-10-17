@@ -3371,6 +3371,14 @@ Lokasi: %2</translation>
         <source>Authentication</source>
         <translation>Otentikasi</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Ubah password tersimpan dengan yang ini</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Ingat password untuk sesi ini</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

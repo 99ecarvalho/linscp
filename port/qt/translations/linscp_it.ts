@@ -3372,6 +3372,14 @@ Percorso: %2</translation>
         <source>Authentication</source>
         <translation>Autenticazione</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>Sostituisci la password memorizzata &amp;con questa</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Ricorda la password per questa sessione</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

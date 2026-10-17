@@ -12,13 +12,13 @@ Last updated: **2026-10-17**
 | Area | Done | Total |
 |---|---|---|
 | A. Site Manager | 0 | 17 |
-| B. Password prompt and banner | 0 | 3 |
+| B. Password prompt and banner | 1 | 3 |
 | C. Progress and synchronization dialogs | 1 | 4 |
 | D. Main window | 0 | 9 |
 | E. Preferences | 0 | 10 |
 | F. Command line | 0 | 3 |
 | G. Known before | 0 | 1 |
-| **Total** | **1** | **47** |
+| **Total** | **2** | **47** |
 
 ## Items
 
@@ -41,7 +41,7 @@ Last updated: **2026-10-17**
 | A15 | Note shown on the form | Low | todo | |
 | A16 | Host name URL parsing | Medium | todo | |
 | A17 | Advanced drop-down: Global Preferences > Logging | Low | todo | |
-| B1 | Prompt: change stored password, remember for this session | High | todo | |
+| B1 | Prompt: change stored password, remember for this session | High | done | 2026-10-17. Offered as TAuthenticateForm::PromptUser offers them; ctest `qt_gui_sites` (a refused stored password replaced; remember offered with the global option off) |
 | B2 | Banner: Use Monospaced Font | Low | todo | |
 | B3 | Banner: clickable links, Open Link | Low | todo | |
 | C1 | Transfer progress: times, Skip, Background, Once Finished, Minimize, speed limit | High | done | 2026-10-17. Proceed in Background for the panels' uploads and downloads (`TMoveToQueue`, Session.cpp), as upstream for its ExecuteFileOperation; ctest `qt_gui_transfer` (times, speed limit, skip, background, once finished), `qt_gui_progress` (the queue resumes and completes the part, OpenSSH) |

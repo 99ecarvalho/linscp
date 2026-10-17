@@ -3376,6 +3376,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>المصادقة</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>تغيير كلمة المرور</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>تذكر كلمة المرور لهذة الجلسة</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

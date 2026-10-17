@@ -3372,6 +3372,14 @@ Locatie: %2</translation>
         <source>Authentication</source>
         <translation>Authenticatie</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>Opgeslagen wachtwoord &amp;instellen op deze</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Onthoud wachtwoord voor deze sessie</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

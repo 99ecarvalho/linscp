@@ -3371,6 +3371,14 @@ Vị trí: %2</translation>
         <source>Authentication</source>
         <translation>Xác thực</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Thay đổi mật khẩu đã lưu thành mật khẩu này</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Ghi nhớ mật khẩu cho phiên này</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

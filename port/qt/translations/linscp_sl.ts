@@ -3374,6 +3374,14 @@ Lokacija: %2</translation>
         <source>Authentication</source>
         <translation>Preverjanje pristnosti</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Spremeni shranjeno geslo na vnešeno</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Zapomni si geslo za to sejo</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

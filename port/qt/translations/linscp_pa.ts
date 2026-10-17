@@ -3372,6 +3372,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>ਪ੍ਰਮਾਣੀਕਰਨ</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>ਇਸ ਨੂੰ ਸੁਰੱਖਿਅਤ ਕੀਤੇ ਪਾਸਵਰਡ ਨਾਲ ਬਦਲੋ</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>ਇਸ ਸੈਸ਼ਨ ਲਈ ਪਾਸਵਰਡ ਯਾਦ ਰੱਖੋ</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

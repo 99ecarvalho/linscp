@@ -3372,6 +3372,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>அங்கீகாரம்</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;சேமிக்கப்பட்ட கடவுச்சொல்லை மாற்றவும்</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;இந்த அமர்வுக்கான கடவுச்சொல்லை நினைவில் கொள்ளுங்கள்</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

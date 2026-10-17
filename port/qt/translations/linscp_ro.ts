@@ -3373,6 +3373,14 @@ Cale: %2</translation>
         <source>Authentication</source>
         <translation>Autentificare</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>Înlocuiește &amp;parola salvată cu aceasta</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>Memo&amp;rează parola pentru această sesiune</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

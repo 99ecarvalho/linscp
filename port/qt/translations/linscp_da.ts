@@ -3372,6 +3372,14 @@ Placering: %2</translation>
         <source>Authentication</source>
         <translation>Autencitetscheck</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Udskift tidligere kodeord med dette</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>Husk kodeordet for denne &amp;session</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

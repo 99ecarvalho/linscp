@@ -3372,6 +3372,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>אימות</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;שנה את הסיסמא השמורה לזו</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;זכור סיסמא לשיחה זו</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

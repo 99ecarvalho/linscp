@@ -3373,6 +3373,14 @@ Umístění: %2</translation>
         <source>Authentication</source>
         <translation>Autentizace</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Změnit uložené heslo na toto</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Pamatovat si heslo po dobu tohoto připojení</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

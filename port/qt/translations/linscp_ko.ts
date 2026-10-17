@@ -3371,6 +3371,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>인증</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>입력한 값으로 저장된 비밀번호 변경(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>이 세션 암호 저장(&amp;R)</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

@@ -3372,6 +3372,14 @@ Asukoht: %2</translation>
         <source>Authentication</source>
         <translation>Kasutajatuvastus</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Salvesta see uueks seansiparooliks</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Jäta parool selleks seansiks meelde</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

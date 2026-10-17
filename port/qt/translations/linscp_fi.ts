@@ -3372,6 +3372,14 @@ Sijainti: %2</translation>
         <source>Authentication</source>
         <translation>Todennus</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>Vaihda tallennettu salasana tähän</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>Muista tämän istunnon salasana</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

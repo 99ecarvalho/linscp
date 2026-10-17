@@ -3373,6 +3373,14 @@ Vieta: %2</translation>
         <source>Authentication</source>
         <translation>Atpažinimas</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Pakeisti įrašytą slaptažodį šiuo</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Prisiminti slaptažodį tik šiam seansui</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

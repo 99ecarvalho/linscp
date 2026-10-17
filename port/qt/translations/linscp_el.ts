@@ -3372,6 +3372,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>Πιστοποίηση</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>Αλλαξε τον αποθηκευμένο κωδικό με αυτόν</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>Θυμίσου τον κωδικό γι αυτήν την συνεδρία</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

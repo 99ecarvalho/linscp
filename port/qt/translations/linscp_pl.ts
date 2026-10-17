@@ -3373,6 +3373,14 @@ Lokalizacja: %2</translation>
         <source>Authentication</source>
         <translation>Uwierzytelnienie</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Zmień zapisane hasło na kolejne</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Zapamiętaj hasło dla tej sesji</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

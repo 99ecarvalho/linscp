@@ -3372,6 +3372,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>Разпознаване</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Смяна на съхранената парола с тази</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Запомняне на паролата за тази сесия</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

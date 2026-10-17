@@ -3371,6 +3371,14 @@ Konum: %2</translation>
         <source>Authentication</source>
         <translation>Kimlik doğrulama</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Kayıtlı parola şununla değiştirilsin</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>Bu bağlantının pa&amp;rolası hatırlansın</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

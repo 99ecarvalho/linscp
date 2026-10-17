@@ -3373,6 +3373,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>Аутентификация</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Изменить сохранённый пароль на введённый</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Запомнить пароль для данного соединения</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

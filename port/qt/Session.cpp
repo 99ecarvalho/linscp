@@ -159,13 +159,23 @@ struct TSession::TImpl
     Answer = AskFrontend(Query, MoreMessages, QueryType, Answers, Params);
   }
 
-  void __fastcall PromptUser(TTerminal * /*Terminal*/, ::TPromptKind Kind, UnicodeString Name,
+  void __fastcall PromptUser(TTerminal * Terminal, ::TPromptKind Kind, UnicodeString Name,
     UnicodeString Instructions, TStrings * Prompts, TStrings * Results, bool & Result, void * /*Arg*/)
   {
     TPrompt Prompt;
     Prompt.Kind = static_cast<TPromptKind>(Kind);
     Prompt.Name = Utf8(Name);
     Prompt.Instructions = Utf8(UnformatMessage(Instructions));
+    // TAuthenticateForm::PromptUser's checkboxes.
+    TSessionData * Stored = NULL;
+    if (IsPasswordPrompt(Kind, Prompts) && (Terminal != NULL) && Terminal->StoredCredentialsTried)
+    {
+      Stored = StoredSessions->FindSame(Terminal->SessionData);
+      Prompt.OfferSave = (Stored != NULL) && !Stored->Password.IsEmpty();
+    }
+    Prompt.OfferRemember = !Prompt.OfferSave && (Prompts->Count == 1) &&
+      FLAGSET(reinterpret_cast<intptr_t>(Prompts->Objects[0]), pupRemember) &&
+      IsPasswordOrPassphrasePrompt(Kind, Prompts);
     for (int Index = 0; Index < Prompts->Count; Index++)
     {
       TPromptField Field;
@@ -191,6 +201,16 @@ struct TSession::TImpl
         {
           Results->Add(Value);
         }
+        Prompts->Objects[Index] = reinterpret_cast<TObject *>(
+          (reinterpret_cast<intptr_t>(Prompts->Objects[Index]) & ~pupRemember) |
+          FLAGMASK((Index == 0) && Prompt.OfferRemember && Prompt.Remember, pupRemember));
+      }
+      if (Prompt.OfferSave && Prompt.Save && (Stored != NULL) && (Results->Count >= 1))
+      {
+        Terminal->SessionData->Password = Results->Strings[0];
+        Stored->Password = Results->Strings[0];
+        // Modified only, explicit.
+        StoredSessions->Save(false, true);
       }
     }
   }

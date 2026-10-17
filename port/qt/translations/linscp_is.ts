@@ -3372,6 +3372,14 @@ Staðsetning: %2</translation>
         <source>Authentication</source>
         <translation>Sannreyning</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Breyta geymdu aðgangsorði í þetta</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Muna aðgangsorð fyrir þessa lotu</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

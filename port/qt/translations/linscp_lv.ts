@@ -3373,6 +3373,14 @@ Atrašanās vieta: %2</translation>
         <source>Authentication</source>
         <translation>Autentifikācija</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Nomainīt saglabāto paroli uz šo</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Atcerēties paroli šai sesijai</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

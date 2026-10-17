@@ -3372,6 +3372,14 @@ Vendndodhja: %2</translation>
         <source>Authentication</source>
         <translation>Vërtetimi</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Ndrysho fjalëkalimin e ruajtur me këtë</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Mbaj mend fjalëkalimin për këtë seancë</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

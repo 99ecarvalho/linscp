@@ -3372,6 +3372,14 @@ Plassering: %2</translation>
         <source>Authentication</source>
         <translation>Autentisering</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Endre lagret passord til dette</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>H&amp;usk passord for denne økten</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

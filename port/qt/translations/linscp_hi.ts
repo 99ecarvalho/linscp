@@ -3372,6 +3372,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>प्रमाणीकरण</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>संग्रहीत पासवर्ड को इससे बदलें(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>इस सत्र के लिए पासवर्ड याद रखें(&amp;R)</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

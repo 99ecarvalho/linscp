@@ -3371,6 +3371,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>身分核對</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>變更為已儲存的密碼(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>針對這個工作階段記憶密碼(&amp;R)</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

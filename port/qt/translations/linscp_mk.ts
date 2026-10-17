@@ -3373,6 +3373,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>Автентикација</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Смени ја зачуваната лозинка со оваа</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Запомни ја лозинката за оваа сесија</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

@@ -3373,6 +3373,14 @@ Umiestnenie: %2</translation>
         <source>Authentication</source>
         <translation>Overovanie</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Zmeniť uložené heslo na toto</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>Zapamätať si heslo pre túto reláciu</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

@@ -3371,6 +3371,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>အထောက်အထားစိစစ်ခြင်း</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>သိမ်းထားသော စကားဝှက် အား ဤတခုသို့ပြောင်းပါ</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>ဤ ကဏ္ဍ ၏ စကားဝှက် အား မှတ်သားပါ</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

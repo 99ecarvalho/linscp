@@ -3372,6 +3372,14 @@ Ruta: %2</translation>
         <source>Authentication</source>
         <translation>Autentificación</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>Cam&amp;biar la contraseña almacenada por esta</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Recordar contraseña para esta sesión</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

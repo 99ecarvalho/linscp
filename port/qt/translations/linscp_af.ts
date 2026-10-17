@@ -3372,6 +3372,14 @@ Ligging: %2</translation>
         <source>Authentication</source>
         <translation>Stawing</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Verander die gestoorde wagwoord na hierdie een</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Onthou wagwoord vir hierdie sessie</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

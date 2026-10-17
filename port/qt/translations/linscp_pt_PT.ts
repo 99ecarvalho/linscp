@@ -3372,6 +3372,14 @@ Localização: %2</translation>
         <source>Authentication</source>
         <translation>Autenticação</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Alterar palavra-passe gravada para esta</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Lembrar palavra-passe para esta sessão</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

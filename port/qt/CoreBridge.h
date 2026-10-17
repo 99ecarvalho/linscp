@@ -92,6 +92,15 @@ struct TPrompt
   std::string Name;
   std::string Instructions;
   std::vector<TPromptField> Fields;
+  // As the Authenticate window's checkboxes (TAuthenticateForm::PromptUser):
+  // a password the stored site has, tried and refused, may be replaced by
+  // the one typed (OfferSave); else a single password or passphrase may be
+  // remembered for the session (OfferRemember, core's pupRemember). The
+  // answers, after the dialog.
+  bool OfferSave = false;
+  bool OfferRemember = false;
+  bool Save = false;
+  bool Remember = false;
 };
 
 struct TError

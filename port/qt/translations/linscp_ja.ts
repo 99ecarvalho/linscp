@@ -3371,6 +3371,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>認証</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>保存されたパスワードを変更する(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>このセッションのパスワードを記憶する(&amp;R)</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

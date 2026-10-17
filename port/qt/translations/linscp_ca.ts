@@ -3372,6 +3372,14 @@ Ubicació: %2</translation>
         <source>Authentication</source>
         <translation>Autenticació</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Canvia la contrasenya emmagatzemada per aquesta</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Recorda la contrasenya durant aquesta sessió</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

@@ -387,6 +387,10 @@ public:
   std::deque<QString> Passwords;
   int HostKeyQueries = 0;
   int PasswordPrompts = 0;
+  // Authenticate's checkboxes: seen, and "Change stored password" checked.
+  bool SaveOffered = false;
+  bool RememberOffered = false;
+  bool SavePassword = false;
   int Errors = 0;
   QString LastQuery;
   // Answer a warning's Ignore rather than its first button.
@@ -461,6 +465,12 @@ private:
     else if (PromptDialog * Prompt = qobject_cast<PromptDialog *>(Modal))
     {
       PasswordPrompts++;
+      SaveOffered = SaveOffered || (Prompt->SavePassword() != nullptr);
+      RememberOffered = RememberOffered || (Prompt->RememberPassword() != nullptr);
+      if (SavePassword && (Prompt->SavePassword() != nullptr))
+      {
+        Prompt->SavePassword()->setChecked(true);
+      }
       if (Passwords.empty() || Prompt->Fields().isEmpty())
       {
         Prompt->reject();
@@ -521,6 +531,35 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
       const QTreeWidgetItem * Folder = Dialog.Tree()->topLevelItem(1);
       Check((Folder != nullptr) && (Folder->text(0) == QStringLiteral("Tests")) && (Folder->childCount() == 1),
         "under its folder in the tree");
+    }
+    // B1: a stored password refused, the prompt offers to store the one
+    // typed instead, as Authenticate's "Change stored password to this one".
+    {
+      CoreBridge::TSite Wrong = CoreBridge::LoadSite("Tests/rclone");
+      Wrong.Name = "Tests/wrong";
+      Wrong.Password = "not it";
+      CoreBridge::SaveSite(Wrong);
+      Responder.Passwords = { "secret" };
+      Responder.SavePassword = true;
+      Check(Window.OpenSite(CoreBridge::LoadSite("Tests/wrong")), "a site whose password is refused opens with the one typed");
+      Check(Responder.SaveOffered && !Responder.RememberOffered, "its prompt offers to change the stored password");
+      QMetaObject::invokeMethod(&Window, "Disconnect");
+      Check(CoreBridge::LoadSite("Tests/wrong").Password == "secret", "and changes it");
+      Responder.SavePassword = false;
+      Responder.PasswordPrompts = 0;
+      CoreBridge::DeleteSite("Tests/wrong");
+      // And, with Security's "Remember password for duration of session"
+      // off, a typed password may be remembered for its session (core's
+      // pupRemember).
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.SessionRememberPassword = false; });
+      Responder.SaveOffered = false;
+      Responder.RememberOffered = false;
+      Responder.Passwords = { "secret" };
+      Check(Window.OpenUrl(QStringLiteral("sftp://linscp@127.0.0.1:%1/").arg(QString::fromLatin1(Port))), "(a session by URL)");
+      Check(Responder.RememberOffered && !Responder.SaveOffered, "its prompt offers to remember the password for the session");
+      QMetaObject::invokeMethod(&Window, "Disconnect");
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.SessionRememberPassword = true; });
+      Responder.PasswordPrompts = 0;
     }
     // Save's own dialog, as WinSCP's TSaveSessionDialog: the name and a
     // folder chosen among the sites' ones; saved there, a child in the tree.

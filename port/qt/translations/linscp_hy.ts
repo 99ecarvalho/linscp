@@ -3372,6 +3372,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>Նույնականացում</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Փոխել պահված գաղտնաբառն այս մեկով</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Հիշել գաղտնաբառն այս աշխատաշրջանի համար</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

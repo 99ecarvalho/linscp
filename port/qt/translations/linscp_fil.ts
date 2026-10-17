@@ -3372,6 +3372,14 @@ Lokasyon: %2</translation>
         <source>Authentication</source>
         <translation>Pagpapatunay</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;Palitan ang natagong password ng password na ito</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Tandaan ang password sa session na ito</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

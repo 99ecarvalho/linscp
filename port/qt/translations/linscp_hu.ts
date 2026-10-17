@@ -3371,6 +3371,14 @@ Hely: %2</translation>
         <source>Authentication</source>
         <translation>Hitelesítés</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>Tárolt jelszó cseréje erre</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>Emlékezzen a jelszóra ebben a munkamenetben</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

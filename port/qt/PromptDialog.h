@@ -1,7 +1,8 @@
 // Core's prompt for credentials or other input -- username, password,
 // passphrase, keyboard-interactive questions -- one field per prompt, hidden
 // where the prompt says not to echo (upstream's forms/Authenticate.cpp and
-// InputDlg.cpp, as one dialog).
+// InputDlg.cpp, as one dialog), with Authenticate's "Change stored
+// password to this one" and "Remember password for this session".
 #ifndef LINSCP_QT_PROMPT_DIALOG_H
 #define LINSCP_QT_PROMPT_DIALOG_H
 
@@ -10,6 +11,7 @@
 
 #include "CoreBridge.h"
 
+class QCheckBox;
 class QLineEdit;
 
 class PromptDialog : public QDialog
@@ -22,9 +24,14 @@ public:
   // After an accepted exec(): the prompt with the fields' values filled in.
   void Fill(CoreBridge::TPrompt & Prompt) const;
   QList<QLineEdit *> Fields() const { return FFields; }
+  // Authenticate's checkboxes, when the prompt offers them (else null).
+  QCheckBox * SavePassword() const { return FSavePassword; }
+  QCheckBox * RememberPassword() const { return FRememberPassword; }
 
 private:
   QList<QLineEdit *> FFields;
+  QCheckBox * FSavePassword = nullptr;
+  QCheckBox * FRememberPassword = nullptr;
 };
 
 #endif

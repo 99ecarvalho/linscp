@@ -3372,6 +3372,14 @@ Emplacement : %2</translation>
         <source>Authentication</source>
         <translation>Authentification</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>Modifier le mot de passe enregistré par celui-ci</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Enregistrer le mot de passe pour cette session</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

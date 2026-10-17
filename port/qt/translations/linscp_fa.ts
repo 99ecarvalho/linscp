@@ -3371,6 +3371,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>احرازهویت</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>تغییر رمزعبور ذخیره شده به این</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>به یادسپاری رمز برای این جلسه</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

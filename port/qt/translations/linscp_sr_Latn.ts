@@ -3373,6 +3373,14 @@ Lokacija: %2</translation>
         <source>Authentication</source>
         <translation>Provera identiteta</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>Promeni &amp;sačuvanu lozinku u novu</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>&amp;Zapamti lozinku za ovu sesiju</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

@@ -1,5 +1,6 @@
 #include "PromptDialog.h"
 
+#include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QFormLayout>
 #include <QLabel>
@@ -36,6 +37,18 @@ PromptDialog::PromptDialog(const CoreBridge::TPrompt & Prompt, QWidget * Parent)
     FFields.append(Edit);
   }
   Layout->addLayout(Form);
+  // Authenticate.dfm's SavePasswordCheck and SessionRememberPasswordCheck,
+  // unchecked each time.
+  if (Prompt.OfferSave)
+  {
+    FSavePassword = new QCheckBox(tr("&Change stored password to this one"), this);
+    Layout->addWidget(FSavePassword);
+  }
+  if (Prompt.OfferRemember)
+  {
+    FRememberPassword = new QCheckBox(tr("&Remember password for this session"), this);
+    Layout->addWidget(FRememberPassword);
+  }
   QDialogButtonBox * Box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
   connect(Box, &QDialogButtonBox::accepted, this, &QDialog::accept);
   connect(Box, &QDialogButtonBox::rejected, this, &QDialog::reject);
@@ -53,4 +66,6 @@ void PromptDialog::Fill(CoreBridge::TPrompt & Prompt) const
   {
     Prompt.Fields[Index].Value = FFields[Index]->text().toStdString();
   }
+  Prompt.Save = (FSavePassword != nullptr) && FSavePassword->isChecked();
+  Prompt.Remember = (FRememberPassword != nullptr) && FRememberPassword->isChecked();
 }

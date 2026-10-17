@@ -3372,6 +3372,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>ავთენტიკაცია</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>დამახსოვრებული პაროლის შე&amp;ცვლა ამაზე</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>პა&amp;როლის დამახსოვრება ამ სესიისთვის</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

@@ -3371,6 +3371,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>การยืนยันตัวตน</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>&amp;เปลี่ยนรหัสผ่านที่จัดเก็บไว้เป็นรหัสนี้</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>จำรหัสผ่านสำหรับเซสชันนี้</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>

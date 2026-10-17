@@ -3372,6 +3372,14 @@ Location: %2</source>
         <source>Authentication</source>
         <translation>প্রমাণীকরণ</translation>
     </message>
+    <message>
+        <source>&amp;Change stored password to this one</source>
+        <translation>সংরক্ষিত পাসওয়ার্ড এটি দিয়ে বদলান(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Remember password for this session</source>
+        <translation>এই সেশনের জন্য পাসওয়ার্ড মনে রাখুন(&amp;R)</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
