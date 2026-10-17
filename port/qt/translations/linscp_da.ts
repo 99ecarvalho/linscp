@@ -2295,6 +2295,10 @@ Placering: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>Tilpas værktøjslinje</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Skift katalogvisningsstil</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

@@ -2295,6 +2295,10 @@ Asukoht: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Kohanda tööriistariba</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Muuda kataloogivaate stiili</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

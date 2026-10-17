@@ -2294,6 +2294,10 @@ Hely: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>Eszköztár &amp;személyre szabása</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Mappanézet stílusának módosítása</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

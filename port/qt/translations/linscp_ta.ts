@@ -2295,6 +2295,10 @@ Location: %2</source>
         <source>&amp;Customize Toolbar</source>
         <translation>கருவிப்பட்டியைத் தனிப்பயனாக்குங்கள்</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>கோப்பகக் காட்சி பாணியை மாற்று</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

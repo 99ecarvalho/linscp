@@ -2299,6 +2299,10 @@ Location: %2</source>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;تخصيص شريط الأدوات</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>تغيير نمط عرض المجلد</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

@@ -2294,6 +2294,10 @@ Vị trí: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Tùy chỉnh Thanh công cụ</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Thay đổi kiểu hiển thị thư mục</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

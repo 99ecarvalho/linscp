@@ -2295,6 +2295,10 @@ Location: %2</source>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;התאם סרגל כלים</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>שנה סגנון תצוגת תיקייה</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

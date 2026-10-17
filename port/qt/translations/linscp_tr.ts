@@ -2294,6 +2294,10 @@ Konum: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>A&amp;raç çubuğunu özelleştir</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Klasör görünümünü değiştirir</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

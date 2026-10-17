@@ -2295,6 +2295,10 @@ Plats: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Anpassa verktygsfältet</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Ändra stil för katalogvy</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

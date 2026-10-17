@@ -2295,6 +2295,10 @@ Ort: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>Symbolleiste &amp;bearbeiten</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Stil der Verzeichnisansicht ändern</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

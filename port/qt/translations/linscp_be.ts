@@ -2296,6 +2296,10 @@ Location: %2</source>
         <source>&amp;Customize Toolbar</source>
         <translation>Дапасаваць панэль &amp;інструментаў</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Змяніць выгляд каталога</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

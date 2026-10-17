@@ -2295,6 +2295,10 @@ Ligging: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Pas nutsbalk aan</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Verander gidsaansigstyl</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

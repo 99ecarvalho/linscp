@@ -2294,6 +2294,10 @@ Lokasi: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Sesuaikan Bar Alat</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Tukar gaya paparan direktori</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

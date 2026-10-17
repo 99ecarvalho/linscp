@@ -2295,6 +2295,10 @@ Local: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Customizar Barra de Ferramentas</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Alterar estilo de visualização de diretório</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

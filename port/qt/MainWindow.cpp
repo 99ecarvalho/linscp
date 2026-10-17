@@ -8023,6 +8023,52 @@ void MainWindow::BuildToolbars(QMenu * Options)
       StoreLayoutChoice([Left, Shown](CoreBridge::TLayout & Layout) { (Left ? Layout.LocalStatusBar : Layout.RemoteStatusBar) = Shown; });
     });
   }
+  // As the panels' NavigationToolbar's last items: the tree (LocalTree,
+  // RemoteTree) and "Change directory view style" (Details, Thumbnails).
+  for (const TSide & Side : { TSide{ true, FLocal, nullptr }, TSide{ false, FOtherLocal, nullptr }, TSide{ false, nullptr, FPanel } })
+  {
+    const bool Left = Side.Left;
+    QToolBar * Navigation = (Side.Local != nullptr) ? Side.Local->Band(TPanelBand::Navigation) : Side.Remote->Band(TPanelBand::Navigation);
+    if (Navigation == nullptr)
+    {
+      continue;
+    }
+    Navigation->addSeparator();
+    QAction * Tree = new QAction(tr("&Tree"), this);
+    Iconize(Tree, "tree");
+    Tree->setCheckable(true);
+    Tree->setStatusTip(tr("Hide/show directory tree"));
+    QAction * Toggle = Left ? FLocalTreeAction : FRemoteTreeAction;
+    Tree->setChecked(Toggle->isChecked());
+    connect(Toggle, &QAction::toggled, Tree, &QAction::setChecked);
+    connect(Tree, &QAction::triggered, this, [this, Left](bool Shown) { SetTreeVisible(Left, Shown); });
+    BandAction(Navigation, Tree, false, (Left ? QStringLiteral("Local") : QStringLiteral("Remote")) + QStringLiteral("Tree"));
+    QAction * ViewStyle = new QAction(tr("Change directory view style"), this);
+    Iconize(ViewStyle, "view-details");
+    QMenu * ViewMenu = new QMenu(this);
+    QActionGroup * ViewGroup = new QActionGroup(ViewMenu);
+    QAction * Details = ViewMenu->addAction(tr("&Details"), this, [this, Left]() { SetPanelThumbnails(Left, false); });
+    Details->setStatusTip(tr("View details"));
+    ViewMenu->addSeparator();
+    QAction * Thumbs = ViewMenu->addAction(tr("&Thumbnails"), this, [this, Left]() { SetPanelThumbnails(Left, true); });
+    Thumbs->setStatusTip(tr("View thumbnails"));
+    for (QAction * Choice : { Details, Thumbs })
+    {
+      Choice->setCheckable(true);
+      ViewGroup->addAction(Choice);
+    }
+    LocalPanel * Local = Side.Local;
+    connect(ViewMenu, &QMenu::aboutToShow, this, [this, Local, Details, Thumbs]()
+    {
+      ((Local != nullptr) ? Local->Thumbnails() : FPanel->Thumbnails()) ? Thumbs->setChecked(true) : Details->setChecked(true);
+    });
+    ViewStyle->setMenu(ViewMenu);
+    BandAction(Navigation, ViewStyle, false, QStringLiteral("TBX"));
+    if (QToolButton * Button = qobject_cast<QToolButton *>(Navigation->widgetForAction(ViewStyle)))
+    {
+      Button->setPopupMode(QToolButton::InstantPopup);
+    }
+  }
   Options->addMenu(LeftPanel);
   Options->addMenu(RightPanel);
   Options->addSeparator();

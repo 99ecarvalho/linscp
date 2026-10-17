@@ -7616,6 +7616,32 @@ void TreesTest(const char * Port, const QString & Directory)
     // Kept.
     Window.SaveLayout();
     Check(CoreBridge::Layout().LocalTree && CoreBridge::Layout().RemoteTree, "kept, as DriveView");
+    // D4: the navigation band's Tree button and its view style drop-down.
+    {
+      QToolBar * Navigation = Window.Panel()->Band(TPanelBand::Navigation);
+      QAction * Tree = nullptr;
+      QAction * ViewStyle = nullptr;
+      for (QAction * Action : Navigation->actions())
+      {
+        Tree = (Action->text() == MainWindow::tr("&Tree")) ? Action : Tree;
+        ViewStyle = (Action->text() == MainWindow::tr("Change directory view style")) ? Action : ViewStyle;
+      }
+      Check((Tree != nullptr) && (ViewStyle != nullptr) && (ViewStyle->menu() != nullptr), "the navigation band: Tree, the view style");
+      if ((Tree != nullptr) && (ViewStyle != nullptr))
+      {
+        const bool Shown = Window.Panel()->TreeVisible();
+        Check(Tree->isChecked() == Shown, "Tree as the panel's");
+        Tree->trigger();
+        Check((Window.Panel()->TreeVisible() != Shown) && (Window.TreeAction(false)->isChecked() != Shown), "Tree toggles it, the menu's too");
+        Tree->trigger();
+        emit ViewStyle->menu()->aboutToShow();
+        QAction * Thumbs = ViewStyle->menu()->actions().last();
+        Thumbs->trigger();
+        Check(Window.Panel()->Thumbnails(), "Thumbnails from the drop-down");
+        ViewStyle->menu()->actions().first()->trigger();
+        Check(!Window.Panel()->Thumbnails(), "and Details");
+      }
+    }
     // E1: Preferences > Commander's "Show directory tree left of file
     // list": beside the files, its width kept apart from its height.
     {

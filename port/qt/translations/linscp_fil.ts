@@ -2295,6 +2295,10 @@ Lokasyon: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>I-&amp;customize ang Toolbar</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Baguhin ang istilo ng pagtingin sa direktoryo</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

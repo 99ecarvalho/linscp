@@ -2296,6 +2296,10 @@ Vieta: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Tinkinti įrankių juostą</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Keisti katalogų peržiūros stilių</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

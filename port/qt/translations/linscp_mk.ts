@@ -2296,6 +2296,10 @@ Location: %2</source>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Прилагоди алатник</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Смени стил на приказ на директориум</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

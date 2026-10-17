@@ -2296,6 +2296,10 @@ Atrašanās vieta: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Pielāgot rīkjoslu</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Mainīt mapes skata stilu</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

@@ -2296,6 +2296,10 @@ Cale: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Personalizare Bară de Unelte</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Schimbare mod de vizualizare a directorului</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

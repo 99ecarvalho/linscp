@@ -2294,6 +2294,10 @@ Location: %2</source>
         <source>&amp;Customize Toolbar</source>
         <translation>自訂工具列(&amp;C)</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>變更目錄檢視樣式</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

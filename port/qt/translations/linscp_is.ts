@@ -2295,6 +2295,10 @@ Staðsetning: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Sérsníða verkfærastiku</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Breyta útliti möppusýnar</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

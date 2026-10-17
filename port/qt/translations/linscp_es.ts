@@ -2295,6 +2295,10 @@ Ruta: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Personalizar barra de herramientas</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Cambiar estilo de vista del directorio</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

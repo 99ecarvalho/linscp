@@ -2295,6 +2295,10 @@ Emplacement : %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Personnaliser la barre d&apos;outils</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Modifier le style d&apos;affichage des répertoires</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

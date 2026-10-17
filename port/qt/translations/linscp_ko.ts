@@ -2294,6 +2294,10 @@ Location: %2</source>
         <source>&amp;Customize Toolbar</source>
         <translation>툴바 사용자 정의(&amp;C)</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>디렉터리 보기 스타일을 변경합니다</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

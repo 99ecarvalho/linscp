@@ -2294,6 +2294,10 @@ Location: %2</source>
         <source>&amp;Customize Toolbar</source>
         <translation>ツールバーのカスタマイズ(&amp;C)</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>ディレクトリの表示を変更します</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

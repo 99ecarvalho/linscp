@@ -2295,6 +2295,10 @@ Locatie: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Werkbalk aanpassen</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Wijzig de stijl van de directoryweergave</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

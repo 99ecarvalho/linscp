@@ -14,11 +14,11 @@ Last updated: **2026-10-17**
 | A. Site Manager | 15 | 17 |
 | B. Password prompt and banner | 3 | 3 |
 | C. Progress and synchronization dialogs | 4 | 4 |
-| D. Main window | 7 | 9 |
+| D. Main window | 9 | 9 |
 | E. Preferences | 9 | 10 |
 | F. Command line | 2 | 3 |
 | G. Known before | 0 | 1 |
-| **Total** | **40** | **47** |
+| **Total** | **42** | **47** |
 
 ## Items
 
@@ -51,11 +51,11 @@ Last updated: **2026-10-17**
 | D1 | Column header menu: sort asc/desc, hide, size format, ... | High | done | 2026-10-17. `FileView::HeaderMenu`; ctest `qt_gui_panel` |
 | D2 | Customize Toolbar | Medium | done | 2026-10-17. In the toolbars' context menus (the main ones' and the panels' bands', as CommanderBarPopup, LocalPanelPopup, RemotePanelPopup); WinSCP's item names, kept in `ToolbarsButtons` (Commander and Explorer); a hidden button leaves the band (its action stays in the menus), back in place with its drop-down; ctest `qt_gui_keys`, `qt_gui_explorer` |
 | D3 | Back/Forward history drop-downs | Medium | done | 2026-10-17. Both panels: `HistoryGo`, `FillHistoryMenu` (ten at most, `CoreBridge::MinimizeName`, the full path as tip); ctest `qt_gui_panel`, `qt_gui_local` |
-| D4 | Panel navigation toolbars: Tree button, view style submenu | Low | todo | |
+| D4 | Panel navigation toolbars: Tree button, view style submenu | Low | done | 2026-10-17. Each navigation band's Tree (in step with the menus' toggle) and Change directory view style (Details, Thumbnails), named as ScpCommander.dfm's for Customize Toolbar; ctest `qt_gui_trees` |
 | D5 | Go to Tree (Ctrl+Alt+T focuses) | Low | done | 2026-10-17. WinSCP's action list runs GoToTreeAction before LocalTreeAction/RemoteTreeAction (NonVisual.dfm:213/222/231; its main window's toolbars do not process shortcuts), so the key shows and focuses; the toggles only show it. `MainWindow::GoToTree`; ctest `qt_gui_trees` |
 | D6 | Go to Command Line (Ctrl+Shift+M focuses) | Low | done | 2026-10-17. The same order (dfm:271/451); `MainWindow::GoToCommandLine`; ctest `qt_gui_keys` |
 | D7 | Go to Address (Ctrl+L), incremental search (Ctrl+F) | Medium | done | 2026-10-17. Ctrl+L and Alt+D: Open Directory in the Commander (as TScpCommanderForm::GoToAddress), the address bar in the Explorer; Ctrl+F: `FileView::StartSearch`, "(start typing)"; ctest `qt_gui_keys` |
-| D8 | Transfer Files in Clipboard | Low | todo | |
+| D8 | Transfer Files in Clipboard | Low | dropped | 2026-10-17. Not in WinSCP: its FileListFromClipboardAction is in no menu or toolbar, and FileListFromClipboard is an empty stub ("// TBD", CustomScpExplorer.cpp:9338) |
 | D9 | Editor Preferences: Use default system editor | Low | done | 2026-10-17. `EditorPreferencesDialog::SystemExternalEditor`: FindExecutable of a .txt file on Windows (not "Open with"), else xdg-mime's text/plain desktop file's Exec; ctest `qt_gui_logswitches` (a fake xdg-mime) |
 | E1 | Commander: tree left of file list | Medium | done | 2026-10-17. `ScpCommander.TreeOnLeft`; each panel's tree width kept apart (`DriveViewWidth`) from its height; ctest `qt_gui_trees` |
 | E2 | Explorer page: Show full path on address bar | Low | done | 2026-10-17. Applied to the address bar at once; ctest `qt_gui_preferences` |

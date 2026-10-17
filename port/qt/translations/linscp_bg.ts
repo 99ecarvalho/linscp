@@ -2295,6 +2295,10 @@ Location: %2</source>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Персонализиране на лентата с инструменти</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Промяна на изгледа на папката</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

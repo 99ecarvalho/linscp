@@ -2295,6 +2295,10 @@ Location: %2</source>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Προσαρμογή γραμμής εργαλείων</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Αλλαγή στυλ προβολής καταλόγου</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

@@ -2295,6 +2295,10 @@ Vendndodhja: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Përshtat shiritin e veglave</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Ndrysho stilin e pamjes së dosjes</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

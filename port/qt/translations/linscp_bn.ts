@@ -2295,6 +2295,10 @@ Location: %2</source>
         <source>&amp;Customize Toolbar</source>
         <translation>টুলবার কাস্টমাইজ(&amp;C)</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>ডিরেক্টরি দেখার ধরন পরিবর্তন</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

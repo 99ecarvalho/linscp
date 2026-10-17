@@ -2294,6 +2294,10 @@ Location: %2</source>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;ปรับแต่งแถบเครื่องมือ</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>เปลี่ยนรูปแบบมุมมองไดเรกทอรี</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

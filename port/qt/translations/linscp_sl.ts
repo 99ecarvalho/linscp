@@ -2297,6 +2297,10 @@ Lokacija: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Prilagodi orodno vrstico</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Spremeni slog prikaza imenika</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

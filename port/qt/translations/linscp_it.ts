@@ -2295,6 +2295,10 @@ Percorso: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>Personalizza Barra degli Strumenti</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Modifica stile visualizzazione cartelle</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

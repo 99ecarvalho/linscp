@@ -2295,6 +2295,10 @@ Ubicació: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Personalitza la barra d&apos;eines</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Canvia l&apos;estil de visualització del directori</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

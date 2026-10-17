@@ -2295,6 +2295,10 @@ Sijainti: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>Mukauta ty&amp;övalikkoa</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Muuta kansionäkymän tyyliä</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

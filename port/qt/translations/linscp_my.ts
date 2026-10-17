@@ -2294,6 +2294,10 @@ Location: %2</source>
         <source>&amp;Customize Toolbar</source>
         <translation>တူးလ်ဘား စိတ်ကြိုက်ပြင်ပါ(&amp;C)</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>လမ်းညွှန် မြင်ကွင်းပုံစံ ပြောင်းပါ</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

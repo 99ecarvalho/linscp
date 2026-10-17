@@ -2294,6 +2294,10 @@ Location: %2</source>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;شخصی سازی نوارابزار</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>تغییر سبک نمایش پوشه</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

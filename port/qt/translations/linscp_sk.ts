@@ -2296,6 +2296,10 @@ Umiestnenie: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>Prispôso&amp;biť panel nástrojov</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Zmeniť štýl zobrazenia priečinka</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

@@ -2295,6 +2295,10 @@ Location: %2</source>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Հարմարեցնել գործիքագոտին</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Փոխել թղթապանակի դիտքի ոճը</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

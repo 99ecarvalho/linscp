@@ -2295,6 +2295,10 @@ Location: %2</source>
         <source>&amp;Customize Toolbar</source>
         <translation>ხელსაწყოთა ზოლის მორგება</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>საქაღალდის ხედის სტილის შეცვლა</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

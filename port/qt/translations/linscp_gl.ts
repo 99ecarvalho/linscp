@@ -2295,6 +2295,10 @@ Localización: %2</translation>
         <source>&amp;Customize Toolbar</source>
         <translation>&amp;Personalizar a barra de ferramentas</translation>
     </message>
+    <message>
+        <source>Change directory view style</source>
+        <translation>Cambiar o estilo de vista do cartafol</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>
