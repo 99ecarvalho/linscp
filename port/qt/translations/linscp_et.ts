@@ -2275,6 +2275,10 @@ Asukoht: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>&amp;Tavanupud</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;Kohanda tööriistariba</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

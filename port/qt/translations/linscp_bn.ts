@@ -2275,6 +2275,10 @@ Location: %2</source>
         <source>&amp;Standard Buttons</source>
         <translation>স্ট্যান্ডার্ড বোতাম(&amp;S)</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>টুলবার কাস্টমাইজ(&amp;C)</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

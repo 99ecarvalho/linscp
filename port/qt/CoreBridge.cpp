@@ -798,11 +798,13 @@ TLayout Layout()
   Result.SelectiveToolbarText = Settings.SelectiveToolbarText;
   Result.LargerToolbar = Settings.LargerToolbar;
   Result.ToolbarsLayout = Utf8(Settings.CommanderToolbarsLayout);
+  Result.ToolbarsButtons = Utf8(Settings.CommanderToolbarsButtons);
   Result.ConsoleWindowSize = Utf8(Settings.ConsoleWindowSize);
   Result.SiteSearch = static_cast<TPreferences::TPanelSearch>(std::clamp(Settings.SiteSearch, 0, 2));
   Result.Explorer.WindowParams = Utf8(Settings.ExplorerWindowParams);
   Result.Explorer.DirViewParams = Utf8(Settings.ExplorerDirViewParams);
   Result.Explorer.ToolbarsLayout = Utf8(Settings.ExplorerToolbarsLayout);
+  Result.Explorer.ToolbarsButtons = Utf8(Settings.ExplorerToolbarsButtons);
   Result.Explorer.StatusBar = Settings.ExplorerStatusBar;
   Result.Explorer.Tabs = Settings.ExplorerSessionsTabs;
   Result.Explorer.ViewStyle = static_cast<TLayout::TExplorer::TViewStyle>(std::clamp(Settings.ExplorerViewStyle, 0, 4));
@@ -911,11 +913,13 @@ void SetLayout(const TLayout & Layout)
   Settings.SelectiveToolbarText = Layout.SelectiveToolbarText;
   Settings.LargerToolbar = Layout.LargerToolbar;
   Settings.CommanderToolbarsLayout = FromUtf8(Layout.ToolbarsLayout);
+  Settings.CommanderToolbarsButtons = FromUtf8(Layout.ToolbarsButtons);
   Settings.ConsoleWindowSize = FromUtf8(Layout.ConsoleWindowSize);
   Settings.SiteSearch = static_cast<int>(Layout.SiteSearch);
   Settings.ExplorerWindowParams = FromUtf8(Layout.Explorer.WindowParams);
   Settings.ExplorerDirViewParams = FromUtf8(Layout.Explorer.DirViewParams);
   Settings.ExplorerToolbarsLayout = FromUtf8(Layout.Explorer.ToolbarsLayout);
+  Settings.ExplorerToolbarsButtons = FromUtf8(Layout.Explorer.ToolbarsButtons);
   Settings.ExplorerStatusBar = Layout.Explorer.StatusBar;
   Settings.ExplorerSessionsTabs = Layout.Explorer.Tabs;
   Settings.ExplorerViewStyle = static_cast<int>(Layout.Explorer.ViewStyle);

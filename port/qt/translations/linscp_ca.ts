@@ -2275,6 +2275,10 @@ Ubicació: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>Botons e&amp;stàndard</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;Personalitza la barra d&apos;eines</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

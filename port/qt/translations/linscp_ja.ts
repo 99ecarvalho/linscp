@@ -2274,6 +2274,10 @@ Location: %2</source>
         <source>&amp;Standard Buttons</source>
         <translation>標準(&amp;S)</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>ツールバーのカスタマイズ(&amp;C)</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

@@ -15,6 +15,7 @@
 
 #include <functional>
 #include <memory>
+#include <map>
 #include <vector>
 
 #include "CoreBridge.h"
@@ -256,6 +257,18 @@ public:
   void GoToAddressBar();
   void IncrementalSearchStart();
   QAction * GoToTreeAction() const { return FGoToTreeAction; }
+  // D2, Customize Toolbar (CreateToolbarButtonsList): Bar's buttons, each
+  // shown or not, as they were made (separators kept); the bands' hidden
+  // buttons as WinSCP stores them (GetToolbarsButtonsStr), and applied.
+  void FillCustomizeMenu(QMenu * Menu, QToolBar * Bar);
+  void SetBandItemShown(QToolBar * Bar, const QString & Item, bool Shown);
+  QString ToolbarsButtons() const;
+  void ApplyToolbarsButtons(const QString & Buttons);
+  // The toolbars' context menus, as CommanderBarPopup and the panels'
+  // LocalPanelPopup and RemotePanelPopup: the bands, the toolbars'
+  // settings, Customize Toolbar for the one clicked.
+  QMenu * createPopupMenu() override;
+  QMenu * ToolbarPopup(QToolBar * Bar);
   // A shared bookmark's keyboard shortcut pressed: its directory opened on
   // the active panel's side. False when none has it, or no directory there.
   bool OpenBookmarkShortCut(unsigned ShortCut);
@@ -631,6 +644,20 @@ private:
     QToolBar * Twin = nullptr;
   };
   std::vector<TBand> FBands;
+  const TBand * BandOf(const QToolBar * Bar) const;
+  QList<QAction *> & BandOrder(QToolBar * Bar);
+  std::map<std::pair<const QToolBar *, const QAction *>, QString> FBandItems;
+  std::map<const QToolBar *, QList<QAction *>> FBandOrders;
+  // A button's drop-down, kept while it is hidden.
+  struct TButtonLook
+  {
+    int Mode = 0;
+    QMenu * Menu = nullptr;
+  };
+  std::map<std::pair<const QToolBar *, const QAction *>, TButtonLook> FButtonLooks;
+  QMenu * FToolbarsMenu = nullptr;
+  QMenu * FLeftPanelMenu = nullptr;
+  QMenu * FRightPanelMenu = nullptr;
   std::vector<std::pair<QToolBar *, QAction *>> FTextButtons;
   QAction * FLockToolbarsAction = nullptr;
   QAction * FSelectiveTextAction = nullptr;
@@ -643,7 +670,10 @@ private:
   void BuildToolbars(QMenu * Options);
   QToolBar * MainBand(const QString & Name, const QString & Title);
   QAction * SideAction(bool Local, QAction * Source, const QString & Text, const char * Role);
-  void BandAction(QToolBar * Bar, QAction * Action, bool Text = false);
+  // Item: the button's name in WinSCP's ToolbarsButtons (its action's,
+  // as GetToolbarItemName); none: not customizable.
+  void BandAction(QToolBar * Bar, QAction * Action, bool Text = false, const QString & Item = QString());
+  void NameBandItem(QToolBar * Bar, QAction * Action, const QString & Item);
   void ApplyToolbarSettings();
   void SaveToolbarSettings();
   void UpdatePresetCombo();

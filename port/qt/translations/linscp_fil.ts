@@ -2275,6 +2275,10 @@ Lokasyon: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>Mga Karaniwang &amp;Button</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>I-&amp;customize ang Toolbar</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

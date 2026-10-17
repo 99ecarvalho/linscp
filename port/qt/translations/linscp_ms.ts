@@ -2274,6 +2274,10 @@ Lokasi: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>Butang &amp;Standard</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;Sesuaikan Bar Alat</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

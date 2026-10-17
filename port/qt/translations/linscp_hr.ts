@@ -2276,6 +2276,10 @@ Lokacija: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>&amp;Standardne gumbi</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;Prilagodi alatnu traku</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

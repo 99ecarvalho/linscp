@@ -2274,6 +2274,10 @@ Location: %2</source>
         <source>&amp;Standard Buttons</source>
         <translation>표준 단추(&amp;S)</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>툴바 사용자 정의(&amp;C)</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

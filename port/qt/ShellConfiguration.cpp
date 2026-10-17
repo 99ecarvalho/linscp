@@ -346,6 +346,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     }
     Storage->WriteString(L"DirViewParams", FSettings.ExplorerDirViewParams);
     Storage->WriteString(L"ToolbarsLayout2", FSettings.ExplorerToolbarsLayout);
+    Storage->WriteString(L"ToolbarsButtons", FSettings.ExplorerToolbarsButtons);
     Storage->WriteBool(L"StatusBar", FSettings.ExplorerStatusBar);
     Storage->WriteBool(L"SessionsTabs", FSettings.ExplorerSessionsTabs);
     Storage->WriteInteger(L"ViewStyle", FSettings.ExplorerViewStyle);
@@ -377,6 +378,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"StatusBar", FSettings.CommanderStatusBar);
     Storage->WriteBool(L"SessionsTabs", FSettings.CommanderSessionsTabs);
     Storage->WriteString(L"ToolbarsLayout2", FSettings.CommanderToolbarsLayout);
+    Storage->WriteString(L"ToolbarsButtons", FSettings.CommanderToolbarsButtons);
     Storage->WriteInteger(L"CurrentPanel", FSettings.CurrentPanel);
     Storage->WriteFloat(L"LocalPanelWidth", FSettings.LocalPanelWidth);
     Storage->WriteBool(L"PreserveLocalDirectory", FSettings.PreserveLocalDirectory);
@@ -936,6 +938,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.ExplorerWindowParams = Storage->ReadString(L"WindowParams", FSettings.ExplorerWindowParams);
     FSettings.ExplorerDirViewParams = Storage->ReadString(L"DirViewParams", FSettings.ExplorerDirViewParams);
     FSettings.ExplorerToolbarsLayout = Storage->ReadString(L"ToolbarsLayout2", FSettings.ExplorerToolbarsLayout);
+    FSettings.ExplorerToolbarsButtons = Storage->ReadString(L"ToolbarsButtons", FSettings.ExplorerToolbarsButtons);
     FSettings.ExplorerStatusBar = Storage->ReadBool(L"StatusBar", FSettings.ExplorerStatusBar);
     FSettings.ExplorerSessionsTabs = Storage->ReadBool(L"SessionsTabs", FSettings.ExplorerSessionsTabs);
     FSettings.ExplorerViewStyle = Storage->ReadInteger(L"ViewStyle", FSettings.ExplorerViewStyle);
@@ -970,6 +973,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.CommanderStatusBar = Storage->ReadBool(L"StatusBar", FSettings.CommanderStatusBar);
     FSettings.CommanderSessionsTabs = Storage->ReadBool(L"SessionsTabs", FSettings.CommanderSessionsTabs);
     FSettings.CommanderToolbarsLayout = Storage->ReadString(L"ToolbarsLayout2", FSettings.CommanderToolbarsLayout);
+    FSettings.CommanderToolbarsButtons = Storage->ReadString(L"ToolbarsButtons", FSettings.CommanderToolbarsButtons);
     FSettings.CurrentPanel = Storage->ReadInteger(L"CurrentPanel", FSettings.CurrentPanel);
     FSettings.LocalPanelWidth = Storage->ReadFloat(L"LocalPanelWidth", FSettings.LocalPanelWidth);
     FSettings.PreserveLocalDirectory = Storage->ReadBool(L"PreserveLocalDirectory", FSettings.PreserveLocalDirectory);

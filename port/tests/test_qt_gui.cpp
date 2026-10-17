@@ -2677,6 +2677,67 @@ void Keys(const QString & Directory)
       Window.GoToAddressBar();
       Responder.Custom = nullptr;
       Check(Asked, "Ctrl+L: Open Directory, in the Commander");
+      // D2: Customize Toolbar: a band's buttons hidden and shown again, in
+      // place, the band's twin with it; kept as WinSCP's ToolbarsButtons.
+      {
+        QToolBar * RemoteFile = Window.Panel()->Band(TPanelBand::File);
+        QToolBar * TwinFile = Window.OtherLocal()->Band(TPanelBand::File);
+        auto Find = [](QMenu & Menu, const QString & Text) -> QAction *
+        {
+          for (QAction * Action : Menu.actions())
+          {
+            if (Action->text() == Text)
+            {
+              return Action;
+            }
+          }
+          return nullptr;
+        };
+        QMenu Customize;
+        Window.FillCustomizeMenu(&Customize, RemoteFile);
+        QAction * Edit = Find(Customize, QStringLiteral("&Edit"));
+        Check((Edit != nullptr) && Edit->isChecked() && (Find(Customize, QStringLiteral("Down&load")) != nullptr) &&
+          Customize.actions().first()->isCheckable(), "Customize Toolbar lists the band's buttons, shown");
+        const int Count = RemoteFile->actions().size();
+        const int TwinCount = TwinFile->actions().size();
+        QAction * EditButton = RemoteFile->actions().value(4);
+        if (Edit != nullptr)
+        {
+          Edit->trigger();
+        }
+        Check((RemoteFile->actions().size() == Count - 1) && (TwinFile->actions().size() == TwinCount - 1) &&
+          !RemoteFile->actions().contains(EditButton), "a button hidden, on the other local panel's band too");
+        Check(Window.ToolbarsButtons() == QStringLiteral("RemoteFile=RemoteEdit:0") &&
+          (CoreBridge::Layout().ToolbarsButtons == "RemoteFile=RemoteEdit:0"), "kept as WinSCP's ToolbarsButtons");
+        Window.FillCustomizeMenu(&Customize, RemoteFile);
+        Edit = Find(Customize, QStringLiteral("&Edit"));
+        Check((Edit != nullptr) && !Edit->isChecked(), "unchecked there");
+        if (Edit != nullptr)
+        {
+          Edit->trigger();
+        }
+        Check((RemoteFile->actions().size() == Count) && (RemoteFile->actions().value(4) == EditButton) &&
+          Window.ToolbarsButtons().isEmpty(), "shown again, in its place");
+        // A button with its drop-down keeps it.
+        QToolBar * History = Window.Panel()->Band(TPanelBand::History);
+        QAction * Back = Window.Panel()->BackAction();
+        Window.SetBandItemShown(History, QStringLiteral("RemoteBack"), false);
+        Check(!History->actions().contains(Back), "Back hidden");
+        Window.SetBandItemShown(History, QStringLiteral("RemoteBack"), true);
+        QToolButton * BackButton = qobject_cast<QToolButton *>(History->widgetForAction(Back));
+        Check((BackButton != nullptr) && (BackButton->popupMode() == QToolButton::MenuButtonPopup) && (BackButton->menu() != nullptr),
+          "and back with its history drop-down");
+        Window.ApplyToolbarsButtons(QStringLiteral("Commands=Console:0;LocalSelection=LocalSelectAll:0"));
+        Check(Window.ToolbarsButtons() == QStringLiteral("Commands=Console:0;LocalSelection=LocalSelectAll:0"), "stored ones applied");
+        Window.ApplyToolbarsButtons(QStringLiteral("Commands=Console:1;LocalSelection=LocalSelectAll:1"));
+        Check(Window.ToolbarsButtons().isEmpty(), "(shown again)");
+        QMenu * Popup = Window.ToolbarPopup(RemoteFile);
+        QAction * CustomizeItem = Find(*Popup, QStringLiteral("&Customize Toolbar"));
+        Check((CustomizeItem != nullptr) && CustomizeItem->isEnabled() && (CustomizeItem->menu() != nullptr) &&
+          !CustomizeItem->menu()->isEmpty() && (Find(*Popup, QStringLiteral("&Lock Toolbars")) != nullptr),
+          "a band's context menu: the toolbars' settings, Customize Toolbar");
+        delete Popup;
+      }
       // (The window active again after the dialog.)
       Window.activateWindow();
       QApplication::setActiveWindow(&Window);
@@ -5242,6 +5303,12 @@ void ExplorerTest(const char * Port, const QString & Directory)
     Responder.Frontend = &Frontend;
     Responder.Passwords = { "secret" };
     Check(Window.Explorer(), "the Explorer interface, as chosen");
+    // D2: its bands' buttons, by ScpExplorer's names.
+    Window.ApplyToolbarsButtons(QStringLiteral("Buttons=RemoteFindFiles:0,Putty:0;Selection=InvertSelection:0"));
+    Check(Window.ToolbarsButtons() == QStringLiteral("Buttons=RemoteFindFiles:0,Putty:0;Selection=InvertSelection:0"),
+      "the Explorer's buttons hidden, by WinSCP's names");
+    Window.ApplyToolbarsButtons(QStringLiteral("Buttons=RemoteFindFiles:1,Putty:1;Selection=InvertSelection:1"));
+    Check(Window.ToolbarsButtons().isEmpty(), "and shown");
     Check(Window.Local()->isHidden() && !Window.Panel()->isHidden(), "the remote panel alone");
     QSplitter * Split = Window.Panel()->findChild<QSplitter *>();
     Check((Split != nullptr) && (Split->orientation() == Qt::Horizontal) && Window.Panel()->TreeVisible(),

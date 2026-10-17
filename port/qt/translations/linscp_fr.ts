@@ -2275,6 +2275,10 @@ Emplacement : %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>Boutons standards</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;Personnaliser la barre d&apos;outils</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

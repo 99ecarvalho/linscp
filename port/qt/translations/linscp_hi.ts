@@ -2275,6 +2275,10 @@ Location: %2</source>
         <source>&amp;Standard Buttons</source>
         <translation>मानक बटन(&amp;S)</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>टूलबार अनुकूलित करें(&amp;C)</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

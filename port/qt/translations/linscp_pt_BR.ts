@@ -2275,6 +2275,10 @@ Local: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>Botões padrão</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;Customizar Barra de Ferramentas</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

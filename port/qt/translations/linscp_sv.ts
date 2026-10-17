@@ -2275,6 +2275,10 @@ Plats: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>&amp;Standardknappar</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;Anpassa verktygsfältet</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

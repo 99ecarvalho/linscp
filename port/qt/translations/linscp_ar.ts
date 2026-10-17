@@ -2279,6 +2279,10 @@ Location: %2</source>
         <source>&amp;Standard Buttons</source>
         <translation>الأزرار ال&amp;قياسية</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;تخصيص شريط الأدوات</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

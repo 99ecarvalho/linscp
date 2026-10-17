@@ -2275,6 +2275,10 @@ Placering: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>&amp;Standardknapper</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>Tilpas værktøjslinje</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

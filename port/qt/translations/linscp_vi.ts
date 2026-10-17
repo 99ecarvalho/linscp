@@ -2274,6 +2274,10 @@ Vị trí: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>&amp;Nút chuẩn</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;Tùy chỉnh Thanh công cụ</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

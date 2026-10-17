@@ -2275,6 +2275,10 @@ Location: %2</source>
         <source>&amp;Standard Buttons</source>
         <translation>Βασικά πλήκτρα</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;Προσαρμογή γραμμής εργαλείων</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

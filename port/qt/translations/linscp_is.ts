@@ -2275,6 +2275,10 @@ Staðsetning: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>&amp;Staðlaðir takkar</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;Sérsníða verkfærastiku</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

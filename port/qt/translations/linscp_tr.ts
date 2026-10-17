@@ -2274,6 +2274,10 @@ Konum: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>&amp;Standart düğmeler</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>A&amp;raç çubuğunu özelleştir</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

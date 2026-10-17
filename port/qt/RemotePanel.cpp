@@ -70,7 +70,8 @@ RemotePanel::RemotePanel(QWidget * Parent) :
     QToolButton * Button = (Bar != nullptr) ? qobject_cast<QToolButton *>(Bar->widgetForAction(Action)) : nullptr;
     if (Button != nullptr)
     {
-      QMenu * Menu = new QMenu(Button);
+      // (The panel's: the button goes when hidden, Customize Toolbar.)
+      QMenu * Menu = new QMenu(this);
       const bool Back = (Action == FBackAction);
       connect(Menu, &QMenu::aboutToShow, this, [this, Menu, Back]() { FillHistoryMenu(Menu, Back); });
       Button->setMenu(Menu);

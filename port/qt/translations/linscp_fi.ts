@@ -2275,6 +2275,10 @@ Sijainti: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>&amp;Vakiopainikkeet</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>Mukauta ty&amp;övalikkoa</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

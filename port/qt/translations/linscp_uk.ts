@@ -2276,6 +2276,10 @@ Location: %2</source>
         <source>&amp;Standard Buttons</source>
         <translation>Стандартні кнопки</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>Налаштувати панель інструментів</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

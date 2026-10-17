@@ -2275,6 +2275,10 @@ Location: %2</source>
         <source>&amp;Standard Buttons</source>
         <translation>&amp;სტანდარტული ღილაკები</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>ხელსაწყოთა ზოლის მორგება</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

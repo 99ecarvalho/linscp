@@ -2274,6 +2274,10 @@ Location: %2</source>
         <source>&amp;Standard Buttons</source>
         <translation>&amp;ปุ่มมาตรฐาน</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;ปรับแต่งแถบเครื่องมือ</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

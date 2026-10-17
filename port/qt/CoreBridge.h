@@ -793,6 +793,8 @@ struct TLayout
   bool SelectiveToolbarText = true;
   int LargerToolbar = 1;
   std::string ToolbarsLayout;
+  // The bands' hidden buttons (ToolbarsButtons: "Band=Item:0,...;...").
+  std::string ToolbarsButtons;
   // The console's size (ConsoleWin.WindowSize: "width,height,ppi").
   std::string ConsoleWindowSize;
   // The Login dialog's site search (LoginDialog.SiteSearch): the beginning
@@ -808,6 +810,7 @@ struct TLayout
     std::string WindowParams;
     std::string DirViewParams;
     std::string ToolbarsLayout;
+    std::string ToolbarsButtons;
     bool StatusBar = true;
     bool Tabs = true;
     enum class TViewStyle { Icon, SmallIcon, List, Report, Thumbnail };

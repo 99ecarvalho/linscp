@@ -2275,6 +2275,10 @@ Localización: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>Botóns e&amp;stándar</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;Personalizar a barra de ferramentas</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

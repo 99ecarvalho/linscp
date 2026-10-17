@@ -2274,6 +2274,10 @@ Location: %2</source>
         <source>&amp;Standard Buttons</source>
         <translation>دکمه های استاندارد</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;شخصی سازی نوارابزار</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

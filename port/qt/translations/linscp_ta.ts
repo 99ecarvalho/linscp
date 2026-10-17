@@ -2275,6 +2275,10 @@ Location: %2</source>
         <source>&amp;Standard Buttons</source>
         <translation>&amp;நிலையான பொத்தான்கள்</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>கருவிப்பட்டியைத் தனிப்பயனாக்குங்கள்</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

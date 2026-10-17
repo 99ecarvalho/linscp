@@ -2276,6 +2276,10 @@ Cale: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>Butoane &amp;Standard</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;Personalizare Bară de Unelte</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

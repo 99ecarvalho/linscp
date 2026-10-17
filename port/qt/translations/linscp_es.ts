@@ -2275,6 +2275,10 @@ Ruta: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>&amp;Botones estándar</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;Personalizar barra de herramientas</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

@@ -6957,13 +6957,236 @@ QAction * MainWindow::SideAction(bool Local, QAction * Source, const QString & T
   return Action;
 }
 
-void MainWindow::BandAction(QToolBar * Bar, QAction * Action, bool Text)
+void MainWindow::BandAction(QToolBar * Bar, QAction * Action, bool Text, const QString & Item)
 {
   Bar->addAction(Action);
   if (Text)
   {
     FTextButtons.emplace_back(Bar, Action);
   }
+  NameBandItem(Bar, Action, Item);
+}
+
+void MainWindow::NameBandItem(QToolBar * Bar, QAction * Action, const QString & Item)
+{
+  if (!Item.isEmpty())
+  {
+    FBandItems[{ Bar, Action }] = Item;
+  }
+}
+
+const MainWindow::TBand * MainWindow::BandOf(const QToolBar * Bar) const
+{
+  for (const TBand & Band : FBands)
+  {
+    if ((Band.Bar == Bar) || (Band.Twin == Bar))
+    {
+      return &Band;
+    }
+  }
+  return nullptr;
+}
+
+// The band's buttons as made, before any was hidden.
+QList<QAction *> & MainWindow::BandOrder(QToolBar * Bar)
+{
+  auto Found = FBandOrders.find(Bar);
+  if (Found == FBandOrders.end())
+  {
+    Found = FBandOrders.emplace(Bar, Bar->actions()).first;
+  }
+  return Found->second;
+}
+
+// As ToolbarButtonItemClick, for the band's twin too: hidden, the button
+// leaves the toolbar (its action may be in menus too); shown, it goes back
+// where it was, with its drop-down.
+void MainWindow::SetBandItemShown(QToolBar * Bar, const QString & Item, bool Shown)
+{
+  const TBand * Band = BandOf(Bar);
+  QList<QToolBar *> Bars = { Bar };
+  if ((Band != nullptr) && (Band->Twin != nullptr))
+  {
+    Bars = { Band->Bar, Band->Twin };
+  }
+  for (QToolBar * Each : Bars)
+  {
+    QList<QAction *> & Order = BandOrder(Each);
+    for (int Index = 0; Index < Order.size(); Index++)
+    {
+      QAction * Action = Order[Index];
+      const auto Name = FBandItems.find({ Each, Action });
+      if ((Name == FBandItems.end()) || (Name->second != Item))
+      {
+        continue;
+      }
+      const bool In = Each->actions().contains(Action);
+      if (!Shown && In)
+      {
+        if (QToolButton * Button = qobject_cast<QToolButton *>(Each->widgetForAction(Action)))
+        {
+          FButtonLooks[{ Each, Action }] = { static_cast<int>(Button->popupMode()), Button->menu() };
+        }
+        Each->removeAction(Action);
+      }
+      else if (Shown && !In)
+      {
+        QAction * Before = nullptr;
+        for (int Next = Index + 1; (Next < Order.size()) && (Before == nullptr); Next++)
+        {
+          if (Each->actions().contains(Order[Next]))
+          {
+            Before = Order[Next];
+          }
+        }
+        Each->insertAction(Before, Action);
+        const auto Look = FButtonLooks.find({ Each, Action });
+        QToolButton * Button = qobject_cast<QToolButton *>(Each->widgetForAction(Action));
+        if ((Look != FButtonLooks.end()) && (Button != nullptr))
+        {
+          if ((Look->second.Menu != nullptr) && (Button->menu() != Look->second.Menu))
+          {
+            Button->setMenu(Look->second.Menu);
+          }
+          Button->setPopupMode(static_cast<QToolButton::ToolButtonPopupMode>(Look->second.Mode));
+        }
+      }
+    }
+  }
+  ApplyToolbarSettings();
+}
+
+void MainWindow::FillCustomizeMenu(QMenu * Menu, QToolBar * Bar)
+{
+  Menu->clear();
+  const TBand * Band = BandOf(Bar);
+  // A twin's, as its band's.
+  QToolBar * Main = (Band != nullptr) ? Band->Bar : Bar;
+  for (QAction * Action : BandOrder(Main))
+  {
+    if (Action->isSeparator())
+    {
+      Menu->addSeparator();
+      continue;
+    }
+    const auto Name = FBandItems.find({ Main, Action });
+    if (Name == FBandItems.end())
+    {
+      continue;
+    }
+    // As StripEllipsis.
+    QString Text = Action->text();
+    if (Text.endsWith(QStringLiteral("...")))
+    {
+      Text.chop(3);
+    }
+    QAction * Item = Menu->addAction(Action->icon(), Text);
+    Item->setCheckable(true);
+    Item->setChecked(Main->actions().contains(Action));
+    const QString ItemName = Name->second;
+    connect(Item, &QAction::triggered, this, [this, Main, ItemName](bool Shown)
+    {
+      SetBandItemShown(Main, ItemName, Shown);
+      SaveToolbarSettings();
+    });
+  }
+}
+
+// As GetToolbarsButtonsStr: all buttons shown by default, the hidden ones
+// kept.
+QString MainWindow::ToolbarsButtons() const
+{
+  QStringList Result;
+  for (const TBand & Band : FBands)
+  {
+    const auto Order = FBandOrders.find(Band.Bar);
+    if (Order == FBandOrders.end())
+    {
+      continue;
+    }
+    QStringList Hidden;
+    for (QAction * Action : Order->second)
+    {
+      const auto Name = FBandItems.find({ Band.Bar, Action });
+      if ((Name != FBandItems.end()) && !Band.Bar->actions().contains(Action))
+      {
+        Hidden.append(Name->second + QStringLiteral(":0"));
+      }
+    }
+    if (!Hidden.isEmpty())
+    {
+      Result.append(Band.Name + QLatin1Char('=') + Hidden.join(QLatin1Char(',')));
+    }
+  }
+  return Result.join(QLatin1Char(';'));
+}
+
+// As LoadToolbarsLayoutStr's buttons.
+void MainWindow::ApplyToolbarsButtons(const QString & Buttons)
+{
+  for (const QString & Entry : Buttons.split(QLatin1Char(';'), Qt::SkipEmptyParts))
+  {
+    const QString Key = Entry.section(QLatin1Char('='), 0, 0);
+    for (const TBand & Band : FBands)
+    {
+      if (Band.Name.compare(Key, Qt::CaseInsensitive) != 0)
+      {
+        continue;
+      }
+      for (const QString & Item : Entry.section(QLatin1Char('='), 1).split(QLatin1Char(','), Qt::SkipEmptyParts))
+      {
+        const bool Shown = (Item.section(QLatin1Char(':'), 1, 1).toInt() != 0);
+        SetBandItemShown(Band.Bar, Item.section(QLatin1Char(':'), 0, 0), Shown);
+      }
+    }
+  }
+}
+
+QMenu * MainWindow::createPopupMenu()
+{
+  QWidget * Under = QApplication::widgetAt(QCursor::pos());
+  while ((Under != nullptr) && (qobject_cast<QToolBar *>(Under) == nullptr))
+  {
+    Under = Under->parentWidget();
+  }
+  QToolBar * Bar = qobject_cast<QToolBar *>(Under);
+  if ((FToolbarsMenu == nullptr) || ((Bar != nullptr) && (BandOf(Bar) == nullptr)))
+  {
+    return QMainWindow::createPopupMenu();
+  }
+  return ToolbarPopup(Bar);
+}
+
+QMenu * MainWindow::ToolbarPopup(QToolBar * Bar)
+{
+  QMenu * Menu = new QMenu(this);
+  const TBand * Band = (Bar != nullptr) ? BandOf(Bar) : nullptr;
+  const bool Panel = (Band != nullptr) && (Band->Name.startsWith(QStringLiteral("Local")) || Band->Name.startsWith(QStringLiteral("Remote")));
+  if (Panel && (FLeftPanelMenu != nullptr))
+  {
+    Menu->addActions((Band->Name.startsWith(QStringLiteral("Local")) ? FLeftPanelMenu : FRightPanelMenu)->actions());
+    Menu->addSeparator();
+    Menu->addAction(FLockToolbarsAction);
+    Menu->addAction(FSelectiveTextAction);
+    for (QAction * Action : FToolbarsMenu->actions())
+    {
+      if (Action->menu() != nullptr)
+      {
+        Menu->addAction(Action);
+      }
+    }
+  }
+  else
+  {
+    Menu->addActions(FToolbarsMenu->actions());
+  }
+  QMenu * Customize = Menu->addMenu(tr("&Customize Toolbar"));
+  if (Bar != nullptr)
+  {
+    FillCustomizeMenu(Customize, Bar);
+  }
+  Customize->setEnabled(!Customize->isEmpty());
+  return Menu;
 }
 
 void MainWindow::BuildToolbars(QMenu * Options)
@@ -6971,17 +7194,17 @@ void MainWindow::BuildToolbars(QMenu * Options)
   // The main bands, WinSCP's Commander's (forms/ScpCommander.dfm), in its
   // default layout's order.
   QToolBar * Commands = MainBand(QStringLiteral("Commands"), tr("Commands"));
-  BandAction(Commands, FCompareAction);
-  BandAction(Commands, FKeepUpToDateAction);
-  BandAction(Commands, FSynchronizeAction, true);
+  BandAction(Commands, FCompareAction, false, QStringLiteral("CompareDirectories"));
+  BandAction(Commands, FKeepUpToDateAction, false, QStringLiteral("Synchronize"));
+  BandAction(Commands, FSynchronizeAction, true, QStringLiteral("FullSynchronize"));
   Commands->addSeparator();
-  BandAction(Commands, FConsoleAction);
-  BandAction(Commands, FPuttyAction);
+  BandAction(Commands, FConsoleAction, false, QStringLiteral("Console"));
+  BandAction(Commands, FPuttyAction, false, QStringLiteral("Putty"));
   Commands->addSeparator();
-  BandAction(Commands, FSyncBrowseAction);
+  BandAction(Commands, FSyncBrowseAction, false, QStringLiteral("SynchronizeBrowsing"));
 
   QToolBar * Preferences = MainBand(QStringLiteral("Preferences"), tr("Preferences"));
-  BandAction(Preferences, FPreferencesAction);
+  BandAction(Preferences, FPreferencesAction, false, QStringLiteral("Preferences"));
   Preferences->addSeparator();
   // As QueueToggleShowAction: the queue shown or not, its menu the choices.
   QAction * Queue = new QAction(tr("&Queue"), this);
@@ -7001,7 +7224,7 @@ void MainWindow::BuildToolbars(QMenu * Options)
   {
     SetQueueShow(FQueue->isVisible() ? CoreBridge::TLayout::TQueueShow::Hide : CoreBridge::TLayout::TQueueShow::Show);
   });
-  BandAction(Preferences, Queue, true);
+  BandAction(Preferences, Queue, true, QStringLiteral("QueueToggleShow"));
 
   QToolBar * Transfer = MainBand(QStringLiteral("Transfer"), tr("Transfer Settings"));
   // The presets, the one in use current (TransferCombo).
@@ -7031,7 +7254,7 @@ void MainWindow::BuildToolbars(QMenu * Options)
   QAction * Configure = new QAction(tr("&Configure..."), this);
   Iconize(Configure, "preferences");
   connect(Configure, &QAction::triggered, this, [this]() { PreferencesDialog(::PreferencesDialog::tr("Transfer")); UpdatePresetCombo(); });
-  BandAction(Transfer, Configure, true);
+  BandAction(Transfer, Configure, true, QStringLiteral("PresetsPreferences"));
   UpdatePresetCombo();
 
   addToolBarBreak();
@@ -7051,13 +7274,13 @@ void MainWindow::BuildToolbars(QMenu * Options)
   {
     NewDefaultTab(QGuiApplication::queryKeyboardModifiers().testFlag(Qt::ControlModifier));
   });
-  BandAction(Session, NewTab, true);
-  BandAction(Session, FSaveSiteAction);
+  BandAction(Session, NewTab, true, QStringLiteral("NewTab"));
+  BandAction(Session, FSaveSiteAction, false, QStringLiteral("SaveCurrentSession"));
   Session->addSeparator();
-  BandAction(Session, FDuplicateTabAction);
-  BandAction(Session, FCloseTabAction);
+  BandAction(Session, FDuplicateTabAction, false, QStringLiteral("DuplicateTab"));
+  BandAction(Session, FCloseTabAction, false, QStringLiteral("CloseTab"));
   Session->addSeparator();
-  BandAction(Session, FSitesAction, true);
+  BandAction(Session, FSitesAction, true, QStringLiteral("SavedSessions"));
 
   // Sort: the active panel's, by its columns (WinSCP's CurrentSortBy...).
   QToolBar * Sort = MainBand(QStringLiteral("Sort"), tr("Sort"));
@@ -7068,8 +7291,11 @@ void MainWindow::BuildToolbars(QMenu * Options)
     QHeaderView * Header = ActiveView()->header();
     ActiveView()->sortByColumn(Header->sortIndicatorSection(), Ascending ? Qt::AscendingOrder : Qt::DescendingOrder);
   });
-  BandAction(Sort, FSortActions[0]);
+  BandAction(Sort, FSortActions[0], false, QStringLiteral("CurrentSortAscending"));
   Sort->addSeparator();
+  // (WinSCP's CurrentSortBy... names.)
+  const char * const SortItems[] = { "CurrentSortByName", "CurrentSortBySize", "CurrentSortByChanged", "CurrentSortByRights",
+    "CurrentSortByOwner", "CurrentSortByGroup" };
   const std::pair<int, QString> Columns[] = {
     { FileListModel::NameColumn, tr("By &Name") }, { FileListModel::SizeColumn, tr("By &Size") },
     { FileListModel::ModifiedColumn, tr("By Date &modified") }, { FileListModel::RightsColumn, tr("By &Permissions/Attributes") },
@@ -7086,7 +7312,7 @@ void MainWindow::BuildToolbars(QMenu * Options)
       ActiveView()->sortByColumn(Column, ActiveView()->header()->sortIndicatorOrder());
     });
     FSortActions[Index + 1] = By;
-    BandAction(Sort, By);
+    BandAction(Sort, By, false, QString::fromLatin1(SortItems[Index]));
   }
   const char * const SortRoles[] = { "sort-ascending", "sort-name", "sort-size", "sort-time", "sort-rights", "sort-owner",
     "sort-group" };
@@ -7117,7 +7343,7 @@ void MainWindow::BuildToolbars(QMenu * Options)
     [this]() { OpenWebPage(QStringLiteral("https://github.com/99ecarvalho/linscp/releases")); });
   UpdatesMenu->addAction(tr("D&onate"), this, [this]() { OpenWebPage(QString::fromLatin1(DonateUrl)); });
   UpdatesButton->setMenu(UpdatesMenu);
-  BandAction(Updates, UpdatesButton);
+  BandAction(Updates, UpdatesButton, false, QStringLiteral("CheckForUpdates"));
 
   // As Toolbar2Toolbar ("Hot Keys"), at the bottom: the F-keys' commands,
   // the copy and move ones the active side's.
@@ -7148,6 +7374,27 @@ void MainWindow::BuildToolbars(QMenu * Options)
     Band.Name = QStringLiteral("Toolbar2");
     Band.Bar = FHotKeysBar;
     FBands.push_back(Band);
+    // As Toolbar2Toolbar's items.
+    const std::pair<QString, const char *> HotKeyItems[] = {
+    { tr("F2 Rename"), "CurrentRename" },
+    { tr("F4 Edit"), "CurrentEdit" },
+    { tr("F5 Copy"), "RemoteCopy" },
+    { tr("F6 Move"), "RemoteMove" },
+    { tr("F7 Create Directory"), "CurrentCreateDir" },
+    { tr("F8 Delete"), "CurrentDelete" },
+    { tr("F9 Properties"), "CurrentProperties" },
+    { tr("F10 Quit"), "CloseApplication" },
+    };
+    for (QAction * Action : FHotKeysBar->actions())
+    {
+      for (const auto & Item : HotKeyItems)
+      {
+        if (Action->text() == Item.first)
+        {
+          NameBandItem(FHotKeysBar, Action, QString::fromLatin1(Item.second));
+        }
+      }
+    }
   }
 
   // The command line, at the bottom (WinSCP's BottomDock), as a band.
@@ -7204,6 +7451,8 @@ void MainWindow::BuildToolbars(QMenu * Options)
   {
     auto BandOf = [&Side](TPanelBand Which) { return (Side.Local != nullptr) ? Side.Local->Band(Which) : Side.Remote->Band(Which); };
     const bool Left = Side.Left;
+    // The side's names: LocalCopy, RemoteCopy, ...
+    const QString Prefix = Left ? QStringLiteral("Local") : QStringLiteral("Remote");
     QToolBar * Path = BandOf(TPanelBand::Path);
     QAction * OpenDirectory = SideAction(Left, FOpenDirectoryAction, tr("&Open Directory/Bookmark..."), "open-directory");
     QMenu * OpenDirMenu = new QMenu(this);
@@ -7212,18 +7461,18 @@ void MainWindow::BuildToolbars(QMenu * Options)
       FillOpenDirMenu(OpenDirMenu, Left, OpenDirectory);
     });
     OpenDirectory->setMenu(OpenDirMenu);
-    BandAction(Path, OpenDirectory);
+    BandAction(Path, OpenDirectory, false, Prefix + QStringLiteral("OpenDir"));
     if (QToolButton * Button = qobject_cast<QToolButton *>(Path->widgetForAction(OpenDirectory)))
     {
       Button->setPopupMode(QToolButton::MenuButtonPopup);
     }
-    BandAction(Path, SideAction(Left, FFilterAction, tr("&Filter..."), "filter"));
+    BandAction(Path, SideAction(Left, FFilterAction, tr("&Filter..."), "filter"), false, Prefix + QStringLiteral("Filter"));
     if (Side.Remote != nullptr)
     {
       // As RemoteNavigationToolbar: Find Files after the panel's own.
       QToolBar * Navigation = BandOf(TPanelBand::Navigation);
       Navigation->addSeparator();
-      BandAction(Navigation, SideAction(false, FFindFilesAction, tr("&Find Files..."), "find"), true);
+      BandAction(Navigation, SideAction(false, FFindFilesAction, tr("&Find Files..."), "find"), true, QStringLiteral("RemoteFindFiles"));
     }
     QToolBar * File = BandOf(TPanelBand::File);
     // Upload from the left, download to it; in a local tab, copy.
@@ -7236,21 +7485,43 @@ void MainWindow::BuildToolbars(QMenu * Options)
       FLeftCopyAction = Copy;
       FLeftMoveAction = Move;
     }
-    BandAction(File, Copy, true);
+    BandAction(File, Copy, true, Prefix + QStringLiteral("Copy"));
     File->addSeparator();
-    BandAction(File, Move);
+    BandAction(File, Move, false, Prefix + QStringLiteral("Move"));
     File->addSeparator();
-    BandAction(File, SideAction(Left, FEditAction, tr("&Edit"), "edit"), true);
-    BandAction(File, (Side.Local != nullptr) ? Side.Local->DeleteAction() : Side.Remote->DeleteAction());
-    BandAction(File, (Side.Local != nullptr) ? Side.Local->RenameAction() : Side.Remote->RenameAction());
-    BandAction(File, SideAction(Left, FPropertiesAction, tr("&Properties"), "properties"), true);
+    BandAction(File, SideAction(Left, FEditAction, tr("&Edit"), "edit"), true, Prefix + QStringLiteral("Edit"));
+    BandAction(File, (Side.Local != nullptr) ? Side.Local->DeleteAction() : Side.Remote->DeleteAction(), false, Prefix + QStringLiteral("Delete"));
+    BandAction(File, (Side.Local != nullptr) ? Side.Local->RenameAction() : Side.Remote->RenameAction(), false, Prefix + QStringLiteral("Rename"));
+    BandAction(File, SideAction(Left, FPropertiesAction, tr("&Properties"), "properties"), true, Prefix + QStringLiteral("Properties"));
     File->addSeparator();
-    BandAction(File, SideAction(Left, FDirectorySizesAction, tr("&Calculate Directory Sizes"), "calculate-size"), true);
+    BandAction(File, SideAction(Left, FDirectorySizesAction, tr("&Calculate Directory Sizes"), "calculate-size"), true,
+      Prefix + QStringLiteral("CalculateDirectorySizes"));
     File->addSeparator();
-    BandAction(File, SideAction(Left, FNewFileAction, tr("&File..."), "new-file"));
-    BandAction(File, (Side.Local != nullptr) ? Side.Local->NewFolderAction() : Side.Remote->NewFolderAction());
-    BandAction(File, SideAction(Left, FLinkAction, (Side.Local != nullptr) ? tr("&Shortcut...") : tr("&Link..."), "link"));
+    BandAction(File, SideAction(Left, FNewFileAction, tr("&File..."), "new-file"), false, Prefix + QStringLiteral("NewFile"));
+    BandAction(File, (Side.Local != nullptr) ? Side.Local->NewFolderAction() : Side.Remote->NewFolderAction(), false, Prefix + QStringLiteral("CreateDir"));
+    BandAction(File, SideAction(Left, FLinkAction, (Side.Local != nullptr) ? tr("&Shortcut...") : tr("&Link..."), "link"), false,
+      Prefix + QStringLiteral("AddEditLink"));
     QToolBar * Selection = BandOf(TPanelBand::Selection);
+    // The panel's own buttons: History and Navigation.
+    QToolBar * History = BandOf(TPanelBand::History);
+    QToolBar * PanelNavigation = BandOf(TPanelBand::Navigation);
+    const std::pair<QAction *, const char *> Own[] = {
+      { (Side.Local != nullptr) ? Side.Local->BackAction() : Side.Remote->BackAction(), "Back" },
+      { (Side.Local != nullptr) ? Side.Local->ForwardAction() : Side.Remote->ForwardAction(), "Forward" },
+      { (Side.Local != nullptr) ? Side.Local->ParentAction() : Side.Remote->ParentAction(), "ParentDir" },
+      { (Side.Local != nullptr) ? Side.Local->RootAction() : Side.Remote->RootAction(), "RootDir" },
+      { (Side.Local != nullptr) ? Side.Local->HomeAction() : Side.Remote->HomeAction(), "HomeDir" },
+      { (Side.Local != nullptr) ? Side.Local->RefreshAction() : Side.Remote->RefreshAction(), "Refresh" } };
+    for (const auto & Each : Own)
+    {
+      for (QToolBar * Bar : { History, PanelNavigation })
+      {
+        if ((Bar != nullptr) && Bar->actions().contains(Each.first))
+        {
+          NameBandItem(Bar, Each.first, Prefix + QString::fromLatin1(Each.second));
+        }
+      }
+    }
     for (const auto & Select : { std::make_pair(tr("Sele&ct Files..."), "select-files"),
            std::make_pair(tr("&Unselect Files..."), "unselect-files"), std::make_pair(tr("Select &All"), "select-all") })
     {
@@ -7270,7 +7541,8 @@ void MainWindow::BuildToolbars(QMenu * Options)
           View->SelectByMaskDialog(Role == QStringLiteral("select-files"));
         }
       });
-      BandAction(Selection, Action);
+      BandAction(Selection, Action, false, Prefix + QString::fromLatin1((Select.second == std::string("select-files")) ? "Select" :
+        ((Select.second == std::string("unselect-files")) ? "Unselect" : "SelectAll")));
     }
   }
   // The bands' names, as WinSCP's layout has them; the other local panel's
@@ -7295,6 +7567,9 @@ void MainWindow::BuildToolbars(QMenu * Options)
   QMenu * Toolbars = Options->addMenu(tr("&Toolbars"));
   QMenu * LeftPanel = new QMenu(tr("&Left Panel"), this);
   QMenu * RightPanel = new QMenu(tr("&Right Panel"), this);
+  FToolbarsMenu = Toolbars;
+  FLeftPanelMenu = LeftPanel;
+  FRightPanelMenu = RightPanel;
   const std::pair<const char *, QString> Toggles[] = {
     { "Commands", tr("&Commands Buttons") }, { "Session", tr("Sessio&ns and Tabs Buttons") },
     { "Preferences", tr("&Preferences Buttons") }, { "Sort", tr("So&rt Buttons") }, { "Updates", tr("&Update Button") },
@@ -7415,6 +7690,28 @@ void MainWindow::BuildToolbars(QMenu * Options)
   FLockToolbarsAction->setChecked(Layout.LockToolbars);
   FSelectiveTextAction->setChecked(Layout.SelectiveToolbarText);
   FIconSizeActions[std::clamp(Layout.LargerToolbar, 0, 2)]->setChecked(true);
+  // The panels' bands' own context menus (LocalPanelPopup, RemotePanelPopup).
+  for (const TBand & Band : FBands)
+  {
+    for (QToolBar * Bar : { Band.Bar, Band.Twin })
+    {
+      if ((Bar != nullptr) && (Bar->parentWidget() != this))
+      {
+        Bar->setContextMenuPolicy(Qt::CustomContextMenu);
+        connect(Bar, &QToolBar::customContextMenuRequested, this, [this, Bar](const QPoint & Pos)
+        {
+          QMenu * Menu = ToolbarPopup(Bar);
+          Menu->setAttribute(Qt::WA_DeleteOnClose);
+          Menu->popup(Bar->mapToGlobal(Pos));
+        });
+      }
+    }
+  }
+  // (The Explorer's, once it has its bands.)
+  if (!FExplorer)
+  {
+    ApplyToolbarsButtons(QString::fromStdString(Layout.ToolbarsButtons));
+  }
   ApplyToolbarSettings();
 }
 
@@ -7483,6 +7780,7 @@ void MainWindow::SaveToolbarSettings()
     }
   }
   (FExplorer ? Layout.Explorer.ToolbarsLayout : Layout.ToolbarsLayout) = (Entries.join(QLatin1Char(',')) + QLatin1Char(',')).toStdString();
+  (FExplorer ? Layout.Explorer.ToolbarsButtons : Layout.ToolbarsButtons) = ToolbarsButtons().toStdString();
   Layout.LockToolbars = FLockToolbarsAction->isChecked();
   Layout.SelectiveToolbarText = FSelectiveTextAction->isChecked();
   for (int Size = 0; Size < 3; Size++)

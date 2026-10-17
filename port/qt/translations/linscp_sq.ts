@@ -2275,6 +2275,10 @@ Vendndodhja: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>Butonat &amp;standardë</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;Përshtat shiritin e veglave</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

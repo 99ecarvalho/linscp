@@ -2274,6 +2274,10 @@ Location: %2</source>
         <source>&amp;Standard Buttons</source>
         <translation>စံ ခလုတ်များ(&amp;S)</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>တူးလ်ဘား စိတ်ကြိုက်ပြင်ပါ(&amp;C)</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

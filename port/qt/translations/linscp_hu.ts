@@ -2274,6 +2274,10 @@ Hely: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>Á&amp;llandó gombok</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>Eszköztár &amp;személyre szabása</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

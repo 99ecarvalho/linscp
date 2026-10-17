@@ -2275,6 +2275,10 @@ Location: %2</source>
         <source>&amp;Standard Buttons</source>
         <translation>&amp;Обичайни бутони</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;Персонализиране на лентата с инструменти</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

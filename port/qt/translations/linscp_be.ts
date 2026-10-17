@@ -2276,6 +2276,10 @@ Location: %2</source>
         <source>&amp;Standard Buttons</source>
         <translation>&amp;Стандартныя</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>Дапасаваць панэль &amp;інструментаў</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

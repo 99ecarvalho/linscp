@@ -209,61 +209,62 @@ void MainWindow::ApplyExplorerInterface()
     FillOpenDirMenu(OpenDirMenu, false, OpenDirectory);
   });
   OpenDirectory->setMenu(OpenDirMenu);
-  BandAction(Address, OpenDirectory);
+  BandAction(Address, OpenDirectory, false, QStringLiteral("RemoteOpenDir"));
   if (QToolButton * Button = qobject_cast<QToolButton *>(Address->widgetForAction(OpenDirectory)))
   {
     Button->setPopupMode(QToolButton::MenuButtonPopup);
   }
-  BandAction(Address, SideAction(false, FFilterAction, tr("&Filter..."), "filter"));
+  BandAction(Address, SideAction(false, FFilterAction, tr("&Filter..."), "filter"), false, QStringLiteral("RemoteFilter"));
   Address->addSeparator();
   QAction * FileColors = new QAction(tr("&File Colors..."), this);
   Iconize(FileColors, "preferences");
   connect(FileColors, &QAction::triggered, this, [this]() { PreferencesDialog(::PreferencesDialog::tr("File colors")); });
-  BandAction(Address, FileColors);
+  BandAction(Address, FileColors, false, QStringLiteral("FileColorsPreferences"));
   addToolBarBreak();
 
   // ButtonsToolbar ("Standard Buttons").
   QToolBar * Buttons = NewBand(QStringLiteral("Buttons"), tr("Standard Buttons"));
-  for (QAction * Action : { FPanel->BackAction(), FPanel->ForwardAction() })
-  {
-    BandAction(Buttons, Action);
-  }
+  // (With ButtonsToolbar's names, as WinSCP's Explorer.)
+  BandAction(Buttons, FPanel->BackAction(), false, QStringLiteral("RemoteBack"));
+  BandAction(Buttons, FPanel->ForwardAction(), false, QStringLiteral("RemoteForward"));
   Buttons->addSeparator();
-  for (QAction * Action : { FPanel->ParentAction(), FPanel->RootAction(), FPanel->HomeAction(), FPanel->RefreshAction() })
-  {
-    BandAction(Buttons, Action);
-  }
+  BandAction(Buttons, FPanel->ParentAction(), false, QStringLiteral("RemoteParentDir"));
+  BandAction(Buttons, FPanel->RootAction(), false, QStringLiteral("RemoteRootDir"));
+  BandAction(Buttons, FPanel->HomeAction(), false, QStringLiteral("RemoteHomeDir"));
+  BandAction(Buttons, FPanel->RefreshAction(), false, QStringLiteral("RemoteRefresh"));
   Buttons->addSeparator();
-  BandAction(Buttons, FFindFilesAction);
+  BandAction(Buttons, FFindFilesAction, false, QStringLiteral("RemoteFindFiles"));
   Buttons->addSeparator();
   QAction * Download = SideAction(false, FCopyAction, tr("Down&load..."), "download");
   QMenu * DownloadMenu = new QMenu(this);
   DownloadMenu->addAction(FCurrentCopyAction);
   DownloadMenu->addAction(FCurrentCopyQueueAction);
   Download->setMenu(DownloadMenu);
-  BandAction(Buttons, Download, true);
+  BandAction(Buttons, Download, true, QStringLiteral("RemoteCopy"));
   if (QToolButton * Button = qobject_cast<QToolButton *>(Buttons->widgetForAction(Download)))
   {
     Button->setPopupMode(QToolButton::MenuButtonPopup);
   }
   Buttons->addSeparator();
-  BandAction(Buttons, SideAction(false, FMoveAction, tr("Download and Dele&te..."), "move"));
+  BandAction(Buttons, SideAction(false, FMoveAction, tr("Download and Dele&te..."), "move"), false, QStringLiteral("RemoteMove"));
   Buttons->addSeparator();
-  BandAction(Buttons, FEditAction, true);
-  BandAction(Buttons, FOpenCurrentAction);
-  BandAction(Buttons, FPanel->DeleteAction());
-  BandAction(Buttons, FPropertiesAction, true);
+  BandAction(Buttons, FEditAction, true, QStringLiteral("RemoteEdit"));
+  BandAction(Buttons, FOpenCurrentAction, false, QStringLiteral("CurrentOpen"));
+  BandAction(Buttons, FPanel->DeleteAction(), false, QStringLiteral("RemoteDelete"));
+  BandAction(Buttons, FPropertiesAction, true, QStringLiteral("RemoteProperties"));
   Buttons->addSeparator();
-  BandAction(Buttons, FDirectorySizesAction);
-  BandAction(Buttons, FPanel->RenameAction());
+  BandAction(Buttons, FDirectorySizesAction, false, QStringLiteral("RemoteCalculateDirectorySizes"));
+  BandAction(Buttons, FPanel->RenameAction(), false, QStringLiteral("RemoteRename"));
   Buttons->addSeparator();
-  for (QAction * Action : { FNewFileAction, FPanel->NewFolderAction(), FLinkAction, FConsoleAction, FPuttyAction })
+  const std::pair<QAction *, const char *> Rest[] = { { FNewFileAction, "RemoteNewFile" }, { FPanel->NewFolderAction(), "RemoteCreateDir" },
+    { FLinkAction, "RemoteAddEditLink" }, { FConsoleAction, "Console" }, { FPuttyAction, "Putty" } };
+  for (const auto & Each : Rest)
   {
-    BandAction(Buttons, Action);
+    BandAction(Buttons, Each.first, false, QString::fromLatin1(Each.second));
   }
   Buttons->addSeparator();
-  BandAction(Buttons, FKeepUpToDateAction);
-  BandAction(Buttons, FSynchronizeAction, true);
+  BandAction(Buttons, FKeepUpToDateAction, false, QStringLiteral("Synchronize"));
+  BandAction(Buttons, FSynchronizeAction, true, QStringLiteral("FullSynchronize"));
   addToolBarBreak();
 
   // SelectionToolbar: the Mark menu's selections.
@@ -271,16 +272,18 @@ void MainWindow::ApplyExplorerInterface()
   if (QMenu * Mark = SubMenu(menuBar()->actions(), tr("&Mark")))
   {
     const QList<QAction *> Marks = Mark->actions();
-    for (const QString & Text : { tr("Sele&ct Files..."), tr("&Unselect Files..."), QString(), tr("Select &All"),
-           tr("&Invert Selection"), tr("C&lear Selection"), tr("&Restore Selection") })
+    const std::pair<QString, const char *> Items[] = { { tr("Sele&ct Files..."), "Select" }, { tr("&Unselect Files..."), "Unselect" },
+      { QString(), nullptr }, { tr("Select &All"), "SelectAll" }, { tr("&Invert Selection"), "InvertSelection" },
+      { tr("C&lear Selection"), "ClearSelection" }, { tr("&Restore Selection"), "RestoreSelection" } };
+    for (const auto & Item : Items)
     {
-      if (Text.isEmpty())
+      if (Item.first.isEmpty())
       {
         Selection->addSeparator();
       }
-      else if (QAction * Action = ActionOf(Marks, Text))
+      else if (QAction * Action = ActionOf(Marks, Item.first))
       {
-        BandAction(Selection, Action);
+        BandAction(Selection, Action, false, QString::fromLatin1(Item.second));
       }
     }
   }
@@ -288,22 +291,22 @@ void MainWindow::ApplyExplorerInterface()
 
   // PreferencesToolbar: Preferences, the views, the queue, the tree.
   QToolBar * Preferences = NewBand(QStringLiteral("Preferences"), tr("Preferences"));
-  BandAction(Preferences, FPreferencesAction);
+  BandAction(Preferences, FPreferencesAction, false, QStringLiteral("Preferences"));
   Preferences->addSeparator();
-  BandAction(Preferences, Cycle);
+  BandAction(Preferences, Cycle, false, QStringLiteral("RemoteCycleStyle"));
   if (QToolButton * Button = qobject_cast<QToolButton *>(Preferences->widgetForAction(Cycle)))
   {
     Button->setPopupMode(QToolButton::MenuButtonPopup);
   }
   if (QueueButton != nullptr)
   {
-    BandAction(Preferences, QueueButton, true);
+    BandAction(Preferences, QueueButton, true, QStringLiteral("QueueToggleShow"));
   }
   Preferences->addSeparator();
   Iconize(FQueueFileListAction, "queue-file-list");
   Iconize(FRemoteTreeAction, "tree");
-  BandAction(Preferences, FQueueFileListAction);
-  BandAction(Preferences, FRemoteTreeAction);
+  BandAction(Preferences, FQueueFileListAction, false, QStringLiteral("QueueFileList"));
+  BandAction(Preferences, FRemoteTreeAction, false, QStringLiteral("RemoteTree"));
   for (const char * Name : { "Transfer", "Updates" })
   {
     Band(Shared.value(QString::fromLatin1(Name)), QString::fromLatin1(Name));
@@ -330,6 +333,9 @@ void MainWindow::ApplyExplorerInterface()
   QMenu * OldOptions = SubMenu(menuBar()->actions(), tr("&Options"));
   QMenu * OldToolbars = (OldOptions != nullptr) ? SubMenu(OldOptions->actions(), tr("&Toolbars")) : nullptr;
   QMenu * Toolbars = new QMenu(tr("&Toolbars"), this);
+  FToolbarsMenu = Toolbars;
+  FLeftPanelMenu = nullptr;
+  FRightPanelMenu = nullptr;
   const std::pair<const char *, QString> Toggles[] = {
     { "Address", tr("&Address") }, { "Buttons", tr("&Standard Buttons") }, { "Selection", tr("Se&lection Buttons") },
     { "Session", tr("Sessio&ns and Tabs Buttons") }, { "Preferences", tr("&Preferences Buttons") },
@@ -385,6 +391,7 @@ void MainWindow::ApplyExplorerInterface()
     FCommandLineBar->hide();
     removeToolBar(FCommandLineBar);
   }
+  ApplyToolbarsButtons(QString::fromStdString(Layout.Explorer.ToolbarsButtons));
   ApplyToolbarSettings();
 
   // The menus, as ScpExplorer.dfm's MenuToolbar: Files, Commands, Mark,

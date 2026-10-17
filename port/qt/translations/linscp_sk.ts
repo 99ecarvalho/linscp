@@ -2276,6 +2276,10 @@ Umiestnenie: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>&amp;Štandardné tlačidlá</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>Prispôso&amp;biť panel nástrojov</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>

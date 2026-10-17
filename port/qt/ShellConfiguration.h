@@ -155,6 +155,10 @@ struct TShellSettings
   bool SelectiveToolbarText = true;
   int LargerToolbar = 1;
   UnicodeString CommanderToolbarsLayout;
+  // ScpCommander.ToolbarsButtons: the bands' hidden buttons
+  // ("Band=Item:0,Item:0;Band=...", TCustomScpExplorerForm::
+  // GetToolbarsButtonsStr); and the Explorer's.
+  UnicodeString CommanderToolbarsButtons;
   // ConsoleWin.WindowSize: "width,height,ppi".
   UnicodeString ConsoleWindowSize = L"570,430,96";
   // LoginDialog.SiteSearch (TIncrementalSearch: isNameStartOnly, isName,
@@ -169,6 +173,7 @@ struct TShellSettings
   UnicodeString ExplorerWindowParams;
   UnicodeString ExplorerDirViewParams = L"0;1;0|150,1;70,1;150,1;79,1;62,1;55,0;20,0;150,0;125,0;@96|6;7;8;0;1;2;3;4;5";
   UnicodeString ExplorerToolbarsLayout;
+  UnicodeString ExplorerToolbarsButtons;
   bool ExplorerStatusBar = true;
   bool ExplorerSessionsTabs = true;
   int ExplorerViewStyle = 0;

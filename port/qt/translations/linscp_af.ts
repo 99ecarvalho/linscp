@@ -2275,6 +2275,10 @@ Ligging: %2</translation>
         <source>&amp;Standard Buttons</source>
         <translation>&amp;Standaardknoppies</translation>
     </message>
+    <message>
+        <source>&amp;Customize Toolbar</source>
+        <translation>&amp;Pas nutsbalk aan</translation>
+    </message>
 </context>
 <context>
     <name>OpenDirectoryDialog</name>
