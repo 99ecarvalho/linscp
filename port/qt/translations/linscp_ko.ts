@@ -4807,6 +4807,18 @@ Location: %2</source>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>탐색기의 &apos;보내기&apos;로 설정</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>익명 인증(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>AWS 환경의 자격 증명(&amp;C)</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS 프로필</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4807,6 +4807,18 @@ Location: %2</source>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>اکسپلورر&apos; &apos;ارسال به&apos; میانبر</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>ورود بی نام</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;اعتبار از محیط AWS</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>نمایه AWS</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -561,6 +561,31 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
       CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.SessionRememberPassword = true; });
       Responder.PasswordPrompts = 0;
     }
+    // A2: FTP's anonymous login; A1: S3's credentials from the AWS
+    // environment, by profile.
+    {
+      SiteManager Dialog(&Window);
+      Dialog.SelectNewSite();
+      Dialog.Protocol()->setCurrentIndex(Dialog.Protocol()->findText(QStringLiteral("FTP")));
+      Check(Dialog.AnonymousLogin()->isVisibleTo(&Dialog) && !Dialog.S3CredentialsEnv()->isVisibleTo(&Dialog),
+        "an FTP site offers anonymous login, not S3's credentials");
+      Dialog.AnonymousLogin()->click();
+      Check((Dialog.UserName()->text() == QStringLiteral("anonymous")) && !Dialog.Password()->text().isEmpty(),
+        "which fills the user and password");
+      Dialog.UserName()->setText(QStringLiteral("someone"));
+      Check(!Dialog.AnonymousLogin()->isChecked(), "and unchecks with another user");
+      qputenv("AWS_ACCESS_KEY_ID", "AKIALINSCPTEST");
+      qputenv("AWS_SECRET_ACCESS_KEY", "linscp-secret");
+      Dialog.Protocol()->setCurrentIndex(Dialog.Protocol()->findText(QStringLiteral("Amazon S3")));
+      Check(Dialog.S3CredentialsEnv()->isVisibleTo(&Dialog) && !Dialog.AnonymousLogin()->isVisibleTo(&Dialog),
+        "an S3 site offers the environment's credentials");
+      Dialog.S3CredentialsEnv()->click();
+      Check((Dialog.UserName()->text() == QStringLiteral("AKIALINSCPTEST")) && !Dialog.UserName()->isEnabled() &&
+        Dialog.S3Profile()->isEnabled(), "which fill the access key from the environment, not editable");
+      Check(Dialog.Edited().S3CredentialsEnv && Dialog.Edited().S3Profile.empty(), "the general profile, the site's");
+      qunsetenv("AWS_ACCESS_KEY_ID");
+      qunsetenv("AWS_SECRET_ACCESS_KEY");
+    }
     // Save's own dialog, as WinSCP's TSaveSessionDialog: the name and a
     // folder chosen among the sites' ones; saved there, a child in the tree.
     {

@@ -4812,6 +4812,18 @@ Location: %2</source>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>مستعرض ويندوز &apos;ارسال الى&apos; اختصار</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>دخول كـ مجهول</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>بيانات الاعتماد من بيئة AWS(&amp;C):</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>ملف تعريف AWS</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

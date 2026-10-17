@@ -4807,6 +4807,18 @@ Location: %2</source>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>「送る」メニューに追加</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>匿名ログイン(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>AWS 環境の認証情報(&amp;C):</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS プロファイル</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

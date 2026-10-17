@@ -4808,6 +4808,18 @@ Placering: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Stifinders &apos;Send til&apos;-genvej</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>A&amp;nonymt login</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>Legitimationsoplysninger fra AWS-miljø:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS-profil</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

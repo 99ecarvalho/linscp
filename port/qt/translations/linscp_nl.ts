@@ -4808,6 +4808,18 @@ Locatie: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Verkenner&apos;s snelkoppeling &apos;Kopiëren naar&apos;</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>A&amp;nonieme login</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;Inloggegevens van AWS-omgeving:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS-profiel</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

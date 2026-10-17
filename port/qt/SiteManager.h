@@ -13,6 +13,7 @@
 
 #include "CoreBridge.h"
 
+class QCheckBox;
 class QComboBox;
 class QLabel;
 class QLineEdit;
@@ -76,6 +77,11 @@ public:
   QSpinBox * Port() const { return FPort; }
   QLineEdit * UserName() const { return FUserName; }
   QLineEdit * Password() const { return FPassword; }
+  // FTP's "Anonymous login"; S3's "Credentials from AWS environment" and
+  // its profile (upstream's BasicFtpPanel, BasicS3Panel).
+  QCheckBox * AnonymousLogin() const { return FAnonymous; }
+  QCheckBox * S3CredentialsEnv() const { return FS3CredentialsEnv; }
+  QComboBox * S3Profile() const { return FS3Profile; }
   // The site with the form applied: what Site() returns, and what Advanced
   // edits.
   CoreBridge::TSite Edited() const;
@@ -108,6 +114,13 @@ private:
   QSpinBox * FPort = nullptr;
   QLineEdit * FUserName = nullptr;
   QLineEdit * FPassword = nullptr;
+  QLabel * FUserNameLabel = nullptr;
+  QLabel * FPasswordLabel = nullptr;
+  class QCheckBox * FAnonymous = nullptr;
+  class QCheckBox * FS3CredentialsEnv = nullptr;
+  class QComboBox * FS3Profile = nullptr;
+  void UpdateS3Credentials();
+  void UpdateCredentials();
   QPushButton * FLogin = nullptr;
   QPushButton * FSave = nullptr;
   QPushButton * FRename = nullptr;

@@ -1095,6 +1095,8 @@ enum class TText
   EncryptKeyGenerated,  // "**Encryption key was generated.**..." (unformatted)
   CopyKeyButton,        // "&Copy Key"
   ClosedOnCompletion,   // "Operation was successfully completed. Connection was closed."
+  S3AccessKeyIdPrompt,  // "A&ccess key ID:"
+  S3SecretAccessKeyPrompt, // "Secret access &key:"
   AuthorizedKeys,       // "Public key for pasting into OpenSSH authorized_keys file:" (unformatted)
   KeyWithCertificate,   // the same for a key with its certificate (unformatted)
   SpecialFolderDocuments, // "My documents"
@@ -1650,6 +1652,10 @@ struct TSite
   TAutoSwitch FtpUseMlsd = TAutoSwitch::Auto;
   TAutoSwitch FtpForcePasvIp = TAutoSwitch::Auto;
   TAutoSwitch FtpHost = TAutoSwitch::Auto;
+  // The Login form's S3 "Credentials from AWS environment" and its profile
+  // (empty: the general credentials).
+  bool S3CredentialsEnv = false;
+  std::string S3Profile;
   // Environment > S3.
   std::string S3DefaultRegion;
   bool S3UrlStylePath = false;
@@ -1834,6 +1840,23 @@ struct TS3Credentials
   std::string RoleArn;
 };
 TS3Credentials S3Credentials(const TSite & Site);
+// The Login form's S3 credentials from the AWS environment, as its
+// LoadS3Profiles and UpdateS3Credentials: the profiles there (sorted; the
+// form lists S3GeneralName first, for none), and a profile's (empty: the
+// general) credentials.
+std::vector<std::string> S3Profiles();
+std::string S3GeneralName();
+struct TS3EnvCredentials
+{
+  std::string UserName;
+  std::string Password;
+  std::string SessionToken;
+  std::string RoleArn;
+};
+TS3EnvCredentials S3EnvCredentials(const std::string & Profile);
+// FTP's anonymous login (AnonymousUserName, AnonymousPassword).
+std::string FtpAnonymousUserName();
+std::string FtpAnonymousPassword();
 // Whether a private key file carries its certificate (GetPublicKeyLine's),
 // false when it cannot be read; the key's public line (OpenSSH format),
 // TCoreError when it cannot be read.

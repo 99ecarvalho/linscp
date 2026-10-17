@@ -4808,6 +4808,18 @@ Location: %2</source>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Συντόμευση &apos;Αποστολή προς&apos; της Εξερεύνησης</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>Ανώνυμη είσοδος</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;Διαπιστευτήρια από το περιβάλλον AWS:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>Προφίλ AWS</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -241,6 +241,8 @@ TSite SiteOf(const TSessionData * Data)
   Site.FtpUseMlsd = AutoSwitchOf(Data->FtpUseMlsd);
   Site.FtpForcePasvIp = AutoSwitchOf(Data->FtpForcePasvIp);
   Site.FtpHost = AutoSwitchOf(Data->FtpHost);
+  Site.S3CredentialsEnv = Data->S3CredentialsEnv;
+  Site.S3Profile = Utf8(Data->S3Profile);
   Site.S3DefaultRegion = Utf8(Data->S3DefaultRegion);
   Site.S3UrlStylePath = (Data->S3UrlStyle == s3usPath);
   Site.S3RequesterPays = Data->S3RequesterPays;
@@ -350,6 +352,8 @@ void ApplyAdvanced(TSessionData * Data, const TSite & Site)
   Data->FtpUseMlsd = AutoSwitchOf(Site.FtpUseMlsd);
   Data->FtpForcePasvIp = AutoSwitchOf(Site.FtpForcePasvIp);
   Data->FtpHost = AutoSwitchOf(Site.FtpHost);
+  Data->S3CredentialsEnv = Site.S3CredentialsEnv;
+  Data->S3Profile = FromUtf8(Site.S3Profile);
   Data->S3DefaultRegion = FromUtf8(Site.S3DefaultRegion);
   Data->S3UrlStyle = Site.S3UrlStylePath ? s3usPath : s3usVirtualHost;
   Data->S3RequesterPays = Site.S3RequesterPays;
@@ -1089,6 +1093,58 @@ int TunnelLocalPortNumberLow()
 int TunnelLocalPortNumberHigh()
 {
   return Configuration->TunnelLocalPortNumberHigh;
+}
+
+std::vector<std::string> S3Profiles()
+{
+  std::vector<std::string> Result;
+  try
+  {
+    std::unique_ptr<TStringList> Profiles(new TStringList());
+    std::unique_ptr<TStrings> Found(GetS3Profiles());
+    Profiles->AddStrings(Found.get());
+    Profiles->Sort();
+    for (int Index = 0; Index < Profiles->Count; Index++)
+    {
+      Result.push_back(Utf8(Profiles->Strings[Index]));
+    }
+  }
+  catch (Exception &)
+  {
+  }
+  return Result;
+}
+
+std::string S3GeneralName()
+{
+  return Utf8(LoadStr(LOGIN_S3_GENERAL_CREDENTIALS));
+}
+
+TS3EnvCredentials S3EnvCredentials(const std::string & Profile)
+{
+  TS3EnvCredentials Result;
+  try
+  {
+    const UnicodeString AProfile = FromUtf8(Profile);
+    Result.UserName = Utf8(S3EnvUserName(AProfile));
+    Result.Password = Utf8(S3EnvPassword(AProfile));
+    Result.SessionToken = Utf8(S3EnvSessionToken(AProfile));
+    Result.RoleArn = Utf8(S3EnvRoleArn(AProfile));
+  }
+  catch (Exception &)
+  {
+  }
+  return Result;
+}
+
+std::string FtpAnonymousUserName()
+{
+  return Utf8(::AnonymousUserName);
+}
+
+std::string FtpAnonymousPassword()
+{
+  return Utf8(::AnonymousPassword);
 }
 
 }  // namespace CoreBridge

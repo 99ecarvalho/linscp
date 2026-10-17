@@ -4808,6 +4808,18 @@ Ort: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>In Windows Explorers „Senden an“-Menü aufnehmen</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>A&amp;nonym anmelden</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>Zugangsdaten von AWS &amp;CLI</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS-Profil</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

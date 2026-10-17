@@ -4807,6 +4807,18 @@ Location: %2</source>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Explorer ၏ &apos;Send To&apos; ဖြတ်လမ်း</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>အမည်မဖော်ဘဲ ဝင်ရောက်ရန်(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>AWS ပတ်ဝန်းကျင်မှ အထောက်အထားများ(&amp;C):</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS ပရိုဖိုင်</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

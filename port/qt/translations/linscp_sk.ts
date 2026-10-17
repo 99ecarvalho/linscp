@@ -4809,6 +4809,18 @@ Umiestnenie: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Odkaz v menu &apos;&amp;Odoslať kam&apos; v Prieskumníkovi Windows</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>Anon&amp;ymné prihlásenie</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>Prihlasova&amp;cie údaje z prostredia AWS:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>Profil AWS</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4808,6 +4808,18 @@ Ligging: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Explorer se &apos;Stuur na&apos;-kortpad</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>A&amp;nonieme aanmelding</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;Geloofsbriewe uit AWS-omgewing:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS-profiel</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

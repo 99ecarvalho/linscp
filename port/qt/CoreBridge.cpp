@@ -1868,6 +1868,8 @@ std::string Text(TText Text)
     case TText::EncryptKeyGenerated: return Utf8(UnformatMessage(LoadStr(ENCRYPT_KEY_GENERATED)));
     case TText::CopyKeyButton: Ident = COPY_KEY_BUTTON; break;
     case TText::ClosedOnCompletion: Ident = CLOSED_ON_COMPLETION; break;
+    case TText::S3AccessKeyIdPrompt: Ident = S3_ACCESS_KEY_ID_PROMPT; break;
+    case TText::S3SecretAccessKeyPrompt: Ident = S3_SECRET_ACCESS_KEY_PROMPT; break;
     case TText::AuthorizedKeys: return Utf8(UnformatMessage(LoadStr(LOGIN_AUTHORIZED_KEYS)));
     case TText::KeyWithCertificate: return Utf8(UnformatMessage(LoadStr(LOGIN_KEY_WITH_CERTIFICATE)));
     case TText::SpecialFolderDocuments: Ident = SPECIAL_FOLDER_MY_DOCUMENTS; break;

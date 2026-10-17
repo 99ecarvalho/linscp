@@ -4809,6 +4809,18 @@ Location: %2</source>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>У меню «Адправіць» Правадніка</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>&amp;Ананімны ўваход</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;Уліковыя даныя з асяроддзя AWS:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>Профіль AWS</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

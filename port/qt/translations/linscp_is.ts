@@ -4808,6 +4808,18 @@ Staðsetning: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>‚Senda til‘-Explorer-skyndivísir</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>&amp;Nafnlaus innskráning</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>Au&amp;ðkenni úr AWS-umhverfi:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS-snið</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4807,6 +4807,18 @@ Vị trí: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Lối tắt trong menu &apos;Gửi đến&apos; của Explorer</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>Đăng nhập &amp;ẩn danh</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;Dùng thông tin xác thực từ môi trường AWS:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>Hồ sơ AWS</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

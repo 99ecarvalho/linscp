@@ -4808,6 +4808,18 @@ Local: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Atalho &apos;Enviar para&apos; do Explorer</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>Login a&amp;nônimo</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;Credenciais do ambiente AWS:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>Perfil da AWS</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4809,6 +4809,18 @@ Vieta: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Explorer &apos;Siųsti į&apos; šaukinys</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>A&amp;noniminis prisijungimas</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;AWS aplinkos prisijungimo duomenys:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS profilis</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

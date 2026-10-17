@@ -4808,6 +4808,18 @@ Sijainti: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Resurssienhallinnan Lähetä-pikakuvake</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>&amp;Anonyymi kirjautuminen</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>A&amp;WS-ympäristön tunnisteet:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS-profiili</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

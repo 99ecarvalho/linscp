@@ -4809,6 +4809,18 @@ Atrašanās vieta: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Explorer &apos;Sūtīt uz&apos; īsceļš</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>A&amp;nonīma pieteikšanās</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;Akreditācijas dati no AWS vides:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS profils</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

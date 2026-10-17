@@ -4808,6 +4808,18 @@ Lokasyon: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Hanapin sa &apos;s &apos;At Ipadala sa&apos; Shortcut</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>A&amp;nonymous na pag login</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>Mga &amp;kredensyal mula sa AWS environment:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS profile</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

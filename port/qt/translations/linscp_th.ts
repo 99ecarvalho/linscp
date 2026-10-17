@@ -4807,6 +4807,18 @@ Location: %2</source>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>ทางลัด &apos;Send To&apos; ของ Explorer</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>เข้าสู่ระบบแบบไม่ระบุตัวตน(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>ข้อมูลประจำตัวจากสภาพแวดล้อม AWS(&amp;C):</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>โปรไฟล์ AWS</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

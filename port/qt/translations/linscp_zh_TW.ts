@@ -4807,6 +4807,18 @@ Location: %2</source>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>檔案總管的&apos;傳送到&apos; 捷徑</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>匿名登入(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>來自 AWS 環境的憑證(&amp;C):</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS 設定檔</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

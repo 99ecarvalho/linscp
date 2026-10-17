@@ -4808,6 +4808,18 @@ Location: %2</source>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>קיצור &amp;דרך &apos; שלח-אל &apos;</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>כניסה א&amp;נונימית</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;אישורים מסביבת AWS:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>פרופיל AWS</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

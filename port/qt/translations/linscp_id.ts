@@ -4807,6 +4807,18 @@ Lokasi: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Pintasan &apos;Kirim ke&apos; Eksplorer</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>Login anonim</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;Kredensial dari lingkungan AWS:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>Profil AWS</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

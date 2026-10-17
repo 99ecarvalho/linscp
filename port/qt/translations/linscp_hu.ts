@@ -4807,6 +4807,18 @@ Hely: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Ikon a &amp;Küldés menübe</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>&amp;Névtelen bejelentkezés</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;Hitelesítési adatok az AWS környezetből:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS-profil</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

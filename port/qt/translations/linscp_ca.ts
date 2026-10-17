@@ -4808,6 +4808,18 @@ Ubicació: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Drecera &apos;Envia a&apos; de l&apos;Explorador</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>Entrada a&amp;nònima</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;Credencials de l&apos;entorn AWS:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>Perfil d&apos;AWS</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

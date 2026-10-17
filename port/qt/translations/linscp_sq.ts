@@ -4808,6 +4808,18 @@ Vendndodhja: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Shkurtore &apos;Dërgo te&apos; e Explorer</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>Hyrje a&amp;nonime</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;Kredencialet nga mjedisi AWS:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>Profili AWS</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -6,6 +6,7 @@
 
 #include <QCheckBox>
 #include <QComboBox>
+#include <QSignalBlocker>
 #include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QFormLayout>
@@ -131,11 +132,48 @@ SiteManager::SiteManager(QWidget * Parent) :
   FPort->setRange(1, 65535);
   Form->addRow(tr("Po&rt number:"), FPort);
   FUserName = new QLineEdit(FormPanel);
-  Form->addRow(tr("&User name:"), FUserName);
+  FUserNameLabel = new QLabel(tr("&User name:"), FormPanel);
+  FUserNameLabel->setBuddy(FUserName);
+  Form->addRow(FUserNameLabel, FUserName);
   FPassword = new QLineEdit(FormPanel);
   FPassword->setEchoMode(QLineEdit::Password);
-  Form->addRow(tr("&Password:"), FPassword);
+  FPasswordLabel = new QLabel(tr("&Password:"), FormPanel);
+  FPasswordLabel->setBuddy(FPassword);
+  Form->addRow(FPasswordLabel, FPassword);
   FormLayout->addLayout(Form);
+  // BasicFtpPanel: anonymous login, the user and password it implies.
+  FAnonymous = new QCheckBox(tr("A&nonymous login"), FormPanel);
+  connect(FAnonymous, &QCheckBox::clicked, this, [this](bool Checked)
+  {
+    if (Checked)
+    {
+      FUserName->setText(QString::fromStdString(CoreBridge::FtpAnonymousUserName()));
+      FPassword->setText(QString::fromStdString(CoreBridge::FtpAnonymousPassword()));
+    }
+    UpdateCredentials();
+  });
+  FormLayout->addWidget(FAnonymous);
+  // BasicS3Panel: the credentials from the AWS environment, by profile.
+  QHBoxLayout * S3Row = new QHBoxLayout();
+  FS3CredentialsEnv = new QCheckBox(tr("&Credentials from AWS environment:"), FormPanel);
+  FS3Profile = new QComboBox(FormPanel);
+  FS3Profile->setEditable(true);
+  FS3Profile->setAccessibleName(tr("AWS profile"));
+  S3Row->addWidget(FS3CredentialsEnv);
+  S3Row->addWidget(FS3Profile, 1);
+  FormLayout->addLayout(S3Row);
+  connect(FS3CredentialsEnv, &QCheckBox::clicked, this, [this]() { UpdateS3Credentials(); UpdateCredentials(); });
+  connect(FS3Profile, &QComboBox::currentTextChanged, this, [this]()
+  {
+    if (!FLoading)
+    {
+      UpdateS3Credentials();
+    }
+  });
+  for (QLineEdit * Edit : { FUserName, FPassword })
+  {
+    connect(Edit, &QLineEdit::textChanged, this, [this]() { UpdateCredentials(); });
+  }
   // As upstream's: Advanced..., with Edit Raw Settings beside it.
   FAdvanced = new QToolButton(FormPanel);
   FAdvanced->setText(tr("Ad&vanced..."));
@@ -426,7 +464,60 @@ void SiteManager::Load(const CoreBridge::TSite & Site)
   FHostName->setText(QString::fromStdString(Site.HostName));
   FUserName->setText(QString::fromStdString(Site.UserName));
   FPassword->setText(QString::fromStdString(Site.Password));
+  // LoadS3Profiles: the general credentials first.
+  {
+    const QSignalBlocker Blocker(FS3Profile);
+    FS3Profile->clear();
+    FS3Profile->addItem(QString::fromStdString(CoreBridge::S3GeneralName()));
+    for (const std::string & Profile : CoreBridge::S3Profiles())
+    {
+      FS3Profile->addItem(QString::fromStdString(Profile));
+    }
+    FS3Profile->setCurrentText(Site.S3Profile.empty() ? FS3Profile->itemText(0) : QString::fromStdString(Site.S3Profile));
+  }
+  FS3CredentialsEnv->setChecked(Site.S3CredentialsEnv);
   FLoading = false;
+  UpdateS3Credentials();
+  UpdateCredentials();
+}
+
+// UpdateS3Credentials: from the environment, the profile's.
+void SiteManager::UpdateS3Credentials()
+{
+  if (FS3CredentialsEnv->isChecked())
+  {
+    const QString Profile = (FS3Profile->currentText() == FS3Profile->itemText(0)) ? QString() : FS3Profile->currentText();
+    const CoreBridge::TS3EnvCredentials Credentials = CoreBridge::S3EnvCredentials(Profile.toStdString());
+    FUserName->setText(QString::fromStdString(Credentials.UserName));
+    FPassword->setText(QString::fromStdString(Credentials.Password));
+  }
+}
+
+// As UpdateControls: FTP's anonymous login checked by its user and
+// password; S3's credentials from the environment instead of typed ones,
+// its labels the access key's.
+void SiteManager::UpdateCredentials()
+{
+  const TProtocol Protocol = static_cast<TProtocol>(FProtocol->currentData().toInt());
+  const bool Ftp = (Protocol == TProtocol::Ftp);
+  const bool S3 = (Protocol == TProtocol::S3);
+  FAnonymous->setVisible(Ftp);
+  FAnonymous->setChecked(
+    (FUserName->text().compare(QString::fromStdString(CoreBridge::FtpAnonymousUserName()), Qt::CaseInsensitive) == 0) &&
+    (FPassword->text().compare(QString::fromStdString(CoreBridge::FtpAnonymousPassword()), Qt::CaseInsensitive) == 0));
+  FS3CredentialsEnv->setVisible(S3);
+  FS3Profile->setVisible(S3);
+  const QTreeWidgetItem * Item = FTree->currentItem();
+  const int Kind = (Item != nullptr) ? Item->data(0, KindRole).toInt() : FolderKind;
+  const bool Form = (Kind == SiteKind) || (Kind == NewSiteKind);
+  const bool Environment = S3 && FS3CredentialsEnv->isChecked();
+  FS3Profile->setEnabled(Form && Environment);
+  FUserName->setEnabled(Form && !Environment);
+  FPassword->setEnabled(Form && !Environment);
+  FUserNameLabel->setText(S3 ? CoreText(CoreBridge::TText::S3AccessKeyIdPrompt) : tr("&User name:"));
+  FPasswordLabel->setText(S3 ? CoreText(CoreBridge::TText::S3SecretAccessKeyPrompt) : tr("&Password:"));
+  FUserNameLabel->setEnabled(FUserName->isEnabled());
+  FPasswordLabel->setEnabled(FPassword->isEnabled());
 }
 
 // As the Login dialog: the encryption choices follow the protocol, and the
@@ -452,6 +543,12 @@ void SiteManager::ProtocolChanged()
       FEncryption->setCurrentIndex((Index >= 0) ? Index : ((Protocol == TProtocol::S3) ? 1 : 0));
     }
   }
+  if ((sender() == FProtocol) && !FLoading)
+  {
+    // TransferProtocolComboChange: a new protocol, no environment's credentials.
+    FS3CredentialsEnv->setChecked(false);
+  }
+  UpdateCredentials();
   const bool HasEncryption = (FEncryption->count() > 0);
   FEncryptionLabel->setVisible(HasEncryption);
   FEncryption->setVisible(HasEncryption);
@@ -479,6 +576,8 @@ CoreBridge::TSite SiteManager::Edited() const
   Site.Port = (FPort->value() == CoreBridge::DefaultPort(Site.Protocol, Site.Encryption)) ? 0 : FPort->value();
   Site.UserName = FUserName->text().toStdString();
   Site.Password = FPassword->text().toStdString();
+  Site.S3CredentialsEnv = (Site.Protocol == TProtocol::S3) && FS3CredentialsEnv->isChecked();
+  Site.S3Profile = (FS3Profile->currentText() == FS3Profile->itemText(0)) ? std::string() : FS3Profile->currentText().toStdString();
   return Site;
 }
 
@@ -871,10 +970,12 @@ void SiteManager::UpdateButtons()
   FAdvanced->setEnabled(Form);
   FRename->setEnabled((Kind == SiteKind) || (Kind == FolderKind));
   FDelete->setEnabled(Kind != NewSiteKind);
-  for (QWidget * Field : std::initializer_list<QWidget *>{ FProtocol, FEncryption, FHostName, FPort, FUserName, FPassword })
+  for (QWidget * Field : std::initializer_list<QWidget *>{ FProtocol, FEncryption, FHostName, FPort, FUserName, FPassword,
+         FAnonymous, FS3CredentialsEnv })
   {
     Field->setEnabled(Form);
   }
+  UpdateCredentials();
 }
 
 bool SiteManager::CreateSessionShortcut(bool SendTo)

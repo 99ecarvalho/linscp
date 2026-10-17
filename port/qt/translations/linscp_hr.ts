@@ -4809,6 +4809,18 @@ Lokacija: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Explorer prečac u &apos;Send to&apos;</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>Anonimni pristup</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;Vjerodajnice iz AWS okruženja:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS profil</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

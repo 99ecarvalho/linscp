@@ -4808,6 +4808,18 @@ Asukoht: %2</translation>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Lisa seanss &amp;Exploreri &apos;Saada&apos;-menüüsse</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>&amp;Anonüümne sisselogimine</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;Volitused AWS-i keskkonnast:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS-i profiil</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

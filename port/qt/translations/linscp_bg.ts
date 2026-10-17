@@ -4808,6 +4808,18 @@ Location: %2</source>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Препратка в „Изпращане до“ на изследователя</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>&amp;Безименно влизане</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;Удостоверения от средата на AWS:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>Профил на AWS</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4809,6 +4809,18 @@ Location: %2</source>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Кратенка &apos;Испрати до&apos; во Explorer</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>А&amp;нонимна најава</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>&amp;Акредитиви од AWS околина:</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS профил</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

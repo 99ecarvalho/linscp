@@ -4808,6 +4808,18 @@ Location: %2</source>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>Explorer का &apos;इसे भेजें&apos; शॉर्टकट</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>अनाम लॉगिन(&amp;N)</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>AWS परिवेश से क्रेडेंशियल(&amp;C):</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS प्रोफ़ाइल</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

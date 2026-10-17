@@ -4808,6 +4808,18 @@ Location: %2</source>
         <source>Explorer&apos;s &apos;Send To&apos; Shortcut</source>
         <translation>உலாவியின் &apos;அனுப்பு&apos; குறுக்குவழி</translation>
     </message>
+    <message>
+        <source>A&amp;nonymous login</source>
+        <translation>பெயரில்லாத உள்நுழைவு</translation>
+    </message>
+    <message>
+        <source>&amp;Credentials from AWS environment:</source>
+        <translation>அவசே சூழலில்லிருந்து நற்சான்றிதழ்கள்</translation>
+    </message>
+    <message>
+        <source>AWS profile</source>
+        <translation>AWS சுயவிவரம்</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>
