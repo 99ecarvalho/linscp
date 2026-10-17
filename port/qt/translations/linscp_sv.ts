@@ -3405,6 +3405,26 @@ Plats: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Använd filsystemets snabbmeny</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Rensa gamla temporära kataloger vid uppstart</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;Fråga innan rensning</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Lägg till &amp;sessionsnamn till temporära sökvägen</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Lägg till f&amp;järrsökväg till temporära sökvägen</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Behåll tillfälliga kopior av fjärrfiler i &amp;deterministiska sökvägar</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

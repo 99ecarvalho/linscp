@@ -3405,6 +3405,26 @@ Sijainti: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Näytä järjestelmän tiedostokontekstivalikko</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Tyhjennä turhat väliaikaiskansiot käynnistyksen yhteydessä</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>K&amp;ysy ennen tyhjennystä</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Lisää istunnon nimi väliaikaiseen polkuun</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Lisää etäpolku väliaikaiseen polkuun</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Säilytä väliaikaiset kopiot etätiedostoista</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

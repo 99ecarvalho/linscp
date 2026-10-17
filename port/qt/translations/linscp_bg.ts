@@ -3405,6 +3405,26 @@ Location: %2</source>
         <source>Use &amp;system file context menu</source>
         <translation>Използване на &amp;системния контекстен изборник за файлове</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Почистване на остарелите временни папки при стартиране</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;Питане преди почистване</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Добавяне на името на &amp;сесията към временния път</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Добавяне на отдалечения &amp;път към временния път</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Временните копия на отдалечените файлове в &amp;детерминирани пътища</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

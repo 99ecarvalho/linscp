@@ -3405,6 +3405,26 @@ Ort: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>System-Kontextmenü des &amp;Betriebssystems verwenden</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>Veraltete temporäre Verzeichnisse beim Start bereinigen</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>Vor dem Bereinigen &amp;nachfragen</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Namen der &amp;Sitzung an den temporären Pfad anhängen</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>&amp;Pfad der Gegenstelle an den temporären Pfad anhängen</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Temporäre Kopien von Gegestellendateien in &amp;determinist. Pfaden behalten</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

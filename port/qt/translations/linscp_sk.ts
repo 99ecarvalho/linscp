@@ -3406,6 +3406,26 @@ Umiestnenie: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Použiť kontextové menu systému pre súbor</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>Vy&amp;čistiť nadbytočné priečinky s dočasnými súbormi pri spustení</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>Opýt&amp;ať sa pred vyčistením</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Pr&amp;ipojiť názov relácie k dočasnej ceste</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Pripo&amp;jiť vzdialenú cestu k dočasnej ceste</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Zachovať dočasné kópie vzdialených súborov v deterministických cestách</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -1,0 +1,15 @@
+List a directory being deleted with the platform's path delimiter.
+
+DoRecursiveDeleteFile lists the directory's entries with FileName + L"\\*".
+On POSIX the backslash is not a path delimiter: the search looked in the
+parent directory for a name "<dir>\*", found nothing, and so the directory
+was not deleted (the temporary folders' cleanup failed for an empty one).
+Built with IncludeTrailingBackslash, as the rest of core builds paths, the
+delimiter is the platform's: on Windows the same backslash as before, so
+upstream's behaviour is unchanged. Line counts are unchanged.
+
+--- a/source/core/Common.cpp
++++ b/source/core/Common.cpp
+@@ -2506,1 +2506,1 @@
+-        Result = (FindFirstUnchecked(FileName + L"\\*", faAnyFile, SearchRec) == 0);
++        Result = (FindFirstUnchecked(IncludeTrailingBackslash(FileName) + L"*", faAnyFile, SearchRec) == 0);

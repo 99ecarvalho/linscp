@@ -3405,6 +3405,26 @@ Localização: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Usar menu de contexto de ficheiro de &amp;sistema</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>Limpar diretórios temporários obsoletos ao iniciar</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>Perguntar &amp;antes de limpar</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Anexar nome da &amp;sessão ao trajeto temporário</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Anexar trajeto remoto ao trajeto temporário</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Manter cópias temporárias dos ficheiros remotos em &amp;determinados caminhos</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

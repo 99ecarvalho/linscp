@@ -3406,6 +3406,26 @@ Location: %2</source>
         <source>Use &amp;system file context menu</source>
         <translation>Користи &amp;системско контекст мени за датотеки</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Исчисти застарени привремени директориуми при стартување</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;Прашај пред чистење</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Додади &amp;име на сесијата на привремената патека</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Додади оддалечена &amp;патека на привремената патека</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Чувај привремени копии на оддалечени датотеки во де&amp;терминистички патеки</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

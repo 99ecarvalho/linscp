@@ -3404,6 +3404,26 @@ Location: %2</source>
         <source>Use &amp;system file context menu</source>
         <translation>시스템 파일 컨텍스트 메뉴 사용(&amp;S)</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>시작 시 필요없는 임시 디렉터리 삭제(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>삭제 시 확인(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>임시 경로에 세션 이름 추가(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>임시 경로에 원격 경로 추가(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>선택한 경로에 원격 파일의 임시 복사본 유지(&amp;D)</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

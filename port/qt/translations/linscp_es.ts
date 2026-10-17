@@ -3405,6 +3405,26 @@ Ruta: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Usar el menú de contexto del &amp;sistema de archivos</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Limpiar directorios temporales obsoletos al iniciar</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;Preguntar antes de limpiar</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Anexar nombre de &amp;sesión a la ruta temporal</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Anexar ruta remota a la ruta tem&amp;poral</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Conservar copias de archivos remotos en rutas determinísticas</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

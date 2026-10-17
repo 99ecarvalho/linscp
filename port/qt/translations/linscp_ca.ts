@@ -3405,6 +3405,26 @@ Ubicació: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>&amp;Utilitza menú contextual del fitxer de sistema</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Neteja els directoris temporals obsolets a l&apos;inici</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;Pregunta abans de netejar</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Afegeix el nom de &amp;sessió al camí temporal</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Afegeix el camí &amp;remot al camí temporal</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>&amp;Mantén còpies temporals dels fitxers remots en camins ben determinats</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

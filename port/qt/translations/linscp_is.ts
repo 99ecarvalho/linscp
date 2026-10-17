@@ -3405,6 +3405,26 @@ Staðsetning: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Nota samhengisvalmynd &amp;skráakerfis</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Hreinsa upp úrelt tímabundin skráasöfn við ræsingu</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;Spyrja fyrir hreinsun</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Bæta &amp;lotunafni við tímabundna slóð</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Bæta fjarrænni &amp;slóð við tímabundna slóð</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Geyma tímabundin afrita af fjarrænum skrám á &amp;ákvæðum slóðum</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

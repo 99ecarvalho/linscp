@@ -269,6 +269,8 @@ public:
   // those that could not be removed).
   bool AnyTemporaryFolders();
   void CleanupTemporaryFolders();
+  // TWinConfiguration::DoFindTemporaryFolders: NULL when there are none.
+  TStrings * FindTemporaryFolders(bool OnlyFirst);
   // The bookmarks, kept as TWinConfiguration keeps them (its Bookmarks
   // key): per site, by session key, and shared.
   TBookmarks * Bookmarks() const { return FBookmarks.get(); }
@@ -334,8 +336,6 @@ protected:
   virtual void __fastcall Default();
 
 private:
-  // TWinConfiguration::DoFindTemporaryFolders: NULL when there are none.
-  TStrings * FindTemporaryFolders(bool OnlyFirst);
 
   bool FOverridden = false;
   LCID FSavedLocale = 0;

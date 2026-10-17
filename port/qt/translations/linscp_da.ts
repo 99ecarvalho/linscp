@@ -3405,6 +3405,26 @@ Placering: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Brug systemfil kontekstmenu</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>Ryd op i forældede midlertidige mapper ved opstart</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>Spørg før oprydning</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Tilføj &amp;sessionsnavn til midlertidig sti</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Tilføj &amp;fjernsti til midlertidig sti</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Behold midlertidige kopier af fjernfiler i deterministiske stier</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

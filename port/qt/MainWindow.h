@@ -252,6 +252,10 @@ public:
   // address bar in the Explorer), IncrementalSearchStartAction (Ctrl+F: the
   // panel's search started). WinSCP's action list runs these first, before
   // the toggles with the same keys.
+  // As Setup.cpp's TemporaryDirectoryCleanup, at start-up when no other
+  // instance runs: the temporary folders past runs left deleted, after
+  // asking (Yes, No, Open them; Never ask again) when the preferences say.
+  void TemporaryDirectoryCleanup();
   void GoToTree();
   void GoToCommandLine();
   void GoToAddressBar();

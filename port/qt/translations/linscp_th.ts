@@ -3404,6 +3404,26 @@ Location: %2</source>
         <source>Use &amp;system file context menu</source>
         <translation>&amp;ใช้เมนูบริบทไฟล์ของระบบ</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;ล้างไดเรกทอรีชั่วคราวที่ล้าสมัยเมื่อเริ่มต้น</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;ถามก่อนล้าง</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>เพิ่มชื่อ&amp;เซสชันในพาธชั่วคราว</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>เพิ่ม&amp;พาธระยะไกลในพาธชั่วคราว</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>เก็บสำเนาชั่วคราวของไฟล์ระยะไกลในพาธที่&amp;กำหนดแน่นอน</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

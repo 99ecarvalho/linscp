@@ -3404,6 +3404,26 @@ Location: %2</source>
         <source>Use &amp;system file context menu</source>
         <translation>Windows のコンテキスト メニューを表示する(&amp;S)</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>起動時に一時フォルダ内を消去する(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>消去する前に尋ねる(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>一時フォルダにセッション名を追加する(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>一時フォルダにリモートパスを追加する(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>リモートファイルを一時フォルダの一意のパスに残す(&amp;D)</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

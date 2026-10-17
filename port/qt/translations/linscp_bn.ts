@@ -3405,6 +3405,26 @@ Location: %2</source>
         <source>Use &amp;system file context menu</source>
         <translation>সিস্টেমের ফাইল কনটেক্সট মেনু ব্যবহার করুন(&amp;S)</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>শুরুতে পুরনো অস্থায়ী ফোল্ডার পরিষ্কার করুন(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>পরিষ্কারের আগে জিজ্ঞাসা করুন(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>অস্থায়ী পাথে সেশনের নাম যোগ করুন(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>অস্থায়ী পাথে রিমোট পাথ যোগ করুন(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>রিমোট ফাইলের অস্থায়ী কপি নির্দিষ্ট পাথে রাখুন(&amp;D)</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

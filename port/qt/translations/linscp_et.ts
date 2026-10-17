@@ -3405,6 +3405,26 @@ Asukoht: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Kasuta &amp;süsteemi faili kontekstimenüüd</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Programmi avamisel kustutatakse aegunud kataloogid ära</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>Enne k&amp;ustutamist küsitakse</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>&amp;Igale sessioonile luuakse nimeline alamkataloog</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>&amp;Vastavalt faili asukohale serveris luuakse alamkataloogid</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Hoia kaugfailide ajutisi koopiaid &amp;kindlates asukohtades</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -3404,6 +3404,26 @@ Konum: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Sistem &amp;dosya sağ tık menüsü kullanılsın</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Sahipsiz geçici klasörler açılışta silinsin</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>Silinmeden &amp;önce onay istensin</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Oturum adı &amp;geçici yola eklensin</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>&amp;Uzak yol geçici yola eklensin</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Uzak &amp;dosyaların geçici kopyaları belirleyici yollara kaydedilsin</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

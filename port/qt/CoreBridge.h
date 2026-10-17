@@ -670,6 +670,14 @@ struct TPreferences
   std::string CustomIniFile;
   std::string RandomSeedFile;
   std::string TemporaryDirectory;
+  // Storage's temporary directory options (TemporaryDirectoryCleanup,
+  // ConfirmTemporaryDirectoryCleanup, TemporaryDirectoryAppendSession,
+  // TemporaryDirectoryAppendPath, TemporaryDirectoryDeterministic).
+  bool TemporaryDirectoryCleanup = true;
+  bool ConfirmTemporaryDirectoryCleanup = true;
+  bool TemporaryDirectoryAppendSession = false;
+  bool TemporaryDirectoryAppendPath = true;
+  bool TemporaryDirectoryDeterministic = false;
   // Environment's confirmations (core's, the GUI's and WinConfiguration's,
   // as TPreferencesDialog has them): drag & drop transfers confirmed,
   // not, or until "Do not show again" (Auto, the default).
@@ -1123,6 +1131,8 @@ enum class TText
   IncrementalSearchNext, // "(press Tab for next)"
   ExecuteAppError,      // "Cannot execute '%s'."
   TimeLeftCalculating,  // "Calculating..."
+  CleanTempConfirm,     // "**Do you want to delete past temporary folders?**...%d..." (unformatted)
+  OpenButton,           // "&Open"
   SynchronizeCompare,   // "Comparing"
   ExportConfigurationTitle, // "Select file to export configuration to"
   ImportConfigurationTitle, // "Select file to import configuration from"
@@ -1907,6 +1917,10 @@ bool HostNameIsUrl(const std::string & HostName);
 // Name, or with " (n)" after it, as TNamedObject::MakeUniqueIn: no stored
 // site's.
 std::string UniqueSiteName(const std::string & Name);
+// The temporary folders past runs left (TWinConfiguration's
+// FindTemporaryFolders), and deleted (CleanupTemporaryFolders).
+std::vector<std::string> TemporaryFolders();
+void CleanupTemporaryFolders();
 // Core's time texts: a span (FormatDateTimeSpan, "0:00:05"), and now's
 // time (TDateTime::TimeString).
 std::string TimeSpanText(double Seconds);

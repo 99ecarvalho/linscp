@@ -3404,6 +3404,26 @@ Location: %2</source>
         <source>Use &amp;system file context menu</source>
         <translation>استفاده از فهرست محتوای پرونده های سیستمی</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>پاک کردن پوشه های موقت منسوخ شده در ابتدای راه اندازی برنامه</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>قبل از پاک کردن پرسیده شود</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>افزودن نام جلسه به مسیر موقت</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>افزودن مسیر ارتباط راه دور به مسیر موقت</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>نگهداری رونوشت موفت از پرونده های ارتباط راه دور در مسیر مشخص</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

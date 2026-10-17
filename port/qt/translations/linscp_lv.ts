@@ -3406,6 +3406,26 @@ Atrašanās vieta: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Izmantot &amp;sistēmas failu konteksta izvēlni</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Iztīrīt novecojušās pagaidu mapes startējot</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;Jautāt pirms tīrīšanas</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Pievienot &amp;sesijas nosaukumu pagaidu ceļam</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Pievienot attālo &amp;ceļu pagaidu ceļam</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Glabāt attālo failu pagaidu kopijas &amp;noteiktos ceļos</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

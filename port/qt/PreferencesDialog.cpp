@@ -448,6 +448,7 @@ void PreferencesDialog::UpdateControls()
     FCustomIniEdit->setEnabled(FCustomIniStorage->isChecked());
   }
   FTemporaryEdit->setEnabled(FCustomTemporary->isChecked());
+  FConfirmTemporaryCleanup->setEnabled(FTemporaryCleanup->isChecked());
 }
 
 // As TPreferencesDialog::UpdateCopyParamListView: the default first, then
@@ -912,6 +913,26 @@ QWidget * PreferencesDialog::MakeStoragePage(const TPreferences & Preferences)
   TemporaryLayout->addWidget(FCustomTemporary, 2, 0);
   TemporaryLayout->addWidget(FTemporaryEdit, 2, 1);
   connect(FCustomTemporary, &QRadioButton::toggled, this, &PreferencesDialog::UpdateControls);
+  // As TemporaryDirectoryCleanupCheck and the rest.
+  FTemporaryCleanup = new QCheckBox(tr("&Cleanup obsolete temporary directories on startup"), Temporary);
+  FTemporaryCleanup->setChecked(Preferences.TemporaryDirectoryCleanup);
+  FConfirmTemporaryCleanup = new QCheckBox(tr("&Ask before cleanup"), Temporary);
+  FConfirmTemporaryCleanup->setChecked(Preferences.ConfirmTemporaryDirectoryCleanup);
+  FTemporaryAppendSession = new QCheckBox(tr("Append &session name to temporary path"), Temporary);
+  FTemporaryAppendSession->setChecked(Preferences.TemporaryDirectoryAppendSession);
+  FTemporaryAppendPath = new QCheckBox(tr("Append remote &path to temporary path"), Temporary);
+  FTemporaryAppendPath->setChecked(Preferences.TemporaryDirectoryAppendPath);
+  FTemporaryDeterministic = new QCheckBox(tr("Keep temporary copies of remote files in &deterministic paths"), Temporary);
+  FTemporaryDeterministic->setChecked(Preferences.TemporaryDirectoryDeterministic);
+  TemporaryLayout->addWidget(FTemporaryCleanup, 3, 0, 1, 2);
+  QHBoxLayout * ConfirmRow = new QHBoxLayout();
+  ConfirmRow->addSpacing(20);
+  ConfirmRow->addWidget(FConfirmTemporaryCleanup);
+  TemporaryLayout->addLayout(ConfirmRow, 4, 0, 1, 2);
+  TemporaryLayout->addWidget(FTemporaryAppendSession, 5, 0, 1, 2);
+  TemporaryLayout->addWidget(FTemporaryAppendPath, 6, 0, 1, 2);
+  TemporaryLayout->addWidget(FTemporaryDeterministic, 7, 0, 1, 2);
+  connect(FTemporaryCleanup, &QCheckBox::toggled, this, &PreferencesDialog::UpdateControls);
   Layout->addWidget(Temporary);
   QGroupBox * Other = new QGroupBox(tr("Other"), Page);
   QFormLayout * OtherLayout = new QFormLayout(Other);
@@ -1301,6 +1322,11 @@ TPreferences PreferencesDialog::Preferences() const
   }
   Result.TemporaryDirectory = FCustomTemporary->isChecked() ? FTemporaryEdit->text().trimmed().toStdString() : std::string();
   Result.RandomSeedFile = FRandomSeedEdit->text().trimmed().toStdString();
+  Result.TemporaryDirectoryCleanup = FTemporaryCleanup->isChecked();
+  Result.ConfirmTemporaryDirectoryCleanup = FConfirmTemporaryCleanup->isChecked();
+  Result.TemporaryDirectoryAppendSession = FTemporaryAppendSession->isChecked();
+  Result.TemporaryDirectoryAppendPath = FTemporaryAppendPath->isChecked();
+  Result.TemporaryDirectoryDeterministic = FTemporaryDeterministic->isChecked();
   Result.PuttyPath = FPuttyPath->text().toStdString();
   Result.PuttyPassword = FPuttyPassword->isChecked();
   Result.AutoOpenInPutty = FAutoOpenInPutty->isChecked();

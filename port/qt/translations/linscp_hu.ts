@@ -3404,6 +3404,26 @@ Hely: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Fájl helyi &amp;rendszermenüjének használata</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>Elavult ideiglenes mappák &amp;törlése indításkor</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>Törlés előtt &amp;kérdezzen</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Ideiglenes mappa nevéhez fűzze hozzá a &amp;munkamenet azonosítóját</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Ideiglenes mappa nevéhez fűzze hozzá a távoli &amp;mappát</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Távoli fájlok ideiglenes másolatának meg&amp;tartása az útvonalakon</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

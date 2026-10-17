@@ -3406,6 +3406,26 @@ Cale: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Utilizează meniul contextual al sistemului</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;La pornire, curăță directoarele temporare învechite</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>Întreabă înainte de &amp;curățare</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Adaugă numele &amp;sesiunii la calea temporară</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Adaugă calea de la distanță la calea &amp;temporară</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Păstrează copii temporare a fișierelor la distanță în căi &amp;determinabile</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

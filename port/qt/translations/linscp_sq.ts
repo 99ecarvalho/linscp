@@ -3405,6 +3405,26 @@ Vendndodhja: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Përdor menynë e kontekstit të skedarëve të &amp;sistemit</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Pastro dosjet e përkohshme të vjetruara në nisje</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;Pyet para pastrimit</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Shto emrin e &amp;seancës në shtegun e përkohshëm</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Shto shtegun e &amp;largët në shtegun e përkohshëm</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Mbaj kopjet e përkohshme të skedarëve të largët në shtigje të &amp;përcaktuara</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -3405,6 +3405,26 @@ Location: %2</source>
         <source>Use &amp;system file context menu</source>
         <translation>השתמש בתפריט ההקשר של &amp;מערכת הקבצים</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;נקה תיקיות זמניות ישנות בעת ההפעלה</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;שאל לפני הניקוי</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>הוסף את שם ה&amp;הפעלה לנתיב הזמני</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>הוסף את ה&amp;נתיב המרוחק לנתיב הזמני</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>שמור עותקים זמניים של קבצים מרוחקים ב&amp;נתיבים קבועים</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

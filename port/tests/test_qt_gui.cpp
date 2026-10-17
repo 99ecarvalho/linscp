@@ -3003,6 +3003,15 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       Dialog.AuthAgentCombo()->setCurrentIndex(1);
       Dialog.CustomTemporaryButton()->setChecked(true);
       Dialog.TemporaryEdit()->setText(Directory);
+      // E3: the temporary directory's options, WinSCP's defaults.
+      Check(Dialog.TemporaryCleanupCheck()->isChecked() && Dialog.ConfirmTemporaryCleanupCheck()->isChecked() &&
+        !Dialog.TemporaryAppendSessionCheck()->isChecked() && Dialog.TemporaryAppendPathCheck()->isChecked() &&
+        !Dialog.TemporaryDeterministicCheck()->isChecked(), "Storage: the temporary directory's options, WinSCP's defaults");
+      Dialog.TemporaryCleanupCheck()->setChecked(false);
+      Check(!Dialog.ConfirmTemporaryCleanupCheck()->isEnabled(), "Ask before cleanup only with the cleanup");
+      Dialog.TemporaryCleanupCheck()->setChecked(true);
+      Dialog.ConfirmTemporaryCleanupCheck()->setChecked(false);
+      Dialog.TemporaryAppendSessionCheck()->setChecked(true);
       Dialog.Save();
       Window.ApplyPreferences();
     }
@@ -3161,6 +3170,24 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       (Saved(Interface, QStringLiteral("AuthAgent")) == QStringLiteral("1")), "Network's and Security's, under core's");
     Check(QFileInfo(QString::fromStdString(CoreBridge::TemporaryDirectoryBase())) == QFileInfo(Directory),
       "the temporary directory, where temporary files go now");
+    Check((Saved(Interface, QStringLiteral("ConfirmTemporaryDirectoryCleanup")) == QStringLiteral("0")) &&
+      (Saved(Interface, QStringLiteral("TemporaryDirectoryAppendSession")) == QStringLiteral("1")),
+      "the temporary directory's options, under WinSCP's keys");
+    // The start-up cleanup: past folders deleted, asked about when the
+    // preferences say (Yes, the responder's first).
+    {
+      const QString Past = QDir(Directory).filePath(QStringLiteral("scp12345"));
+      QDir().mkpath(Past);
+      Check((CoreBridge::TemporaryFolders().size() == 1) && (QFileInfo(QString::fromStdString(CoreBridge::TemporaryFolders()[0])) == QFileInfo(Past)),
+        "a past temporary folder found");
+      Window.TemporaryDirectoryCleanup();
+      Check(!QFileInfo::exists(Past), "and deleted, without asking");
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & Preferences) { Preferences.ConfirmTemporaryDirectoryCleanup = true; });
+      QDir().mkpath(Past);
+      Responder.LastQuery.clear();
+      Window.TemporaryDirectoryCleanup();
+      Check(!QFileInfo::exists(Past) && Responder.LastQuery.contains(QStringLiteral("1")), "or after asking, counting them");
+    }
     {
       CoreBridge::TPreferences Off = CoreBridge::Preferences();
       Off.Logging = false;

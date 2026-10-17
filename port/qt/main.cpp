@@ -115,13 +115,22 @@ int main(int argc, char ** argv)
     std::unique_ptr<InstanceServer> Server;
     if (!Smoke)
     {
+      // As WinMain: not for a second instance, whose folders are in use.
+      const bool OnlyInstance = !SingleInstance::AnyOtherInstance();
       Server.reset(new InstanceServer([&Window](const QStringList & Arguments)
       {
         return Window.CommandLineFromAnotherInstance(Arguments);
       }));
       // As WinSCP starts: the session the command line names, else its
       // Login dialog, the site manager.
-      QTimer::singleShot(0, &Window, [&Window]() { Window.StartUp(); });
+      QTimer::singleShot(0, &Window, [&Window, OnlyInstance]()
+      {
+        if (OnlyInstance && CoreBridge::Preferences().TemporaryDirectoryCleanup)
+        {
+          Window.TemporaryDirectoryCleanup();
+        }
+        Window.StartUp();
+      });
     }
     if (Smoke)
     {

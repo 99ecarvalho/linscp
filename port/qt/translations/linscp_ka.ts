@@ -3405,6 +3405,26 @@ Location: %2</source>
         <source>Use &amp;system file context menu</source>
         <translation>&amp;სისტემური ფაილის კონტექსტური მენიუს გამოყენება</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;მოძველებული დროებითი საქაღალდეების გასუფთავება გაშვებისას</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;კითხვა მოსუფთავებამდე</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>&amp;სესიის სახელის მიწერა დროებითი ბილიკისთვის</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>დაშორებული &amp;ბილიკის მიწერა დროებითი ბილიკისთვის</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>დაშორებული ფაილების ასლის შენარჩუნება &amp;დეტერმინისტულ ბილიკებზე</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

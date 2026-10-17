@@ -3404,6 +3404,26 @@ Vị trí: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Sử dụng &amp;menu ngữ cảnh hệ thống</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Dọn dẹp các thư mục tạm cũ khi khởi động</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;Hỏi trước khi dọn dẹp</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Thêm &amp;tên phiên vào đường dẫn tạm</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Thêm đường dẫn &amp;từ xa vào đường dẫn tạm</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Giữ bản sao tạm của tệp từ xa ở đường dẫn &amp;cố định</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

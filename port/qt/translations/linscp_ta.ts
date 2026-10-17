@@ -3405,6 +3405,26 @@ Location: %2</source>
         <source>Use &amp;system file context menu</source>
         <translation>&amp;கணினி கோப்பு சூழல் பட்டியல் பயன்படுத்து</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;தொடக்கத்தில் வழக்கற்றுப் போன தற்காலிக கோப்பகங்கள் துடை</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;சுத்தம் செய்வதற்கு முன் கேளுங்கள்</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>தற்காலிக பாதைக்கு &amp;அமர்வு பெயர் முடிவில்சேர்</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>தற்காலிக பாதைக்கான தொலை பாதையை முடிவில்சேர்</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>தொலை கோப்புகளின் தற்காலிக நகல்களை &amp;நிர்ணயிக்கும் பாதைகளில் வைத்திருங்கள்</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

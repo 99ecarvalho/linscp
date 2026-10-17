@@ -3405,6 +3405,26 @@ Ligging: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Gebruik &amp;stelsel se lêerkontekskieslys</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Ruim verouderde tydelike gidse op by begin</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;Vra voor opruiming</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Voeg &amp;sessienaam by tydelike pad</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Voeg afgeleë &amp;pad by tydelike pad</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Hou tydelike kopieë van afgeleë lêers in &amp;vaste paaie</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -3406,6 +3406,26 @@ Location: %2</source>
         <source>Use &amp;system file context menu</source>
         <translation>Использовать &amp;контекстное меню операционной системы</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Очищать устаревшие временные папки при запуске</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;Спрашивать перед очисткой</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Добавлять к пути &amp;имя соединения</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Добавлять к пути &amp;адрес на сервере</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>&amp;Хранить временные копии  файлов по фиксированным путям</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

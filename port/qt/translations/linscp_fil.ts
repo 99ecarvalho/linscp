@@ -3405,6 +3405,26 @@ Lokasyon: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Gamitin ang context menu ng &amp;system para sa file</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Linisin ang mga lumang pansamantalang direktoryo sa pagsisimula</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;Magtanong bago maglinis</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Idagdag ang pangalan ng &amp;session sa pansamantalang path</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Idagdag ang remote &amp;path sa pansamantalang path</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Itago ang mga pansamantalang kopya ng mga remote file sa mga &amp;tiyak na path</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

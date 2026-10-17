@@ -341,6 +341,11 @@ TPreferences Preferences()
     Configuration->GetDefaultIniFileExportPath());
   Result.RandomSeedFile = Utf8(Configuration->RandomSeedFile);
   Result.TemporaryDirectory = Utf8(Settings.DDTemporaryDirectory);
+  Result.TemporaryDirectoryCleanup = Settings.TemporaryDirectoryCleanup;
+  Result.ConfirmTemporaryDirectoryCleanup = Settings.ConfirmTemporaryDirectoryCleanup;
+  Result.TemporaryDirectoryAppendSession = Settings.TemporaryDirectoryAppendSession;
+  Result.TemporaryDirectoryAppendPath = Settings.TemporaryDirectoryAppendPath;
+  Result.TemporaryDirectoryDeterministic = Settings.TemporaryDirectoryDeterministic;
   Result.ConfirmOverwriting = Configuration->ConfirmOverwriting;
   Result.ConfirmResume = Configuration->ConfirmResume;
   Result.ConfirmDeleting = Settings.ConfirmDeleting;
@@ -613,6 +618,32 @@ std::string TemporaryDirectoryBase()
   return Utf8(Shell()->ExpandedTemporaryDirectory());
 }
 
+std::vector<std::string> TemporaryFolders()
+{
+  std::vector<std::string> Result;
+  std::unique_ptr<TStrings> Folders(Shell()->FindTemporaryFolders(false));
+  if (Folders.get() != NULL)
+  {
+    for (int Index = 0; Index < Folders->Count; Index++)
+    {
+      Result.push_back(Utf8(Folders->Strings[Index]));
+    }
+  }
+  return Result;
+}
+
+void CleanupTemporaryFolders()
+{
+  try
+  {
+    Shell()->CleanupTemporaryFolders();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 void SetPreferences(const TPreferences & Preferences)
 {
   // What the preferences do not set stays (the layout, the internal
@@ -656,6 +687,11 @@ void SetPreferences(const TPreferences & Preferences)
   }
   Settings.FileColors = Colors->CommaText;
   Settings.DDTemporaryDirectory = FromUtf8(Preferences.TemporaryDirectory);
+  Settings.TemporaryDirectoryCleanup = Preferences.TemporaryDirectoryCleanup;
+  Settings.ConfirmTemporaryDirectoryCleanup = Preferences.ConfirmTemporaryDirectoryCleanup;
+  Settings.TemporaryDirectoryAppendSession = Preferences.TemporaryDirectoryAppendSession;
+  Settings.TemporaryDirectoryAppendPath = Preferences.TemporaryDirectoryAppendPath;
+  Settings.TemporaryDirectoryDeterministic = Preferences.TemporaryDirectoryDeterministic;
   Settings.ConfirmDeleting = Preferences.ConfirmDeleting;
   Settings.ConfirmRecycling = Preferences.ConfirmRecycling;
   Settings.ConfirmTransferring = Preferences.ConfirmTransferring;
@@ -1895,6 +1931,8 @@ std::string Text(TText Text)
     case TText::IncrementalSearchNext: Ident = INC_NEXT_SEARCH; break;
     case TText::ExecuteAppError: Ident = EXECUTE_APP_ERROR; break;
     case TText::TimeLeftCalculating: Ident = PROGRESS_TIME_LEFT_CALCULATING; break;
+    case TText::CleanTempConfirm: Ident = CLEANTEMP_CONFIRM2; break;
+    case TText::OpenButton: Ident = OPEN_BUTTON; break;
     case TText::SynchronizeCompare: Ident = SYNCHRONIZE_PROGRESS_COMPARE; break;
     case TText::ExportConfigurationTitle: Ident = EXPORT_CONF_TITLE; break;
     case TText::ImportConfigurationTitle: Ident = IMPORT_CONF_TITLE; break;

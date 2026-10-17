@@ -258,7 +258,8 @@ P2-10 and P2-11 waited, at the user's request, for P3.
 1. The upstream PRs for the carried patches (ADR 0006), waiting on WinSCP's
    maintainer: winscp/winscp#79 (portability), #80 (`LogEvent`), #81 (log
    file names), #82 (local EOL), #83 (OpenSSH import paths), #84, #85 (S3);
-   each patch dropped when a pin move brings it in.
+   each patch dropped when a pin move brings it in. Not offered yet:
+   `core-recursive-delete-delimiter.patch` (2026-10-17, gap E3).
 2. The WinSCP functionality audit's gaps (2026-10-17): [gaps.md](gaps.md),
    their status in [gaps_tracker.md](gaps_tracker.md); transfer progress
    (C1) and the Site Manager (A) first.

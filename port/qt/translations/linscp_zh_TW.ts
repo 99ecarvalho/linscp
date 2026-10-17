@@ -3404,6 +3404,26 @@ Location: %2</source>
         <source>Use &amp;system file context menu</source>
         <translation>使用系統檔案的右鍵選單(&amp;S)</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>啟動時，清理廢棄的暫存目錄(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>清理前先問我(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>增加工作階段名稱到暫存路徑(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>增加遠端路徑到暫存路徑(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>保留遠端檔案的臨時副本在確定的路徑(&amp;D)</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -18,3 +18,4 @@ core-openssh-import-posix-paths.patch
 core-terminal-logevent-not-inline.patch
 core-s3-acl-not-implemented.patch
 core-s3-folder-tags.patch
+core-recursive-delete-delimiter.patch

@@ -3404,6 +3404,26 @@ Lokasi: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Gunakan berkas &amp;sistem pada menu konteks</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>Bersihkan direktori sementara yg tidak terpakai pada saat startup(&amp;c)</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>T&amp;anya sebelum membersihkan</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Tambahkan nama &amp;sesi ke alamat sementara</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Tambahkan alamat remote ke alamat sementara(&amp;p)</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Pertahankan salinan sementara berkas remote pada alamat &amp;deterministik</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -3404,6 +3404,26 @@ Lokasi: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Guna menu konteks fail &amp;sistem</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Bersihkan direktori sementara usang semasa permulaan</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;Tanya sebelum membersihkan</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Tambah nama &amp;sesi pada laluan sementara</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Tambah &amp;laluan jauh pada laluan sementara</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Simpan salinan sementara fail jauh dalam laluan &amp;tetap</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

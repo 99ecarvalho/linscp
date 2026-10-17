@@ -3406,6 +3406,26 @@ Lokacija: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Koristi &amp;sistemski kontekstni meni za datoteke</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>O&amp;briši zastarele privremene direktorijume pri pokretanju</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>Pit&amp;aj pre brisanja</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Dodaj &amp;ime sesije na privremenu putanju</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Dodaj udaljenu &amp;putanju na privremenu putanju</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Čuvaj privremene kopije udaljenih datoteka u &amp;determinističkim putanjama</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

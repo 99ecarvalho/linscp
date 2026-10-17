@@ -1781,6 +1781,64 @@ void MainWindow::UpdateTreeShortcut()
   }
 }
 
+void MainWindow::TemporaryDirectoryCleanup()
+{
+  const std::vector<std::string> Folders = CoreBridge::TemporaryFolders();
+  if (Folders.empty())
+  {
+    return;
+  }
+  bool Continue = true;
+  if (CoreBridge::Preferences().ConfirmTemporaryDirectoryCleanup)
+  {
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Confirmation;
+    Query.Message = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::CleanTempConfirm))
+      .replace(QStringLiteral("%d"), QString::number(Folders.size())).toStdString();
+    for (const std::string & Folder : Folders)
+    {
+      Query.MoreMessages += Folder + "\n";
+    }
+    auto Button = [](unsigned Answer, const std::string & Caption)
+    {
+      CoreBridge::TQueryButton Result;
+      Result.Answer = Answer;
+      Result.Caption = Caption;
+      return Result;
+    };
+    Query.Buttons = { Button(CoreBridge::AnswerYes, "&Yes"), Button(CoreBridge::AnswerNo, "&No"),
+      Button(CoreBridge::AnswerRetry, CoreBridge::Text(CoreBridge::TText::OpenButton)) };
+    Query.CancelAnswer = CoreBridge::AnswerNo;
+    Query.NeverAskAgainCheck = true;
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    const CoreBridge::TQueryResult Answer = Frontend.Query(Query);
+    if (Answer.NeverAskAgain && (Answer.Answer == CoreBridge::AnswerYes))
+    {
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & Preferences) { Preferences.ConfirmTemporaryDirectoryCleanup = false; });
+    }
+    else if (Answer.Answer == CoreBridge::AnswerRetry)
+    {
+      for (const std::string & Folder : Folders)
+      {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(Folder)));
+      }
+    }
+    Continue = (Answer.Answer == CoreBridge::AnswerYes);
+  }
+  if (Continue)
+  {
+    try
+    {
+      CoreBridge::CleanupTemporaryFolders();
+    }
+    catch (const CoreBridge::TCoreError & E)
+    {
+      ShowError(E);
+    }
+  }
+}
+
 void MainWindow::GoToTree()
 {
   const bool Left = FLocalActive && !FExplorer;

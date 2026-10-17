@@ -3405,6 +3405,26 @@ Location: %2</source>
         <source>Use &amp;system file context menu</source>
         <translation>सिस्टम फ़ाइल संदर्भ मेनू का उपयोग करें(&amp;S)</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>आरंभ पर पुरानी अस्थायी निर्देशिकाएँ साफ़ करें(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>सफ़ाई से पहले पूछें(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>अस्थायी पथ में सत्र का नाम जोड़ें(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>अस्थायी पथ में दूरस्थ पथ जोड़ें(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>दूरस्थ फ़ाइलों की अस्थायी प्रतियाँ निश्चित पथों में रखें(&amp;D)</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

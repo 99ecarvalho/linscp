@@ -3405,6 +3405,26 @@ Location: %2</source>
         <source>Use &amp;system file context menu</source>
         <translation>Χρήση του μενού &amp;περιβάλλοντος αρχείων του συστήματος</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Εκκαθάριση παρωχημένων προσωρινών φακέλων κατά την εκκίνηση</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;Ερώτηση πριν την εκκαθάριση</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Προσθήκη ονόματος &amp;συνεδρίας στην προσωρινή διαδρομή</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Προσθήκη απομακρυσμένης &amp;διαδρομής στην προσωρινή διαδρομή</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Διατήρηση προσωρινών αντιγράφων απομακρυσμένων αρχείων σε &amp;σταθερές διαδρομές</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

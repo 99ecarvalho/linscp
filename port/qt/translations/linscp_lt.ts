@@ -3406,6 +3406,26 @@ Vieta: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>Naudoti sistemos failo kontekstinį meniu</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>&amp;Išvalyti nebenaudojamus laikinuosius katalogus OS paleidime</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;Klausti prieš išvalant</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Pridėti &amp;seanso pavadinimą prie laikinojo kelio</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Pridėti nuotolinį &amp;kelią prie laikinojo kelio</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Laikyti laikinas nuotolinių failų kopijas &amp;deterministiniuose keliuose</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

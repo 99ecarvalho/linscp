@@ -3404,6 +3404,26 @@ Location: %2</source>
         <source>Use &amp;system file context menu</source>
         <translation>စနစ်၏ ဖိုင် context မီနူးကို သုံးပါ(&amp;S)</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>စတင်ချိန်တွင် ဟောင်းနေသော ယာယီဖိုင်တွဲများကို ရှင်းပါ(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>မရှင်းမီ မေးပါ(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>ယာယီလမ်းကြောင်းတွင် ဆက်ရှင်အမည် ထည့်ပါ(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>ယာယီလမ်းကြောင်းတွင် အဝေးလမ်းကြောင်း ထည့်ပါ(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>အဝေးဖိုင်များ၏ ယာယီမိတ္တူများကို သတ်မှတ်လမ်းကြောင်းများတွင် ထားပါ(&amp;D)</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

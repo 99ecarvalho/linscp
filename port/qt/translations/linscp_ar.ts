@@ -3409,6 +3409,26 @@ Location: %2</source>
         <source>Use &amp;system file context menu</source>
         <translation>استخدام ملفات النظام في القائمة بزر الماوس الايمن اعلى</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>حذف المجلد المؤقت في البداية</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>اسألني قبل الحذف</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>الحاق اسم الجلسة الى مسار مؤقت</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>الحاق مسار بعيد الى مسار مؤقت</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>الاحتفاظ بنسخ مؤقتة من الملفات عن بعد ومسارات حتمية</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

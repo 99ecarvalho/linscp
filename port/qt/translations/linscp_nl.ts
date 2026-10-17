@@ -3405,6 +3405,26 @@ Locatie: %2</translation>
         <source>Use &amp;system file context menu</source>
         <translation>&amp;Gebruik systeembestand contextmenu</translation>
     </message>
+    <message>
+        <source>&amp;Cleanup obsolete temporary directories on startup</source>
+        <translation>Overbodige tijdelijke mappen &amp;opruimen bij starten</translation>
+    </message>
+    <message>
+        <source>&amp;Ask before cleanup</source>
+        <translation>&amp;Vragen voor opruimen</translation>
+    </message>
+    <message>
+        <source>Append &amp;session name to temporary path</source>
+        <translation>Voeg sessie&amp;naam toe aan tijdelijk pad</translation>
+    </message>
+    <message>
+        <source>Append remote &amp;path to temporary path</source>
+        <translation>Voeg e&amp;xtern pad toe aan tijdelijk pad</translation>
+    </message>
+    <message>
+        <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
+        <translation>Maak tijdelijke kopieën van ext. bestanden in &amp;deterministische mappen</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

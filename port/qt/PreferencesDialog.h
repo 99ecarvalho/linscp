@@ -203,6 +203,13 @@ public:
   class QToolButton * AddCommandButton() const { return FAddCommand; }
   QPushButton * ConfigureCommandButton() const { return FConfigureCommand; }
 
+  // Storage's temporary directory options, for tests.
+  QCheckBox * TemporaryCleanupCheck() const { return FTemporaryCleanup; }
+  QCheckBox * ConfirmTemporaryCleanupCheck() const { return FConfirmTemporaryCleanup; }
+  QCheckBox * TemporaryAppendSessionCheck() const { return FTemporaryAppendSession; }
+  QCheckBox * TemporaryAppendPathCheck() const { return FTemporaryAppendPath; }
+  QCheckBox * TemporaryDeterministicCheck() const { return FTemporaryDeterministic; }
+
 private:
   void AddPage(const QString & Name, QWidget * Page, bool Subpage = false);
   QWidget * MakePanelsPage(const CoreBridge::TPreferences & Preferences);
@@ -399,6 +406,11 @@ private:
   QRadioButton * FCustomTemporary = nullptr;
   QLineEdit * FTemporaryEdit = nullptr;
   QLineEdit * FRandomSeedEdit = nullptr;
+  QCheckBox * FTemporaryCleanup = nullptr;
+  QCheckBox * FConfirmTemporaryCleanup = nullptr;
+  QCheckBox * FTemporaryAppendSession = nullptr;
+  QCheckBox * FTemporaryAppendPath = nullptr;
+  QCheckBox * FTemporaryDeterministic = nullptr;
   CoreBridge::TEditorSettings FEditor;
   QCheckBox * FEditorCheckNotModified = nullptr;
   std::vector<CoreBridge::TEditorDefinition> FEditors;
