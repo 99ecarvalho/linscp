@@ -2962,7 +2962,7 @@ Local: %2</translation>
         <translation>Ícones</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Conjunto de ícones:</translation>
     </message>
     <message>
@@ -3424,6 +3424,38 @@ Local: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Manter cópias temporárias dos arquivos remotos em &amp;determinadas pastas</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Espaços de Trabalho</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Automaticamente salvar espaços de trabalho ao sair</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Nome do espaço de trabalho &amp;Padrão</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Salvar &amp;senhas (não recomendado)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Conectar todas as sessões de área de trabalho abertas ou pasta de site</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Exibir diálogo de Login na iniciação e quando a última sessão for fechada</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Truncar títulos das abas se não couberem na janela</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Bloquear mensagens de erro p&amp;opup quando sessão inativa estiver desconectada</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Local: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>So&amp;bre...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>E&amp;xibir diálogo de login durante a iniciação e quando a última sessão for fechada</translation>
     </message>
 </context>
 <context>

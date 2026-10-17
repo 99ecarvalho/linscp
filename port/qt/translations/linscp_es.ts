@@ -2962,7 +2962,7 @@ Ruta: %2</translation>
         <translation>Iconos</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Conjunto de iconos:</translation>
     </message>
     <message>
@@ -3424,6 +3424,38 @@ Ruta: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Conservar copias de archivos remotos en rutas determinísticas</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Áreas de trabajo</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Guardar espacio de trabajo al salir</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Nombre predeterminado del área de trabajo:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Guardar &amp;contraseñas (no recomendado)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Conectar todas las sesiones del área de trabajo o grupo de sitios abierto</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Mostrar diálogo de conexión al &amp;inicio y cuando se cierre la última sesión.</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Truncar títulos de pestaña si no caben en la ventana</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>No mostrar errores emergentes por sesión inactiva desconectada</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Ruta: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;Acerca de...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Mostrar diálogo de conexión al &amp;inicio y cuando se cierre la última sesión.</translation>
     </message>
 </context>
 <context>

@@ -2962,8 +2962,8 @@ Plassering: %2</translation>
         <translation>Ikoner</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>Ikon&amp;sett:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;Ikonsett:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3424,6 +3424,38 @@ Plassering: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Behold midlertidige kopier av eksterne filer i &amp;deterministiske stier</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Arbeidsområder</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Lagre arbeidsområdet &amp;automatisk ved avslutning</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Standard navn for arbeidsområde:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Lagre &amp;passord (ikke anbefalt)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Koble til alle økter i åpnet arbeidsområde eller nettstedsmappe</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Vis innloggingsdialog ved oppstart og når den siste økten er avsluttet</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>Forkor&amp;t fanetitler når de ikke passer til vinduet</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Ikke vis feilmelding når en &amp;inaktiv økt kobles fra</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Plassering: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;Om</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Vis innloggingsdialog ved oppstart og når den siste økten er avsluttet</translation>
     </message>
 </context>
 <context>

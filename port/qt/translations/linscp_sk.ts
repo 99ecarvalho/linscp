@@ -2963,7 +2963,7 @@ Umiestnenie: %2</translation>
         <translation>Ikony</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Sada ikon:</translation>
     </message>
     <message>
@@ -3425,6 +3425,38 @@ Umiestnenie: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Zachovať dočasné kópie vzdialených súborov v deterministických cestách</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Pracovné priestory</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Automaticky uložiť pracovný priestor pri ukončení</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Pre&amp;dvolené meno pracovného priestoru:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Ukladať &amp;heslá (neodporúča sa)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>Pripojiť všetky relácie otvoreného pracovného priestoru alebo priečinka s lokalitami</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Zobraziť prihla&amp;sovací dialóg pri spustení a po zatvorení poslednej relácie</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>Skrá&amp;tiť názvy kariet keď sa nezmestia do okna</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Nezobrazovať vyskakovacie hlásenie o chybe pri odpojení relácie bez prebiehajúcej činnosti</translation>
     </message>
 </context>
 <context>
@@ -4932,6 +4964,10 @@ Umiestnenie: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;O programe...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Zobraziť prihla&amp;sovací dialóg pri spustení a po zatvorení poslednej relácie</translation>
     </message>
 </context>
 <context>

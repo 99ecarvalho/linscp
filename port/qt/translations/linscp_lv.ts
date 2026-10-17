@@ -2963,8 +2963,8 @@ Atrašanās vieta: %2</translation>
         <translation>Ikonas</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>Ikonu &amp;kopa:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;Ikonu kopa:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3425,6 +3425,38 @@ Atrašanās vieta: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Glabāt attālo failu pagaidu kopijas &amp;noteiktos ceļos</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Darbvietas</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Automātiski saglabāt darbvietu, izejot</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Noklusējuma darbvietas nosaukums:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Saglabāt &amp;paroles (nav ieteicams)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>Pie&amp;slēgt visas atvērtās darbvietas vai vietņu mapes sesijas</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Rādīt pieteikšanās logu, startējot un aizverot pēdējo sesiju</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Saīsināt ciļņu virsrakstus, ja tie neietilpst logā</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Nerādīt kļūdas ziņojumu, kad &amp;dīkstāvē esoša sesija tiek atvienota</translation>
     </message>
 </context>
 <context>
@@ -4932,6 +4964,10 @@ Atrašanās vieta: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>P&amp;ar...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Rādīt pieteikšanās logu, startējot un aizverot pēdējo sesiju</translation>
     </message>
 </context>
 <context>

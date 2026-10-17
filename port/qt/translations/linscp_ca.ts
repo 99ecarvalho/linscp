@@ -2962,7 +2962,7 @@ Ubicació: %2</translation>
         <translation>Icones</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Joc d&apos;icones:</translation>
     </message>
     <message>
@@ -3424,6 +3424,38 @@ Ubicació: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>&amp;Mantén còpies temporals dels fitxers remots en camins ben determinats</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Àrees de treball</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Desa &amp;automàticament l&apos;àrea de treball al sortir</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Nom de l&apos;àrea de treball per &amp;defecte:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Desa contrasen&amp;yes (no recomanat)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Connecta totes les sessions de l&apos;àrea de treball o carpeta del lloc oberta</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Mostra el diàleg Entra a l&apos;inici i quan es tanca la darrera sessió</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Truncar els títols de les pestanyes quan no caben a la finestra</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>No m&amp;ostrar missatge d&apos;error quan la sessió inactiva està desconnectada</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Ubicació: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;Quant a...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Mostra el diàleg Entra a l&apos;inici i quan es tanca la darrera sessió</translation>
     </message>
 </context>
 <context>

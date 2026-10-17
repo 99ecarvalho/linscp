@@ -2962,8 +2962,8 @@ Localização: %2</translation>
         <translation>Ícones</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>Conjunto de í&amp;cones:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;Conjunto de ícones:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3424,6 +3424,38 @@ Localização: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Manter cópias temporárias dos ficheiros remotos em &amp;determinados caminhos</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Área de trabalho</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Salvar área de trabalho &amp;automaticamente ao sair</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Nome da área de trabalho por &amp;defeito:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Salvar &amp;palavras passe (não recomendado)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Ligar todas as sessões da área de trabalho ou pasta de sites aberta</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Mo&amp;strar a caixa de início da sessão ao iniciar e quando a última sessão é terminada</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Trunca os títulos dos separadores quando eles não encaixarem na janela</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Não apresentar mensagem de erro quando uma sessão inactiva f&amp;or desligada</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Localização: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;Sobre...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Mo&amp;strar a caixa de início da sessão ao iniciar e quando a última sessão é terminada</translation>
     </message>
 </context>
 <context>

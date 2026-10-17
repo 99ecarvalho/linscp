@@ -2963,8 +2963,8 @@ Vieta: %2</translation>
         <translation>Piktogramos</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>Piktogramų &amp;rinkinys:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;Piktogramų rinkinys:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3425,6 +3425,38 @@ Vieta: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Laikyti laikinas nuotolinių failų kopijas &amp;deterministiniuose keliuose</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Darbo sritys</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Baigus darbą &amp;automatiškai įrašyti darbo sritį</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Darbo srities numatytasis pavadinimas:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Įrašyti &amp;slaptažodžius (nerekomenduojama)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Prijungti visus atvertos darbo srities arba tinklavietės aplanko seansus</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Rodyti prisijungimo langą paleidžiant programą ir uždarant paskutinį seansą</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Sutrumpinti skirtukų pavadinimus, jei jie netelpa į langą</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Nerodyti klaidos &amp;pranešimo, kuomet atjungiamas neaktyvus seansas</translation>
     </message>
 </context>
 <context>
@@ -4932,6 +4964,10 @@ Vieta: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;Apie...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Rodyti prisijungimo langą paleidžiant programą ir uždarant paskutinę sesiją</translation>
     </message>
 </context>
 <context>

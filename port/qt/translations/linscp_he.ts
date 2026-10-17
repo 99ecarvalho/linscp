@@ -2962,7 +2962,7 @@ Location: %2</source>
         <translation>סמלים</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;ערכת סמלים:</translation>
     </message>
     <message>
@@ -3424,6 +3424,38 @@ Location: %2</source>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>שמור עותקים זמניים של קבצים מרוחקים ב&amp;נתיבים קבועים</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>סביבות עבודה</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>שמור &amp;אוטומטית את סביבת העבודה ביציאה</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;שם ברירת מחדל לסביבת עבודה:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>שמור &amp;סיסמאות (לא מומלץ)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;חבר את כל השיחות של סביבת העבודה או תיקיית האתרים שנפתחה</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;הצג את חלון ההתחברות בהפעלה וכאשר השיחה האחרונה נסגרת</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;קצר כותרות לשוניות כאשר אינן נכנסות בחלון</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>אל תציג הודעת שגיאה כאשר הפעלה &amp;לא פעילה מתנתקת</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Location: %2</source>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;אודות</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;הצג את חלון ההתחברות בהפעלה וכאשר השיחה האחרונה נסגרת</translation>
     </message>
 </context>
 <context>

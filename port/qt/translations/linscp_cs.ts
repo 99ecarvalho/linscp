@@ -2963,7 +2963,7 @@ Umístění: %2</translation>
         <translation>Ikony</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Sada ikon:</translation>
     </message>
     <message>
@@ -3425,6 +3425,38 @@ Umístění: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Ukládat dočasné kopie vzdálených souborů v pevně &amp;daných cestách</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Pracovní prostory</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Automaticky ukládat pracovní prostor při ukončení</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Výchozí jméno pracovního prostoru</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Uložit &amp;hesla (nedoporučuje se)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>Připojit všechna spojení otevřeného p&amp;racovního prostoru nebo složky míst</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Zobrazovat okno &amp;Přihlášení při spuštění a při zavření posledního spojení</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>Zkrátit titulky &amp;karet, pokud se nevejdou do okna</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Nezo&amp;brazovat chybovou zprávu pokud se spojení odpojí při nečinnosti</translation>
     </message>
 </context>
 <context>
@@ -4932,6 +4964,10 @@ Umístění: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;O programu...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Zobrazovat okno Přihlášení při spuštění a při zavření posledního spojení</translation>
     </message>
 </context>
 <context>

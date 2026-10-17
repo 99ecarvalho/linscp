@@ -215,6 +215,8 @@ public:
     std::runtime_error(Error.Message), Error(Error), Aborted(Aborted) {}
   TError Error;
   bool Aborted;
+  // Core's EFatal: the session's connection is lost.
+  bool Fatal = false;
 };
 
 // Starts core as upstream's WinSCP.exe does, with this process's command
@@ -575,6 +577,19 @@ struct TPreferences
   // The icon set (IconSet.h's id; empty: the platform's default).
   std::string IconSet;
   bool KeepOpenWhenNoSession = true;
+  // Window: the Login dialog when there is no session; tab titles
+  // truncated; a workspace's sessions all connected as it opens; its
+  // Workspaces group (the default workspace, saved on exit, with
+  // passwords).
+  bool ShowLoginWhenNoSession = true;
+  bool SessionTabCaptionTruncation = true;
+  // GUIConfiguration's SessionSilentDisconnect: no message when an idle
+  // session's connection is lost.
+  bool SessionSilentDisconnect = false;
+  bool WorkspaceConnectAll = false;
+  bool AutoSaveWorkspace = false;
+  bool AutoSaveWorkspacePasswords = false;
+  std::string AutoWorkspace;
   // File colors: the first mask a file matches colors it.
   struct TFileColor
   {
@@ -1132,6 +1147,8 @@ enum class TText
   ExecuteAppError,      // "Cannot execute '%s'."
   TimeLeftCalculating,  // "Calculating..."
   CleanTempConfirm,     // "**Do you want to delete past temporary folders?**...%d..." (unformatted)
+  LoginNotShowingAgain, // "**Stop showing Login dialog automatically?**..." (unformatted)
+  NeverPopupDisconnect, // "&Never popup disconnect messages"
   OpenButton,           // "&Open"
   SynchronizeCompare,   // "Comparing"
   ExportConfigurationTitle, // "Select file to export configuration to"
@@ -1921,6 +1938,9 @@ std::string UniqueSiteName(const std::string & Name);
 // FindTemporaryFolders), and deleted (CleanupTemporaryFolders).
 std::vector<std::string> TemporaryFolders();
 void CleanupTemporaryFolders();
+// Configuration's DisablePasswordStoring (an administrator's): no password
+// is stored.
+bool PasswordStoringDisabled();
 // Core's time texts: a span (FormatDateTimeSpan, "0:00:05"), and now's
 // time (TDateTime::TimeString).
 std::string TimeSpanText(double Seconds);

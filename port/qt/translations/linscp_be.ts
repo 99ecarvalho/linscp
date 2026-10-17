@@ -2963,7 +2963,7 @@ Location: %2</source>
         <translation>Значкі</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Набор значкоў:</translation>
     </message>
     <message>
@@ -3425,6 +3425,38 @@ Location: %2</source>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Захоўваць часовыя копіі аддаленых файлаў па &amp;дэтэрмінаваных шляхах</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Працоўныя прасторы</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Аўтаматычна за&amp;хоўваць працоўную прастору пры выхадзе</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Назва прад&amp;вызначанай працоўнай прасторы:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Захоўваць &amp;паролі (не рэкамендуецца)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>Злучаць &amp;усе сеансы адкрытай працоўнай прасторы або папкі з сайтамі</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Паказваць акно ўваходу пры запуску і пры закрыцці ўсіх &amp;сеансаў</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Абразаць загалоўкі ўкладак, калі яны не змяшчаюцца ў акне</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Не паказваць паведамленне пра памылку, калі сеанс адлучаецца падчас &amp;чакання</translation>
     </message>
 </context>
 <context>
@@ -4932,6 +4964,10 @@ Location: %2</source>
     <message>
         <source>A&amp;bout...</source>
         <translation>П&amp;ра праграму...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Паказваць акно ўваходу пры запуску і пасля &amp;закрыцця апошняга сеанса</translation>
     </message>
 </context>
 <context>

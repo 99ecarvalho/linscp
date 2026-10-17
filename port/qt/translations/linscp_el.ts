@@ -2962,7 +2962,7 @@ Location: %2</source>
         <translation>Εικονίδια</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Σύνολο εικονιδίων:</translation>
     </message>
     <message>
@@ -3424,6 +3424,38 @@ Location: %2</source>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Διατήρηση προσωρινών αντιγράφων απομακρυσμένων αρχείων σε &amp;σταθερές διαδρομές</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Χώροι εργασίας</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Αυτόματη αποθήκευση χώρου εργασίας κατά την έξοδο</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Προεπιλεγμένο όνομα χώρου εργασίας:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Αποθήκευση &amp;κωδικών (δεν συνιστάται)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Σύνδεση όλων των συνεδριών του ανοιγμένου χώρου εργασίας ή φακέλου χώρων</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Εμφάνιση του παραθύρου εισόδου κατά την εκκίνηση και όταν κλείσει η τελευταία συνεδρία</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Περικοπή τίτλων καρτελών όταν δεν χωρούν στο παράθυρο</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Να μην εμφανίζεται μήνυμα σφάλματος όταν αποσυνδέεται &amp;αδρανής συνεδρία</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Location: %2</source>
     <message>
         <source>A&amp;bout...</source>
         <translation>Σχετικά</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Εμφάνιση του παραθύρου εισόδου κατά την εκκίνηση και όταν κλείσει η τελευταία συνεδρία</translation>
     </message>
 </context>
 <context>

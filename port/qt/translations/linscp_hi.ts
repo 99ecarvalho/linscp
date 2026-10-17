@@ -2962,8 +2962,8 @@ Location: %2</source>
         <translation>आइकन</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>आइकन सेट(&amp;S):</translation>
+        <source>&amp;Icon set:</source>
+        <translation>आइकन सेट(&amp;I):</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3424,6 +3424,38 @@ Location: %2</source>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>दूरस्थ फ़ाइलों की अस्थायी प्रतियाँ निश्चित पथों में रखें(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>वर्कस्पेस</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>बाहर निकलने पर वर्कस्पेस स्वचालित रूप से सहेजें(&amp;A)</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>डिफ़ॉल्ट वर्कस्पेस नाम(&amp;D):</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>पासवर्ड सहेजें (अनुशंसित नहीं)(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>खोले गए वर्कस्पेस या साइट फ़ोल्डर के सभी सत्र कनेक्ट करें(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>स्टार्टअप पर और अंतिम सत्र बंद होने पर लॉगिन संवाद दिखाएँ(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>विंडो में फिट न होने पर टैब शीर्षक छोटे करें(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>निष्क्रिय सत्र डिस्कनेक्ट होने पर त्रुटि संदेश न दिखाएँ(&amp;O)</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Location: %2</source>
     <message>
         <source>A&amp;bout...</source>
         <translation>परिचय(&amp;B)...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>स्टार्टअप पर और अंतिम सत्र बंद होने पर लॉगिन संवाद दिखाएँ(&amp;S)</translation>
     </message>
 </context>
 <context>

@@ -263,6 +263,9 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"SelectiveToolbarText", FSettings.SelectiveToolbarText);
     Storage->WriteInteger(L"LargerToolbar", FSettings.LargerToolbar);
     Storage->WriteBool(L"KeepOpenWhenNoSession", FSettings.KeepOpenWhenNoSession);
+    Storage->WriteBool(L"ShowLoginWhenNoSession", FSettings.ShowLoginWhenNoSession);
+    Storage->WriteBool(L"SessionTabCaptionTruncation", FSettings.SessionTabCaptionTruncation);
+    Storage->WriteBool(L"WorkspaceConnectAll", FSettings.WorkspaceConnectAll);
     Storage->WriteBool(L"AutoOpenInPutty", FSettings.AutoOpenInPutty);
     Storage->WriteBool(L"AutoSaveWorkspace", FSettings.AutoSaveWorkspace);
     Storage->WriteBool(L"AutoSaveWorkspacePasswords", FSettings.AutoSaveWorkspacePasswords);
@@ -860,6 +863,10 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.SelectiveToolbarText = Storage->ReadBool(L"SelectiveToolbarText", FSettings.SelectiveToolbarText);
     FSettings.LargerToolbar = Storage->ReadInteger(L"LargerToolbar", FSettings.LargerToolbar);
     FSettings.KeepOpenWhenNoSession = Storage->ReadBool(L"KeepOpenWhenNoSession", FSettings.KeepOpenWhenNoSession);
+    FSettings.ShowLoginWhenNoSession = Storage->ReadBool(L"ShowLoginWhenNoSession", FSettings.ShowLoginWhenNoSession);
+    FSettings.SessionTabCaptionTruncation =
+      Storage->ReadBool(L"SessionTabCaptionTruncation", FSettings.SessionTabCaptionTruncation);
+    FSettings.WorkspaceConnectAll = Storage->ReadBool(L"WorkspaceConnectAll", FSettings.WorkspaceConnectAll);
     FSettings.AutoOpenInPutty = Storage->ReadBool(L"AutoOpenInPutty", FSettings.AutoOpenInPutty);
     FSettings.AutoSaveWorkspace = Storage->ReadBool(L"AutoSaveWorkspace", FSettings.AutoSaveWorkspace);
     FSettings.AutoSaveWorkspacePasswords = Storage->ReadBool(L"AutoSaveWorkspacePasswords", FSettings.AutoSaveWorkspacePasswords);

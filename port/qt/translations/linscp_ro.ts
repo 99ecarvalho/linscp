@@ -2963,8 +2963,8 @@ Cale: %2</translation>
         <translation>Pictograme</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>Set de &amp;pictograme:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;Set de pictograme:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3425,6 +3425,38 @@ Cale: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Păstrează copii temporare a fișierelor la distanță în căi &amp;determinabile</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Spații de lucru</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Salvare &amp;automată a spațiului de lucru la ieșire</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Nume &amp;implicit pentru spațiul de lucru:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Salvare &amp;parole (nerecomandat)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Conectează toate sesiunile deschise din spațiul de lucru sau director de site</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Afișare Ferea&amp;stră conectare la start și la închiderea ultimei sesiuni</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Trunchiază titlurile filelor când acestea nu încap în fereastră</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Nu afișa &amp;mesaj de eroare când e deconectată sesiunea inactivă</translation>
     </message>
 </context>
 <context>
@@ -4932,6 +4964,10 @@ Cale: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;Despre...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Afișare Ferea&amp;stră conectare la start și la închiderea ultimei sesiuni</translation>
     </message>
 </context>
 <context>

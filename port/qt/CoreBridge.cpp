@@ -13,6 +13,7 @@
 #include <GUIConfiguration.h>
 #include <FileMasks.h>
 #include <Cryptography.h>
+#include <FrontendCommon.h>
 #include <HeadlessMain.h>
 #include <TextsCore.h>
 #include <TextsWin.h>
@@ -87,7 +88,9 @@ TCoreError CoreErrorOf(Exception & E)
   {
     Error.Message = Utf8(E.Message);
   }
-  return TCoreError(Error, !Shown);
+  TCoreError Result(Error, !Shown);
+  Result.Fatal = (dynamic_cast<EFatal *>(&E) != NULL);
+  return Result;
 }
 
 namespace
@@ -270,6 +273,13 @@ TPreferences Preferences()
   Result.PathInCaption = static_cast<TPreferences::TPathInCaption>(Settings.PathInCaption);
   Result.IconSet = Utf8(Settings.IconSet);
   Result.KeepOpenWhenNoSession = Settings.KeepOpenWhenNoSession;
+  Result.ShowLoginWhenNoSession = Settings.ShowLoginWhenNoSession;
+  Result.SessionSilentDisconnect = GUIConfiguration->SessionSilentDisconnect;
+  Result.SessionTabCaptionTruncation = Settings.SessionTabCaptionTruncation;
+  Result.WorkspaceConnectAll = Settings.WorkspaceConnectAll;
+  Result.AutoSaveWorkspace = Settings.AutoSaveWorkspace;
+  Result.AutoSaveWorkspacePasswords = Settings.AutoSaveWorkspacePasswords;
+  Result.AutoWorkspace = Utf8(Settings.AutoWorkspace);
   // As TFileColorData::LoadList: comma text of "BBGGRR:mask" (TColor).
   std::unique_ptr<TStringList> Colors(CommaTextToStringList(Settings.FileColors));
   for (int Index = 0; Index < Colors->Count; Index++)
@@ -678,6 +688,13 @@ void SetPreferences(const TPreferences & Preferences)
   Settings.PathInCaption = static_cast<int>(Preferences.PathInCaption);
   Settings.IconSet = FromUtf8(Preferences.IconSet);
   Settings.KeepOpenWhenNoSession = Preferences.KeepOpenWhenNoSession;
+  Settings.ShowLoginWhenNoSession = Preferences.ShowLoginWhenNoSession;
+  GUIConfiguration->SessionSilentDisconnect = Preferences.SessionSilentDisconnect;
+  Settings.SessionTabCaptionTruncation = Preferences.SessionTabCaptionTruncation;
+  Settings.WorkspaceConnectAll = Preferences.WorkspaceConnectAll;
+  Settings.AutoSaveWorkspace = Preferences.AutoSaveWorkspace;
+  Settings.AutoSaveWorkspacePasswords = Preferences.AutoSaveWorkspacePasswords;
+  Settings.AutoWorkspace = FromUtf8(Preferences.AutoWorkspace);
   // As TFileColorData::SaveList.
   std::unique_ptr<TStringList> Colors(new TStringList());
   for (const TPreferences::TFileColor & Color : Preferences.FileColors)
@@ -1548,6 +1565,8 @@ void Initialize(IFrontend * AFrontend)
   try
   {
     HeadlessInitialize();
+    // As WinMain: the command line's logging switches, for this run.
+    ApplyLogSwitches(TProgramParams::Instance(), false);
     ShellConfiguration()->OnMasterPasswordPrompt = MasterPasswordPrompt;
     ShellConfiguration()->OnMasterPasswordRecrypt = []() { TSession::RecryptPasswords(); };
   }
@@ -1932,6 +1951,8 @@ std::string Text(TText Text)
     case TText::ExecuteAppError: Ident = EXECUTE_APP_ERROR; break;
     case TText::TimeLeftCalculating: Ident = PROGRESS_TIME_LEFT_CALCULATING; break;
     case TText::CleanTempConfirm: Ident = CLEANTEMP_CONFIRM2; break;
+    case TText::LoginNotShowingAgain: Ident = LOGIN_NOT_SHOWING_AGAIN; break;
+    case TText::NeverPopupDisconnect: Ident = NEVER_POPUP_DISCONNECT; break;
     case TText::OpenButton: Ident = OPEN_BUTTON; break;
     case TText::SynchronizeCompare: Ident = SYNCHRONIZE_PROGRESS_COMPARE; break;
     case TText::ExportConfigurationTitle: Ident = EXPORT_CONF_TITLE; break;

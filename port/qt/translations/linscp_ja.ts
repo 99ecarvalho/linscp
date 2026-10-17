@@ -2961,8 +2961,8 @@ Location: %2</source>
         <translation>アイコン</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>アイコン セット(&amp;S):</translation>
+        <source>&amp;Icon set:</source>
+        <translation>アイコン セット(&amp;I):</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3423,6 +3423,38 @@ Location: %2</source>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>リモートファイルを一時フォルダの一意のパスに残す(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>ワークスペース</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>終了時にワークスペースを保存する(&amp;A)</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>デフォルト ワークスペースの名前(&amp;D):</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>パスワードを保存する(&amp;P) [推奨しない]</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>開かれたワークスペースまたはフォルダのすべてのセッションに接続する(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>最後のセッションを閉じた後の起動時にログインを表示(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>ウィンドウサイズに合わない場合にタブのタイトルを短くする(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>アイドル状態のセッション切断はエラーメッセージを表示しない(&amp;O)</translation>
     </message>
 </context>
 <context>
@@ -4930,6 +4962,10 @@ Location: %2</source>
     <message>
         <source>A&amp;bout...</source>
         <translation>バージョン情報(&amp;A)...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>最後のセッションを閉じた後の起動時にログインを表示(&amp;S)</translation>
     </message>
 </context>
 <context>

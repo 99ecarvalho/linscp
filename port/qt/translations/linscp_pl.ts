@@ -2963,8 +2963,8 @@ Lokalizacja: %2</translation>
         <translation>Ikony</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>Zestaw &amp;ikon:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;Zestaw ikon:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3425,6 +3425,38 @@ Lokalizacja: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Zachowaj tymcz. kopie zdalnych plików w &amp;deterministycznych ścieżkach</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Obszary robocze</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Automatycznie zapisz obszar roboczy przy wyjściu</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Domyślna nazwa obszaru roboczego:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Zapisz &amp;hasła (niepolecane)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>Połącz wszystkie &amp;sesje otwartego obszaru roboczego lub folderu witryny</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Pokaż okno dialogowe logowania przy starcie i po zamknięciu ostatniej sesji</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>Przytnij &amp;tytuły kart, jeśli nie mieszczą się w oknie</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Nie wyświetlaj &amp;komunikatu o błędzie, gdy bezczynna sesja jest rozłączona</translation>
     </message>
 </context>
 <context>
@@ -4932,6 +4964,10 @@ Lokalizacja: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>O pro&amp;gramie</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Pokaż okno dialogowe logowania przy starcie i po zamknięciu ostatniej sesji</translation>
     </message>
 </context>
 <context>

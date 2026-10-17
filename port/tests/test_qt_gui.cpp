@@ -348,6 +348,22 @@ void Dialogs()
   }
 }
 
+// F1: the GUI's logging switches (WinMain's /log, /xmllog, /loglevel,
+// /logsize), this run's, from the process's command line.
+void LogSwitches(const QString & LogFile)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+  Check(Preferences.Logging && (QFileInfo(QString::fromStdString(Preferences.LogFileName)) == QFileInfo(LogFile)),
+    "/log: the session log on, to the file given");
+  // (LogLevel: the dialog's, core's LogProtocol + 1.)
+  Check((Preferences.LogLevel == 3) && Preferences.LogSensitive, "/loglevel=2*: debug 2, passwords included");
+  Check((Preferences.LogMaxCount == 3) && (Preferences.LogMaxSize == 1024 * 1024), "/logsize=3*1M: rotated at 1 MB, three kept");
+  Check(Preferences.LogActions && !Preferences.ActionsLogFileName.empty(), "/xmllog: the XML log on");
+  CoreBridge::Finalize();
+}
+
 void Language(const QString & Translations)
 {
   QtFrontend Frontend;
@@ -2899,6 +2915,16 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       Check(Dialog.RememberPasswordCheck()->isChecked(), "passwords remembered for the session by default");
       Check(Dialog.PathShortButton()->isChecked() && Dialog.KeepOpenCheck()->isChecked() && Dialog.FileColors().empty(),
         "the Window and File colors pages show WinSCP's defaults");
+      // E4, E5, E6: the Window page's, WinSCP's defaults; the workspace's
+      // name and passwords with its saving.
+      Check(Dialog.ShowLoginCheck()->isChecked() && Dialog.TabTruncationCheck()->isChecked() &&
+        !Dialog.AutoSaveWorkspaceCheck()->isChecked() && !Dialog.AutoWorkspaceCombo()->isEnabled() &&
+        !Dialog.AutoSaveWorkspacePasswordsCheck()->isEnabled() && !Dialog.WorkspaceConnectAllCheck()->isChecked(),
+        "Window: the Login dialog shown, titles truncated, workspaces not saved, connected as selected");
+      Dialog.AutoSaveWorkspaceCheck()->setChecked(true);
+      Check(Dialog.AutoWorkspaceCombo()->isEnabled() && Dialog.AutoSaveWorkspacePasswordsCheck()->isEnabled() &&
+        !Dialog.AutoWorkspaceCombo()->currentText().isEmpty(), "saving on exit: its name, New Workspace to start with");
+      Dialog.AutoSaveWorkspaceCheck()->setChecked(false);
       Check(!Dialog.ShowHiddenFilesCheck()->isChecked() && (Dialog.SizeFormatCombo()->currentIndex() == 1) &&
         Dialog.NaturalSortingCheck()->isChecked(), "showing the settings");
       bool Portuguese = false;
@@ -3251,6 +3277,20 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       CoreBridge::SetPreferences(Off);
       MainWindow Closing(CoreBridge::Info());
       Closing.show();
+      // E4: the Login dialog first (ShowLoginWhenNoSession), with its
+      // "Show Login dialog..." checkbox; cancelled, the window closes.
+      bool LoginShown = false;
+      Responder.Custom = [&LoginShown](QWidget * Modal)
+      {
+        SiteManager * Login = qobject_cast<SiteManager *>(Modal);
+        if (Login == nullptr)
+        {
+          return false;
+        }
+        LoginShown = Login->ShowAgainCheck()->isVisibleTo(Login) && Login->ShowAgainCheck()->isChecked();
+        Login->reject();
+        return true;
+      };
       for (QAction * Action : Closing.findChildren<QAction *>())
       {
         if (Action->text() == MainWindow::tr("&Disconnect Session"))
@@ -3259,6 +3299,8 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
           Action->trigger();
         }
       }
+      Responder.Custom = nullptr;
+      Check(LoginShown, "the last session closed: the Login dialog, as WinSCP's NeedSession");
       Check(!Closing.isVisible(), "without keeping it open, the window closes with the session");
       Off.KeepOpenWhenNoSession = true;
       CoreBridge::SetPreferences(Off);
@@ -6137,10 +6179,13 @@ void TabsTest(const char * Port, const QString & Directory)
     Check(Window.WorkspaceName() == Name, "the name offered next time");
     Check(Window.CloseTab(1) && Window.CloseTab(0) && (Window.TabCount() == 0), "(both tabs closed)");
     Check(Window.OpenWorkspace(Name) && (Window.TabCount() == 2) && (Window.ActiveTab() == 0), "Open the workspace: two tabs");
+    // E6: WinSCP's default: the other tab's session connects once selected.
+    Check(!Window.TabPending(0) && Window.TabPending(1) && (Window.TabBar()->elideMode() == Qt::ElideRight),
+      "the first connected, the second as it is selected; the titles truncated");
     Check((Window.Panel()->Path() == QStringLiteral("/")) &&
       (QDir(Window.Local()->Path()) == QDir(QDir(Directory).filePath(QStringLiteral("first")))),
       "the first with its directories");
-    Check(Window.SwitchTab(1) && (Window.Panel()->Path() == QStringLiteral("/sub")) &&
+    Check(Window.SwitchTab(1) && !Window.TabPending(1) && Window.Session()->Active() && (Window.Panel()->Path() == QStringLiteral("/sub")) &&
       (QDir(Window.Local()->Path()) == QDir(QDir(Directory).filePath(QStringLiteral("second")))),
       "the second with its directories");
     {
@@ -6513,6 +6558,23 @@ void SessionCommandsTest(const char * Port, const QString & Key, const QString &
     Check(!Window.Session()->Active() && (Window.TabCount() == 1), "(the connection lost, the tab kept)");
     Check(Window.ReconnectSession() && Window.Session()->Active(), "Reconnect Session");
     Check(QString::fromStdString(Window.Session()->CurrentDirectory()) == QStringLiteral("/sub"), "where it was");
+    // E5: a connection lost while idle: its message, unless the preferences
+    // say to keep quiet (then in the status bar).
+    {
+      CoreBridge::TError Lost;
+      Lost.Message = "Connection has been unexpectedly closed.";
+      CoreBridge::TCoreError Fatal(Lost, false);
+      Fatal.Fatal = true;
+      Responder.LastQuery.clear();
+      Window.IdleError(Fatal);
+      Check(Responder.LastQuery.contains(QStringLiteral("unexpectedly closed")), "a lost connection's message, while idle");
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & Preferences) { Preferences.SessionSilentDisconnect = true; });
+      Responder.LastQuery.clear();
+      Window.IdleError(Fatal);
+      Check(Responder.LastQuery.isEmpty() && Window.statusBar()->currentMessage().contains(QStringLiteral("unexpectedly closed")),
+        "or none, Do not popup error message when idle session is disconnected");
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & Preferences) { Preferences.SessionSilentDisconnect = false; });
+    }
 
     // Install Public Key: the test server is not OpenSSH (asked, OK); the
     // key, converted to PuTTY's format first, added to the server's
@@ -8147,6 +8209,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 3) && (std::strcmp(argv[1], "menus-explorer") == 0))
   {
     Menus(true);
+  }
+  else if ((argc >= 3) && (std::strcmp(argv[1], "logswitches") == 0))
+  {
+    LogSwitches(QString::fromLocal8Bit(argv[2]));
   }
   else if ((argc >= 3) && (std::strcmp(argv[1], "language") == 0))
   {

@@ -2962,7 +2962,7 @@ Emplacement : %2</translation>
         <translation>Icônes</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Jeu d&apos;icônes :</translation>
     </message>
     <message>
@@ -3424,6 +3424,38 @@ Emplacement : %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Utiliser des répertoires aux chemins non aléatoires</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Espaces de travail</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Enregistrer automatiquement l&apos;espace de travail à la fermeture</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Nom de l&apos;espace de travail par défaut :</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Enregistrer les &amp;mots de passe (non recommandé)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>Connecter toutes les sessions de l&apos;espace de travail ou du dossier de sites ouverts</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Afficher la boîte de dialogue de connexion au démarrage et à la fermeture de la dernière session</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Tronquer les titres des onglets lorsqu&apos;ils ne rentrent pas dans la fenêtre</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Ne pas &amp;afficher de message d&apos;erreur lorsqu&apos;une session inactive est déconnectée</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Emplacement : %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>À propos...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Afficher la boîte de dialogue de connexion au démarrage et à la fermeture de la dernière session</translation>
     </message>
 </context>
 <context>

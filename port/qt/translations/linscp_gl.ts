@@ -2962,7 +2962,7 @@ Localización: %2</translation>
         <translation>Iconas</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Conxunto de iconas:</translation>
     </message>
     <message>
@@ -3424,6 +3424,38 @@ Localización: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Manter as copias temporais dos ficheiros remotos en camiños &amp;deterministas</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Espazos de traballo</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Gardar &amp;automaticamente o espazo de traballo ao saír</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Nome pre&amp;determinado do espazo de traballo:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Gardar os &amp;contrasinais (non recomendado)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>Co&amp;nectar todas as sesións do espazo de traballo ou cartafol de sitios aberto</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Mostrar o diálogo de acceso ao iniciar e cando se pecha a última sesión</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Truncar os títulos das lapelas cando non caben na ventá</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Non amosar a mensaxe de erro cando se &amp;desconecte unha sesión inactiva</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Localización: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>Ac&amp;erca de...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Mostrar o diálogo de acceso ao iniciar e cando se pecha a última sesión</translation>
     </message>
 </context>
 <context>

@@ -49,7 +49,24 @@ public:
   // Connects to a site, saved or as edited in the site manager.
   bool OpenSite(const CoreBridge::TSite & Site);
   // File > Site Manager: false when it was closed without logging in.
-  bool SiteManagerDialog();
+  // Automatic: shown by itself (NeedSession), with its "Show Login dialog
+  // on startup..." checkbox.
+  bool SiteManagerDialog(bool Automatic = false);
+  // As TCustomScpExplorerForm::NeedSession, at start-up and once the last
+  // tab closes: the Login dialog, if the preferences say; then, unless the
+  // window is to stay open, the window closed with no session.
+  void NeedSession(bool Startup);
+  // As ShowExtendedExceptionEx for an error while idle: a lost connection
+  // quietly (SessionSilentDisconnect), else with "Never popup disconnect
+  // messages"; any other error as it is.
+  void IdleError(const CoreBridge::TCoreError & E);
+  // The active tab's pending session connected, as Open connects a new one.
+  bool ConnectPendingTab();
+  // Open's two halves around the connecting: the session's local directory
+  // and the rest; the tab made (or the previous one back on failure).
+  void Opened();
+  void OpenDone(bool Result, int Previous);
+  bool TabPending(int Index) const { return (Index >= 0) && (Index < static_cast<int>(FTabs.size())) && FTabs[Index].Pending; }
   // As WinSCP starts: the session the command line names (a site or a URL,
   // CoreBridge::TSession::FromCommandLine), else, or when it says too
   // little or does not connect, the site manager.
@@ -742,6 +759,9 @@ private:
     // A local tab's name, as renamed (a session's is its own).
     QString Name;
     bool SynchronizeBrowsing = false;
+    // A workspace's session not connected yet: it connects as the tab is
+    // first selected (WorkspaceConnectAll off, WinSCP's default).
+    bool Pending = false;
     // The panels' state, kept with "remember panels' state" (P3-16).
     TPanelState LocalState;
     TPanelState RemoteState;

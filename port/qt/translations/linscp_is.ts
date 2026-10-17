@@ -2962,8 +2962,8 @@ Staðsetning: %2</translation>
         <translation>Táknmyndir</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>Táknmynda&amp;sett:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;Táknmyndasett:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3424,6 +3424,38 @@ Staðsetning: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Geyma tímabundin afrita af fjarrænum skrám á &amp;ákvæðum slóðum</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Vinnusvæði</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Sjálfvirkt vista vinnusvæði við lokun</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Sjálfgilt vinnusvæðisnafn:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Vista &amp;aðgangsorð (ekki ráðlagt)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Tengja allar lotur opnaðs vinnusvæðis eða setramöppu</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Sýna Innskráningarglugga við ræsingu og þegar síðustu lotu er lokað</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>Stytta &amp;flipaheiti þegar þau passa ekki í glugga</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Ekki birta villuboð þegar óvirk &amp;seta aftengist</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Staðsetning: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;Um…</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Sýna Innskráningarglugga við ræsingu og þegar síðustu lotu er lokað</translation>
     </message>
 </context>
 <context>

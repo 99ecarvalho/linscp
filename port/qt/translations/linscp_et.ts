@@ -2962,8 +2962,8 @@ Asukoht: %2</translation>
         <translation>Ikoonid</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>Ikoonide &amp;komplekt:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;Ikoonide komplekt:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3424,6 +3424,38 @@ Asukoht: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Hoia kaugfailide ajutisi koopiaid &amp;kindlates asukohtades</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Tööruumid</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Tööruum salvestatakse väljumisel &amp;automaatselt</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Vaikimisi tööruumi nimi:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Salvesta ka &amp;paroolid (ei ole soovitav)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Ühenda kõik avatud tööruumi või seansikausta seansid</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Kuva sisselogimise aken käivitamisel ja viimase seansi sulgemisel</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Lühenda kaartide pealkirju, kui need aknasse ei mahu</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Ära kuva veateadet, kui &amp;jõude seanss katkestatakse</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Asukoht: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>Tea&amp;ve...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Kuva sisselogimise aken käivitamisel ja viimase seansi sulgemisel</translation>
     </message>
 </context>
 <context>

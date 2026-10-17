@@ -757,6 +757,11 @@ std::string TimeSpanText(double Seconds)
   return Utf8(FormatDateTimeSpan(TDateTime(Seconds / SecsPerDay)));
 }
 
+bool PasswordStoringDisabled()
+{
+  return Configuration->DisablePasswordStoring;
+}
+
 std::string MinimizeName(const std::string & Path, int MaxLen, bool Unix)
 {
   return Utf8(::MinimizeName(FromUtf8(Path), MaxLen, Unix));

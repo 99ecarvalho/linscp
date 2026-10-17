@@ -2964,7 +2964,7 @@ Lokacija: %2</translation>
         <translation>Ikone</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Nabor ikon:</translation>
     </message>
     <message>
@@ -3426,6 +3426,38 @@ Lokacija: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Obdrži začasne kopije oddaljenih datotek v &amp;dobro poznanih poteh</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Delovna okolja</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Samodejno shrani delovno okolje ob izhodu</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Privzeto ime delovnega okolja:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Shrani &amp;gesla (ni priporočljivo)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Poveži vse seje odprtega delovnega prostora ali mape mesta</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Prikaži prijavno okno ob zagonu ter po zaprtju zadnje seje</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Skrajšaj naslove zavihkov, ko se ne prilegajo oknu</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Ne prikaži p&amp;ojavnega sporočila o napaki, ko je nedejavna seja prekinjena</translation>
     </message>
 </context>
 <context>
@@ -4933,6 +4965,10 @@ Lokacija: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>O pro&amp;gramu...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Prikaži prijavno okno ob zagonu ter po zaprtju zadnje seje</translation>
     </message>
 </context>
 <context>

@@ -2961,8 +2961,8 @@ Konum: %2</translation>
         <translation>Simgeler</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>Simge &amp;takımı:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;Simge takımı:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3423,6 +3423,38 @@ Konum: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Uzak &amp;dosyaların geçici kopyaları belirleyici yollara kaydedilsin</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Çalışma alanları</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Çalışma alanı çıkışta &amp;otomatik olarak kaydedilsin</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Varsayılan çalışma alanı adı:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>&amp;Parolalar kaydedilsin (önerilmez):</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Açılan çalışma alanının veya site klasörünün tüm oturumları bağlansın</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Açılışta oturum açma penceresi ve son oturum zamanı görüntülensin</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Pencereye sığmadığında sekme başlıkları budansın</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Boştaki oturumun bağlantısı kesildiğinde hata iletisi &amp;görüntülenmesin</translation>
     </message>
 </context>
 <context>
@@ -4930,6 +4962,10 @@ Konum: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;Hakkında...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Açılışta oturum açma penceresi ve &amp;son oturumun ne zaman kapatıldığı görüntülensin</translation>
     </message>
 </context>
 <context>

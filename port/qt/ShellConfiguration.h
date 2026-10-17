@@ -51,6 +51,13 @@ struct TShellSettings
   // linscp's: the icon set (IconSet.h's ids); empty for the platform's default.
   UnicodeString IconSet;
   bool KeepOpenWhenNoSession = true;
+  // Window: the Login dialog at start-up and once the last session closes
+  // (ShowLoginWhenNoSession); tab titles truncated to fit
+  // (SessionTabCaptionTruncation); a workspace's sessions all connected as
+  // it opens, not each as its tab is first selected (WorkspaceConnectAll).
+  bool ShowLoginWhenNoSession = true;
+  bool SessionTabCaptionTruncation = true;
+  bool WorkspaceConnectAll = false;
   // Integration > Applications: each new session opened in PuTTY too.
   bool AutoOpenInPutty = false;
   // Workspaces: saved automatically on closing, with passwords or not, and

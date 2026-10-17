@@ -2962,8 +2962,8 @@ Ligging: %2</translation>
         <translation>Ikone</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>Ikoon&amp;stel:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;Ikoonstel:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3424,6 +3424,38 @@ Ligging: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Hou tydelike kopieë van afgeleë lêers in &amp;vaste paaie</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Werkruimtes</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Stoor werkruimte &amp;outomaties by verlating</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Verstek werkruimtenaam:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Stoor &amp;wagwoorde (nie aanbeveel nie)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Koppel alle sessies van oopgemaakte werkruimte of werfvouer</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Wys aanmeldingsdialoog by aanvang en wanneer die laaste sessie gesluit word</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Verkort oortjietitels wanneer hulle nie in die venster pas nie</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Moenie f&amp;outboodskap wys wanneer ledige sessie ontkoppel word nie</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Ligging: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;Oor...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Wys aanmeldingsdialoog by aanvang en wanneer die laaste sessie gesluit word</translation>
     </message>
 </context>
 <context>

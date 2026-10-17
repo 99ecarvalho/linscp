@@ -2961,8 +2961,8 @@ Hely: %2</translation>
         <translation>Ikonok</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>Ikon&amp;készlet:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;Ikonkészlet:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3423,6 +3423,38 @@ Hely: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Távoli fájlok ideiglenes másolatának meg&amp;tartása az útvonalakon</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Munkaterületek</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Munkaterület &amp;automatikus mentése kilépéskor</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>A&amp;lapértelmezett munkaterületnév:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>&amp;Jelszavak mentése (nem ajánlott)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>A megnyitott munkaterület vagy webhelymappa összes munkamenetének &amp;csatlakozása</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Megjelenítés induláskor és az utolsó munkamenet bezárásakor</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>A lapcímek csonkolása, ha nem fér el</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>&amp;Ne jelenjen meg felugró ablakban hibaüzenet a munkamenet szétkapcsolásakor</translation>
     </message>
 </context>
 <context>
@@ -4930,6 +4962,10 @@ Hely: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;Névjegy</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Megjelenítés induláskor és az utolsó munkamenet bezárásakor</translation>
     </message>
 </context>
 <context>

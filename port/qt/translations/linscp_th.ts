@@ -2961,7 +2961,7 @@ Location: %2</source>
         <translation>ไอคอน</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;ชุดไอคอน:</translation>
     </message>
     <message>
@@ -3423,6 +3423,38 @@ Location: %2</source>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>เก็บสำเนาชั่วคราวของไฟล์ระยะไกลในพาธที่&amp;กำหนดแน่นอน</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>เวิร์กสเปซ</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;บันทึกเวิร์กสเปซโดยอัตโนมัติเมื่อออกจากโปรแกรม</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;ชื่อเวิร์กสเปซเริ่มต้น:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>บันทึก&amp;รหัสผ่าน (ไม่แนะนำ)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;เชื่อมต่อทุกเซสชั่นของเวิร์กสเปซหรือโฟลเดอร์เว็บไซต์ที่เปิด</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;แสดงกล่องโต้ตอบเข้าสู่ระบบเมื่อเริ่มโปรแกรมและเมื่อปิดเซสชั่นสุดท้าย</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;ตัดชื่อแท็บเมื่อไม่พอดีกับหน้าต่าง</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>ไม่แสดงข้อความแสดงข้อผิดพลาดเมื่อเซสชันที่&amp;ไม่ได้ใช้งานถูกตัดการเชื่อมต่อ</translation>
     </message>
 </context>
 <context>
@@ -4930,6 +4962,10 @@ Location: %2</source>
     <message>
         <source>A&amp;bout...</source>
         <translation>เกี่ยวกับ</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;แสดงกล่องโต้ตอบเข้าสู่ระบบเมื่อเริ่มโปรแกรมและเมื่อปิดเซสชั่นสุดท้าย</translation>
     </message>
 </context>
 <context>

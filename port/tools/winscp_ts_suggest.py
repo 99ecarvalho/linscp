@@ -60,9 +60,13 @@ def dfm_captions(path):
             if (line == 'end>') and items:
                 items.pop()
         else:
-            m = re.match(r'(Caption|Hint) = (.*)', line)
+            m = re.match(r'(Caption|Hint) =\s*(.*)', line)
             if m:
                 value = m.group(2)
+                # A long one starts on the next line ("Caption = " alone).
+                if not value:
+                    i += 1
+                    value = lines[i].strip()
                 while value.endswith('+'):
                     i += 1
                     value = value[:-1] + lines[i].strip()

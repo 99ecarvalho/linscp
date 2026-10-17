@@ -134,6 +134,13 @@ public:
   QRadioButton * PathShortButton() const { return FPathShort; }
   QRadioButton * PathNoneButton() const { return FPathNone; }
   QCheckBox * KeepOpenCheck() const { return FKeepOpen; }
+  QCheckBox * ShowLoginCheck() const { return FShowLogin; }
+  QCheckBox * TabTruncationCheck() const { return FTabTruncation; }
+  QCheckBox * SilentDisconnectCheck() const { return FSilentDisconnect; }
+  QCheckBox * AutoSaveWorkspaceCheck() const { return FAutoSaveWorkspace; }
+  QCheckBox * AutoSaveWorkspacePasswordsCheck() const { return FAutoSaveWorkspacePasswords; }
+  QComboBox * AutoWorkspaceCombo() const { return FAutoWorkspace; }
+  QCheckBox * WorkspaceConnectAllCheck() const { return FWorkspaceConnectAll; }
   // File colors, and their buttons' actions (what the dialog would edit
   // given).
   QListWidget * FileColorsList() const { return FFileColorsList; }
@@ -369,6 +376,13 @@ private:
   QRadioButton * FPathShort = nullptr;
   QRadioButton * FPathNone = nullptr;
   QCheckBox * FKeepOpen = nullptr;
+  QCheckBox * FShowLogin = nullptr;
+  QCheckBox * FTabTruncation = nullptr;
+  QCheckBox * FSilentDisconnect = nullptr;
+  QCheckBox * FAutoSaveWorkspace = nullptr;
+  QCheckBox * FAutoSaveWorkspacePasswords = nullptr;
+  QComboBox * FAutoWorkspace = nullptr;
+  QCheckBox * FWorkspaceConnectAll = nullptr;
   std::vector<CoreBridge::TPreferences::TFileColor> FFileColors;
   QListWidget * FFileColorsList = nullptr;
   QPushButton * FEditFileColor = nullptr;

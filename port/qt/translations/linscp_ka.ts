@@ -2962,8 +2962,8 @@ Location: %2</source>
         <translation>ხატულები</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>ხატულების &amp;ნაკრები:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;ხატულების ნაკრები:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3424,6 +3424,38 @@ Location: %2</source>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>დაშორებული ფაილების ასლის შენარჩუნება &amp;დეტერმინისტულ ბილიკებზე</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>სამუშაო სივრცეები</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>სამუშაო სივრცის &amp;ავტომატური შენახვა გასვლისას</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;ნაგულისხმევი სამუშაო სივრცის სახელი:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>&amp;პაროლების შენახვა (რეკომენდებული არაა)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>გახსნილი სამუშაო სივრცის ან საიტების საქაღალდის ყველა სესიის &amp;დაკავშირება</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>შესვლის დიალოგი&amp;ს ჩვენება გაშვებისას და როცა ბოლო სესია დაიხურება</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>ჩანართების სათაურების &amp;შემოკლება, როცა ფანჯარაში არ ეტევა</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>არ აჩვენო შეცდომის შეტყობინება, როცა &amp;უმოქმედო სესია გაითიშება</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Location: %2</source>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;შესახებ...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>შესვლის დიალოგი&amp;ს ჩვენება გაშვებისას და როცა ბოლო სესია დაიხურება</translation>
     </message>
 </context>
 <context>

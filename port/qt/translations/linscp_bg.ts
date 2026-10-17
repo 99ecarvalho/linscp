@@ -2962,7 +2962,7 @@ Location: %2</source>
         <translation>Значета</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Набор значета:</translation>
     </message>
     <message>
@@ -3424,6 +3424,38 @@ Location: %2</source>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Временните копия на отдалечените файлове в &amp;детерминирани пътища</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Работни пространства</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Автоматично съхраняване на работното пространство при изход</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Име на работното пространство по подразбиране:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Съхраняване на &amp;паролите (не се препоръчва)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Свързване на всички сесии от отвореното работно пространство или папка</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Показване на прозореца за &amp;влизане при пускане и след затваряне на последната сесия</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Съкращаване на заглавията на разделите, когато не се побират в прозореца</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Без съобщение за грешка при &amp;прекъсване на неактивна сесия</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Location: %2</source>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;За...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Показване на прозореца за &amp;влизане при пускане и след затваряне на последната сесия</translation>
     </message>
 </context>
 <context>

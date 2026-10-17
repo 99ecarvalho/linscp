@@ -449,6 +449,9 @@ void PreferencesDialog::UpdateControls()
   }
   FTemporaryEdit->setEnabled(FCustomTemporary->isChecked());
   FConfirmTemporaryCleanup->setEnabled(FTemporaryCleanup->isChecked());
+  // As UpdateControls: the workspace's name and passwords with the saving.
+  FAutoWorkspace->setEnabled(FAutoSaveWorkspace->isChecked());
+  FAutoSaveWorkspacePasswords->setEnabled(FAutoSaveWorkspace->isChecked() && !CoreBridge::PasswordStoringDisabled());
 }
 
 // As TPreferencesDialog::UpdateCopyParamListView: the default first, then
@@ -479,6 +482,36 @@ QWidget * PreferencesDialog::MakeWindowPage(const TPreferences & Preferences)
 {
   QWidget * Page = new QWidget(this);
   QVBoxLayout * Layout = new QVBoxLayout(Page);
+  // As WorkspacesGroup: the workspace saved on exit, its name (the one in
+  // use, else New Workspace), with passwords; and how a workspace opens.
+  QGroupBox * Workspaces = new QGroupBox(tr("Workspaces"), Page);
+  QGridLayout * WorkspacesLayout = new QGridLayout(Workspaces);
+  FAutoSaveWorkspace = new QCheckBox(tr("&Automatically save workspace on exit"), Workspaces);
+  FAutoSaveWorkspace->setChecked(Preferences.AutoSaveWorkspace);
+  QLabel * AutoWorkspaceLabel = new QLabel(tr("&Default workspace name:"), Workspaces);
+  FAutoWorkspace = new QComboBox(Workspaces);
+  FAutoWorkspace->setEditable(true);
+  FAutoWorkspace->setInsertPolicy(QComboBox::NoInsert);
+  for (const std::string & Name : CoreBridge::WorkspaceNames())
+  {
+    FAutoWorkspace->addItem(QString::fromStdString(Name));
+  }
+  FAutoWorkspace->setCurrentText(!Preferences.AutoWorkspace.empty() ? QString::fromStdString(Preferences.AutoWorkspace) :
+    QString::fromStdString(CoreBridge::Text(CoreBridge::TText::NewWorkspace)));
+  AutoWorkspaceLabel->setBuddy(FAutoWorkspace);
+  FAutoSaveWorkspacePasswords = new QCheckBox(tr("Save &passwords (not recommended)"), Workspaces);
+  FAutoSaveWorkspacePasswords->setChecked(Preferences.AutoSaveWorkspacePasswords);
+  FWorkspaceConnectAll = new QCheckBox(tr("&Connect all sessions of opened workspace or site folder"), Workspaces);
+  FWorkspaceConnectAll->setChecked(Preferences.WorkspaceConnectAll);
+  WorkspacesLayout->addWidget(FAutoSaveWorkspace, 0, 0, 1, 3);
+  WorkspacesLayout->addItem(new QSpacerItem(20, 0, QSizePolicy::Fixed), 1, 0);
+  WorkspacesLayout->addWidget(AutoWorkspaceLabel, 1, 1);
+  WorkspacesLayout->addWidget(FAutoWorkspace, 1, 2);
+  WorkspacesLayout->addWidget(FAutoSaveWorkspacePasswords, 2, 1, 1, 2);
+  WorkspacesLayout->addWidget(FWorkspaceConnectAll, 3, 0, 1, 3);
+  WorkspacesLayout->setColumnStretch(2, 1);
+  connect(FAutoSaveWorkspace, &QCheckBox::toggled, this, &PreferencesDialog::UpdateControls);
+  Layout->addWidget(Workspaces);
   QGroupBox * Path = new QGroupBox(tr("Path in window title"), Page);
   QVBoxLayout * PathLayout = new QVBoxLayout(Path);
   FPathFull = new QRadioButton(tr("Show &full path"), Path);
@@ -502,9 +535,18 @@ QWidget * PreferencesDialog::MakeWindowPage(const TPreferences & Preferences)
   FExternalSessionInExistingInstance = new QCheckBox(tr("Open new externally initiated sessions in &existing window"), Misc);
   FExternalSessionInExistingInstance->setChecked(Preferences.ExternalSessionInExistingInstance);
   MiscLayout->addWidget(FExternalSessionInExistingInstance);
+  FShowLogin = new QCheckBox(tr("&Show Login dialog on startup and when the last session is closed"), Misc);
+  FShowLogin->setChecked(Preferences.ShowLoginWhenNoSession);
+  MiscLayout->addWidget(FShowLogin);
   FKeepOpen = new QCheckBox(tr("&Keep main window open when the last session is closed"), Misc);
   FKeepOpen->setChecked(Preferences.KeepOpenWhenNoSession);
   MiscLayout->addWidget(FKeepOpen);
+  FSilentDisconnect = new QCheckBox(tr("Do not p&opup error message when idle session is disconnected"), Misc);
+  FSilentDisconnect->setChecked(Preferences.SessionSilentDisconnect);
+  MiscLayout->addWidget(FSilentDisconnect);
+  FTabTruncation = new QCheckBox(tr("&Truncate tab titles when they do not fit to window"), Misc);
+  FTabTruncation->setChecked(Preferences.SessionTabCaptionTruncation);
+  MiscLayout->addWidget(FTabTruncation);
   Layout->addWidget(Misc);
   // linscp's: WinSCP's own icons are not reusable (IconSet.h).
   QGroupBox * Icons = new QGroupBox(tr("Icons"), Page);
@@ -517,7 +559,7 @@ QWidget * PreferencesDialog::MakeWindowPage(const TPreferences & Preferences)
   const int IconSetIndex = FIconSet->findData(Preferences.IconSet.empty() ? IconSet::DefaultSet() :
     QString::fromStdString(Preferences.IconSet));
   FIconSet->setCurrentIndex(std::max(IconSetIndex, 0));
-  IconsLayout->addRow(tr("Icon &set:"), FIconSet);
+  IconsLayout->addRow(tr("&Icon set:"), FIconSet);
   Layout->addWidget(Icons);
   Layout->addStretch(1);
   return Page;
@@ -1287,6 +1329,13 @@ TPreferences PreferencesDialog::Preferences() const
   Result.PathInCaption = FPathFull->isChecked() ? TPreferences::TPathInCaption::Full :
     (FPathNone->isChecked() ? TPreferences::TPathInCaption::None : TPreferences::TPathInCaption::Short);
   Result.KeepOpenWhenNoSession = FKeepOpen->isChecked();
+  Result.ShowLoginWhenNoSession = FShowLogin->isChecked();
+  Result.SessionTabCaptionTruncation = FTabTruncation->isChecked();
+  Result.SessionSilentDisconnect = FSilentDisconnect->isChecked();
+  Result.WorkspaceConnectAll = FWorkspaceConnectAll->isChecked();
+  Result.AutoSaveWorkspace = FAutoSaveWorkspace->isChecked();
+  Result.AutoSaveWorkspacePasswords = FAutoSaveWorkspacePasswords->isChecked();
+  Result.AutoWorkspace = FAutoWorkspace->currentText().trimmed().toStdString();
   Result.MinimizeToTray = FMinimizeToTray->isChecked();
   Result.ExternalSessionInExistingInstance = FExternalSessionInExistingInstance->isChecked();
   Result.FileColors = FFileColors;

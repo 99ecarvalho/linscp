@@ -300,6 +300,34 @@ SiteManager::SiteManager(QWidget * Parent) :
   Splitter->setStretchFactor(0, 2);
   Splitter->setStretchFactor(1, 3);
 
+  FShowAgain = new QCheckBox(tr("&Show Login dialog on startup and when the last session is closed"), this);
+  FShowAgain->setChecked(true);
+  FShowAgain->hide();
+  connect(FShowAgain, &QCheckBox::clicked, this, [this](bool Checked)
+  {
+    // As ShowAgainCheckClick.
+    if (!Checked)
+    {
+      CoreBridge::TQuery Query;
+      Query.Type = CoreBridge::TQueryType::Confirmation;
+      Query.Message = CoreBridge::Text(CoreBridge::TText::LoginNotShowingAgain);
+      CoreBridge::TQueryButton OK;
+      OK.Answer = CoreBridge::AnswerOK;
+      OK.Caption = "OK";
+      CoreBridge::TQueryButton Cancel;
+      Cancel.Answer = CoreBridge::AnswerCancel;
+      Cancel.Caption = "Cancel";
+      Query.Buttons = { OK, Cancel };
+      Query.CancelAnswer = CoreBridge::AnswerCancel;
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      if (Frontend.Query(Query).Answer != CoreBridge::AnswerOK)
+      {
+        FShowAgain->setChecked(true);
+      }
+    }
+  });
+  Layout->addWidget(FShowAgain);
   QDialogButtonBox * Box = new QDialogButtonBox(this);
   FLogin = Box->addButton(tr("&Login"), QDialogButtonBox::AcceptRole);
   FLogin->setDefault(true);

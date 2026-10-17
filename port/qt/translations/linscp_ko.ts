@@ -2961,8 +2961,8 @@ Location: %2</source>
         <translation>아이콘</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>아이콘 세트(&amp;S):</translation>
+        <source>&amp;Icon set:</source>
+        <translation>아이콘 세트(&amp;I):</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3423,6 +3423,38 @@ Location: %2</source>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>선택한 경로에 원격 파일의 임시 복사본 유지(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>작업공간</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>닫을 때 자동으로 작업공간 저장(&amp;A)</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>기존 작업공간 이름(&amp;D):</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>암호 저장 (권장하지 않음)(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>열려 있는 워크스페이스 및 사이트 폴더의 모든 세션을 연결(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>시작 및 마지막 세션이 닫힐 때 로그인 창 표시(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>탭 제목이 창 보다 크면 자름(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>유휴 세션 연결이 끊어질 경우 오류 메시지를 표시안함(&amp;O)</translation>
     </message>
 </context>
 <context>
@@ -4930,6 +4962,10 @@ Location: %2</source>
     <message>
         <source>A&amp;bout...</source>
         <translation>정보(&amp;B)...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>시작 및 마지막 세션이 닫힐 때 로그인 창 표시(&amp;S)</translation>
     </message>
 </context>
 <context>

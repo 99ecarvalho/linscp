@@ -2962,8 +2962,8 @@ Plats: %2</translation>
         <translation>Ikoner</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>Ikon&amp;uppsättning:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;Ikonuppsättning:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3424,6 +3424,38 @@ Plats: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Behåll tillfälliga kopior av fjärrfiler i &amp;deterministiska sökvägar</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Arbetsytor</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Spara &amp;automatiskt arbetsyta vid avslut</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Standardnamn arbetsyta:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Spara &amp;lösenord (rekommenderas inte)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Anslut alla sessioner i öppnad arbetsyta eller platsmapp</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Visa inloggningsdialogrutan vid start och när den sista sessionen är stängd</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Trunkera fliktitlar när de inte passar i fönstret</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Visa inte &amp;felmeddelandet när inaktiv session är frånkopplad</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Plats: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;Om...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Visa inloggningsdialogrutan vid start och när den sista sessionen är stängd</translation>
     </message>
 </context>
 <context>

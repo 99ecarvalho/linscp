@@ -2962,7 +2962,7 @@ Vendndodhja: %2</translation>
         <translation>Ikonat</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Grupi i ikonave:</translation>
     </message>
     <message>
@@ -3424,6 +3424,38 @@ Vendndodhja: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Mbaj kopjet e përkohshme të skedarëve të largët në shtigje të &amp;përcaktuara</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Hapësirat e punës</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Ruaj &amp;automatikisht hapësirën e punës kur del</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Emri i &amp;parazgjedhur i hapësirës së punës:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Ruaj &amp;fjalëkalimet (nuk rekomandohet)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Lidh të gjitha seancat e hapësirës së punës ose dosjes së sajteve të hapur</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Shfaq dialogun e hyrjes në nisje dhe kur mbyllet seanca e fundit</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>Shkurto &amp;titujt e skedave kur nuk përshtaten në dritare</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Mos shfaq mesazh gabimi kur shkëputet një seancë &amp;joaktive</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Vendndodhja: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>Rre&amp;th...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Shfaq dialogun e hyrjes në nisje dhe kur mbyllet seanca e fundit</translation>
     </message>
 </context>
 <context>

@@ -2961,7 +2961,7 @@ Location: %2</source>
         <translation>آیکون ها</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;مجموعه آیکون:</translation>
     </message>
     <message>
@@ -3423,6 +3423,38 @@ Location: %2</source>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>نگهداری رونوشت موفت از پرونده های ارتباط راه دور در مسیر مشخص</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>فضا های کار</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>ذخیره خودکار فضای کاری را در هنگام خروج</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>نام پیش فرض فضای کاری</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>ذخیره &amp;گذرواژه (توصیه نمی شود)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;اتصال همه جلسات فضای کاری یا پوشه تارنمای باز شده</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>نمایش پنجره ورود هنگام اجرا و وقتی که آخرین جلسه بسته شد</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;کوتاه کردن عنوان تب ها وقتی در صفحه جا نمی شوند.</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>هنگام قطع شدن نشست بیکار، پیام خطا &amp;نشان داده نشود</translation>
     </message>
 </context>
 <context>
@@ -4930,6 +4962,10 @@ Location: %2</source>
     <message>
         <source>A&amp;bout...</source>
         <translation>درباره</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>نمایش پنجره ورود در هنگام اجرا و وقتی که آخرین جلسه بسته می شود.</translation>
     </message>
 </context>
 <context>

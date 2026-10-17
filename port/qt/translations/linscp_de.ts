@@ -2962,8 +2962,8 @@ Ort: %2</translation>
         <translation>Symbole</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>Symbol&amp;satz:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;Symbolsatz:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3424,6 +3424,38 @@ Ort: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Temporäre Kopien von Gegestellendateien in &amp;determinist. Pfaden behalten</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Arbeitsbereiche</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Arbeitsbereich beim Beenden automatisch speichern</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Voreinstellung für Arbeitsbereichsname:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>&amp;Passwörter speichern (nicht empfohlen)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Alle Sitzungen des geöffneten Arbeitsbereichs oder des Verbindungszielordners verbinden</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Anmeldedialog beim Start an&amp;zeigen und wenn letzte Sitzung geschlossen wurde</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>Zu lange Spaltenbezeichnungen kürzen</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Keine P&amp;opup-Fehlermeldung anzeigen, wenn eine inaktive Sitzung getrennt wird</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Ort: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;Über …</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Anmeldedialog beim Start und nach Schließen der letzten Sitzung zeigen</translation>
     </message>
 </context>
 <context>

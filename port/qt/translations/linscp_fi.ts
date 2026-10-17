@@ -2962,8 +2962,8 @@ Sijainti: %2</translation>
         <translation>Kuvakkeet</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>Kuvake&amp;sarja:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;Kuvakesarja:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3424,6 +3424,38 @@ Sijainti: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Säilytä väliaikaiset kopiot etätiedostoista</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Työtilat</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Tallenna työtila automaattisesti suljettaessa</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Työtilan oletusnimi:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Tallenna salasanat (ei suositella)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Yhdistä kaikki avatun työtilan tai kohdekansion istunnot</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Näytä kirjautumisikkuna käynnistettäessä ja kun viimeinen istunto suljetaan</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Lyhennä välilehtien otsikot, kun ne eivät sovi ikkunaan</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Älä näytä virheilmoitusta, kun j&amp;outilas istunto katkeaa</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Sijainti: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>T&amp;ietoja</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Näytä kirjautumisikkuna käynnistettäessä ja kun viimeinen istunto suljetaan</translation>
     </message>
 </context>
 <context>

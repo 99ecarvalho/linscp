@@ -2962,8 +2962,8 @@ Locatie: %2</translation>
         <translation>Pictogrammen</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>Pictogram&amp;set:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;Pictogramset:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3424,6 +3424,38 @@ Locatie: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Maak tijdelijke kopieën van ext. bestanden in &amp;deterministische mappen</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Werkruimtes</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Automatisch werkruimte opslaan bij afsluiten</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Standaard werkruimte naam:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>&amp;Wachtwoorden opslaan (niet aanbevolen)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>Alle sessies van geopende werkruimte of sitemap &amp;verbinden</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Toon &amp;logindialoog en tijd van sluiten van laatse sessie tijdens opstarten</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>Verkort &amp;tabbladtitels als ze niet op het scherm passen</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Geen f&amp;outmelding tonen wanneer een inactieve sessie wordt verbroken</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Locatie: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;Over...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Laat Login dialoog tijdens opstarten zien en wanneer de laatste sessie gesloten is</translation>
     </message>
 </context>
 <context>

@@ -2961,8 +2961,8 @@ Location: %2</source>
         <translation>အိုင်ကွန်များ</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>အိုင်ကွန် အစုံ(&amp;S):</translation>
+        <source>&amp;Icon set:</source>
+        <translation>အိုင်ကွန် အစုံ(&amp;I):</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3423,6 +3423,38 @@ Location: %2</source>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>အဝေးဖိုင်များ၏ ယာယီမိတ္တူများကို သတ်မှတ်လမ်းကြောင်းများတွင် ထားပါ(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>အလုပ်ခွင်များ</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>ထွက်သည့်အခါ အလုပ်ခွင်ကို အလိုအလျောက် သိမ်းပါ(&amp;A)</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>မူလ အလုပ်ခွင် အမည်(&amp;D):</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>စကားဝှက်များ သိမ်းပါ (အကြံမပြုပါ)(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>ဖွင့်ထားသော အလုပ်ခွင် သို့မဟုတ် ဆိုက်စာတွဲ၏ ကဏ္ဍအားလုံးကို ချိတ်ဆက်ပါ(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>စတင်ချိန်နှင့် နောက်ဆုံးကဏ္ဍ ပိတ်သည့်အခါ ဝင်ရောက်ခြင်း ဝင်းဒိုးကို ပြပါ(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>ဝင်းဒိုးတွင် မဆံ့သည့်အခါ တဘ်ခေါင်းစဉ်များကို ဖြတ်တောက်ပါ(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>အလုပ်မလုပ်သော ဆက်ရှင် ချိတ်ဆက်မှုပြတ်သောအခါ အမှားစာ မပြပါနှင့်(&amp;O)</translation>
     </message>
 </context>
 <context>
@@ -4930,6 +4962,10 @@ Location: %2</source>
     <message>
         <source>A&amp;bout...</source>
         <translation>အကြောင်း(&amp;B)...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>စတင်ချိန်နှင့် နောက်ဆုံးကဏ္ဍ ပိတ်သည့်အခါ ဝင်ရောက်ခြင်း ဝင်းဒိုးကို ပြပါ(&amp;S)</translation>
     </message>
 </context>
 <context>

@@ -154,9 +154,9 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
     {
       return;
     }
-    if (FTabs.empty() && !CoreBridge::Preferences().KeepOpenWhenNoSession)
+    if (FTabs.empty())
     {
-      close();
+      NeedSession(false);
     }
   });
   FQuitAction = FileMenu->addAction(tr("&Quit"), this, &QWidget::close);
@@ -360,9 +360,9 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   {
     QTimer::singleShot(0, this, [this, Index]()
     {
-      if (CloseTab(Index) && FTabs.empty() && !CoreBridge::Preferences().KeepOpenWhenNoSession)
+      if (CloseTab(Index) && FTabs.empty())
       {
-        close();
+        NeedSession(false);
       }
     });
   });
@@ -488,9 +488,9 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FDuplicateTabAction = TabsMenu->addAction(tr("Du&plicate Tab"), this, [this]() { DuplicateTab(); });
   FCloseTabAction = TabsMenu->addAction(tr("&Close Tab"), this, [this]()
   {
-    if ((FActiveTab >= 0) && CloseTab(FActiveTab) && FTabs.empty() && !CoreBridge::Preferences().KeepOpenWhenNoSession)
+    if ((FActiveTab >= 0) && CloseTab(FActiveTab) && FTabs.empty())
     {
-      close();
+      NeedSession(false);
     }
   });
   FCloseTabAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_D));
@@ -848,6 +848,12 @@ bool MainWindow::PreferencesDialog(const QString & Page)
 void MainWindow::ApplyPreferences()
 {
   const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+  // As SessionTabCaptionTruncation: the titles elided to fit, else
+  // scrolled.
+  if (FTabBar != nullptr)
+  {
+    FTabBar->setElideMode(Preferences.SessionTabCaptionTruncation ? Qt::ElideRight : Qt::ElideNone);
+  }
   // Interface's theme, at once (the icons take the palette's colours).
   const bool ThemeChanged = (Preferences.DarkTheme != FAppliedTheme);
   if (ThemeChanged)
@@ -1449,7 +1455,57 @@ void MainWindow::StartUp()
   }
   if (!Session || !CanOpen || !Open(std::move(Session)))
   {
-    SiteManagerDialog();
+    NeedSession(true);
+  }
+}
+
+void MainWindow::IdleError(const CoreBridge::TCoreError & E)
+{
+  if (!E.Fatal || E.Aborted)
+  {
+    ShowError(E);
+    return;
+  }
+  if (CoreBridge::Preferences().SessionSilentDisconnect)
+  {
+    statusBar()->showMessage(QString::fromStdString(E.Error.Message));
+    UpdateTabs();
+    UpdateActions();
+    return;
+  }
+  CoreBridge::TQuery Query;
+  Query.Type = CoreBridge::TQueryType::Error;
+  Query.Message = E.Error.Message;
+  Query.MoreMessages = E.Error.MoreMessages;
+  CoreBridge::TQueryButton OK;
+  OK.Answer = CoreBridge::AnswerOK;
+  OK.Caption = "OK";
+  Query.Buttons = { OK };
+  Query.CancelAnswer = CoreBridge::AnswerOK;
+  Query.NeverAskAgainCheck = true;
+  Query.NeverAskAgainTitle = CoreBridge::Text(CoreBridge::TText::NeverPopupDisconnect);
+  QtFrontend Frontend;
+  Frontend.SetWindow(this);
+  if (Frontend.Query(Query).NeverAskAgain)
+  {
+    CoreBridge::ChangePreferences([](CoreBridge::TPreferences & Preferences) { Preferences.SessionSilentDisconnect = true; });
+  }
+  UpdateTabs();
+  UpdateActions();
+}
+
+void MainWindow::NeedSession(bool Startup)
+{
+  const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+  const bool ShowLogin = Preferences.ShowLoginWhenNoSession;
+  if (ShowLogin)
+  {
+    SiteManagerDialog(true);
+  }
+  // Not at start-up without the dialog: there was no chance to open one.
+  if ((ShowLogin || !Startup) && !Preferences.KeepOpenWhenNoSession && FTabs.empty())
+  {
+    close();
   }
 }
 
@@ -1507,17 +1563,24 @@ void MainWindow::StandaloneKeepUpToDate(const CoreBridge::TKeepUpToDateParams & 
   close();
 }
 
-bool MainWindow::SiteManagerDialog()
+bool MainWindow::SiteManagerDialog(bool Automatic)
 {
   if (FBusy)
   {
     return false;
   }
   SiteManager Dialog(this);
+  Dialog.ShowAgainCheck()->setVisible(Automatic);
   Dialog.OnPreferences = [this](const QString & Page) { PreferencesDialog(Page); };
   Dialog.OnCheckForUpdates = [this]() { CheckForUpdates(); };
   Dialog.OnAbout = [this]() { About(); };
-  if (Dialog.exec() != QDialog::Accepted)
+  const int Result = Dialog.exec();
+  // As TLoginDialog::Execute: unchecked, not shown by itself again.
+  if (Automatic && !Dialog.ShowAgainCheck()->isChecked())
+  {
+    CoreBridge::ChangePreferences([](CoreBridge::TPreferences & Preferences) { Preferences.ShowLoginWhenNoSession = false; });
+  }
+  if (Result != QDialog::Accepted)
   {
     return false;
   }
@@ -1546,41 +1609,53 @@ bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
     statusBar()->showMessage(tr("Connecting to %1...").arg(QString::fromStdString(Session->Name())));
     Session->Open();
     FSession = std::move(Session);
-    ApplyPreferences();
-    // As WinSCP (TScpCommanderForm::RestoreSessionLocalDirView): the site's
-    // local directory, when it has one; when remembered, one that is gone
-    // falls back to the nearest that is not, quietly.
-    if (!FSession->LocalDirectory().empty())
-    {
-      QString Directory = QDir::cleanPath(QDir::fromNativeSeparators(QString::fromStdString(FSession->LocalDirectory())));
-      if (FSession->UpdateDirectories())
-      {
-        while (!QFileInfo(Directory).isDir() && !QDir(Directory).isRoot() && !Directory.isEmpty())
-        {
-          const QString Parent = QFileInfo(Directory).path();
-          if (Parent == Directory)
-          {
-            break;
-          }
-          Directory = Parent;
-        }
-      }
-      if (QFileInfo(Directory).isDir() || !FSession->UpdateDirectories())
-      {
-        FLocal->ChangeDirectory(Directory);
-      }
-    }
+    Opened();
     Result = true;
-    // As TTerminalManager's: the site first in the jump list (Windows).
-    if (!FStandalone)
-    {
-      Integration::UpdateJumpList(CoreBridge::TJumpListEntry::Site, FSession->Name(), true);
-    }
   }
   catch (const CoreBridge::TCoreError & E)
   {
     ShowError(E);
   }
+  OpenDone(Result, Previous);
+  return Result;
+}
+
+// What follows a session's connecting, for a new tab or a pending one.
+void MainWindow::Opened()
+{
+  ApplyPreferences();
+  // As WinSCP (TScpCommanderForm::RestoreSessionLocalDirView): the site's
+  // local directory, when it has one; when remembered, one that is gone
+  // falls back to the nearest that is not, quietly.
+  if (!FSession->LocalDirectory().empty())
+  {
+    QString Directory = QDir::cleanPath(QDir::fromNativeSeparators(QString::fromStdString(FSession->LocalDirectory())));
+    if (FSession->UpdateDirectories())
+    {
+      while (!QFileInfo(Directory).isDir() && !QDir(Directory).isRoot() && !Directory.isEmpty())
+      {
+        const QString Parent = QFileInfo(Directory).path();
+        if (Parent == Directory)
+        {
+          break;
+        }
+        Directory = Parent;
+      }
+    }
+    if (QFileInfo(Directory).isDir() || !FSession->UpdateDirectories())
+    {
+      FLocal->ChangeDirectory(Directory);
+    }
+  }
+  // As TTerminalManager's: the site first in the jump list (Windows).
+  if (!FStandalone)
+  {
+    Integration::UpdateJumpList(CoreBridge::TJumpListEntry::Site, FSession->Name(), true);
+  }
+}
+
+void MainWindow::OpenDone(bool Result, int Previous)
+{
   FBusy = false;
   if (Result)
   {
@@ -1595,7 +1670,7 @@ bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
     UpdateTabs();
     UpdateTitle();
     UpdateActions();
-    return false;
+    return;
   }
   UpdateTabs();
   statusBar()->showMessage(Result ? tr("Connected") : tr("Not connected"));
@@ -1621,6 +1696,37 @@ bool MainWindow::Open(std::unique_ptr<CoreBridge::TSession> Session)
       OpenInPutty();
     }
   }
+}
+
+bool MainWindow::ConnectPendingTab()
+{
+  if (FBusy || !TabPending(FActiveTab) || !FSession)
+  {
+    return false;
+  }
+  FBusy = true;
+  UpdateTitle();
+  UpdateActions();
+  bool Result = false;
+  try
+  {
+    statusBar()->showMessage(tr("Connecting to %1...").arg(QString::fromStdString(FSession->Name())));
+    FSession->Reconnect();
+    FTabs[FActiveTab].Pending = false;
+    Opened();
+    Result = true;
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  FBusy = false;
+  statusBar()->showMessage(Result ? tr("Connected") : tr("Not connected"));
+  FPanel->SetSession(FSession.get());
+  FQueue->SetSession(FSession.get());
+  UpdateTabs();
+  UpdateTitle();
+  UpdateActions();
   return Result;
 }
 
@@ -1945,7 +2051,7 @@ void MainWindow::QueueIdle()
   }
   catch (const CoreBridge::TCoreError & E)
   {
-    ShowError(E);
+    IdleError(E);
   }
   if (Changed)
   {
@@ -4994,6 +5100,12 @@ bool MainWindow::SwitchTab(int Index)
   UpdateTabs();
   UpdateTitle();
   UpdateActions();
+  // As DoSetActiveSession's AutoReconnect: a workspace's session, the
+  // first time.
+  if (TabPending(Index))
+  {
+    ConnectPendingTab();
+  }
   return true;
 }
 
@@ -5196,6 +5308,9 @@ bool MainWindow::OpenWorkspace(const QString & Name)
   }
   const int First = TabCount();
   bool Any = false;
+  // As TTerminalManager::NewSessions: each a tab, connected as it is
+  // selected, the first now (or, WorkspaceConnectAll, all of them now).
+  const bool ConnectAll = CoreBridge::Preferences().WorkspaceConnectAll;
   for (std::unique_ptr<CoreBridge::TSession> & Session : Sessions)
   {
     if (Session->IsLocalBrowser())
@@ -5203,9 +5318,18 @@ bool MainWindow::OpenWorkspace(const QString & Name)
       NewLocalTab(QString::fromStdString(Session->LocalDirectory()), QString::fromStdString(Session->OtherLocalDirectory()));
       Any = true;
     }
-    else
+    else if (ConnectAll)
     {
       Any = Open(std::move(Session)) || Any;
+    }
+    else
+    {
+      TTab Tab;
+      Tab.LocalPath = QDir::fromNativeSeparators(QString::fromStdString(Session->LocalDirectory()));
+      Tab.Session = std::move(Session);
+      Tab.Pending = true;
+      FTabs.push_back(std::move(Tab));
+      Any = true;
     }
   }
   if (Any)
@@ -5934,6 +6058,10 @@ bool MainWindow::ReconnectSession()
   if (FBusy || !FSession || FSession->Active())
   {
     return false;
+  }
+  if (TabPending(FActiveTab))
+  {
+    return ConnectPendingTab();
   }
   FBusy = true;
   UpdateActions();

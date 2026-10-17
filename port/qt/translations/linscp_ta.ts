@@ -2962,8 +2962,8 @@ Location: %2</source>
         <translation>சின்னங்கள்</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>சின்னத் &amp;தொகுப்பு:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;சின்னத் தொகுப்பு:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3424,6 +3424,38 @@ Location: %2</source>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>தொலை கோப்புகளின் தற்காலிக நகல்களை &amp;நிர்ணயிக்கும் பாதைகளில் வைத்திருங்கள்</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>பணியிடங்கள்</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>வெளியேறும்போது பணியிடத்தை தானாக சேமி</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;இயல்புநிலை பணியிட பெயர்:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>சேமி &amp;கடவுச்சொற்கள் (பரிந்துரைக்கப்படவில்லை)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>திறக்கப்பட்ட பணிவெளி அல்லது தளக் கோப்புறையின் அனைத்து அமர்வுகளையும் இணை</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;தொடக்கத்தில் உள்நுழைவு உரையாடலைக் காட்டு மற்றும் கடைசி அமர்வு மூடப்படும் போது</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>சாளரத்திற்கு பொருந்தாதபோது தாவல் தலைப்பை துண்டி</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>செயலற்ற அமர்வு துண்டிக்கப்படும்போது பிழைச் செய்தியைக் காட்ட வேண்டாம்</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Location: %2</source>
     <message>
         <source>A&amp;bout...</source>
         <translation>பற்றி...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;தொடக்கத்தில் உள்நுழைவு உரையாடலைக் காட்டு மற்றும் கடைசி அமர்வு மூடப்படும் போது</translation>
     </message>
 </context>
 <context>

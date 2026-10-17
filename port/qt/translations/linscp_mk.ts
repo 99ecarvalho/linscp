@@ -2963,7 +2963,7 @@ Location: %2</source>
         <translation>Икони</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Сет на икони:</translation>
     </message>
     <message>
@@ -3425,6 +3425,38 @@ Location: %2</source>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Чувај привремени копии на оддалечени датотеки во де&amp;терминистички патеки</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Работни простори</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Автоматски зачувај работен простор при излез</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Име на с&amp;тандарден работен простор:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Зачувај &amp;лозинки (не се препорачува)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Поврзи ги сите сесии од отворениот работен простор или папка со локации</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Прикажи дијалог за &amp;најава при стартување и кога последната сесија е затворена</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Скрати наслови на табови кога не ги збира прозорецот</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Не прикажувај ск&amp;окачка порака за грешка кога ќе се прекине неактивна сесија</translation>
     </message>
 </context>
 <context>
@@ -4932,6 +4964,10 @@ Location: %2</source>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;За програмата...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Прикажи дијалог за најава при стартување и кога последната сесија ќе се затвори</translation>
     </message>
 </context>
 <context>

@@ -2961,7 +2961,7 @@ Vị trí: %2</translation>
         <translation>Biểu tượng</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Bộ biểu tượng:</translation>
     </message>
     <message>
@@ -3423,6 +3423,38 @@ Vị trí: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Giữ bản sao tạm của tệp từ xa ở đường dẫn &amp;cố định</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Không gian làm việc</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Tự động lưu không gian làm việc khi thoát</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Tên không gian làm việc mặc định:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Lưu &amp;mật khẩu (không khuyến nghị)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Kết nối tất cả phiên của không gian làm việc hoặc thư mục site đã mở</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Hiển thị hộp thoại đăng nhập khi khởi động và khi phiên cuối cùng đóng</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Rút gọn tiêu đề tab nếu không vừa cửa sổ</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Không hiện thông báo lỗi khi phiên &amp;nhàn rỗi bị ngắt kết nối</translation>
     </message>
 </context>
 <context>
@@ -4930,6 +4962,10 @@ Vị trí: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;Giới thiệu...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Hiển thị hộp thoại đăng nhập khi khởi động và khi đóng phiên cuối cùng</translation>
     </message>
 </context>
 <context>

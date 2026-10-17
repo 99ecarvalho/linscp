@@ -2963,7 +2963,7 @@ Location: %2</source>
         <translation>Іконки</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Набір іконок:</translation>
     </message>
     <message>
@@ -3425,6 +3425,38 @@ Location: %2</source>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Тримайте тимчасові копії вилучених файлів в детермінованих шляхах</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Робочі області</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Автоматично зберігати робочу область при виході</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Типове ім&apos;я робочої області</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Зберегти &amp;паролі (не рекомендовано)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Підключити всі сеанси відкритої робочої області або теки сайтів</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Показати діалогове вікно входу при запуску та коли останній сеанс було закрито</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Обрізати заголовки вкладок, якщо вони не вміщуються у вікно</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Не показувати повідомлення про помилку, коли &amp;неактивний сеанс від’єднано</translation>
     </message>
 </context>
 <context>
@@ -4932,6 +4964,10 @@ Location: %2</source>
     <message>
         <source>A&amp;bout...</source>
         <translation>Про...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Показати діалогове вікно входу при запуску та коли останній сеанс було закрито</translation>
     </message>
 </context>
 <context>

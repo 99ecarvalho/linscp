@@ -2961,7 +2961,7 @@ Lokasi: %2</translation>
         <translation>Ikon</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Set ikon:</translation>
     </message>
     <message>
@@ -3423,6 +3423,38 @@ Lokasi: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Pertahankan salinan sementara berkas remote pada alamat &amp;deterministik</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Ruang Kerja</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Simpan ruang kerja secara otomatis ketika keluar</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Nama ruang kerja &amp;default:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Simpan &amp;password (tidak disarankan)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Hubungkan semua sesi dari ruang kerja atau folder situs yang dibuka</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Tampilkan dialog Login saat memulai dan ketika sesi terakhir ditutup</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Potong judul tab jika tidak muat di jendela</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Jangan tampilkan pesan kesalahan saat sesi &amp;menganggur terputus</translation>
     </message>
 </context>
 <context>
@@ -4930,6 +4962,10 @@ Lokasi: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>T&amp;entang...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Tampilkan dialog Login saat memulai dan ketika sesi terakhir ditutup</translation>
     </message>
 </context>
 <context>

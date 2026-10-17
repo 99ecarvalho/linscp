@@ -2962,8 +2962,8 @@ Location: %2</source>
         <translation>আইকন</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>আইকন সেট(&amp;S):</translation>
+        <source>&amp;Icon set:</source>
+        <translation>আইকন সেট(&amp;I):</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3424,6 +3424,38 @@ Location: %2</source>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>রিমোট ফাইলের অস্থায়ী কপি নির্দিষ্ট পাথে রাখুন(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>ওয়ার্কস্পেস</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>প্রস্থানের সময় স্বয়ংক্রিয়ভাবে ওয়ার্কস্পেস সংরক্ষণ করুন(&amp;A)</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>ডিফল্ট ওয়ার্কস্পেসের নাম(&amp;D):</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>পাসওয়ার্ড সংরক্ষণ করুন (প্রস্তাবিত নয়)(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>খোলা ওয়ার্কস্পেস বা সাইট ফোল্ডারের সব সেশন সংযুক্ত করুন(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>শুরুতে এবং শেষ সেশন বন্ধ হলে লগইন ডায়ালগ দেখান(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>উইন্ডোতে না আঁটলে ট্যাবের শিরোনাম ছোট করুন(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>নিষ্ক্রিয় সেশন বিচ্ছিন্ন হলে ত্রুটি বার্তা দেখাবেন না(&amp;O)</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Location: %2</source>
     <message>
         <source>A&amp;bout...</source>
         <translation>সম্পর্কে(&amp;B)...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>শুরুতে এবং শেষ সেশন বন্ধ হলে লগইন ডায়ালগ দেখান(&amp;S)</translation>
     </message>
 </context>
 <context>

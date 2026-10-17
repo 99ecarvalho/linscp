@@ -2962,7 +2962,7 @@ Lokasyon: %2</translation>
         <translation>Mga icon</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Set ng icon:</translation>
     </message>
     <message>
@@ -3424,6 +3424,38 @@ Lokasyon: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Itago ang mga pansamantalang kopya ng mga remote file sa mga &amp;tiyak na path</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Mga Workspace</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Awtomatikong i-save ang workspace sa paglabas</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Default na pangalan ng workspace:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>I-save ang mga &amp;password (hindi inirerekomenda)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>I-&amp;connect ang lahat ng session ng binuksang workspace o polder ng site</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Ipakita ang Login dialog sa pagsisimula at kapag isinara ang huling session</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Paikliin ang mga pamagat ng tab kapag hindi kasya sa bintana</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Huwag ipakita ang mensahe ng error kapag nadiskonekta ang &amp;idle na session</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Lokasyon: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;Tungkol Sa...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Ipakita ang Login dialog sa pagsisimula at kapag isinara ang huling session</translation>
     </message>
 </context>
 <context>

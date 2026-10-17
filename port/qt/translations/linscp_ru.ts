@@ -2963,7 +2963,7 @@ Location: %2</source>
         <translation>Значки</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Набор значков:</translation>
     </message>
     <message>
@@ -3425,6 +3425,38 @@ Location: %2</source>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>&amp;Хранить временные копии  файлов по фиксированным путям</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Рабочие области</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Автоматически сохранять рабочую область при выходе</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>&amp;Имя рабочей области по умолчанию:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>&amp;Сохранять пароли (не рекомендуется)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Подключить все сеансы открытой рабочей области или папки сайта</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Показывать диалог входа при запуске закрытии последнего соединения</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Обрезать названия вкладок когда они не помещаются в окно</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Не выводить всплывающее сообщение об ошибке при отключении неактивного сеанса</translation>
     </message>
 </context>
 <context>
@@ -4932,6 +4964,10 @@ Location: %2</source>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;О программе…</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Показывать диалог входа при запуске и когда последняя сессия закрыта</translation>
     </message>
 </context>
 <context>

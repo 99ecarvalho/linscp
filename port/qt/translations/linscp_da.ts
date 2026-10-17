@@ -2962,8 +2962,8 @@ Placering: %2</translation>
         <translation>Ikoner</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
-        <translation>Ikon&amp;sæt:</translation>
+        <source>&amp;Icon set:</source>
+        <translation>&amp;Ikonsæt:</translation>
     </message>
     <message>
         <source>&amp;Remember panels&apos; state when switching sessions</source>
@@ -3424,6 +3424,38 @@ Placering: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Behold midlertidige kopier af fjernfiler i deterministiske stier</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Arbejdsområder</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Gem automatisk arbejdsområde ved afslutning</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Standardarbejdsområdenavn</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Gem &amp;adgangskoder (anbefales ikke)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Forbind alle sessioner i det åbne arbejdsområde eller den åbnede webstedsmappe</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Vis logind boksen ved opstart og når den sidste session er lukket</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>Afkort fanetitler, når de ikke passer til vinduet</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Vis ikke fejlmeddelelsen, når inaktiv session er afbrudt</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Placering: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>O&amp;m...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Vis Login dialog ved startup og når den sidste session lukkes</translation>
     </message>
 </context>
 <context>

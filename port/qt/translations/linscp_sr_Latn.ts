@@ -2963,7 +2963,7 @@ Lokacija: %2</translation>
         <translation>Ikone</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Skup ikona:</translation>
     </message>
     <message>
@@ -3425,6 +3425,38 @@ Lokacija: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Čuvaj privremene kopije udaljenih datoteka u &amp;determinističkim putanjama</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Radni prostori</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>&amp;Automatski sačuvaj radni prostor pri izlasku</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Ime po&amp;drazumevanog radnog prostora:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Sačuvaj &amp;lozinke (nije preporučeno)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Poveži sve sesije otvorenog radnog prostora ili fascikle lokacija</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Prikaži dijalog za prijavu pri pokretanju i kada se poslednja sesija zatvori</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Skrati naslove kartica kada ne staju u prozor</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Ne prikazuj is&amp;kačuću poruku o grešci kada se neaktivna sesija prekine</translation>
     </message>
 </context>
 <context>
@@ -4932,6 +4964,10 @@ Lokacija: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>&amp;O programu...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>&amp;Prikaži dijalog za prijavu pri pokretanju i kada se poslednja sesija zatvori</translation>
     </message>
 </context>
 <context>

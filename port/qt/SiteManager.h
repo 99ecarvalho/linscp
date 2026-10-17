@@ -58,6 +58,9 @@ public:
   // Confirm is false. False when it did not save.
   bool SetDefaults(bool Confirm = true);
   QToolButton * SaveButton() const { return FSave; }
+  // As ShowAgainPanel, when shown by itself: "Show Login dialog on startup
+  // and when the last session is closed", unchecked only after asking.
+  QCheckBox * ShowAgainCheck() const { return FShowAgain; }
   // Renames the selected site or folder (a folder: every site in it).
   bool RenameSelected(const QString & NewName);
   // A folder under the selected one, in the tree until a site is saved in it.
@@ -206,6 +209,7 @@ private:
   QPushButton * FDelete = nullptr;
   QPushButton * FNewFolder = nullptr;
   QPushButton * FManage = nullptr;
+  QCheckBox * FShowAgain = nullptr;
   QMenu * FToolsMenu = nullptr;
   bool eventFilter(QObject * Watched, QEvent * Event) override;
   class QTreeWidgetItem * SearchSite(const QString & Text, bool AllowExpanding, bool SkipCurrent, bool Reverse);

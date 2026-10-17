@@ -2962,7 +2962,7 @@ Percorso: %2</translation>
         <translation>Icone</translation>
     </message>
     <message>
-        <source>Icon &amp;set:</source>
+        <source>&amp;Icon set:</source>
         <translation>&amp;Set di icone:</translation>
     </message>
     <message>
@@ -3424,6 +3424,38 @@ Percorso: %2</translation>
     <message>
         <source>Keep temporary copies of remote files in &amp;deterministic paths</source>
         <translation>Conserva copie temporanee file remoti in percorsi &amp;deterministici</translation>
+    </message>
+    <message>
+        <source>Workspaces</source>
+        <translation>Aree di lavoro</translation>
+    </message>
+    <message>
+        <source>&amp;Automatically save workspace on exit</source>
+        <translation>Salva &amp;automaticamente area di lavoro all&apos;uscita</translation>
+    </message>
+    <message>
+        <source>&amp;Default workspace name:</source>
+        <translation>Nome pre&amp;definito area di lavoro:</translation>
+    </message>
+    <message>
+        <source>Save &amp;passwords (not recommended)</source>
+        <translation>Salva &amp;password (non consigliato)</translation>
+    </message>
+    <message>
+        <source>&amp;Connect all sessions of opened workspace or site folder</source>
+        <translation>&amp;Connetti tutte le sessioni aperte dell&apos;area di lavoro o della cartella del sito</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Vi&amp;sualizza finestra accesso all&apos;avvio e quando l&apos;ultima sessione è chiusa</translation>
+    </message>
+    <message>
+        <source>&amp;Truncate tab titles when they do not fit to window</source>
+        <translation>&amp;Tronca i titoli delle schede quando non si adattano alla finestra</translation>
+    </message>
+    <message>
+        <source>Do not p&amp;opup error message when idle session is disconnected</source>
+        <translation>Quando la sessione inattiva è disconnessa non visualizzare il messaggio di errore</translation>
     </message>
 </context>
 <context>
@@ -4931,6 +4963,10 @@ Percorso: %2</translation>
     <message>
         <source>A&amp;bout...</source>
         <translation>Informazioni...</translation>
+    </message>
+    <message>
+        <source>&amp;Show Login dialog on startup and when the last session is closed</source>
+        <translation>Vi&amp;sualizza finestra accesso all&apos;avvio e quando l&apos;ultima sessione è chiusa</translation>
     </message>
 </context>
 <context>
