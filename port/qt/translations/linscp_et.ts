@@ -318,6 +318,10 @@ Asukoht: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>Jäta redaktor &amp;meelde</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Kasuta süsteemi vaikeredaktorit</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

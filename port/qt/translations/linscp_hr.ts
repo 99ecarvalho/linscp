@@ -318,6 +318,10 @@ Lokacija: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>Zapamti ovaj uređivač</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Koristi standardni uređivač sustava</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

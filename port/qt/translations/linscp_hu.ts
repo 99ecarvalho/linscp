@@ -318,6 +318,10 @@ Hely: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>Emlékezz a program &amp;társításra</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Rendszer alapértelmezett szerkesztője</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

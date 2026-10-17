@@ -318,6 +318,10 @@ Location: %2</source>
         <source>&amp;Remember this editor</source>
         <translation>ਇਸ ਸੰਪਾਦਕ ਨੂੰ ਯਾਦ ਰੱਖੋ</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>ਡਿਫਾਲਟ ਸਿਸਟਮ ਸੰਪਾਦਕ ਵਰਤੋਂ</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

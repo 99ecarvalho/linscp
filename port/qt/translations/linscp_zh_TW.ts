@@ -318,6 +318,10 @@ Location: %2</source>
         <source>&amp;Remember this editor</source>
         <translation>記憶這個編輯器(&amp;R)</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>使用預設系統編輯器</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

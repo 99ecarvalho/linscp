@@ -318,6 +318,10 @@ Ligging: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>&amp;Onthou hierdie redigeerder</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Gebruik stelsel se verstekredigeerder</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

@@ -318,6 +318,10 @@ Lokasyon: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>A&amp;lalahanin ang editor na ito</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Gamitin ang default na system editor</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

@@ -40,8 +40,15 @@ public:
   QCheckBox * SdiCheck() const { return FSdi; }
   QCheckBox * RememberCheck() const { return FRemember; }
   QPushButton * OkButton() const { return FOk; }
+  QPushButton * DefaultButton() const { return FDefault; }
+  // As DetectSystemExternalEditor: the system's editor of text files, as
+  // a command (Windows: FindExecutable of a .txt file; elsewhere: the
+  // desktop file xdg-mime names for text/plain, its Exec); empty for none.
+  static QString SystemExternalEditor();
 
 private:
+  QPushButton * FDefault = nullptr;
+  QString FSystemExternalEditor;
   void UpdateControls();
   // As ExternalEditorOptionsAutodetect: the options a known editor needs,
   // when the command changes to or from one.

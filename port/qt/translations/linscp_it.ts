@@ -318,6 +318,10 @@ Percorso: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>&amp;Ricorda questo editor</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Usa editor di sistema predefinito</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

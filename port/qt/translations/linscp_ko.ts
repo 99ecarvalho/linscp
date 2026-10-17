@@ -318,6 +318,10 @@ Location: %2</source>
         <source>&amp;Remember this editor</source>
         <translation>현재 편집기 저장(&amp;R)</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>기본 편집기 사용</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

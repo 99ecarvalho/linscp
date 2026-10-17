@@ -318,6 +318,10 @@ Location: %2</source>
         <source>&amp;Remember this editor</source>
         <translation>ဤပြင်ဆင်မှုအားမှတ်ထားပါ</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>စနစ်၏ မူလပြင်ဆင်မှုကို သုံးပါ</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

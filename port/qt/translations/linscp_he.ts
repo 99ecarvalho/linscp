@@ -318,6 +318,10 @@ Location: %2</source>
         <source>&amp;Remember this editor</source>
         <translation>&amp;זכור עורך זה</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>השתמש בעורך ברירת המחדל של המערכת</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

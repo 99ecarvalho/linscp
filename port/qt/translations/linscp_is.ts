@@ -318,6 +318,10 @@ Staðsetning: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>&amp;Muna þennan ritil</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Nota sjálfgildan kerfisritil</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

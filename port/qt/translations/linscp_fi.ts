@@ -318,6 +318,10 @@ Sijainti: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>&amp;Muista tämä editori</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Käytä järjestelmän oletuseditoria</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

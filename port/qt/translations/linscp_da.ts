@@ -318,6 +318,10 @@ Placering: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>H&amp;usk denne editor</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Anvend systemets standardeditor</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

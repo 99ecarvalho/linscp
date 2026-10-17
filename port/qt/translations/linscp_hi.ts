@@ -318,6 +318,10 @@ Location: %2</source>
         <source>&amp;Remember this editor</source>
         <translation>यह संपादक याद रखें(&amp;R)</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>सिस्टम का डिफ़ॉल्ट संपादक उपयोग करें</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

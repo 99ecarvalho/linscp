@@ -318,6 +318,10 @@ Location: %2</source>
         <source>&amp;Remember this editor</source>
         <translation>&amp;Հիշել այս խմբագրիչը</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Օգտագործել համակարգի լռելյայն խմբագրիչը</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

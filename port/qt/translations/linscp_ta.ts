@@ -318,6 +318,10 @@ Location: %2</source>
         <source>&amp;Remember this editor</source>
         <translation>&amp;இந்த திருத்தியை நினைவில் கொள்க</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>இயல்புநிலை கணினி திருத்தியைப் பயன்படுத்தவும்</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

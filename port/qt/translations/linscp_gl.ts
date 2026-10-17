@@ -318,6 +318,10 @@ Localización: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>&amp;Lembrar este editor</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Usar o editor predeterminado do sistema</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

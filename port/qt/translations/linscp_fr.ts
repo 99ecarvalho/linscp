@@ -318,6 +318,10 @@ Emplacement : %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>Se souvenir de cet éditeur</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Utiliser l&apos;éditeur par défaut du système</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

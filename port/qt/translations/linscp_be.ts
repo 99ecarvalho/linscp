@@ -318,6 +318,10 @@ Location: %2</source>
         <source>&amp;Remember this editor</source>
         <translation>За&amp;помніць гэты рэдактар</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Прадвызначаны сістэмны рэдактар</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

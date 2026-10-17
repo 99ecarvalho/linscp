@@ -318,6 +318,10 @@ Ubicació: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>&amp;Recorda aquest editor</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Utilitza l&apos;editor per defecte del sistema</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

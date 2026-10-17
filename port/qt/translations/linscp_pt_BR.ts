@@ -318,6 +318,10 @@ Local: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>&amp;Recordar-se deste editor</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Usar editor padrão do sistema</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

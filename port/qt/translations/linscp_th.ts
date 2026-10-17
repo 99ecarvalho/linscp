@@ -318,6 +318,10 @@ Location: %2</source>
         <source>&amp;Remember this editor</source>
         <translation>&amp;จำตัวแก้ไขนี้</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>ใช้ตัวแก้ไขเริ่มต้นของระบบ</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

@@ -14,11 +14,11 @@ Last updated: **2026-10-17**
 | A. Site Manager | 15 | 17 |
 | B. Password prompt and banner | 3 | 3 |
 | C. Progress and synchronization dialogs | 4 | 4 |
-| D. Main window | 6 | 9 |
+| D. Main window | 7 | 9 |
 | E. Preferences | 9 | 10 |
 | F. Command line | 2 | 3 |
 | G. Known before | 0 | 1 |
-| **Total** | **39** | **47** |
+| **Total** | **40** | **47** |
 
 ## Items
 
@@ -56,7 +56,7 @@ Last updated: **2026-10-17**
 | D6 | Go to Command Line (Ctrl+Shift+M focuses) | Low | done | 2026-10-17. The same order (dfm:271/451); `MainWindow::GoToCommandLine`; ctest `qt_gui_keys` |
 | D7 | Go to Address (Ctrl+L), incremental search (Ctrl+F) | Medium | done | 2026-10-17. Ctrl+L and Alt+D: Open Directory in the Commander (as TScpCommanderForm::GoToAddress), the address bar in the Explorer; Ctrl+F: `FileView::StartSearch`, "(start typing)"; ctest `qt_gui_keys` |
 | D8 | Transfer Files in Clipboard | Low | todo | |
-| D9 | Editor Preferences: Use default system editor | Low | todo | |
+| D9 | Editor Preferences: Use default system editor | Low | done | 2026-10-17. `EditorPreferencesDialog::SystemExternalEditor`: FindExecutable of a .txt file on Windows (not "Open with"), else xdg-mime's text/plain desktop file's Exec; ctest `qt_gui_logswitches` (a fake xdg-mime) |
 | E1 | Commander: tree left of file list | Medium | done | 2026-10-17. `ScpCommander.TreeOnLeft`; each panel's tree width kept apart (`DriveViewWidth`) from its height; ctest `qt_gui_trees` |
 | E2 | Explorer page: Show full path on address bar | Low | done | 2026-10-17. Applied to the address bar at once; ctest `qt_gui_preferences` |
 | E3 | Storage: temporary directory options (5) | Medium | done | 2026-10-17. The editing already followed them; the start-up cleanup added (`MainWindow::TemporaryDirectoryCleanup`, as Setup.cpp's, not for a second instance), and core's recursive delete fixed for POSIX (`core-recursive-delete-delimiter.patch`); ctest `qt_gui_preferences` |

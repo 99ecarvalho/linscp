@@ -318,6 +318,10 @@ Konum: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>Bu düzenleyici &amp;hatırlansın</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Sistem düzenleyicisi kullanılsın</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

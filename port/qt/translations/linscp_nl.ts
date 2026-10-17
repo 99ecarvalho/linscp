@@ -318,6 +318,10 @@ Locatie: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>&amp;Onthoud deze editor</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Gebruik standaard systeemeditor</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

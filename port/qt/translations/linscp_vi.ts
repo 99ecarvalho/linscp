@@ -318,6 +318,10 @@ Vị trí: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>&amp;Ghi nhớ lựa chọn này</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Dùng trình soạn thảo mặc định của hệ thống</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

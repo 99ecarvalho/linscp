@@ -318,6 +318,10 @@ Location: %2</source>
         <source>&amp;Remember this editor</source>
         <translation>Запам&apos;ятати цей редактор</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Використовувати системний редактор за замовчуванням</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

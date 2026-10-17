@@ -450,6 +450,39 @@ void LogSwitches(const QString & LogFile)
   // run's default transfer settings.
   Check(CoreBridge::DefaultKeyFile() == "/tmp/linscp-default.ppk", "/privatekey: the default key");
   Check(!CoreBridge::DefaultTransferSettings().PreserveTime, "/rawtransfersettings: the default transfer settings");
+#if !defined(_WIN32)
+  // D9: Editor preferences' "Use default system editor": xdg-mime's desktop
+  // file for text/plain, its Exec without the field codes.
+  {
+    const QDir Root(QDir::temp().filePath(QStringLiteral("linscp-xdg-%1").arg(QCoreApplication::applicationPid())));
+    QDir().mkpath(Root.filePath(QStringLiteral("bin")));
+    QDir().mkpath(Root.filePath(QStringLiteral("share/applications")));
+    {
+      QFile Mime(Root.filePath(QStringLiteral("bin/xdg-mime")));
+      Mime.open(QIODevice::WriteOnly);
+      Mime.write("#!/bin/sh\necho linscp-test-editor.desktop\n");
+      Mime.close();
+      Mime.setPermissions(Mime.permissions() | QFileDevice::ExeOwner);
+      QFile Desktop(Root.filePath(QStringLiteral("share/applications/linscp-test-editor.desktop")));
+      Desktop.open(QIODevice::WriteOnly);
+      Desktop.write("[Desktop Entry]\nType=Application\nName=Test\nExec=testeditor --new-window %F\n[Desktop Action New]\nExec=other\n");
+    }
+    const QByteArray OldPath = qgetenv("PATH");
+    const QByteArray OldData = qgetenv("XDG_DATA_HOME");
+    qputenv("PATH", Root.filePath(QStringLiteral("bin")).toLocal8Bit() + ":" + OldPath);
+    qputenv("XDG_DATA_HOME", Root.filePath(QStringLiteral("share")).toLocal8Bit());
+    Check(EditorPreferencesDialog::SystemExternalEditor() == QStringLiteral("testeditor --new-window"),
+      "the system's text editor, from xdg-mime's desktop file");
+    EditorPreferencesDialog Dialog(EditorPreferencesDialog::TMode::Add, CoreBridge::TEditorDefinition(), true);
+    Check(Dialog.DefaultButton()->isEnabled(), "Use default system editor offered");
+    Dialog.DefaultButton()->click();
+    Check(Dialog.ExternalButton()->isChecked() && (Dialog.CommandEdit()->text() == QStringLiteral("testeditor --new-window")),
+      "and filled in as the external editor");
+    qputenv("PATH", OldPath);
+    qputenv("XDG_DATA_HOME", OldData);
+    QDir(Root.path()).removeRecursively();
+  }
+#endif
   CoreBridge::Finalize();
 }
 

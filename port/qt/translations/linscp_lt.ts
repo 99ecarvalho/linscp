@@ -318,6 +318,10 @@ Vieta: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>&amp;Prisiminti šį redaktorių</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Naudoti numatytą sistemos redaktorių</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

@@ -318,6 +318,10 @@ Atrašanās vieta: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>&amp;Atcerēties šo redaktoru</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Lietot sistēmas noklusējuma redaktoru</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

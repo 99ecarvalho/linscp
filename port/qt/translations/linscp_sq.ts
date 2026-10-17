@@ -318,6 +318,10 @@ Vendndodhja: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>Mbaj mend këtë &amp;redaktues</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Përdor redaktuesin e parazgjedhur të sistemit</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

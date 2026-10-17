@@ -318,6 +318,10 @@ Ort: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>Diesen Editor me&amp;rken</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Systemweiten Editor verwenden</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

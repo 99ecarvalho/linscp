@@ -318,6 +318,10 @@ Location: %2</source>
         <source>&amp;Remember this editor</source>
         <translation>این ویرایشگر را به یادبسپار</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>از ویرایشگر پیش فرض سیستم استفاده کن</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

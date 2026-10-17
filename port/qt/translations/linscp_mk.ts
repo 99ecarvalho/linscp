@@ -318,6 +318,10 @@ Location: %2</source>
         <source>&amp;Remember this editor</source>
         <translation>&amp;Запомни го овој уредувач</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Употребувај стандарден системски уредувач</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

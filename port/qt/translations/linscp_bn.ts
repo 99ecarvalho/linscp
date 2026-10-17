@@ -318,6 +318,10 @@ Location: %2</source>
         <source>&amp;Remember this editor</source>
         <translation>এই এডিটর মনে রাখুন(&amp;R)</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>ডিফল্ট সিস্টেম এডিটর ব্যবহার করুন</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

@@ -318,6 +318,10 @@ Location: %2</source>
         <source>&amp;Remember this editor</source>
         <translation>Να θυμάσαι αυτόν τον επεξεργαστή</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Χρήση του προεπιλεγμένου επεξεργαστή του συστήματος</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>

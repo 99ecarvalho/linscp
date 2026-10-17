@@ -10,7 +10,18 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QFile>
+#include <QHBoxLayout>
+#include <QProcess>
+#include <QRegularExpression>
+#include <QStandardPaths>
+#include <QTemporaryDir>
 #include <QVBoxLayout>
+
+#if defined(Q_OS_WIN)
+#include <windows.h>
+#include <shellapi.h>
+#endif
 
 #include "QtFrontend.h"
 
@@ -51,9 +62,24 @@ EditorPreferencesDialog::EditorPreferencesDialog(TMode Mode, const CoreBridge::T
   }
   EditorLayout->addWidget(FCommand, 2, 0);
   EditorLayout->addWidget(FBrowse, 2, 1);
+  // As DefaultButton: the system's editor, when there is one.
+  FSystemExternalEditor = SystemExternalEditor();
+  FDefault = new QPushButton(tr("Use default system editor"), EditorGroup);
+  FDefault->setEnabled(!FSystemExternalEditor.isEmpty());
+  connect(FDefault, &QPushButton::clicked, this, [this]()
+  {
+    FExternal->setChecked(true);
+    FCommand->setText(FSystemExternalEditor);
+    UpdateControls();
+    Autodetect();
+  });
+  QHBoxLayout * DefaultRow = new QHBoxLayout();
+  DefaultRow->addWidget(FDefault);
+  DefaultRow->addStretch(1);
+  EditorLayout->addLayout(DefaultRow, 3, 0, 1, 2);
   if (Mode != TMode::AdHoc)
   {
-    EditorLayout->addWidget(FOpen, 3, 0, 1, 2);
+    EditorLayout->addWidget(FOpen, 4, 0, 1, 2);
   }
   Layout->addWidget(EditorGroup);
 
@@ -176,4 +202,67 @@ void EditorPreferencesDialog::accept()
     }
   }
   QDialog::accept();
+}
+
+QString EditorPreferencesDialog::SystemExternalEditor()
+{
+#if defined(Q_OS_WIN)
+  // A .txt file's executable, as WinSCP finds it (not "Open with").
+  QTemporaryDir Directory;
+  if (!Directory.isValid())
+  {
+    return QString();
+  }
+  const QString TempName = QDir::toNativeSeparators(Directory.filePath(QStringLiteral("linscp.txt")));
+  {
+    QFile File(TempName);
+    if (!File.open(QIODevice::WriteOnly))
+    {
+      return QString();
+    }
+  }
+  wchar_t Executable[MAX_PATH] = {};
+  if ((reinterpret_cast<INT_PTR>(FindExecutableW(reinterpret_cast<const wchar_t *>(TempName.utf16()), nullptr, Executable)) <= 32) ||
+      !QFileInfo::exists(QString::fromWCharArray(Executable)) ||
+      (QFileInfo(QString::fromWCharArray(Executable)).fileName().compare(QStringLiteral("openwith.exe"), Qt::CaseInsensitive) == 0))
+  {
+    return QString();
+  }
+  // As FormatCommand: the program quoted.
+  return QStringLiteral("\"%1\"").arg(QString::fromWCharArray(Executable));
+#else
+  QProcess Query;
+  Query.start(QStringLiteral("xdg-mime"), { QStringLiteral("query"), QStringLiteral("default"), QStringLiteral("text/plain") });
+  if (!Query.waitForFinished(3000) || (Query.exitCode() != 0))
+  {
+    return QString();
+  }
+  const QString Desktop = QString::fromLocal8Bit(Query.readAllStandardOutput()).trimmed();
+  if (Desktop.isEmpty())
+  {
+    return QString();
+  }
+  const QString Path = QStandardPaths::locate(QStandardPaths::ApplicationsLocation, Desktop);
+  QFile File(Path);
+  if (Path.isEmpty() || !File.open(QIODevice::ReadOnly))
+  {
+    return QString();
+  }
+  bool InEntry = false;
+  for (const QString & Raw : QString::fromUtf8(File.readAll()).split(QLatin1Char('\n')))
+  {
+    const QString Line = Raw.trimmed();
+    if (Line.startsWith(QLatin1Char('[')))
+    {
+      InEntry = (Line == QStringLiteral("[Desktop Entry]"));
+    }
+    else if (InEntry && Line.startsWith(QStringLiteral("Exec=")))
+    {
+      // The field codes (%f, %U...) dropped: the file is the editor's
+      // argument as WinSCP passes it.
+      return Line.mid(5).remove(QRegularExpression(QStringLiteral("\\s*%[fFuUdDnNickvm]"))).trimmed();
+    }
+  }
+  return QString();
+#endif
 }

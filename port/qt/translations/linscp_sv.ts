@@ -318,6 +318,10 @@ Plats: %2</translation>
         <source>&amp;Remember this editor</source>
         <translation>&amp;Kom ihåg den här editorn</translation>
     </message>
+    <message>
+        <source>Use default system editor</source>
+        <translation>Använd systemets standardeditor</translation>
+    </message>
 </context>
 <context>
     <name>EditorWindow</name>
