@@ -4753,18 +4753,6 @@ Sijainti: %2</translation>
         <translation>PuTTY-yksityinen avain -tiedostot (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Nimeä &amp;uudelleen...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Nimeä uudelleen</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Uusi &amp;nimi:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;Lisäasetukset...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Sijainti: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Kaikista &amp;tärkeistä kohdekentistä</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Nimeä &amp;uudelleen</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Huom</translation>
     </message>
 </context>
 <context>

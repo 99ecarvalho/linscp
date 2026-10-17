@@ -4753,18 +4753,6 @@ Location: %2</source>
         <translation>PuTTY தனியார் திறவுகோல் கோப்புகள் (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>&amp;மறுபெயரிடு...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>மறுபெயரிடு</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>புதிய &amp;பெயர்:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;மேம்படுத்தபட்ட...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>அனைத்து &amp;முதன்மை தள புலங்கள்</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>மறுபெயரிடு</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>குறிப்பு</translation>
     </message>
 </context>
 <context>

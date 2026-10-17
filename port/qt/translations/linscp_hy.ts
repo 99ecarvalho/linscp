@@ -4753,18 +4753,6 @@ Location: %2</source>
         <translation>PuTTY-ի փակ բանալու ֆայլեր (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>&amp;Վերանվանել...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Վերանվանել</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Նոր &amp;անուն:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;Լրացուցիչ...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Կայքի բոլոր &amp;հիմնական դաշտերը</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Վերանվանե&amp;լ</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Նշում</translation>
     </message>
 </context>
 <context>

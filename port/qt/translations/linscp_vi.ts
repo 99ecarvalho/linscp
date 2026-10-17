@@ -4752,18 +4752,6 @@ Vị trí: %2</translation>
         <translation>Tệp khóa riêng PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Đổi &amp;tên...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Đổi tên</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>&amp;Tên mới:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;Nâng cao...</translation>
     </message>
@@ -4878,6 +4866,14 @@ Vị trí: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>&amp;Tất cả trường chính của trang</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>&amp;Đổi tên</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Ghi chú</translation>
     </message>
 </context>
 <context>

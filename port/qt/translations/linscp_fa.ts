@@ -4752,18 +4752,6 @@ Location: %2</source>
         <translation>پرونده های کلید خصوصی PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>&amp;تغییرنام...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>تغییرنام</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>&amp;نام جدید:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;پیشرفته...</translation>
     </message>
@@ -4878,6 +4866,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>همه &amp;زمینه های اصلی تارنما</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>تغییرنام</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>یادداشت</translation>
     </message>
 </context>
 <context>

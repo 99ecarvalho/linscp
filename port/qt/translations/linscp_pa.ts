@@ -4753,18 +4753,6 @@ Location: %2</source>
         <translation>PuTTY ਪ੍ਰਾਈਵੇਟ ਕੁੰਜੀ ਫਾਈਲਾਂ (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>ਪੁਨਰ-ਨਾਮਿਤ ਕਰੋ(&amp;N)...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>ਨਾਮ ਬਦਲੋ</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>ਨਵਾਂ ਨਾਮ(&amp;N):</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>ਐਡਵਾਂਸਡ(&amp;V)...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>ਸਾਰੇ ਮੁੱਖ ਸਾਈਟ ਫੀਲਡ</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>ਪੁਨਰ-ਨਾਮਿਤ ਕਰੋ</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>ਨੋਟ</translation>
     </message>
 </context>
 <context>

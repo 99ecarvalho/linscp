@@ -4752,18 +4752,6 @@ Lokasi: %2</translation>
         <translation>Berkas Kunci Privat PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Ganti &amp;Nama...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Ganti Nama</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>&amp;Nama baru:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;Lanjutan...</translation>
     </message>
@@ -4878,6 +4866,14 @@ Lokasi: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Se&amp;mua field situs utama</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Ganti &amp;nama</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Catatan</translation>
     </message>
 </context>
 <context>

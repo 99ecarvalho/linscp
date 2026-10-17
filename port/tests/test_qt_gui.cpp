@@ -661,6 +661,9 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
       Dialog.SelectNewSite();
       Dialog.HostName()->setText(QStringLiteral("alpha.example"));
       Dialog.UserName()->setText(QStringLiteral("zed"));
+      CoreBridge::TSite Colored = Dialog.Edited();
+      Colored.Color = 0x0000FF;
+      Dialog.SetEdited(Colored);
       Check(Dialog.SaveAs(QStringLiteral("Tests/alpha"), false), "a site to search for");
       Dialog.SelectNewSite();
       Dialog.HostName()->setText(QStringLiteral("beta.example"));
@@ -703,9 +706,28 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
       Dialog.SelectNewSite();
       Dialog.StartSiteSearch();
       Check(Dialog.SiteSearching() && Dialog.SiteSearchStatus()->isVisibleTo(&Dialog), "Find Site starts it");
+      // A15: the note shown; A14: the color on the icon.
+      Check(Dialog.SelectSite(QStringLiteral("beta")) && Dialog.NoteGroup()->isVisibleTo(&Dialog), "a site's note shown");
+      Check(Dialog.SelectSite(QStringLiteral("Tests/alpha")) && !Dialog.NoteGroup()->isVisibleTo(&Dialog), "none without one");
+      const QImage ColoredIcon = Dialog.Tree()->currentItem()->icon(0).pixmap(16, 16).toImage();
+      Dialog.SelectSite(QStringLiteral("beta"));
+      const QImage PlainIcon = Dialog.Tree()->currentItem()->icon(0).pixmap(16, 16).toImage();
+      Check(ColoredIcon != PlainIcon, "a site's color on its icon");
+      // A13: renamed in place.
+      Dialog.RenameInPlace();
+      QLineEdit * Editor = Dialog.Tree()->viewport()->findChild<QLineEdit *>();
+      Check(Editor != nullptr, "Rename edits the label");
+      if (Editor != nullptr)
+      {
+        Editor->setText(QStringLiteral("gamma"));
+        QTest::keyClick(Editor, Qt::Key_Return);
+        QTest::qWait(50);
+      }
+      Check(CoreBridge::SiteExists("gamma") && !CoreBridge::SiteExists("beta") && Dialog.SelectSite(QStringLiteral("gamma")),
+        "the site renamed as the label says");
       Dialog.SelectSite(QStringLiteral("Tests/alpha"));
       Dialog.DeleteSelected(false);
-      Dialog.SelectSite(QStringLiteral("beta"));
+      Dialog.SelectSite(QStringLiteral("gamma"));
       Dialog.DeleteSelected(false);
     }
     // A16: a URL in the host name parsed on leaving it; A6: Paste Session URL.
@@ -5845,6 +5867,18 @@ void TabsTest(const char * Port, const QString & Directory)
       SiteManager Sites(&Window);
       Check(Sites.SelectWorkspace(Name) && Sites.Workspace() == Name, "the site manager lists the workspace");
       Check(!Sites.HostName()->isEnabled(), "not edited there");
+      // A13: but renamed, in place, its sessions with it.
+      Sites.RenameInPlace();
+      QLineEdit * Editor = Sites.Tree()->viewport()->findChild<QLineEdit *>();
+      Check(Editor != nullptr, "a workspace renamed in place");
+      if (Editor != nullptr)
+      {
+        Editor->setText(QStringLiteral("Renamed Workspace"));
+        QTest::keyClick(Editor, Qt::Key_Return);
+        QTest::qWait(50);
+      }
+      Check((CoreBridge::WorkspaceSessionCount("Renamed Workspace") == 2) && (CoreBridge::WorkspaceSessionCount(Name.toStdString()) == 0) &&
+        Sites.SelectWorkspace(QStringLiteral("Renamed Workspace")), "with its sessions");
       Check(Sites.DeleteSelected(false) && CoreBridge::WorkspaceNames().empty() && !Sites.SelectWorkspace(Name),
         "deleted with its sessions");
     }

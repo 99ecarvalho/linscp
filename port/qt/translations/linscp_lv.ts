@@ -4754,18 +4754,6 @@ Atrašanās vieta: %2</translation>
         <translation>PuTTY privātās atslēgas faili (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Pār&amp;dēvēt...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Pārdēvēt</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Jaunais &amp;nosaukums:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>P&amp;apildu...</translation>
     </message>
@@ -4880,6 +4868,14 @@ Atrašanās vieta: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Visi vietnes &amp;galvenie lauki</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Pār&amp;dēvēt</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Piezīme</translation>
     </message>
 </context>
 <context>

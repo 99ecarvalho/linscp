@@ -15,8 +15,10 @@
 
 class QCheckBox;
 class QComboBox;
+class QGroupBox;
 class QLabel;
 class QMenu;
+class QPlainTextEdit;
 class QLineEdit;
 class QPushButton;
 class QSpinBox;
@@ -113,6 +115,10 @@ public:
   void PasteUrl();
   // As HostNameEditExit: a URL in the host name parsed into the form.
   void ParseHostName();
+  // Rename (F2): the selected site's, folder's or workspace's label edited
+  // in place; renamed when the edit ends.
+  void RenameInPlace();
+  QGroupBox * NoteGroup() const { return FNoteGroup; }
   // A10, the site search (SitesIncrementalSearch): Text from the item
   // under the cursor (after it when SkipCurrent; backwards when Reverse),
   // in collapsed folders too, but first in what shows unless Expanding;
@@ -183,7 +189,13 @@ private:
   QString FSearchText;
   CoreBridge::TPreferences::TPanelSearch FSiteSearch = CoreBridge::TPreferences::TPanelSearch::AnyPart;
   void AskNewFolder();
-  void AskRename();
+  // A13, rename in place: the label edited, then renamed as it says.
+  void Renamed(QTreeWidgetItem * Item);
+  QTreeWidgetItem * FRenameItem = nullptr;
+  QString FRenameText;
+  // A15: the site's note, read-only (NoteGroup).
+  QGroupBox * FNoteGroup = nullptr;
+  QPlainTextEdit * FNote = nullptr;
   // The new site's name from Clone to New Site, for Save; empty otherwise.
   QString FNewSiteName;
   QToolButton * FAdvanced = nullptr;

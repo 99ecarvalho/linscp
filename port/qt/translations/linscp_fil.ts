@@ -4753,18 +4753,6 @@ Lokasyon: %2</translation>
         <translation>Mga PuTTY Private Key File (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Muling pa&amp;ngalanan...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Palitan ang pangalan</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Bagong &amp;pangalan:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>Ad&amp;vanced...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Lokasyon: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Lahat ng &amp;Pangunahing Field ng Site</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>I-Re&amp;name</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Talaan</translation>
     </message>
 </context>
 <context>

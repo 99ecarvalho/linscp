@@ -4753,18 +4753,6 @@ Location: %2</source>
         <translation>Αρχεία ιδιωτικού κλειδιού PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>&amp;Μετονομασία...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Μετονομασία</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Νέο ό&amp;νομα:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;Για προχωρημένους...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Όλα τα &amp;κύρια πεδία τοποθεσίας</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Μετονόμασε</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Σημείωση</translation>
     </message>
 </context>
 <context>

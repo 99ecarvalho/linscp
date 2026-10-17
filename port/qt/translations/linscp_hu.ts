@@ -4752,18 +4752,6 @@ Hely: %2</translation>
         <translation>PuTTY privát kulcsfájlok (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Át&amp;nevezés...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Átnevezés</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Új &amp;név:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;Haladó...</translation>
     </message>
@@ -4878,6 +4866,14 @@ Hely: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Összes főbb webhelymező</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Át&amp;nevezés...</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Megjegyzés</translation>
     </message>
 </context>
 <context>

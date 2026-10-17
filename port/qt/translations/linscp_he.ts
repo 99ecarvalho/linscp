@@ -4753,18 +4753,6 @@ Location: %2</source>
         <translation>קבצי מפתח פרטי של PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>&amp;שנה שם...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>שנה שם</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>&amp;שם חדש:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;מתקדם...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>כל שדות האתר ה&amp;עיקריים</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>&amp;שנה שם</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>הערה</translation>
     </message>
 </context>
 <context>

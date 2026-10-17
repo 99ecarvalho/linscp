@@ -4753,18 +4753,6 @@ Emplacement : %2</translation>
         <translation>Fichiers de clé privée PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Re&amp;nommer...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Renommer</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Nouveau &amp;nom :</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>A&amp;vancé...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Emplacement : %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>&amp;Tous les champs importants du site</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Re&amp;nommer</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Note</translation>
     </message>
 </context>
 <context>

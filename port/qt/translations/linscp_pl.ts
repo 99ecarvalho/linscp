@@ -4754,18 +4754,6 @@ Lokalizacja: %2</translation>
         <translation>Pliki klucza prywatnego PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>&amp;Zmień nazwę...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Zmień nazwę</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Nowa &amp;nazwa:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;Zaawansowane...</translation>
     </message>
@@ -4880,6 +4868,14 @@ Lokalizacja: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>&amp;wszystkie główne pola połączenia</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>&amp;Zmień nazwę</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Uwaga</translation>
     </message>
 </context>
 <context>

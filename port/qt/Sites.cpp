@@ -878,6 +878,69 @@ void ValidateWorkspaceName(const std::string & Name)
   }
 }
 
+void ValidateSiteName(const std::string & Label)
+{
+  try
+  {
+    TSessionData::ValidateName(FromUtf8(Label));
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void RenameWorkspace(const std::string & Name, const std::string & NewName)
+{
+  try
+  {
+    const UnicodeString OldRoot = FromUtf8(Name);
+    const UnicodeString NewRoot = FromUtf8(NewName);
+    if (OldRoot == NewRoot)
+    {
+      return;
+    }
+    TSessionData::ValidateName(NewRoot);
+    // As CheckDuplicateFolder.
+    if (!SameText(OldRoot, NewRoot) && (StoredSessions->IsFolderOrWorkspace(NewRoot)))
+    {
+      throw Exception(MainInstructions(FMTLOAD(LOGIN_DUPLICATE_SESSION_FOLDER_WORKSPACE, (NewRoot))));
+    }
+    std::vector<TSessionData *> Moved;
+    for (int Index = 0; Index < StoredSessions->Count; Index++)
+    {
+      TSessionData * Data = StoredSessions->Sessions[Index];
+      if (Data->IsWorkspace && Data->IsInFolderOrWorkspace(OldRoot))
+      {
+        Moved.push_back(Data);
+      }
+    }
+    for (TSessionData * Data : Moved)
+    {
+      const UnicodeString Path = NewRoot + Data->Name.SubString(OldRoot.Length() + 1, Data->Name.Length() - OldRoot.Length());
+      Data->Remove();
+      TSessionData * NewData = StoredSessions->NewSession(Path, Data);
+      // The same one, when only the letter case changed.
+      if (NewData != Data)
+      {
+        StoredSessions->Remove(Data);
+      }
+    }
+    // Modified only, explicit.
+    StoredSessions->Save(false, true);
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+int SiteColor(const std::string & Name)
+{
+  const TSessionData * Data = StoredSite(Name);
+  return (Data != NULL) ? Data->Color : 0;
+}
+
 void DeleteSite(const std::string & Name)
 {
   try

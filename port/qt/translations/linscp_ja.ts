@@ -4752,18 +4752,6 @@ Location: %2</source>
         <translation>PuTTY 秘密鍵ファイル (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>名前の変更(&amp;N)...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>名前の変更</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>新しい名前(&amp;N):</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>設定(&amp;V)...</translation>
     </message>
@@ -4878,6 +4866,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>サイト情報のいずれかに一致(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>名前の変更(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>メモ</translation>
     </message>
 </context>
 <context>

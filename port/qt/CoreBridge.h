@@ -1924,6 +1924,13 @@ std::vector<std::string> WorkspaceNames();
 void DeleteWorkspace(const std::string & Name);
 int WorkspaceSessionCount(const std::string & Name);
 void ValidateWorkspaceName(const std::string & Name);
+// The Login dialog's rename in place: a tree label (TSessionData::
+// ValidateName: no slash), and a workspace's (its sessions moved; not over
+// another folder or workspace).
+void ValidateSiteName(const std::string & Label);
+void RenameWorkspace(const std::string & Name, const std::string & NewName);
+// A stored site's color (TColor, 0 none), for its icon in the tree.
+int SiteColor(const std::string & Name);
 // What WinSCP keeps for them (TWinConfiguration's): the workspace saved
 // automatically when the window closes, with passwords or not, and whether
 // it was (LastStoredSession), so it opens at the next start.

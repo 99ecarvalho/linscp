@@ -4752,18 +4752,6 @@ Location: %2</source>
         <translation>PuTTY私钥文件 (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>重命名(&amp;N)...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>重命名</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>新名称(&amp;N)：</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>高级(&amp;V)...</translation>
     </message>
@@ -4878,6 +4866,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>搜索所有主要站点字段(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>重命名(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>提示</translation>
     </message>
 </context>
 <context>

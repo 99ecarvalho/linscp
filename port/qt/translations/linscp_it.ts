@@ -4753,18 +4753,6 @@ Percorso: %2</translation>
         <translation>File chiave privata PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Ri&amp;nomina...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Rinomina</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>&amp;Nuovo nome:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>A&amp;vanzate...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Percorso: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Tutti i principali ca&amp;mpi del sito</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Ri&amp;nomina</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Nota</translation>
     </message>
 </context>
 <context>

@@ -4753,18 +4753,6 @@ Ligging: %2</translation>
         <translation>PuTTY privaat sleutellêers (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Her&amp;noem...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Hernoem</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Nuwe &amp;naam:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>Gevor&amp;derd...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Ligging: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Alle &amp;hoofvelde van werf</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Her&amp;noem</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Nota</translation>
     </message>
 </context>
 <context>

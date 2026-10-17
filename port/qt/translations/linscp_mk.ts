@@ -4754,18 +4754,6 @@ Location: %2</source>
         <translation>PuTTY датотеки со приватен клуч (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Преи&amp;менувај...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Преименувај</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Ново &amp;име:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>Напр&amp;едно...</translation>
     </message>
@@ -4880,6 +4868,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Сите &amp;главни полиња на локацијата</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Пре&amp;именувај</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Забелешка</translation>
     </message>
 </context>
 <context>

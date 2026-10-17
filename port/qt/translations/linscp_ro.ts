@@ -4754,18 +4754,6 @@ Cale: %2</translation>
         <translation>Fișiere cheie privată PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Rede&amp;numire...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Redenumire</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>&amp;Nume nou:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;Avansat...</translation>
     </message>
@@ -4880,6 +4868,14 @@ Cale: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Toate Câmpurile &amp;Importante ale Site-ului</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Rede&amp;numire</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Informare</translation>
     </message>
 </context>
 <context>

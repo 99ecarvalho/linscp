@@ -4753,18 +4753,6 @@ Staðsetning: %2</translation>
         <translation>PuTTY-einkalykilskrár (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Endur&amp;nefna…</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Endurnefna</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Nýtt &amp;nafn:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>Í&amp;tarlegt…</translation>
     </message>
@@ -4879,6 +4867,14 @@ Staðsetning: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Allir &amp;meiriháttar setursreitir</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Endur&amp;nefna</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Athugasemd</translation>
     </message>
 </context>
 <context>

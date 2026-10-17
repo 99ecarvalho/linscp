@@ -29,11 +29,16 @@
 #include "SiteRawDialog.h"
 #include "ImportSitesDialog.h"
 #include "CleanupDialog.h"
+#include "ColorMenu.h"
 #include "CustomCommandDialog.h"
 #include "GenerateUrlDialog.h"
 #include <QActionGroup>
 #include <QApplication>
 #include <QClipboard>
+#include <QGroupBox>
+#include <QPainter>
+#include <QPlainTextEdit>
+#include <QTimer>
 #include <QKeyEvent>
 #include <QGuiApplication>
 #include <QMenu>
@@ -136,14 +141,37 @@ SiteManager::SiteManager(QWidget * Parent) :
   FManage->setMenu(ManageMenu);
   TreeButtons->addWidget(FManage);
   FNewFolder = new QPushButton(tr("Ne&w Folder..."), TreePanel);
-  FRename = new QPushButton(tr("Re&name..."), TreePanel);
+  FRename = new QPushButton(tr("Re&name"), TreePanel);
   FDelete = new QPushButton(tr("&Delete"), TreePanel);
   TreeButtons->addWidget(FNewFolder);
   TreeButtons->addWidget(FRename);
   TreeButtons->addWidget(FDelete);
   TreeLayout->addLayout(TreeButtons);
   connect(FNewFolder, &QPushButton::clicked, this, &SiteManager::AskNewFolder);
-  connect(FRename, &QPushButton::clicked, this, &SiteManager::AskRename);
+  connect(FRename, &QPushButton::clicked, this, &SiteManager::RenameInPlace);
+  FTree->setEditTriggers(QAbstractItemView::NoEditTriggers);
+  connect(FTree, &QTreeWidget::itemChanged, this, [this](QTreeWidgetItem * Item, int)
+  {
+    if ((Item == FRenameItem) && (Item->text(0) != FRenameText))
+    {
+      // Not while the tree is in its signal: the rename fills it again.
+      FRenameItem = nullptr;
+      QTimer::singleShot(0, this, [this, Name = Item->data(0, NameRole).toString(), Kind = Item->data(0, KindRole).toInt(),
+        Text = Item->text(0).trimmed()]()
+      {
+        for (QTreeWidgetItemIterator It(FTree); *It; ++It)
+        {
+          if (((*It)->data(0, NameRole).toString() == Name) && ((*It)->data(0, KindRole).toInt() == Kind))
+          {
+            FTree->setCurrentItem(*It);
+            (*It)->setText(0, Text);
+            Renamed(*It);
+            return;
+          }
+        }
+      });
+    }
+  });
   connect(FDelete, &QPushButton::clicked, this, [this]() { DeleteSelected(true); });
 
   QWidget * FormPanel = new QWidget(Splitter);
@@ -222,6 +250,14 @@ SiteManager::SiteManager(QWidget * Parent) :
   AdvancedRow->addStretch(1);
   AdvancedRow->addWidget(FAdvanced);
   FormLayout->addLayout(AdvancedRow);
+  FNoteGroup = new QGroupBox(tr("Note"), FormPanel);
+  QVBoxLayout * NoteLayout = new QVBoxLayout(FNoteGroup);
+  FNote = new QPlainTextEdit(FNoteGroup);
+  FNote->setReadOnly(true);
+  FNote->setAccessibleName(tr("Note"));
+  NoteLayout->addWidget(FNote);
+  FNoteGroup->hide();
+  FormLayout->addWidget(FNoteGroup, 1);
   FormLayout->addStretch(1);
   connect(FProtocol, &QComboBox::currentIndexChanged, this, &SiteManager::ProtocolChanged);
   connect(FEncryption, &QComboBox::currentIndexChanged, this, &SiteManager::ProtocolChanged);
@@ -277,6 +313,18 @@ SiteManager::SiteManager(QWidget * Parent) :
   Fill(QString());
 }
 
+// The site's icon with its color, as GetSessionColorImage's mask: a
+// swatch over its corner.
+static QIcon ColoredSiteIcon(const QIcon & Site, int Color)
+{
+  QPixmap Pixmap = Site.pixmap(16, 16);
+  QPainter Painter(&Pixmap);
+  const QPixmap Swatch = SessionColorIcon(Color).pixmap(9, 9);
+  Painter.drawPixmap(Pixmap.width() - Swatch.width(), Pixmap.height() - Swatch.height(), Swatch);
+  Painter.end();
+  return QIcon(Pixmap);
+}
+
 void SiteManager::Fill(const QString & Select, const QStringList & ExtraFolders)
 {
   const QSignalBlocker Blocker(FTree);
@@ -327,7 +375,9 @@ void SiteManager::Fill(const QString & Select, const QStringList & ExtraFolders)
     QTreeWidgetItem * Item = (Parent != nullptr) ? new QTreeWidgetItem(Parent, { Leaf }) : new QTreeWidgetItem(FTree, { Leaf });
     Item->setData(0, KindRole, SiteKind);
     Item->setData(0, NameRole, Path);
-    Item->setIcon(0, SiteIcon);
+    // As GetSessionImageIndex: tinted with the site's color.
+    const int Color = CoreBridge::SiteColor(Name);
+    Item->setIcon(0, (Color != 0) ? ColoredSiteIcon(SiteIcon, Color) : SiteIcon);
     if (Path == Select)
     {
       Selected = Item;
@@ -350,6 +400,15 @@ void SiteManager::Fill(const QString & Select, const QStringList & ExtraFolders)
     Item->setData(0, NameRole, QString::fromStdString(Name));
     Item->setIcon(0, WorkspaceIcon);
   }
+  // Sites, folders and workspaces renamed in place.
+  for (QTreeWidgetItemIterator It(FTree); *It; ++It)
+  {
+    if ((*It)->data(0, KindRole).toInt() != NewSiteKind)
+    {
+      (*It)->setFlags((*It)->flags() | Qt::ItemIsEditable);
+    }
+  }
+  FRenameItem = nullptr;
   FTree->expandAll();
   FTree->setCurrentItem(Selected);
   CurrentChanged();
@@ -508,6 +567,8 @@ void SiteManager::Load(const CoreBridge::TSite & Site)
 {
   FLoading = true;
   FSite = Site;
+  FNote->setPlainText(QString::fromStdString(Site.Note));
+  FNoteGroup->setVisible(!QString::fromStdString(Site.Note).trimmed().isEmpty());
   FProtocol->setCurrentIndex(FProtocol->findData(static_cast<int>(Site.Protocol)));
   ProtocolChanged();
   const int Encryption = FEncryption->findData(static_cast<int>(Site.Encryption));
@@ -762,18 +823,67 @@ void SiteManager::AskNewFolder()
   }
 }
 
-void SiteManager::AskRename()
+static void AddSearchMenu(SiteManager * Dialog, QMenu * Menu, CoreBridge::TPreferences::TPanelSearch Current);
+
+// As RenameSessionActionExecute.
+void SiteManager::RenameInPlace()
 {
-  const QString Current = !SelectedName().isEmpty() ? SelectedName() : SelectedFolder();
-  bool OK = false;
-  const QString Name = QInputDialog::getText(this, tr("Rename"), tr("New &name:"), QLineEdit::Normal, Current, &OK).trimmed();
-  if (OK && !Name.isEmpty() && (Name != Current))
+  QTreeWidgetItem * Item = FTree->currentItem();
+  if ((Item == nullptr) || !FRename->isEnabled())
   {
-    RenameSelected(Name);
+    return;
   }
+  ResetSiteSearch();
+  FTree->setFocus();
+  FRenameItem = Item;
+  FRenameText = Item->text(0);
+  FTree->editItem(Item, 0);
 }
 
-static void AddSearchMenu(SiteManager * Dialog, QMenu * Menu, CoreBridge::TPreferences::TPanelSearch Current);
+// As SessionTreeEdited: the site, folder (its sites) or workspace renamed;
+// the tree as it was when that fails.
+void SiteManager::Renamed(QTreeWidgetItem * Item)
+{
+  const int Kind = Item->data(0, KindRole).toInt();
+  const QString Name = Item->data(0, NameRole).toString();
+  const QString Text = Item->text(0).trimmed();
+  if (Text.isEmpty())
+  {
+    Fill(Name);
+    return;
+  }
+  try
+  {
+    CoreBridge::ValidateSiteName(Text.toStdString());
+    if (Kind == WorkspaceKind)
+    {
+      CoreBridge::RenameWorkspace(Name.toStdString(), Text.toStdString());
+      Fill(QString());
+      SelectWorkspace(Text);
+      return;
+    }
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    Fill(Name);
+    if (Kind == WorkspaceKind)
+    {
+      SelectWorkspace(Name);
+    }
+    return;
+  }
+  const int Slash = Name.lastIndexOf(QLatin1Char('/'));
+  const QString Path = (Slash > 0) ? (Name.left(Slash + 1) + Text) : Text;
+  if (!RenameSelected(Path))
+  {
+    Fill(Name);
+    if (Kind == FolderKind)
+    {
+      SelectFolder(Name);
+    }
+  }
+}
 
 void SiteManager::FillManageMenu(QMenu * Menu)
 {
@@ -805,7 +915,7 @@ void SiteManager::FillManageMenu(QMenu * Menu)
   else
   {
     Menu->addAction(tr("&Delete"), this, [this]() { DeleteSelected(true); });
-    Menu->addAction(tr("&Rename"), this, &SiteManager::AskRename)->setEnabled(FRename->isEnabled());
+    Menu->addAction(tr("&Rename"), this, &SiteManager::RenameInPlace)->setEnabled(FRename->isEnabled());
   }
   if (Kind == SiteKind)
   {
@@ -1071,7 +1181,7 @@ bool SiteManager::eventFilter(QObject * Watched, QEvent * Event)
       {
         if (FRename->isEnabled())
         {
-          AskRename();
+          RenameInPlace();
         }
         return true;
       }
@@ -1533,7 +1643,7 @@ void SiteManager::UpdateButtons()
   FLogin->setEnabled(Kind != FolderKind);
   FSave->setEnabled(Form);
   FAdvanced->setEnabled(Form);
-  FRename->setEnabled((Kind == SiteKind) || (Kind == FolderKind));
+  FRename->setEnabled((Kind == SiteKind) || (Kind == FolderKind) || (Kind == WorkspaceKind));
   FDelete->setEnabled(Kind != NewSiteKind);
   for (QWidget * Field : std::initializer_list<QWidget *>{ FProtocol, FEncryption, FHostName, FPort, FUserName, FPassword,
          FAnonymous, FS3CredentialsEnv })

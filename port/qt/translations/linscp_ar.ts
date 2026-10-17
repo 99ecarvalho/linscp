@@ -4757,18 +4757,6 @@ Location: %2</source>
         <translation>ملفات المفاتيح الخاصة لـ PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>إعادة ت&amp;سمية...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>إعادة تسمية</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>الا&amp;سم الجديد:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;متقدم...</translation>
     </message>
@@ -4883,6 +4871,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>جميع حقول الموقع ال&amp;رئيسية</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>إعا&amp;دة تسمية ...</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>الملاحظات</translation>
     </message>
 </context>
 <context>

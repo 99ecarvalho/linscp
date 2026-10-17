@@ -4752,18 +4752,6 @@ Location: %2</source>
         <translation>PuTTY ကိုယ်ပိုင် ကီး ဖိုင်များ (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>အမည်ပြောင်းပါ(&amp;N)...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>အမည်ပြောင်းပါ</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>အမည်သစ်(&amp;N):</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>အဆင့်မြင့်(&amp;V)...</translation>
     </message>
@@ -4878,6 +4866,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>ဆိုက်၏ အဓိကအကွက်အားလုံး(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>အမည်ပြောင်းပါ(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>မှတ်စု</translation>
     </message>
 </context>
 <context>

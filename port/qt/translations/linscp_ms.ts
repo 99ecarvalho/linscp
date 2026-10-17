@@ -4752,18 +4752,6 @@ Lokasi: %2</translation>
         <translation>Fail Kunci Persendirian PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Tukar &amp;nama...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Tukar nama</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Nama &amp;baharu:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>Lan&amp;jutan...</translation>
     </message>
@@ -4878,6 +4866,14 @@ Lokasi: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Semua &amp;Medan Utama Tapak</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Tukar nama</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Nota</translation>
     </message>
 </context>
 <context>

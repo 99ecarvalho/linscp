@@ -4753,18 +4753,6 @@ Plats: %2</translation>
         <translation>PuTTY privata nyckelfiler (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>B&amp;yt namn...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Byt namn</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Nytt &amp;namn:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>A&amp;vancerad...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Plats: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Alla &amp;fält för webbplatsen</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>B&amp;yt namn</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Anteckning</translation>
     </message>
 </context>
 <context>

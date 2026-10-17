@@ -4753,18 +4753,6 @@ Ruta: %2</translation>
         <translation>Archivos de clave privada PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Re&amp;nombrar...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Renombrar</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Nuevo &amp;nombre:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>A&amp;vanzado...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Ruta: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Todos los campos principales del sitio</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Re&amp;nombrar</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Notas</translation>
     </message>
 </context>
 <context>

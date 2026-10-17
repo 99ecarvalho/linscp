@@ -4754,18 +4754,6 @@ Umiestnenie: %2</translation>
         <translation>Súbory s privátnym kľúčom PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Pre&amp;menovať...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Premenovať</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Nový &amp;názov:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>Po&amp;kročilé...</translation>
     </message>
@@ -4880,6 +4868,14 @@ Umiestnenie: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Všetky hlavné polia lok&amp;ality</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Premenovať</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Poznámka</translation>
     </message>
 </context>
 <context>

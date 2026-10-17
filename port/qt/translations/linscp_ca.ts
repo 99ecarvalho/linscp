@@ -4753,18 +4753,6 @@ Ubicació: %2</translation>
         <translation>Fitxers de clau privada PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Canvia de &amp;nom...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Canvia el nom</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>&amp;Nom nou:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>A&amp;vançat...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Ubicació: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Tots els ca&amp;mps importants del lloc</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>&amp;Canvia el nom</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Nota</translation>
     </message>
 </context>
 <context>

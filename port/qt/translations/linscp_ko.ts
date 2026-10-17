@@ -4752,18 +4752,6 @@ Location: %2</source>
         <translation>PuTTY 개인 키 파일 (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>이름 바꾸기(&amp;N)...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>이름 바꾸기</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>새 이름(&amp;N):</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>고급(&amp;V)...</translation>
     </message>
@@ -4878,6 +4866,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>모든 주요 사이트 필드(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>이름 바꾸기(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>노트</translation>
     </message>
 </context>
 <context>

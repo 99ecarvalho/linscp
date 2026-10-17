@@ -4754,18 +4754,6 @@ Lokacija: %2</translation>
         <translation>PuTTY datoteke privatnog ključa (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>&amp;Preimenuj...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Preimenuj</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Novi &amp;naziv:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;Napredno...</translation>
     </message>
@@ -4880,6 +4868,14 @@ Lokacija: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Sva glavna polja stranice</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>&amp;Preimenuj</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Napomena</translation>
     </message>
 </context>
 <context>

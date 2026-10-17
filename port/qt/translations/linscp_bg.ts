@@ -4753,18 +4753,6 @@ Location: %2</source>
         <translation>Файлове с частни ключове на PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Пре&amp;именуване...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Преименуване</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Ново &amp;име:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;Разширени...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Всички &amp;основни полета на сайта</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Пре&amp;именуване</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Бележка</translation>
     </message>
 </context>
 <context>

@@ -4754,18 +4754,6 @@ Vieta: %2</translation>
         <translation>„PuTTY“ privataus rakto failai (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Per&amp;vadinti...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Pervadinti</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>&amp;Naujas pavadinimas:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;Daugiau...</translation>
     </message>
@@ -4880,6 +4868,14 @@ Vieta: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Visi &amp;pagrindiniai tinklavietės laukai</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>P&amp;ervadinti ...</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Pastaba</translation>
     </message>
 </context>
 <context>

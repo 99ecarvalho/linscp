@@ -4753,18 +4753,6 @@ Location: %2</source>
         <translation>PuTTY-ის პირადი გასაღების ფაილები (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>სახე&amp;ლის გადარქმევა...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>სახელის გადარქმევა</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>ახალი &amp;სახელი:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;დამატებით...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>საიტის &amp;ყველა ძირითადი ველი</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>სახე&amp;ლის გადარქმევა</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>შენიშვნა</translation>
     </message>
 </context>
 <context>

@@ -4752,18 +4752,6 @@ Konum: %2</translation>
         <translation>PuTTY kişisel anahtar dosyaları (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Ye&amp;niden adlandır...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Yeniden adlandır</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Yeni &amp;ad:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>G&amp;elişmiş...</translation>
     </message>
@@ -4878,6 +4866,14 @@ Konum: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>&amp;Tüm temel site alanlarında</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Ye&amp;niden adlandır</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Not</translation>
     </message>
 </context>
 <context>

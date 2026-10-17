@@ -4753,18 +4753,6 @@ Location: %2</source>
         <translation>PuTTY निजी कुंजी फ़ाइलें (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>नाम बदलें(&amp;N)...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>नाम बदलें</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>नया नाम(&amp;N):</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>उन्नत(&amp;V)...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>साइट के सभी मुख्य फ़ील्ड(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>नाम बदलें(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>टिप्पणी</translation>
     </message>
 </context>
 <context>

@@ -4753,18 +4753,6 @@ Ort: %2</translation>
         <translation>PuTTY-Dateien mit privatem Schlüssel (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Umbe&amp;nennen …</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Umbenennen</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Neuer &amp;Name:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;Erweitert …</translation>
     </message>
@@ -4879,6 +4867,14 @@ Ort: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Alle &amp;Hauptfelder des Ziels</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Umbe&amp;nennen</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Hinweis</translation>
     </message>
 </context>
 <context>

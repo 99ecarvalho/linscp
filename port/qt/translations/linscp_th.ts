@@ -4752,18 +4752,6 @@ Location: %2</source>
         <translation>ไฟล์ไพรเวตคีย์ PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>&amp;เปลี่ยนชื่อ...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>เปลี่ยนชื่อ</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>&amp;ชื่อใหม่:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;ขั้นสูง...</translation>
     </message>
@@ -4878,6 +4866,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>ฟิลด์&amp;หลักทั้งหมดของไซต์</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>เปลี่ยนชื่อ</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>หมายเหตุ</translation>
     </message>
 </context>
 <context>

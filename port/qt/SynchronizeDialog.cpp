@@ -463,7 +463,7 @@ QMenu * SyncChecklistDialog::PopupMenu()
   // The two sides: the left (local) one explored in the file manager, as
   // OpenFolderInExplorer; each side's paths copied.
   QMenu * Left = Menu->addMenu(tr("&Left Directory"));
-  Left->addAction(tr("&Explore"), this, [this]()
+  Left->addAction(tr("&Explore"), QKeySequence(Qt::CTRL | Qt::Key_BracketLeft), this, [this]()
   {
     const std::vector<std::size_t> Selected = SelectedIndexes();
     if (!Selected.empty())
@@ -475,14 +475,14 @@ QMenu * SyncChecklistDialog::PopupMenu()
   Left->addAction(tr("Copy &Path to Clipboard"), this, [this]()
   {
     QGuiApplication::clipboard()->setText(SelectedPaths(true).join(QLatin1Char('\n')));
-  }, QKeySequence(Qt::CTRL | Qt::Key_BracketLeft))->setEnabled(Any);
+  })->setEnabled(Any);
   QMenu * Right = Menu->addMenu(tr("Rig&ht Directory"));
-  Right->addAction(tr("Copy &Path to Clipboard"), this, [this]()
+  Right->addAction(tr("Copy &Path to Clipboard"), QKeySequence(Qt::CTRL | Qt::Key_BracketRight), this, [this]()
   {
     QGuiApplication::clipboard()->setText(SelectedPaths(false).join(QLatin1Char('\n')));
-  }, QKeySequence(Qt::CTRL | Qt::Key_BracketRight))->setEnabled(Any);
+  })->setEnabled(Any);
   Menu->addSeparator();
-  Menu->addAction(tr("Select &All"), this, [this]() { FList->selectAll(); }, QKeySequence::SelectAll)
+  Menu->addAction(tr("Select &All"), QKeySequence(QKeySequence::SelectAll), this, [this]() { FList->selectAll(); })
     ->setEnabled(FList->selectedItems().size() < FList->topLevelItemCount());
   return Menu;
 }

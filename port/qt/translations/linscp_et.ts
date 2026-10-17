@@ -4753,18 +4753,6 @@ Asukoht: %2</translation>
         <translation>PuTTY privaatvõtme failid (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>&amp;Nimeta ümber...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Nimeta ümber</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Uus &amp;nimi:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>Tä&amp;psemalt...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Asukoht: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Kõik saidi &amp;põhiväljad</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>&amp;Nimeta ringi</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Märkus</translation>
     </message>
 </context>
 <context>

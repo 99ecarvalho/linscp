@@ -4754,18 +4754,6 @@ Location: %2</source>
         <translation>Файли приватних ключів PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Перей&amp;менувати...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Перейменувати</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Нова &amp;назва:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;Поглиблено...</translation>
     </message>
@@ -4880,6 +4868,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Усі головні поля сайту</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Перейменувати</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Замітка</translation>
     </message>
 </context>
 <context>

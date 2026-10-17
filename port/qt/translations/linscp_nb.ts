@@ -4753,18 +4753,6 @@ Plassering: %2</translation>
         <translation>PuTTY private nøkkelfiler (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>&amp;Omdøp...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Omdøp</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Nytt &amp;navn:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;Avansert...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Plassering: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Alle &amp;hoved nettsted felt</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Døp&amp;om</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Merknad</translation>
     </message>
 </context>
 <context>

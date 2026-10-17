@@ -4754,18 +4754,6 @@ Location: %2</source>
         <translation>Файлы закрытых ключей PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>&amp;Переименовать…</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Переименовать</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Новое &amp;имя:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;Ещё…</translation>
     </message>
@@ -4880,6 +4868,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>&amp;Все основные поля подключения</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>&amp;Переименовать</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Заметка</translation>
     </message>
 </context>
 <context>

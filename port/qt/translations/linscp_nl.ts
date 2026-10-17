@@ -4753,18 +4753,6 @@ Locatie: %2</translation>
         <translation>PuTTY-privésleutelbestanden (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>&amp;Hernoemen...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Naam wijzigen</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Nieuwe &amp;naam:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>&amp;Geavanceerd...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Locatie: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Alle &amp;belangrijke site velden</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>&amp;Naam wijzigen</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Notitie</translation>
     </message>
 </context>
 <context>

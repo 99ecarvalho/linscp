@@ -4753,18 +4753,6 @@ Vendndodhja: %2</translation>
         <translation>Skedarë çelësash privatë PuTTY (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>Riemër&amp;to...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Riemërto</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>Emri i &amp;ri:</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>Të a&amp;vancuara...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Vendndodhja: %2</translation>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>Të gjitha fushat &amp;kryesore të sajtit</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>Ri&amp;emërto</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>Shënim</translation>
     </message>
 </context>
 <context>

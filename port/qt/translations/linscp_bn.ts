@@ -4753,18 +4753,6 @@ Location: %2</source>
         <translation>PuTTY প্রাইভেট কী ফাইল (*.ppk)</translation>
     </message>
     <message>
-        <source>Re&amp;name...</source>
-        <translation>নাম পরিবর্তন(&amp;N)...</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>নাম পরিবর্তন</translation>
-    </message>
-    <message>
-        <source>New &amp;name:</source>
-        <translation>নতুন নাম(&amp;N):</translation>
-    </message>
-    <message>
         <source>Ad&amp;vanced...</source>
         <translation>উন্নত(&amp;V)...</translation>
     </message>
@@ -4879,6 +4867,14 @@ Location: %2</source>
     <message>
         <source>All &amp;Major Site Fields</source>
         <translation>সাইটের সব প্রধান ক্ষেত্র(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Re&amp;name</source>
+        <translation>নাম পরিবর্তন(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Note</source>
+        <translation>নোট</translation>
     </message>
 </context>
 <context>
