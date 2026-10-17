@@ -259,10 +259,13 @@ P2-10 and P2-11 waited, at the user's request, for P3.
    maintainer: winscp/winscp#79 (portability), #80 (`LogEvent`), #81 (log
    file names), #82 (local EOL), #83 (OpenSSH import paths), #84, #85 (S3);
    each patch dropped when a pin move brings it in.
-2. Left for later (the user's call, 2026-10-15): mnemonic clashes in the
+2. The WinSCP functionality audit's gaps (2026-10-17): [gaps.md](gaps.md),
+   their status in [gaps_tracker.md](gaps_tracker.md); transfer progress
+   (C1) and the Site Manager (A) first.
+3. Left for later (the user's call, 2026-10-15): mnemonic clashes in the
    translated shell (P3-26), Serbian's locale (Q-14), code signing, more
    distribution channels, a native-speaker review of the translations.
-3. Custom command extensions on POSIX (the user's call): WinSCP's own need
+4. Custom command extensions on POSIX (the user's call): WinSCP's own need
    Windows PowerShell; pwsh and the assembly with console pipes (P1-23)
    could run them there.
 
