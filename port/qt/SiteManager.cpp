@@ -39,6 +39,7 @@
 #include <QPainter>
 #include <QPlainTextEdit>
 #include <QTimer>
+#include <QDropEvent>
 #include <QKeyEvent>
 #include <QGuiApplication>
 #include <QMenu>
@@ -101,6 +102,11 @@ SiteManager::SiteManager(QWidget * Parent) :
   FSearchStatus->hide();
   TreeLayout->addWidget(FSearchStatus);
   FTree->installEventFilter(this);
+  // Sites dragged into folders; the tree does not move them itself.
+  FTree->setDragEnabled(true);
+  FTree->setDragDropMode(QAbstractItemView::DragDrop);
+  FTree->setDefaultDropAction(Qt::CopyAction);
+  FTree->viewport()->installEventFilter(this);
   FSiteSearch = CoreBridge::Layout().SiteSearch;
   // The actions' keys, as upstream's action list's, with no menu open.
   const std::pair<QKeySequence, std::function<void()>> Keys[] = {
@@ -400,13 +406,15 @@ void SiteManager::Fill(const QString & Select, const QStringList & ExtraFolders)
     Item->setData(0, NameRole, QString::fromStdString(Name));
     Item->setIcon(0, WorkspaceIcon);
   }
-  // Sites, folders and workspaces renamed in place.
+  // Sites, folders and workspaces renamed in place; only sites dragged
+  // (SessionTreeStartDrag).
   for (QTreeWidgetItemIterator It(FTree); *It; ++It)
   {
-    if ((*It)->data(0, KindRole).toInt() != NewSiteKind)
-    {
-      (*It)->setFlags((*It)->flags() | Qt::ItemIsEditable);
-    }
+    const int Kind = (*It)->data(0, KindRole).toInt();
+    Qt::ItemFlags Flags = (*It)->flags();
+    Flags.setFlag(Qt::ItemIsEditable, Kind != NewSiteKind);
+    Flags.setFlag(Qt::ItemIsDragEnabled, Kind == SiteKind);
+    (*It)->setFlags(Flags);
   }
   FRenameItem = nullptr;
   FTree->expandAll();
@@ -1128,9 +1136,103 @@ void SiteManager::UpdateSiteSearch()
   }
 }
 
-// As SessionTreeKeyDown, SessionTreeKeyPress and CMDialogKey.
+// As NormalizeDropTarget and SessionAllowDrop.
+std::optional<QString> SiteManager::DropFolder(const QString & Site, const QTreeWidgetItem * Target) const
+{
+  QString Folder;
+  if (Target != nullptr)
+  {
+    const int Kind = Target->data(0, KindRole).toInt();
+    if (Kind == WorkspaceKind)
+    {
+      return std::nullopt;
+    }
+    if (Kind == FolderKind)
+    {
+      Folder = Target->data(0, NameRole).toString();
+    }
+    else if (Kind == SiteKind)
+    {
+      const QString Name = Target->data(0, NameRole).toString();
+      const int Slash = Name.lastIndexOf(QLatin1Char('/'));
+      Folder = (Slash > 0) ? Name.left(Slash) : QString();
+    }
+  }
+  const int Slash = Site.lastIndexOf(QLatin1Char('/'));
+  const QString Current = (Slash > 0) ? Site.left(Slash) : QString();
+  if (Site.isEmpty() || (Folder == Current))
+  {
+    return std::nullopt;
+  }
+  return Folder;
+}
+
+// As SessionTreeDragDrop: asks before overwriting a site there.
+bool SiteManager::MoveSite(const QString & Site, const QString & Folder)
+{
+  const QString Leaf = Site.mid(Site.lastIndexOf(QLatin1Char('/')) + 1);
+  const QString Path = Folder.isEmpty() ? Leaf : (Folder + QLatin1Char('/') + Leaf);
+  if (CoreBridge::SiteExists(Path.toStdString()))
+  {
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Confirmation;
+    Query.Message = CoreText(CoreBridge::TText::ConfirmOverwriteSite, Path).toStdString();
+    CoreBridge::TQueryButton Yes;
+    Yes.Answer = CoreBridge::AnswerYes;
+    Yes.Caption = "&Yes";
+    CoreBridge::TQueryButton No;
+    No.Answer = CoreBridge::AnswerNo;
+    No.Caption = "&No";
+    Query.Buttons = { Yes, No };
+    Query.CancelAnswer = CoreBridge::AnswerNo;
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    if (Frontend.Query(Query).Answer != CoreBridge::AnswerYes)
+    {
+      return false;
+    }
+  }
+  try
+  {
+    CoreBridge::RenameSite(Site.toStdString(), Path.toStdString());
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    Fill(Site);
+    return false;
+  }
+  FNewFolders.removeAll(Folder);
+  Fill(Path);
+  return true;
+}
+
+// As SessionTreeKeyDown, SessionTreeKeyPress and CMDialogKey; and the
+// tree's drag & drop (SessionTreeProc's CM_DRAG, SessionTreeDragDrop).
 bool SiteManager::eventFilter(QObject * Watched, QEvent * Event)
 {
+  if ((Watched == FTree->viewport()) &&
+      ((Event->type() == QEvent::DragEnter) || (Event->type() == QEvent::DragMove) || (Event->type() == QEvent::Drop)))
+  {
+    QDropEvent * Drop = static_cast<QDropEvent *>(Event);
+    const QString Site = SelectedName();
+    const std::optional<QString> Folder = (Drop->source() == FTree) ?
+      DropFolder(Site, FTree->itemAt(Drop->position().toPoint())) : std::nullopt;
+    if (!Folder.has_value())
+    {
+      Drop->ignore();
+      return true;
+    }
+    // A copy for the tree, which then removes nothing: the tree is
+    // filled again from the sites.
+    Drop->setDropAction(Qt::CopyAction);
+    Drop->accept();
+    if (Event->type() == QEvent::Drop)
+    {
+      QTimer::singleShot(0, this, [this, Site, Folder = *Folder]() { MoveSite(Site, Folder); });
+    }
+    return true;
+  }
   if (Watched == FTree)
   {
     if (Event->type() == QEvent::FocusOut)

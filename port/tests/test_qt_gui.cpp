@@ -725,9 +725,24 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
       }
       Check(CoreBridge::SiteExists("gamma") && !CoreBridge::SiteExists("beta") && Dialog.SelectSite(QStringLiteral("gamma")),
         "the site renamed as the label says");
+      // A12: dragged into a folder.
+      Check(Dialog.SelectFolder(QStringLiteral("Tests")), "(the folder)");
+      const QTreeWidgetItem * TestsFolder = Dialog.Tree()->currentItem();
+      const QTreeWidgetItem * NewSiteItem = Dialog.Tree()->topLevelItem(0);
+      Check((Dialog.DropFolder(QStringLiteral("gamma"), TestsFolder) == QStringLiteral("Tests")) &&
+        !Dialog.DropFolder(QStringLiteral("gamma"), nullptr).has_value() &&
+        !Dialog.DropFolder(QStringLiteral("gamma"), NewSiteItem).has_value() &&
+        (Dialog.DropFolder(QStringLiteral("Tests/alpha"), nullptr) == QString()), "a site drops into another folder, or the top level");
+      Check(Dialog.MoveSite(QStringLiteral("gamma"), QStringLiteral("Tests")) && CoreBridge::SiteExists("Tests/gamma") &&
+        !CoreBridge::SiteExists("gamma") && (Dialog.Tree()->currentItem()->data(0, Qt::UserRole).toString() == QStringLiteral("Tests/gamma")),
+        "moved there, selected");
+      const bool SiteDragged = (Dialog.Tree()->currentItem()->flags() & Qt::ItemIsDragEnabled);
+      Dialog.SelectFolder(QStringLiteral("Tests"));
+      Check(!(Dialog.Tree()->topLevelItem(0)->flags() & Qt::ItemIsDragEnabled) && SiteDragged &&
+        !(Dialog.Tree()->currentItem()->flags() & Qt::ItemIsDragEnabled), "only sites dragged");
       Dialog.SelectSite(QStringLiteral("Tests/alpha"));
       Dialog.DeleteSelected(false);
-      Dialog.SelectSite(QStringLiteral("gamma"));
+      Dialog.SelectSite(QStringLiteral("Tests/gamma"));
       Dialog.DeleteSelected(false);
     }
     // A16: a URL in the host name parsed on leaving it; A6: Paste Session URL.

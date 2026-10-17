@@ -9,6 +9,8 @@
 
 #include <QDialog>
 
+#include <optional>
+
 #include <functional>
 
 #include "CoreBridge.h"
@@ -119,6 +121,12 @@ public:
   // in place; renamed when the edit ends.
   void RenameInPlace();
   QGroupBox * NoteGroup() const { return FNoteGroup; }
+  // A12, drag & drop in the tree (SessionTreeDragDrop): a site into the
+  // folder of the item it is dropped on (the top level for none);
+  // DropFolder: that folder, empty for the top level, null when it cannot
+  // go there (a workspace, or where it is already).
+  std::optional<QString> DropFolder(const QString & Site, const QTreeWidgetItem * Target) const;
+  bool MoveSite(const QString & Site, const QString & Folder);
   // A10, the site search (SitesIncrementalSearch): Text from the item
   // under the cursor (after it when SkipCurrent; backwards when Reverse),
   // in collapsed folders too, but first in what shows unless Expanding;
