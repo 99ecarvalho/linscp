@@ -5031,10 +5031,6 @@ Hely: %2</translation>
         <translation>Teljes folyamat:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Átküldve:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Sebesség:</translation>
     </message>
@@ -5053,6 +5049,62 @@ Hely: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Hátra lévő idő:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Kezdés ideje:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Eltelt idő:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Átvitt bájtok:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>Fájl &amp;kihagyása</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>Kis &amp;méret</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>&amp;Háttérbe helyezés</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Befejezéskor</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Művelet befejezésekor végrehajtandó művelet</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Várakozzon</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>Munkamenet &amp;szétkapcsolása</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Számítógép &amp;alvó üzemmódba helyezése</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>Számítógép &amp;kikapcsolása</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Sebességkorlát (KB/s)</translation>
     </message>
 </context>
 <context>

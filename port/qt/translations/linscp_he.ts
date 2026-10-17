@@ -5032,10 +5032,6 @@ Location: %2</source>
         <translation>התקדמות כוללת:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>הועבר:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>מהירות:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>זמן שנותר:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>שעת התחלה:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>זמן שחלף:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>בתים שהועברו:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;דלג על קובץ זה</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;צמצם</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>המשך ב&amp;רקע</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>בסיום</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>מה לעשות בסיום הפעולה</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;הישאר במצב סרק</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;נתק שיחה</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>העבר את המחשב למצב &amp;שינה</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;כבה את המחשב</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>מגבלת מהירות (KB/s)</translation>
     </message>
 </context>
 <context>

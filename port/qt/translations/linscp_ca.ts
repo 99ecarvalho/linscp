@@ -4007,15 +4007,15 @@ Ubicació: %2</translation>
     </message>
     <message>
         <source>Pages</source>
-        <translation type="unfinished">Pàgines</translation>
+        <translation>Pàgines</translation>
     </message>
     <message>
         <source>&amp;Color</source>
-        <translation type="unfinished">&amp;Color</translation>
+        <translation>&amp;Color</translation>
     </message>
     <message>
         <source>Environment</source>
-        <translation type="unfinished">Entorn</translation>
+        <translation>Entorn</translation>
     </message>
     <message>
         <source>Server environment</source>
@@ -4039,11 +4039,11 @@ Ubicació: %2</translation>
     </message>
     <message>
         <source>Time zone offset hours</source>
-        <translation type="unfinished"></translation>
+        <translation>Diferència de zona horària (hores)</translation>
     </message>
     <message>
         <source>Time zone offset minutes</source>
-        <translation type="unfinished"></translation>
+        <translation>Diferència de zona horària (minuts)</translation>
     </message>
     <message>
         <source>minutes</source>
@@ -4075,7 +4075,7 @@ Ubicació: %2</translation>
     </message>
     <message>
         <source>&amp;Remote directory:</source>
-        <translation type="unfinished">Directori &amp;remot:</translation>
+        <translation>Directori &amp;remot:</translation>
     </message>
     <message>
         <source>Local directory is not used with Explorer interface.</source>
@@ -4163,7 +4163,7 @@ Ubicació: %2</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished">Auto</translation>
+        <translation>Auto</translation>
     </message>
     <message>
         <source>&amp;Preferred SFTP protocol version:</source>
@@ -4279,7 +4279,7 @@ Ubicació: %2</translation>
     </message>
     <message>
         <source>S3</source>
-        <translation type="unfinished"></translation>
+        <translation>S3</translation>
     </message>
     <message>
         <source>&amp;Default region:</source>
@@ -4303,7 +4303,7 @@ Ubicació: %2</translation>
     </message>
     <message>
         <source>Authentication</source>
-        <translation type="unfinished">Autenticació</translation>
+        <translation>Autenticació</translation>
     </message>
     <message>
         <source>&amp;Session token:</source>
@@ -4315,7 +4315,7 @@ Ubicació: %2</translation>
     </message>
     <message>
         <source>WebDAV</source>
-        <translation type="unfinished"></translation>
+        <translation>WebDAV</translation>
     </message>
     <message>
         <source>&amp;Tolerate non-encoded special characters in filenames</source>
@@ -4379,7 +4379,7 @@ Ubicació: %2</translation>
     </message>
     <message>
         <source>Local</source>
-        <translation type="unfinished">Local</translation>
+        <translation>Local</translation>
     </message>
     <message>
         <source>&amp;Autodetect</source>
@@ -4403,11 +4403,11 @@ Ubicació: %2</translation>
     </message>
     <message>
         <source>Telnet command</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordre Telnet</translation>
     </message>
     <message>
         <source>Local proxy command</source>
-        <translation type="unfinished"></translation>
+        <translation>Ordre del servidor intermediari local</translation>
     </message>
     <message>
         <source>Co&amp;nsider proxying local host connections</source>
@@ -4415,11 +4415,11 @@ Ubicació: %2</translation>
     </message>
     <message>
         <source>No</source>
-        <translation type="unfinished">No</translation>
+        <translation>No</translation>
     </message>
     <message>
         <source>Yes</source>
-        <translation type="unfinished">Sí</translation>
+        <translation>Sí</translation>
     </message>
     <message>
         <source>Do &amp;DNS name lookup at proxy end:</source>
@@ -4459,7 +4459,7 @@ Ubicació: %2</translation>
     </message>
     <message>
         <source>TLS/SSL</source>
-        <translation type="unfinished"></translation>
+        <translation>TLS/SSL</translation>
     </message>
     <message>
         <source>TLS options</source>
@@ -4487,11 +4487,11 @@ Ubicació: %2</translation>
     </message>
     <message>
         <source>Client certificate file</source>
-        <translation type="unfinished"></translation>
+        <translation>Fitxer de certificat del client</translation>
     </message>
     <message>
         <source>Certificate Files (*.pfx *.p12 *.pem *.crt *.key);;All Files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fitxers de certificat (*.pfx *.p12 *.pem *.crt *.key);;Tots els fitxers (*)</translation>
     </message>
     <message>
         <source>SSH</source>
@@ -4507,15 +4507,15 @@ Ubicació: %2</translation>
     </message>
     <message>
         <source>Encryption cipher selection policy</source>
-        <translation type="unfinished"></translation>
+        <translation>Política de selecció de l&apos;algorisme d&apos;encriptació</translation>
     </message>
     <message>
         <source>&amp;Up</source>
-        <translation type="unfinished">Am&amp;unt</translation>
+        <translation>&amp;Amunt</translation>
     </message>
     <message>
         <source>&amp;Down</source>
-        <translation type="unfinished">A&amp;vall</translation>
+        <translation>A&amp;vall</translation>
     </message>
     <message>
         <source>Enable legacy use of single-&amp;DES</source>
@@ -4535,7 +4535,7 @@ Ubicació: %2</translation>
     </message>
     <message>
         <source>Algorithm selection policy</source>
-        <translation type="unfinished"></translation>
+        <translation>Política de selecció de l&apos;algorisme</translation>
     </message>
     <message>
         <source>Attempt &amp;GSSAPI key exchange</source>
@@ -4579,15 +4579,15 @@ Ubicació: %2</translation>
     </message>
     <message>
         <source>Certificate</source>
-        <translation type="unfinished"></translation>
+        <translation>Certificat</translation>
     </message>
     <message>
         <source>OpenSSH certificates (*-cert.pub);;All Files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>Certificats OpenSSH (*-cert.pub);;Tots els fitxers (*)</translation>
     </message>
     <message>
         <source>GSSAPI</source>
-        <translation type="unfinished"></translation>
+        <translation>GSSAPI</translation>
     </message>
     <message>
         <source>Attempt &amp;GSSAPI authentication</source>
@@ -5032,10 +5032,6 @@ Ubicació: %2</translation>
         <translation>Progrés total:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Transferit:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Velocitat:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Ubicació: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Temps restant:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Hora d&apos;inici:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Temps transcorregut:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Bytes transferits:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Omet aquest fitxer</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimitza</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>&amp;Segueix en segon pla</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Un cop finalitzada</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Acció a efectuar un cop finalitzada l&apos;operació</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Roman inactiva</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Desconnecta la sessió</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Atura tem&amp;poralment l&apos;ordinador</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Tanca l&apos;ordinador</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Límit de velocitat (KB/s)</translation>
     </message>
 </context>
 <context>

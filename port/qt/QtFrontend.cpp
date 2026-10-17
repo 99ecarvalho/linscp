@@ -190,6 +190,24 @@ bool QtFrontend::TransferProgress(const CoreBridge::TTransferProgress & Progress
   return true;
 }
 
+CoreBridge::TTransferAnswer QtFrontend::TransferControl(const CoreBridge::TTransferProgress & Progress)
+{
+  if (FTransfer)
+  {
+    FTransfer->Update(Progress);
+    return FTransfer->Answer();
+  }
+  return CoreBridge::TTransferAnswer();
+}
+
+void QtFrontend::TransferCompleted()
+{
+  if (FTransfer && (FTransfer->OnceFinished() != TransferDialog::TOnceFinished::Idle) && FOnceFinished)
+  {
+    FOnceFinished(static_cast<int>(FTransfer->OnceFinished()));
+  }
+}
+
 void QtFrontend::TransferFinished()
 {
   FTransfer.reset();

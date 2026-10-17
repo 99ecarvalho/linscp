@@ -5031,10 +5031,6 @@ Lokasi: %2</translation>
         <translation>Kemajuan keseluruhan:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Dipindahkan:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Kelajuan:</translation>
     </message>
@@ -5053,6 +5049,62 @@ Lokasi: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Masa berbaki:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Masa mula:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Masa digunakan:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Bait yang terpindah:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Langkau fail ini</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Kecilkan</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Teruskan di &amp;latar belakang</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Setelah Selesai</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Tindakan yang dilakukan setelah operasi selesai</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>Kekal &amp;Melahu</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Putuskan Sesi</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>&amp;Tidurkan Komputer</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Matikan Komputer</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Had kelajuan (KB/s)</translation>
     </message>
 </context>
 <context>

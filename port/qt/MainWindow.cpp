@@ -2000,8 +2000,15 @@ void MainWindow::QueueEmptied()
   {
     return;
   }
-  // As TTerminal::CloseOnCompletion: the session closed.
-  const QString Closed = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ClosedOnQueueEmpty));
+  RunOnceDone(Operation, QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ClosedOnQueueEmpty)));
+}
+
+// As TTerminal::CloseOnCompletion and what the GUI does with its
+// operation: the session closed (Closed said), then the computer put to
+// sleep or shut down, or the question whether to exit. The queue's once
+// empty and the Progress window's once finished.
+void MainWindow::RunOnceDone(TOnceEmpty Operation, const QString & Closed)
+{
   FQueueSession = nullptr;
   Disconnect();
   statusBar()->showMessage(Closed);

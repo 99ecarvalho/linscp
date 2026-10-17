@@ -5032,10 +5032,6 @@ Ligging: %2</translation>
         <translation>Algehele vordering:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Oorgedra:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Spoed:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Ligging: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Tyd oor:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Begintyd:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Tyd verstreke:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Grepe oorgedra:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Slaan hierdie lêer oor</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimeer</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Gaan voort in die &amp;agtergrond</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Sodra klaar</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Aksie om uit te voer sodra die bewerking klaar is</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Bly ledig</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Ontkoppel sessie</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Plaas rekenaar in &amp;slaapmodus</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>Sl&amp;uit rekenaar af</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Spoedlimiet (KB/s)</translation>
     </message>
 </context>
 <context>

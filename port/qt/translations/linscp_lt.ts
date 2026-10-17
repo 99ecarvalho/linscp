@@ -5033,10 +5033,6 @@ Vieta: %2</translation>
         <translation>Bendra eiga:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Perduota:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Greitis:</translation>
     </message>
@@ -5055,6 +5051,62 @@ Vieta: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Likęs laikas:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Pradžios laikas:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Praėjęs laikas:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Perduoti baitai:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Praleisti šį failą</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Suskleisti langą</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Tęsti &amp;fone</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Kai baigta</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Atliekamas veiksmas kai baigiama operacija</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Likti veiksniam</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Nutraukti seansą</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Už&amp;migdyti kompiuterį</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Išjungti kompiuterį</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Greičio limitas (KB/s)</translation>
     </message>
 </context>
 <context>

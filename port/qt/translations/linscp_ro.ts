@@ -5033,10 +5033,6 @@ Cale: %2</translation>
         <translation>Progres total:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Transferat:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Viteză:</translation>
     </message>
@@ -5055,6 +5051,62 @@ Cale: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Timp rămas:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Ora de începere:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Timp scurs:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Baiți transferați:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>O&amp;mite acest fișier</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimizare</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Continuare în fundal</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>La Terminare</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Comanda care va fi executată odată ce operația curentă se termină</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Nimic</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Deconectare din Sesiune</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>&amp;Repaus Calculator</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Oprire Calculator</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Viteza limită (KB/s)</translation>
     </message>
 </context>
 <context>

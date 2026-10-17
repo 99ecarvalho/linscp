@@ -5032,10 +5032,6 @@ Location: %2</source>
         <translation>ஒட்டுமொத்த முன்னேற்றம்:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>பரிமாற்றப்பட்டது:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>வேகம்:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/நொ</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>மீத நேரம்:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>தொடக்க நேரம்:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>கடந்த நேரம்:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>பைட்டுகள் பரிமாற்றப்பட்டன:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;இந்த கோப்பைத் தவிர்</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;குறைத்தல்</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>&amp;பின்னணியில் தொடர்</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>முடிந்ததும்</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>செயல்பாடு முடிந்ததும் செய்ய நடவடிக்கை</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;சும்மா இரு</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;அமர்வு துண்டி</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>கணினியை &amp;தூங்கவை</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>கணினியை மூடு</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>வேக வரம்பு (கிபை/நொ)</translation>
     </message>
 </context>
 <context>

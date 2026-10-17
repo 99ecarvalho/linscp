@@ -5032,10 +5032,6 @@ Percorso: %2</translation>
         <translation>Avanzamento totale:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Trasferito:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Velocità:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Percorso: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Tempo rimasto:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Ora inizio:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Tempo trascorso:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Byte trasmessi:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Salta questo file</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>Riduci a &amp;icona</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Procedi in &amp;Background</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Una volta completato</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Azione da compiere una volta che l&apos;operazione è completata</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>Re&amp;sta inattivo</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Disconnetti sessione</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Sos&amp;pendi computer</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Spegni computer</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Limite di velocità (KB/s)</translation>
     </message>
 </context>
 <context>

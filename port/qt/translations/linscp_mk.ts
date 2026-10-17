@@ -5033,10 +5033,6 @@ Location: %2</source>
         <translation>Вкупен напредок:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Пренесено:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Брзина:</translation>
     </message>
@@ -5055,6 +5051,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Преостанато време:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Време на почеток:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Изминато време:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Пренесени бајти:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>Пре&amp;скокни ја оваа датотека</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Минимизирај</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Продолжи во &amp;позадина</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>По завршување</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Изврши ја оваа активност по завршувањето на операцијата</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Остани неактивен</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Прекини сесија</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Зас&amp;пиј го компјутерот</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Исклучи го компјутерот</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Ограничување на брзината (KB/s)</translation>
     </message>
 </context>
 <context>

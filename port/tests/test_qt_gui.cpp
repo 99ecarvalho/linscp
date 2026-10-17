@@ -395,6 +395,8 @@ public:
   QtFrontend * Frontend = nullptr;
   int TransfersSeen = 0;
   bool CancelTransfers = false;
+  // Asked about the progress window each time it is seen.
+  std::function<void(TransferDialog *)> OnTransfer;
   // Other dialogs (a message box's Yes, a plain dialog's OK), with their
   // titles.
   bool AcceptDialogs = false;
@@ -418,6 +420,10 @@ private:
       if (CancelTransfers)
       {
         Frontend->Transfer()->CancelButton()->click();
+      }
+      else if (OnTransfer)
+      {
+        OnTransfer(Frontend->Transfer());
       }
       return;
     }
@@ -1081,8 +1087,8 @@ void Transfer(const char * Port, const QString & Directory)
     Responder.CancelTransfers = true;
     Check(!Window.TransferSelected(false, false), "an upload cancelled from the progress window does not complete");
     Check(Responder.TransfersSeen > 0, "the progress window was up while it ran");
+    Responder.CancelTransfers = false;
 
-    // In the background, through the queue: the panels catch up by themselves.
     const auto WaitFor = [](const std::function<bool()> & Condition)
     {
       QElapsedTimer Timer;
@@ -1093,6 +1099,127 @@ void Transfer(const char * Port, const QString & Directory)
       }
       return Condition();
     };
+    // The cancelled upload's part, not to be asked about resuming it.
+    Window.Panel()->Refresh();
+    for (const QString & Name : Window.Panel()->Names())
+    {
+      // big.bin.filepart, as core keeps a part to resume.
+      if (Name.startsWith(QStringLiteral("big.bin")))
+      {
+        Window.Session()->Delete({ Name.toStdString() });
+      }
+    }
+    // C1, the Progress window's toolbar (Progress.dfm): slowed down with
+    // its speed limit, it shows the times, and Proceed in Background moves
+    // the rest to the queue, which completes it.
+    {
+      QElapsedTimer Clock;
+      Clock.start();
+      int Step = 0;
+      bool TimesShown = false;
+      Responder.OnTransfer = [&](TransferDialog * Dialog)
+      {
+        if (Step == 0)
+        {
+          Dialog->SpeedLimit()->setCurrentText(QStringLiteral("1024"));
+          Dialog->SpeedLimit()->lineEdit()->editingFinished();
+          Step = 1;
+        }
+        else if ((Step == 1) && (Clock.elapsed() > 1500))
+        {
+          TimesShown = !Dialog->TimeElapsed()->text().isEmpty() &&
+            (!Dialog->StartTime()->text().isEmpty() || !Dialog->TimeLeft()->text().isEmpty());
+          if (Dialog->BackgroundButton()->isEnabled())
+          {
+            Dialog->BackgroundButton()->click();
+            Step = 2;
+          }
+        }
+      };
+      Local->Select({ QStringLiteral("big.bin") });
+      Window.ActivatePanel(true);
+      Check(!Window.TransferSelected(false, false), "an upload moved to the background does not complete in the window");
+      Check(Step == 2, "Proceed in Background was there to click");
+      Check(TimesShown, "the window showed the time elapsed and the start time or time left");
+      Check(Clock.elapsed() < 20000, "the speed limit held, until moved");
+      Responder.OnTransfer = nullptr;
+      // The queue takes it (rclone's server cannot resume the part: the
+      // whole run is qt_gui_progress's, against OpenSSH).
+      Check(WaitFor([&Window]()
+      {
+        for (const CoreBridge::TQueueEntry & Entry : Window.Session()->QueueEntries())
+        {
+          if (QString::fromStdString(Entry.Source).endsWith(QStringLiteral("big.bin")))
+          {
+            return true;
+          }
+        }
+        return false;
+      }), "the queue takes the rest");
+      Window.Session()->QueueExecute(CoreBridge::TSession::TQueueOperation::DeleteAll, 0);
+      Check(WaitFor([&Window]() { return Window.Session()->QueueEntries().empty(); }), "(cancelled there)");
+      Window.Panel()->Refresh();
+      for (const QString & Name : Window.Panel()->Names())
+      {
+        if (Name.startsWith(QStringLiteral("big.bin")))
+        {
+          Window.Session()->Delete({ Name.toStdString() });
+        }
+      }
+      bool Whole = false;
+
+
+      // Skip this file: the first of two skipped, the second uploaded.
+      {
+        QFile File(Dir.filePath(QStringLiteral("after.txt")));
+        File.open(QIODevice::WriteOnly);
+        File.write("after the skipped one\n");
+      }
+      Local->Refresh();
+      Step = 0;
+      Responder.OnTransfer = [&](TransferDialog * Dialog)
+      {
+        if (Step == 0)
+        {
+          Dialog->SpeedLimit()->setCurrentText(QStringLiteral("1024"));
+          Dialog->SpeedLimit()->lineEdit()->editingFinished();
+          Step = 1;
+        }
+        else if ((Step == 1) && Dialog->SkipButton()->isEnabled())
+        {
+          Dialog->SkipButton()->click();
+          Step = 2;
+        }
+      };
+      Local->Select({ QStringLiteral("big.bin"), QStringLiteral("after.txt") });
+      Window.ActivatePanel(true);
+      Window.TransferSelected(false, false);
+      Responder.OnTransfer = nullptr;
+      Window.Panel()->Refresh();
+      Whole = false;
+      bool After = false;
+      for (const CoreBridge::TRemoteEntry & Entry : Window.Session()->List())
+      {
+        Whole = Whole || ((Entry.Name == "big.bin") && (Entry.Size == 40 * 1024 * 1024));
+        After = After || (Entry.Name == "after.txt");
+      }
+      Check((Step == 2) && !Whole && After, "Skip this file skips the one in progress, the next goes on");
+
+      // Once Finished: a completed transfer hands its choice on.
+      int Finished = -1;
+      Frontend.SetOnceFinished([&Finished](int OnceFinished) { Finished = OnceFinished; });
+      {
+        Frontend.TransferStarted(false, 1);
+        Frontend.Transfer()->SetOnceFinished(TransferDialog::TOnceFinished::Disconnect);
+        Frontend.TransferCompleted();
+        Frontend.TransferFinished();
+      }
+      Check(Finished == static_cast<int>(TransferDialog::TOnceFinished::Disconnect),
+        "a completed transfer's Once Finished reaches the window's owner");
+      Frontend.SetOnceFinished(nullptr);
+    }
+
+    // In the background, through the queue: the panels catch up by themselves.
     {
       QFile File(Dir.filePath(QStringLiteral("queued.txt")));
       File.open(QIODevice::WriteOnly);
@@ -3860,6 +3987,95 @@ void Tools(const char * Port, const QString & Directory)
 
 // HostDirectory: Directory as the server sees it, the host's path (under
 // Wine, Directory is a Windows one).
+// C1's Proceed in Background against OpenSSH, which resumes the part the
+// window left (rclone's server cannot): slowed down with the window's speed
+// limit, moved to the queue, completed there.
+void ProgressTest(const char * Port, const QString & Key, const QString & User, const QString & Directory,
+  const QString & HostDirectory)
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    MainWindow Window(CoreBridge::Info());
+    Frontend.SetWindow(&Window);
+    Window.show();
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    CoreBridge::TSite Site = CoreBridge::NewSite();
+    Site.HostName = "127.0.0.1";
+    Site.Port = QString::fromLatin1(Port).toInt();
+    Site.UserName = User.toStdString();
+    const std::string Ppk = QDir(Directory).filePath(QStringLiteral("client.ppk")).toStdString();
+    try
+    {
+      CoreBridge::ConvertKey(Key.toStdString(), Ppk);
+    }
+    catch (const CoreBridge::TCoreError &)
+    {
+      Check(false, "the key converts");
+    }
+    Site.PrivateKeyFile = Ppk;
+    Check(Window.OpenSite(Site), "an SFTP session over sshd");
+    const QDir Dir(Directory);
+    Dir.mkpath(QStringLiteral("up"));
+    Dir.mkpath(QStringLiteral("down"));
+    {
+      QFile File(Dir.filePath(QStringLiteral("up/big.bin")));
+      File.open(QIODevice::WriteOnly);
+      File.write(QByteArray(40 * 1024 * 1024, 'b'));
+    }
+    Window.Local()->ChangeDirectory(Dir.filePath(QStringLiteral("up")));
+    Check(Window.Panel()->ChangeDirectory(QDir(HostDirectory).filePath(QStringLiteral("down"))), "into the server's directory");
+    int Step = 0;
+    QElapsedTimer Clock;
+    Clock.start();
+    Responder.OnTransfer = [&](TransferDialog * Dialog)
+    {
+      if (Step == 0)
+      {
+        Dialog->SpeedLimit()->setCurrentText(QStringLiteral("1024"));
+        Dialog->SpeedLimit()->lineEdit()->editingFinished();
+        Step = 1;
+      }
+      else if ((Step == 1) && (Clock.elapsed() > 1500) && Dialog->BackgroundButton()->isEnabled())
+      {
+        Dialog->BackgroundButton()->click();
+        Step = 2;
+      }
+    };
+    Window.Local()->Select({ QStringLiteral("big.bin") });
+    Window.ActivatePanel(true);
+    Check(!Window.TransferSelected(false, false), "moved to the background, it does not complete in the window");
+    Check(Step == 2, "Proceed in Background was there to click");
+    Responder.OnTransfer = nullptr;
+    // The queue's connection asks about the host key too: shown, answered.
+    QElapsedTimer Timer;
+    Timer.start();
+    const QFileInfo Target(Dir.filePath(QStringLiteral("down/big.bin")));
+    while (Timer.elapsed() < 60000)
+    {
+      QApplication::processEvents(QEventLoop::AllEvents, 200);
+      for (const CoreBridge::TQueueEntry & Entry : Window.Session()->QueueEntries())
+      {
+        if ((Entry.State == CoreBridge::TQueueEntry::TState::Query) &&
+            Window.Session()->QueueAllows(CoreBridge::TSession::TQueueOperation::Query, Entry.Id))
+        {
+          Window.Session()->QueueExecute(CoreBridge::TSession::TQueueOperation::Query, Entry.Id);
+        }
+      }
+      // Whole, and the part gone (renamed into place).
+      if ((QFileInfo(Target.filePath()).size() == 40 * 1024 * 1024) &&
+          !QFileInfo::exists(Target.filePath() + QStringLiteral(".filepart")))
+      {
+        break;
+      }
+    }
+    Check(QFileInfo(Target.filePath()).size() == 40 * 1024 * 1024, "the queue completes the file, resuming the part");
+    Check(!QFileInfo::exists(Target.filePath() + QStringLiteral(".filepart")), "no part left");
+  }
+  CoreBridge::Finalize();
+}
+
 void Commands(const char * Port, const QString & Key, const QString & User, const QString & Directory,
   const QString & HostDirectory)
 {
@@ -5569,6 +5785,31 @@ void AccessibilityTest(const char * Port, const QString & Locale, const QString 
           QDir().mkpath(Shots);
           Dialog.grab().save(QDir(Shots).filePath(QStringLiteral("Preferences_%1.png").arg(Page, 2, 10, QLatin1Char('0'))));
         }
+      }
+    }
+    // The Progress window, as a transfer shows it.
+    {
+      TransferDialog Dialog(true, 3, &Window);
+      CoreBridge::TTransferProgress Progress;
+      Progress.FileName = "/home/user/report.pdf";
+      Progress.FilePercent = 40;
+      Progress.OverallPercent = 25;
+      Progress.Transferred = 3 * 1024 * 1024;
+      Progress.Total = 12 * 1024 * 1024;
+      Progress.Speed = 1024 * 1024;
+      Progress.StartTime = "10:00:00";
+      Progress.TimeElapsed = "0:00:03";
+      Progress.TimeLeft = "0:00:09";
+      Progress.CanSkip = true;
+      Progress.CanMoveToQueue = true;
+      Dialog.Update(Progress);
+      Dialog.adjustSize();
+      Audit(Dialog);
+      const QString Shots = qEnvironmentVariable("LINSCP_SHOTS");
+      if (!Shots.isEmpty())
+      {
+        QDir().mkpath(Shots);
+        Dialog.grab().save(QDir(Shots).filePath(QStringLiteral("Progress.png")));
       }
     }
     // Site Advanced: each protocol's pages (TLS/SSL's with TLS).
@@ -7320,6 +7561,11 @@ int main(int argc, char ** argv)
   else if ((argc >= 5) && (std::strcmp(argv[1], "drop") == 0))
   {
     DragAndDrop(argv[3], QString::fromLocal8Bit(argv[4]));
+  }
+  else if ((argc >= 7) && (std::strcmp(argv[1], "progress") == 0))
+  {
+    ProgressTest(argv[3], QString::fromLocal8Bit(argv[4]), QString::fromLocal8Bit(argv[5]), QString::fromLocal8Bit(argv[6]),
+      QString::fromLocal8Bit((argc >= 8) ? argv[7] : argv[6]));
   }
   else if ((argc >= 7) && (std::strcmp(argv[1], "commands") == 0))
   {

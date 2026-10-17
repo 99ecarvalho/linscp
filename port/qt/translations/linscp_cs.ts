@@ -5033,10 +5033,6 @@ Umístění: %2</translation>
         <translation>Celkový průběh:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Přeneseno:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Rychlost:</translation>
     </message>
@@ -5055,6 +5051,62 @@ Umístění: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Zbývající čas:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Čas zahájení:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Uplynulý čas:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Přeneseno bajtů:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Přeskočit tento soubor</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimalizovat</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Pokračovat na &amp;pozadí</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Po dokončení</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Operaci k provedení po dokončení</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Nedělat nic</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Odpojit spojení</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Uvést počítač do režimu &amp;spánku</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Vypnout počítač</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Speed (KB/s)</translation>
     </message>
 </context>
 <context>

@@ -5031,10 +5031,6 @@ Location: %2</source>
         <translation>总进度：</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>已传输:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>速度：</translation>
     </message>
@@ -5053,6 +5049,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>剩余时间：</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>开始时间：</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>已用时间：</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>已传输字节：</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>跳过该文件(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>最小化(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>后台处理(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>一旦完成</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>操作完成后执行的动作</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>待机(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>断开会话(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>电脑休眠(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>关闭电脑(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>限速（KB/s）</translation>
     </message>
 </context>
 <context>

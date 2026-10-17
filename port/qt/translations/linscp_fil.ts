@@ -5032,10 +5032,6 @@ Lokasyon: %2</translation>
         <translation>Kabuuang progreso:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Nailipat:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Bilis:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Lokasyon: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Natitirang oras:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Oras ng simula:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Oras na nakalipas:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Mga byte na nailipat:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Laktawan ang file na ito</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>I-mi&amp;nimize</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Magpatuloy sa &amp;Background</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Kapag Natapos</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Gagawin kapag natapos ang operasyon</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Manatiling Idle</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>I-&amp;diskonekta ang Session</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>I-slee&amp;p ang Kompyuter</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>I-&amp;shut down ang Kompyuter</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Limitasyon ng bilis (KB/s)</translation>
     </message>
 </context>
 <context>

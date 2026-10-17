@@ -5036,10 +5036,6 @@ Location: %2</source>
         <translation>التقدم الكلي:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>نقل:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>السرعة:</translation>
     </message>
@@ -5058,6 +5054,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/ث</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>الوقت المتبقي:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>وقت البدء:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>الوقت المنقضي:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>البايت المنقولة:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;تخطي هذا الملف</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;تصغير</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>بعد انهاء العمل</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>عند الانتهاء</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>الإجراء الذي سيتم تنفيذه عند انتهاء العملية</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;البقاء خاملا</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;قطع اتصال الجلسة</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>&amp;وضع الكمبيوتر في حالة السكون</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>إ&amp;يقاف تشغيل الكمبيوتر</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>حد السرعة (ك.ب/ث)</translation>
     </message>
 </context>
 <context>

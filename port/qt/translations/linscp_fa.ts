@@ -5031,10 +5031,6 @@ Location: %2</source>
         <translation>پیشرفت کلی:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>انتقال یافته:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>شتاب:</translation>
     </message>
@@ -5053,6 +5049,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>زمان باقی مانده:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>زمان آغاز:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>زمان سپری شده:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>بایت انتقال یافته:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>رد شدن از این پرونده</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;کوچک کردن</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>ادامه در پس زمینه</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>پس از پایان</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>اقدام هنگام پایان عملیات</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;بیکار ماندن</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;قطع جلسه</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>&amp;خواب رفتن رایانه</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>خاموش کردن رایانه</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>محدودیت سرعت (ک.ب/ث)</translation>
     </message>
 </context>
 <context>

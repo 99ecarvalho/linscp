@@ -5031,10 +5031,6 @@ Location: %2</source>
         <translation>전체 진행률:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>전송됨:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>속도:</translation>
     </message>
@@ -5053,6 +5049,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>남은 시간:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>시작 시간:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>예상 시간:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>전송된 바이트:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>이 파일 건너뛰기</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>최소화(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>백그라운드로 진행(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>일단 완료</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>작업이 완료되면 수행할 작업</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>유휴 상태 유지(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>세션 종료(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>컴퓨터 절전(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>컴퓨터 종료(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>속도 제한 (KB/s)</translation>
     </message>
 </context>
 <context>

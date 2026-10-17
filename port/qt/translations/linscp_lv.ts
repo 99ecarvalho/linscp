@@ -5033,10 +5033,6 @@ Atrašanās vieta: %2</translation>
         <translation>Kopējais progress:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Pārnests:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Ātrums:</translation>
     </message>
@@ -5055,6 +5051,62 @@ Atrašanās vieta: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Atlikušais laiks:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Sākuma laiks:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Pagājušais laiks:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Pārnestie baiti:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Izlaist šo failu</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimizēt</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Turpināt &amp;fonā</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Kad pabeigts</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Darbība, ko veikt, kad operācija pabeigta</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Gaidīt</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>Atvieno&amp;t sesiju</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Pārslēgt datoru &amp;miega režīmā</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Izslēgt datoru</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Ātruma ierobežojums (KB/s)</translation>
     </message>
 </context>
 <context>

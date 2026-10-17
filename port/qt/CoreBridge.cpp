@@ -6,6 +6,7 @@
 #include "GuiShim.h"
 
 #include <Common.h>
+#include <CopyParam.h>
 #include <Configuration.h>
 #include <CoreMain.h>
 #include <Exceptions.h>
@@ -820,6 +821,48 @@ std::vector<std::string> History(const std::string & Name)
     Result.push_back(Utf8(Value));
   }
   return Result;
+}
+
+std::vector<std::string> SpeedLimits()
+{
+  std::unique_ptr<TStringList> Source(new TStringList());
+  for (const UnicodeString & Value : Shell()->History(L"SpeedLimit"))
+  {
+    Source->Add(Value);
+  }
+  // As CustomWinConfiguration's defaults: halving from the maximum.
+  if (Source->Count == 0)
+  {
+    for (unsigned long Speed = MaxSpeed; Speed >= MinSpeed; Speed /= 2)
+    {
+      Source->Add(SetSpeedLimit(Speed));
+    }
+  }
+  std::unique_ptr<TStringList> Limits(new TStringList());
+  CopySpeedLimits(Source.get(), Limits.get());
+  std::vector<std::string> Result;
+  for (int Index = 0; Index < Limits->Count; Index++)
+  {
+    Result.push_back(Utf8(Limits->Strings[Index]));
+  }
+  return Result;
+}
+
+unsigned long SpeedLimitOf(const std::string & Text)
+{
+  try
+  {
+    return GetSpeedLimit(FromUtf8(Text).Trim());
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+std::string SpeedLimitText(unsigned long Limit)
+{
+  return Utf8(SetSpeedLimit(Limit));
 }
 
 void AddToHistory(const std::string & Name, const std::string & Value)
@@ -1824,6 +1867,7 @@ std::string Text(TText Text)
     case TText::ScpShellPage: Ident = LOGIN_SCP_SHELL_PAGE; break;
     case TText::EncryptKeyGenerated: return Utf8(UnformatMessage(LoadStr(ENCRYPT_KEY_GENERATED)));
     case TText::CopyKeyButton: Ident = COPY_KEY_BUTTON; break;
+    case TText::ClosedOnCompletion: Ident = CLOSED_ON_COMPLETION; break;
     case TText::AuthorizedKeys: return Utf8(UnformatMessage(LoadStr(LOGIN_AUTHORIZED_KEYS)));
     case TText::KeyWithCertificate: return Utf8(UnformatMessage(LoadStr(LOGIN_KEY_WITH_CERTIFICATE)));
     case TText::SpecialFolderDocuments: Ident = SPECIAL_FOLDER_MY_DOCUMENTS; break;

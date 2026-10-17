@@ -101,6 +101,7 @@ public:
   void NewDefaultTab(bool Reverse = false);
   TOnceEmpty OnceEmpty() const { return FOnceEmpty; }
   void SetOnceEmpty(TOnceEmpty Operation);
+  void RunOnceDone(TOnceEmpty Operation, const QString & Closed);
   // What sleeps or shuts down the computer instead (tests); false: refused.
   std::function<bool(TOnceEmpty)> PowerAction;
   // -1, 0 or 1 as version A is older, the same or newer than B ("v0.2.0",

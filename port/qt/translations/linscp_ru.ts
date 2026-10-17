@@ -5033,10 +5033,6 @@ Location: %2</source>
         <translation>Всего:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Передано:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Скорость:</translation>
     </message>
@@ -5055,6 +5051,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/с</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Осталось времени:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Начало:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Прошло времени:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Передано байт:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Пропустить этот файл</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Свернуть</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Выполнять в фоновом режиме</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>По завершении</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Действие, однократно выполняемое по окончании передачи</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Ожидать</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Разорвать соединение</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>&amp;Усыпить компьютер</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Выключить компьютер</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Ограничение скорости передачи (кб/с)</translation>
     </message>
 </context>
 <context>

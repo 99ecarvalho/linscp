@@ -5032,10 +5032,6 @@ Location: %2</source>
         <translation>Συνολική πρόοδος:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Μεταφέρθηκε:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Ταχύτητα:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Χρόνος που απομένει:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Χρόνος έναρξης:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Χρόνος που χρειάστηκε:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Byte που μεταφέρθηκαν:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Παράλειψη αυτού του αρχείου</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>Ελα&amp;χιστοποίηση</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Συνέχεια στο &amp;φόντο</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Όταν ολοκληρωθεί</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Ενέργεια μετά την ολοκλήρωση της λειτουργίας</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>Παραμονή σε &amp;αδράνεια</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Αποσύνδεση συνεδρίας</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Ανα&amp;στολή Υπολογιστή</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>Τερματισμός Υπολογιστή</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Όριο ταχύτητας (KB/s)</translation>
     </message>
 </context>
 <context>

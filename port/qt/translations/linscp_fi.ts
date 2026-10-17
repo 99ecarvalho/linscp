@@ -5032,10 +5032,6 @@ Sijainti: %2</translation>
         <translation>Kokonaisedistyminen:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Siirretty:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Nopeus:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Sijainti: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Aikaa jäljellä:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Aloitusaika:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Aikaa kulunut:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Tavua siirretty:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>Ohita tämä tiedo&amp;sto</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>Pie&amp;nennä</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Jat&amp;ka taustalla</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Kun valmis</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Toiminnan päätyttyä suoritettava toiminto</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>Ä&amp;lä tee mitään</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>Katka&amp;ise istunto</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Aseta tietokone le&amp;potilaan</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Sammuta tietokone</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Nopeusrajoitus (KB/s)</translation>
     </message>
 </context>
 <context>

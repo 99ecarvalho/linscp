@@ -5032,10 +5032,6 @@ Asukoht: %2</translation>
         <translation>Üldine edenemine:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Üle kantud:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Kiirus:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Asukoht: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Aega jäänud:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Algusaeg:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Aega kulunud:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Üle kantud baite:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>Jäta see fail &amp;vahele</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimeeri</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Jätka &amp;taustal</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Pärast lõpetamist</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Tegevus, mida teha pärast toimingu lõppu</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Jää ootele</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Katkesta seanss</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Arvuti &amp;unerežiimi</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Lülita arvuti välja</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Kiiruspiirang (KB/s)</translation>
     </message>
 </context>
 <context>

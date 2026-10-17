@@ -5032,10 +5032,6 @@ Staðsetning: %2</translation>
         <translation>Heildarframvinda:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Flutt:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Hraði:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Staðsetning: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Tími eftir:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Upphafstími:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Tími liðinn:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Bæti flutt:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Sleppa þessari skrá</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Lágmarka</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Halda áfram í &amp;bakgrunni</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Þegar lokið</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Aðgerð til að framkvæma þegar aðgerðinni lýkur</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Haldast aðgerðalaus</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Aftengjast lotu</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Sv&amp;æfa tölvu</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Slökkva á tölvu</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Hraðatakmark (KB/s)</translation>
     </message>
 </context>
 <context>

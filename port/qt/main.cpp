@@ -102,6 +102,15 @@ int main(int argc, char ** argv)
     MainWindow Window(Info);
     Frontend.SetWindow(&Window);
     Frontend.SetStatus([&Window](const QString & Text) { Window.statusBar()->showMessage(Text); });
+    // A transfer's "Once finished", once it has returned (as the queue's).
+    Frontend.SetOnceFinished([&Window](int OnceFinished)
+    {
+      QTimer::singleShot(0, &Window, [&Window, OnceFinished]()
+      {
+        Window.RunOnceDone(static_cast<MainWindow::TOnceEmpty>(OnceFinished),
+          QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ClosedOnCompletion)));
+      });
+    });
     Window.show();
     std::unique_ptr<InstanceServer> Server;
     if (!Smoke)
@@ -128,6 +137,7 @@ int main(int argc, char ** argv)
     Result = App.exec();
     Frontend.SetWindow(nullptr);
     Frontend.SetStatus(nullptr);
+    Frontend.SetOnceFinished(nullptr);
   }
   CoreBridge::Finalize();
   return Result;

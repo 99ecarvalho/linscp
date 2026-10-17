@@ -5032,10 +5032,6 @@ Location: %2</source>
         <translation>कुल प्रगति:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>स्थानांतरित:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>गति:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>शेष समय:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>प्रारंभ समय:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>बीता समय:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>स्थानांतरित बाइट:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>इस फ़ाइल को छोड़ें(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>छोटा करें(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>पृष्ठभूमि में जारी रखें(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>पूर्ण होने पर</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>ऑपरेशन पूर्ण होने पर की जाने वाली क्रिया</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>निष्क्रिय रहें(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>सत्र डिस्कनेक्ट करें(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>कंप्यूटर को स्लीप मोड में डालें(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>कंप्यूटर बंद करें(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>गति सीमा (KB/s)</translation>
     </message>
 </context>
 <context>

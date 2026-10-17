@@ -5034,10 +5034,6 @@ Lokacija: %2</translation>
         <translation>Skupni napredek:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Preneseno:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Hitrost:</translation>
     </message>
@@ -5056,6 +5052,62 @@ Lokacija: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Preostali čas:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Čas začetka:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Pretečeni čas:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Prenesenih Bytov:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Preskoči to datoteko</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimiraj</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Nadaljuj v &amp;ozadju</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Ko je končano</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Dejanje, ki ga je treba izvesti, ko je operacija končana</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>O&amp;stani nedejaven</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Prekini sejo</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Uspava&amp;j računalnik</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Zaustavi računalnik</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Omejitev hitrosti (KB/s)</translation>
     </message>
 </context>
 <context>

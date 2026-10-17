@@ -35,7 +35,12 @@ public:
   void Information(const std::string & Text) override;
   void TransferStarted(bool Upload, int FileCount) override;
   bool TransferProgress(const CoreBridge::TTransferProgress & Progress) override;
+  CoreBridge::TTransferAnswer TransferControl(const CoreBridge::TTransferProgress & Progress) override;
+  void TransferCompleted() override;
   void TransferFinished() override;
+  // Where a completed transfer's "Once finished" goes (the main window
+  // runs it as the queue's once-empty action): TransferDialog::TOnceFinished.
+  void SetOnceFinished(std::function<void(int)> OnceFinished) { FOnceFinished = std::move(OnceFinished); }
   // The progress window of the transfer under way, if any: for tests.
   TransferDialog * Transfer() const { return FTransfer.get(); }
   void BusyStart() override;
@@ -55,6 +60,7 @@ private:
   std::function<void(const QString &)> FStatus;
   std::function<bool(const QString &, const QString &, const QString &)> FStartProgram;
   std::unique_ptr<TransferDialog> FTransfer;
+  std::function<void(int)> FOnceFinished;
 };
 
 #endif

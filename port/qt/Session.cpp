@@ -98,6 +98,11 @@ struct TSession::TImpl
   // BeginErrorList's: collecting, and what.
   bool ErrorListActive = false;
   std::vector<TError> ErrorList;
+  // The transfer the Progress window shows, as TCustomScpExplorerForm's
+  // FTransferResumeList and FMoveToQueue: the files it started, in order
+  // (NULL when it cannot move to the queue), and whether it was asked to.
+  TStringList * TransferResumeList = NULL;
+  bool MoveToQueue = false;
 
   // The queue's events come on its threads: they only flag the change.
   void __fastcall QueueListUpdate(TTerminalQueue * /*Queue*/)
@@ -223,9 +228,48 @@ struct TSession::TImpl
     Progress.FilesDone = ProgressData.FilesFinishedSuccessfully;
     Progress.FileCount = ProgressData.Count;
     Progress.Speed = ProgressData.CPS();
-    if (!Frontend()->TransferProgress(Progress))
+    // As TProgressForm::UpdateControls.
+    Progress.StartTime = Utf8(ProgressData.StartTime.TimeString());
+    Progress.TimeElapsed = Utf8(FormatDateTimeSpan(ProgressData.TimeElapsed()));
+    Progress.ElapsedSeconds = TimeToSeconds(ProgressData.TimeElapsed());
+    if (ProgressData.TotalSizeSet && (SecondsBetween(ProgressData.StartTime, Now()) >= 3))
     {
-      ProgressData.SetCancel(csCancel);
+      Progress.TimeLeft = Utf8(FormatDateTimeSpan(ProgressData.TotalTimeLeft()));
+    }
+    Progress.SpeedLimit = ProgressData.CPSLimit;
+    Progress.CanSkip = (ProgressData.Cancel < csCancelFile);
+    Progress.CanMoveToQueue = (TransferResumeList != NULL) && !MoveToQueue && (ProgressData.Cancel == csContinue);
+    const TTransferAnswer Answer = Frontend()->TransferControl(Progress);
+    if (Answer.SpeedLimitSet)
+    {
+      ProgressData.SetCPSLimit(Answer.SpeedLimit);
+    }
+    // As FileOperationProgress: cancel cancels even the move.
+    switch (Answer.Action)
+    {
+      case TTransferAnswer::TAction::Cancel:
+        ProgressData.SetCancelAtLeast(csCancel);
+        MoveToQueue = false;
+        break;
+      case TTransferAnswer::TAction::SkipFile:
+        ProgressData.SetCancelAtLeast(csCancelFile);
+        break;
+      case TTransferAnswer::TAction::MoveToQueue:
+        if (TransferResumeList != NULL)
+        {
+          MoveToQueue = true;
+          ProgressData.SetCancelAtLeast(csCancel);
+        }
+        break;
+      default:
+        break;
+    }
+    // The files started, the last one the one to resume in the queue.
+    if ((TransferResumeList != NULL) && !ProgressData.FullFileName.IsEmpty() &&
+        ((TransferResumeList->Count == 0) ||
+         (TransferResumeList->Strings[TransferResumeList->Count - 1] != ProgressData.FullFileName)))
+    {
+      TransferResumeList->Add(ProgressData.FullFileName);
     }
   }
 
@@ -788,6 +832,74 @@ class TTransferBracket
 public:
   TTransferBracket(bool Upload, int Count) { Frontend()->TransferStarted(Upload, Count); }
   ~TTransferBracket() { Frontend()->TransferFinished(); }
+  // Done without error or cancel: the window's "Once finished" applies.
+  bool Done(bool Result)
+  {
+    if (Result)
+    {
+      Frontend()->TransferCompleted();
+    }
+    return Result;
+  }
+};
+
+// As TCustomScpExplorerForm::ExecuteFileOperation: the Progress window's
+// "Proceed in background" moves the rest of a transfer to the queue, the
+// files done skipped and the one in progress resumed. Run calls the
+// transfer and, once it stops for the move, queues what is left.
+class TMoveToQueue
+{
+public:
+  // The session's TransferResumeList and MoveToQueue.
+  TMoveToQueue(TStringList *& ResumeList, bool & Move, bool Capable) :
+    FResumeList(ResumeList),
+    FMove(Move)
+  {
+    FResumeList = Capable ? FList.get() : NULL;
+    FMove = false;
+  }
+  ~TMoveToQueue()
+  {
+    FResumeList = NULL;
+    FMove = false;
+  }
+  template<typename TTransfer, typename TQueue>
+  bool Run(TGUICopyParamType & CopyParam, const TTransfer & Transfer, const TQueue & Queue)
+  {
+    try
+    {
+      const bool Result = Transfer();
+      // Stopped between files, no abort is raised.
+      if (FMove)
+      {
+        Abort();
+      }
+      return Result;
+    }
+    catch (EAbort &)
+    {
+      if (!FMove)
+      {
+        throw;
+      }
+      if (FList->Count > 0)
+      {
+        CopyParam.TransferResumeFile = FList->Strings[FList->Count - 1];
+        FList->Delete(FList->Count - 1);
+      }
+      // The settings own it; the queue item takes their copy.
+      CopyParam.TransferSkipList = FList.release();
+      FResumeList = NULL;
+      FMove = false;
+      Queue();
+      return false;
+    }
+  }
+
+private:
+  TStringList *& FResumeList;
+  bool & FMove;
+  std::unique_ptr<TStringList> FList{new TStringList()};
 };
 
 }  // namespace
@@ -805,9 +917,19 @@ bool TSession::Upload(const std::vector<std::string> & LocalPaths, const std::st
     }
     const UnicodeString Target = RemoteDirectory.empty() ? F->Terminal->CurrentDirectory : FromUtf8(RemoteDirectory);
     TGUICopyParamType CopyParam = TransferCopyParam(Settings);
-    TTransferBracket Bracket(true, Files->Count);
-    return F->Terminal->CopyToRemote(Files.get(), UnixIncludeTrailingBackslash(Target), &CopyParam,
-      FLAGMASK(Move, cpDelete), NULL);
+    const int Params = FLAGMASK(Move, cpDelete);
+    TMoveToQueue Mover(F->TransferResumeList, F->MoveToQueue, F->Terminal->IsCapable[fcMoveToQueue]);
+    std::unique_ptr<TTransferBracket> Bracket(new TTransferBracket(true, Files->Count));
+    return Mover.Run(CopyParam,
+      [&]() { return Bracket->Done(F->Terminal->CopyToRemote(Files.get(), UnixIncludeTrailingBackslash(Target), &CopyParam, Params, NULL)); },
+      [&]()
+      {
+        Bracket.reset();
+        F->EnsureQueue()->AddItem(new TUploadQueueItem(F->Terminal.get(), Files.get(), UnixIncludeTrailingBackslash(Target),
+          &CopyParam, Params | FLAGMASK(CopyParam.QueueNoConfirmation, cpNoConfirmation), CopyParam.QueueParallel));
+        F->QueueAdded++;
+        F->QueueChanged = true;
+      });
   }
   catch (Exception & E)
   {
@@ -834,8 +956,19 @@ bool TSession::DownloadPaths(const std::vector<std::string> & Paths, const std::
       Files->AddObject(APath, Owned.back().get());
     }
     TGUICopyParamType CopyParam = TransferCopyParam(Settings);
-    TTransferBracket Bracket(false, Files->Count);
-    return F->Terminal->CopyToLocal(Files.get(), IncludeTrailingBackslash(FromUtf8(LocalDirectory)), &CopyParam, 0, NULL);
+    const UnicodeString Target = IncludeTrailingBackslash(FromUtf8(LocalDirectory));
+    TMoveToQueue Mover(F->TransferResumeList, F->MoveToQueue, F->Terminal->IsCapable[fcMoveToQueue]);
+    std::unique_ptr<TTransferBracket> Bracket(new TTransferBracket(false, Files->Count));
+    return Mover.Run(CopyParam,
+      [&]() { return Bracket->Done(F->Terminal->CopyToLocal(Files.get(), Target, &CopyParam, 0, NULL)); },
+      [&]()
+      {
+        Bracket.reset();
+        F->EnsureQueue()->AddItem(new TDownloadQueueItem(F->Terminal.get(), Files.get(), Target, &CopyParam,
+          FLAGMASK(CopyParam.QueueNoConfirmation, cpNoConfirmation), CopyParam.QueueParallel));
+        F->QueueAdded++;
+        F->QueueChanged = true;
+      });
   }
   catch (Exception & E)
   {
@@ -856,9 +989,20 @@ bool TSession::Download(const std::vector<std::string> & Names, const std::strin
       Files->AddObject(File->FileName, File);
     }
     TGUICopyParamType CopyParam = TransferCopyParam(Settings);
-    TTransferBracket Bracket(false, Files->Count);
-    return F->Terminal->CopyToLocal(Files.get(), IncludeTrailingBackslash(FromUtf8(LocalDirectory)), &CopyParam,
-      FLAGMASK(Move, cpDelete), NULL);
+    const UnicodeString Target = IncludeTrailingBackslash(FromUtf8(LocalDirectory));
+    const int Params = FLAGMASK(Move, cpDelete);
+    TMoveToQueue Mover(F->TransferResumeList, F->MoveToQueue, F->Terminal->IsCapable[fcMoveToQueue]);
+    std::unique_ptr<TTransferBracket> Bracket(new TTransferBracket(false, Files->Count));
+    return Mover.Run(CopyParam,
+      [&]() { return Bracket->Done(F->Terminal->CopyToLocal(Files.get(), Target, &CopyParam, Params, NULL)); },
+      [&]()
+      {
+        Bracket.reset();
+        F->EnsureQueue()->AddItem(new TDownloadQueueItem(F->Terminal.get(), Files.get(), Target, &CopyParam,
+          Params | FLAGMASK(CopyParam.QueueNoConfirmation, cpNoConfirmation), CopyParam.QueueParallel));
+        F->QueueAdded++;
+        F->QueueChanged = true;
+      });
   }
   catch (Exception & E)
   {

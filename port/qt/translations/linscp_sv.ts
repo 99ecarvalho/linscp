@@ -5032,10 +5032,6 @@ Plats: %2</translation>
         <translation>Totalt förlopp:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Överfört:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Hastighet:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Plats: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Tid kvar:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Start tid:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Förfluten tid:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Bytes överförda:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Hoppa över den här filen</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimera</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Fortsätt i &amp;bakgrunden</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>När operationen är klar</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Åtgärd som ska utföras när operationen är klar</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Förbli inaktiv</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Koppla ifrån session</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>&amp;Försätt datorn i viloläge</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Stäng av datorn</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Hastighetsbegränsning (kB/s)</translation>
     </message>
 </context>
 <context>

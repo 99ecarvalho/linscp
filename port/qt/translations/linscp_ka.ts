@@ -5032,10 +5032,6 @@ Location: %2</source>
         <translation>საერთო მიმდინარეობა:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>გადაცემულია:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>სიჩქარე:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/წმ</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>დარჩენილი დრო:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>დაწყების დრო:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>გასული დრო:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>გადაცემულია ბაიტი:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>ამ ფაილი&amp;ს გამოტოვება</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;ჩაკეცვა</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>გაგრძელება &amp;ფონზე</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>როცა დასრულდება</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>ერთხელ შესასრულებელი ქმედება ოპერაციის დასრულებისას</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;უქმედ დარჩენა</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;სესიის გათიშვა</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>კომპიუტე&amp;რის დაძინება</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;კომპიუტერის გამორთვა</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>სიჩქარის ზღვარი (კბ/წმ)</translation>
     </message>
 </context>
 <context>

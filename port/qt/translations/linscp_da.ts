@@ -5032,10 +5032,6 @@ Placering: %2</translation>
         <translation>Samlet forløb:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Overført:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Hastighed:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Placering: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Tid tilbage:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Starttidspunkt:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Tid der Gået:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Bytes overført:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>Spring denne fil over</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimer</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Fortsæt i &amp;baggrunden</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Når du er færdig</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Handling, der skal udføres, når handlingen er færdig</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Forbliv forbundet</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Afbryd forbindelse</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Sæt computeren på &amp;slumre</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>Luk computeren</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Hastighedsbegrænsning (KB/s)</translation>
     </message>
 </context>
 <context>

@@ -5032,10 +5032,6 @@ Locatie: %2</translation>
         <translation>Totale voortgang:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Verzonden:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Snelheid:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Locatie: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Tijd resterend:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Start tijd:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Tijd verstreken:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Bytes overgedragen:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Sla dit bestand over</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimaliseer</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Doe verder op &amp;achtergrond</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Wanneer voltooid</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Actie om uit te voeren wanneer bewerking voltooid is</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>Blijf &amp;inactief</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Verbreek sessie</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>&amp;Standby computer</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>Computer &amp;afsluiten</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Snelheidslimiet (KB/s)</translation>
     </message>
 </context>
 <context>

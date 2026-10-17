@@ -5031,10 +5031,6 @@ Location: %2</source>
         <translation>全体の進捗状況:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>転送完了:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>速度</translation>
     </message>
@@ -5053,6 +5049,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>残り時間:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>開始時間:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>経過時間:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>転送済み:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>スキップ(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>最小化(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>バックグラウンドで実行(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>終了時</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>実行が終了した際のアクションを指定</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>アイドル状態を維持(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>セッションを切断(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>スリープ(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>シャットダウン(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>帯域制限 (KB/s)</translation>
     </message>
 </context>
 <context>

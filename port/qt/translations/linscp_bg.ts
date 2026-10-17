@@ -5032,10 +5032,6 @@ Location: %2</source>
         <translation>Общ ход:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Обменени:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Скорост:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/с</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Оставащо време:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Начално време:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Изминало време:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Байта обменени:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Пропускане на този файл</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>С&amp;маляване</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Продължаване във &amp;фонов режим</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>След приключване</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Действие след приключване на операцията</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Бездействие</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Прекъсване на сесията</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>При&amp;спиване на компютъра</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Изключване на компютъра</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Ограничение на скоростта (KB/s)</translation>
     </message>
 </context>
 <context>

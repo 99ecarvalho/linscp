@@ -5031,10 +5031,6 @@ Vị trí: %2</translation>
         <translation>Tiến trình tổng:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Đã truyền:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Tốc độ:</translation>
     </message>
@@ -5053,6 +5049,62 @@ Vị trí: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Thời gian còn lại:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Thời gian bắt đầu:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Thời gian đã trôi qua:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Số byte đã truyền:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Bỏ qua tập tin này</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Thu nhỏ</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Chuyển sang &amp;nền</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Hoàn tất một lần</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Hành động thực hiện khi thao tác kết thúc</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Giữ không hoạt động</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Ngắt kết nối phiên</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Ngủ má&amp;y tính</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Tắt máy tính</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Giới hạn tốc độ (KB/s)</translation>
     </message>
 </context>
 <context>

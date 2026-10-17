@@ -5032,10 +5032,6 @@ Location: %2</source>
         <translation>Ընդհանուր առաջընթաց:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Փոխանցված:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Արագություն:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/վ</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Մնացած ժամանակ:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Մեկնարկի ժամանակ:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Անցած ժամանակ:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Փոխանցված բայթեր:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Բաց թողնել այս ֆայլը</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>Ն&amp;վազեցնել</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Շարունակել &amp;ֆոնային ռեժիմում</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Ավարտից հետո</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Ինչ անել գործողության ավարտից հետո</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Մնալ անգործ</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Անջատել աշխատաշրջանը</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Անցկացնել &amp;քնի ռեժիմի</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>Ան&amp;ջատել համակարգիչը</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Արագության սահմանափակում (ԿԲ/վ)</translation>
     </message>
 </context>
 <context>

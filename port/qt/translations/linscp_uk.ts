@@ -5033,10 +5033,6 @@ Location: %2</source>
         <translation>Загальний прогрес:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Передано:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Швидк.:</translation>
     </message>
@@ -5055,6 +5051,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/с</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Залишилось часу:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Час старту:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Пройшло часу:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Передано байт:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>Пропустити цей файл</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Мінімізувати</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Виконувати у фоні</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>По завершенню:</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Виконати дію один раз при закінчені операції</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Бездія</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Завершити сесію</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Комп&apos;ютер до &amp;сплячого режиму</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>Вимкнути комп&apos;ютер</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Обмеження швидкості (KБ/с):</translation>
     </message>
 </context>
 <context>

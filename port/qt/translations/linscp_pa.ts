@@ -5032,10 +5032,6 @@ Location: %2</source>
         <translation>ਕੁੱਲ ਤਰੱਕੀ:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>ਟ੍ਰਾਂਸਫਰ ਕੀਤੀ ਗਈ:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>ਗਤੀ:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>ਬਾਕੀ ਸਮਾਂ:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>ਸ਼ੁਰੂ ਹੋਣ ਦਾ ਸਮਾਂ:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>ਬੀਤਿਆ ਸਮਾਂ:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>ਟ੍ਰਾਂਸਫਰ ਕੀਤੇ ਬਾਈਟ:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>ਇਸ ਫਾਈਲ ਨੂੰ ਛੱਡੋ(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>ਛੋਟਾ ਕਰੋ(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>ਬੈਕਗ੍ਰਾਊਂਡ ਵਿੱਚ ਜਾਰੀ ਰੱਖੋ(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>ਮੁਕੰਮਲ ਹੋਣ &apos;ਤੇ</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>ਕਾਰਵਾਈ ਮੁਕੰਮਲ ਹੋਣ &apos;ਤੇ ਕੀਤਾ ਜਾਣ ਵਾਲਾ ਕੰਮ</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>ਵਿਹਲੇ ਰਹੋ(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>ਸੈਸ਼ਨ ਨੂੰ ਡਿਸਕਨੈਕਟ ਕਰੋ(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>ਕੰਪਿਊਟਰ ਨੂੰ ਸਲੀਪ ਮੋਡ ਵਿੱਚ ਪਾਓ(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>ਕੰਪਿਊਟਰ ਬੰਦ ਕਰੋ(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>ਗਤੀ ਸੀਮਾ (KB/s)</translation>
     </message>
 </context>
 <context>

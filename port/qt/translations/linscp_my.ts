@@ -5031,10 +5031,6 @@ Location: %2</source>
         <translation>စုစုပေါင်း တိုးတက်နှုန်း:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>ပြောင်းရွှေ့ပြီးသည်:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>မြန်နှုန်း:</translation>
     </message>
@@ -5053,6 +5049,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>ကျန်ရှိသောအချိန်:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>စတင်ချိန်:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>ကြာမြင့်ချိန်:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>ပြောင်းရွှေ့ပြီး ဘိုက်:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>ဤဖိုင်ကို ကျော်ပါ(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>ချုံ့ထားပါ(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>နောက်ခံတွင် ဆက်လုပ်ပါ(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>ပြီးဆုံးသည့်အခါ</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>လုပ်ငန်း ပြီးဆုံးသည့်အခါ လုပ်ဆောင်မည့် လုပ်ဆောင်ချက်</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>အလုပ်မလုပ်ဘဲ နေပါ(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>ကဏ္ဍ ချိတ်ဆက်မှု ဖြတ်ပါ(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>ကွန်ပျူတာကို အိပ်စက်မုဒ်သို့ ထားပါ(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>ကွန်ပျူတာကို ပိတ်ပါ(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>မြန်နှုန်း ကန့်သတ်ချက် (KB/s)</translation>
     </message>
 </context>
 <context>

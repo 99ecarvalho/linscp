@@ -5032,10 +5032,6 @@ Location: %2</source>
         <translation>সামগ্রিক অগ্রগতি:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>ট্রান্সফার হয়েছে:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>গতি:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>অবশিষ্ট সময়:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>শুরুর সময়:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>অতিবাহিত সময়:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>ট্রান্সফার হওয়া বাইট:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>এই ফাইলটি এড়িয়ে যান(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>ছোট করুন(&amp;M)</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>ব্যাকগ্রাউন্ডে চালিয়ে যান(&amp;B)</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>শেষ হলে</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>অপারেশন শেষ হলে যে কাজ করা হবে</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>নিষ্ক্রিয় থাকুন(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>সেশন সংযোগ বিচ্ছিন্ন করুন(&amp;D)</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>কম্পিউটারকে স্লিপ মোডে রাখুন(&amp;P)</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>কম্পিউটার বন্ধ করুন(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>গতির সীমা (KB/s)</translation>
     </message>
 </context>
 <context>

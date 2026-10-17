@@ -5033,10 +5033,6 @@ Location: %2</source>
         <translation>Агульны ход выканання:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Перададзена:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Хуткасць:</translation>
     </message>
@@ -5055,6 +5051,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/с</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Засталося:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Пачатак:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Прайшло:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Перададзена:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Прапусціць гэты файл</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Згарнуць</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Працягнуць у &amp;фонавым рэжыме</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Пасля завяршэння</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Дзеянне, якое трэба выканаць пасля завяршэння аперацыі</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Чакаць</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Адлучыць сеанс</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Камп&apos;ютар у рэжым &amp;сну</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Выключыць камп&apos;ютар</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Абмежаванне хуткасці (кБ/с)</translation>
     </message>
 </context>
 <context>

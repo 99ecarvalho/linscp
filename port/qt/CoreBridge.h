@@ -118,6 +118,29 @@ struct TTransferProgress
   int FileCount = 0;
   // Bytes per second.
   unsigned int Speed = 0;
+  // As the Progress window shows them (core's formatting): when it started,
+  // how long it has run, and how long it has left, empty while no estimate
+  // can be made (the total not known, or under three seconds in).
+  std::string StartTime;
+  std::string TimeElapsed;
+  std::string TimeLeft;
+  int ElapsedSeconds = 0;
+  // The speed limit in force (bytes per second, 0 none); whether the
+  // current file can be skipped, and the rest moved to the queue.
+  unsigned long SpeedLimit = 0;
+  bool CanSkip = false;
+  bool CanMoveToQueue = false;
+};
+
+// The Progress window's answer to a report: go on, cancel, skip the file
+// (csCancelFile), or move the rest to the background queue; and the speed
+// limit chosen (SpeedLimitSet: one chosen, 0 for none).
+struct TTransferAnswer
+{
+  enum class TAction { Continue, Cancel, SkipFile, MoveToQueue };
+  TAction Action = TAction::Continue;
+  bool SpeedLimitSet = false;
+  unsigned long SpeedLimit = 0;
 };
 
 // The shell's side, implemented on Qt (port/qt/QtFrontend.cpp). Every call
@@ -142,6 +165,17 @@ public:
   virtual void TransferStarted(bool Upload, int FileCount) = 0;
   // false to cancel it.
   virtual bool TransferProgress(const TTransferProgress & Progress) = 0;
+  // The Progress window's full answer; by default TransferProgress's:
+  // cancel or go on.
+  virtual TTransferAnswer TransferControl(const TTransferProgress & Progress)
+  {
+    TTransferAnswer Answer;
+    Answer.Action = TransferProgress(Progress) ? TTransferAnswer::TAction::Continue : TTransferAnswer::TAction::Cancel;
+    return Answer;
+  }
+  // A transfer the window showed ended without error or cancel, before
+  // TransferFinished: where its "Once finished" choice applies.
+  virtual void TransferCompleted() {}
   virtual void TransferFinished() = 0;
 
   virtual void BusyStart() = 0;
@@ -778,6 +812,13 @@ TLayout Layout();
 // "Commands" and "LocalCommands" are the command line's): newest first.
 // Adding saves.
 std::vector<std::string> History(const std::string & Name);
+// The Progress window's speed limits (KB/s, "Unlimited" first), as
+// CopySpeedLimits lists the "SpeedLimit" history, with WinSCP's defaults
+// while it is empty; a typed one's limit (GetSpeedLimit: bytes per second,
+// 0 unlimited; TCoreError when it is none), and a limit's text.
+std::vector<std::string> SpeedLimits();
+unsigned long SpeedLimitOf(const std::string & Text);
+std::string SpeedLimitText(unsigned long Limit);
 void AddToHistory(const std::string & Name, const std::string & Value);
 // Saves it.
 void SetLayout(const TLayout & Layout);
@@ -1044,6 +1085,7 @@ enum class TText
   ScpShellPage,         // "SCP/Shell"
   EncryptKeyGenerated,  // "**Encryption key was generated.**..." (unformatted)
   CopyKeyButton,        // "&Copy Key"
+  ClosedOnCompletion,   // "Operation was successfully completed. Connection was closed."
   AuthorizedKeys,       // "Public key for pasting into OpenSSH authorized_keys file:" (unformatted)
   KeyWithCertificate,   // the same for a key with its certificate (unformatted)
   SpecialFolderDocuments, // "My documents"

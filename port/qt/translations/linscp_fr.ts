@@ -5032,10 +5032,6 @@ Emplacement : %2</translation>
         <translation>Progression totale :</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Transférés:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Vitesse :</translation>
     </message>
@@ -5054,6 +5050,62 @@ Emplacement : %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Temps restant :</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Début :</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Temps écoulé :</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Octets transférés :</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>Passer ce fichier</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Réduire</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Procéder en &amp;arrière-plan</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Une fois terminé</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Action à réaliser une fois opération terminée</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Rester inactif</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Déconnecter la session</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Mettre en &amp;veille l&apos;ordinateur</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>Éteindre l&apos;ordinateur</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Limite de vitesse (KB/s)</translation>
     </message>
 </context>
 <context>

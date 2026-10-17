@@ -112,6 +112,7 @@ CONTEXT_FORMS = {
     'TransferSettingsBox': ['Copy.dfm', 'FullSynchronize.dfm'],
     'SynchronizeDialog': ['FullSynchronize.dfm'],
     'SynchronizeProgress': ['SynchronizeProgress.dfm'],
+    'TransferDialog': ['Progress.dfm'],
     'SyncChecklistDialog': ['SynchronizeChecklist.dfm'],
     'SiteManager': ['Login.dfm'],
     'SiteAdvanced': ['SiteAdvanced.dfm'],

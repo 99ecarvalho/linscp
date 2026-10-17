@@ -5031,10 +5031,6 @@ Location: %2</source>
         <translation>ความคืบหน้าทั้งหมด:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>โอนย้ายแล้ว:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>ความเร็ว:</translation>
     </message>
@@ -5053,6 +5049,62 @@ Location: %2</source>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>เวลาที่เหลือ:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>เวลาเริ่มต้น:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>เวลาที่ใช้ไป:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>ไบต์ที่โอนย้ายแล้ว:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;ข้ามไฟล์นี้</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;ย่อหน้าต่าง</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>ทำงานต่อใน&amp;เบื้องหลัง</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>เมื่อเสร็จสิ้น</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>การดำเนินการเมื่อการทำงานเสร็จสิ้น</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;ไม่ต้องทำอะไร</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;ตัดการเชื่อมต่อเซสชั่น</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>&amp;พักเครื่องคอมพิวเตอร์</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;ปิดเครื่องคอมพิวเตอร์</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>จำกัดความเร็ว (KB/s)</translation>
     </message>
 </context>
 <context>

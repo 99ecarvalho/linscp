@@ -5031,10 +5031,6 @@ Konum: %2</translation>
         <translation>Toplam ilerleme:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Aktarılan:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Hız:</translation>
     </message>
@@ -5053,6 +5049,62 @@ Konum: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Kalan süre:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Başlangıç zamanı:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Geçen süre:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Aktarılan bayt:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Bu dosyayı atla</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Küçült</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>A&amp;rka planda işlensin</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Tamamlandığında</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>İşlem tamamlandığında yapılacak işlem</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Boşta beklensin</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Oturum kapatılsın</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Bilgisayar &amp;uyutulsun</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>Bilgisayar &amp;kapatılsın</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Hız sınırlaması (KB/s)</translation>
     </message>
 </context>
 <context>

@@ -5032,10 +5032,6 @@ Vendndodhja: %2</translation>
         <translation>Progresi i përgjithshëm:</translation>
     </message>
     <message>
-        <source>Transferred:</source>
-        <translation>Transferuar:</translation>
-    </message>
-    <message>
         <source>Speed:</source>
         <translation>Shpejtësia:</translation>
     </message>
@@ -5054,6 +5050,62 @@ Vendndodhja: %2</translation>
     <message>
         <source>%1/s</source>
         <translation>%1/s</translation>
+    </message>
+    <message>
+        <source>Time left:</source>
+        <translation>Koha e mbetur:</translation>
+    </message>
+    <message>
+        <source>Start time:</source>
+        <translation>Koha e fillimit:</translation>
+    </message>
+    <message>
+        <source>Time elapsed:</source>
+        <translation>Koha e kaluar:</translation>
+    </message>
+    <message>
+        <source>Bytes transferred:</source>
+        <translation>Bajte të transferuar:</translation>
+    </message>
+    <message>
+        <source>&amp;Skip this file</source>
+        <translation>&amp;Kapërce këtë skedar</translation>
+    </message>
+    <message>
+        <source>&amp;Minimize</source>
+        <translation>&amp;Minimizo</translation>
+    </message>
+    <message>
+        <source>Proceed in &amp;Background</source>
+        <translation>Vazhdo në &amp;sfond</translation>
+    </message>
+    <message>
+        <source>Once Finished</source>
+        <translation>Pas përfundimit</translation>
+    </message>
+    <message>
+        <source>Action to perform once the operation finishes</source>
+        <translation>Veprimi për t&apos;u kryer pas përfundimit të operacionit</translation>
+    </message>
+    <message>
+        <source>&amp;Stay Idle</source>
+        <translation>&amp;Qëndro joaktiv</translation>
+    </message>
+    <message>
+        <source>&amp;Disconnect Session</source>
+        <translation>&amp;Shkëput seancën</translation>
+    </message>
+    <message>
+        <source>Slee&amp;p Computer</source>
+        <translation>Vëre kompjuterin në &amp;gjumë</translation>
+    </message>
+    <message>
+        <source>&amp;Shut Down Computer</source>
+        <translation>&amp;Fike kompjuterin</translation>
+    </message>
+    <message>
+        <source>Speed limit (KB/s)</source>
+        <translation>Kufiri i shpejtësisë (KB/s)</translation>
     </message>
 </context>
 <context>
