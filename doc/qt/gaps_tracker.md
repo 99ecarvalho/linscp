@@ -16,9 +16,9 @@ Last updated: **2026-10-17**
 | C. Progress and synchronization dialogs | 4 | 4 |
 | D. Main window | 9 | 9 |
 | E. Preferences | 10 | 10 |
-| F. Command line | 2 | 3 |
+| F. Command line | 3 | 3 |
 | G. Known before | 1 | 1 |
-| **Total** | **46** | **47** |
+| **Total** | **47** | **47** |
 
 ## Items
 
@@ -69,5 +69,5 @@ Last updated: **2026-10-17**
 | E10 | Preferences search box | Low | done | Results scroll instead of being cut at the group's bottom |
 | F1 | GUI: /log, /xmllog, /loglevel, /logsize | Medium | done | 2026-10-17. linscp-cli's `ApplyLogSwitches`, moved to FrontendCommon, at the GUI's initialization; ctest `qt_gui_logswitches` |
 | F2 | GUI: /synchronize, /edit, /refresh, /explore, /workspace, /rawtransfersettings, /privatekey, /help | Medium | done | 2026-10-17. /synchronize, /edit (the window hidden), /refresh (to the running instance; a path as core reads it, "/dir/"), download URLs (downloaded, or focused with /explore or /browse), /workspace (before a site of the same name), /rawtransfersettings and /privatekey for the run, /help (linscp-cli's usage). /Console= and /DotNet= not applicable: they record the wrappers' versions for WinSCP's update service; ctest `qt_gui_uploadswitch`, `qt_gui_sessioncommands`, `qt_gui_tabs`, `qt_gui_logswitches` |
-| F3 | CLI: /info, /batchsettings, /copyid, /fingerprintscan, /dumpcallstack, /h | Low | todo | |
+| F3 | CLI: /info, /batchsettings, /copyid, /fingerprintscan, /dumpcallstack, /h | Low | done | The GUI hands them to linscp-cli, as WinSCP.exe to its console. /dumpcallstack left out: it signals a GUI that waits for it with a JCL callstack dumper, which linscp has not |
 | G1 | Site Advanced: Edit in PuTTY; private key Tools menu | Low | done | From P3-27; Edit in PuTTY needs PuTTY's registry sessions, so Windows only |

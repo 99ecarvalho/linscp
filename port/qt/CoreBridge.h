@@ -2201,8 +2201,9 @@ bool CommandLineUseDefaults();
 // As WinMain: /rawtransfersettings, this run's default transfer settings
 // (Initialize applies them).
 void ApplyRawTransferSettingsSwitch();
-// /help, /h, /?: the usage, as WinSCP shows its console's.
-bool CommandLineHelp();
+// As WinMain's console modes: /help (/h, /?), /batchsettings, /keygen,
+// /copyid, /fingerprintscan, /info, which linscp-cli runs.
+bool CommandLineConsole();
 // As pcRefresh: /refresh [path], with the session (empty: every one)
 // named on the command line, or the Arguments given (another instance's).
 bool CommandLineRefresh(std::string & Session, std::string & Path, const std::vector<std::string> * Arguments = nullptr);

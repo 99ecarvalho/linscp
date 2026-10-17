@@ -198,6 +198,44 @@ def main():
         check('[Sessions\\linscp-test]' in stored and 'HostName=127.0.0.1' in stored,
               'the stored site survives the configuration being saved', stored[:2000])
 
+        # /batchsettings: raw settings onto the sites a mask matches.
+        rc, out, err = run('/batchsettings', 'linscp-*', 'Compression=1', ini=ini_arg, env=ini_env)
+        text = out.decode(errors='replace')
+        stored = open(ini_path, encoding='utf-8', errors='replace').read()
+        check(rc == 0 and 'linscp-test' in text and 'Compression=1' in stored,
+              f'/batchsettings changes the matching site (rc {rc})', text + err.decode(errors='replace'))
+        rc, out, err = run('/batchsettings', 'linscp-*')
+        check(rc == 1, f'/batchsettings without settings fails (rc {rc})', out.decode(errors='replace'))
+
+        # /fingerprintscan: the host key's fingerprints, unverified.
+        rc, out, err = run('/fingerprintscan', url)
+        text = out.decode(errors='replace')
+        check(rc == 0 and ('SHA-256: ' + full_fingerprint) in text,
+              f'/fingerprintscan prints the host key (rc {rc})', text + err.decode(errors='replace'))
+
+        # /info: the SSH and TLS implementations.
+        rc, out, err = run('/info')
+        text = out.decode(errors='replace')
+        check(rc == 0 and 'SSH implementation: PuTTY' in text and 'TLS/SSL cipher suites:' in text,
+              f'/info lists the algorithms (rc {rc})', text)
+
+        # /copyid: the key into the server's .ssh/authorized_keys. Against
+        # rclone, so the server's home is the test's directory and not the
+        # user's own.
+        if fixtures.rclone_binary():
+            root = os.path.join(tmp, 'rclone-root')
+            os.makedirs(root)
+            with fixtures.rclone_sftp(root, 'linscp', 'linscp-pw', os.path.join(tmp, 'rclone-cache')) as rport:
+                rc, out, err = run('/copyid', '/identity=' + native(ppk),
+                                   f'sftp://linscp:linscp-pw@127.0.0.1:{rport}/', '/hostkey=*')
+                text = out.decode(errors='replace')
+                authorized = os.path.join(root, '.ssh', 'authorized_keys')
+                client_pub = open(os.path.join(tmp, 'client.pub')).read().split()[1]
+                check(rc == 0 and os.path.isfile(authorized) and client_pub in open(authorized).read(),
+                      f'/copyid installs the key (rc {rc})', text + err.decode(errors='replace'))
+        rc, out, err = run('/copyid', url)
+        check(rc == 1, f'/copyid without /identity fails (rc {rc})', out.decode(errors='replace'))
+
         # A script file with /parameter.
         script = os.path.join(tmp, 'script.txt')
         with open(script, 'w') as f:

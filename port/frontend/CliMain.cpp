@@ -8,7 +8,8 @@
 // script, with the same behaviour: the script and its output are core's;
 // what lives here is how queries, prompts and input meet the console, and
 // those follow TConsoleRunner and winscp.com (see StdioConsole.h). Modes
-// besides scripting: /keygen (key conversion, upstream's KeyGen) and /help.
+// besides scripting: /keygen (key conversion, upstream's KeyGen),
+// /batchsettings, /copyid, /fingerprintscan, /info and /help.
 #include <vcl.h>
 #pragma hdrstop
 
@@ -16,10 +17,14 @@
 #include <Configuration.h>
 #include <CoreMain.h>
 #include <Exceptions.h>
+#include <FileMasks.h>
+#include <FtpFileSystem.h>
+#include <HierarchicalStorage.h>
 #include <Interface.h>
 #include <PuttyTools.h>
 #include <Script.h>
 #include <SessionData.h>
+#include <SessionInfo.h>
 #include <Terminal.h>
 #include <TextsCore.h>
 #include <TextsWin.h>
@@ -46,6 +51,11 @@ const wchar_t * const KeyGenCertificateSwitch = L"Certificate";
 const wchar_t * const NoInteractiveInputSwitch = L"NoInteractiveInput";
 const wchar_t * const StdOutSwitch = L"StdOut";
 const wchar_t * const StdInSwitch = L"StdIn";
+const wchar_t * const BatchSettingsSwitch = L"batchsettings";
+const wchar_t * const CopyIdSwitch = L"CopyId";
+const wchar_t * const IdentitySwitch = L"Identity";
+const wchar_t * const FingerprintScanSwitch = L"FingerprintScan";
+const wchar_t * const InfoSwitch = L"Info";
 const wchar_t * const ExitCommand = L"exit";
 // GUIConfiguration's KeepUpToDateChangeDelay default: how long a directory
 // must be quiet before keepuptodate synchronizes it.
@@ -1170,6 +1180,139 @@ int KeyGen(TCliConsole * Console, TProgramParams * Params)
   return Result;
 }
 //---------------------------------------------------------------------------
+// Upstream's /batchsettings: raw settings applied to the sites a mask
+// matches.
+int BatchSettings(TCliConsole * Console, TProgramParams * Params)
+{
+  int Result = ResultSuccess;
+  try
+  {
+    std::unique_ptr<TStrings> Arguments(new TStringList());
+    Params->FindSwitch(BatchSettingsSwitch, Arguments.get());
+    if (Arguments->Count < 1)
+    {
+      throw Exception(LoadStr(BATCH_SET_NO_MASK));
+    }
+    else if (Arguments->Count < 2)
+    {
+      throw Exception(LoadStr(BATCH_SET_NO_SETTINGS));
+    }
+    TFileMasks Mask(Arguments->Strings[0]);
+    Arguments->Delete(0);
+    std::unique_ptr<TOptionsStorage> OptionsStorage(new TOptionsStorage(Arguments.get(), false));
+    int Matches = 0;
+    int Changes = 0;
+    for (int Index = 0; Index < StoredSessions->Count; Index++)
+    {
+      TSessionData * Data = StoredSessions->Sessions[Index];
+      if (!Data->IsWorkspace && Mask.Matches(Data->Name, false, false))
+      {
+        Matches++;
+        std::unique_ptr<TSessionData> OriginalData(new TSessionData(L""));
+        OriginalData->CopyDataNoRecrypt(Data);
+        bool UnsafeSettings; // unused
+        Data->ApplyRawSettings(OptionsStorage.get(), false, true, UnsafeSettings);
+        const bool Changed = !OriginalData->IsSame(Data, false);
+        if (Changed)
+        {
+          Changes++;
+        }
+        Console->PrintLine(Data->Name + TitleSeparator + LoadStr(Changed ? BATCH_SET_CHANGED : BATCH_SET_NOT_CHANGED));
+      }
+    }
+    StoredSessions->Save(false, true); // explicit
+    Console->PrintLine(FMTLOAD(BATCH_SET_SUMMARY, (Matches, Changes)));
+  }
+  catch (Exception & E)
+  {
+    Result = HandleException(Console, E);
+  }
+  return Result;
+}
+//---------------------------------------------------------------------------
+// Upstream's /fingerprintscan: the host key's (or TLS certificate's)
+// fingerprints, unverified.
+int FingerprintScan(TCliConsole * Console, TProgramParams * Params)
+{
+  int Result = ResultSuccess;
+  try
+  {
+    ApplyLogSwitches(Params, true);
+    std::unique_ptr<TSessionData> SessionData;
+    if (Params->ParamCount > 0)
+    {
+      int ParsedInfo;
+      SessionData.reset(StoredSessions->ParseUrl(Params->Param[1], Params, ParsedInfo));
+      if (FLAGSET(ParsedInfo, piDefaultsOnly) || !SessionData->CanLogin ||
+          (!SessionData->UsesSsh && (SessionData->Ftps == ftpsNone)))
+      {
+        SessionData.reset();
+      }
+    }
+    if (!SessionData)
+    {
+      throw Exception(LoadStr(FINGERPRINTSCAN_NEED_SECURE_SESSION));
+    }
+    std::unique_ptr<TTerminal> Terminal(new TTerminal(SessionData.get(), Configuration));
+    UnicodeString SHA256;
+    UnicodeString SHA1;
+    UnicodeString MD5;
+    Terminal->FingerprintScan(SHA256, SHA1, MD5);
+    if (!SHA256.IsEmpty())
+    {
+      Console->PrintLine(FORMAT(L"SHA-256: %s", (SHA256)));
+    }
+    if (!SHA1.IsEmpty())
+    {
+      Console->PrintLine(FORMAT(L"SHA-1: %s", (SHA1)));
+    }
+    if (!MD5.IsEmpty())
+    {
+      Console->PrintLine(FORMAT(L"MD5:     %s", (MD5)));
+    }
+  }
+  catch (Exception & E)
+  {
+    Result = HandleException(Console, E);
+  }
+  return Result;
+}
+//---------------------------------------------------------------------------
+void PrintListAndFree(TCliConsole * Console, const UnicodeString & Caption, TStrings * List)
+{
+  std::unique_ptr<TStrings> Owner(List);
+  Console->PrintLine(Caption);
+  for (int Index = 0; Index < List->Count; Index++)
+  {
+    Console->PrintLine(List->Strings[Index]);
+  }
+  Console->PrintLine();
+}
+//---------------------------------------------------------------------------
+// Upstream's /info: the SSH and TLS implementations and their algorithms.
+int Info(TCliConsole * Console)
+{
+  int Result = ResultSuccess;
+  try
+  {
+    Console->PrintLine(FORMAT(L"SSH implementation: PuTTY %s", (GetPuTTYVersion())));
+    Console->PrintLine();
+    PrintListAndFree(Console, L"SSH encryption ciphers:", SshCipherList());
+    PrintListAndFree(Console, L"SSH key exchange algorithms:", SshKexList());
+    PrintListAndFree(Console, L"SSH host key algorithms:", SshHostKeyList());
+    PrintListAndFree(Console, L"SSH MAC algorithms:", SshMacList());
+    Console->PrintLine(TSessionLog::GetSeparator());
+    Console->PrintLine(FORMAT(L"TLS/SSL implementation: %s", (GetOpenSSLVersionText())));
+    Console->PrintLine();
+    PrintListAndFree(Console, L"TLS/SSL cipher suites:", TlsCipherList());
+  }
+  catch (Exception & E)
+  {
+    Result = HandleException(Console, E);
+  }
+  return Result;
+}
+//---------------------------------------------------------------------------
 // The switches this client has, with upstream's descriptions.
 void Usage(TCliConsole * Console)
 {
@@ -1194,7 +1337,10 @@ void Usage(TCliConsole * Console)
     L"[/stdout[=binary|chunked]] [/stdin[=binary]]",
     L"[/log=<logfile> [/loglevel=<level>] [/logsize=[<count>*]<size>]] [/xmllog=<logfile> [/xmlgroups]]",
     L"[/nointeractiveinput] [/ini=<inifile>] [/rawconfig config1=value1 config2=value2 ...]",
+    L"/batchsettings <site_mask> setting1=value1 setting2=value2 ...",
     L"/keygen keyfile [/output=<file>] [/changepassphrase] [/comment=<text>] [/certificate=<file>]",
+    L"/copyid /identity=<file> mysession",
+    L"/info",
     L"/help",
   };
   for (const wchar_t * S : Syntax)
@@ -1213,7 +1359,8 @@ void Usage(TCliConsole * Console)
     { L"/stdin", USAGE_STDIN }, { L"/log=", USAGE_LOG }, { L"/loglevel=", USAGE_LOGLEVEL },
     { L"/logsize=", USAGE_LOGSIZE }, { L"/xmllog=", USAGE_XMLLOG }, { L"/xmlgroups", USAGE_XMLGROUPS },
     { L"/nointeractiveinput", USAGE_INTERACTIVEINPUT }, { L"/ini=", USAGE_INI },
-    { L"/rawconfig", USAGE_RAWCONFIG }, { L"/help", USAGE_HELP },
+    { L"/rawconfig", USAGE_RAWCONFIG }, { L"/batchsettings", USAGE_BATCHSETTINGS },
+    { L"/copyid", USAGE_COPYID }, { L"/info", USAGE_INFO }, { L"/help", USAGE_HELP },
   };
   int Width = 0;
   for (const auto & S : Switches)
@@ -1240,10 +1387,25 @@ int RunScripting(TCliConsole * Console, TProgramParams * Params)
   int Result;
   try
   {
+    const bool CopyId = Params->FindSwitch(CopyIdSwitch);
     if (CheckSafe(Params))
     {
       UnicodeString Value;
-      if (Params->FindSwitch(SCRIPT_SWITCH, Value) && !Value.IsEmpty())
+      if (CopyId)
+      {
+        // Upstream's /copyid: the script's copyid, with /identity's (or
+        // -i's) key.
+        UnicodeString IdentityFileName;
+        bool ValueSet;
+        FindNixCompatibleSwitch(Params, IdentitySwitch, L"i", IdentityFileName, ValueSet);
+        if (IdentityFileName.IsEmpty())
+        {
+          throw Exception(LoadStr(COPYID_IDETITY_MISSING));
+        }
+        ScriptCommands->Add(FORMAT(L"%s \"%s\"", (COPYID_COMMAND, IdentityFileName)));
+        ScriptCommands->Add(ExitCommand);
+      }
+      else if (Params->FindSwitch(SCRIPT_SWITCH, Value) && !Value.IsEmpty())
       {
         LoadScriptFromFile(Value, ScriptCommands.get());
       }
@@ -1267,7 +1429,7 @@ int RunScripting(TCliConsole * Console, TProgramParams * Params)
       }
     }
     ApplyLogSwitches(Params, true);
-    const bool UsageWarnings = (ScriptCommands->Count > 0) || !Console->Interactive();
+    const bool UsageWarnings = !CopyId && ((ScriptCommands->Count > 0) || !Console->Interactive());
     Result = Runner.Run(Session, Params, ScriptCommands.get(), ScriptParameters.get(), UsageWarnings);
   }
   catch (Exception & E)
@@ -1308,13 +1470,30 @@ int main()
       {
         Console.reset(new TStdioConsole(StdOut, StdIn, NoInteractiveInput));
       }
-      if (Params->FindSwitch(L"help") || Params->FindSwitch(L"?"))
+      // In upstream's order (WinMain.cpp).
+      if (Params->FindSwitch(L"help") || Params->FindSwitch(L"h") || Params->FindSwitch(L"?"))
       {
         Usage(Console.get());
+      }
+      else if (Params->FindSwitch(BatchSettingsSwitch))
+      {
+        Result = CheckSafe(Params) ? BatchSettings(Console.get(), Params) : ResultAnyError;
       }
       else if (Params->FindSwitch(KeyGenSwitch))
       {
         Result = CheckSafe(Params) ? KeyGen(Console.get(), Params) : ResultAnyError;
+      }
+      else if (Params->FindSwitch(CopyIdSwitch))
+      {
+        Result = RunScripting(Console.get(), Params);
+      }
+      else if (Params->FindSwitch(FingerprintScanSwitch))
+      {
+        Result = CheckSafe(Params) ? FingerprintScan(Console.get(), Params) : ResultAnyError;
+      }
+      else if (Params->FindSwitch(InfoSwitch))
+      {
+        Result = Info(Console.get());
       }
       else
       {

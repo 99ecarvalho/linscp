@@ -394,10 +394,12 @@ void ApplyRawTransferSettingsSwitch()
   }
 }
 
-bool CommandLineHelp()
+bool CommandLineConsole()
 {
   TProgramParams * Params = TProgramParams::Instance();
-  return Params->FindSwitch(L"help") || Params->FindSwitch(L"h") || Params->FindSwitch(L"?");
+  return Params->FindSwitch(L"help") || Params->FindSwitch(L"h") || Params->FindSwitch(L"?") ||
+    Params->FindSwitch(L"batchsettings") || Params->FindSwitch(L"KeyGen") || Params->FindSwitch(L"CopyId") ||
+    Params->FindSwitch(L"FingerprintScan") || Params->FindSwitch(L"Info");
 }
 
 bool CommandLineUseDefaults()
