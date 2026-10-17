@@ -4856,6 +4856,10 @@ Location: %2</source>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;צור כתובת URL/קוד להפעלה...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>הדבק &amp;URL של הפעלה</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

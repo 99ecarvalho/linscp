@@ -1883,6 +1883,12 @@ int TunnelLocalPortNumberHigh();
 // asking before overwriting another is the dialog's (SiteExists). Throws
 // TCoreError: no name, a special site, a storage error.
 void SaveSite(const TSite & Site, const std::string & BaseName = std::string());
+// The Login dialog's ParseUrl: Url (or an IPv6 literal) applied to Site,
+// not as a stored site's; Unsafe when it has settings to confirm
+// (UnsafeSession).
+TSite ParseSiteUrl(const TSite & Site, const std::string & Url, bool & Unsafe);
+// As ParseHostName: HostName is more than a host name (a URL to parse).
+bool HostNameIsUrl(const std::string & HostName);
 // Name, or with " (n)" after it, as TNamedObject::MakeUniqueIn: no stored
 // site's.
 std::string UniqueSiteName(const std::string & Name);

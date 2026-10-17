@@ -4856,6 +4856,10 @@ Placering: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Generér Session URL/kode...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Indsæt Session &amp;URL</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4856,6 +4856,10 @@ Plassering: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Generer økt URL/kode...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Lim inn økt-&amp;URL</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

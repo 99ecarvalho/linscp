@@ -4857,6 +4857,10 @@ Umiestnenie: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Generovať URL/kód relácie...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Vložiť &amp;URL adresu relácie</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

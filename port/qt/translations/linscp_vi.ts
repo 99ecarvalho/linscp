@@ -4855,6 +4855,10 @@ Vị trí: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Tạo URL/Mã phiên...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Dán &amp;URL phiên</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4857,6 +4857,10 @@ Location: %2</source>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Згенерыраваць URL-адрас/код сеанса...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Уставіць &amp;URL-адрас сеанса</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

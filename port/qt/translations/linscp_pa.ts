@@ -4856,6 +4856,10 @@ Location: %2</source>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>ਸੈਸ਼ਨ URL/ਕੋਡ ਬਣਾਓ...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>ਸੈਸ਼ਨ URL ਪੇਸਟ ਕਰੋ</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

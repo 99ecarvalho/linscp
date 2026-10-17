@@ -4857,6 +4857,10 @@ Vieta: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Kurti seanso URL/Kodą...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Įdėti seanso &amp;URL</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4855,6 +4855,10 @@ Location: %2</source>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>세션 URL/코드 생성(&amp;G)...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>세션 URL 붙여넣기(&amp;U)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

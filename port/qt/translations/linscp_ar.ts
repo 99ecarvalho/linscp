@@ -4860,6 +4860,10 @@ Location: %2</source>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>إن&amp;شاء عنوان URL/رمز الجلسة...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>لصق الرابط</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

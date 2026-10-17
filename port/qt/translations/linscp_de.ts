@@ -4856,6 +4856,10 @@ Ort: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>Sitzungs-URL/-Code &amp;erzeugen …</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Sitzungs-&amp;URL einfügen</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

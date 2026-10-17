@@ -105,6 +105,14 @@ public:
   // Clone to New Site: the selected site's settings in the new site, its
   // name kept (made unique) for Save.
   void CloneToNewSite();
+  // As ParseUrl: Url into the form, after asking about unsafe settings;
+  // false when not.
+  bool ParseUrl(const QString & Url);
+  // Paste Session URL: the clipboard's URL into the new site (the form,
+  // for the new site already selected).
+  void PasteUrl();
+  // As HostNameEditExit: a URL in the host name parsed into the form.
+  void ParseHostName();
   // Reset: the new site from the defaults.
   void ResetNewSite();
   // Generate Session URL/Code, for the site as edited.

@@ -4856,6 +4856,10 @@ Vendndodhja: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Gjenero URL/kodin e seancës...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Ngjit &amp;URL-në e seancës</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

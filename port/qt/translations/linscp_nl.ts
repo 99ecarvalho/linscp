@@ -4856,6 +4856,10 @@ Locatie: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Maak sessie URL/Code...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Plak sessie &amp;URL</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

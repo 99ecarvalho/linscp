@@ -4856,6 +4856,10 @@ Location: %2</source>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>सत्र URL/कोड बनाएँ(&amp;G)...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>सत्र URL चिपकाएँ(&amp;U)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

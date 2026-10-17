@@ -4855,6 +4855,10 @@ Location: %2</source>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>產生工作階段網址/程式碼(&amp;G)...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>貼上工作階段的網址(&amp;U)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

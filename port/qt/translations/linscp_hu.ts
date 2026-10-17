@@ -4855,6 +4855,10 @@ Hely: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>Munkamenet URL/Kód &amp;generálása...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Munkamenet &amp;URL beillesztése</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

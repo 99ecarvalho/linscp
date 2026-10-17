@@ -4856,6 +4856,10 @@ Ubicació: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Genera URL/Codi de la sessió...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Enganxa &amp;URL de la sessió</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

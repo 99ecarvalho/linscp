@@ -4855,6 +4855,10 @@ Location: %2</source>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;آفریدن جلسه آدرس/کد...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>چسباندن آدرس جلسه</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

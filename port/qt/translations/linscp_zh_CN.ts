@@ -4855,6 +4855,10 @@ Location: %2</source>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>生成会话URL/代码(&amp;G)...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>复制会话URL(&amp;U)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

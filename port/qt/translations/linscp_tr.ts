@@ -4855,6 +4855,10 @@ Konum: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Oturum adresi ya da kodu oluştur...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>&amp;Oturum adresini yapıştır</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4856,6 +4856,10 @@ Ruta: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Generar URL/código de sesión...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Pegar &amp;URL de sesión</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

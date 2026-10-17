@@ -4856,6 +4856,10 @@ Sijainti: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Luo istunto-URL/-koodi...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Liitä istunnon &amp;URL</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

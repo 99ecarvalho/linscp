@@ -4856,6 +4856,10 @@ Localización: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Xerar URL/código da sesión...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Pegar o &amp;URL da sesión</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

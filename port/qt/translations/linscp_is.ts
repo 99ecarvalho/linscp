@@ -4856,6 +4856,10 @@ Staðsetning: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Framleiða lotuvefslóð/kóða…</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Líma &amp;lotuvefslóð</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4855,6 +4855,10 @@ Location: %2</source>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>ဆက်ရှင် URL/ကုဒ် ထုတ်ပါ(&amp;G)...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>ဆက်ရှင် URL ကူးထည့်ပါ(&amp;U)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

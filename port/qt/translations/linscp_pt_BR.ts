@@ -4856,6 +4856,10 @@ Local: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Gerar URL/Código da Sessão...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Colar &amp;URL da Sessão</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

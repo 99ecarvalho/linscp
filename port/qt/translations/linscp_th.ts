@@ -4855,6 +4855,10 @@ Location: %2</source>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;สร้าง URL/โค้ดของเซสชัน...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>วาง &amp;URL ของเซสชัน</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

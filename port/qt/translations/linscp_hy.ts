@@ -4856,6 +4856,10 @@ Location: %2</source>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Ստեղծել աշխատաշրջանի URL/կոդ...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Տեղադրել աշխատաշրջանի &amp;URL</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4856,6 +4856,10 @@ Plats: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Skapa sessions-URL/kod...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Klistra in sessions-&amp;URL</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

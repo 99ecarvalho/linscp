@@ -4856,6 +4856,10 @@ Location: %2</source>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Генериране на URL/код на сесията...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Поставяне на &amp;URL на сесия</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

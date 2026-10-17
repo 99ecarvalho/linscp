@@ -4856,6 +4856,10 @@ Percorso: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Genera URL sessione/codice...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Incolla &amp;URL sessione</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

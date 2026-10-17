@@ -4855,6 +4855,10 @@ Location: %2</source>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>セッション URL/コードの生成(&amp;G)...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>セッション URL を貼り付け(&amp;U)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

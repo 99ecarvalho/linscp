@@ -654,6 +654,27 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
       Dialog.SetDefaults(false);
       Check(CoreBridge::NewSite().UserName == OriginalUser.toStdString(), "and set back");
     }
+    // A16: a URL in the host name parsed on leaving it; A6: Paste Session URL.
+    {
+      SiteManager Dialog(&Window);
+      Dialog.SelectNewSite();
+      Dialog.HostName()->setText(QStringLiteral("ftp://joe@example.com:2121/pub/"));
+      Dialog.ParseHostName();
+      Check((Dialog.Protocol()->currentText() == QStringLiteral("FTP")) && (Dialog.HostName()->text() == QStringLiteral("example.com")) &&
+        (Dialog.Port()->value() == 2121) && (Dialog.UserName()->text() == QStringLiteral("joe")), "a URL in the host name, parsed");
+      Dialog.HostName()->setText(QStringLiteral("plain.example.com"));
+      Dialog.ParseHostName();
+      Check((Dialog.HostName()->text() == QStringLiteral("plain.example.com")) && (Dialog.Port()->value() == 2121),
+        "a host name alone, left");
+      Dialog.SelectSite(QStringLiteral("Tests/rclone"));
+      QGuiApplication::clipboard()->setText(QStringLiteral("scp://ann@host.example:2222/"));
+      Dialog.PasteUrl();
+      Check((Dialog.Tree()->currentItem() == Dialog.Tree()->topLevelItem(0)) && (Dialog.Protocol()->currentText() == QStringLiteral("SCP")) &&
+        (Dialog.HostName()->text() == QStringLiteral("host.example")) && (Dialog.UserName()->text() == QStringLiteral("ann")) &&
+        (Dialog.Port()->value() == 2222), "Paste Session URL, into the new site");
+      Check(Dialog.SelectSite(QStringLiteral("Tests/rclone")) && (Dialog.HostName()->text() == QStringLiteral("127.0.0.1")),
+        "the stored site untouched");
+    }
     // A4/A11: Manage's menu, the tree's context menu, per item; A5: Clone to
     // New Site; Reset; Generate Session URL/Code for a site.
     {

@@ -4856,6 +4856,10 @@ Location: %2</source>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>Δη&amp;μιουργία URL/κώδικα συνεδρίας...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Επικόλληση &amp;URL συνεδρίας</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

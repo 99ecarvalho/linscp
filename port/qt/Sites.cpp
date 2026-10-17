@@ -693,6 +693,64 @@ void SaveSite(const TSite & Site, const std::string & BaseName)
   }
 }
 
+// As TLoginDialog::DoParseUrl.
+static void ParseLoginUrl(TSessionData * Data, const UnicodeString & Url, int & ParsedInfo)
+{
+  Data->ParseUrl(Url, NULL, NULL, ParsedInfo, NULL, NULL, pufPreferProtocol);
+  Data->RequireDirectories = false;
+}
+
+TSite ParseSiteUrl(const TSite & Site, const std::string & Url, bool & Unsafe)
+{
+  try
+  {
+    std::unique_ptr<TSessionData> Data(SessionDataOf(Site, Site.Name));
+    const UnicodeString Text = FromUtf8(Url);
+    Unsafe = false;
+    // Otherwise the colons would be taken for the URL's.
+    if (IsIPv6Literal(Text))
+    {
+      Data->HostName = HasIP6LiteralBrackets(Text) ? StripIP6LiteralBrackets(Text) : Text;
+    }
+    else
+    {
+      int ParsedInfo = 0;
+      ParseLoginUrl(Data.get(), Text, ParsedInfo);
+      Unsafe = FLAGSET(ParsedInfo, piUnsafeSettings);
+    }
+    TSite Result = SiteOf(Data.get());
+    Result.Name = Site.Name;
+    return Result;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+bool HostNameIsUrl(const std::string & HostName)
+{
+  try
+  {
+    const UnicodeString Text = FromUtf8(HostName).Trim();
+    if (Text.IsEmpty())
+    {
+      return false;
+    }
+    std::unique_ptr<TSessionData> Parsed(new TSessionData(EmptyStr));
+    int ParsedInfo = 0;
+    ParseLoginUrl(Parsed.get(), Text, ParsedInfo);
+    std::unique_ptr<TSessionData> Plain(new TSessionData(EmptyStr));
+    Plain->HostName = Text;
+    // Has the legacy HostName parsing intervened?
+    return (Plain->HostName != Text) || !Parsed->IsSameDecrypted(Plain.get());
+  }
+  catch (Exception &)
+  {
+    return false;
+  }
+}
+
 std::string UniqueSiteName(const std::string & Name)
 {
   std::unique_ptr<TSessionData> Data(new TSessionData(FromUtf8(Name)));

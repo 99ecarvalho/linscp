@@ -31,6 +31,8 @@
 #include "CleanupDialog.h"
 #include "CustomCommandDialog.h"
 #include "GenerateUrlDialog.h"
+#include <QClipboard>
+#include <QGuiApplication>
 #include <QMenu>
 #include <QToolButton>
 
@@ -134,6 +136,7 @@ SiteManager::SiteManager(QWidget * Parent) :
   Form->addRow(FEncryptionLabel, FEncryption);
   FHostName = new QLineEdit(FormPanel);
   Form->addRow(tr("&Host name:"), FHostName);
+  connect(FHostName, &QLineEdit::editingFinished, this, &SiteManager::ParseHostName);
   FPort = new QSpinBox(FormPanel);
   FPort->setRange(1, 65535);
   Form->addRow(tr("Po&rt number:"), FPort);
@@ -765,6 +768,7 @@ void SiteManager::FillManageMenu(QMenu * Menu)
   {
     Menu->addAction(tr("Save &As..."), this, [this]() { SaveAsDialog(true); });
     Menu->addAction(tr("&Reset"), this, &SiteManager::ResetNewSite);
+    Menu->addAction(tr("Paste Session &URL"), QKeySequence(Qt::CTRL | Qt::Key_V), this, &SiteManager::PasteUrl);
   }
   else
   {
@@ -814,6 +818,71 @@ void SiteManager::CloneToNewSite()
   FHostName->setFocus();
 }
 
+bool SiteManager::ParseUrl(const QString & Url)
+{
+  try
+  {
+    bool Unsafe = false;
+    const CoreBridge::TSite Site = CoreBridge::ParseSiteUrl(Edited(), Url.toStdString(), Unsafe);
+    if (Unsafe)
+    {
+      CoreBridge::TQuery Query;
+      Query.Type = CoreBridge::TQueryType::Confirmation;
+      Query.Message = CoreBridge::Text(CoreBridge::TText::UnsafeSession);
+      CoreBridge::TQueryButton OK;
+      OK.Answer = CoreBridge::AnswerOK;
+      OK.Caption = "OK";
+      CoreBridge::TQueryButton Cancel;
+      Cancel.Answer = CoreBridge::AnswerCancel;
+      Cancel.Caption = "Cancel";
+      Query.Buttons = { OK, Cancel };
+      Query.CancelAnswer = CoreBridge::AnswerCancel;
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      if (Frontend.Query(Query).Answer != CoreBridge::AnswerOK)
+      {
+        return false;
+      }
+    }
+    Load(Site);
+    UpdateButtons();
+    return true;
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+}
+
+// As PasteUrlActionExecute.
+void SiteManager::PasteUrl()
+{
+  const QString Url = QGuiApplication::clipboard()->text().trimmed();
+  if (Url.isEmpty())
+  {
+    return;
+  }
+  const QTreeWidgetItem * Item = FTree->currentItem();
+  if ((Item == nullptr) || (Item->data(0, KindRole).toInt() != NewSiteKind))
+  {
+    SelectNewSite();
+  }
+  ParseUrl(Url);
+  // Shown: the host name pasted.
+  FHostName->setFocus();
+  FHostName->selectAll();
+}
+
+void SiteManager::ParseHostName()
+{
+  const QString HostName = FHostName->text().trimmed();
+  if (!FLoading && CoreBridge::HostNameIsUrl(HostName.toStdString()))
+  {
+    ParseUrl(HostName);
+  }
+}
+
 // As ResetNewSessionActionExecute.
 void SiteManager::ResetNewSite()
 {
@@ -850,6 +919,12 @@ bool SiteManager::OpenInPutty()
 
 void SiteManager::accept()
 {
+  // As upstream, before saving or logging in: leaving the host name may
+  // not have parsed it.
+  if (SelectedWorkspace().isEmpty())
+  {
+    ParseHostName();
+  }
   if (!SelectedWorkspace().isEmpty() || VerifyKey())
   {
     QDialog::accept();
@@ -919,6 +994,7 @@ void SiteManager::Save()
 // with the site's own name for a stored site (Save As).
 void SiteManager::SaveAsDialog(bool Force)
 {
+  ParseHostName();
   const QString Name = SelectedName();
   if (!Force)
   {

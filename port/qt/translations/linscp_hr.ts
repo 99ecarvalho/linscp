@@ -4857,6 +4857,10 @@ Lokacija: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Stvori &gt;URSl sesije/koda...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Zalijepi &amp;URL sesije</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

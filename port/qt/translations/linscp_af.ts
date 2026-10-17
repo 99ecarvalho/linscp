@@ -4856,6 +4856,10 @@ Ligging: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Genereer sessie-URL/kode...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Plak sessie-&amp;URL</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

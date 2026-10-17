@@ -4855,6 +4855,10 @@ Lokasi: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Buat URL/Kode Sesi...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Tempelkan &amp;URL Sesi</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

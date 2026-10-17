@@ -4857,6 +4857,10 @@ Umístění: %2</translation>
         <source>&amp;Generate Session URL/Code...</source>
         <translation>&amp;Generovat URL/kód spojení...</translation>
     </message>
+    <message>
+        <source>Paste Session &amp;URL</source>
+        <translation>Vložit URL &amp;spojení</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>
