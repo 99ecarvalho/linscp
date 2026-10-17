@@ -11,14 +11,14 @@ Last updated: **2026-10-17**
 
 | Area | Done | Total |
 |---|---|---|
-| A. Site Manager | 13 | 17 |
+| A. Site Manager | 15 | 17 |
 | B. Password prompt and banner | 1 | 3 |
 | C. Progress and synchronization dialogs | 2 | 4 |
 | D. Main window | 1 | 9 |
 | E. Preferences | 0 | 10 |
 | F. Command line | 0 | 3 |
 | G. Known before | 0 | 1 |
-| **Total** | **17** | **47** |
+| **Total** | **19** | **47** |
 
 ## Items
 
@@ -31,7 +31,7 @@ Last updated: **2026-10-17**
 | A5 | Clone to New Site | Medium | done | 2026-10-17. The name made unique for Save (`CoreBridge::UniqueSiteName`); ctest `qt_gui_sites` |
 | A6 | Paste Session URL | Medium | done | 2026-10-17. In the new site's Manage menu (Ctrl+V), `CoreBridge::ParseSiteUrl`; ctest `qt_gui_sites` |
 | A7 | Transfer Settings Rule... | Low | todo | |
-| A8 | Tools: Run Pageant/PuTTYgen, Import/Export Configuration, Preferences, Check for Updates, About | Medium | todo | |
+| A8 | Tools: Run Pageant/PuTTYgen, Import/Export Configuration, Preferences, Check for Updates, About | Medium | done | 2026-10-17. `SiteManager::FindTool`, `RunTool`, `ExportConfiguration`, `ImportConfiguration` (restarts with the same /ini); the main window's dialogs through `OnPreferences`, `OnCheckForUpdates`, `OnAbout`; ctest `qt_gui_sites` |
 | A9 | Login drop-down: Open in PuTTY | Low | todo | Open in PuTTY is in Manage's menu (A4); the Login button's drop-down is left |
 | A10 | Site search (three modes, Find Site) | High | done | 2026-10-17. Typed in the tree, Tab/Shift+Tab, Escape, Backspace; Search in the Manage menus; `Interface\LoginDialog\SiteSearch`; the tree's Delete and F2 keys, and the actions' keys (Ctrl+F, Ctrl+P, Ctrl+V, Alt+A); ctest `qt_gui_sites` |
 | A11 | Tree context menus | High | done | 2026-10-17. Manage's menu (A4); ctest `qt_gui_sites` |
@@ -40,7 +40,7 @@ Last updated: **2026-10-17**
 | A14 | Site color icons in the tree | Low | done | 2026-10-17. A swatch over the site icon's corner; ctest `qt_gui_sites` |
 | A15 | Note shown on the form | Low | done | 2026-10-17. Read-only, shown when the site has one; ctest `qt_gui_sites` |
 | A16 | Host name URL parsing | Medium | done | 2026-10-17. On leaving the field and before Save and Login, `CoreBridge::HostNameIsUrl`; ctest `qt_gui_sites` |
-| A17 | Advanced drop-down: Global Preferences > Logging | Low | todo | |
+| A17 | Advanced drop-down: Global Preferences > Logging | Low | done | 2026-10-17. Through `OnPreferences`; ctest `qt_gui_sites` |
 | B1 | Prompt: change stored password, remember for this session | High | done | 2026-10-17. Offered as TAuthenticateForm::PromptUser offers them; ctest `qt_gui_sites` (a refused stored password replaced; remember offered with the global option off) |
 | B2 | Banner: Use Monospaced Font | Low | todo | |
 | B3 | Banner: clickable links, Open Link | Low | todo | |

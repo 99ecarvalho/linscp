@@ -4877,6 +4877,38 @@ Umístění: %2</translation>
         <source>Note</source>
         <translation>Poznámka</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>P&amp;rotokolování</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Importovat/&amp;Obnovit konfiguraci...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Exportovat/Zálohovat konfiguraci...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>&amp;Spustit Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Spustit PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Zjištění &amp;nové verze</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Předvolby...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;O programu...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

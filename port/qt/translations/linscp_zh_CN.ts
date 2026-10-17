@@ -4875,6 +4875,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>提示</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>日志</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>导入/恢复配置(&amp;C)...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>导出/备份配置(&amp;E)...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>运行Pageant(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>运行PuTTYgen(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>检查更新(&amp;U)</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>选项(&amp;P)...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>关于(&amp;B)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

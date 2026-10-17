@@ -4876,6 +4876,38 @@ Percorso: %2</translation>
         <source>Note</source>
         <translation>Nota</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>Creazione registro...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Importa (ripristina) &amp;configurazione...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Esporta (backup) configurazione...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Esegui &amp;Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Esegui PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Verifica aggiornamenti</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>Im&amp;postazioni...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>Informazioni...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4876,6 +4876,38 @@ Ort: %2</translation>
         <source>Note</source>
         <translation>Hinweis</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>Protoko&amp;ll …</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>&amp;Konfiguration importieren/wiederherstellen …</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Konfiguration exportieren/sichern …</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>&amp;Pageant ausführen</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>PuTTY&amp;gen ausführen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Nach &amp;Aktualisierungen suchen</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Einstellungen …</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;Über …</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

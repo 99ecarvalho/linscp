@@ -4876,6 +4876,38 @@ Vendndodhja: %2</translation>
         <source>Note</source>
         <translation>Shënim</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>Re&amp;gjistrimi...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Importo/&amp;rikthe konfigurimin...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Eksporto/ruaj kopje të konfigurimit...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Ekzekuto Pagea&amp;nt</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Ekzekuto PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>&amp;Kontrollo për përditësime</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Preferencat...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>Rre&amp;th...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

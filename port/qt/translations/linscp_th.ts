@@ -4875,6 +4875,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>หมายเหตุ</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>กำลังเข้าสู่ระบบ...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>นำเข้า/คืนค่าการตั้งค่า...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>ส่งออก/สำรองการตั้งค่า...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>เรียกใช้ Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>เรียกใช้ PuTTYgen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>ตรวจหาการอัพเดท</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;ตั้งค่า...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>เกี่ยวกับ</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4876,6 +4876,38 @@ Locatie: %2</translation>
         <source>Note</source>
         <translation>Notitie</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Loggen...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Importeer/Herstel &amp;configuratie...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Exporteer/Backup configuratie...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>&amp;Pageant starten</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>PuTTY&amp;gen starten</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Controleren op &amp;updates</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Voorkeuren...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;Over...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

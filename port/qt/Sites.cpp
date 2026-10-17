@@ -751,6 +751,35 @@ bool HostNameIsUrl(const std::string & HostName)
   }
 }
 
+std::string ConfigurationExportPath()
+{
+  return Utf8(Configuration->GetDefaultIniFileExportPath());
+}
+
+void ExportConfiguration(const std::string & FileName)
+{
+  try
+  {
+    Configuration->Export(FromUtf8(FileName));
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+void ImportConfiguration(const std::string & FileName)
+{
+  try
+  {
+    Configuration->Import(FromUtf8(FileName));
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 std::string UniqueSiteName(const std::string & Name)
 {
   std::unique_ptr<TSessionData> Data(new TSessionData(FromUtf8(Name)));

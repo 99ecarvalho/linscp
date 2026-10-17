@@ -4877,6 +4877,38 @@ Atrašanās vieta: %2</translation>
         <source>Note</source>
         <translation>Piezīme</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>Žurnalē&amp;šana...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Importēt/&amp;atjaunot konfigurāciju...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Eksportēt/dublēt konfigurāciju...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Palaist Pagea&amp;nt</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Palaist PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Pārbaudīt &amp;atjauninājumus</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Iestatījumi...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>P&amp;ar...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4876,6 +4876,38 @@ Plassering: %2</translation>
         <source>Note</source>
         <translation>Merknad</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Logging...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Importer/gjenopprett &amp;konfigurasjon</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>Eksporter/sikkerhetskopier konfigurasjon</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Kjør &amp;Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Kjør PUTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Se etter o&amp;ppdateringer</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Innstillinger...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;Om</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

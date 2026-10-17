@@ -9,6 +9,7 @@
 
 #include <QDialog>
 
+#include <functional>
 #include <optional>
 
 #include <functional>
@@ -146,6 +147,25 @@ public:
   // Open in PuTTY, the site as edited.
   bool OpenInPutty();
 
+  // What the main window gives: Tools > Preferences (and Advanced's Global
+  // Preferences > Logging, its page), Check for Updates, About; not in the
+  // menus without.
+  std::function<void(const QString & Page)> OnPreferences;
+  std::function<void()> OnCheckForUpdates;
+  std::function<void()> OnAbout;
+  // After Import/Restore Configuration: this application started again
+  // (with its /ini), this one quit; tests replace it.
+  std::function<void()> RestartApplication;
+  // Tools > Run Pageant, Run PuTTYgen, as FindTool: next to linscp, in its
+  // PuTTY folder, or on the PATH; empty when none.
+  static QString FindTool(const QString & Name);
+  bool RunTool(const QString & Name);
+  // Tools > Export/Backup Configuration (to FileName, else asked) and
+  // Import/Restore Configuration (after asking, unless FileName is given).
+  bool ExportConfiguration(const QString * FileName = nullptr);
+  bool ImportConfiguration(const QString * FileName = nullptr);
+  QMenu * ToolsMenu() const { return FToolsMenu; }
+
   // Tools > Desktop Icon, and Explorer's 'Send To' Shortcut (SendTo,
   // Windows): the selected site's, folder's or workspace's, after asking.
   bool CreateSessionShortcut(bool SendTo);
@@ -186,6 +206,7 @@ private:
   QPushButton * FDelete = nullptr;
   QPushButton * FNewFolder = nullptr;
   QPushButton * FManage = nullptr;
+  QMenu * FToolsMenu = nullptr;
   bool eventFilter(QObject * Watched, QEvent * Event) override;
   class QTreeWidgetItem * SearchSite(const QString & Text, bool AllowExpanding, bool SkipCurrent, bool Reverse);
   bool SiteMatches(const QTreeWidgetItem * Item, const QString & Text) const;

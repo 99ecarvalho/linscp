@@ -4876,6 +4876,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>टिप्पणी</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>लॉगिंग(&amp;L)...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>कॉन्फ़िगरेशन आयात/पुनर्स्थापित करें(&amp;R)...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>कॉन्फ़िगरेशन निर्यात/बैकअप करें(&amp;E)...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Pageant चलाएँ(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>PuTTYgen चलाएँ(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>अपडेट की जाँच करें(&amp;U)</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>वरीयताएँ(&amp;P)...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>परिचय(&amp;B)...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

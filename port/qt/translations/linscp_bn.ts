@@ -4876,6 +4876,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>নোট</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>লগিং(&amp;L)...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>কনফিগারেশন ইমপোর্ট/পুনরুদ্ধার(&amp;R)...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>কনফিগারেশন এক্সপোর্ট/ব্যাকআপ(&amp;E)...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Pageant চালান(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>PuTTYgen চালান(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>আপডেট পরীক্ষা করুন(&amp;U)</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>পছন্দসমূহ(&amp;P)...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>সম্পর্কে(&amp;B)...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

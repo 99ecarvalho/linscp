@@ -4876,6 +4876,38 @@ Staðsetning: %2</translation>
         <source>Note</source>
         <translation>Athugasemd</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Atburðaskráandi…</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Flytja inn/Endurheimta &amp;stillingu…</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Flytja út/Öryggisafrita stillingu…</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Keyra &amp;Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Keyra PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Athuga eftir &amp;uppfærslum</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Kjörstillingar</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;Um…</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

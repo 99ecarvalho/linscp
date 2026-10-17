@@ -1497,6 +1497,9 @@ bool MainWindow::SiteManagerDialog()
     return false;
   }
   SiteManager Dialog(this);
+  Dialog.OnPreferences = [this](const QString & Page) { PreferencesDialog(Page); };
+  Dialog.OnCheckForUpdates = [this]() { CheckForUpdates(); };
+  Dialog.OnAbout = [this]() { About(); };
   if (Dialog.exec() != QDialog::Accepted)
   {
     return false;

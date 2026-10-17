@@ -4877,6 +4877,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>Забелешка</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Логирање...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Увези/врати &amp;конфигурација...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Извези/зачувај конфигурација...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Стартувај &amp;Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Стартувај PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Провери дали има &amp;ажурирање</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Поставувања...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;За програмата...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

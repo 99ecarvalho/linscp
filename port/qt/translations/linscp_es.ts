@@ -4876,6 +4876,38 @@ Ruta: %2</translation>
         <source>Note</source>
         <translation>Notas</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Registro...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Importar/restaurar &amp;configuración...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Exportar/respaldar configuración...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Ejecutar &amp;Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Ejecutar PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Comprobar &amp;actualizaciones</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Opciones...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;Acerca de...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4876,6 +4876,38 @@ Asukoht: %2</translation>
         <source>Note</source>
         <translation>Märkus</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Logimine...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Impordi/&amp;taasta seadistus...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Ekspordi/varunda seadistus...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Käivita Pagea&amp;nt</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Käivita PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>&amp;Otsi uuendusi</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Eelistused...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>Tea&amp;ve...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

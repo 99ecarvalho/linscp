@@ -1118,6 +1118,11 @@ enum class TText
   SetDefaultSiteSettings, // "Set current session settings as default?" (unformatted)
   IncrementalSearchType, // "(start typing)"
   IncrementalSearchNext, // "(press Tab for next)"
+  ExecuteAppError,      // "Cannot execute '%s'."
+  ExportConfigurationTitle, // "Select file to export configuration to"
+  ImportConfigurationTitle, // "Select file to import configuration from"
+  ConfigurationFilter,  // "INI files (*.ini)|*.ini|All files (*.*)|*.*"
+  ImportConfiguration,  // "**Restore configuration from a backup?**..." (unformatted)
 };
 std::string Text(TText Text);
 // What synchronizing did, as TCustomScpExplorerForm::Synchronize's summary:
@@ -1897,6 +1902,13 @@ bool HostNameIsUrl(const std::string & HostName);
 // Name, or with " (n)" after it, as TNamedObject::MakeUniqueIn: no stored
 // site's.
 std::string UniqueSiteName(const std::string & Name);
+// The Login dialog's Tools > Export/Backup Configuration and
+// Import/Restore Configuration (TConfiguration::Export, Import): the
+// preferences and sites to an INI file, or from one into the storage in
+// use (the application then restarted); where the export goes by default.
+std::string ConfigurationExportPath();
+void ExportConfiguration(const std::string & FileName);
+void ImportConfiguration(const std::string & FileName);
 // The Login dialog's Set Defaults: Site as the new sites' settings
 // (StoredSessions->DefaultSettings), stored.
 void SaveDefaultSite(const TSite & Site);

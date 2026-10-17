@@ -4876,6 +4876,38 @@ Localización: %2</translation>
         <source>Note</source>
         <translation>Nota</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Rexistro...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Importar/&amp;restaurar a configuración...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Exportar/copiar a configuración...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Executar Pagea&amp;nt</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Executar PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Buscar &amp;actualizacións</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Preferencias...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>Ac&amp;erca de...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

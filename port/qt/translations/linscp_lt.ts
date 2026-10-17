@@ -4877,6 +4877,38 @@ Vieta: %2</translation>
         <source>Note</source>
         <translation>Pastaba</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Registravimas...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Importuoti &amp;konfigūraciją...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Eksportuoti konfigūraciją...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Paleisti „&amp;Pageant“</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Paleisti „PuTTY&amp;gen“</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Tikrinti, ar yra atnaujinimų</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Nuostatos...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;Apie...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

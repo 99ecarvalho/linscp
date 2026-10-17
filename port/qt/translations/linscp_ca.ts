@@ -4876,6 +4876,38 @@ Ubicació: %2</translation>
         <source>Note</source>
         <translation>Nota</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Enregistrament...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Importa/&amp;Restaura configuració...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Exporta/Desa configuració...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Executa P&amp;ageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Executa P&amp;uTTYgen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>&amp;Comprova actualitzacions</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Preferències...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;Quant a...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

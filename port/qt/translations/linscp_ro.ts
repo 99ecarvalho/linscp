@@ -4877,6 +4877,38 @@ Cale: %2</translation>
         <source>Note</source>
         <translation>Informare</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>Jurna&amp;l Evenimente...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Importare/Restaurare &amp;Configurare</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Exportare/Creare Copie de Siguranță pentru Configurare</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Executare &amp;Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Executare PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>&amp;Verificare actualizări</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Preferințe...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;Despre...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

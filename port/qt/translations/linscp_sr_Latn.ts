@@ -4877,6 +4877,38 @@ Lokacija: %2</translation>
         <source>Note</source>
         <translation>Napomena</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Beleženje...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Uvezi/Vrati &amp;konfiguraciju...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Izvezi/Napravi rezervnu kopiju konfiguracije...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Pokreni &amp;Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Pokreni PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Proveri postojanje novije ver&amp;zije</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Podešavanja...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;O programu...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

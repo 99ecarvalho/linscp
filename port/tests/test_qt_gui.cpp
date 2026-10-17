@@ -654,6 +654,85 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
       Dialog.SetDefaults(false);
       Check(CoreBridge::NewSite().UserName == OriginalUser.toStdString(), "and set back");
     }
+    // A8: Tools' additions; A17: Advanced's Global Preferences > Logging.
+    {
+      SiteManager Dialog(&Window);
+      auto Find = [](QMenu * Menu, const QString & Text) -> QAction *
+      {
+        for (QAction * Action : Menu->actions())
+        {
+          if (Action->text() == Text)
+          {
+            return Action;
+          }
+        }
+        return nullptr;
+      };
+      QMenu * Tools = Dialog.ToolsMenu();
+      emit Tools->aboutToShow();
+      Check((Find(Tools, QStringLiteral("Import/&Restore Configuration...")) != nullptr) &&
+        (Find(Tools, QStringLiteral("&Export/Backup Configuration...")) != nullptr) &&
+        (Find(Tools, QStringLiteral("Run Pagea&nt")) != nullptr) && (Find(Tools, QStringLiteral("Run PuTTY&gen")) != nullptr),
+        "Tools: configuration backup, Pageant and PuTTYgen");
+      Check(!Find(Tools, QStringLiteral("A&bout..."))->isVisible() && !Find(Tools, QStringLiteral("Check for &Updates"))->isVisible(),
+        "the main window's items only with the main window's");
+      QString Page;
+      bool AboutShown = false;
+      Dialog.OnPreferences = [&Page](const QString & Shown) { Page = Shown; };
+      Dialog.OnAbout = [&AboutShown]() { AboutShown = true; };
+      Dialog.OnCheckForUpdates = []() {};
+      emit Tools->aboutToShow();
+      Check(Find(Tools, QStringLiteral("A&bout..."))->isVisible() && Find(Tools, QStringLiteral("&Preferences..."))->isVisible(), "then shown");
+      Find(Tools, QStringLiteral("A&bout..."))->trigger();
+      Find(Tools, QStringLiteral("&Preferences..."))->trigger();
+      Check(AboutShown && Page.isEmpty(), "About, Preferences");
+      QMenu * Advanced = nullptr;
+      for (QToolButton * Button : Dialog.findChildren<QToolButton *>())
+      {
+        if (Button->text() == QStringLiteral("Ad&vanced..."))
+        {
+          Advanced = Button->menu();
+        }
+      }
+      Check((Advanced != nullptr) && (Find(Advanced, QStringLiteral("&Logging...")) != nullptr), "Advanced: Global Preferences > Logging");
+      if (Advanced != nullptr)
+      {
+        Find(Advanced, QStringLiteral("&Logging..."))->trigger();
+      }
+      Check(Page == QStringLiteral("Logging"), "the preferences' Logging page");
+#if !defined(_WIN32)
+      const QString ToolDir = QDir(Directory).filePath(QStringLiteral("tools"));
+      QDir().mkpath(ToolDir);
+      QFile Tool(QDir(ToolDir).filePath(QStringLiteral("pageant")));
+      Tool.open(QIODevice::WriteOnly);
+      Tool.write("#!/bin/sh\n");
+      Tool.close();
+      Tool.setPermissions(Tool.permissions() | QFileDevice::ExeOwner);
+      const QByteArray OldPath = qgetenv("PATH");
+      qputenv("PATH", ToolDir.toLocal8Bit() + ":" + OldPath);
+      Check(SiteManager::FindTool(QStringLiteral("pageant")) == Tool.fileName(), "Pageant found on the PATH");
+      qputenv("PATH", OldPath);
+#endif
+      Check(SiteManager::FindTool(QStringLiteral("linscp-no-such-tool")).isEmpty(), "none, when nowhere");
+      // Export, then import back.
+      Dialog.SelectNewSite();
+      Dialog.HostName()->setText(QStringLiteral("backup.example"));
+      Check(Dialog.SaveAs(QStringLiteral("backedup"), false), "(a site in the backup)");
+      const QString Backup = QDir(Directory).filePath(QStringLiteral("backup.ini"));
+      Check(Dialog.ExportConfiguration(&Backup) && QFile::exists(Backup), "Export/Backup Configuration writes the file");
+      QFile BackupFile(Backup);
+      BackupFile.open(QIODevice::ReadOnly);
+      Check(BackupFile.readAll().contains("backup.example"), "with the sites");
+      BackupFile.close();
+      Dialog.SelectSite(QStringLiteral("backedup"));
+      Dialog.DeleteSelected(false);
+      Check(!CoreBridge::SiteExists("backedup"), "(the site deleted)");
+      bool Restarted = false;
+      Dialog.RestartApplication = [&Restarted]() { Restarted = true; };
+      Check(Dialog.ImportConfiguration(&Backup) && Restarted && CoreBridge::SiteExists("backedup") && CoreBridge::SiteExists("Tests/rclone"),
+        "Import/Restore Configuration: the sites back, the application restarted");
+      CoreBridge::DeleteSite("backedup");
+    }
     // A10: the site search, typed in the tree; Tab for the next match; its
     // three modes.
     {

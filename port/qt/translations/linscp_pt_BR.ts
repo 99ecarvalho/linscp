@@ -4876,6 +4876,38 @@ Local: %2</translation>
         <source>Note</source>
         <translation>Nota</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Logando...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Importar/Restaurar &amp;Configuração</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Exportar/Backup Configuração...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>&amp;Rodar Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Rodar PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Verificar por at&amp;ualizações</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Preferências...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>So&amp;bre...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4875,6 +4875,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>노트</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>로그(&amp;L)...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>구성 가져오기(&amp;C)...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>구성 내보내기(&amp;E)...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Pageant 실행(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Puttygen 실행(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>업데이트 검사(&amp;U)</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>설정(&amp;P)...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>정보(&amp;B)...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

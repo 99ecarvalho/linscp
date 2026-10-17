@@ -4876,6 +4876,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>குறிப்பு</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;பதிவு...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>இறக்குமதி/மீட்டமை &amp;உள்ளமைவு...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;ஏற்றுமதி/காப்புப்பிரதி உள்ளமைவு...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>&amp;அணிவகுப்பு இயக்கு</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>புட்டி&amp;உரு இயக்கு</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>புதுப்பிப்புகளை சரிபார்</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;விருப்பத்தேர்வுகள்...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>பற்றி...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

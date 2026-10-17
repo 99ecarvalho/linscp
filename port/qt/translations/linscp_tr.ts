@@ -4875,6 +4875,38 @@ Konum: %2</translation>
         <source>Note</source>
         <translation>Not</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>Gün&amp;lük kaydı...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>A&amp;yarları içe aktar/geri yükle...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>Ayarları &amp;dışa aktar/yedekle...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>&amp;Pageant çalıştır</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>PuTTY&amp;gen çalıştır</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Güncelleme &amp;denetimi</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>Aya&amp;rlar...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;Hakkında...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

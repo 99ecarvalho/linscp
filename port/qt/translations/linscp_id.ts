@@ -4875,6 +4875,38 @@ Lokasi: %2</translation>
         <source>Note</source>
         <translation>Catatan</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Log...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>&amp;Konfigurasi Impor/Pemulihan</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>Konfigurasi &amp;Ekspor/Pencadangan</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Jalankan &amp;Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Jalankan PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Cek Pembar&amp;uan</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Preferensi...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>T&amp;entang...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

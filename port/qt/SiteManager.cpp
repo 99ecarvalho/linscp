@@ -30,11 +30,17 @@
 #include "ImportSitesDialog.h"
 #include "CleanupDialog.h"
 #include "ColorMenu.h"
+#include "PreferencesDialog.h"
 #include "CustomCommandDialog.h"
 #include "GenerateUrlDialog.h"
 #include <QActionGroup>
 #include <QApplication>
 #include <QClipboard>
+#include <QCoreApplication>
+#include <QDir>
+#include <QFileInfo>
+#include <QProcess>
+#include <QStandardPaths>
 #include <QGroupBox>
 #include <QPainter>
 #include <QPlainTextEdit>
@@ -55,6 +61,20 @@ using TEncryption = CoreBridge::TSite::TEncryption;
 // its name; "New Site" neither.
 enum { NameRole = Qt::UserRole, KindRole };
 enum TKind { NewSiteKind, FolderKind, SiteKind, WorkspaceKind };
+
+// The VCL's filter ("INI files (*.ini)|*.ini|All files (*.*)|*.*") as Qt's.
+QString QtFilter(const QString & Filter)
+{
+  const QStringList Parts = Filter.split(QLatin1Char('|'));
+  QStringList Result;
+  for (int Index = 0; Index + 1 < Parts.size(); Index += 2)
+  {
+    const QString Name = Parts[Index];
+    const QString Masks = QString(Parts[Index + 1]).replace(QLatin1Char(';'), QLatin1Char(' '));
+    Result.append(Name.contains(QLatin1Char('(')) ? Name : QStringLiteral("%1 (%2)").arg(Name, Masks));
+  }
+  return Result.join(QStringLiteral(";;"));
+}
 
 QString CoreText(CoreBridge::TText Text)
 {
@@ -250,6 +270,16 @@ SiteManager::SiteManager(QWidget * Parent) :
   QMenu * AdvancedMenu = new QMenu(FAdvanced);
   AdvancedMenu->addAction(tr("A&dvanced..."), this, &SiteManager::Advanced);
   AdvancedMenu->addAction(tr("Edit &Raw Settings..."), this, [this]() { RawSettings(); });
+  // Global Preferences.
+  AdvancedMenu->addSeparator();
+  QAction * Logging = AdvancedMenu->addAction(tr("&Logging..."), this, [this]()
+  {
+    if (OnPreferences)
+    {
+      OnPreferences(::PreferencesDialog::tr("Logging"));
+    }
+  });
+  connect(AdvancedMenu, &QMenu::aboutToShow, this, [this, Logging]() { Logging->setVisible(bool(OnPreferences)); });
   FAdvanced->setMenu(AdvancedMenu);
   connect(FAdvanced, &QToolButton::clicked, this, &SiteManager::Advanced);
   QHBoxLayout * AdvancedRow = new QHBoxLayout();
@@ -291,17 +321,35 @@ SiteManager::SiteManager(QWidget * Parent) :
   // As upstream's Login: Tools, its menu.
   QPushButton * Tools = Box->addButton(tr("&Tools"), QDialogButtonBox::ResetRole);
   QMenu * ToolsMenu = new QMenu(Tools);
+  FToolsMenu = ToolsMenu;
   ToolsMenu->addAction(tr("&Import Sites..."), this, [this]() { ImportSites(); });
   ToolsMenu->addSeparator();
+  ToolsMenu->addAction(tr("Import/&Restore Configuration..."), this, [this]() { ImportConfiguration(); });
+  ToolsMenu->addAction(tr("&Export/Backup Configuration..."), this, [this]() { ExportConfiguration(); });
   ToolsMenu->addAction(tr("&Clean Up..."), this, [this]() { Cleanup(); });
+  ToolsMenu->addSeparator();
+  QAction * Pageant = ToolsMenu->addAction(tr("Run Pagea&nt"), this, [this]() { RunTool(QStringLiteral("pageant")); });
+  QAction * Puttygen = ToolsMenu->addAction(tr("Run PuTTY&gen"), this, [this]() { RunTool(QStringLiteral("puttygen")); });
+  QAction * ToolsSeparator = ToolsMenu->addSeparator();
+  QAction * CheckForUpdates = ToolsMenu->addAction(tr("Check for &Updates"), this, [this]() { if (OnCheckForUpdates) { OnCheckForUpdates(); } });
+  QAction * ToolsSeparator2 = ToolsMenu->addSeparator();
+  QAction * Preferences = ToolsMenu->addAction(tr("&Preferences..."), this, [this]() { if (OnPreferences) { OnPreferences(QString()); } });
+  QAction * About = ToolsMenu->addAction(tr("A&bout..."), this, [this]() { if (OnAbout) { OnAbout(); } });
   // As Manage's DesktopIconAction and SendToHookAction.
   ToolsMenu->addSeparator();
   FDesktopIconAction = ToolsMenu->addAction(tr("Desktop &Icon"), this, [this]() { CreateSessionShortcut(false); });
 #if defined(Q_OS_WIN)
   FSendToAction = ToolsMenu->addAction(tr("Explorer's 'Send To' Shortcut"), this, [this]() { CreateSessionShortcut(true); });
 #endif
-  connect(ToolsMenu, &QMenu::aboutToShow, this, [this]()
+  connect(ToolsMenu, &QMenu::aboutToShow, this, [=, this]()
   {
+    Pageant->setEnabled(!FindTool(QStringLiteral("pageant")).isEmpty());
+    Puttygen->setEnabled(!FindTool(QStringLiteral("puttygen")).isEmpty());
+    CheckForUpdates->setVisible(bool(OnCheckForUpdates));
+    ToolsSeparator->setVisible(bool(OnCheckForUpdates));
+    ToolsSeparator2->setVisible(bool(OnPreferences) || bool(OnAbout));
+    Preferences->setVisible(bool(OnPreferences));
+    About->setVisible(bool(OnAbout));
     const QTreeWidgetItem * Item = FTree->currentItem();
     const int Kind = (Item != nullptr) ? Item->data(0, KindRole).toInt() : NewSiteKind;
     FDesktopIconAction->setEnabled((Kind == SiteKind) || (Kind == FolderKind) || (Kind == WorkspaceKind));
@@ -1299,6 +1347,125 @@ bool SiteManager::eventFilter(QObject * Watched, QEvent * Event)
     }
   }
   return QDialog::eventFilter(Watched, Event);
+}
+
+QString SiteManager::FindTool(const QString & Name)
+{
+#if defined(Q_OS_WIN)
+  const QString File = Name + QStringLiteral(".exe");
+#else
+  const QString File = Name;
+#endif
+  const QDir AppDir(QCoreApplication::applicationDirPath());
+  for (const QString & Path : { AppDir.filePath(File), AppDir.filePath(QStringLiteral("PuTTY/") + File) })
+  {
+    if (QFileInfo(Path).isExecutable())
+    {
+      return Path;
+    }
+  }
+  return QStandardPaths::findExecutable(File);
+}
+
+// As ExecuteTool.
+bool SiteManager::RunTool(const QString & Name)
+{
+  const QString Path = FindTool(Name);
+  if (Path.isEmpty() || !QProcess::startDetached(Path, {}))
+  {
+    ShowMessage(CoreBridge::TQueryType::Error, CoreText(CoreBridge::TText::ExecuteAppError, Path.isEmpty() ? Name : Path));
+    return false;
+  }
+  return true;
+}
+
+// As ExportActionExecute.
+bool SiteManager::ExportConfiguration(const QString * FileName)
+{
+  QString File = (FileName != nullptr) ? *FileName : QString();
+  if (FileName == nullptr)
+  {
+    File = QFileDialog::getSaveFileName(this, CoreText(CoreBridge::TText::ExportConfigurationTitle),
+      QString::fromStdString(CoreBridge::ConfigurationExportPath()), QtFilter(CoreText(CoreBridge::TText::ConfigurationFilter)));
+    if (File.isEmpty())
+    {
+      return false;
+    }
+  }
+  try
+  {
+    CoreBridge::ExportConfiguration(QDir::toNativeSeparators(File).toStdString());
+    return true;
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+}
+
+// As ImportActionExecute: asked first, as it overwrites the preferences
+// and sites; the application restarted with them.
+bool SiteManager::ImportConfiguration(const QString * FileName)
+{
+  QString File = (FileName != nullptr) ? *FileName : QString();
+  if (FileName == nullptr)
+  {
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Warning;
+    Query.Message = CoreBridge::Text(CoreBridge::TText::ImportConfiguration);
+    CoreBridge::TQueryButton OK;
+    OK.Answer = CoreBridge::AnswerOK;
+    OK.Caption = "OK";
+    CoreBridge::TQueryButton Cancel;
+    Cancel.Answer = CoreBridge::AnswerCancel;
+    Cancel.Caption = "Cancel";
+    Query.Buttons = { OK, Cancel };
+    Query.CancelAnswer = CoreBridge::AnswerCancel;
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    if (Frontend.Query(Query).Answer != CoreBridge::AnswerOK)
+    {
+      return false;
+    }
+    File = QFileDialog::getOpenFileName(this, CoreText(CoreBridge::TText::ImportConfigurationTitle),
+      QString::fromStdString(CoreBridge::ConfigurationExportPath()), QtFilter(CoreText(CoreBridge::TText::ConfigurationFilter)));
+    if (File.isEmpty())
+    {
+      return false;
+    }
+  }
+  // Before the sites go.
+  FTree->clear();
+  try
+  {
+    CoreBridge::ImportConfiguration(QDir::toNativeSeparators(File).toStdString());
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    Fill(QString());
+    return false;
+  }
+  if (RestartApplication)
+  {
+    RestartApplication();
+  }
+  else
+  {
+    // As ExecuteSelf, with the storage this run uses.
+    QStringList Arguments;
+    for (const QString & Argument : QCoreApplication::arguments().mid(1))
+    {
+      if (Argument.startsWith(QStringLiteral("/ini="), Qt::CaseInsensitive) || Argument.startsWith(QStringLiteral("-ini="), Qt::CaseInsensitive))
+      {
+        Arguments.append(Argument);
+      }
+    }
+    QProcess::startDetached(QCoreApplication::applicationFilePath(), Arguments);
+    QCoreApplication::quit();
+  }
+  return true;
 }
 
 // As TLoginDialog::CloneToNewSite.

@@ -4876,6 +4876,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>შენიშვნა</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>ჟურნა&amp;ლი...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>შემოტანის/აღდგენის &amp;მორგება...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;გატანის/მარქაფის მორგება...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>&amp;Pageant-ის გაშვება</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>PuTTY&amp;gen-ის გაშვება</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>განახლებების &amp;შემოწმება</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;გამართვა...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;შესახებ...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

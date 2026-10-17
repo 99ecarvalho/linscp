@@ -4876,6 +4876,38 @@ Sijainti: %2</translation>
         <source>Note</source>
         <translation>Huom</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>Loki...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Tuo/palauta asetukset...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>Vie/varmuuskopioi asetukset...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Käynnistä &amp;Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Käynnistä PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Tarkista &amp;päivitykset</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Asetukset...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>T&amp;ietoja</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

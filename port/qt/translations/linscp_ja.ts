@@ -4875,6 +4875,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>メモ</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>ログ(&amp;L)...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>設定のインポート/復元(&amp;C)...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>設定のエクスポート/バックアップ(&amp;E)...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Pageant を実行(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>PuTTYgen を実行(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>WinSCP の更新を確認</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>環境設定(&amp;P)...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>バージョン情報(&amp;A)...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

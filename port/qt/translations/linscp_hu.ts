@@ -4875,6 +4875,38 @@ Hely: %2</translation>
         <source>Note</source>
         <translation>Megjegyzés</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Naplózás...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Beállítások &amp;importálása/visszaállítása...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>Beállítások &amp;exportálása/mentése...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>&amp;Pageant indítása</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>PuTTY&amp;gen indítása</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>&amp;Frissítések keresése</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Beállítások...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;Névjegy</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

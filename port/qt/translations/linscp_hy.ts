@@ -4876,6 +4876,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>Նշում</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Մատյանավորում...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Ներմուծել/&amp;վերականգնել կազմաձևումը...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Արտահանել/պահուստավորել կազմաձևումը...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Գործարկել Pagea&amp;nt-ը</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Գործարկել PuTTY&amp;gen-ը</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Ստուգել &amp;թարմացումները</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>Նախ&amp;ընտրանքներ...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;Ծրագրի մասին...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4876,6 +4876,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>הערה</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;יומן...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>יבוא/&amp;שחזור תצורה...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>י&amp;צוא/גיבוי תצורה...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>הפעל את Pagea&amp;nt</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>הפעל את PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>&amp;בדוק עידכונים</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>ה&amp;עדפות...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;אודות</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

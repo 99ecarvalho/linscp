@@ -4875,6 +4875,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>یادداشت</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>در حال ورود...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>وارد/بازیابی تنظیمات...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>ذخیره/پشتیبان از تنظیمات...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>اجرا کردن Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>اجرا کردن PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>بررسی قابلیت به روز رسانی</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>تنظیمات...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>درباره</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4876,6 +4876,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>Σημείωση</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>Εισαγωγή...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Εισαγωγή/επανφορά ρυθμίσεων</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>Εξεγωγή/αντίγραφο ρυθμίσεων</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Εκτέλεση Pagea&amp;nt</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Εκτέλεση PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Ελεγξε για ενημερώσεις</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>Προτιμήσεις...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>Σχετικά</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

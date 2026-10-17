@@ -4875,6 +4875,38 @@ Vị trí: %2</translation>
         <source>Note</source>
         <translation>Ghi chú</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Ghi nhật ký...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Nhập/Khôi phục &amp;Cấu hình...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Xuất/Sao lưu cấu hình...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Chạy &amp;Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Chạy PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Kiểm tra &amp;cập nhật</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Cài đặt...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;Giới thiệu...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

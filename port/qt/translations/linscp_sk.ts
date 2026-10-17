@@ -4877,6 +4877,38 @@ Umiestnenie: %2</translation>
         <source>Note</source>
         <translation>Poznámka</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>Pri&amp;hlasovanie...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Importovať/obnoviť &amp;konfiguráciu...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Exportovať/zálohovať konfiguráciu...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Spustiť &amp;Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Spustiť PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Kontrola &amp;aktualizácií</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Nastavenia...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;O programe...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4876,6 +4876,38 @@ Lokasyon: %2</translation>
         <source>Note</source>
         <translation>Talaan</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>Pag-&amp;log...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>I-import/I-&amp;restore ang Configuration...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>I-&amp;export/I-backup ang Configuration...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Patakbuhin ang Pagea&amp;nt</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Patakbuhin ang PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Mag-Change ng mga &amp;Updates</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>Mga &amp;Kagustuhan...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;Tungkol Sa...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

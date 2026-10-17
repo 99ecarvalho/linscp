@@ -4877,6 +4877,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>Нататка</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Журнал...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Імпартаваць/Аднавіць &amp;канфігурацыю...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Экспартаваць/Захаваць канфігурацыю...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Запусціць &amp;Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Запусціць PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Праверыць &amp;абнаўленні</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Налады...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>П&amp;ра праграму...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

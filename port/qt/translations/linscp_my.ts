@@ -4875,6 +4875,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>မှတ်စု</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>မှတ်တမ်းတင်ခြင်း(&amp;L)...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>ဖွဲ့စည်းပုံ တင်သွင်း/ပြန်ယူပါ(&amp;R)...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>ဖွဲ့စည်းပုံ ထုတ်ယူ/အရန်သိမ်းပါ(&amp;E)...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Pageant ကို ဖွင့်ပါ(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>PuTTYgen ကို ဖွင့်ပါ(&amp;G)</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>အပ်ဒိတ်များ စစ်ဆေးပါ(&amp;U)</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>နှစ်သက်ရာရွေးချယ်မှုများ(&amp;P)...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>အကြောင်း(&amp;B)...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

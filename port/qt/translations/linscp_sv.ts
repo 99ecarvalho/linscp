@@ -4876,6 +4876,38 @@ Plats: %2</translation>
         <source>Note</source>
         <translation>Anteckning</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Loggning...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>Importera/Återställ &amp;konfiguration...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Exportera/Säkerhetskopiera konfiguration...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>Kör &amp;Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>Kör PuTTY&amp;gen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Sök efter &amp;uppdateringar</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Inställningar...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;Om...</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

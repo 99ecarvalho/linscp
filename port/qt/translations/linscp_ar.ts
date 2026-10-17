@@ -4880,6 +4880,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>الملاحظات</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>تسجيل الدخول...</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>استيراد/استعادة الاعدادات...</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>تصدير/تكوين النسخ الاحتياطي...</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>تشغيل &amp;Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>PuTTY&amp;تشغيل</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>التحقق من تحديثات</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>الخيارات...</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>...ح&amp;ول</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

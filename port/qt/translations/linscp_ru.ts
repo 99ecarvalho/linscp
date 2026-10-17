@@ -4877,6 +4877,38 @@ Location: %2</source>
         <source>Note</source>
         <translation>Заметка</translation>
     </message>
+    <message>
+        <source>&amp;Logging...</source>
+        <translation>&amp;Протоколирование…</translation>
+    </message>
+    <message>
+        <source>Import/&amp;Restore Configuration...</source>
+        <translation>&amp;Импорт/восстановление настроек…</translation>
+    </message>
+    <message>
+        <source>&amp;Export/Backup Configuration...</source>
+        <translation>&amp;Экспорт/сохранение настроек…</translation>
+    </message>
+    <message>
+        <source>Run Pagea&amp;nt</source>
+        <translation>&amp;Запустить Pageant</translation>
+    </message>
+    <message>
+        <source>Run PuTTY&amp;gen</source>
+        <translation>За&amp;пустить PuTTYgen</translation>
+    </message>
+    <message>
+        <source>Check for &amp;Updates</source>
+        <translation>Проверить обновления</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences...</source>
+        <translation>&amp;Настройки…</translation>
+    </message>
+    <message>
+        <source>A&amp;bout...</source>
+        <translation>&amp;О программе…</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>
