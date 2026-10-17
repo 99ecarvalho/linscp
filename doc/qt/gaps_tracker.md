@@ -15,10 +15,10 @@ Last updated: **2026-10-17**
 | B. Password prompt and banner | 3 | 3 |
 | C. Progress and synchronization dialogs | 4 | 4 |
 | D. Main window | 9 | 9 |
-| E. Preferences | 9 | 10 |
+| E. Preferences | 10 | 10 |
 | F. Command line | 2 | 3 |
 | G. Known before | 1 | 1 |
-| **Total** | **45** | **47** |
+| **Total** | **46** | **47** |
 
 ## Items
 
@@ -66,7 +66,7 @@ Last updated: **2026-10-17**
 | E7 | Internal editor: Disable smooth scrolling | Low | dropped | 2026-10-17. Not applicable: upstream's works around the Windows rich edit control's smooth scrolling; Qt's editor scrolls without animation |
 | E8 | Languages: Get more... | Low | done | 2026-10-17. linscp's translations page (doc/qt/translations.md) |
 | E9 | Drag & Drop: network drives for the fake-file drop | Low | done | 2026-10-17. With upstream's fallback it serves: without the extension running (or broken), each drive watched for the fake directory's copy (`DragExt::TCreationMonitor`, `MonitorRoots`: fixed drives, DDDrives' network ones, less "-X"); ctest `qt_gui_dragmonitor` (Wine; the VM was not reachable) |
-| E10 | Preferences search box | Low | todo | |
+| E10 | Preferences search box | Low | done | Results scroll instead of being cut at the group's bottom |
 | F1 | GUI: /log, /xmllog, /loglevel, /logsize | Medium | done | 2026-10-17. linscp-cli's `ApplyLogSwitches`, moved to FrontendCommon, at the GUI's initialization; ctest `qt_gui_logswitches` |
 | F2 | GUI: /synchronize, /edit, /refresh, /explore, /workspace, /rawtransfersettings, /privatekey, /help | Medium | done | 2026-10-17. /synchronize, /edit (the window hidden), /refresh (to the running instance; a path as core reads it, "/dir/"), download URLs (downloaded, or focused with /explore or /browse), /workspace (before a site of the same name), /rawtransfersettings and /privatekey for the run, /help (linscp-cli's usage). /Console= and /DotNet= not applicable: they record the wrappers' versions for WinSCP's update service; ctest `qt_gui_uploadswitch`, `qt_gui_sessioncommands`, `qt_gui_tabs`, `qt_gui_logswitches` |
 | F3 | CLI: /info, /batchsettings, /copyid, /fingerprintscan, /dumpcallstack, /h | Low | todo | |

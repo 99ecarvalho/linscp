@@ -3501,6 +3501,14 @@ Location: %2</source>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Να επιτρέπεται η απόθεση αρχείων σε αυτές τις &amp;μονάδες δικτύου:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Αναζήτηση</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>Δεν βρέθηκαν αποτελέσματα αναζήτησης.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

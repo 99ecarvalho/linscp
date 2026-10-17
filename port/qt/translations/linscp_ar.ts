@@ -3505,6 +3505,14 @@ Location: %2</source>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>السماح بإفلات الملفات على &amp;محركات الشبكة هذه:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>بحث</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>لم يتم العثور على نتائج بحث.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

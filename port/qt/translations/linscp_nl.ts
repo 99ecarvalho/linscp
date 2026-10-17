@@ -3501,6 +3501,14 @@ Locatie: %2</translation>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Toestaan bestanden plaatsen op &amp;netwerkschijven:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Zoeken</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>Geen zoekresultaten gevonden.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

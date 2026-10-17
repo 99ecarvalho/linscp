@@ -3500,6 +3500,14 @@ Location: %2</source>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>ネットワーク ドライブへのドロップを許可(&amp;N):</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>検索</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>見つかりませんでした。</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

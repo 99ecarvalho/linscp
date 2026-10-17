@@ -3502,6 +3502,14 @@ Location: %2</source>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Дозволи пуштање датотеки во овие &amp;мрежни дискови:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Пребарување</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>Нема пронајдени резултати.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

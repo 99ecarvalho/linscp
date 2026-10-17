@@ -3501,6 +3501,14 @@ Location: %2</source>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>ਇਹਨਾਂ ਨੈੱਟਵਰਕ ਡਰਾਈਵਾਂ ’ਤੇ ਫ਼ਾਈਲਾਂ ਸੁੱਟਣ ਦਿਓ(&amp;N):</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>ਖੋਜੋ</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>ਕੋਈ ਖੋਜ ਨਤੀਜਾ ਨਹੀਂ ਮਿਲਿਆ।</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

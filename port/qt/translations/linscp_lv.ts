@@ -3502,6 +3502,14 @@ Atrašanās vieta: %2</translation>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Atļaut nomest failus šajos &amp;tīkla diskos:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Meklēt</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>Meklēšanas rezultāti netika atrasti.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

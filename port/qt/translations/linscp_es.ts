@@ -3501,6 +3501,14 @@ Ruta: %2</translation>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Permitir arrastrar archivos a estas unidades de &amp;red:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Búsqueda</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>No se encontró ningún resultado de búsqueda.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

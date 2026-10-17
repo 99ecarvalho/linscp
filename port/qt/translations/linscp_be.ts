@@ -3502,6 +3502,14 @@ Location: %2</source>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Дазволіць перацягванне ў &amp;сеткавыя дыскі:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Пошук</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>Нічога не знойдзена.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

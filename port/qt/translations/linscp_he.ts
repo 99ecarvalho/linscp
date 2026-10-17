@@ -3501,6 +3501,14 @@ Location: %2</source>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>אפשר שחרור קבצים לכונני ה&amp;רשת האלה:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>חיפוש</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>לא נמצאו תוצאות חיפוש.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

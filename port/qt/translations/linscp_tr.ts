@@ -3500,6 +3500,14 @@ Konum: %2</translation>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Dosyalar &amp;bu ağ sürücülerine bırakılabilsin:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Ara</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>Herhangi bir sonuç bulunamadı.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

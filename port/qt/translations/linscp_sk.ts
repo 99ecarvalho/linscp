@@ -3502,6 +3502,14 @@ Umiestnenie: %2</translation>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Povoliť pustenie súborov na tieto sieťové jed&amp;notky:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Hľadať</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>Žiadne výsledky vyhľadávania.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

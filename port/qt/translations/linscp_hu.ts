@@ -3500,6 +3500,14 @@ Hely: %2</translation>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Engedélyezése ezekre a &amp;hálózati mappákra:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Keresés</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>Nincs találat.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

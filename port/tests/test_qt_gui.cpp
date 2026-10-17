@@ -3511,6 +3511,33 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       CoreBridge::SetEditorSettings(Editor);
     }
 
+    // E10: the search box above the tree, the pages' captions with its
+    // text, links to them.
+    {
+      PreferencesDialog Dialog;
+      Dialog.SearchEdit()->setText(QStringLiteral("beep when"));
+      QStringList Results = Dialog.SearchResults();
+      Check(Dialog.Searching() && (Results.size() == 1) &&
+        (Results[0] == QStringLiteral("Environment \u00BB Notifications \u00BB \nBeep when work finishes, if it lasted more than")),
+        "a lower-case search, any case; the result in its context");
+      Dialog.SearchEdit()->setText(QStringLiteral("BEEP"));
+      Check(Dialog.Searching() && Dialog.SearchResults().isEmpty(), "with upper case, the case matters");
+      Dialog.SearchEdit()->setText(QStringLiteral("drag"));
+      Results = Dialog.SearchResults();
+      Check(Results.contains(QStringLiteral("Transfer \u00BB \nDrag & Drop")), "the pages' names, as the tree's");
+      Dialog.SearchEdit()->setText(QStringLiteral("Dark"));
+      Results = Dialog.SearchResults();
+      const int Dark = static_cast<int>(Results.indexOf(QRegularExpression(QStringLiteral(".*\nDark$"))));
+      Check(Dark >= 0, "a drop-down list's items");
+      Dialog.OpenSearchResult(Dark);
+      Check(!Dialog.Searching() && Dialog.ThemeCombo()->isVisibleTo(&Dialog) &&
+        (Dialog.Navigation()->currentItem()->text(0) == QStringLiteral("Interface")), "the result's page shown");
+      Dialog.SearchEdit()->setText(QStringLiteral("theme"));
+      QKeyEvent Escape(QEvent::KeyPress, Qt::Key_Escape, Qt::NoModifier);
+      QApplication::sendEvent(&Dialog, &Escape);
+      Check(!Dialog.Searching() && Dialog.SearchEdit()->text().isEmpty(), "Escape leaves the results");
+    }
+
     // Editors and Internal editor: saved, and what the editor then is.
     {
       const CoreBridge::TEditorSettings Before = CoreBridge::EditorSettings();

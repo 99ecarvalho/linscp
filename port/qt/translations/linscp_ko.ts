@@ -3500,6 +3500,14 @@ Location: %2</source>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>다음 네트워크 드라이브에 끌어서 놓기 허용(&amp;N)</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>찾기</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>검색 결과가 없습니다.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -3500,6 +3500,14 @@ Location: %2</source>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>อนุญาตให้วางไฟล์ลงใน&amp;ไดรฟ์เครือข่ายเหล่านี้:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>ค้นหา</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>ไม่พบผลการค้นหา</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -3501,6 +3501,14 @@ Staðsetning: %2</translation>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Leyfa sleppingu skráa á þessi &amp;netdrif:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Leita</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>Engar leitarniðurstöður fundust.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

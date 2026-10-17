@@ -3501,6 +3501,14 @@ Placering: %2</translation>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Tillad at slippe filer til disse netværksdrev:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Søg</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>Ingen søgeresultater fundet.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

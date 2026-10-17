@@ -3501,6 +3501,14 @@ Lokasyon: %2</translation>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Payagan ang pag-drop ng mga file sa mga &amp;network drive na ito:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Maghanap</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>Walang nahanap na resulta ng paghahanap.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

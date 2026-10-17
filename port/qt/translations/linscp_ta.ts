@@ -3501,6 +3501,14 @@ Location: %2</source>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>இந்த பிணையம் இயக்கிகளில் கோப்புகளை கைவிட இசைவு:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>தேடல்</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>தேடல் முடிவுகள் எதுவும் கிடைக்கவில்லை.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

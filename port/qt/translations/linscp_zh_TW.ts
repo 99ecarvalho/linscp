@@ -3500,6 +3500,14 @@ Location: %2</source>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>允許將檔案放置到此等網路磁碟機(&amp;N):</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>搜尋</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>找不到搜尋結果。</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

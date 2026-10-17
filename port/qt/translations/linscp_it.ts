@@ -3501,6 +3501,14 @@ Percorso: %2</translation>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Permette il rilascio di file su queste e u&amp;nità di rete:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Cerca</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>Nessun risultato ricerca trovato.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

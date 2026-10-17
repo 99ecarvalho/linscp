@@ -3500,6 +3500,14 @@ Location: %2</source>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>اجازه رها کردن پرونده در این درایوهای شبکه</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>جستجو</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>هیچ نتیجه‌ای برای جستجو یافت نشد.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

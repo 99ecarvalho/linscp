@@ -3502,6 +3502,14 @@ Vieta: %2</translation>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Leisti įkelti failus į šiuos &amp;tinklo diskus:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Paieška</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>Paieškos rezultatų nerasta.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -50,6 +50,9 @@
 #include <QKeyEvent>
 #include <QShortcut>
 #include <QScrollBar>
+#include <QScrollArea>
+#include <QTextDocumentFragment>
+#include <QAbstractButton>
 #include <QTreeWidget>
 #include <QStackedWidget>
 #include <QSystemTrayIcon>
@@ -80,6 +83,14 @@ TPreferences::TAutoSwitch AutoSwitchOfIndex(int Index)
     ((Index == 1) ? TPreferences::TAutoSwitch::Off : TPreferences::TAutoSwitch::On);
 }
 
+// As StripHotkey, with the "(&X)" the CJK translations append.
+QString StripHotkey(const QString & Text)
+{
+  static const QRegularExpression Appended(QStringLiteral("\\(&[^&]\\)"));
+  QString Result = Text;
+  return PresetCaption(Result.remove(Appended));
+}
+
 }  // namespace
 
 PreferencesDialog::PreferencesDialog(QWidget * Parent) :
@@ -99,7 +110,21 @@ PreferencesDialog::PreferencesDialog(QWidget * Parent) :
   // Its names are WinSCP's tree's, "Drag & Drop" with a plain "&".
   FNavigation->setProperty("literalText", true);
   FPages = new QStackedWidget(this);
-  Main->addWidget(FNavigation);
+  // WinSCP's SearchEdit above the tree: the pages' captions with its text
+  // on a page of their own, links to them.
+  FSearchEdit = new QLineEdit(this);
+  FSearchEdit->setPlaceholderText(tr("Search"));
+  FSearchEdit->setAccessibleName(tr("Search"));
+  FSearchEdit->setClearButtonEnabled(true);
+  FSearchEdit->installEventFilter(this);
+  FNavigation->installEventFilter(this);
+  connect(FSearchEdit, &QLineEdit::textChanged, this, [this](const QString & Text) { UpdateSearching(!Text.isEmpty()); });
+  QShortcut * Find = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_F), this);
+  connect(Find, &QShortcut::activated, FSearchEdit, [this]() { FSearchEdit->setFocus(Qt::ShortcutFocusReason); });
+  QVBoxLayout * NavigationLayout = new QVBoxLayout();
+  NavigationLayout->addWidget(FSearchEdit);
+  NavigationLayout->addWidget(FNavigation, 1);
+  Main->addLayout(NavigationLayout);
   Main->addWidget(FPages, 1);
   Layout->addLayout(Main, 1);
 
@@ -146,6 +171,23 @@ PreferencesDialog::PreferencesDialog(QWidget * Parent) :
   }
   FNavigation->setFixedWidth(NamesWidth + 2 * FNavigation->frameWidth() +
     FNavigation->verticalScrollBar()->sizeHint().width() + 16);
+  FSearchEdit->setFixedWidth(FNavigation->width());
+  FSearchPage = new QWidget(this);
+  QVBoxLayout * SearchPageLayout = new QVBoxLayout(FSearchPage);
+  SearchPageLayout->setContentsMargins(0, 0, 0, 0);
+  QGroupBox * SearchGroup = new QGroupBox(tr("Search"), FSearchPage);
+  QVBoxLayout * SearchGroupLayout = new QVBoxLayout(SearchGroup);
+  QScrollArea * SearchScroll = new QScrollArea(SearchGroup);
+  SearchScroll->setFrameShape(QFrame::NoFrame);
+  SearchScroll->setWidgetResizable(true);
+  QWidget * SearchList = new QWidget(SearchScroll);
+  FSearchLayout = new QVBoxLayout(SearchList);
+  FSearchLayout->setContentsMargins(0, 0, 0, 0);
+  FSearchLayout->addStretch(1);
+  SearchScroll->setWidget(SearchList);
+  SearchGroupLayout->addWidget(SearchScroll);
+  SearchPageLayout->addWidget(SearchGroup);
+  FPages->addWidget(FSearchPage);
   connect(FNavigation, &QTreeWidget::currentItemChanged, this, [this](QTreeWidgetItem * Item)
   {
     if (Item != nullptr)
@@ -170,6 +212,293 @@ void PreferencesDialog::AddPage(const QString & Name, QWidget * Page, bool Subpa
   QTreeWidgetItem * Item = (Parent != nullptr) ? new QTreeWidgetItem(Parent, { Name }) : new QTreeWidgetItem(FNavigation, { Name });
   Item->setData(0, Qt::UserRole, FPages->addWidget(Page));
   FPageItems.push_back(Item);
+}
+
+// As TPreferencesDialog::GetControlText: a page's is its name in the tree.
+QString PreferencesDialog::ControlText(QWidget * Control) const
+{
+  QString Result;
+  const int Page = FPages->indexOf(Control);
+  if (Page >= 0)
+  {
+    for (const QTreeWidgetItem * Item : FPageItems)
+    {
+      if (Item->data(0, Qt::UserRole).toInt() == Page)
+      {
+        Result = Item->text(0);
+      }
+    }
+  }
+  else if (QLabel * Label = qobject_cast<QLabel *>(Control))
+  {
+    Result = Label->text();
+    if (Label->textFormat() != Qt::PlainText && Qt::mightBeRichText(Result))
+    {
+      Result = QTextDocumentFragment::fromHtml(Result).toPlainText();
+    }
+  }
+  else if (QAbstractButton * Button = qobject_cast<QAbstractButton *>(Control))
+  {
+    Result = Button->text();
+  }
+  else if (QGroupBox * Group = qobject_cast<QGroupBox *>(Control))
+  {
+    Result = Group->title();
+  }
+  return Result;
+}
+
+// As TPreferencesDialog::GetSearchParent: a page's is its section's page.
+QWidget * PreferencesDialog::SearchParent(QWidget * Control) const
+{
+  QWidget * Result = nullptr;
+  const int Page = FPages->indexOf(Control);
+  if (Page >= 0)
+  {
+    for (const QTreeWidgetItem * Item : FPageItems)
+    {
+      if ((Item->data(0, Qt::UserRole).toInt() == Page) && (Item->parent() != nullptr))
+      {
+        Result = FPages->widget(Item->parent()->data(0, Qt::UserRole).toInt());
+      }
+    }
+  }
+  else
+  {
+    Result = Control->parentWidget();
+    if (Result == FPages)
+    {
+      Result = nullptr;
+    }
+  }
+  return Result;
+}
+
+// As TPreferencesDialog::Search: the captions (a drop-down list's items)
+// of the page's shown controls, not what is typed in.
+void PreferencesDialog::Search(QWidget * Control, std::vector<TSearchResult> & Results) const
+{
+  const QString Text = FSearchEdit->text();
+  // As ContainsTextSemiCaseSensitive.
+  const Qt::CaseSensitivity Sensitivity = (Text.toLower() == Text) ? Qt::CaseInsensitive : Qt::CaseSensitive;
+  QComboBox * Combo = qobject_cast<QComboBox *>(Control);
+  if ((Combo != nullptr) && !Combo->isEditable())
+  {
+    for (int Index = 0; Index < Combo->count(); Index++)
+    {
+      if (Combo->itemText(Index).contains(Text, Sensitivity))
+      {
+        Results.push_back({ Combo->itemText(Index), Control });
+      }
+    }
+  }
+  else if ((Combo == nullptr) && (qobject_cast<QLineEdit *>(Control) == nullptr) &&
+           (qobject_cast<QAbstractSpinBox *>(Control) == nullptr) &&
+           (qobject_cast<QAbstractScrollArea *>(Control) == nullptr))
+  {
+    const QString Caption = ((FPages->indexOf(Control) >= 0) || Control->property("literalText").toBool()) ?
+      ControlText(Control) : StripHotkey(ControlText(Control));
+    // Not the unit labels (as "s").
+    if ((Caption.length() >= 4) && Caption.contains(Text, Sensitivity))
+    {
+      Results.push_back({ Caption, Control });
+    }
+    for (QWidget * Child : Control->findChildren<QWidget *>(QString(), Qt::FindDirectChildrenOnly))
+    {
+      if (!Child->isHidden() && !Child->isWindow())
+      {
+        Search(Child, Results);
+      }
+    }
+  }
+}
+
+bool PreferencesDialog::Searching() const
+{
+  return (FSearchResults != nullptr);
+}
+
+QStringList PreferencesDialog::SearchResults() const
+{
+  QStringList Result;
+  if (FSearchResults != nullptr)
+  {
+    for (const TSearchResult & SearchResult : *FSearchResults)
+    {
+      // As the results page's labels: the context, then the caption.
+      QString Context;
+      for (QWidget * Parent = SearchParent(SearchResult.Control); Parent != nullptr; Parent = SearchParent(Parent))
+      {
+        const QString ParentCaption = (FPages->indexOf(Parent) >= 0) ? ControlText(Parent) : StripHotkey(ControlText(Parent));
+        if (!ParentCaption.isEmpty())
+        {
+          Context = ParentCaption + QStringLiteral(" \u00BB ") + Context;
+        }
+      }
+      Result.append((Context.isEmpty() ? QStringLiteral("\u00BB") : Context) + QLatin1Char('\n') + SearchResult.Caption);
+    }
+  }
+  return Result;
+}
+
+void PreferencesDialog::UpdateSearching(bool Searching)
+{
+  if (!Searching)
+  {
+    if (FSearchResults != nullptr)
+    {
+      FSearchResults.reset();
+      if (QTreeWidgetItem * Item = FNavigation->currentItem())
+      {
+        FPages->setCurrentIndex(Item->data(0, Qt::UserRole).toInt());
+      }
+    }
+  }
+  else
+  {
+    auto Results = std::make_unique<std::vector<TSearchResult>>();
+    // The pages in the tree's order.
+    for (const QTreeWidgetItem * Item : FPageItems)
+    {
+      Search(FPages->widget(Item->data(0, Qt::UserRole).toInt()), *Results);
+    }
+    if ((FSearchResults == nullptr) || (*FSearchResults != *Results))
+    {
+      FSearchResults = std::move(Results);
+      while (FSearchLayout->count() > 1)
+      {
+        QLayoutItem * LayoutItem = FSearchLayout->takeAt(0);
+        delete LayoutItem->widget();
+        delete LayoutItem;
+      }
+      const QStringList Texts = SearchResults();
+      if (Texts.isEmpty())
+      {
+        FSearchLayout->insertWidget(0, new QLabel(tr("No search results found.")));
+      }
+      for (int Index = 0; Index < Texts.size(); Index++)
+      {
+        const int Separator = Texts[Index].indexOf(QLatin1Char('\n'));
+        QLabel * ContextLabel = new QLabel(Texts[Index].left(Separator));
+        ContextLabel->setTextFormat(Qt::PlainText);
+        QLabel * LinkLabel = new QLabel(QStringLiteral("<a href=\"%1\">%2</a>").arg(Index).arg(Texts[Index].mid(Separator + 1).toHtmlEscaped()));
+        LinkLabel->setWordWrap(true);
+        LinkLabel->setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::LinksAccessibleByKeyboard);
+        LinkLabel->setFocusPolicy(Qt::TabFocus);
+        LinkLabel->setAccessibleName(Texts[Index].mid(Separator + 1));
+        connect(LinkLabel, &QLabel::linkActivated, this, [this](const QString & Link) { OpenSearchResult(Link.toInt()); });
+        const int At = FSearchLayout->count() - 1;
+        FSearchLayout->insertWidget(At, ContextLabel);
+        FSearchLayout->insertWidget(At + 1, LinkLabel);
+        FSearchLayout->insertSpacing(At + 2, 8);
+      }
+    }
+    FPages->setCurrentWidget(FSearchPage);
+  }
+}
+
+void PreferencesDialog::OpenSearchResult(int Index)
+{
+  if ((FSearchResults != nullptr) && (Index >= 0) && (Index < static_cast<int>(FSearchResults->size())))
+  {
+    const TSearchResult Result = (*FSearchResults)[Index];
+    FSearchResults.reset();
+    QWidget * Page = Result.Control;
+    while (FPages->indexOf(Page) < 0)
+    {
+      Page = Page->parentWidget();
+    }
+    for (QTreeWidgetItem * Item : FPageItems)
+    {
+      if (Item->data(0, Qt::UserRole).toInt() == FPages->indexOf(Page))
+      {
+        FNavigation->setCurrentItem(Item);
+      }
+    }
+    FPages->setCurrentWidget(Page);
+    FocusAndHighlightControl(Result.Control, Result.Caption);
+  }
+}
+
+// As TPreferencesDialog::FocusAndHighlightControl.
+void PreferencesDialog::FocusAndHighlightControl(QWidget * Control, const QString & Text)
+{
+  bool HighlightInside = true;
+  QLabel * Label = qobject_cast<QLabel *>(Control);
+  if ((Label != nullptr) && (Label->buddy() != nullptr))
+  {
+    Control = Label->buddy();
+    HighlightInside = false;
+  }
+  QRadioButton * Radio = qobject_cast<QRadioButton *>(Control);
+  // Not focusing an unchecked radio button, that would check it.
+  if ((Radio != nullptr) && !Radio->isChecked())
+  {
+    QWidget * Focus = Radio->parentWidget();
+    for (QRadioButton * Sibling : Radio->parentWidget()->findChildren<QRadioButton *>(QString(), Qt::FindDirectChildrenOnly))
+    {
+      if (Sibling->isChecked())
+      {
+        Focus = Sibling;
+      }
+    }
+    if (Focus->isEnabled())
+    {
+      Focus->setFocus(Qt::OtherFocusReason);
+    }
+  }
+  else
+  {
+    if (Control->isEnabled())
+    {
+      Control->setFocus(Qt::OtherFocusReason);
+    }
+    QComboBox * Combo = qobject_cast<QComboBox *>(Control);
+    if (HighlightInside && (Combo != nullptr) && !Combo->isEditable() && (Combo->currentText() != Text) && Combo->isVisible())
+    {
+      Combo->showPopup();
+    }
+  }
+  // Where it is, on a page that scrolls.
+  for (QWidget * Parent = Control->parentWidget(); Parent != nullptr; Parent = Parent->parentWidget())
+  {
+    if (QScrollArea * Scroll = qobject_cast<QScrollArea *>(Parent))
+    {
+      Scroll->ensureWidgetVisible(Control);
+      break;
+    }
+  }
+}
+
+bool PreferencesDialog::eventFilter(QObject * Object, QEvent * Event)
+{
+  if (Event->type() == QEvent::FocusIn)
+  {
+    if (Object == FSearchEdit)
+    {
+      UpdateSearching(!FSearchEdit->text().isEmpty());
+    }
+    else if (Object == FNavigation)
+    {
+      UpdateSearching(false);
+    }
+  }
+  return QDialog::eventFilter(Object, Event);
+}
+
+void PreferencesDialog::keyPressEvent(QKeyEvent * Event)
+{
+  // Escape leaves the results, not the dialog.
+  if ((Event->key() == Qt::Key_Escape) && (Event->modifiers() == Qt::NoModifier) && (FSearchResults != nullptr))
+  {
+    FSearchEdit->clear();
+    FNavigation->setFocus(Qt::OtherFocusReason);
+    Event->accept();
+  }
+  else
+  {
+    QDialog::keyPressEvent(Event);
+  }
 }
 
 QString PreferencesDialog::PageName(int Index) const

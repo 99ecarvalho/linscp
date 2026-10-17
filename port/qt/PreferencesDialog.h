@@ -46,6 +46,13 @@ public:
   void ShowPageAt(int Index);
   // Shows the page of that name (as the tree's), if there is one.
   bool ShowPage(const QString & Name);
+  // The search box above the tree (Ctrl+F): the pages' captions with the
+  // text, in the tree's order, each as "context\ncaption".
+  QLineEdit * SearchEdit() const { return FSearchEdit; }
+  bool Searching() const;
+  QStringList SearchResults() const;
+  // Goes to that result's page and control, as a click on its link.
+  void OpenSearchResult(int Index);
   // Environment, Interface, the panels' Remote and Local, Drag & Drop,
   // Updates.
   QCheckBox * ConfirmTransferringCheck() const { return FConfirmTransferring; }
@@ -296,6 +303,27 @@ private:
   void LoadPresets();
   void EditPresetDialog(bool Add, bool Duplicate);
   void UpdateControls();
+
+protected:
+  bool eventFilter(QObject * Object, QEvent * Event) override;
+  void keyPressEvent(QKeyEvent * Event) override;
+private:
+  struct TSearchResult
+  {
+    QString Caption;
+    QWidget * Control;
+    bool operator ==(const TSearchResult & Other) const { return (Caption == Other.Caption) && (Control == Other.Control); }
+  };
+  void UpdateSearching(bool Searching);
+  void Search(QWidget * Control, std::vector<TSearchResult> & Results) const;
+  QString ControlText(QWidget * Control) const;
+  QWidget * SearchParent(QWidget * Control) const;
+  void FocusAndHighlightControl(QWidget * Control, const QString & Text);
+  QLineEdit * FSearchEdit = nullptr;
+  QWidget * FSearchPage = nullptr;
+  class QVBoxLayout * FSearchLayout = nullptr;
+  // Null while not searching, as FSearchResults.
+  std::unique_ptr<std::vector<TSearchResult>> FSearchResults;
 
   QTreeWidget * FNavigation = nullptr;
   std::vector<class QTreeWidgetItem *> FPageItems;

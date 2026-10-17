@@ -3501,6 +3501,14 @@ Ligging: %2</translation>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Laat toe dat lêers op hierdie &amp;netwerkaandrywers gelos word:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Soek</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>Geen soekresultate gevind nie.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

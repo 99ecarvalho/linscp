@@ -3500,6 +3500,14 @@ Location: %2</source>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>ဤကွန်ရက်ဒရိုက်များသို့ ဖိုင်များ ချထားခွင့်ပြုပါ(&amp;N):</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>ရှာဖွေရန်</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>ရှာဖွေမှု ရလဒ် မတွေ့ပါ။</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

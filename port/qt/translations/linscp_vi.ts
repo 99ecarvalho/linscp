@@ -3500,6 +3500,14 @@ Vị trí: %2</translation>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Cho phép thả tệp vào các ổ đĩa &amp;mạng sau:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Tìm kiếm</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>Không tìm thấy kết quả nào.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

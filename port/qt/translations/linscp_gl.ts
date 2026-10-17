@@ -3501,6 +3501,14 @@ Localización: %2</translation>
         <source>Allow dropping files to these &amp;network drives:</source>
         <translation>Permitir soltar ficheiros nestas unidades de &amp;rede:</translation>
     </message>
+    <message>
+        <source>Search</source>
+        <translation>Buscar</translation>
+    </message>
+    <message>
+        <source>No search results found.</source>
+        <translation>Non se atoparon resultados da busca.</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>
