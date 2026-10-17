@@ -3462,6 +3462,22 @@ Atrašanās vieta: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Rādīt &amp;mapju koku pa kreisi no failu saraksta</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Šīs lapas iestatījumi attiecas tikai uz Explorer saskarni.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Skats</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Rādīt pilnu ceļu adreses joslā</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Iegūt &amp;vairāk...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

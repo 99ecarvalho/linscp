@@ -137,6 +137,7 @@ public:
   QCheckBox * ShowLoginCheck() const { return FShowLogin; }
   QCheckBox * TabTruncationCheck() const { return FTabTruncation; }
   QCheckBox * TreeOnLeftCheck() const { return FTreeOnLeft; }
+  QCheckBox * ShowFullAddressCheck() const { return FShowFullAddress; }
   QCheckBox * SilentDisconnectCheck() const { return FSilentDisconnect; }
   QCheckBox * AutoSaveWorkspaceCheck() const { return FAutoSaveWorkspace; }
   QCheckBox * AutoSaveWorkspacePasswordsCheck() const { return FAutoSaveWorkspacePasswords; }
@@ -223,6 +224,7 @@ private:
   QWidget * MakePanelsPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeCommanderPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeLanguagesPage();
+  QWidget * MakeExplorerPage();
   QWidget * MakeTransferPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeBackgroundPage(const CoreBridge::TPreferences & Preferences);
   QWidget * MakeEndurancePage(const CoreBridge::TPreferences & Preferences);
@@ -380,6 +382,7 @@ private:
   QCheckBox * FShowLogin = nullptr;
   QCheckBox * FTabTruncation = nullptr;
   QCheckBox * FTreeOnLeft = nullptr;
+  QCheckBox * FShowFullAddress = nullptr;
   QCheckBox * FSilentDisconnect = nullptr;
   QCheckBox * FAutoSaveWorkspace = nullptr;
   QCheckBox * FAutoSaveWorkspacePasswords = nullptr;

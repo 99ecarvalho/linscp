@@ -3460,6 +3460,22 @@ Lokasi: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Tampilkan pohon direktori di kiri daftar berkas</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Preferensi di tab ini hanya berlaku pada tampilan Eksplorer</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Lihat</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Tunjukkan alamat lengkap pada balok alamat</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Dapatkan lebih(&amp;m)...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

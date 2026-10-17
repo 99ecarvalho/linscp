@@ -53,6 +53,8 @@
 #include <QTreeWidget>
 #include <QStackedWidget>
 #include <QSystemTrayIcon>
+#include <QDesktopServices>
+#include <QUrl>
 #include <QVBoxLayout>
 
 #include <algorithm>
@@ -113,6 +115,7 @@ PreferencesDialog::PreferencesDialog(QWidget * Parent) :
   AddPage(tr("Interface"), MakeInterfacePage(Preferences), true);
   AddPage(tr("Window"), MakeWindowPage(Preferences), true);
   AddPage(tr("Commander"), MakeCommanderPage(Preferences), true);
+  AddPage(tr("Explorer"), MakeExplorerPage(), true);
   AddPage(tr("Languages"), MakeLanguagesPage(), true);
   AddPage(tr("Panels"), MakePanelsPage(Preferences));
   AddPage(tr("Remote"), MakeRemotePage(Preferences), true);
@@ -337,6 +340,22 @@ QWidget * PreferencesDialog::MakeCommanderPage(const TPreferences & Preferences)
 
 // As TPreferencesDialog::LoadLanguages: each translation, the one chosen
 // current; one that does not load greyed, as its custom draw has it.
+// As ExplorerSheet.
+QWidget * PreferencesDialog::MakeExplorerPage()
+{
+  QWidget * Page = new QWidget(this);
+  QVBoxLayout * Layout = new QVBoxLayout(Page);
+  Layout->addWidget(new QLabel(tr("Preferences on this page apply to Explorer interface only."), Page));
+  QGroupBox * View = new QGroupBox(tr("View"), Page);
+  QVBoxLayout * ViewLayout = new QVBoxLayout(View);
+  FShowFullAddress = new QCheckBox(tr("&Show full path on address bar"), View);
+  FShowFullAddress->setChecked(CoreBridge::Layout().Explorer.ShowFullAddress);
+  ViewLayout->addWidget(FShowFullAddress);
+  Layout->addWidget(View);
+  Layout->addStretch(1);
+  return Page;
+}
+
 QWidget * PreferencesDialog::MakeLanguagesPage()
 {
   QWidget * Page = new QWidget(this);
@@ -363,6 +382,16 @@ QWidget * PreferencesDialog::MakeLanguagesPage()
   GroupLayout->addWidget(FLanguages, 1);
   FLanguageChange = new QLabel(tr("Changes will apply on the next start."), Group);
   GroupLayout->addWidget(FLanguageChange);
+  // As LanguagesGetMoreButton: linscp's translations, and how to add one.
+  QPushButton * GetMore = new QPushButton(tr("Get &more..."), Group);
+  connect(GetMore, &QPushButton::clicked, this, []()
+  {
+    QDesktopServices::openUrl(QUrl(QStringLiteral("https://github.com/99ecarvalho/linscp/blob/main/doc/qt/translations.md")));
+  });
+  QHBoxLayout * GetMoreRow = new QHBoxLayout();
+  GetMoreRow->addStretch(1);
+  GetMoreRow->addWidget(GetMore);
+  GroupLayout->addLayout(GetMoreRow);
   Layout->addWidget(Group, 1);
   return Page;
 }
@@ -1467,6 +1496,13 @@ void PreferencesDialog::Save()
   FExtensions->Commit();
   CoreBridge::SetEditorSettings(EditorSettings());
   CoreBridge::SetEditors(FEditors);
+  // Explorer's: the layout's (TScpExplorerConfiguration).
+  if (CoreBridge::Layout().Explorer.ShowFullAddress != FShowFullAddress->isChecked())
+  {
+    CoreBridge::TLayout Layout = CoreBridge::Layout();
+    Layout.Explorer.ShowFullAddress = FShowFullAddress->isChecked();
+    CoreBridge::SetLayout(Layout);
+  }
   if (FLanguages->currentItem() != nullptr)
   {
     CoreBridge::SetPreferredLocale(Locale());

@@ -3461,6 +3461,22 @@ Local: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Exibir árvore de &amp;diretórios à esquerda da lista de arquivos</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>As preferências nesta aba apenas se aplicam a interface similar ao Explorer</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Exibir</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Mostrar endereço completo na barra de endereços</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Obter &amp;mais</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

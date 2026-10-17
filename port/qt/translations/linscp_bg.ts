@@ -3461,6 +3461,22 @@ Location: %2</source>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Показване на &amp;дървото на папките вляво от списъка с файлове</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Настройките на тази страница се отнасят само за интерфейса Изследовател.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Изглед</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Показване на пълния път в адресната лента</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>&amp;Още...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

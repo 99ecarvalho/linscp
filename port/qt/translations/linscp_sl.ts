@@ -3463,6 +3463,22 @@ Lokacija: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Prikaži &amp;drevo imenika levo od seznama datotek</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Lastnosti na tem zavihku bodo vplivale samo na vmesnik Raziskovalec.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Pogled</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>Prikaži celotno pot v na&amp;slovni vrstici</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Pridobi &amp;več...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -879,6 +879,11 @@ void MainWindow::ApplyPreferences()
   }
   // As SessionTabCaptionTruncation: the titles elided to fit, else
   // scrolled.
+  // The Explorer's address bar: its full path or not (ShowFullAddress).
+  if (FExplorer && (FAddress != nullptr))
+  {
+    UpdateAddress();
+  }
   if (FTabBar != nullptr)
   {
     FTabBar->setElideMode(Preferences.SessionTabCaptionTruncation ? Qt::ElideRight : Qt::ElideNone);

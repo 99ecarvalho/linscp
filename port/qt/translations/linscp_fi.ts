@@ -3461,6 +3461,22 @@ Sijainti: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Näytä kansiorakenne tiedostojen vasemmalla puolella</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Tämän sivun asetukset vaikuttavat vain Explorer-käyttöliittymään.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Näkymä</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Näytä koko polku osoitekentässä</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Hae &amp;lisää...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -3461,6 +3461,22 @@ Ruta: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Mostrar árbol de &amp;directorios a la izquierda de la lista de archivos</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Las preferencias de esta pestaña se aplican solo a la interfaz tipo Explorador</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Ver</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>Mostrar &amp;ruta completa en la barra de direcciones</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>&amp;Más...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

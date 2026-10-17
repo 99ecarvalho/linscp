@@ -3462,6 +3462,22 @@ Lokacija: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Prikaži &amp;stablo direktorijuma levo od liste datoteka</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Podešavanja na ovoj kartici se odnose isključivo na okruženje poput Explorera</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Prikaz</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>Prikaži punu putanju u adre&amp;snoj traci</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>&amp;Više jezika...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

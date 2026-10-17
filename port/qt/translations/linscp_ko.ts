@@ -3460,6 +3460,22 @@ Location: %2</source>
         <source>Show &amp;directory tree left of file list</source>
         <translation>파일 목록 왼쪽에 디렉터리 표시(&amp;D)</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>이 탭의 설정은 탐색기 인터페이스에서만 적용됩니다.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>보기</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>주소 표시줄에 전체 경로 표시(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>추가 정보(&amp;M)...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

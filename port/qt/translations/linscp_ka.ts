@@ -3461,6 +3461,22 @@ Location: %2</source>
         <source>Show &amp;directory tree left of file list</source>
         <translation>საქაღალდეების &amp;ხის ჩვენება ფაილების სიის მარცხნივ</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>პარამეტრები ამ გვერდზე, მხოლოდ, Explorer-ის ინტერფეისს ეხება.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>ხედი</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;სრული ბილიკის ჩვენება მისამართის პანელზე</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>&amp;მეტის მიღება...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

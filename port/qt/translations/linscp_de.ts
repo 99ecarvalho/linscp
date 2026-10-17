@@ -3461,6 +3461,22 @@ Ort: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>&amp;Verzeichnisbaum links neben der Dateiliste anzeigen</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Die Einstellungen auf dieser Seite gelten nur für die Explorer-Benutzerschnittstelle.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Ansicht</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Vollständigen Pfad in der Adressleiste anzeigen</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Mehr &amp;Sprachen …</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

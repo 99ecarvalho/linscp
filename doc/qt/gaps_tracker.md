@@ -15,10 +15,10 @@ Last updated: **2026-10-17**
 | B. Password prompt and banner | 1 | 3 |
 | C. Progress and synchronization dialogs | 3 | 4 |
 | D. Main window | 6 | 9 |
-| E. Preferences | 5 | 10 |
+| E. Preferences | 8 | 10 |
 | F. Command line | 2 | 3 |
 | G. Known before | 0 | 1 |
-| **Total** | **32** | **47** |
+| **Total** | **35** | **47** |
 
 ## Items
 
@@ -58,13 +58,13 @@ Last updated: **2026-10-17**
 | D8 | Transfer Files in Clipboard | Low | todo | |
 | D9 | Editor Preferences: Use default system editor | Low | todo | |
 | E1 | Commander: tree left of file list | Medium | done | 2026-10-17. `ScpCommander.TreeOnLeft`; each panel's tree width kept apart (`DriveViewWidth`) from its height; ctest `qt_gui_trees` |
-| E2 | Explorer page: Show full path on address bar | Low | todo | Stored |
+| E2 | Explorer page: Show full path on address bar | Low | done | 2026-10-17. Applied to the address bar at once; ctest `qt_gui_preferences` |
 | E3 | Storage: temporary directory options (5) | Medium | done | 2026-10-17. The editing already followed them; the start-up cleanup added (`MainWindow::TemporaryDirectoryCleanup`, as Setup.cpp's, not for a second instance), and core's recursive delete fixed for POSIX (`core-recursive-delete-delimiter.patch`); ctest `qt_gui_preferences` |
 | E4 | Window: Show Login dialog on startup / last session closed | Medium | done | 2026-10-17. `MainWindow::NeedSession` (as TCustomScpExplorerForm's) at start-up and once the last tab closes; the Site Manager's own "Show Login dialog..." check when shown by itself, unchecked after asking; ctest `qt_gui_preferences` |
 | E5 | Window: truncate tab titles; silent idle disconnect | Low | done | 2026-10-17. Titles elided (`QTabBar::setElideMode`); an idle session's lost connection quiet in the status bar, else its message with "Never popup disconnect messages" (`MainWindow::IdleError`, `TCoreError::Fatal`); ctest `qt_gui_tabs`, `qt_gui_sessioncommands` |
 | E6 | Window: Workspaces group (4) | Medium | done | 2026-10-17. With WinSCP's default, a workspace's other sessions connect as their tabs are selected (`TTab::Pending`, `ConnectPendingTab`); Connect all connects them as it opens; ctest `qt_gui_preferences`, `qt_gui_tabs` |
-| E7 | Internal editor: Disable smooth scrolling | Low | todo | May be not applicable |
-| E8 | Languages: Get more... | Low | todo | |
+| E7 | Internal editor: Disable smooth scrolling | Low | dropped | 2026-10-17. Not applicable: upstream's works around the Windows rich edit control's smooth scrolling; Qt's editor scrolls without animation |
+| E8 | Languages: Get more... | Low | done | 2026-10-17. linscp's translations page (doc/qt/translations.md) |
 | E9 | Drag & Drop: network drives for the fake-file drop | Low | todo | Windows only |
 | E10 | Preferences search box | Low | todo | |
 | F1 | GUI: /log, /xmllog, /loglevel, /logsize | Medium | done | 2026-10-17. linscp-cli's `ApplyLogSwitches`, moved to FrontendCommon, at the GUI's initialization; ctest `qt_gui_logswitches` |

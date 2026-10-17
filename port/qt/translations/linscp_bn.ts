@@ -3461,6 +3461,22 @@ Location: %2</source>
         <source>Show &amp;directory tree left of file list</source>
         <translation>ফাইল তালিকার বামে ডিরেক্টরি ট্রি দেখান(&amp;D)</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>এই পৃষ্ঠার পছন্দসমূহ শুধুমাত্র এক্সপ্লোরার ইন্টারফেসে প্রযোজ্য।</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>দেখুন</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>ঠিকানা বারে সম্পূর্ণ পাথ দেখান(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>আরও পান(&amp;M)...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

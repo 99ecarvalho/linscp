@@ -3462,6 +3462,22 @@ Location: %2</source>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Прикажи &amp;дрво на директориуми лево од списокот на датотеки</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Поставките на оваа страница се применуваат само на Explorer интерфејсот.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Преглед</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Прикажи целосна патека во лентата со адреса</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>&amp;Повеќе јазици...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -3461,6 +3461,22 @@ Vendndodhja: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Shfaq pemën e &amp;dosjeve majtas listës së skedarëve</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Preferencat në këtë faqe vlejnë vetëm për ndërfaqen Explorer.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Pamja</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Shfaq shtegun e plotë në shiritin e adresës</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Merr &amp;më shumë...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

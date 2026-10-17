@@ -3461,6 +3461,22 @@ Ubicació: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Mostra l&apos;arbre de &amp;directoris a l&apos;esquerra de la llista de fitxers</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Les preferències en aquesta pestanya només s&apos;apliquen a la interfície tipus Explorador.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Visualitza</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Mostra camí complet a la barra d&apos;adreces</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Obtén &amp;més...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

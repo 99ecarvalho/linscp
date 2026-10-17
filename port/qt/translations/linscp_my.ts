@@ -3460,6 +3460,22 @@ Location: %2</source>
         <source>Show &amp;directory tree left of file list</source>
         <translation>ဖိုင်စာရင်း၏ ဘယ်ဘက်တွင် လမ်းညွှန်သစ်ပင် ပြပါ(&amp;D)</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>ဤစာမျက်နှာရှိ ရွေးချယ်မှုများသည် Explorer မျက်နှာပြင်အတွက်သာ သက်ရောက်သည်။</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>မြင်ကွင်း</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>လိပ်စာဘားတွင် လမ်းကြောင်းအပြည့် ပြပါ(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>ထပ်ယူပါ(&amp;M)...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

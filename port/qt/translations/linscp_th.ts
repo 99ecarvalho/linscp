@@ -3460,6 +3460,22 @@ Location: %2</source>
         <source>Show &amp;directory tree left of file list</source>
         <translation>แสดงแผนผัง&amp;ไดเรกทอรีทางซ้ายของรายการไฟล์</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>การตั้งค่าในหน้านี้ใช้กับส่วนติดต่อ Explorer เท่านั้น</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>มุมมอง</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;แสดงพาธเต็มในแถบที่อยู่</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>รับ&amp;เพิ่มเติม...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

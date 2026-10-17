@@ -3462,6 +3462,22 @@ Location: %2</source>
         <source>Show &amp;directory tree left of file list</source>
         <translation>&amp;Открыть слева дерево каталогов</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Эти настройки влияют только на интерфейс в стиле «Проводник Windows».</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>&amp;Вид</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Показывать полный адрес в адресной строке</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>&amp;Добавить ещё…</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

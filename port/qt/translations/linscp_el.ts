@@ -3461,6 +3461,22 @@ Location: %2</source>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Εμφάνιση &amp; δέντρο καταλόγου αριστερά από λίστα αρχείων</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Οι προτιμήσεις σε αυτή τη σελίδα ισχύουν μόνο για τη διεπαφή του Explorer.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Προβολή</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>Εμφάνιση πλήρης διαδρομή στη γραμμή διευθύνσεων</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>&amp;Περισσότερες...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

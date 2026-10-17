@@ -3460,6 +3460,22 @@ Location: %2</source>
         <source>Show &amp;directory tree left of file list</source>
         <translation>在檔案列表左方顯示目錄樹(&amp;D)</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>此板的偏好設定，僅套用到檔案總管介面。</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>檢視</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>在位址列顯示全部路徑(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>取得更多(&amp;M)...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

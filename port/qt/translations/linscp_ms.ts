@@ -3460,6 +3460,22 @@ Lokasi: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Tunjukkan pepohon &amp;direktori di kiri senarai fail</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Kecenderungan pada tab ini hanya terdapat pada antaramuka Norton Commander sahaja.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Paparan</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>Papar jalan penuh pada bar alamat</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Dapatkan &amp;lagi...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

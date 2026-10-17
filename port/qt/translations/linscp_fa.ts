@@ -3460,6 +3460,22 @@ Location: %2</source>
         <source>Show &amp;directory tree left of file list</source>
         <translation>نمایش درخت پوشه در سمت چپ فهرست پرونده</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>تنطیمات این صفحه تنها برای رابط کاربری کاوشگر استفاده می شود</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>نمایش</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>نمایش کامل مسیر در آدرس بار</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>دریافت بیشتر...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

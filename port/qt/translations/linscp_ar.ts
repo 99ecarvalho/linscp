@@ -3465,6 +3465,22 @@ Location: %2</source>
         <source>Show &amp;directory tree left of file list</source>
         <translation>مشاهدة شجرة الدليل تبقى من قائمة ملف</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>الخيارات في هذا التبويب تنطبق على الواجهة الشبيهة بالمتصفح فقط.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>عرض</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;عرض المسار الكامل في شريط العنوان</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>المزيد من اللغات</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

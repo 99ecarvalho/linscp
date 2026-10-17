@@ -3460,6 +3460,22 @@ Vị trí: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Hiển thị &amp;cây thư mục bên trái danh sách tệp</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Các tùy chọn trên trang này chỉ áp dụng cho giao diện Explorer.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Chế độ &amp;Hiển thị</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Hiển thị đầy đủ đường dẫn trên thanh địa chỉ</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>&amp;Tải thêm...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

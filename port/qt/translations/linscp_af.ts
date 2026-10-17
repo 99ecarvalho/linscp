@@ -3461,6 +3461,22 @@ Ligging: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Wys &amp;gidsboom links van lêerlys</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Voorkeure op hierdie bladsy geld slegs vir die Explorer-koppelvlak.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Aansig</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Wys volle pad in adresbalk</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Kry &amp;meer...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

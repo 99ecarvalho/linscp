@@ -3462,6 +3462,22 @@ Cale: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Afișare arbore de &amp;directoare în stânga listei de fișiere</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Preferințele de mai jos se aplică doar interfeței Explorer.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Vizualizare</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>Afișare cale completă în bara de adre&amp;să</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Mai &amp;multe...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

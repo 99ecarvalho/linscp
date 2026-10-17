@@ -3462,6 +3462,22 @@ Location: %2</source>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Показати дерево тек ліворуч списку файлів</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Налаштування в цій вкладці застосовні лише до Explorer-подібного інтерфейсу.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Перегляд</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>Відображувати повний шлях в адресному рядку</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Отримати більше...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

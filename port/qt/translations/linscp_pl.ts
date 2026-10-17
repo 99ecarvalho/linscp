@@ -3462,6 +3462,22 @@ Lokalizacja: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Pokaż &amp;drzewo katalogu po lewej stronie listy plików</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Ustawienia na tej zakładce dotyczą wyłącznie interfejsu typu Eksplorator</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Widok</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>Pokaż pełną ścieżkę w pa&amp;sku adresu</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Pobierz &amp;więcej...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

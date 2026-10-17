@@ -3461,6 +3461,22 @@ Location: %2</source>
         <source>Show &amp;directory tree left of file list</source>
         <translation>கோப்பு பட்டியலின் இடதுபுறமாக அடைவு மரத்தைக் காட்டு</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>இந்த பக்கத்தில் விருப்பத்தேர்வுகள் உலாவி இடைமுகத்திற்கு மட்டுமே பொருந்தும்.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>காண்க</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;முகவரி பட்டியில் முழு பாதையையும் காட்டுங்கள்</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>மேலும் பெறுங்கள்...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

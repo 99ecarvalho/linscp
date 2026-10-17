@@ -2868,7 +2868,7 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
         Pages.append(Dialog.PageName(Index));
       }
       Check(Pages == QStringList({ PreferencesDialog::tr("Environment"), PreferencesDialog::tr("Interface"),
-        PreferencesDialog::tr("Window"), PreferencesDialog::tr("Commander"),
+        PreferencesDialog::tr("Window"), PreferencesDialog::tr("Commander"), PreferencesDialog::tr("Explorer"),
         PreferencesDialog::tr("Languages"), PreferencesDialog::tr("Panels"), PreferencesDialog::tr("Remote"),
         PreferencesDialog::tr("Local"), PreferencesDialog::tr("File colors"),
         PreferencesDialog::tr("Editors"), PreferencesDialog::tr("Internal editor"), PreferencesDialog::tr("Transfer"),
@@ -2877,7 +2877,7 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
         PreferencesDialog::tr("Integration"), PreferencesDialog::tr("Applications"), PreferencesDialog::tr("Commands"),
         PreferencesDialog::tr("Storage"), PreferencesDialog::tr("Updates") }),
         "the dialog's pages, in the order of WinSCP's tree");
-      Check((Dialog.Navigation()->topLevelItemCount() == 10) && (Dialog.Navigation()->topLevelItem(0)->childCount() == 4) &&
+      Check((Dialog.Navigation()->topLevelItemCount() == 10) && (Dialog.Navigation()->topLevelItem(0)->childCount() == 5) &&
         (Dialog.Navigation()->topLevelItem(3)->child(0)->text(0) == PreferencesDialog::tr("Drag & Drop")),
         "as its tree: each section with its subpages");
       // Environment, Interface, Remote, Local, Drag & Drop, Updates: WinSCP's
@@ -2898,8 +2898,8 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
         !Dialog.RefreshRemotePanelIntervalSpin()->isEnabled() && !Dialog.PreserveLocalDirectoryCheck()->isChecked() &&
         Dialog.DeleteToRecycleBinCheck()->isChecked() && Dialog.DDWarnLackOfTempSpaceCheck()->isChecked(),
         "the panels' and drag and drop's defaults");
-      Check(Dialog.ShowPage(PreferencesDialog::tr("Updates")) && !Dialog.ShowPage(QStringLiteral("Explorer")),
-        "pages shown by name; no Explorer's");
+      Check(Dialog.ShowPage(PreferencesDialog::tr("Updates")) && !Dialog.ShowPage(QStringLiteral("No such page")),
+        "pages shown by name, only those there are");
       Dialog.ConfirmDeletingCheck()->setChecked(false);
       Dialog.ConfirmDDTransferCheck()->setCheckState(Qt::Unchecked);
       Check(!Dialog.ConfirmDDTransferCheck()->isTristate(), "once changed, never grayed again");
@@ -2920,6 +2920,8 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       Check(Dialog.RememberPasswordCheck()->isChecked(), "passwords remembered for the session by default");
       Check(Dialog.PathShortButton()->isChecked() && Dialog.KeepOpenCheck()->isChecked() && Dialog.FileColors().empty(),
         "the Window and File colors pages show WinSCP's defaults");
+      // E2: the Explorer page's, as stored.
+      Check(Dialog.ShowFullAddressCheck()->isChecked() == CoreBridge::Layout().Explorer.ShowFullAddress, "Explorer: Show full path on address bar");
       // E4, E5, E6: the Window page's, WinSCP's defaults; the workspace's
       // name and passwords with its saving.
       Check(Dialog.ShowLoginCheck()->isChecked() && Dialog.TabTruncationCheck()->isChecked() &&

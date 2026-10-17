@@ -3461,6 +3461,22 @@ Emplacement : %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Afficher l&apos;arborescence à gauche de la liste des fichiers</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Les réglages suivants ne s&apos;appliquent que sur l&apos;interface Explorateur</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Affichage</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Afficher le chemin complet dans la barre d&apos;adresse</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Plus...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

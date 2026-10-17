@@ -3462,6 +3462,22 @@ Umiestnenie: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Zobraziť strom prie&amp;činkov naľavo od zoznamu súborov</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Nastavenia na tejto záložke sa vzťahujú len na rozhranie Prieskumníka.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Zobraziť</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>Zobraziť úplnú cestu v riadku s adresou</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Získať &amp;viac...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

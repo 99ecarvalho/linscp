@@ -3460,6 +3460,22 @@ Konum: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Klasör &amp;ağacı dosya listesinin solunda görüntülensin</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Bu sayfadaki ayarlar yalnızca Windows Dosya Gezgini arayüzü için geçerlidir.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Görünüm</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Adres çubuğunda tam yol görüntülensin</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>&amp;Diğer diller...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -3461,6 +3461,22 @@ Lokasyon: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Ipakita ang &amp;directory tree sa kaliwa ng listahan ng file</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Ang mga kagustuhan sa pahinang ito ay para lamang sa Explorer na interface.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Tingnan</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Ipakita ang buong path sa address bar</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Kumuha ng &amp;higit pa...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

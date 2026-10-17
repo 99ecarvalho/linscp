@@ -3461,6 +3461,22 @@ Plassering: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Vis &amp;katalog-tre til venstre for filliste</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Innstillinger i dette panelet gjelder kun for Utforsker grensesnittet</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Vis</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Vis full sti på adresse-linjen</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Hent &amp;flere...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

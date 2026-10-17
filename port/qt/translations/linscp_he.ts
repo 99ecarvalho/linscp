@@ -3461,6 +3461,22 @@ Location: %2</source>
         <source>Show &amp;directory tree left of file list</source>
         <translation>הצג את &amp;עץ התיקיות משמאל לרשימת הקבצים</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>ההעדפות בדף זה חלות על ממשק Explorer בלבד.</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>מראה</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;הצג נתיב מלא בשורת הכתובת</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>&amp;קבל עוד...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

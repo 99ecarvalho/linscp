@@ -3460,6 +3460,22 @@ Location: %2</source>
         <source>Show &amp;directory tree left of file list</source>
         <translation>ファイル リストの左にディレクトリ ツリーを表示する(&amp;D)</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>この設定は外観でエクスプローラーのユーザー インターフェイスを選択したときのみ有効です</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>表示</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>アドレス バーに完全なパスを表示する(&amp;S)</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>その他の言語(&amp;M)...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

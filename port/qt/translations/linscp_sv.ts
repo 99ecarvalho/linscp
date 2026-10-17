@@ -3461,6 +3461,22 @@ Plats: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Visa &amp;katalogträd vänster om fillistan</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Inställningar på den här fliken gäller endast för utforskargränssnittet</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Visa</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>Vi&amp;sa den fullständiga sökvägen i adressfältet</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Hämta &amp;fler...</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

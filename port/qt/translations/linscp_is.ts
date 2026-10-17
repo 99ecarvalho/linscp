@@ -3461,6 +3461,22 @@ Staðsetning: %2</translation>
         <source>Show &amp;directory tree left of file list</source>
         <translation>Sýna &amp;skráasafnstré vinstra megin við skráalista</translation>
     </message>
+    <message>
+        <source>Preferences on this page apply to Explorer interface only.</source>
+        <translation>Kjörstillingar á þessari síðu gilda um Explorer-viðmót einungis</translation>
+    </message>
+    <message>
+        <source>View</source>
+        <translation>Skoða</translation>
+    </message>
+    <message>
+        <source>&amp;Show full path on address bar</source>
+        <translation>&amp;Sýna fulla slóð á staðfangsstiku</translation>
+    </message>
+    <message>
+        <source>Get &amp;more...</source>
+        <translation>Fá &amp;fleiri…</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>
