@@ -1,0 +1,59 @@
+Build local paths with the platform's delimiter where they are literals.
+
+Six local paths are written with a literal backslash. On POSIX that is not
+a path delimiter, so each named a single entry with a backslash in it:
+
+- TCopyParamType::ValidLocalPath joined a remote path's components into one
+  directory, "home\user\dir" (the temporary folders' "append remote path");
+- the default AWS files were looked up as "~/.aws\credentials" and
+  "~/.aws\config", so ~/.aws was never read;
+- FileZilla's sites were looked up as "FileZilla\sitemanager.xml" under the
+  application data folder; FileZilla's own folder there is "filezilla" on
+  POSIX (~/.config/filezilla);
+- the user extensions folder was "WinSCP\Extensions" under the application
+  data folder;
+- an extension's session log file option defaulted to "%TEMP%\<name>.log";
+- PuTTY's default paths were "<Program Files>\PuTTY\putty.exe".
+
+Each is built with IncludeTrailingBackslash or PathDelim, as the rest of
+core builds paths, or chooses by PathDelim: on Windows the same backslash
+and names as before, so upstream's behaviour is unchanged. Line counts are
+unchanged.
+
+Offered upstream as winscp/winscp#87, one commit each, with an #ifdef _WIN32
+as the maintainer prefers: the same choices made at compile time, carried
+here as one line each to keep the line count; dropped when a pin move brings
+it in.
+
+--- a/source/core/CopyParam.cpp
++++ b/source/core/CopyParam.cpp
+@@ -667,1 +667,1 @@
+-      Result += L"\\";
++      Result += PathDelim;
+--- a/source/core/S3FileSystem.cpp
++++ b/source/core/S3FileSystem.cpp
+@@ -75,1 +75,1 @@
+-      UnicodeString DefaultFileName = IncludeTrailingBackslash(ProfilePath) + L".aws\\" + DefaultName;
++      UnicodeString DefaultFileName = IncludeTrailingBackslash(IncludeTrailingBackslash(ProfilePath) + L".aws") + DefaultName;
+--- a/source/core/Configuration.cpp
++++ b/source/core/Configuration.cpp
+@@ -1699,2 +1699,2 @@
+-  UnicodeString FilezillaSiteManagerFile = CombinePaths(AppDataPath, L"FileZilla\\sitemanager.xml");
+-  UnicodeString FilezillaConfigurationFile = CombinePaths(AppDataPath, L"FileZilla\\filezilla.xml");
++  UnicodeString FilezillaSiteManagerFile = CombinePaths(AppDataPath, (PathDelim == L'\\') ? L"FileZilla\\sitemanager.xml" : L"filezilla/sitemanager.xml");
++  UnicodeString FilezillaConfigurationFile = CombinePaths(AppDataPath, (PathDelim == L'\\') ? L"FileZilla\\filezilla.xml" : L"filezilla/filezilla.xml");
+--- a/source/windows/WinConfiguration.cpp
++++ b/source/windows/WinConfiguration.cpp
+@@ -1461,1 +1461,1 @@
+-  return IncludeTrailingBackslash(GetShellFolderPath(CSIDL_APPDATA)) + L"WinSCP\\" + ExtensionsSubFolder;
++  return IncludeTrailingBackslash(IncludeTrailingBackslash(GetShellFolderPath(CSIDL_APPDATA)) + L"WinSCP") + ExtensionsSubFolder;
+@@ -3528,1 +3528,1 @@
+-        Option.FileInitial = L"%TEMP%\\" + ExtensionBaseName + L".log";
++        Option.FileInitial = IncludeTrailingBackslash(L"%TEMP%") + ExtensionBaseName + L".log";
+--- a/source/windows/GUIConfiguration.cpp
++++ b/source/windows/GUIConfiguration.cpp
+@@ -561,2 +561,2 @@
+-  FDefaultPuttyPathOnly = IncludeTrailingBackslash(ProgramsFolder) + L"PuTTY\\" + OriginalPuttyExecutable;
+-  FDefaultPuttyPath = L"%ProgramFiles%\\PuTTY\\" + OriginalPuttyExecutable;
++  FDefaultPuttyPathOnly = IncludeTrailingBackslash(IncludeTrailingBackslash(ProgramsFolder) + L"PuTTY") + OriginalPuttyExecutable;
++  FDefaultPuttyPath = IncludeTrailingBackslash(IncludeTrailingBackslash(L"%ProgramFiles%") + L"PuTTY") + OriginalPuttyExecutable;

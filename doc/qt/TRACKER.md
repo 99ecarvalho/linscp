@@ -258,9 +258,12 @@ P2-10 and P2-11 waited, at the user's request, for P3.
 1. The upstream PRs for the carried patches (ADR 0006), waiting on WinSCP's
    maintainer: winscp/winscp#79 (portability), #80 (`LogEvent`), #81 (log
    file names), #82 (local EOL), #83 (OpenSSH import paths), #84, #85 (S3),
-   #86 (`core-recursive-delete-delimiter.patch`, offered 2026-10-17 with
-   `#ifdef _WIN32`, as the maintainer prefers); each patch dropped when a
-   pin move brings it in.
+   #86 (`core-recursive-delete-delimiter.patch`), #87
+   (`core-posix-local-path-delimiters.patch`: valid local paths, ~/.aws,
+   FileZilla's folder, the extensions folder and log default, PuTTY's
+   default paths), #88 (`core-path-comparison-case.patch`), all offered
+   2026-10-17 with `#ifdef _WIN32`, as the maintainer prefers; each patch
+   dropped when a pin move brings it in.
 2. The WinSCP functionality audit's gaps (2026-10-17): [gaps.md](gaps.md),
    all 47 closed in [gaps_tracker.md](gaps_tracker.md) (`/dumpcallstack`
    left out); next, checking the Windows-only parts (Edit in PuTTY, PuTTYgen)

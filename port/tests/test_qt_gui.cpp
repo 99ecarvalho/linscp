@@ -5434,6 +5434,22 @@ void ExtensionsTest(const char * Port, const QString & Directory)
       "# @option - -config label \"Says hello.\"\n"
       "# @option Mode -config dropdownlist \"&Mode:\" \"plain\" \"plain=Plain\" \"fancy=Fancy\"\n");
     Write(QStringLiteral("a.txt"), "a");
+    // A session log file option: its default in the temporary folder, with
+    // the platform's delimiter (core-posix-local-path-delimiters.patch).
+    {
+      const QString LogExtension = Write(QStringLiteral("logs.WinSCPextension.txt"),
+        "# @name &Log Something\n# @command echo \"%Log%\"\n# @option Log -config sessionlogfile\n");
+      CoreBridge::TExtensionsEdit Edit;
+      const int Index = Edit.AddFromFile(LogExtension.toStdString(), -1, []() { return true; });
+      const std::vector<CoreBridge::TExtensionOption> Options = Edit.Options(Index, 2, std::string());
+#if defined(_WIN32)
+      const std::string Initial = "%TEMP%\\logs.log";
+#else
+      const std::string Initial = "%TEMP%/logs.log";
+#endif
+      Check((Options.size() == 1) && (Options[0].Kind == CoreBridge::TExtensionOption::TKind::File) &&
+        (Options[0].FileInitial == Initial), "a session log file option's default");
+    }
     {
       PreferencesDialog Dialog(&Window);
       Dialog.ShowPage(PreferencesDialog::tr("Commands"));

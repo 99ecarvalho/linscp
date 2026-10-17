@@ -123,6 +123,14 @@ add_test(NAME core_init_build
 add_test(NAME core_init COMMAND test_core_init /ini=nul)
 set_tests_properties(core_init PROPERTIES DEPENDS core_init_build)
 
+# Core's local paths with the platform's delimiter and case rule.
+add_executable(test_core_paths EXCLUDE_FROM_ALL test_core_paths.cpp)
+target_link_libraries(test_core_paths PRIVATE linscp-runtime)
+add_test(NAME core_paths_build
+  COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_core_paths)
+add_test(NAME core_paths COMMAND test_core_paths /ini=nul)
+set_tests_properties(core_paths PROPERTIES DEPENDS core_paths_build)
+
 # Sites in WinSCP's INI file, read through core's storage as CoreLoad does.
 add_executable(test_ini_sites EXCLUDE_FROM_ALL test_ini_sites.cpp)
 target_link_libraries(test_ini_sites PRIVATE linscp-runtime)
