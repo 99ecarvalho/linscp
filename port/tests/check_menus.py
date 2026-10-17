@@ -27,7 +27,8 @@ ALIASES = {'Upload': 'Download', 'Upload in Background': 'Download in Background
 
 
 def clean(caption):
-    caption = caption.replace('&', '')
+    # Without a shortcut shown after a tab, as QMenu draws it.
+    caption = caption.split('\t')[0].replace('&', '')
     return caption[:-3] if caption.endswith('...') else caption
 
 
