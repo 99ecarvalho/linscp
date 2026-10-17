@@ -4864,6 +4864,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>لصق الرابط</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>ال&amp;بحث عن موقع</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;خيارات</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>&amp;بداية اسم الموقع فقط</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;أي جزء من اسم الموقع</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>جميع حقول الموقع ال&amp;رئيسية</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

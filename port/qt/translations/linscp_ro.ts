@@ -4861,6 +4861,26 @@ Cale: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Inserare &amp;URL de Sesiune</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Căutare Site</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Opțiuni</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>&amp;Doar Începutul Numelui Site-ului</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;Orice Parte din Numele Site-ului</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Toate Câmpurile &amp;Importante ale Site-ului</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

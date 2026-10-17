@@ -4861,6 +4861,26 @@ Umístění: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Vložit URL &amp;spojení</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Hledat místo</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Možnosti</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Jen &amp;začátek jména místa</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;Libovolná část jména místa</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Všechny &amp;důležité položky místa</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

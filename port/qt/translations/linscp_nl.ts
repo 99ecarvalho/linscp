@@ -4860,6 +4860,26 @@ Locatie: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Plak sessie &amp;URL</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Vind Site</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Opties</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>&amp;Enkel begin van sitenaam</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;Ieder deel van sitenaam</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Alle &amp;belangrijke site velden</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

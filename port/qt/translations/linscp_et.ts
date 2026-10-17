@@ -4860,6 +4860,26 @@ Asukoht: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Kleebi seansi &amp;URL</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Otsi saiti</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Eelistused</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Ainult saidi nime &amp;algus</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>Saidi nime &amp;mis tahes osa</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Kõik saidi &amp;põhiväljad</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

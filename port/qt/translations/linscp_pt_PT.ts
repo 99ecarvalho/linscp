@@ -4860,6 +4860,26 @@ Localização: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Colar sessão &amp;URL</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>Localizar Site</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Opções</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>&amp;Inicio do nome do site</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;Qualquer parte do nome do site</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>&amp;Todos os campos do nome do site</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

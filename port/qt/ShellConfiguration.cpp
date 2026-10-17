@@ -441,6 +441,11 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     TCloseSubKeyPath Close(Storage);
     Storage->WriteString(L"WindowSize", FSettings.ConsoleWindowSize);
   }
+  if (Storage->OpenSubKeyPath(L"Interface\\LoginDialog", true))
+  {
+    TCloseSubKeyPath Close(Storage);
+    Storage->WriteInteger(L"SiteSearch", FSettings.SiteSearch);
+  }
   if (Storage->OpenSubKeyPath(L"Interface\\QueueView", true))
   {
     TCloseSubKeyPath Close(Storage);
@@ -1031,6 +1036,11 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
   {
     TCloseSubKeyPath Close(Storage);
     FSettings.ConsoleWindowSize = Storage->ReadString(L"WindowSize", FSettings.ConsoleWindowSize);
+  }
+  if (Storage->OpenSubKeyPath(L"Interface\\LoginDialog", false))
+  {
+    TCloseSubKeyPath Close(Storage);
+    FSettings.SiteSearch = Storage->ReadInteger(L"SiteSearch", FSettings.SiteSearch);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\QueueView", false))
   {

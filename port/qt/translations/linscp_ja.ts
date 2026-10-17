@@ -4859,6 +4859,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>セッション URL を貼り付け(&amp;U)</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>サイトを検索(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>オプション(&amp;O)</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>サイト名の先頭に一致(&amp;B)</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>サイト名の一部に一致(&amp;A)</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>サイト情報のいずれかに一致(&amp;M)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

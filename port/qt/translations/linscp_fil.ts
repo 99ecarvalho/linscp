@@ -4860,6 +4860,26 @@ Lokasyon: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>I-paste ang Session &amp;URL</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Hanapin ang Site</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>Mga &amp;Opsyon</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Simula lamang ng pangalan ng &amp;site</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;Anumang bahagi ng pangalan ng site</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Lahat ng &amp;Pangunahing Field ng Site</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

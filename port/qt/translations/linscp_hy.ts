@@ -4860,6 +4860,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>Տեղադրել աշխատաշրջանի &amp;URL</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Գտնել կայքը</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Ընտրանքներ</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Միայն կայքի անվան &amp;սկիզբը</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>Կայքի անվան &amp;ցանկացած մաս</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Կայքի բոլոր &amp;հիմնական դաշտերը</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

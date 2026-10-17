@@ -799,6 +799,7 @@ TLayout Layout()
   Result.LargerToolbar = Settings.LargerToolbar;
   Result.ToolbarsLayout = Utf8(Settings.CommanderToolbarsLayout);
   Result.ConsoleWindowSize = Utf8(Settings.ConsoleWindowSize);
+  Result.SiteSearch = static_cast<TPreferences::TPanelSearch>(std::clamp(Settings.SiteSearch, 0, 2));
   Result.Explorer.WindowParams = Utf8(Settings.ExplorerWindowParams);
   Result.Explorer.DirViewParams = Utf8(Settings.ExplorerDirViewParams);
   Result.Explorer.ToolbarsLayout = Utf8(Settings.ExplorerToolbarsLayout);
@@ -911,6 +912,7 @@ void SetLayout(const TLayout & Layout)
   Settings.LargerToolbar = Layout.LargerToolbar;
   Settings.CommanderToolbarsLayout = FromUtf8(Layout.ToolbarsLayout);
   Settings.ConsoleWindowSize = FromUtf8(Layout.ConsoleWindowSize);
+  Settings.SiteSearch = static_cast<int>(Layout.SiteSearch);
   Settings.ExplorerWindowParams = FromUtf8(Layout.Explorer.WindowParams);
   Settings.ExplorerDirViewParams = FromUtf8(Layout.Explorer.DirViewParams);
   Settings.ExplorerToolbarsLayout = FromUtf8(Layout.Explorer.ToolbarsLayout);
@@ -1885,6 +1887,8 @@ std::string Text(TText Text)
     case TText::DDTransferConfirmOff: return Utf8(UnformatMessage(LoadStr(DD_TRANSFER_CONFIRM_OFF2)));
     case TText::DDWarnLackOfTempSpace: Ident = DD_WARN_LACK_OF_TEMP_SPACE; break;
     case TText::SetDefaultSiteSettings: Ident = SET_DEFAULT_SESSION_SETTINGS; break;
+    case TText::IncrementalSearchType: Ident = INC_SEARCH_TYPE; break;
+    case TText::IncrementalSearchNext: Ident = INC_NEXT_SEARCH; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

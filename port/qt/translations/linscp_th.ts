@@ -4859,6 +4859,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>วาง &amp;URL ของเซสชัน</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;ค้นหาไซต์</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;ตัวเลือก</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>เฉพาะ&amp;ต้นชื่อไซต์</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>ส่วน&amp;ใดก็ได้ของชื่อไซต์</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>ฟิลด์&amp;หลักทั้งหมดของไซต์</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4860,6 +4860,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>Поставяне на &amp;URL на сесия</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Търсене на сайт</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Възможности</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Само &amp;началото на името на сайта</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;Коя да е част от името на сайта</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Всички &amp;основни полета на сайта</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

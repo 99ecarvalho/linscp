@@ -4859,6 +4859,26 @@ Lokasi: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Tampal &amp;URL Sesi</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Cari Tapak</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Opsyen</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>&amp;Awal nama tapak sahaja</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>Mana-mana &amp;bahagian nama tapak</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Semua &amp;Medan Utama Tapak</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

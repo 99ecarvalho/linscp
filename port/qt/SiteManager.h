@@ -113,6 +113,18 @@ public:
   void PasteUrl();
   // As HostNameEditExit: a URL in the host name parsed into the form.
   void ParseHostName();
+  // A10, the site search (SitesIncrementalSearch): Text from the item
+  // under the cursor (after it when SkipCurrent; backwards when Reverse),
+  // in collapsed folders too, but first in what shows unless Expanding;
+  // false when nothing matches. As the tree searches what is typed in it.
+  bool SearchSites(const QString & Text, bool SkipCurrent = false, bool Reverse = false, bool Expanding = false);
+  // Find Site (Ctrl+F): the search started, nothing typed yet.
+  void StartSiteSearch();
+  void ResetSiteSearch();
+  bool SiteSearching() const { return FSearching; }
+  QLabel * SiteSearchStatus() const { return FSearchStatus; }
+  // Search > Options: what the search matches (LoginDialog.SiteSearch).
+  void SetSiteSearch(CoreBridge::TPreferences::TPanelSearch Search);
   // Reset: the new site from the defaults.
   void ResetNewSite();
   // Generate Session URL/Code, for the site as edited.
@@ -160,6 +172,16 @@ private:
   QPushButton * FDelete = nullptr;
   QPushButton * FNewFolder = nullptr;
   QPushButton * FManage = nullptr;
+  bool eventFilter(QObject * Watched, QEvent * Event) override;
+  class QTreeWidgetItem * SearchSite(const QString & Text, bool AllowExpanding, bool SkipCurrent, bool Reverse);
+  bool SiteMatches(const QTreeWidgetItem * Item, const QString & Text) const;
+  void UpdateSiteSearch();
+  QLabel * FSearchStatus = nullptr;
+  bool FSearching = false;
+  bool FSearchHaveNext = false;
+  bool FIncrementalSearching = false;
+  QString FSearchText;
+  CoreBridge::TPreferences::TPanelSearch FSiteSearch = CoreBridge::TPreferences::TPanelSearch::AnyPart;
   void AskNewFolder();
   void AskRename();
   // The new site's name from Clone to New Site, for Save; empty otherwise.

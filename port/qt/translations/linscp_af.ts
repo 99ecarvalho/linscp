@@ -4860,6 +4860,26 @@ Ligging: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Plak sessie-&amp;URL</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Soek werf</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Opsies</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Slegs &amp;begin van werfnaam</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;Enige deel van werfnaam</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Alle &amp;hoofvelde van werf</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

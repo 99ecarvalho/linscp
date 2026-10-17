@@ -4861,6 +4861,26 @@ Lokacija: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Zalijepi &amp;URL sesije</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Pronađi lokaciju</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Opcije</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Samo &amp;početak imena stranice</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;Bilo koji dio imena stranice</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Sva glavna polja stranice</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

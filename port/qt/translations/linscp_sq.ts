@@ -4860,6 +4860,26 @@ Vendndodhja: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Ngjit &amp;URL-në e seancës</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Gjej sajtin</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Opsionet</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Vetëm &amp;fillimi i emrit të sajtit</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>Çdo &amp;pjesë e emrit të sajtit</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Të gjitha fushat &amp;kryesore të sajtit</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

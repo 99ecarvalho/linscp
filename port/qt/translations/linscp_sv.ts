@@ -4860,6 +4860,26 @@ Plats: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Klistra in sessions-&amp;URL</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Hitta webbplats</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Alternativ</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Endast &amp;början av webbplatsens namn</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;Varje del av webbplatsens namn</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Alla &amp;fält för webbplatsen</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

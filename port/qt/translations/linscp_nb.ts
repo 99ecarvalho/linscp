@@ -4860,6 +4860,26 @@ Plassering: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Lim inn økt-&amp;URL</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Finn nettsted</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Innstillinger</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Kun &amp;begynnelsen på nettstednavn</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;En hver del av nettstednavn</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Alle &amp;hoved nettsted felt</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4860,6 +4860,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>სესიის ბმ&amp;ულის ჩასმა</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>საიტის &amp;ძებნა</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;მორგება</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>მხოლო&amp;დ, საიტის სახელის დასაწყისი</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>საიტის სახელის ნ&amp;ებისმიერი ნაწილი</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>საიტის &amp;ყველა ძირითადი ველი</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

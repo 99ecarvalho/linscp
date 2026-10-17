@@ -4859,6 +4859,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>세션 URL 붙여넣기(&amp;U)</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>사이트 찾기(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>옵션(&amp;O)</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>사이트 이름 시작만(&amp;B)</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>사이트 이름의 모든 부분(&amp;A)</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>모든 주요 사이트 필드(&amp;M)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

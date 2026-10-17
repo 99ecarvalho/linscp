@@ -4860,6 +4860,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>সেশন URL পেস্ট(&amp;U)</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>সাইট খুঁজুন(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>অপশনস্(&amp;O)</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>শুধুমাত্র সাইটের নামের শুরু(&amp;B)</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>সাইটের নামের যেকোনো অংশ(&amp;A)</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>সাইটের সব প্রধান ক্ষেত্র(&amp;M)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

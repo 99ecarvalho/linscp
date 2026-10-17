@@ -4860,6 +4860,26 @@ Staðsetning: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Líma &amp;lotuvefslóð</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Finna vefsvæði</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Valmöguleikar</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>&amp;Upphaf setursnafns einungis</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;Hvaða hluta setursnafns sem er</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Allir &amp;meiriháttar setursreitir</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

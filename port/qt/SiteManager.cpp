@@ -31,7 +31,10 @@
 #include "CleanupDialog.h"
 #include "CustomCommandDialog.h"
 #include "GenerateUrlDialog.h"
+#include <QActionGroup>
+#include <QApplication>
 #include <QClipboard>
+#include <QKeyEvent>
 #include <QGuiApplication>
 #include <QMenu>
 #include <QToolButton>
@@ -86,6 +89,28 @@ SiteManager::SiteManager(QWidget * Parent) :
     }
   });
   TreeLayout->addWidget(FTree, 1);
+  // As SitesIncrementalSearchPanel: what is searched, below the tree.
+  FSearchStatus = new QLabel(TreePanel);
+  FSearchStatus->setTextFormat(Qt::PlainText);
+  FSearchStatus->setFrameShape(QFrame::StyledPanel);
+  FSearchStatus->hide();
+  TreeLayout->addWidget(FSearchStatus);
+  FTree->installEventFilter(this);
+  FSiteSearch = CoreBridge::Layout().SiteSearch;
+  // The actions' keys, as upstream's action list's, with no menu open.
+  const std::pair<QKeySequence, std::function<void()>> Keys[] = {
+    { QKeySequence(Qt::CTRL | Qt::Key_F), [this]() { StartSiteSearch(); } },
+    { QKeySequence(Qt::CTRL | Qt::Key_P), [this]() { if (FTree->currentItem() != nullptr) { const int Kind = FTree->currentItem()->data(0, KindRole).toInt(); if ((Kind == SiteKind) || (Kind == NewSiteKind)) { OpenInPutty(); } } } },
+    { QKeySequence(Qt::CTRL | Qt::Key_V), [this]() { PasteUrl(); } },
+    { QKeySequence(Qt::ALT | Qt::Key_A), [this]() { if (FSave->isEnabled()) { SaveAsDialog(true); } } },
+  };
+  for (const auto & Key : Keys)
+  {
+    QAction * Action = new QAction(this);
+    Action->setShortcut(Key.first);
+    connect(Action, &QAction::triggered, this, Key.second);
+    addAction(Action);
+  }
   // As upstream's: the item's menu, on the tree and its Manage button.
   FTree->setContextMenuPolicy(Qt::CustomContextMenu);
   connect(FTree, &QTreeWidget::customContextMenuRequested, this, [this](const QPoint & Pos)
@@ -95,6 +120,7 @@ SiteManager::SiteManager(QWidget * Parent) :
     {
       FTree->setCurrentItem(Item);
     }
+    ResetSiteSearch();
     QMenu Menu(this);
     FillManageMenu(&Menu);
     Menu.exec(FTree->viewport()->mapToGlobal(Pos));
@@ -453,6 +479,10 @@ void SiteManager::ShowMessage(CoreBridge::TQueryType Type, const QString & Messa
 
 void SiteManager::CurrentChanged()
 {
+  if (!FIncrementalSearching)
+  {
+    ResetSiteSearch();
+  }
   const QTreeWidgetItem * Item = FTree->currentItem();
   const int Kind = (Item != nullptr) ? Item->data(0, KindRole).toInt() : FolderKind;
   try
@@ -743,6 +773,8 @@ void SiteManager::AskRename()
   }
 }
 
+static void AddSearchMenu(SiteManager * Dialog, QMenu * Menu, CoreBridge::TPreferences::TPanelSearch Current);
+
 void SiteManager::FillManageMenu(QMenu * Menu)
 {
   const QTreeWidgetItem * Item = FTree->currentItem();
@@ -792,6 +824,7 @@ void SiteManager::FillManageMenu(QMenu * Menu)
   }
   if (Kind != NewSiteKind)
   {
+    Menu->addSeparator();
     Menu->addAction(tr("Desktop &Icon"), this, [this]() { CreateSessionShortcut(false); });
 #if defined(Q_OS_WIN)
     if (Kind == SiteKind)
@@ -800,6 +833,260 @@ void SiteManager::FillManageMenu(QMenu * Menu)
     }
 #endif
   }
+  AddSearchMenu(this, Menu, FSiteSearch);
+}
+
+// As the Manage menus' Search group.
+static void AddSearchMenu(SiteManager * Dialog, QMenu * Menu, CoreBridge::TPreferences::TPanelSearch Current)
+{
+  using TSearch = CoreBridge::TPreferences::TPanelSearch;
+  Menu->addSeparator();
+  Menu->addAction(SiteManager::tr("&Find Site"), QKeySequence(Qt::CTRL | Qt::Key_F), Dialog, &SiteManager::StartSiteSearch);
+  QMenu * Options = Menu->addMenu(SiteManager::tr("&Options"));
+  QActionGroup * Group = new QActionGroup(Options);
+  const std::pair<QString, TSearch> Items[] = {
+    { SiteManager::tr("&Beginning of Site Name Only"), TSearch::NameStart },
+    { SiteManager::tr("&Any Part of Site Name"), TSearch::AnyPart },
+    { SiteManager::tr("All &Major Site Fields"), TSearch::AllColumns } };
+  for (const auto & Item : Items)
+  {
+    const TSearch Search = Item.second;
+    QAction * Action = Options->addAction(Item.first, Dialog, [Dialog, Search]() { Dialog->SetSiteSearch(Search); });
+    Action->setCheckable(true);
+    Action->setChecked(Search == Current);
+    Group->addAction(Action);
+  }
+}
+
+void SiteManager::SetSiteSearch(CoreBridge::TPreferences::TPanelSearch Search)
+{
+  if (FSiteSearch != Search)
+  {
+    FSiteSearch = Search;
+    CoreBridge::TLayout Layout = CoreBridge::Layout();
+    Layout.SiteSearch = Search;
+    CoreBridge::SetLayout(Layout);
+    ResetSiteSearch();
+  }
+}
+
+// As ContainsTextSemiCaseSensitive: lower case matches either case.
+static bool ContainsSemiCaseSensitive(const QString & Text, const QString & Sub)
+{
+  return Text.contains(Sub, (Sub.toLower() == Sub) ? Qt::CaseInsensitive : Qt::CaseSensitive);
+}
+
+bool SiteManager::SiteMatches(const QTreeWidgetItem * Item, const QString & Text) const
+{
+  using TSearch = CoreBridge::TPreferences::TPanelSearch;
+  const QString Name = Item->text(0);
+  switch (FSiteSearch)
+  {
+    case TSearch::NameStart:
+      return ContainsSemiCaseSensitive(Name.left(Text.size()), Text);
+    case TSearch::AnyPart:
+      return ContainsSemiCaseSensitive(Name, Text);
+    case TSearch::AllColumns:
+      if (ContainsSemiCaseSensitive(Name, Text))
+      {
+        return true;
+      }
+      if (Item->data(0, KindRole).toInt() == SiteKind)
+      {
+        try
+        {
+          const CoreBridge::TSite Site = CoreBridge::LoadSite(Item->data(0, NameRole).toString().toStdString());
+          return ContainsSemiCaseSensitive(QString::fromStdString(Site.HostName), Text) ||
+            ContainsSemiCaseSensitive(QString::fromStdString(Site.UserName), Text) ||
+            ContainsSemiCaseSensitive(QString::fromStdString(Site.Note), Text);
+        }
+        catch (const CoreBridge::TCoreError &)
+        {
+        }
+      }
+      return false;
+  }
+  return false;
+}
+
+// As TLoginDialog::SearchSite: from the item under the cursor, round the
+// tree (into collapsed folders when AllowExpanding).
+QTreeWidgetItem * SiteManager::SearchSite(const QString & Text, bool AllowExpanding, bool SkipCurrent, bool Reverse)
+{
+  std::vector<QTreeWidgetItem *> Items;
+  for (QTreeWidgetItemIterator It(FTree); *It; ++It)
+  {
+    Items.push_back(*It);
+  }
+  if (Items.empty())
+  {
+    return nullptr;
+  }
+  const int Count = static_cast<int>(Items.size());
+  const auto Found = std::find(Items.begin(), Items.end(), FTree->currentItem());
+  const int Current = (Found != Items.end()) ? static_cast<int>(Found - Items.begin()) : 0;
+  auto Next = [Count, Reverse](int Index) { return Reverse ? ((Index + Count - 1) % Count) : ((Index + 1) % Count); };
+  int Index = SkipCurrent ? Next(Current) : Current;
+  if (SkipCurrent && (Index == Current))
+  {
+    return nullptr;
+  }
+  while (true)
+  {
+    bool Eligible = true;
+    for (QTreeWidgetItem * Parent = Items[Index]->parent(); Eligible && (Parent != nullptr); Parent = Parent->parent())
+    {
+      Eligible = Parent->isExpanded() || AllowExpanding;
+    }
+    if (Eligible && SiteMatches(Items[Index], Text))
+    {
+      return Items[Index];
+    }
+    Index = Next(Index);
+    if (Index == Current)
+    {
+      return nullptr;
+    }
+  }
+}
+
+bool SiteManager::SearchSites(const QString & Text, bool SkipCurrent, bool Reverse, bool Expanding)
+{
+  QTreeWidgetItem * Item = nullptr;
+  if (!Expanding)
+  {
+    Item = SearchSite(Text, false, SkipCurrent, Reverse);
+  }
+  if (Item == nullptr)
+  {
+    Item = SearchSite(Text, true, SkipCurrent, Reverse);
+    for (QTreeWidgetItem * Parent = (Item != nullptr) ? Item->parent() : nullptr; Parent != nullptr; Parent = Parent->parent())
+    {
+      Parent->setExpanded(true);
+    }
+  }
+  if (Item == nullptr)
+  {
+    return false;
+  }
+  FIncrementalSearching = true;
+  FTree->setCurrentItem(Item);
+  FIncrementalSearching = false;
+  FSearching = true;
+  FSearchText = Text;
+  // Tab always searches, in collapsed folders too.
+  QTreeWidgetItem * NextItem = SearchSite(Text, true, true, Reverse);
+  FSearchHaveNext = (NextItem != nullptr) && (NextItem != Item);
+  UpdateSiteSearch();
+  FTree->scrollToItem(Item);
+  return true;
+}
+
+void SiteManager::StartSiteSearch()
+{
+  FTree->setFocus();
+  if (!FSearching)
+  {
+    FSearching = true;
+    FSearchHaveNext = false;
+    FSearchText.clear();
+    UpdateSiteSearch();
+  }
+}
+
+void SiteManager::ResetSiteSearch()
+{
+  FSearching = false;
+  FSearchHaveNext = false;
+  FSearchText.clear();
+  UpdateSiteSearch();
+}
+
+// As FormatIncrementalSearchStatus.
+void SiteManager::UpdateSiteSearch()
+{
+  FSearchStatus->setVisible(FSearching);
+  if (FSearching)
+  {
+    const QString Shown = FSearchText.isEmpty() ? QString::fromStdString(CoreBridge::Text(CoreBridge::TText::IncrementalSearchType)) : FSearchText;
+    QString Status = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::IncrementalSearch)).replace(QStringLiteral("%s"), Shown);
+    if (FSearchHaveNext && !FSearchText.isEmpty())
+    {
+      Status += QLatin1Char(' ') + QString::fromStdString(CoreBridge::Text(CoreBridge::TText::IncrementalSearchNext));
+    }
+    FSearchStatus->setText(Status);
+  }
+}
+
+// As SessionTreeKeyDown, SessionTreeKeyPress and CMDialogKey.
+bool SiteManager::eventFilter(QObject * Watched, QEvent * Event)
+{
+  if (Watched == FTree)
+  {
+    if (Event->type() == QEvent::FocusOut)
+    {
+      ResetSiteSearch();
+    }
+    else if (Event->type() == QEvent::KeyPress)
+    {
+      QKeyEvent * Key = static_cast<QKeyEvent *>(Event);
+      const Qt::KeyboardModifiers Modifiers = Key->modifiers() & ~(Qt::ShiftModifier | Qt::KeypadModifier);
+      if (((Key->key() == Qt::Key_Tab) || (Key->key() == Qt::Key_Backtab)) && !FSearchText.isEmpty())
+      {
+        if (!SearchSites(FSearchText, true, Key->key() == Qt::Key_Backtab, true))
+        {
+          QApplication::beep();
+        }
+        return true;
+      }
+      if ((Key->key() == Qt::Key_Escape) && FSearching)
+      {
+        ResetSiteSearch();
+        return true;
+      }
+      if (Key->key() == Qt::Key_Backspace)
+      {
+        if (FSearching)
+        {
+          if (FSearchText.size() <= 1)
+          {
+            ResetSiteSearch();
+          }
+          else
+          {
+            SearchSites(FSearchText.left(FSearchText.size() - 1));
+          }
+        }
+        return true;
+      }
+      if ((Key->key() == Qt::Key_Delete) && (Modifiers == Qt::NoModifier))
+      {
+        if (FDelete->isEnabled())
+        {
+          DeleteSelected(true);
+        }
+        return true;
+      }
+      if ((Key->key() == Qt::Key_F2) && (Modifiers == Qt::NoModifier))
+      {
+        if (FRename->isEnabled())
+        {
+          AskRename();
+        }
+        return true;
+      }
+      const QString Text = Key->text();
+      if ((Modifiers == Qt::NoModifier) && !Text.isEmpty() && (Text.at(0) >= QLatin1Char(' ')) && Text.at(0).isPrint())
+      {
+        if (!SearchSites(FSearchText + Text))
+        {
+          QApplication::beep();
+        }
+        return true;
+      }
+    }
+  }
+  return QDialog::eventFilter(Watched, Event);
 }
 
 // As TLoginDialog::CloneToNewSite.

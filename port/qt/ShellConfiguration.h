@@ -157,6 +157,9 @@ struct TShellSettings
   UnicodeString CommanderToolbarsLayout;
   // ConsoleWin.WindowSize: "width,height,ppi".
   UnicodeString ConsoleWindowSize = L"570,430,96";
+  // LoginDialog.SiteSearch (TIncrementalSearch: isNameStartOnly, isName,
+  // isAll), the Login dialog's site search.
+  int SiteSearch = 1;
   // Interface\Explorer (TScpExplorerConfiguration), the Explorer
   // interface's: its window, its panel's columns, its toolbars (its key
   // ToolbarsLayout2), status bar and tabs, the view style (TDirViewStyle:

@@ -4860,6 +4860,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>அமர்வு &amp;முகவரி ஒட்டு</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>வலைதளம் தேடு</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;விருப்பங்கள்</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>&amp;தளத்தின் துவக்க பெயர் மட்டுமே</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;தள பெயரின் எந்த பகுதியும்</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>அனைத்து &amp;முதன்மை தள புலங்கள்</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

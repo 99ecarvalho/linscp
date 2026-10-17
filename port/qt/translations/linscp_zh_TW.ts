@@ -4859,6 +4859,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>貼上工作階段的網址(&amp;U)</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>尋找站台(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>選項(&amp;O)</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>僅在站台名稱開首(&amp;B)</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>在站台名稱任何部份(&amp;B)</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>所有主要站台欄位(&amp;M)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

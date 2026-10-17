@@ -4859,6 +4859,26 @@ Hely: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Munkamenet &amp;URL beillesztése</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>Webhely &amp;keresése</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Beállítások</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Csak a webhely nevének &amp;kezdete</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>Webhely nevének &amp;bármely része</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Összes főbb webhelymező</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

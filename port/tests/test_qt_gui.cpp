@@ -654,6 +654,60 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
       Dialog.SetDefaults(false);
       Check(CoreBridge::NewSite().UserName == OriginalUser.toStdString(), "and set back");
     }
+    // A10: the site search, typed in the tree; Tab for the next match; its
+    // three modes.
+    {
+      SiteManager Dialog(&Window);
+      Dialog.SelectNewSite();
+      Dialog.HostName()->setText(QStringLiteral("alpha.example"));
+      Dialog.UserName()->setText(QStringLiteral("zed"));
+      Check(Dialog.SaveAs(QStringLiteral("Tests/alpha"), false), "a site to search for");
+      Dialog.SelectNewSite();
+      Dialog.HostName()->setText(QStringLiteral("beta.example"));
+      CoreBridge::TSite Noted = Dialog.Edited();
+      Noted.Note = "findme here";
+      Dialog.SetEdited(Noted);
+      Check(Dialog.SaveAs(QStringLiteral("beta"), false), "and another");
+      Dialog.SetSiteSearch(CoreBridge::TPreferences::TPanelSearch::AnyPart);
+      Dialog.SelectNewSite();
+      Dialog.Tree()->collapseAll();
+      QTest::keyClicks(Dialog.Tree(), QStringLiteral("alp"));
+      Check((Dialog.Tree()->currentItem()->text(0) == QStringLiteral("alpha")) && Dialog.Tree()->currentItem()->parent()->isExpanded() &&
+        Dialog.SiteSearching() && Dialog.SiteSearchStatus()->text().contains(QStringLiteral("alp")),
+        "typing in the tree finds the site, in its collapsed folder");
+      QTest::keyClick(Dialog.Tree(), Qt::Key_Escape);
+      Check(!Dialog.SiteSearching() && Dialog.SiteSearchStatus()->isHidden(), "Escape ends the search");
+      Dialog.SelectNewSite();
+      QTest::keyClicks(Dialog.Tree(), QStringLiteral("eta"));
+      Check(Dialog.Tree()->currentItem()->text(0) == QStringLiteral("beta"), "any part of the name");
+      QTest::keyClick(Dialog.Tree(), Qt::Key_Backspace);
+      QTest::keyClick(Dialog.Tree(), Qt::Key_Backspace);
+      Check(Dialog.SiteSearchStatus()->text().contains(QStringLiteral("e")), "Backspace takes a letter back");
+      const QString First = Dialog.Tree()->currentItem()->text(0);
+      QTest::keyClick(Dialog.Tree(), Qt::Key_Tab);
+      const QString Second = Dialog.Tree()->currentItem()->text(0);
+      QTest::keyClick(Dialog.Tree(), Qt::Key_Backtab);
+      Check((First != Second) && (Dialog.Tree()->currentItem()->text(0) == First), "Tab the next match, Shift+Tab back");
+      Dialog.ResetSiteSearch();
+      Dialog.SetSiteSearch(CoreBridge::TPreferences::TPanelSearch::NameStart);
+      Dialog.SelectNewSite();
+      Check(!Dialog.SearchSites(QStringLiteral("eta")) && Dialog.SearchSites(QStringLiteral("bet")), "the beginning of the name only");
+      Dialog.SetSiteSearch(CoreBridge::TPreferences::TPanelSearch::AllColumns);
+      Dialog.SelectNewSite();
+      Check(Dialog.SearchSites(QStringLiteral("findme")) && (Dialog.Tree()->currentItem()->text(0) == QStringLiteral("beta")) &&
+        Dialog.SearchSites(QStringLiteral("zed")) && (Dialog.Tree()->currentItem()->text(0) == QStringLiteral("alpha")),
+        "all major fields: the note, the user");
+      Check(CoreBridge::Layout().SiteSearch == CoreBridge::TPreferences::TPanelSearch::AllColumns, "the mode kept");
+      Dialog.SetSiteSearch(CoreBridge::TPreferences::TPanelSearch::AnyPart);
+      Dialog.ResetSiteSearch();
+      Dialog.SelectNewSite();
+      Dialog.StartSiteSearch();
+      Check(Dialog.SiteSearching() && Dialog.SiteSearchStatus()->isVisibleTo(&Dialog), "Find Site starts it");
+      Dialog.SelectSite(QStringLiteral("Tests/alpha"));
+      Dialog.DeleteSelected(false);
+      Dialog.SelectSite(QStringLiteral("beta"));
+      Dialog.DeleteSelected(false);
+    }
     // A16: a URL in the host name parsed on leaving it; A6: Paste Session URL.
     {
       SiteManager Dialog(&Window);

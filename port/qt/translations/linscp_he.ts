@@ -4860,6 +4860,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>הדבק &amp;URL של הפעלה</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;חפש אתר</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;אפשרויות</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>&amp;תחילת שם האתר בלבד</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;כל חלק משם האתר</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>כל שדות האתר ה&amp;עיקריים</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

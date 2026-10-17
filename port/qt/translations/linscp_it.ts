@@ -4860,6 +4860,26 @@ Percorso: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Incolla &amp;URL sessione</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Cerca sito</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Opzioni</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>&amp;Solo inizio del nome sito</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>Ogni p&amp;arte del nome sito</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Tutti i principali ca&amp;mpi del sito</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

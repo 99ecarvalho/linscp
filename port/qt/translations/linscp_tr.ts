@@ -4859,6 +4859,26 @@ Konum: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>&amp;Oturum adresini yapıştır</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Site bul</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Ayarlar</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Yalnızca site adı &amp;başlangıcında</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>Site &amp;adının içinde</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>&amp;Tüm temel site alanlarında</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

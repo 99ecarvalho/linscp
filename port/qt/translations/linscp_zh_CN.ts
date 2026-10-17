@@ -4859,6 +4859,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>复制会话URL(&amp;U)</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>查找站点（&amp;F）</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>选项(&amp;O)</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>仅搜索以此名称开头的站点(&amp;B)</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>搜索站点名称的任意部分(&amp;A)</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>搜索所有主要站点字段(&amp;M)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4859,6 +4859,26 @@ Vị trí: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Dán &amp;URL phiên</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Tìm trang</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Tùy chọn</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Chỉ &amp;phần đầu tên trang</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>Bất kỳ &amp;phần nào của tên</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>&amp;Tất cả trường chính của trang</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

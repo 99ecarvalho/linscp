@@ -4860,6 +4860,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>Επικόλληση &amp;URL συνεδρίας</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Εύρεση τοποθεσίας</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>Επιλογές</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Μόνο η &amp;αρχή του ονόματος τοποθεσίας</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;Οποιοδήποτε μέρος του ονόματος τοποθεσίας</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Όλα τα &amp;κύρια πεδία τοποθεσίας</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

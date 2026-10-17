@@ -11,14 +11,14 @@ Last updated: **2026-10-17**
 
 | Area | Done | Total |
 |---|---|---|
-| A. Site Manager | 8 | 17 |
+| A. Site Manager | 9 | 17 |
 | B. Password prompt and banner | 1 | 3 |
 | C. Progress and synchronization dialogs | 2 | 4 |
 | D. Main window | 1 | 9 |
 | E. Preferences | 0 | 10 |
 | F. Command line | 0 | 3 |
 | G. Known before | 0 | 1 |
-| **Total** | **12** | **47** |
+| **Total** | **13** | **47** |
 
 ## Items
 
@@ -33,7 +33,7 @@ Last updated: **2026-10-17**
 | A7 | Transfer Settings Rule... | Low | todo | |
 | A8 | Tools: Run Pageant/PuTTYgen, Import/Export Configuration, Preferences, Check for Updates, About | Medium | todo | |
 | A9 | Login drop-down: Open in PuTTY | Low | todo | Open in PuTTY is in Manage's menu (A4); the Login button's drop-down is left |
-| A10 | Site search (three modes, Find Site) | High | todo | |
+| A10 | Site search (three modes, Find Site) | High | done | 2026-10-17. Typed in the tree, Tab/Shift+Tab, Escape, Backspace; Search in the Manage menus; `Interface\\LoginDialog\\SiteSearch`; the tree's Delete and F2 keys, and the actions' keys (Ctrl+F, Ctrl+P, Ctrl+V, Alt+A); ctest `qt_gui_sites` |
 | A11 | Tree context menus | High | done | 2026-10-17. Manage's menu (A4); ctest `qt_gui_sites` |
 | A12 | Drag & drop in the tree | Medium | todo | |
 | A13 | Rename in place (F2), workspaces renamable | Medium | todo | |

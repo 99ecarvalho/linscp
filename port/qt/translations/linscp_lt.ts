@@ -4861,6 +4861,26 @@ Vieta: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Įdėti seanso &amp;URL</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Rasti tinklavietę</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Parametrai</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>&amp;Pradžioje tik tinklavietės pavadinimas</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;Bet kuri tinklavietės pavadinimo dalis</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Visi &amp;pagrindiniai tinklavietės laukai</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

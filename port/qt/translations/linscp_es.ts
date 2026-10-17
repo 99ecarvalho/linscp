@@ -4860,6 +4860,26 @@ Ruta: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Pegar &amp;URL de sesión</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Buscar sitio</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Opciones</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Solo comienzo del nombre del sitio</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>Cualquier parte del nombre del sitio</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Todos los campos principales del sitio</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -795,6 +795,9 @@ struct TLayout
   std::string ToolbarsLayout;
   // The console's size (ConsoleWin.WindowSize: "width,height,ppi").
   std::string ConsoleWindowSize;
+  // The Login dialog's site search (LoginDialog.SiteSearch): the beginning
+  // of the site's name, any part of it, or its major fields too.
+  TPreferences::TPanelSearch SiteSearch = TPreferences::TPanelSearch::AnyPart;
   // The Explorer interface's own (Interface\Explorer): its window, its
   // panel's columns, toolbars, status bar and tabs, the view style
   // (TDirViewStyle: icons, small icons, list, details, thumbnails), the
@@ -1113,6 +1116,8 @@ enum class TText
   DDTransferConfirmOff, // "Transfer confirmation turned off ... Click here to undo."
   DDWarnLackOfTempSpace, // "Too little space on temporary drive! ... '%s' ... %s ... %s ..."
   SetDefaultSiteSettings, // "Set current session settings as default?" (unformatted)
+  IncrementalSearchType, // "(start typing)"
+  IncrementalSearchNext, // "(press Tab for next)"
 };
 std::string Text(TText Text);
 // What synchronizing did, as TCustomScpExplorerForm::Synchronize's summary:

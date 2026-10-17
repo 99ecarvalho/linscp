@@ -4861,6 +4861,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>Вметни &amp;URL на сесијата</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Најди локација</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Опции</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>&amp;Само почеток на името на локацијата</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;Било кој дел од името на локацијата</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Сите &amp;главни полиња на локацијата</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

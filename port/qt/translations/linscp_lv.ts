@@ -4861,6 +4861,26 @@ Atrašanās vieta: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Ielīmēt sesijas &amp;URL</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Atrast vietni</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Opcijas</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Tikai vietnes nosaukuma &amp;sākums</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;Jebkura vietnes nosaukuma daļa</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Visi vietnes &amp;galvenie lauki</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

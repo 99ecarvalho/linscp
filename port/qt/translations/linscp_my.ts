@@ -4859,6 +4859,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>ဆက်ရှင် URL ကူးထည့်ပါ(&amp;U)</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>ဆိုက် ရှာဖွေပါ(&amp;F)</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>ရွေးစရာများ(&amp;O)</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>ဆိုက်အမည်၏ အစပိုင်းသာ(&amp;B)</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>ဆိုက်အမည်၏ မည်သည့်အပိုင်းမဆို(&amp;A)</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>ဆိုက်၏ အဓိကအကွက်အားလုံး(&amp;M)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

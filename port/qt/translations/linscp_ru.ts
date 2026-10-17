@@ -4861,6 +4861,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>Вставить URL соединения</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>Найти подключение</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Настройки</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>Только &amp;начало имени подключения</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;Любая часть имени подключения</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>&amp;Все основные поля подключения</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

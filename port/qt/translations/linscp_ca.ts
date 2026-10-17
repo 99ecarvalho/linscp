@@ -4860,6 +4860,26 @@ Ubicació: %2</translation>
         <source>Paste Session &amp;URL</source>
         <translation>Enganxa &amp;URL de la sessió</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Cerca el lloc</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>&amp;Opcions</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>&amp;Només part inicial del nom del lloc</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>Qu&amp;alsevol part del nom del lloc</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Tots els ca&amp;mps importants del lloc</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

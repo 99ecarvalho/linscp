@@ -4859,6 +4859,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>چسباندن آدرس جلسه</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;جستجوی سایت</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>تنظیمات</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>&amp;تنها شروع نام تارنما</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>&amp;هرقسمت نام تارنما</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>همه &amp;زمینه های اصلی تارنما</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

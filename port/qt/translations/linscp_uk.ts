@@ -4861,6 +4861,26 @@ Location: %2</source>
         <source>Paste Session &amp;URL</source>
         <translation>Вставити &amp;URL сесії</translation>
     </message>
+    <message>
+        <source>&amp;Find Site</source>
+        <translation>&amp;Знайти сайт</translation>
+    </message>
+    <message>
+        <source>&amp;Options</source>
+        <translation>Опції</translation>
+    </message>
+    <message>
+        <source>&amp;Beginning of Site Name Only</source>
+        <translation>З початку назви сайту</translation>
+    </message>
+    <message>
+        <source>&amp;Any Part of Site Name</source>
+        <translation>Будь яка частина назви сайту</translation>
+    </message>
+    <message>
+        <source>All &amp;Major Site Fields</source>
+        <translation>Усі головні поля сайту</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>
