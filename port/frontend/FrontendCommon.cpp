@@ -266,3 +266,78 @@ void __fastcall AnswerNameAndCaption(
       throw Exception(L"Undefined answer");
   }
 }
+//---------------------------------------------------------------------------
+namespace
+{
+const wchar_t * const UnsafeSwitch = L"Unsafe";
+const wchar_t * const LogSwitch = L"Log";
+const wchar_t * const LogSizeSwitch = L"LogSize";
+const wchar_t LogSizeSeparator = L'*';
+}
+//---------------------------------------------------------------------------
+bool CheckSafe(TProgramParams * Params)
+{
+  return !Params->FindSwitch(UnsafeSwitch);
+}
+//---------------------------------------------------------------------------
+// WinMain.cpp's handling of the logging switches, and UserInterface.cpp's
+// CheckLogParam/CheckXmlLogParam.
+void ApplyLogSwitches(TProgramParams * Params, bool Console)
+{
+  UnicodeString Value;
+  if (Params->FindSwitch(L"loglevel", Value))
+  {
+    const int Star = Value.Pos(L"*");
+    if (Star > 0)
+    {
+      bool Sensitive = true;
+      Value.Delete(Star, 1);
+      if ((Star <= Value.Length()) && (Value[Star] == L'-'))
+      {
+        Sensitive = false;
+        Value.Delete(Star, 1);
+      }
+      Value = Value.Trim();
+      Configuration->TemporaryLogSensitive(Sensitive);
+    }
+    int Level = 0;
+    if (!Value.IsEmpty() && TryStrToInt(Value, Level) && (Level >= -1))
+    {
+      Configuration->TemporaryLogProtocol(Level);
+    }
+  }
+  if (Params->FindSwitch(LogSizeSwitch, Value))
+  {
+    const int Star = Value.Pos(LogSizeSeparator);
+    int MaxCount = 0;
+    if (Star > 1)
+    {
+      if (!TryStrToInt(Value.SubString(1, Star - 1), MaxCount))
+      {
+        MaxCount = -1;
+      }
+      Value.Delete(1, Star);
+      Value = Value.Trim();
+    }
+    __int64 MaxSize = 0;
+    if ((MaxCount >= 0) && !Value.IsEmpty() && TryStrToSize(Value, MaxSize))
+    {
+      Configuration->TemporaryLogMaxCount(MaxCount);
+      Configuration->TemporaryLogMaxSize(MaxSize);
+    }
+  }
+  if (Params->FindSwitch(LogSwitch, Value) && CheckSafe(Params))
+  {
+    Configuration->TemporaryLogging(Value);
+  }
+  if (Params->FindSwitch(L"XmlLog", Value) && CheckSafe(Params))
+  {
+    Configuration->TemporaryActionsLogging(Value);
+    // (The console's: WinSCP.com's.)
+    if (Console && Params->FindSwitch(L"XmlLogRequired"))
+    {
+      Configuration->LogActionsRequired = true;
+    }
+  }
+}
+

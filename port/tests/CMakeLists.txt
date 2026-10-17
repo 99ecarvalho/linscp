@@ -308,6 +308,11 @@ if(TARGET linscp)
     COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_qt_gui)
   add_test(NAME qt_dialogs COMMAND test_qt_gui dialogs -platform offscreen)
   set_tests_properties(qt_dialogs PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
+  # F1: the GUI's logging switches (the log file is only named, not written).
+  add_test(NAME qt_gui_logswitches COMMAND test_qt_gui logswitches "${CMAKE_CURRENT_BINARY_DIR}/gui-switches.log" /ini=nul
+           "/log=${CMAKE_CURRENT_BINARY_DIR}/gui-switches.log" /loglevel=2* /logsize=3*1M
+           "/xmllog=${CMAKE_CURRENT_BINARY_DIR}/gui-switches.xml" -platform offscreen)
+  set_tests_properties(qt_gui_logswitches PROPERTIES DEPENDS qt_gui_build TIMEOUT 60)
   add_test(NAME qt_language COMMAND test_qt_gui language "${LINSCP_TRANSLATIONS_DIR}" -platform offscreen)
   set_tests_properties(qt_language PROPERTIES DEPENDS "qt_gui_build;gui_build" TIMEOUT 120)
   # The shell's .ts files keep up with its texts (port/tools/check_ts_current.py).
