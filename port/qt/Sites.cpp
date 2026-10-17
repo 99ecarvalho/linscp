@@ -9,6 +9,7 @@
 
 #include <CoreMain.h>
 #include <SessionData.h>
+#include <RemoteFiles.h>
 #include <TextsWin.h>
 #include <GUIConfiguration.h>
 #include <Configuration.h>
@@ -754,6 +755,11 @@ bool HostNameIsUrl(const std::string & HostName)
 std::string TimeSpanText(double Seconds)
 {
   return Utf8(FormatDateTimeSpan(TDateTime(Seconds / SecsPerDay)));
+}
+
+std::string MinimizeName(const std::string & Path, int MaxLen, bool Unix)
+{
+  return Utf8(::MinimizeName(FromUtf8(Path), MaxLen, Unix));
 }
 
 std::string NowTimeText()

@@ -1907,6 +1907,9 @@ std::string UniqueSiteName(const std::string & Name);
 // Core's time texts: a span (FormatDateTimeSpan, "0:00:05"), and now's
 // time (TDateTime::TimeString).
 std::string TimeSpanText(double Seconds);
+// A path shortened to MaxLen with "..." (core's MinimizeName; Unix: with
+// slashes).
+std::string MinimizeName(const std::string & Path, int MaxLen, bool Unix);
 std::string NowTimeText();
 // The Login dialog's Tools > Export/Backup Configuration and
 // Import/Restore Configuration (TConfiguration::Export, Import): the

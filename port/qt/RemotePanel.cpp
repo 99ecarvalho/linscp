@@ -1,4 +1,6 @@
 #include "RemotePanel.h"
+#include <cstdlib>
+#include <QToolButton>
 #include <QListView>
 #include "DirectoryTree.h"
 #include <QScrollBar>
@@ -62,6 +64,19 @@ RemotePanel::RemotePanel(QWidget * Parent) :
   };
   FBackAction = Add(QStyle::SP_ArrowBack, tr("&Back"), QKeySequence::Back, [this]() { Back(); });
   FForwardAction = Add(QStyle::SP_ArrowForward, tr("&Forward"), QKeySequence::Forward, [this]() { Forward(); });
+  // As HistoryMenu: the buttons' drop-downs.
+  for (QAction * Action : { FBackAction, FForwardAction })
+  {
+    QToolButton * Button = (Bar != nullptr) ? qobject_cast<QToolButton *>(Bar->widgetForAction(Action)) : nullptr;
+    if (Button != nullptr)
+    {
+      QMenu * Menu = new QMenu(Button);
+      const bool Back = (Action == FBackAction);
+      connect(Menu, &QMenu::aboutToShow, this, [this, Menu, Back]() { FillHistoryMenu(Menu, Back); });
+      Button->setMenu(Menu);
+      Button->setPopupMode(QToolButton::MenuButtonPopup);
+    }
+  }
   Bar = FBands[TPanelBand::Navigation];
   FParentAction = Add(QStyle::SP_FileDialogToParent, tr("&Parent Directory"), QKeySequence(Qt::Key_Backspace), [this]() { RemotePanel::Parent(); });
   // As TCustomDirView.KeyDown: Alt+Up and Ctrl+PgUp too.
@@ -361,6 +376,46 @@ bool RemotePanel::Forward()
   FBack.append(Here);
   UpdateActions();
   return true;
+}
+
+bool RemotePanel::HistoryGo(int Index)
+{
+  QStringList & From = (Index < 0) ? FBack : FForward;
+  QStringList & To = (Index < 0) ? FForward : FBack;
+  const int Steps = std::abs(Index);
+  if ((Steps == 0) || (Steps > From.size()))
+  {
+    return false;
+  }
+  const QString Target = From[From.size() - Steps];
+  const QString Here = FCurrent;
+  if (!Run([this, &Target]() { FSession->ChangeDirectory(Target.toStdString()); }, false))
+  {
+    return false;
+  }
+  To.append(Here);
+  for (int Step = 1; Step < Steps; Step++)
+  {
+    To.append(From.takeLast());
+  }
+  From.removeLast();
+  UpdateActions();
+  return true;
+}
+
+void RemotePanel::FillHistoryMenu(QMenu * Menu, bool Back)
+{
+  Menu->clear();
+  Menu->setToolTipsVisible(true);
+  const QStringList & List = Back ? FBack : FForward;
+  for (int Step = 1; Step <= std::min<int>(List.size(), 10); Step++)
+  {
+    const QString Path = List[List.size() - Step];
+    QAction * Action = Menu->addAction(QString::fromStdString(CoreBridge::MinimizeName(Path.toStdString(), 50, true)));
+    Action->setToolTip(Path);
+    const int Index = Back ? -Step : Step;
+    connect(Action, &QAction::triggered, this, [this, Index]() { HistoryGo(Index); });
+  }
 }
 
 bool RemotePanel::Parent()

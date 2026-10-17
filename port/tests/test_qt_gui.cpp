@@ -1356,6 +1356,30 @@ void Panel(const char * Port)
     Check(Panel->Back() && (Panel->Path() == QStringLiteral("/")), "back");
     Check(Panel->Forward() && (Panel->Path() == QStringLiteral("/sub")), "forward");
     Check(Panel->Parent() && (Panel->Path() == QStringLiteral("/")), "parent");
+    // D3: Back's and Forward's drop-downs, each a step further.
+    {
+      bool DropDown = false;
+      for (QToolButton * Button : Panel->findChildren<QToolButton *>())
+      {
+        DropDown = DropDown || ((Button->defaultAction() == Panel->BackAction()) && (Button->popupMode() == QToolButton::MenuButtonPopup) &&
+          (Button->menu() != nullptr));
+      }
+      Check(DropDown, "Back drops down its history");
+      QMenu Menu;
+      Panel->FillHistoryMenu(&Menu, true);
+      Check((Menu.actions().size() >= 2) && (Menu.actions()[0]->text() == QStringLiteral("/sub")) &&
+        (Menu.actions()[0]->toolTip() == QStringLiteral("/sub")) && (Menu.actions()[1]->text() == QStringLiteral("/")),
+        "the directories back, the last first");
+      const int BackCount = Menu.actions().size();
+      Menu.actions()[1]->trigger();
+      Panel->FillHistoryMenu(&Menu, true);
+      Check((Panel->Path() == QStringLiteral("/")) && (Menu.actions().size() == BackCount - 2), "two steps back");
+      Panel->FillHistoryMenu(&Menu, false);
+      Check((Menu.actions().size() == 2) && (Menu.actions()[0]->text() == QStringLiteral("/sub")), "both forward now");
+      Menu.actions()[0]->trigger();
+      Check((Panel->Path() == QStringLiteral("/sub")) && Panel->ForwardAction()->isEnabled(), "one forward");
+      Check(Panel->HistoryGo(1) && (Panel->Path() == QStringLiteral("/")) && !Panel->HistoryGo(1), "and the last");
+    }
     Panel->Open(QStringLiteral("sub"));
     Check(Panel->Path() == QStringLiteral("/sub"), "opening a directory enters it");
     Check(Panel->Root() && (Panel->Path() == QStringLiteral("/")), "root");
@@ -1430,6 +1454,14 @@ void Local(const QString & Directory)
     Check(QFileInfo(Panel->Path()) == QFileInfo(Dir.filePath(QStringLiteral("sub"))), "a directory is entered");
     Check(Panel->Back() && (QFileInfo(Panel->Path()) == QFileInfo(Directory)), "back");
     Check(Panel->Forward() && (QFileInfo(Panel->Path()) == QFileInfo(Dir.filePath(QStringLiteral("sub")))), "forward");
+    {
+      // D3: Back's drop-down.
+      QMenu Menu;
+      Panel->FillHistoryMenu(&Menu, true);
+      Check(!Menu.actions().isEmpty() && (QFileInfo(Menu.actions()[0]->toolTip()) == QFileInfo(Directory)) &&
+        Panel->HistoryGo(-1) && (QFileInfo(Panel->Path()) == QFileInfo(Directory)) && Panel->HistoryGo(1),
+        "the local history drops down, a step at a time");
+    }
     Check(Panel->Parent() && (QFileInfo(Panel->Path()) == QFileInfo(Directory)), "parent");
     Check(Panel->Home() && (QFileInfo(Panel->Path()) == QFileInfo(QDir::homePath())), "home");
     Check(Panel->Root() && QDir(Panel->Path()).isRoot(), "root");

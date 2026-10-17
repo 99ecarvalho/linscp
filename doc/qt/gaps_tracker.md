@@ -14,11 +14,11 @@ Last updated: **2026-10-17**
 | A. Site Manager | 15 | 17 |
 | B. Password prompt and banner | 1 | 3 |
 | C. Progress and synchronization dialogs | 3 | 4 |
-| D. Main window | 4 | 9 |
+| D. Main window | 5 | 9 |
 | E. Preferences | 0 | 10 |
 | F. Command line | 0 | 3 |
 | G. Known before | 0 | 1 |
-| **Total** | **23** | **47** |
+| **Total** | **24** | **47** |
 
 ## Items
 
@@ -50,7 +50,7 @@ Last updated: **2026-10-17**
 | C4 | Console: Adjust Window, Copy/Select All menu | Low | todo | |
 | D1 | Column header menu: sort asc/desc, hide, size format, ... | High | done | 2026-10-17. `FileView::HeaderMenu`; ctest `qt_gui_panel` |
 | D2 | Customize Toolbar | Medium | todo | |
-| D3 | Back/Forward history drop-downs | Medium | todo | |
+| D3 | Back/Forward history drop-downs | Medium | done | 2026-10-17. Both panels: `HistoryGo`, `FillHistoryMenu` (ten at most, `CoreBridge::MinimizeName`, the full path as tip); ctest `qt_gui_panel`, `qt_gui_local` |
 | D4 | Panel navigation toolbars: Tree button, view style submenu | Low | todo | |
 | D5 | Go to Tree (Ctrl+Alt+T focuses) | Low | done | 2026-10-17. WinSCP's action list runs GoToTreeAction before LocalTreeAction/RemoteTreeAction (NonVisual.dfm:213/222/231; its main window's toolbars do not process shortcuts), so the key shows and focuses; the toggles only show it. `MainWindow::GoToTree`; ctest `qt_gui_trees` |
 | D6 | Go to Command Line (Ctrl+Shift+M focuses) | Low | done | 2026-10-17. The same order (dfm:271/451); `MainWindow::GoToCommandLine`; ctest `qt_gui_keys` |

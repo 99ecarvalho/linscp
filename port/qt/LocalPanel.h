@@ -43,6 +43,12 @@ public:
   void ShowPathMenu();
   bool Back();
   bool Forward();
+  // As TCustomDirView.HistoryGo: Index steps back (negative) or forward,
+  // the directories passed over moved to the other list; and the Back and
+  // Forward buttons' drop-downs (HistoryMenu: ten at most, each a step
+  // further).
+  bool HistoryGo(int Index);
+  void FillHistoryMenu(class QMenu * Menu, bool Back);
   bool Parent();
   bool Root();
   bool Home();
