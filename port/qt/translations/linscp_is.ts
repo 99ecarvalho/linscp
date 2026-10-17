@@ -679,6 +679,42 @@ Staðsetning: %2</translation>
         <source>By &amp;Group</source>
         <translation>Eftir &amp;hópi</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Raða &amp;hækkandi</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Raða &amp;lækkandi</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;Fela dálk</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Sýna skráar&amp;stærðir í</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Bæti</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kílóbæti</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>&amp;Stutt snið</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Reikna skráasafnsstærðir</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Dálkar</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

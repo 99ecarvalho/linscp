@@ -679,6 +679,42 @@ Plats: %2</translation>
         <source>By &amp;Group</source>
         <translation>Efter &amp;grupp</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Sortera stig&amp;ande</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Sortera fallan&amp;de</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;Dölj kolumn</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Visa &amp;filstorlekar i</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Byte</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilobyte</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>&amp;Kort format</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Beräkna katalogstorlekar</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Kolumner</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

@@ -679,6 +679,42 @@ Lokacija: %2</translation>
         <source>By &amp;Group</source>
         <translation>Po &amp;grupi</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Posloži &amp;uzlazno</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Posloži &amp;silazno</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;Sakrij stupac</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Pokazuj veli&amp;činu datoteka u</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Riječi (bajtova)</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kiloriječi</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>&amp;Kratki format</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Izračunaj veličine direktorija</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Stupci</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

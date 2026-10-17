@@ -679,6 +679,42 @@ Location: %2</source>
         <source>By &amp;Group</source>
         <translation>Ըստ &amp;խմբի</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Տեսակավորել &amp;աճման կարգով</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Տեսակավորել &amp;նվազման կարգով</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;Թաքցնել սյունակը</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Ցուցադրել &amp;ֆայլերի չափերը</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Բայթ</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Կիլոբայթ</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>Կ&amp;արճ ձևաչափ</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>Հաշվել գրացուցակների &amp;չափերը</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Սյունակներ</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

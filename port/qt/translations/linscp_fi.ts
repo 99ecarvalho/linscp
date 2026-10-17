@@ -679,6 +679,42 @@ Sijainti: %2</translation>
         <source>By &amp;Group</source>
         <translation>&amp;Ryhmän mukaan</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Järjestä A-&gt;Z</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Järjestä Z-&gt;A</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;Piilota sarake</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Näytä tiedostojen koot</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>Tavua</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilotavua</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>Lyhyt muoto</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Laske kansioiden koot</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Sarakkeet</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

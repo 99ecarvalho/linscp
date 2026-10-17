@@ -679,6 +679,42 @@ Location: %2</source>
         <source>By &amp;Group</source>
         <translation>समूह के अनुसार(&amp;G)</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>आरोही क्रमबद्ध करें(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>अवरोही क्रमबद्ध करें(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>स्तंभ छिपाएँ(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>फ़ाइल आकार इसमें दिखाएँ(&amp;Z)</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>बाइट(&amp;B)</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>किलोबाइट(&amp;K)</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>संक्षिप्त स्वरूप(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>निर्देशिका आकार की गणना करें(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>स्तंभ(&amp;C)</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

@@ -679,6 +679,42 @@ Placering: %2</translation>
         <source>By &amp;Group</source>
         <translation>Efter &amp;gruppe</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Sortér st&amp;igende</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Sortér aftagen&amp;de</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>S&amp;kjul kolonne</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Vis filstørrelser i</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>Byte</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>Kilobytes</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>Kort format</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>Beregn mappestørrelser</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>Kolonner</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

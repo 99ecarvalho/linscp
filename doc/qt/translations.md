@@ -100,6 +100,10 @@ port/tools/ts_language.py import port/qt/translations/linscp_<locale>.ts todo.js
 cmake -S . -B build/linux                           # the build picks the new file up
 ```
 
+A text the shell has in two places (a menu item in the main window and in a
+panel's popup) is filled from the other with `ts_language.py same <ts>...`,
+where its translations agree.
+
 `new` copies the shell's texts from an existing `.ts`, lets lupdate lay out
 the language's plural forms, and fills what WinSCP's translation has.
 `export` writes the rest as JSON, with the texts already translated as a

@@ -679,6 +679,42 @@ Location: %2</source>
         <source>By &amp;Group</source>
         <translation>グループ(&amp;G)</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>昇順に並び替え(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>降順に並び替え(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>列を隠す(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>ファイル サイズの表示(&amp;Z)</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>バイト(&amp;B)</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>キロバイト(&amp;K)</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>短い書式(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>ディレクトリ サイズを計算(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>列(&amp;C)</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

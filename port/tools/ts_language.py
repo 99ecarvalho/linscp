@@ -7,6 +7,9 @@ and back (doc/qt/translations.md).
   ts_language.py export <ts> <json>      its untranslated texts, and its
                                          translated ones as a glossary
   ts_language.py import <ts> <json>      the translator's texts into it
+  ts_language.py same <ts>...            an untranslated text from the same
+                                         text translated in another context of
+                                         the file, where those agree
 
 `new` takes the shell's texts from an existing .ts (they are the same in
 each), lets lupdate lay out the language's plural forms, and runs
@@ -134,6 +137,34 @@ def import_(a):
     return 0
 
 
+def same(a):
+    for ts in a.ts:
+        text = open(ts, encoding='utf-8').read()
+        known = {}
+        for name, part in contexts(text):
+            for m in MESSAGE.finditer(part):
+                if 'type="unfinished"' not in m.group(0) and m.group(3):
+                    known.setdefault(m.group(1), set()).add(m.group(3))
+        taken = 0
+
+        def take(m):
+            nonlocal taken
+            options = known.get(m.group(1), set())
+            if ('type="unfinished"' not in m.group(0)) or (len(options) != 1):
+                return m.group(0)
+            translation = next(iter(options))
+            if problems(html.unescape(m.group(1)), html.unescape(translation)):
+                return m.group(0)
+            taken += 1
+            return f'<source>{m.group(1)}</source>{m.group(2)}<translation>{translation}</translation>'
+
+        text = MESSAGE.sub(take, text)
+        open(ts, 'w', encoding='utf-8').write(text)
+        left = text.count('type="unfinished"')
+        print(f'{os.path.basename(ts)}: {taken} taken, {left} untranslated', file=sys.stderr)
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest='command', required=True)
@@ -147,6 +178,9 @@ def main():
         p.add_argument('ts')
         p.add_argument('json')
         p.set_defaults(run=run)
+    p = sub.add_parser('same')
+    p.add_argument('ts', nargs='+')
+    p.set_defaults(run=same)
     a = ap.parse_args()
     return a.run(a)
 

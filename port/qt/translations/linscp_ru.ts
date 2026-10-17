@@ -679,6 +679,42 @@ Location: %2</source>
         <source>By &amp;Group</source>
         <translation>По &amp;группе</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>По &amp;возрастанию</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>По &amp;убыванию</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;Скрыть колонку</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Показывать размер файлов в</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;байтах</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;килобайтах</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>&amp;коротком формате</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Подсчитать размеры каталогов</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Колонки</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

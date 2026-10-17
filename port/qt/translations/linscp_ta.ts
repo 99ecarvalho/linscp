@@ -679,6 +679,42 @@ Location: %2</source>
         <source>By &amp;Group</source>
         <translation>&amp;குழு மூலம்</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>ஏறு வரிசைப்படுத்து</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>இறங்கு வரிசைப்படுத்து</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;நெடுவரிசையை மறை</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>கோப்பை அளவுகளை இதில் காட்டு</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;பைட்டுகள்</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;கிலோபைட்டுகள்</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>&amp;குறுகிய வடிவம்</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;அடைவு அளவுகளை கணக்கிடுங்கள்</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;நெடுவரிசைகள்</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

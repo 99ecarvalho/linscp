@@ -679,6 +679,42 @@ Umístění: %2</translation>
         <source>By &amp;Group</source>
         <translation>Podle &amp;skupiny</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Řadit &amp;vzestupně</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Řadit &amp;sestupně</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;Skrýt sloupec</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Zo&amp;brazovat velikosti souborů v</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Bajtech</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilobajtech</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>Krátké &amp;formě</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Spočítat velikost adresáře</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>Sloup&amp;ce</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

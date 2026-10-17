@@ -679,6 +679,42 @@ Location: %2</source>
         <source>By &amp;Group</source>
         <translation>حسب الم&amp;جموعة</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>ترتيب &amp;تصاعدي</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>ترتيب ت&amp;نازلي</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>إ&amp;خفاء عمود</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>إظهار أحجام الملفات في</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;بايت</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;كيلوبايت</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>شكل مختصر</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;حساب أحجام الأدلة</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>الأ&amp;عمدة</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

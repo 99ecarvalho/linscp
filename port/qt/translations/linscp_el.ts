@@ -679,6 +679,42 @@ Location: %2</source>
         <source>By &amp;Group</source>
         <translation>Ανά ομάδα</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Αύξουσα Ταξινόμηση</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Φθίνουσα ταξινόμηση</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>Απόκρυψη στήλης</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Εμφάνιση μεγεθών αρχείων σε</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>Bytes</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilobytes</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>Περιεκτικό format</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Υπολογισμός μεγεθών καταλόγων</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Στήλες</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

@@ -679,6 +679,42 @@ Lokasyon: %2</translation>
         <source>By &amp;Group</source>
         <translation>Ayon sa &amp;Grupo</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Isaayos Pa&amp;taas</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Isaayos Pa&amp;baba</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;Itago ang Column</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Ipakita ang &amp;Laki ng File sa</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Bytes</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilobytes</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>&amp;Maikling format</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Kalkulahin ang Laki ng mga Direktoryo</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>Mga &amp;Column</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

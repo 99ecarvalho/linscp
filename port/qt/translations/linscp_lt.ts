@@ -679,6 +679,42 @@ Vieta: %2</translation>
         <source>By &amp;Group</source>
         <translation>Pagal &amp;grupę</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Rikiuoti &amp;didėjančiai</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Rikiuoti &amp;mažėjančiai</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;Paslėpti stulpelį</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Rodyti failų dy&amp;džius</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Baitai</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilobaitai</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>&amp;Trumpas formatas</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Apskaičiuoti katalogų dydžius</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Stulpeliai</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

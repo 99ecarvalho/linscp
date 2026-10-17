@@ -222,6 +222,11 @@ public:
   // The panel menus' Sort (NonVisual.dfm's ...SortBy...Actions): Ascending,
   // then by each column; Local, the local panel's (attributes, no owner).
   QMenu * SortMenu(bool Local);
+  // The column header's popup (NonVisual.dfm's Local/RemoteDirViewColumnPopup)
+  // for the column clicked (-1: none): Sort Ascending, Sort Descending, By
+  // Extension, Hide Column; Show File Sizes In; Calculate Directory Sizes;
+  // Columns.
+  QMenu * HeaderMenu(int Column);
   // Mark > Restore Selection, as TCustomDirView's SaveSelectedNames and
   // RestoreSelectedNames: the names selected when an operation started
   // (a transfer, Properties, a custom command), selected again; forgotten
@@ -254,6 +259,10 @@ signals:
   void Dropped(const QMimeData * Data, const QString & OnDirectory, Qt::DropAction Action);
   // Tab: to the other panel, as WinSCP's Commander.
   void SwitchPanel();
+  // The header popup's window-wide actions: the size format chosen
+  // (TPreferences::TSizeFormat), the directories' sizes asked for.
+  void SizeFormatChosen(int Format);
+  void CalculateDirectorySizesRequested();
 
 protected:
   bool event(QEvent * Event) override;

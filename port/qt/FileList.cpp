@@ -423,7 +423,7 @@ void FileView::SetupColumns(bool TypeShown)
   header()->setContextMenuPolicy(Qt::CustomContextMenu);
   connect(header(), &QWidget::customContextMenuRequested, this, [this](const QPoint & Pos)
   {
-    QMenu * Menu = ColumnsMenu();
+    QMenu * Menu = HeaderMenu(header()->logicalIndexAt(Pos));
     Menu->exec(header()->mapToGlobal(Pos));
     Menu->deleteLater();
   });
@@ -629,6 +629,54 @@ void FileView::ResetLayout()
   }
   // WinSCP's default sort ("0;1": by name, ascending).
   sortByColumn(FileListModel::NameColumn, Qt::AscendingOrder);
+}
+
+QMenu * FileView::HeaderMenu(int Column)
+{
+  QMenu * Menu = new QMenu(this);
+  const bool OnColumn = (Column >= 0);
+  const Qt::SortOrder Order = header()->sortIndicatorOrder();
+  const int Sorted = header()->sortIndicatorSection();
+  QAction * Ascending = Menu->addAction(tr("Sort &Ascending"), this, [this, Column]() { sortByColumn(Column, Qt::AscendingOrder); });
+  Ascending->setCheckable(true);
+  Ascending->setChecked(OnColumn && (Sorted == Column) && (Order == Qt::AscendingOrder));
+  Ascending->setEnabled(OnColumn);
+  QAction * Descending = Menu->addAction(tr("Sort &Descending"), this, [this, Column]() { sortByColumn(Column, Qt::DescendingOrder); });
+  Descending->setCheckable(true);
+  Descending->setChecked(OnColumn && (Sorted == Column) && (Order == Qt::DescendingOrder));
+  Descending->setEnabled(OnColumn);
+  QAction * ByExtension = Menu->addAction(tr("By &Extension"), this, [this]()
+  {
+    sortByColumn(FileListModel::ExtColumn, header()->sortIndicatorOrder());
+  });
+  ByExtension->setCheckable(true);
+  ByExtension->setChecked(Sorted == FileListModel::ExtColumn);
+  // The name is always shown.
+  QAction * Hide = Menu->addAction(tr("&Hide Column"), this, [this, Column]() { setColumnHidden(Column, true); });
+  Hide->setEnabled(OnColumn && (Column != FileListModel::NameColumn));
+  Menu->addSeparator();
+  QMenu * Sizes = Menu->addMenu(tr("Show File Si&zes In"));
+  QActionGroup * SizeGroup = new QActionGroup(Sizes);
+  const int Current = static_cast<int>(CoreBridge::Preferences().SizeFormat);
+  const std::pair<QString, CoreBridge::TPreferences::TSizeFormat> Formats[] = {
+    { tr("&Bytes"), CoreBridge::TPreferences::TSizeFormat::Bytes },
+    { tr("&Kilobytes"), CoreBridge::TPreferences::TSizeFormat::Kilobytes },
+    { tr("&Short format"), CoreBridge::TPreferences::TSizeFormat::Short } };
+  for (const auto & Format : Formats)
+  {
+    const int Value = static_cast<int>(Format.second);
+    QAction * Action = Sizes->addAction(Format.first, this, [this, Value]() { emit SizeFormatChosen(Value); });
+    Action->setCheckable(true);
+    Action->setChecked(Value == Current);
+    SizeGroup->addAction(Action);
+  }
+  Menu->addAction(tr("&Calculate Directory Sizes"), this, [this]() { emit CalculateDirectorySizesRequested(); });
+  Menu->addSeparator();
+  QMenu * Columns = ColumnsMenu(true);
+  Columns->setTitle(tr("&Columns"));
+  Columns->setParent(Menu, Columns->windowFlags());
+  Menu->addMenu(Columns);
+  return Menu;
 }
 
 QMenu * FileView::SortMenu(bool Local)

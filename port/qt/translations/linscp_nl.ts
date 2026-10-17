@@ -679,6 +679,42 @@ Locatie: %2</translation>
         <source>By &amp;Group</source>
         <translation>Op &amp;groep</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>&amp;Oplopend sorteren</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>&amp;Aflopend sorteren</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>Kolom &amp;verbergen</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Toon bestandsgr&amp;oottes in</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Bytes</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilobytes</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>&amp;Korte notatie</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Bereken directorygroottes</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>Ko&amp;lommen</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

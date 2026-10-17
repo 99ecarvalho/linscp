@@ -679,6 +679,42 @@ Lokasi: %2</translation>
         <source>By &amp;Group</source>
         <translation>Pada &amp;Grup</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Urutkan &amp;Ascending</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Urutkan &amp;Descending</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;Hilangkan Kolom</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Tampilkan Ukuran Berkas dalam(&amp;z)</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Byte</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilobyte</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>Format pendek(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Hitung Ukuran Direktori</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Kolom</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

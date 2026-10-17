@@ -679,6 +679,42 @@ Location: %2</source>
         <source>By &amp;Group</source>
         <translation>အုပ်စုအလိုက်(&amp;G)</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>ငယ်စဉ်ကြီးလိုက် စီပါ(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>ကြီးစဉ်ငယ်လိုက် စီပါ(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>ကော်လံ ဖျောက်ပါ(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>ဖိုင်အရွယ်အစားများကို ပြရန်(&amp;Z)</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>ဘိုက်(&amp;B)</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>ကီလိုဘိုက်(&amp;K)</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>အတိုပုံစံ(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>လမ်းညွှန်နေရာ အရွယ်အစားများ တွက်ချက်ပါ(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>ကော်လံများ(&amp;C)</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

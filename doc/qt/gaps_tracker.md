@@ -14,11 +14,11 @@ Last updated: **2026-10-17**
 | A. Site Manager | 0 | 17 |
 | B. Password prompt and banner | 1 | 3 |
 | C. Progress and synchronization dialogs | 1 | 4 |
-| D. Main window | 0 | 9 |
+| D. Main window | 1 | 9 |
 | E. Preferences | 0 | 10 |
 | F. Command line | 0 | 3 |
 | G. Known before | 0 | 1 |
-| **Total** | **2** | **47** |
+| **Total** | **3** | **47** |
 
 ## Items
 
@@ -48,7 +48,7 @@ Last updated: **2026-10-17**
 | C2 | Synchronization progress: times, Minimize | Medium | todo | |
 | C3 | Synchronization checklist context menu | Medium | todo | |
 | C4 | Console: Adjust Window, Copy/Select All menu | Low | todo | |
-| D1 | Column header menu: sort asc/desc, hide, size format, ... | High | todo | |
+| D1 | Column header menu: sort asc/desc, hide, size format, ... | High | done | 2026-10-17. `FileView::HeaderMenu`; ctest `qt_gui_panel` |
 | D2 | Customize Toolbar | Medium | todo | |
 | D3 | Back/Forward history drop-downs | Medium | todo | |
 | D4 | Panel navigation toolbars: Tree button, view style submenu | Low | todo | |

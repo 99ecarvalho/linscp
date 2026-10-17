@@ -679,6 +679,42 @@ Asukoht: %2</translation>
         <source>By &amp;Group</source>
         <translation>&amp;Grupi järgi</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Sorteeri &amp;kasvavalt</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Sorteeri ka&amp;hanevalt</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>P&amp;eida veerg</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Failisuu&amp;rused</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Baidid</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilobaidid</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>&amp;Lühivorming</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Arvuta kataloogide suurused</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Veerud</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

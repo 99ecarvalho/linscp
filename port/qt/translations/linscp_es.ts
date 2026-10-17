@@ -679,6 +679,42 @@ Ruta: %2</translation>
         <source>By &amp;Group</source>
         <translation>Por &amp;grupo</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>&amp;Ascendente</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>&amp;Descendente</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;Ocultar columna</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Mostrar tamaños de archivo en</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Bytes</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilobytes</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>Formato cor&amp;to</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Calcular tamaños de directorios</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Columnas</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

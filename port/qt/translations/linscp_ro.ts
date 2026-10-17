@@ -679,6 +679,42 @@ Cale: %2</translation>
         <source>By &amp;Group</source>
         <translation>După &amp;Grup</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Sortare &amp;Ascendentă</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Sortare &amp;Descendentă</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>Ascundere co&amp;loană</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>A&amp;fișează Mărimile Fișierelor În</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Octeți</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilobaiți</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>Format compact</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Calculare Mărimi Directoare</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Coloane</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

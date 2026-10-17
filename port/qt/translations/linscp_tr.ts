@@ -679,6 +679,42 @@ Konum: %2</translation>
         <source>By &amp;Group</source>
         <translation>&amp;Gruba göre</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>&amp;Artan</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>A&amp;zalan</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>Sü&amp;tunu gizle</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>D&amp;osya boyutu görünümü</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Bayt</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilobayt</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>Kı&amp;sa biçim</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>Klasör &amp;boyutlarını hesapla</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Sütunlar</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

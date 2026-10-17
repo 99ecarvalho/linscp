@@ -679,6 +679,42 @@ Percorso: %2</translation>
         <source>By &amp;Group</source>
         <translation>Per &amp;gruppo</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Ordinamento &amp;ascendente</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Ordinamento &amp;discendente</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>Nascondi colonna</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Visualizza dimensione file in</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Byte</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilobyte</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>Formato breve</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Calcola dimensioni cartella</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Colonne</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

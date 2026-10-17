@@ -679,6 +679,42 @@ Location: %2</source>
         <source>By &amp;Group</source>
         <translation>&amp;ตามกลุ่ม</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>&amp;เรียงจากน้อยไปมาก</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>เรียงจาก&amp;มากไปน้อย</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;ซ่อนคอลัมน์</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>&amp;แสดงขนาดไฟล์เป็น</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;ไบต์</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;กิโลไบต์</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>&amp;รูปแบบย่อ</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;คำนวณขนาดไดเรกทอรี</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;คอลัมน์</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

@@ -679,6 +679,42 @@ Hely: %2</translation>
         <source>By &amp;Group</source>
         <translation>&amp;Csoport szerint</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>&amp;Növekvő sorrendbe</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>&amp;Csökkenő sorrendbe</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;Oszlop elrejtése</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Fájlméret megjelenítése ebben</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Byte</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilobyte</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>&amp;Rövid formátum</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>Mappaméretek &amp;kiszámítása</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Oszlopok</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

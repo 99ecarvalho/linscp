@@ -679,6 +679,42 @@ Location: %2</source>
         <source>By &amp;Group</source>
         <translation>그룹(&amp;G)</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>오름차순으로 정렬(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>내림차순으로 정렬(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>열 숨김(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>파일 크기 표시(&amp;Z)</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>바이트(&amp;B)</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>킬로바이트(&amp;K)</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>간단한 형식</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>디렉터리 크기 계산(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>컬럼(&amp;C)</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

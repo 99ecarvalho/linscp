@@ -119,7 +119,7 @@ CONTEXT_FORMS = {
     'SiteAdvanced': ['SiteAdvanced.dfm'],
     'MainWindow': ['NonVisual.dfm', 'ScpCommander.dfm', 'CustomScpExplorer.dfm', 'Copy.dfm'],
     'QueuePanel': ['NonVisual.dfm', 'CustomScpExplorer.dfm'],
-    'FileView': ['SelectMask.dfm'],
+    'FileView': ['SelectMask.dfm', 'NonVisual.dfm'],
     'EditorWindow': ['Editor.dfm', 'Editor.rc'],
     'FindDialog': ['Editor.dfm'],
     'PropertiesDialog': ['Properties.dfm'],

@@ -679,6 +679,42 @@ Emplacement : %2</translation>
         <source>By &amp;Group</source>
         <translation>Par &amp;groupe</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Tri croissant</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Tri &amp;décroissant</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>Cac&amp;her la colonne</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Afficher la &amp;taille des fichiers en</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Octets</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilo octets</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>Format &amp;court</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Calculer la taille des répertoires</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Colonnes</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

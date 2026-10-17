@@ -679,6 +679,42 @@ Ubicació: %2</translation>
         <source>By &amp;Group</source>
         <translation>Per &amp;Grup</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Ordre &amp;ascendent</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Ordre &amp;descendent</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;Amaga columna</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Mostra &amp;mides de fitxer dins</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Bytes</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilobytes</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>&amp;Format curt</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Calcula les mides del directori</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Columnes</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

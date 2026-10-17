@@ -679,6 +679,42 @@ Location: %2</source>
         <source>By &amp;Group</source>
         <translation>برحسب گروه</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>مرتب سازی افزایشی</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>مرتب سازی کاهشی</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>مخفی کردن ستون</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>نمایش اندازه ها به</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>بایت</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>کیلوبایت</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>قالب کوتاه</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;محاسبه اندازه حجم پوشه</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;ستونها</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

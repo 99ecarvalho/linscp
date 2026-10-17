@@ -679,6 +679,42 @@ Location: %2</source>
         <source>By &amp;Group</source>
         <translation>ਸਮੂਹ ਅਨੁਸਾਰ(&amp;G)</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>ਉੱਪਰੀ ਕ੍ਰਮਬੱਧ ਕਰੋ(&amp;A)</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>ਹੇਠਾਂ ਵਰਗੀ ਕ੍ਰਮਬੱਧ ਕਰੋ(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>ਕਾਲਮ ਨੂੰ ਛੁਪਾਓ</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>ਫਾਈਲ ਆਕਾਰ ਇਸ ਵਿੱਚ ਦਿਖਾਓ(&amp;Z)</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>ਬਾਈਟ(&amp;B)</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>ਕਿਲੋਬਾਈਟ(&amp;K)</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>ਛੋਟਾ ਫਾਰਮੈਟ(&amp;S)</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>ਡਾਇਰੈਕਟਰੀ ਆਕਾਰਾਂ ਦੀ ਗਿਣਤੀ ਕਰੋ(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>ਕਾਲਮ(&amp;C)</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

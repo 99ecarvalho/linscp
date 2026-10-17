@@ -679,6 +679,42 @@ Atrašanās vieta: %2</translation>
         <source>By &amp;Group</source>
         <translation>Pēc &amp;grupas</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Kārtot a&amp;ugošā secībā</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Kārtot &amp;dilstošā secībā</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;Slēpt kolonnu</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Rādīt failu i&amp;zmērus</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Baiti</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilobaiti</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>Ī&amp;sais formāts</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Aprēķināt mapju izmērus</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Kolonnas</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

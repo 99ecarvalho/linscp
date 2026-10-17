@@ -679,6 +679,42 @@ Location: %2</source>
         <source>By &amp;Group</source>
         <translation>לפי &amp;קבוצה</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>&amp;מיון בסדר עולה</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>מיון בסדר &amp;יורד</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>ה&amp;סתר עמודה</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>הצג &amp;גדלי קבצים ב</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;בתים</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;קילובתים</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>תבנית &amp;מקוצרת</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;חשב גדלי ספריות</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;עמודות</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

@@ -301,6 +301,26 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   connect(FLocal, &LocalPanel::Changed, this, [this]() { PanelLoaded(true); });
   connect(FPanel, &RemotePanel::Changed, this, [this]() { PanelLoaded(false); });
   // Tab: to the other panel.
+  // The column header popups' window-wide items: the file sizes' format
+  // (WinSCP's FormatSizeBytes, every panel's), the directories' sizes of
+  // the panel clicked.
+  for (FileView * View : { FLocal->View(), FPanel->View(), FOtherLocal->View() })
+  {
+    const bool OnLocal = (View == FLocal->View());
+    connect(View, &FileView::SizeFormatChosen, this, [this](int Format)
+    {
+      CoreBridge::ChangePreferences([Format](CoreBridge::TPreferences & P)
+      {
+        P.SizeFormat = static_cast<CoreBridge::TPreferences::TSizeFormat>(Format);
+      });
+      ApplyPreferences();
+    });
+    connect(View, &FileView::CalculateDirectorySizesRequested, this, [this, OnLocal]()
+    {
+      ActivatePanel(OnLocal);
+      CalculateDirectorySizes();
+    });
+  }
   connect(FLocal->View(), &FileView::SwitchPanel, this, [this]() { ActivatePanel(false); });
   connect(FPanel->View(), &FileView::SwitchPanel, this, [this]() { ActivatePanel(true); });
   // Ctrl+[ and Ctrl+]: the local and remote paths to the clipboard.

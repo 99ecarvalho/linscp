@@ -964,6 +964,45 @@ void Panel(const char * Port)
     Panel->View()->sortByColumn(FileListModel::SizeColumn, Qt::DescendingOrder);
     Check(Panel->Names().first() == QStringLiteral("sub"), "directories first sorted the other way too");
     Panel->View()->sortByColumn(FileListModel::NameColumn, Qt::AscendingOrder);
+    // D1, the column header's popup (NonVisual.dfm's RemoteDirViewColumnPopup).
+    {
+      const auto Item = [](QMenu * Menu, const QString & Text) -> QAction *
+      {
+        for (QAction * Action : Menu->actions())
+        {
+          if (Action->text() == Text)
+          {
+            return Action;
+          }
+        }
+        return nullptr;
+      };
+      FileView * View = Panel->View();
+      QMenu * Menu = View->HeaderMenu(FileListModel::SizeColumn);
+      Check((Item(Menu, FileView::tr("Sort &Ascending")) != nullptr) && (Item(Menu, FileView::tr("&Hide Column")) != nullptr) &&
+        (Item(Menu, FileView::tr("Show File Si&zes In")) != nullptr) && (Item(Menu, FileView::tr("&Columns")) != nullptr),
+        "the header popup has WinSCP's items");
+      Item(Menu, FileView::tr("Sort &Descending"))->trigger();
+      Check((View->header()->sortIndicatorSection() == FileListModel::SizeColumn) &&
+        (View->header()->sortIndicatorOrder() == Qt::DescendingOrder), "Sort Descending sorts by the column clicked");
+      delete Menu;
+      Menu = View->HeaderMenu(FileListModel::NameColumn);
+      Check(!Item(Menu, FileView::tr("&Hide Column"))->isEnabled(), "the name cannot be hidden");
+      delete Menu;
+      Menu = View->HeaderMenu(FileListModel::ModifiedColumn);
+      Item(Menu, FileView::tr("&Hide Column"))->trigger();
+      Check(View->isColumnHidden(FileListModel::ModifiedColumn), "Hide Column hides it");
+      delete Menu;
+      View->setColumnHidden(FileListModel::ModifiedColumn, false);
+      Menu = View->HeaderMenu(FileListModel::SizeColumn);
+      Item(Menu, FileView::tr("Show File Si&zes In"))->menu()->actions()[0]->trigger();
+      Check(CoreBridge::Preferences().SizeFormat == CoreBridge::TPreferences::TSizeFormat::Bytes,
+        "Show File Sizes In sets the preference");
+      delete Menu;
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.SizeFormat = CoreBridge::TPreferences::TSizeFormat::Kilobytes; });
+      Window.ApplyPreferences();
+      View->sortByColumn(FileListModel::NameColumn, Qt::AscendingOrder);
+    }
 
     Check(Panel->NewFolder(QStringLiteral("made")) && Panel->Names().contains(QStringLiteral("made")), "a new folder appears");
     Check(Panel->Selected() == QStringList({ QStringLiteral("made") }), "selected");

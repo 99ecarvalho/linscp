@@ -679,6 +679,42 @@ Location: %2</source>
         <source>By &amp;Group</source>
         <translation>ჯ&amp;გუფით</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>&amp;აღმავლით დალაგება</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>&amp;დაღმავლით დალაგება</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>სვეტის და&amp;მალვა</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>ფაილის &amp;ზომების ჩვენება სად</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;ბაიტი</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;კილობაიტი</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>&amp;მოკლე ფორმატი</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>საქაღალდის &amp;ზომების გამოთვლა</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;სვეტები</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>

@@ -679,6 +679,42 @@ Vendndodhja: %2</translation>
         <source>By &amp;Group</source>
         <translation>Sipas &amp;grupit</translation>
     </message>
+    <message>
+        <source>Sort &amp;Ascending</source>
+        <translation>Rendit &amp;rritëse</translation>
+    </message>
+    <message>
+        <source>Sort &amp;Descending</source>
+        <translation>Rendit &amp;zbritëse</translation>
+    </message>
+    <message>
+        <source>&amp;Hide Column</source>
+        <translation>&amp;Fshih kolonën</translation>
+    </message>
+    <message>
+        <source>Show File Si&amp;zes In</source>
+        <translation>Shfaq &amp;madhësitë e skedarëve në</translation>
+    </message>
+    <message>
+        <source>&amp;Bytes</source>
+        <translation>&amp;Bajte</translation>
+    </message>
+    <message>
+        <source>&amp;Kilobytes</source>
+        <translation>&amp;Kilobajte</translation>
+    </message>
+    <message>
+        <source>&amp;Short format</source>
+        <translation>Format i &amp;shkurtër</translation>
+    </message>
+    <message>
+        <source>&amp;Calculate Directory Sizes</source>
+        <translation>&amp;Llogarit madhësitë e direktorive</translation>
+    </message>
+    <message>
+        <source>&amp;Columns</source>
+        <translation>&amp;Kolonat</translation>
+    </message>
 </context>
 <context>
     <name>FindFilesDialog</name>
