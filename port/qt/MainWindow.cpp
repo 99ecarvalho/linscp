@@ -1448,6 +1448,27 @@ void MainWindow::StartUp()
     StandaloneKeepUpToDate(KeepParams, KeepUseDefaults);
     return;
   }
+  std::string SyncLocal;
+  std::string SyncRemote;
+  bool SyncUseDefaults = false;
+  std::string EditFile;
+  try
+  {
+    if (CoreBridge::CommandLineSynchronize(SyncLocal, SyncRemote, SyncUseDefaults))
+    {
+      StandaloneSynchronize(QString::fromStdString(SyncLocal), QString::fromStdString(SyncRemote), SyncUseDefaults);
+      return;
+    }
+    if (CoreBridge::CommandLineEdit(EditFile))
+    {
+      StandaloneEdit(QString::fromStdString(EditFile));
+      return;
+    }
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
   // Preferences > Updates' periodic check, once the window is up; the jump
   // list shown again, as SetupInitialize has it.
   QTimer::singleShot(0, this, [this]()
@@ -1589,6 +1610,91 @@ void MainWindow::StandaloneKeepUpToDate(const CoreBridge::TKeepUpToDateParams & 
     KeepUpToDate(&Params, UseDefaults);
   }
   close();
+}
+
+void MainWindow::StandaloneSynchronize(const QString & LocalDirectory, const QString & RemoteDirectory, bool UseDefaults)
+{
+  FStandalone = true;
+  bool CanOpen = false;
+  std::unique_ptr<CoreBridge::TSession> Session;
+  try
+  {
+    Session = CoreBridge::TSession::FromCommandLine(CanOpen);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  const bool Connected = (Session && CanOpen) ? Open(std::move(Session)) : SiteManagerDialog();
+  if (Connected && FSession && FSession->Active())
+  {
+    // As SynchronizeDirectories: the directories given, else the site's
+    // local one (Open has it) and the session's current remote one.
+    if (!LocalDirectory.isEmpty())
+    {
+      FLocal->ChangeDirectory(QDir::fromNativeSeparators(LocalDirectory));
+    }
+    if (!RemoteDirectory.isEmpty())
+    {
+      FPanel->ChangeDirectory(RemoteDirectory);
+    }
+    Synchronize(!UseDefaults);
+  }
+  close();
+}
+
+void MainWindow::StandaloneEdit(const QString & FileName)
+{
+  FStandalone = true;
+  bool CanOpen = false;
+  std::unique_ptr<CoreBridge::TSession> Session;
+  try
+  {
+    Session = CoreBridge::TSession::FromCommandLine(CanOpen);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+  }
+  const bool Connected = (Session && CanOpen) ? Open(std::move(Session)) : SiteManagerDialog();
+  EditorWindow * Editor = nullptr;
+  if (Connected && FSession && FSession->Active())
+  {
+    // As StandaloneEdit: relative to the session's directory.
+    const QString Full = FileName.startsWith(QLatin1Char('/')) ? FileName : (FPanel->Path() + QLatin1Char('/') + FileName);
+    const int Slash = Full.lastIndexOf(QLatin1Char('/'));
+    if (FPanel->ChangeDirectory((Slash > 0) ? Full.left(Slash) : QStringLiteral("/")) || (FPanel->Path() == Full.left(std::max(Slash, 1))))
+    {
+      Editor = EditRemote(Full.mid(Slash + 1));
+    }
+  }
+  if (Editor == nullptr)
+  {
+    close();
+    return;
+  }
+  // Application->ShowMainForm = false: the editor alone, the program ending
+  // with it.
+  hide();
+  connect(Editor, &QObject::destroyed, this, [this]() { QTimer::singleShot(0, this, &QWidget::close); });
+}
+
+void MainWindow::RefreshPanel(const QString & Site, const QString & Path)
+{
+  bool Active = false;
+  for (int Index = 0; Index < TabCount(); Index++)
+  {
+    CoreBridge::TSession * Session = (Index == FActiveTab) ? FSession.get() : FTabs[Index].Session.get();
+    if ((Session != nullptr) && Session->RefreshFromCommandLine(Site.toStdString(), Path.toStdString()) && (Index == FActiveTab))
+    {
+      Active = true;
+    }
+  }
+  // The active one read again, when it shows Path (or anything).
+  if (Active && !FBusy && (Path.isEmpty() || (FPanel->Path() + QLatin1Char('/')).startsWith(Path.endsWith(QLatin1Char('/')) ? Path : (Path + QLatin1Char('/')))))
+  {
+    FPanel->Refresh();
+  }
 }
 
 bool MainWindow::SiteManagerDialog(bool Automatic)

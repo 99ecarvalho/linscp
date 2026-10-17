@@ -2209,6 +2209,61 @@ bool CommandLineKeepUpToDate(TKeepUpToDateParams & Params, bool & UseDefaults)
   }
 }
 
+bool CommandLineSynchronize(std::string & LocalDirectory, std::string & RemoteDirectory, bool & UseDefaults)
+{
+  UseDefaults = false;
+  try
+  {
+    TProgramParams * Program = TProgramParams::Instance();
+    std::unique_ptr<TStringList> Values(new TStringList());
+    if (!Program->FindSwitch(L"Synchronize", Values.get(), 4))
+    {
+      return false;
+    }
+    // Undocumented syntax for "Start in New Window" (upstream's).
+    if (Values->Count >= 4)
+    {
+      GUIConfiguration->SynchronizeMode = StrToIntDef(Values->Strings[2], GUIConfiguration->SynchronizeMode);
+      GUIConfiguration->SynchronizeParams = StrToIntDef(Values->Strings[3], GUIConfiguration->SynchronizeParams);
+      Configuration->DontSave();
+    }
+    LocalDirectory = (Values->Count >= 1) ? Utf8(Values->Strings[0]) : std::string();
+    RemoteDirectory = (Values->Count >= 2) ? Utf8(Values->Strings[1]) : std::string();
+    UnicodeString Value;
+    UseDefaults = Program->FindSwitch(L"Defaults", Value);
+    return true;
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+bool CommandLineEdit(std::string & FileName)
+{
+  std::unique_ptr<TStringList> Values(new TStringList());
+  if (TProgramParams::Instance()->FindSwitch(L"Edit", Values.get(), 1) && (Values->Count == 1))
+  {
+    FileName = Utf8(Values->Strings[0]);
+    return true;
+  }
+  return false;
+}
+
+bool CommandLineRefresh(std::string & Session, std::string & Path, const std::vector<std::string> * Arguments)
+{
+  std::unique_ptr<TProgramParams> Owner;
+  TProgramParams * Program = ProgramParamsOf(Arguments, Owner);
+  std::unique_ptr<TStringList> Values(new TStringList());
+  if (!Program->FindSwitch(L"Refresh", Values.get(), 1))
+  {
+    return false;
+  }
+  Path = (Values->Count > 0) ? Utf8(Values->Strings[0]) : std::string();
+  Session = (Program->ParamCount > 0) ? Utf8(Program->Param[1]) : std::string();
+  return true;
+}
+
 void SaveKeepUpToDateDefaults(const TKeepUpToDateParams & Params, bool SaveSettings)
 {
   const TSynchronizeParamType SParams = SynchronizeParamsOf(Params);
@@ -4830,6 +4885,43 @@ void TSession::ClearCaches()
   if (Active())
   {
     F->Terminal->ClearCaches();
+  }
+}
+
+bool TSession::RefreshFromCommandLine(const std::string & Site, const std::string & Path)
+{
+  if (!Active())
+  {
+    return false;
+  }
+  try
+  {
+    TTerminal * Terminal = F->Terminal.get();
+    if (!Site.empty())
+    {
+      // As IsAvailableTerminalForSite.
+      int ParsedInfo = 0;
+      std::unique_ptr<TSessionData> Data(StoredSessions->ParseUrl(FromUtf8(Site), NULL, ParsedInfo));
+      std::unique_ptr<TSessionData> TerminalData(Terminal->SessionData->Clone());
+      Terminal->UpdateSessionCredentials(TerminalData.get());
+      if (!TerminalData->IsSameSite(Data.get()))
+      {
+        return false;
+      }
+    }
+    if (Path.empty())
+    {
+      Terminal->ClearCaches();
+    }
+    else
+    {
+      Terminal->DirectoryModified(FromUtf8(Path), true);
+    }
+    return true;
+  }
+  catch (Exception &)
+  {
+    return false;
   }
 }
 

@@ -2159,6 +2159,15 @@ std::string KeepUpToDateSynchronizeQuestion();
 // become this run's default transfer settings. False without it. Throws
 // TCoreError.
 bool CommandLineKeepUpToDate(TKeepUpToDateParams & Params, bool & UseDefaults);
+// As WinMain's pcFullSynchronize: /synchronize [local [remote [mode
+// params]]] (the last two, upstream's undocumented ones, for this run
+// only); whether /defaults skips the dialog. False without it.
+bool CommandLineSynchronize(std::string & LocalDirectory, std::string & RemoteDirectory, bool & UseDefaults);
+// As pcEdit: /edit with the one remote file to edit. False without it.
+bool CommandLineEdit(std::string & FileName);
+// As pcRefresh: /refresh [path], with the session (empty: every one)
+// named on the command line, or the Arguments given (another instance's).
+bool CommandLineRefresh(std::string & Session, std::string & Path, const std::vector<std::string> * Arguments = nullptr);
 
 // What keeping up to date logs (TSynchronizeLogEntry).
 enum class TKeepUpToDateLog { Scan, Start, Change, Upload, Delete, DirChange, ContinuedError };
@@ -2213,6 +2222,10 @@ public:
   // anything to clear (AreCachesEmpty).
   bool CachesEmpty() const;
   void ClearCaches();
+  // As TCustomScpExplorerForm::RefreshPanel, for another instance's
+  // /refresh: on Site's session (empty: any), the caches cleared, or Path
+  // marked modified. False when this is another site's, or not connected.
+  bool RefreshFromCommandLine(const std::string & Site, const std::string & Path);
   // Tabs > Change Password, as TCustomScpExplorerForm::ChangePassword: a
   // secondary session that authenticates with the password only and asks
   // for a new one. CanChangePassword: the protocol's fcChangePassword.

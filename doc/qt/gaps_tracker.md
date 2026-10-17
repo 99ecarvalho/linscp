@@ -68,6 +68,6 @@ Last updated: **2026-10-17**
 | E9 | Drag & Drop: network drives for the fake-file drop | Low | todo | Windows only |
 | E10 | Preferences search box | Low | todo | |
 | F1 | GUI: /log, /xmllog, /loglevel, /logsize | Medium | done | 2026-10-17. linscp-cli's `ApplyLogSwitches`, moved to FrontendCommon, at the GUI's initialization; ctest `qt_gui_logswitches` |
-| F2 | GUI: /synchronize, /edit, /refresh, /explore, /workspace, /rawtransfersettings, /privatekey, /help | Medium | todo | |
+| F2 | GUI: /synchronize, /edit, /refresh, /explore, /workspace, /rawtransfersettings, /privatekey, /help | Medium | wip | 2026-10-17: /synchronize (`StandaloneSynchronize`), /edit (`StandaloneEdit`, the window hidden), /refresh (to the running instance, `RefreshPanel`); ctest `qt_gui_uploadswitch`, `qt_gui_sessioncommands`. Left: /explore, /workspace, global /rawtransfersettings and /privatekey, /help, the wrappers' versions |
 | F3 | CLI: /info, /batchsettings, /copyid, /fingerprintscan, /dumpcallstack, /h | Low | todo | |
 | G1 | Site Advanced: Edit in PuTTY; private key Tools menu | Low | todo | From P3-27 |

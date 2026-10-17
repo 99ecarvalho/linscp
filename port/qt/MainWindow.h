@@ -56,6 +56,15 @@ public:
   // tab closes: the Login dialog, if the preferences say; then, unless the
   // window is to stay open, the window closed with no session.
   void NeedSession(bool Startup);
+  // As WinMain's FullSynchronize and Edit, standalone: the command line's
+  // session opened, then its directories synchronized (the dialog unless
+  // UseDefaults), or its file edited with the window hidden; the program
+  // ends with it.
+  void StandaloneSynchronize(const QString & LocalDirectory, const QString & RemoteDirectory, bool UseDefaults);
+  void StandaloneEdit(const QString & FileName);
+  // Another instance's /refresh (RefreshPanel): the matching sessions'
+  // caches or Path refreshed, the active panel read again when showing it.
+  void RefreshPanel(const QString & Site, const QString & Path);
   void ApplyTreeOnLeft(bool OnLeft, const CoreBridge::TLayout & Layout);
   bool FLayoutRestored = false;
   // As ShowExtendedExceptionEx for an error while idle: a lost connection

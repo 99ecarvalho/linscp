@@ -88,6 +88,15 @@ int main(int argc, char ** argv)
 #endif
   // As WinMain: a session named goes to the window already running, if it
   // takes it (Shift held, as OpenInNewWindow, the other way round).
+  // As WinMain's pcRefresh: to the instance running, nothing more.
+  std::string RefreshSession;
+  std::string RefreshPath;
+  if (!Smoke && CoreBridge::CommandLineRefresh(RefreshSession, RefreshPath))
+  {
+    SingleInstance::Send(App.arguments().mid(1));
+    CoreBridge::Finalize();
+    return 0;
+  }
   if (!Smoke &&
       CoreBridge::CommandLineForAnotherInstance(QGuiApplication::queryKeyboardModifiers().testFlag(Qt::ShiftModifier)) &&
       SingleInstance::Send(App.arguments().mid(1)))
@@ -119,6 +128,18 @@ int main(int argc, char ** argv)
       const bool OnlyInstance = !SingleInstance::AnyOtherInstance();
       Server.reset(new InstanceServer([&Window](const QStringList & Arguments)
       {
+        std::vector<std::string> Strings;
+        for (const QString & Argument : Arguments)
+        {
+          Strings.push_back(Argument.toStdString());
+        }
+        std::string Session;
+        std::string Path;
+        if (CoreBridge::CommandLineRefresh(Session, Path, &Strings))
+        {
+          Window.RefreshPanel(QString::fromStdString(Session), QString::fromStdString(Path));
+          return true;
+        }
         return Window.CommandLineFromAnotherInstance(Arguments);
       }));
       // As WinSCP starts: the session the command line names, else its

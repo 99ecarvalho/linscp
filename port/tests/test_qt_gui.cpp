@@ -6552,6 +6552,17 @@ void SessionCommandsTest(const char * Port, const QString & Key, const QString &
     Window.Panel()->ChangeDirectory(QStringLiteral("/sub"));
     Check(!Window.Session()->CachesEmpty(), "(the directories read are cached)");
     Check(Window.ClearCaches() && Window.Session()->CachesEmpty(), "Clear Caches");
+    // F2: another instance's /refresh: the caches cleared, on this site's
+    // session only.
+    Window.Panel()->ChangeDirectory(QStringLiteral("/"));
+    Window.Panel()->ChangeDirectory(QStringLiteral("/sub"));
+    // (rclone keeps its own listings: what the session does is checked.)
+    Check(!Window.Session()->RefreshFromCommandLine("sftp://nobody@other.example/", std::string()) && !Window.Session()->CachesEmpty(),
+      "/refresh for another site: left");
+    Check(Window.Session()->RefreshFromCommandLine(std::string(), std::string()) && Window.Session()->CachesEmpty(),
+      "/refresh: the caches cleared");
+    Window.RefreshPanel(QString(), QStringLiteral("/sub/"));
+    Check(Window.Panel()->Path() == QStringLiteral("/sub"), "the panel read again");
 
     // A lost connection: reconnected, in the directory it was in.
     Window.Session()->DropConnection();
@@ -7791,6 +7802,62 @@ void UploadSwitchTest(const char * Port, const QString & Directory)
     Window.StartUp();
     Check(QFileInfo::exists(Root.filePath(QStringLiteral("sub/sent.txt"))), "uploaded to the session's directory");
     Check(!Window.isVisible(), "then the window closes");
+  }
+  // F2: /synchronize, /edit, /refresh.
+  {
+    const QDir Dir(Directory);
+    const QDir Root(Dir.filePath(QStringLiteral("../root")));
+    const QString Url = QStringLiteral("sftp://linscp@127.0.0.1:%1/sub/").arg(QString::fromLatin1(Port));
+    const QString Source = Dir.filePath(QStringLiteral("syncsrc"));
+    QDir().mkpath(Source);
+    {
+      QFile Out(QDir(Source).filePath(QStringLiteral("synced.txt")));
+      Out.open(QIODevice::WriteOnly);
+      Out.write("synced");
+    }
+    TResponder Responder;
+    Responder.Frontend = &Frontend;
+    Responder.Passwords = std::deque<QString>(8, QStringLiteral("secret"));
+    Responder.AcceptDialogs = true;
+    {
+      MainWindow Window(CoreBridge::Info());
+      Frontend.SetWindow(&Window);
+      Window.show();
+      CoreBridge::SetArguments({ "/ini=nul", Url.toStdString(), "/synchronize", QDir::toNativeSeparators(Source).toStdString(), "/sub",
+        "/defaults" });
+      Window.StartUp();
+      Check(QFileInfo::exists(Root.filePath(QStringLiteral("sub/synced.txt"))), "/synchronize: the directories synchronized");
+      Check(!Window.isVisible(), "then the window closes");
+    }
+    {
+      MainWindow Window(CoreBridge::Info());
+      Frontend.SetWindow(&Window);
+      Window.show();
+      CoreBridge::SetArguments({ "/ini=nul", Url.toStdString(), "/edit", "/sub/sent.txt" });
+      Window.StartUp();
+      EditorWindow * Editor = nullptr;
+      for (QWidget * Widget : QApplication::topLevelWidgets())
+      {
+        if (qobject_cast<EditorWindow *>(Widget) != nullptr)
+        {
+          Editor = qobject_cast<EditorWindow *>(Widget);
+        }
+      }
+      Check((Editor != nullptr) && (Editor->Editor()->toPlainText() == QStringLiteral("sent")) && !Window.isVisible(),
+        "/edit: the file in the editor, the window hidden");
+      if (Editor != nullptr)
+      {
+        Editor->close();
+        QTest::qWait(100);
+      }
+    }
+    std::string Session;
+    std::string Path;
+    // (As core reads it, "/sub" alone would be a switch: "/sub/" is a path.)
+    const std::vector<std::string> Refresh = { Url.toStdString(), "/refresh", "/sub/" };
+    const bool Found = CoreBridge::CommandLineRefresh(Session, Path, &Refresh);
+    Check(Found && (Session == Url.toStdString()) && (Path == "/sub/"),
+      "/refresh: the session and the path, for the instance running");
   }
   CoreBridge::Finalize();
 }
