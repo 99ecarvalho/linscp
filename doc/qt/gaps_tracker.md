@@ -11,14 +11,14 @@ Last updated: **2026-10-17**
 
 | Area | Done | Total |
 |---|---|---|
-| A. Site Manager | 2 | 17 |
+| A. Site Manager | 3 | 17 |
 | B. Password prompt and banner | 1 | 3 |
 | C. Progress and synchronization dialogs | 2 | 4 |
 | D. Main window | 1 | 9 |
 | E. Preferences | 0 | 10 |
 | F. Command line | 0 | 3 |
 | G. Known before | 0 | 1 |
-| **Total** | **6** | **47** |
+| **Total** | **7** | **47** |
 
 ## Items
 
@@ -26,7 +26,7 @@ Last updated: **2026-10-17**
 |---|---|---|---|---|
 | A1 | S3 "Credentials from AWS environment" | Medium | done | 2026-10-17. With the profile combo, as TLoginDialog's S3CredentialsEnvCheck; ctest `qt_gui_sites` |
 | A2 | FTP "Anonymous login" | Medium | done | 2026-10-17. As TLoginDialog's AnonymousLoginCheck; ctest `qt_gui_sites` |
-| A3 | Save drop-down: Save As, Set Defaults | High | todo | |
+| A3 | Save drop-down: Save As, Set Defaults | High | done | 2026-10-17. `SiteManager::SaveAsDialog`, `SetDefaults` (`CoreBridge::SaveDefaultSite`); ctest `qt_gui_sites` |
 | A4 | Manage button and menu | High | todo | Shares its menus with A11 |
 | A5 | Clone to New Site | Medium | todo | |
 | A6 | Paste Session URL | Medium | todo | |

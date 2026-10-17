@@ -4820,6 +4820,14 @@ Staðsetning: %2</translation>
         <source>AWS profile</source>
         <translation>AWS-snið</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>Vista &amp;sem…</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>Stilla &amp;sjálfgilt</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

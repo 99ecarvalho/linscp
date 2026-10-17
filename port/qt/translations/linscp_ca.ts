@@ -4820,6 +4820,14 @@ Ubicació: %2</translation>
         <source>AWS profile</source>
         <translation>Perfil d&apos;AWS</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>&amp;Anomena i desa...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>Estableix per &amp;defecte</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

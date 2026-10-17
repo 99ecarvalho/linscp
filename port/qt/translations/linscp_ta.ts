@@ -4820,6 +4820,14 @@ Location: %2</source>
         <source>AWS profile</source>
         <translation>AWS சுயவிவரம்</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>என சேமி...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>இயல்புநிலைகள் அமை</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

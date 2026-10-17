@@ -4819,6 +4819,14 @@ Location: %2</source>
         <source>AWS profile</source>
         <translation>โปรไฟล์ AWS</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>บันทึกเป็น...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>ตั้งค่าเริ่มต้น</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

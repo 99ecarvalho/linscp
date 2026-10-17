@@ -4821,6 +4821,14 @@ Vieta: %2</translation>
         <source>AWS profile</source>
         <translation>AWS profilis</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>&amp;Įrašyti kaip...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>Numatytieji</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

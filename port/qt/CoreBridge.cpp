@@ -1884,6 +1884,7 @@ std::string Text(TText Text)
     case TText::AutoWorkspaceEnable: Ident = AUTO_WORKSPACE_ENABLE; break;
     case TText::DDTransferConfirmOff: return Utf8(UnformatMessage(LoadStr(DD_TRANSFER_CONFIRM_OFF2)));
     case TText::DDWarnLackOfTempSpace: Ident = DD_WARN_LACK_OF_TEMP_SPACE; break;
+    case TText::SetDefaultSiteSettings: Ident = SET_DEFAULT_SESSION_SETTINGS; break;
     default: return std::string();
   }
   return Utf8(LoadStr(Ident));

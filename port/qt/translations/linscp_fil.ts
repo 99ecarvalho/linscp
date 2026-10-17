@@ -4820,6 +4820,14 @@ Lokasyon: %2</translation>
         <source>AWS profile</source>
         <translation>AWS profile</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>I-&amp;save bilang</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>I-save bilang de&amp;fault</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

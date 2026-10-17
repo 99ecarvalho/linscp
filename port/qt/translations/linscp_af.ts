@@ -4820,6 +4820,14 @@ Ligging: %2</translation>
         <source>AWS profile</source>
         <translation>AWS-profiel</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>Stoor &amp;as...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>Stel &amp;verstekwaardes</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

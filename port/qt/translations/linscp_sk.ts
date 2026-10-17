@@ -4821,6 +4821,14 @@ Umiestnenie: %2</translation>
         <source>AWS profile</source>
         <translation>Profil AWS</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>Uložiť &amp;ako...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>Predvolené</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

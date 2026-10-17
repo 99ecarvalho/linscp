@@ -693,6 +693,26 @@ void SaveSite(const TSite & Site, const std::string & BaseName)
   }
 }
 
+void SaveDefaultSite(const TSite & Site)
+{
+  try
+  {
+    std::unique_ptr<TSessionData> Data(SessionDataOf(Site, std::string()));
+    // As SetDefaultSessionActionExecute: the master password first.
+    TShellConfiguration * Shell = dynamic_cast<TShellConfiguration *>(GUIConfiguration);
+    if (!Configuration->DisablePasswordStoring && Data->HasAnyPassword() && Shell->UseMasterPassword())
+    {
+      Shell->AskForMasterPasswordIfNotSet();
+    }
+    // Stored by the setter (only modified, explicit).
+    StoredSessions->DefaultSettings = Data.get();
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
 void RenameSite(const std::string & Name, const std::string & NewName)
 {
   if (Name == NewName)

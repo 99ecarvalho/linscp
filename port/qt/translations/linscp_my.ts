@@ -4819,6 +4819,14 @@ Location: %2</source>
         <source>AWS profile</source>
         <translation>AWS ပရိုဖိုင်</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>အမည်အသစ်ဖြင့် သိမ်းပါ(&amp;A)...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>မူလအဖြစ် သတ်မှတ်ပါ(&amp;F)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

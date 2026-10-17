@@ -4819,6 +4819,14 @@ Lokasi: %2</translation>
         <source>AWS profile</source>
         <translation>Profil AWS</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>Simpan seb&amp;agai...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>Laras de&amp;fault</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4820,6 +4820,14 @@ Location: %2</source>
         <source>AWS profile</source>
         <translation>Профил на AWS</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>Съхраняване &amp;като...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>Под&amp;разбирана</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4820,6 +4820,14 @@ Location: %2</source>
         <source>AWS profile</source>
         <translation>AWS प्रोफ़ाइल</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>इस रूप में सहेजें(&amp;A)...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>डिफ़ॉल्ट सेट करें(&amp;F)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

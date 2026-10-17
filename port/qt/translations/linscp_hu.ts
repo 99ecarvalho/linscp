@@ -4819,6 +4819,14 @@ Hely: %2</translation>
         <source>AWS profile</source>
         <translation>AWS-profil</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>Mentés, mint...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>A&amp;lapértelmezettnek beállítás</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

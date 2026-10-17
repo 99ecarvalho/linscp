@@ -4819,6 +4819,14 @@ Location: %2</source>
         <source>AWS profile</source>
         <translation>نمایه AWS</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>ذخیره به عنوان...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>انتخاب به عنوان پیش فرض</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

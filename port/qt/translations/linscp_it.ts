@@ -4820,6 +4820,14 @@ Percorso: %2</translation>
         <source>AWS profile</source>
         <translation>Profilo AWS</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>&amp;Salva con nome...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>Valori prede&amp;finiti</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

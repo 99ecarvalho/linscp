@@ -4820,6 +4820,14 @@ Locatie: %2</translation>
         <source>AWS profile</source>
         <translation>AWS-profiel</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>&amp;Opslaan als...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>Als &amp;standaard</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

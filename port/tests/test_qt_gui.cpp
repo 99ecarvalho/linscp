@@ -616,6 +616,44 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
       Check(Dialog.SelectSite(QStringLiteral("Tests/other@127.0.0.2")), "as Tests/other@127.0.0.2");
       Dialog.DeleteSelected(false);
     }
+    // A3: Save's drop-down: Save As, for a stored site too, with its name;
+    // Set Defaults, the new site's settings from then on.
+    {
+      SiteManager Dialog(&Window);
+      const QList<QAction *> SaveActions = Dialog.SaveButton()->menu()->actions();
+      Check((SaveActions.size() == 4) && (SaveActions[1]->text() == QStringLiteral("Save &As...")) &&
+        (SaveActions[3]->text() == QStringLiteral("Set De&faults")), "Save drops down Save As and Set Defaults");
+      Check(Dialog.SelectSite(QStringLiteral("Tests/rclone")), "Save As from a stored site");
+      bool Asked = false;
+      Responder.Custom = [&Asked](QWidget * Modal)
+      {
+        SaveSiteDialog * Save = qobject_cast<SaveSiteDialog *>(Modal);
+        if (Save == nullptr)
+        {
+          return false;
+        }
+        Asked = (Save->NameEdit()->text() == QStringLiteral("rclone")) && (Save->FolderCombo()->currentText() == QStringLiteral("Tests"));
+        Save->NameEdit()->setText(QStringLiteral("rclone copy"));
+        Save->accept();
+        return true;
+      };
+      Dialog.SaveAsDialog(true);
+      Responder.Custom = nullptr;
+      Check(Asked, "asks for a name, the site's own offered");
+      Check(Dialog.SelectSite(QStringLiteral("Tests/rclone copy")) && (Dialog.HostName()->text() == QStringLiteral("127.0.0.1")) &&
+        Dialog.SelectSite(QStringLiteral("Tests/rclone")), "a copy saved, the original kept");
+      Dialog.SelectSite(QStringLiteral("Tests/rclone copy"));
+      Dialog.DeleteSelected(false);
+      Dialog.SelectNewSite();
+      const QString OriginalUser = Dialog.UserName()->text();
+      Dialog.UserName()->setText(QStringLiteral("defaultuser"));
+      Check(Dialog.SetDefaults(false) && Dialog.UserName()->text() == QStringLiteral("defaultuser"),
+        "Set Defaults, the new site from them");
+      Check(CoreBridge::NewSite().UserName == "defaultuser", "stored as the new sites' settings");
+      Dialog.UserName()->setText(OriginalUser);
+      Dialog.SetDefaults(false);
+      Check(CoreBridge::NewSite().UserName == OriginalUser.toStdString(), "and set back");
+    }
     {
       SiteManager Dialog(&Window);
       Check(Dialog.SelectSite(QStringLiteral("Tests/rclone")), "a new site manager has it");

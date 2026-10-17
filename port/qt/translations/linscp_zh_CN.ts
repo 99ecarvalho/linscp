@@ -4819,6 +4819,14 @@ Location: %2</source>
         <source>AWS profile</source>
         <translation>AWS 配置文件</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>另存为(&amp;S)...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>设置为默认值(&amp;F)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4820,6 +4820,14 @@ Localización: %2</translation>
         <source>AWS profile</source>
         <translation>Perfil de AWS</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>Gardar &amp;como...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>Establecer como &amp;predeterminado</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

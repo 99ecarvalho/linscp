@@ -196,7 +196,20 @@ SiteManager::SiteManager(QWidget * Parent) :
   QDialogButtonBox * Box = new QDialogButtonBox(this);
   FLogin = Box->addButton(tr("&Login"), QDialogButtonBox::AcceptRole);
   FLogin->setDefault(true);
-  FSave = Box->addButton(tr("&Save"), QDialogButtonBox::ActionRole);
+  // As upstream's Save, its drop-down (SaveDropDownMenu): Save, Save As...,
+  // Set Defaults.
+  FSave = new QToolButton(this);
+  FSave->setText(tr("&Save"));
+  FSave->setPopupMode(QToolButton::MenuButtonPopup);
+  FSave->setToolButtonStyle(Qt::ToolButtonTextOnly);
+  QMenu * SaveMenu = new QMenu(FSave);
+  QAction * SaveAction = SaveMenu->addAction(tr("&Save"), this, &SiteManager::Save);
+  SaveMenu->setDefaultAction(SaveAction);
+  SaveMenu->addAction(tr("Save &As..."), this, [this]() { SaveAsDialog(true); });
+  SaveMenu->addSeparator();
+  SaveMenu->addAction(tr("Set De&faults"), this, [this]() { SetDefaults(); });
+  FSave->setMenu(SaveMenu);
+  Box->addButton(FSave, QDialogButtonBox::ActionRole);
   QPushButton * Close = Box->addButton(tr("Close"), QDialogButtonBox::RejectRole);
   // As upstream's Login: Tools, its menu.
   QPushButton * Tools = Box->addButton(tr("&Tools"), QDialogButtonBox::ResetRole);
@@ -222,7 +235,7 @@ SiteManager::SiteManager(QWidget * Parent) :
   });
   Tools->setMenu(ToolsMenu);
   connect(FLogin, &QPushButton::clicked, this, &SiteManager::accept);
-  connect(FSave, &QPushButton::clicked, this, &SiteManager::Save);
+  connect(FSave, &QToolButton::clicked, this, &SiteManager::Save);
   connect(Close, &QPushButton::clicked, this, &QDialog::reject);
   Layout->addWidget(Box);
 
@@ -761,8 +774,16 @@ bool SiteManager::SaveAs(const QString & Name, bool SavePassword)
 // whether to keep the password.
 void SiteManager::Save()
 {
+  // As SaveSessionActionExecute: for the new site, Save As.
+  SaveAsDialog(SelectedName().isEmpty());
+}
+
+// As SaveAsSession: in place unless Force, else through the save dialog,
+// with the site's own name for a stored site (Save As).
+void SiteManager::SaveAsDialog(bool Force)
+{
   const QString Name = SelectedName();
-  if (!Name.isEmpty())
+  if (!Force)
   {
     if (!VerifyKey())
     {
@@ -787,7 +808,8 @@ void SiteManager::Save()
   CoreBridge::TSession::TSaveAsSite Defaults;
   const QString Suggested =
     QString::fromStdString(Site.UserName.empty() ? Site.HostName : Site.UserName + "@" + Site.HostName);
-  Defaults.Name = (Folder.isEmpty() ? Suggested : (Folder + QLatin1Char('/') + Suggested)).toStdString();
+  Defaults.Name = !Name.isEmpty() ? Name.toStdString() :
+    (Folder.isEmpty() ? Suggested : (Folder + QLatin1Char('/') + Suggested)).toStdString();
   Defaults.CanSavePassword = !FPassword->text().isEmpty();
   QStringList Folders;
   for (QTreeWidgetItemIterator It(FTree); *It; ++It)
@@ -811,6 +833,49 @@ void SiteManager::Save()
       CreateSessionShortcut(false);
     }
   }
+}
+
+// As SetDefaultSessionActionExecute: the form as the new sites' settings,
+// after asking; then the new site, from them.
+bool SiteManager::SetDefaults(bool Confirm)
+{
+  if (Confirm)
+  {
+    CoreBridge::TQuery Query;
+    Query.Type = CoreBridge::TQueryType::Confirmation;
+    Query.Message = CoreBridge::Text(CoreBridge::TText::SetDefaultSiteSettings);
+    CoreBridge::TQueryButton OK;
+    OK.Answer = CoreBridge::AnswerOK;
+    OK.Caption = "OK";
+    CoreBridge::TQueryButton Cancel;
+    Cancel.Answer = CoreBridge::AnswerCancel;
+    Cancel.Caption = "Cancel";
+    Query.Buttons = { OK, Cancel };
+    Query.CancelAnswer = CoreBridge::AnswerCancel;
+    QtFrontend Frontend;
+    Frontend.SetWindow(this);
+    if (Frontend.Query(Query).Answer != CoreBridge::AnswerOK)
+    {
+      return false;
+    }
+  }
+  if (!VerifyKey())
+  {
+    return false;
+  }
+  try
+  {
+    CoreBridge::SaveDefaultSite(Edited());
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+  // As Default: the new site, reset.
+  SelectNewSite();
+  Load(CoreBridge::NewSite());
+  return true;
 }
 
 // As the Login dialog renames in its tree: a site, or a folder with every

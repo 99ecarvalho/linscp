@@ -4820,6 +4820,14 @@ Asukoht: %2</translation>
         <source>AWS profile</source>
         <translation>AWS-i profiil</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>Salvesta &amp;kui...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>Vaikes&amp;äteteks</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

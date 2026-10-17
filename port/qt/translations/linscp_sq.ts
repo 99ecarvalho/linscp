@@ -4820,6 +4820,14 @@ Vendndodhja: %2</translation>
         <source>AWS profile</source>
         <translation>Profili AWS</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>Ruaj &amp;si...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>Cakto si &amp;parazgjedhje</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

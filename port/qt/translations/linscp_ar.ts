@@ -4824,6 +4824,14 @@ Location: %2</source>
         <source>AWS profile</source>
         <translation>ملف تعريف AWS</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>حفظ باسم...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>تعيين الا&amp;فتراضي</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -19,6 +19,7 @@ class QLabel;
 class QLineEdit;
 class QPushButton;
 class QSpinBox;
+class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
 
@@ -44,6 +45,13 @@ public:
   bool SaveAs(const QString & Name, bool SavePassword);
   // Saves the selected site in place, or asks for a name for a new one.
   void Save();
+  // Save As: asks for a name (the site's own for a stored site) even for a
+  // stored site when Force.
+  void SaveAsDialog(bool Force);
+  // Set Defaults: the form as the new sites' settings, after asking unless
+  // Confirm is false. False when it did not save.
+  bool SetDefaults(bool Confirm = true);
+  QToolButton * SaveButton() const { return FSave; }
   // Renames the selected site or folder (a folder: every site in it).
   bool RenameSelected(const QString & NewName);
   // A folder under the selected one, in the tree until a site is saved in it.
@@ -122,11 +130,11 @@ private:
   void UpdateS3Credentials();
   void UpdateCredentials();
   QPushButton * FLogin = nullptr;
-  QPushButton * FSave = nullptr;
+  QToolButton * FSave = nullptr;
   QPushButton * FRename = nullptr;
   QPushButton * FDelete = nullptr;
   QPushButton * FNewFolder = nullptr;
-  class QToolButton * FAdvanced = nullptr;
+  QToolButton * FAdvanced = nullptr;
   // The site under the cursor, with what the form does not show.
   CoreBridge::TSite FSite;
   // Folders made in this dialog, with no site in them yet.

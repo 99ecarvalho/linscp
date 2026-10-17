@@ -1112,6 +1112,7 @@ enum class TText
   AutoWorkspaceEnable,  // "Press 'No' to enable automatic saving of the workspace."
   DDTransferConfirmOff, // "Transfer confirmation turned off ... Click here to undo."
   DDWarnLackOfTempSpace, // "Too little space on temporary drive! ... '%s' ... %s ... %s ..."
+  SetDefaultSiteSettings, // "Set current session settings as default?" (unformatted)
 };
 std::string Text(TText Text);
 // What synchronizing did, as TCustomScpExplorerForm::Synchronize's summary:
@@ -1876,6 +1877,9 @@ int TunnelLocalPortNumberHigh();
 // asking before overwriting another is the dialog's (SiteExists). Throws
 // TCoreError: no name, a special site, a storage error.
 void SaveSite(const TSite & Site, const std::string & BaseName = std::string());
+// The Login dialog's Set Defaults: Site as the new sites' settings
+// (StoredSessions->DefaultSettings), stored.
+void SaveDefaultSite(const TSite & Site);
 // Edit Raw Settings, as TSiteRawDialog: the site's settings (of BaseName's
 // stored site, or the defaults, with Site's fields) as core's options
 // other than the protocol, host, port, user and password; and, the options

@@ -4820,6 +4820,14 @@ Ruta: %2</translation>
         <source>AWS profile</source>
         <translation>Perfil de AWS</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>&amp;Guardar como...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>&amp;Predeterminado</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

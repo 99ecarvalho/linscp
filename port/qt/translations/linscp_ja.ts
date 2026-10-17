@@ -4819,6 +4819,14 @@ Location: %2</source>
         <source>AWS profile</source>
         <translation>AWS プロファイル</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>名前をつけて保存(&amp;A)...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>デフォルトの設定として使う(&amp;F)</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4821,6 +4821,14 @@ Lokacija: %2</translation>
         <source>AWS profile</source>
         <translation>AWS profil</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>Spremi &amp;kao</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>Postavi &amp;zadano</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

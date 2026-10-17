@@ -4821,6 +4821,14 @@ Atrašanās vieta: %2</translation>
         <source>AWS profile</source>
         <translation>AWS profils</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>Saglabāt &amp;kā...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>Iestatīt &amp;noklusējumu</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

@@ -4819,6 +4819,14 @@ Vị trí: %2</translation>
         <source>AWS profile</source>
         <translation>Hồ sơ AWS</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>Lưu &amp;thành...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>Đặt làm &amp;mặc định</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>

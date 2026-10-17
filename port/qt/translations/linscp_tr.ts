@@ -4819,6 +4819,14 @@ Konum: %2</translation>
         <source>AWS profile</source>
         <translation>AWS profili</translation>
     </message>
+    <message>
+        <source>Save &amp;As...</source>
+        <translation>&amp;Farklı kaydet...</translation>
+    </message>
+    <message>
+        <source>Set De&amp;faults</source>
+        <translation>&amp;Varsayılan olarak ayarla</translation>
+    </message>
 </context>
 <context>
     <name>SshHostCADialog</name>
