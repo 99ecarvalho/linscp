@@ -4926,6 +4926,42 @@ Vendndodhja: %2</translation>
         <source>(none)</source>
         <translation>(asnjë)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>&amp;Shëno</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>&amp;Hiq shënimin</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Shëno të gjitha veprimet në këtë di&amp;rektori</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Hiq shënimin e të gjitha veprimeve në kë&amp;të direktori</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Direktoria e &amp;majtë</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Eksploro</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Kopjo &amp;shtegun në kujtesën e fragmenteve</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Direktoria e &amp;djathtë</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Përzgjidh të &amp;gjitha</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

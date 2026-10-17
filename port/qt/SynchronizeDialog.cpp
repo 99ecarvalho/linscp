@@ -1,6 +1,10 @@
 #include "SynchronizeDialog.h"
 #include <algorithm>
 #include <QMenu>
+#include <QUrl>
+#include <QGuiApplication>
+#include <QDesktopServices>
+#include <QClipboard>
 #include "QtFrontend.h"
 
 #include <QApplication>
@@ -410,8 +414,147 @@ SyncChecklistDialog::SyncChecklistDialog(CoreBridge::TSyncChecklist & Checklist,
     UpdateTools();
   });
   FReverse->setEnabled(false);
+  // ListViewPopupMenu.
+  FList->setContextMenuPolicy(Qt::CustomContextMenu);
+  connect(FList, &QWidget::customContextMenuRequested, this, [this](const QPoint & Pos)
+  {
+    QMenu * Menu = PopupMenu();
+    Menu->exec(FList->viewport()->mapToGlobal(Pos));
+    Menu->deleteLater();
+  });
+  // Its keys while the list has the focus: Copy Path to Clipboard (left,
+  // right), Select All.
+  QAction * LeftPath = new QAction(this);
+  LeftPath->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_BracketLeft));
+  connect(LeftPath, &QAction::triggered, this, [this]() { QGuiApplication::clipboard()->setText(SelectedPaths(true).join(QLatin1Char('\n'))); });
+  QAction * RightPath = new QAction(this);
+  RightPath->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_BracketRight));
+  connect(RightPath, &QAction::triggered, this, [this]() { QGuiApplication::clipboard()->setText(SelectedPaths(false).join(QLatin1Char('\n'))); });
+  FList->addAction(LeftPath);
+  FList->addAction(RightPath);
   UpdateTools();
   UpdateStatus();
+}
+
+QMenu * SyncChecklistDialog::PopupMenu()
+{
+  QMenu * Menu = new QMenu(this);
+  const bool Any = !FList->selectedItems().isEmpty();
+  Menu->addAction(tr("&Check"), this, [this]() { CheckSelected(true); })->setEnabled(Any);
+  Menu->addAction(tr("&Uncheck"), this, [this]() { CheckSelected(false); })->setEnabled(Any);
+  Menu->addSeparator();
+  Menu->addAction(tr("Check All Actions in &This Directory"), this, [this]() { CheckDirectory(true); })->setEnabled(Any);
+  Menu->addAction(tr("Uncheck All Actions in This &Directory"), this, [this]() { CheckDirectory(false); })->setEnabled(Any);
+  Menu->addSeparator();
+  Menu->addAction(tr("&Reverse"), this, &SyncChecklistDialog::ReverseSelected)->setEnabled(Any);
+  if (FMoveAction != nullptr)
+  {
+    for (QAction * Action : { FMoveAction, FCalculateAction, FCalculateAllAction })
+    {
+      Menu->addAction(Action);
+    }
+  }
+  if (FCustomCommands->isVisible())
+  {
+    QMenu * Commands = Menu->addMenu(FCustomCommands->text());
+    FillCustomCommands(Commands);
+  }
+  Menu->addSeparator();
+  // The two sides: the left (local) one explored in the file manager, as
+  // OpenFolderInExplorer; each side's paths copied.
+  QMenu * Left = Menu->addMenu(tr("&Left Directory"));
+  Left->addAction(tr("&Explore"), this, [this]()
+  {
+    const std::vector<std::size_t> Selected = SelectedIndexes();
+    if (!Selected.empty())
+    {
+      const CoreBridge::TSyncItem & Item = FChecklist.Items()[Selected.front()];
+      QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(Item.LocalDirectory)));
+    }
+  })->setEnabled(FList->selectedItems().size() == 1);
+  Left->addAction(tr("Copy &Path to Clipboard"), this, [this]()
+  {
+    QGuiApplication::clipboard()->setText(SelectedPaths(true).join(QLatin1Char('\n')));
+  }, QKeySequence(Qt::CTRL | Qt::Key_BracketLeft))->setEnabled(Any);
+  QMenu * Right = Menu->addMenu(tr("Rig&ht Directory"));
+  Right->addAction(tr("Copy &Path to Clipboard"), this, [this]()
+  {
+    QGuiApplication::clipboard()->setText(SelectedPaths(false).join(QLatin1Char('\n')));
+  }, QKeySequence(Qt::CTRL | Qt::Key_BracketRight))->setEnabled(Any);
+  Menu->addSeparator();
+  Menu->addAction(tr("Select &All"), this, [this]() { FList->selectAll(); }, QKeySequence::SelectAll)
+    ->setEnabled(FList->selectedItems().size() < FList->topLevelItemCount());
+  return Menu;
+}
+
+void SyncChecklistDialog::CheckSelected(bool Check)
+{
+  for (QTreeWidgetItem * Item : FList->selectedItems())
+  {
+    const int Index = Item->data(NameColumn, IndexRole).toInt();
+    FChecklist.Check(Index, Check);
+    Load(Index);
+  }
+  UpdateStatus();
+}
+
+// As CheckDirectory: every item in or below a selected item's directory.
+void SyncChecklistDialog::CheckDirectory(bool Check)
+{
+  QStringList Directories;
+  for (std::size_t Index : SelectedIndexes())
+  {
+    QString Directory = QString::fromStdString(FChecklist.Items()[Index].LocalDirectory);
+    if (!Directory.endsWith(QLatin1Char('/')) && !Directory.endsWith(QLatin1Char('\\')))
+    {
+      Directory += QDir::separator();
+    }
+    Directories.append(Directory);
+  }
+  for (std::size_t Index = 0; Index < FChecklist.Items().size(); Index++)
+  {
+    QString Directory = QString::fromStdString(FChecklist.Items()[Index].LocalDirectory);
+    if (!Directory.endsWith(QLatin1Char('/')) && !Directory.endsWith(QLatin1Char('\\')))
+    {
+      Directory += QDir::separator();
+    }
+    for (const QString & Selected : Directories)
+    {
+      if (Directory.startsWith(Selected, Qt::CaseInsensitive))
+      {
+        FChecklist.Check(Index, Check);
+        Load(static_cast<int>(Index));
+        break;
+      }
+    }
+  }
+  UpdateStatus();
+}
+
+// ForceGetLocalPath and ForceGetRemotePath: each side's directory and name,
+// whether the file is there or not.
+QStringList SyncChecklistDialog::SelectedPaths(bool Local) const
+{
+  QStringList Result;
+  for (std::size_t Index : SelectedIndexes())
+  {
+    const CoreBridge::TSyncItem & Item = FChecklist.Items()[Index];
+    const QString Name = QString::fromStdString(Item.Name);
+    if (Local)
+    {
+      Result.append(QDir(QString::fromStdString(Item.LocalDirectory)).filePath(Name));
+    }
+    else
+    {
+      QString Directory = QString::fromStdString(Item.RemoteDirectory);
+      if (!Directory.endsWith(QLatin1Char('/')))
+      {
+        Directory += QLatin1Char('/');
+      }
+      Result.append(Directory + Name);
+    }
+  }
+  return Result;
 }
 
 void SyncChecklistDialog::Reload()

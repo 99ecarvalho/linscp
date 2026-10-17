@@ -4926,6 +4926,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(κανένα)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>Σήμανση</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>Αποεπιλογή</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Σήμανση όλων των ενεργειών σε αυτόν &amp;τον κατάλογο</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Αποεπιλογή όλων των ενεργειών σε αυτόν τον &amp;κατάλογο</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Α&amp;ριστερός κατάλογος</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Εξερεύνηση</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Αντιγραφή &amp;διαδρομής στο πρόχειρο</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>&amp;Δεξιός κατάλογος</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Επιλογή όλων</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

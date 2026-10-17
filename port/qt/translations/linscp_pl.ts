@@ -4927,6 +4927,42 @@ Lokalizacja: %2</translation>
         <source>(none)</source>
         <translation>(brak)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>&amp;Zaznacz</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>&amp;Odznacz</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>&amp;Zaznacz wszystkie czynności w tym katalogu</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>&amp;Odznacz wszystkie czynności w tym katalogu</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Katalog po &amp;lewej</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Eksploruj</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>&amp;Kopiuj ścieżkę do schowka</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Katalog po &amp;prawej</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Zaznacz &amp;wszystkie</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

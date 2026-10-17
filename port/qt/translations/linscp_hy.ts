@@ -4926,6 +4926,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(ոչ մեկը)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>&amp;Նշել</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>Ա&amp;պանշել</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Նշել այ&amp;ս գրացուցակի բոլոր գործողությունները</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Ապանշել այս գրա&amp;ցուցակի բոլոր գործողությունները</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>&amp;Ձախ գրացուցակ</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Բացել ֆայլերի կառավարչում</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Պատճենել &amp;ուղին սեղմատախտակին</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Ա&amp;ջ գրացուցակ</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Ընտրել &amp;բոլորը</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

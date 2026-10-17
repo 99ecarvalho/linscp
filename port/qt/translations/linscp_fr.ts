@@ -4926,6 +4926,42 @@ Emplacement : %2</translation>
         <source>(none)</source>
         <translation>(aucun)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>Sélectionner</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>Désélectionner</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Vérifier toutes les actions de ce répertoire</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Décocher toutes les actions de ce répertoire</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Répertoire de &amp;gauche</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Explorer</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Copier le chemin dans le Presse-papier</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Répertoire de &amp;droite</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Tout sélectionner</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

@@ -4926,6 +4926,42 @@ Lokasyon: %2</translation>
         <source>(none)</source>
         <translation>(wala)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>I-&amp;check</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>I-&amp;uncheck</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>I-check Lahat ng Aksyon sa Direktoryong I&amp;to</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>I-uncheck Lahat ng Aksyon sa &amp;Direktoryong Ito</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Kali&amp;wang Direktoryo</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Galugarin</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Kopyahin ang &amp;Path sa Clipboard</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Ka&amp;nang Direktoryo</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Piliin &amp;Lahat</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

@@ -4927,6 +4927,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(нет)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>От&amp;метить</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>О&amp;чистить</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Отметить все действия в этом каталоге</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Снять отметку со всех действий в этом каталоге</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Каталог слева</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>Исследовать</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>&amp;Скопировать путь в буфер обмена</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Каталог справа:</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Отметить &amp;все</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

@@ -4926,6 +4926,42 @@ Staðsetning: %2</translation>
         <source>(none)</source>
         <translation>(ekkert)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>&amp;Haka</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>&amp;Afhaka</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Haka við allar aðgerðir í &amp;þessu skráasafni</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Afhaka við allar aðgerðir í þessu &amp;skráasafni</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Vi&amp;nstra skráasafn</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Kanna</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Afrita &amp;slóð á klippispjald</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>&amp;Hægra skráasafn</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Velja &amp;allt</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

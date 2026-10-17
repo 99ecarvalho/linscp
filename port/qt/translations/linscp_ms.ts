@@ -4925,6 +4925,42 @@ Lokasi: %2</translation>
         <source>(none)</source>
         <translation>(tiada)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>Tan&amp;da</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>N&amp;yahtanda</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Tanda Semua Tindakan dalam Direkt&amp;ori Ini</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Nyahtanda Semua Tindakan dalam Dir&amp;ektori Ini</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Direktori &amp;Kiri</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Jelajah</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Salin &amp;Laluan ke Clipboard</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>D&amp;irektori Kanan</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Pilih semu&amp;a</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

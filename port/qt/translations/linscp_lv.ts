@@ -4927,6 +4927,42 @@ Atrašanās vieta: %2</translation>
         <source>(none)</source>
         <translation>(nav)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>A&amp;tzīmēt</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>&amp;Noņemt atzīmi</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Atzīmēt visas darbības &amp;šajā mapē</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Noņemt atzīmi visām darbībām šajā &amp;mapē</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>K&amp;reisā mape</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Pārlūkot</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Kopēt &amp;ceļu piezīmju atmiņā</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>&amp;Labā mape</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Iezīmēt &amp;visu</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

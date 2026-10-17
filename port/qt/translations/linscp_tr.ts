@@ -4925,6 +4925,42 @@ Konum: %2</translation>
         <source>(none)</source>
         <translation>(yok)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>&amp;Seç</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>&amp;Bırak</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Bu klasördeki &amp;tüm işlemler denetlensin</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Bu klasördeki hiçbir işlem &amp;denetlenmesin</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>&amp;Sol klasör</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>Dosya &amp;gezgininde aç</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Yolu &amp;panoya kopyala</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>S&amp;ağ klasör</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Tümünü seç</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

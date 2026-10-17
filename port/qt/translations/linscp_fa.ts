@@ -4925,6 +4925,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(هیچ)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>انتخاب</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>برداشتن انتخاب</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>برسی تمامی عمل ها در &amp;این پوشه</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>برسی نکردن تمامی عمل ها در &amp;این پوشه</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>پوشه &amp;چپ</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;کاوش</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>رونوشت مسیر به حافظه موقت</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>پوشه &amp;راست</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>انتخاب همه</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

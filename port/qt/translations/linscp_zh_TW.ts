@@ -4925,6 +4925,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(無)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>選取(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>取消選取(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>勾選此目錄所有動作(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>取消勾選此目錄所有動作(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>左側目錄(&amp;L)</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>瀏覽(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>複製路徑到剪貼簿(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>右側目錄(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>全選(&amp;A)</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

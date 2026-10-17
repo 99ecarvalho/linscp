@@ -4926,6 +4926,42 @@ Ligging: %2</translation>
         <source>(none)</source>
         <translation>(geen)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>M&amp;erk</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>&amp;Ontmerk</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Merk alle aksies in &amp;hierdie gids</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Ontmerk alle aksies in hierdie &amp;gids</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>L&amp;inkergids</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Verken</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Kopieer &amp;pad na knipbord</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Reg&amp;tergids</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Kies &amp;alles</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

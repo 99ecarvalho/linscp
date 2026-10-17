@@ -4926,6 +4926,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(არცერთი)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>&amp;შემოწმება</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>ჩართვის მ&amp;ოხსნა</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>ამ საქაღალდეში ყველა მოქმედების &amp;ჩართვა</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>ამ საქაღალდეში ყველა მოქმედების ჩართვის მოხ&amp;სნა</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>მარ&amp;ცხენა საქაღალდე</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>დათვალი&amp;ერება</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>ბილიკის კოპირება _ბაფერში</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>მარ&amp;ჯვენა საქაღალდე</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>ყველაფრის &amp;მონიშვნა</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

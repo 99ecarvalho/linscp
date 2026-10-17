@@ -4925,6 +4925,42 @@ Hely: %2</translation>
         <source>(none)</source>
         <translation>(nincs)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>Be&amp;jelölés</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>Bejelölés &amp;törlése</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Az összes művelet &amp;bepipálása ebben a mappában</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Az összes művelet &amp;kipipálása ebben a mappában</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Ba&amp;l mappa</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Felfedezés</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Útvonal &amp;másolása vágólapra</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Jo&amp;bb mappa</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Összes kijelölése</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

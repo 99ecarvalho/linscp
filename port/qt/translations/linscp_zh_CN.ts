@@ -4925,6 +4925,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(无)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>选中(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>反选(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>在该目录中选中全部动作(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>在该目录中反选全部动作(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>左侧目录（&amp;L）</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>浏览（&amp;E）</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>将路径复制到剪贴板(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>右侧目录（&amp;H）</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>全选(&amp;A)</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

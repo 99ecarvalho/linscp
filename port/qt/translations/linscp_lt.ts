@@ -4927,6 +4927,42 @@ Vieta: %2</translation>
         <source>(none)</source>
         <translation>(nėra)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>&amp;Pažymėti</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>&amp;Atžymėti</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Pažymėti visus veiksmus &amp;šiame kataloge</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Atžymėti visus veiksmus šiame &amp;kataloge</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>&amp;Kairysis katalogas</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Naršyti</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Kopijuoti &amp;kelią į iškarpinę</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>&amp;Dešinysis katalogas</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Pažymėti &amp;viską</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

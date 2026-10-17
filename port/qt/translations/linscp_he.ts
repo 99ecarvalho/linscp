@@ -4926,6 +4926,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(ללא)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>&amp;סמן</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>&amp;בטל סימון</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>סמן את כל הפעולות בספריה &amp;זו</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>בטל את סימון כל ה&amp;פעולות בספריה זו</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>הספריה ה&amp;שמאלית</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;סייר</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>העתק &amp;נתיב ללוח הגזירים</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>הספריה ה&amp;ימנית</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>בחר &amp;הכל</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

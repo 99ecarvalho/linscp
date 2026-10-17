@@ -4926,6 +4926,42 @@ Asukoht: %2</translation>
         <source>(none)</source>
         <translation>(puudub)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>V&amp;ali</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>Ä&amp;ra vali</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Vali kõik toi&amp;mingud selles kataloogis</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Ära vali ühte&amp;gi toimingut selles kataloogis</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Va&amp;sak kataloog</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>Ava &amp;Exploreris</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Kopeeri &amp;asukohatee lõikelauale</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Parem katal&amp;oog</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>V&amp;ali kõik</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

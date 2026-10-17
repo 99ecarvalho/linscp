@@ -4927,6 +4927,42 @@ Cale: %2</translation>
         <source>(none)</source>
         <translation>(niciuna)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>&amp;Bifare</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>&amp;Debifare</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Bifează Toate Activitățile din Aces&amp;t Director</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Debifează Toate Activitățile din Acest &amp;Director</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Directorul &amp;stâng</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>Răsfoir&amp;e</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Copiere Cale în Memoria Tem&amp;porară</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Directorul &amp;drept</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Selectare Tot&amp;ală</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

@@ -4925,6 +4925,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(なし)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>選択(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>選択解除(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>このディレクトリのすべてのアクションを選択(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>このディレクトリのすべてのアクションを非選択(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>左ディレクトリ(&amp;L)</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>エクスプローラー(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>パスをクリップボードにコピー(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>右ディレクトリ(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>すべて選択(&amp;A)</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

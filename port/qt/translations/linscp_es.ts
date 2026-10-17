@@ -4926,6 +4926,42 @@ Ruta: %2</translation>
         <source>(none)</source>
         <translation>(ninguno)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>&amp;Marcar</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>&amp;Desmarcar</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Marcar todas las acciones en es&amp;te directorio</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Desmarcar todas las acciones en es&amp;te directorio</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Directorio i&amp;zquierdo</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Examinar</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Co&amp;piar ruta al portapapeles</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Directorio derec&amp;ho</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Seleccionar &amp;todo</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

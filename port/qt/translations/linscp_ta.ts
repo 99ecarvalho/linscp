@@ -4926,6 +4926,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(எதுவுமில்லை)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>தேர்வுசெய்</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>&amp;தேர்வுநீக்கு</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>இந்த கோப்பகத்தில் உள்ள அனைத்து செயல்களையும் தேர்வுசெய்</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>இந்த &amp;கோப்பகத்தில் உள்ள அனைத்து செயல்களையும் தேர்வுநீக்கு</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>இடது கோப்பகம்</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>உலாவு</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>இடைநிலைப் பலகைக்கு பாதையை நகலெடு</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>வலது கோப்பகம்</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>அனைத்தையும் தெரிவுசெய்</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

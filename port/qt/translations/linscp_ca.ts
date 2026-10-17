@@ -4926,6 +4926,42 @@ Ubicació: %2</translation>
         <source>(none)</source>
         <translation>(cap)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>Acti&amp;va</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>&amp;Desactiva</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Activa totes les opcions en a&amp;quest directori</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Desactiva totes les opcions en aq&amp;uest directori</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Directori &amp;esquerre</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Explora</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Copia el &amp;camí al porta-retalls</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Directori &amp;dret</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Selecciona-ho tot</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

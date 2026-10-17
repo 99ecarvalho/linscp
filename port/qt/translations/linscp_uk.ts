@@ -4927,6 +4927,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(немає)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>Позначити</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>Зняти позначки</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Відмітити всі дії в цьому каталозі</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Зняти відмітку для всіх дії в цьому каталозі</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>&amp;Ліва тека</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Перегляд</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Копіювати шлях в буфер обміну</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>&amp;Права тека</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Обрати все</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

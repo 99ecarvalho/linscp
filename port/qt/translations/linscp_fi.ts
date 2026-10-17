@@ -4926,6 +4926,42 @@ Sijainti: %2</translation>
         <source>(none)</source>
         <translation>(ei mitään)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>Valitse</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>Poista valinta</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Valitse kaikki toiminnot &amp;tässä kansiossa</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Poista kaikkien toimintojen valinta tässä &amp;kansiossa</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>&amp;Vasen kansio</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>Avaa &amp;kansio</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Kopioi etäpolku &amp;leikepöydälle</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>&amp;Oikea kansio</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Valitse &amp;kaikki</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

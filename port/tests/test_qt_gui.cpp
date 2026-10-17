@@ -1782,6 +1782,30 @@ void Synchronization(const char * Port, const QString & Directory)
       Dialog.ReverseSelected();
       Check(List->Items()[1].Action == CoreBridge::TSyncItem::TAction::DeleteLocal, "a new upload reversed is a local delete");
       Check(Dialog.List()->topLevelItem(1)->toolTip(4) == SyncChecklistDialog::tr("Delete local"), "shown so");
+      Dialog.ReverseSelected();
+      // C3, ListViewPopupMenu: Check and Uncheck the selection, all actions
+      // in its directory, its paths copied.
+      Dialog.List()->clearSelection();
+      Dialog.List()->topLevelItem(0)->setSelected(true);
+      Dialog.CheckSelected(false);
+      Check(List->CheckedCount() == 1, "Uncheck unchecks the selection");
+      Dialog.CheckDirectory(false);
+      Check(List->CheckedCount() == 0, "Uncheck All Actions in This Directory takes the rest of it");
+      Dialog.CheckDirectory(true);
+      Check(List->CheckedCount() == 2, "and Check All, back");
+      const QStringList Paths = Dialog.SelectedPaths(false);
+      Check((Paths.size() == 1) && Paths.front().startsWith(QStringLiteral("/sub/")), "the remote path, to copy");
+      Check(QFileInfo(Dialog.SelectedPaths(true).front()).dir() == QDir(Directory), "and the local one");
+      QMenu * Popup = Dialog.PopupMenu();
+      QStringList Captions;
+      for (QAction * Action : Popup->actions())
+      {
+        Captions.append(Action->text());
+      }
+      Check(Captions.contains(SyncChecklistDialog::tr("Check All Actions in &This Directory")) &&
+        Captions.contains(SyncChecklistDialog::tr("&Left Directory")) && Captions.contains(SyncChecklistDialog::tr("Select &All")),
+        "the popup has WinSCP's items");
+      delete Popup;
     }
 
     // Commands > Synchronize, from the local panel: the remote directory updated.

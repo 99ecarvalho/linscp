@@ -4927,6 +4927,42 @@ Umiestnenie: %2</translation>
         <source>(none)</source>
         <translation>(žiadne)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>&amp;Označiť</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>Od&amp;značiť</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Označiť všetky akcie v &amp;tomto priečinku</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>O&amp;dznačiť všetky akcie v tomto priečinku</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Priečinok v&amp;ľavo</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>Pr&amp;ehľadať</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Kopírovať cestu do &amp;schránky</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Priečinok v&amp;pravo</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Vybr&amp;ať všetko</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

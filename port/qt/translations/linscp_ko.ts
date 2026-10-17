@@ -4925,6 +4925,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(없음)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>선택(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>선택 해제(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>이 디렉터리에 모든 동작 확인(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>이 디렉터리에 모든 동작 확인 해제(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>왼쪽 디렉터리(&amp;L)</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>탐색(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>클립보드에 경로 복사(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>오른쪽 디렉터리(&amp;R)</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>모두 선택(&amp;A)</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

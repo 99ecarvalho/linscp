@@ -4927,6 +4927,42 @@ Lokacija: %2</translation>
         <source>(none)</source>
         <translation>(ništa)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>&amp;Označi</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>&amp;Ukloni</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Označi sve radnje u &amp;ovom direktoriju</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Odznači sve radnje u ovom &amp;direktoriju</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>&amp;Lijevi direktorij</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Pretraži</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>&amp;Kopiraj putanju u međuspremnik</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Des&amp;ni direktorij</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Odaberi &amp;sve</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

@@ -4930,6 +4930,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(لا شيء)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>&amp;تحديد</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>إل&amp;غاء التحديد</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>تحديد كل الإجراءات في &amp;هذا الدليل</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>إلغاء تحديد كل الإجراءات في هذا ال&amp;دليل</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>الدليل الأيس&amp;ر</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;فتح</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>نسخ المسار الى الحافظة</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>الدليل الأ&amp;يمن</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;اختيار الكل</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

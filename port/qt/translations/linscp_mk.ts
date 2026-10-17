@@ -4927,6 +4927,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(нема)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>О&amp;значи</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>О&amp;дзначи</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Означи ги сите акции во &amp;оваа папка</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Одзначи ги сите акции во оваа &amp;папка</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>&amp;Лев директориум</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Истражи</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Копирај &amp;патека во табла</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Дес&amp;ен директориум</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Избери &amp;сѐ</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

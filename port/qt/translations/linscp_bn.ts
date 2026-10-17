@@ -4926,6 +4926,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(কোনোটিই নয়)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>চিহ্নিত করুন(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>অচিহ্নিত করুন(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>এই ডিরেক্টরির সব কাজ চিহ্নিত করুন(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>এই ডিরেক্টরির সব কাজ অচিহ্নিত করুন(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>বাম ডিরেক্টরি(&amp;L)</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>এক্সপ্লোর করুন(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>পথ ক্লিপবোর্ডে কপি করুন(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>ডান ডিরেক্টরি(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>সব নির্বাচন(&amp;A)</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

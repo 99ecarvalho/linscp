@@ -4926,6 +4926,42 @@ Percorso: %2</translation>
         <source>(none)</source>
         <translation>(nessuno)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>Seleziona</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>Deseleziona</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Seleziona &amp;Tutte le Azioni in Questa Cartella</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>&amp;Deseleziona Tutte le Azioni in Questa Cartella</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Cartella &amp;sinistra</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Esplora</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Copia per&amp;corso negli Appunti</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Cartella &amp;destra</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Selezion&amp;a tutto</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

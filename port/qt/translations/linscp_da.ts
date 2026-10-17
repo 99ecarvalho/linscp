@@ -4926,6 +4926,42 @@ Placering: %2</translation>
         <source>(none)</source>
         <translation>(ingen)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>Tjek</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>Fjern afkrydsning</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Tjek alle handlinger i &amp;denne mappe</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Fjern markeringen af alle handlinger i denne mappe</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Venstre mappe</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>Stifinder</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Kopiér sti til &amp;udklipsholderen</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Højre mappe</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Vælg &amp;alle</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

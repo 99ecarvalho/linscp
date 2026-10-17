@@ -4925,6 +4925,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(မရှိ)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>မှတ်ပါ(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>မမှတ်ပါ(&amp;U)</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>ဤလမ်းညွှန်နေရာရှိ လုပ်ဆောင်ချက်အားလုံး မှတ်ပါ(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>ဤလမ်းညွှန်နေရာရှိ လုပ်ဆောင်ချက်အားလုံး မမှတ်ပါ(&amp;D)</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>ဘယ်လမ်းညွှန်နေရာ(&amp;L)</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>ရှာဖွေကြည့်ပါ(&amp;E)</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>လမ်းကြောင်းကို မျက်ပြင်ကတ်ပြားသို့ ကူးယူပါ(&amp;P)</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>ညာလမ်းညွှန်နေရာ(&amp;H)</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>အကုန်ရွေးပါ(&amp;A)</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

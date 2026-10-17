@@ -4925,6 +4925,42 @@ Location: %2</source>
         <source>(none)</source>
         <translation>(ไม่มี)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>เ&amp;ลือก</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>ไ&amp;ม่เลือก</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>เลือกการดำเนินการทั้งหมดในไดเรกทอรี&amp;นี้</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>ไม่เลือกการ&amp;ดำเนินการทั้งหมดในไดเรกทอรีนี้</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>ไดเรกทอรี&amp;ซ้าย</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;สำรวจ</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>&amp;คัดลอกพาธไปยังคลิปบอร์ด</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>ไดเรกทอรี&amp;ขวา</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>เลือก&amp;ทั้งหมด</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

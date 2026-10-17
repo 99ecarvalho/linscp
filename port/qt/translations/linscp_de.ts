@@ -4926,6 +4926,42 @@ Ort: %2</translation>
         <source>(none)</source>
         <translation>(keine)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>A&amp;uswählen</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>A&amp;bwählen</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Alle Aktionen in &amp;diesem Ordner auswählen</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Alle Aktionen in diesem &amp;Ordner abwählen</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Ordner &amp;linkes Fenster</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>Ordner durchsuchen</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>&amp;Verzeichnispfad kopieren</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Ordner rec&amp;htes Fenster</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Alles markieren</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

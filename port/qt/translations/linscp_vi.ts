@@ -4925,6 +4925,42 @@ Vị trí: %2</translation>
         <source>(none)</source>
         <translation>(không có)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>&amp;Chọn</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>Bỏ &amp;chọn</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Chọn tất cả hành động trong &amp;thư mục này</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Bỏ chọn tất cả hành động trong &amp;thư mục này</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>Thư mục bên t&amp;rái</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Duyệt</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Sao chép &amp;Đường dẫn</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Thư mục bên &amp;phải</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Chọn &amp;Tất cả</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

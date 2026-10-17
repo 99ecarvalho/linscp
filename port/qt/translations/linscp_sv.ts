@@ -4926,6 +4926,42 @@ Plats: %2</translation>
         <source>(none)</source>
         <translation>(inga)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>&amp;Markera</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>&amp;Avmarkera</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Markera alla åtgärder i &amp;denna katalog</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Avmarkera alla åtgärder i denna &amp;katalog</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>&amp;Vänster katalog</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Utforska</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Kopiera s&amp;ökväg till urklipp</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>&amp;Höger katalog</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Markera alla</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

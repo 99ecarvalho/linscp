@@ -4928,6 +4928,42 @@ Lokacija: %2</translation>
         <source>(none)</source>
         <translation>(brez)</translation>
     </message>
+    <message>
+        <source>&amp;Check</source>
+        <translation>Označi</translation>
+    </message>
+    <message>
+        <source>&amp;Uncheck</source>
+        <translation>Odstrani oznake</translation>
+    </message>
+    <message>
+        <source>Check All Actions in &amp;This Directory</source>
+        <translation>Preveri vse akcije v &amp;teh mapah</translation>
+    </message>
+    <message>
+        <source>Uncheck All Actions in This &amp;Directory</source>
+        <translation>Odkljuci vse akcije v tej &amp;mapi</translation>
+    </message>
+    <message>
+        <source>&amp;Left Directory</source>
+        <translation>&amp;Levi imenik</translation>
+    </message>
+    <message>
+        <source>&amp;Explore</source>
+        <translation>&amp;Raziskuj</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Path to Clipboard</source>
+        <translation>Kopiraj &amp;pot v odložišče</translation>
+    </message>
+    <message>
+        <source>Rig&amp;ht Directory</source>
+        <translation>Des&amp;ni imenik</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Izberi &amp;vse</translation>
+    </message>
 </context>
 <context>
     <name>SynchronizeDialog</name>

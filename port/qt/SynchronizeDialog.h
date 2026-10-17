@@ -128,6 +128,15 @@ public:
   void CheckAll(bool Check);
   // The selected entries' actions reversed.
   void ReverseSelected();
+  // ListViewPopupMenu's: the selection checked or not; every action under
+  // the selection's directories checked or not (CheckDirectory); the
+  // selection's local or remote paths, a line each, to the clipboard
+  // (PathToClipboard).
+  void CheckSelected(bool Check);
+  void CheckDirectory(bool Check);
+  QStringList SelectedPaths(bool Local) const;
+  // The list's popup, as it opens (for tests).
+  class QMenu * PopupMenu();
   // The Tools menu's (WinSCP's): the selected (All: every) directory's size;
   // the selection moved instead of transferred and deleted; the next pair
   // that could be, selected.
