@@ -3477,6 +3477,10 @@ Localización: %2</translation>
         <source>Get &amp;more...</source>
         <translation>Obter &amp;máis...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Permitir soltar ficheiros nestas unidades de &amp;rede:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

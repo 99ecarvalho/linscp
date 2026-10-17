@@ -349,6 +349,37 @@ void Dialogs()
   }
 }
 
+// E9: the fake file's monitors (StartCreationDirectoryMonitorsOnEachDrive's
+// TDirectoryMonitor): a directory made anywhere under a root found by its
+// name. Windows only (77 elsewhere: skipped).
+int DragMonitor(const QString & Directory)
+{
+#if defined(_WIN32)
+  QDir().mkpath(Directory);
+  DragExt::TCreationMonitor Monitor({ Directory });
+  Check(Monitor.Count() == 1, "the root watched");
+  const QString Made = QDir(Directory).filePath(QStringLiteral("deep/er/scp12345"));
+  QDir().mkpath(Made);
+  QString Found;
+  QElapsedTimer Waited;
+  Waited.start();
+  while (Found.isEmpty() && (Waited.elapsed() < 5000))
+  {
+    Found = Monitor.Found(QStringLiteral("scp12345"));
+    QThread::msleep(50);
+  }
+  Check(QFileInfo(Found) == QFileInfo(Made), "a fake directory's copy found, deep in the root");
+  Check(Monitor.Found(QStringLiteral("scp12345")).isEmpty(), "once");
+  Check(!DragExt::MonitorRoots({}).isEmpty() && !DragExt::MonitorRoots({ "-C" }).contains(QStringLiteral("C:\\")),
+    "the fixed drives watched, those listed with \"-\" not");
+  return 0;
+#else
+  Q_UNUSED(Directory);
+  Check(DragExt::MonitorRoots({}).isEmpty(), "(none but on Windows)");
+  return 77;
+#endif
+}
+
 // F1: the GUI's logging switches (WinMain's /log, /xmllog, /loglevel,
 // /logsize), this run's, from the process's command line.
 void LogSwitches(const QString & LogFile)
@@ -8340,6 +8371,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 3) && (std::strcmp(argv[1], "menus-explorer") == 0))
   {
     Menus(true);
+  }
+  else if ((argc >= 3) && (std::strcmp(argv[1], "dragmonitor") == 0))
+  {
+    return DragMonitor(QString::fromLocal8Bit(argv[2]));
   }
   else if ((argc >= 3) && (std::strcmp(argv[1], "logswitches") == 0))
   {

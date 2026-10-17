@@ -220,7 +220,13 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
     // "scp" directory dragged, which the extension's copy hook stops in
     // Explorer, saying where; then downloaded straight there.
     FFakeDrag.reset();
-    if (CoreBridge::Preferences().DDFakeFile && DragExt::Installed() && !DragExt::Broken())
+    const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+#if defined(Q_OS_WIN)
+    const bool FakeFile = Preferences.DDFakeFile;
+#else
+    const bool FakeFile = false;
+#endif
+    if (FakeFile)
     {
       auto Fake = std::make_unique<TFakeDrag>();
       Fake->Directory = std::make_unique<QTemporaryDir>(
@@ -228,6 +234,12 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
       Fake->Names = Drag.Names;
       if (Fake->Directory->isValid() && Fake->Drag.Begin(Fake->Directory->path()))
       {
+        // Without the extension to tell (or with it broken): the drives
+        // watched for the fake directory's copy.
+        if (!DragExt::Running() || DragExt::Broken())
+        {
+          Fake->Drag.Monitor(DragExt::MonitorRoots(Preferences.DDDrives));
+        }
         QMimeData * Data = MakeFileDrag(Drag);
         Data->setUrls({ QUrl::fromLocalFile(Fake->Directory->path()) });
         FFakeDrag = std::move(Fake);

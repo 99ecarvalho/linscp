@@ -3477,6 +3477,10 @@ Staðsetning: %2</translation>
         <source>Get &amp;more...</source>
         <translation>Fá &amp;fleiri…</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Leyfa sleppingu skráa á þessi &amp;netdrif:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

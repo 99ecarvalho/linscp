@@ -3477,6 +3477,10 @@ Local: %2</translation>
         <source>Get &amp;more...</source>
         <translation>Obter &amp;mais</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Permitir soltar arquivos &amp;nestes drives de rede:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

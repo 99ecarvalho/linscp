@@ -3479,6 +3479,10 @@ Lokacija: %2</translation>
         <source>Get &amp;more...</source>
         <translation>Pridobi &amp;več...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Dovoli spuščanje datotek v te &amp;omrežne diske:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

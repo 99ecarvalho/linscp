@@ -727,6 +727,9 @@ struct TPreferences
   // The reserve: the size times this (not in the dialog, as WinSCP's).
   double DDWarnLackOfTempSpaceRatio = 1.1;
   bool DDFakeFile = true;
+  // The drives watched for the fake file's drop: network drives to add,
+  // "-X" to leave out (DDDrives, one per line).
+  std::vector<std::string> DDDrives;
   // Panels > Remote: directories that cannot be entered shown; the
   // directory read again after each operation (core's
   // AutoReadDirectoryAfterOp); refreshed while idle, every so many seconds.

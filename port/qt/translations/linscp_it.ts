@@ -3477,6 +3477,10 @@ Percorso: %2</translation>
         <source>Get &amp;more...</source>
         <translation>Altre lingue...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Permette il rilascio di file su queste e u&amp;nità di rete:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

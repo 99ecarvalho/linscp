@@ -55,6 +55,7 @@
 #include <QSystemTrayIcon>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QPlainTextEdit>
 #include <QVBoxLayout>
 
 #include <algorithm>
@@ -438,6 +439,8 @@ void PreferencesDialog::UpdateControls()
   // As UpdateControls: the warning for the temporary folder's way only.
   FDDWarnLackOfTempSpace->setEnabled(!FDDFakeFile->isChecked());
   FDragExtStatus->setEnabled(FDDFakeFile->isEnabled() && FDDFakeFile->isChecked());
+  FDDDrives->setEnabled(FDDFakeFile->isEnabled() && FDDFakeFile->isChecked());
+  FDDDrivesLabel->setEnabled(FDDDrives->isEnabled());
   FUpdatesProxyHost->setEnabled(FUpdatesProxy->isChecked());
   FUpdatesProxyPort->setEnabled(FUpdatesProxy->isChecked());
   // As UpdateControls' editors.
@@ -1441,6 +1444,14 @@ TPreferences PreferencesDialog::Preferences() const
   if (FDDFakeFile->isEnabled())
   {
     Result.DDFakeFile = FDDFakeFile->isChecked();
+    Result.DDDrives.clear();
+    for (const QString & Line : FDDDrives->toPlainText().split(QLatin1Char('\n')))
+    {
+      if (!Line.trimmed().isEmpty())
+      {
+        Result.DDDrives.push_back(Line.trimmed().toStdString());
+      }
+    }
   }
   Result.ShowInaccesibleDirectories = FShowInaccesibleDirectories->isChecked();
   Result.AutoReadDirectoryAfterOp = FAutoReadDirectoryAfterOp->isChecked();
@@ -2776,6 +2787,17 @@ QWidget * PreferencesDialog::MakeDragDropPage(const TPreferences & Preferences)
   FDragExtStatus->setText(QString::fromStdString(CoreBridge::Text(
     !Windows ? TText::DragExtNotInstalled : (DragExt::Broken() ? TText::DragExtBroken :
       (!DragExt::Installed() ? TText::DragExtNotInstalled : (DragExt::Running() ? TText::DragExtRunning : TText::DragExtNotRunning))))));
+  // As DDDrivesMemo: the network drives (fixed ones are watched anyway).
+  FDDDrivesLabel = new QLabel(tr("Allow dropping files to these &network drives:"), Group);
+  FDDDrives = new QPlainTextEdit(Group);
+  FDDDrives->setMaximumHeight(FDDDrives->fontMetrics().height() * 4);
+  QStringList Drives;
+  for (const std::string & Drive : Preferences.DDDrives)
+  {
+    Drives.append(QString::fromStdString(Drive));
+  }
+  FDDDrives->setPlainText(Drives.join(QLatin1Char('\n')));
+  FDDDrivesLabel->setBuddy(FDDDrives);
   QRadioButton * Temporary = new QRadioButton(tr("Download files via &temporary folder"), Group);
   FDDFakeFile->setChecked(Windows && Preferences.DDFakeFile);
   Temporary->setChecked(!FDDFakeFile->isChecked());
@@ -2788,9 +2810,11 @@ QWidget * PreferencesDialog::MakeDragDropPage(const TPreferences & Preferences)
   GroupLayout->addWidget(FakeFile, 0, 0, 1, 2);
   GroupLayout->addWidget(FakeFileLabel, 1, 1);
   GroupLayout->addWidget(FDragExtStatus, 2, 1);
-  GroupLayout->addWidget(Temporary, 3, 0, 1, 2);
-  GroupLayout->addWidget(TemporaryLabel, 4, 1);
-  GroupLayout->addWidget(FDDWarnLackOfTempSpace, 5, 1);
+  GroupLayout->addWidget(FDDDrivesLabel, 3, 1);
+  GroupLayout->addWidget(FDDDrives, 4, 1);
+  GroupLayout->addWidget(Temporary, 5, 0, 1, 2);
+  GroupLayout->addWidget(TemporaryLabel, 6, 1);
+  GroupLayout->addWidget(FDDWarnLackOfTempSpace, 7, 1);
   GroupLayout->setColumnMinimumWidth(0, 16);
   GroupLayout->setColumnStretch(1, 1);
   Layout->addWidget(Group);

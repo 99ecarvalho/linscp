@@ -217,6 +217,9 @@ struct TShellSettings
   bool DDWarnLackOfTempSpace = true;
   double DDWarnLackOfTempSpaceRatio = 1.1;
   bool DDFakeFile = true;
+  // DDDrives: the network drives the fake file's drop may go to, and the
+  // drives not watched ("-X"), comma text.
+  UnicodeString DDDrives;
   // Panels' Local and Remote pages: local deletes to the trash, remote
   // directories that cannot be read shown, the remote panel refreshed
   // while idle every so many seconds (stored as a TDateTime);

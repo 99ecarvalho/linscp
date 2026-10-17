@@ -3477,6 +3477,10 @@ Plats: %2</translation>
         <source>Get &amp;more...</source>
         <translation>Hämta &amp;fler...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Tillåt att filer släpps till dessa &amp;nätverksenheter:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -3477,6 +3477,10 @@ Ligging: %2</translation>
         <source>Get &amp;more...</source>
         <translation>Kry &amp;meer...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Laat toe dat lêers op hierdie &amp;netwerkaandrywers gelos word:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

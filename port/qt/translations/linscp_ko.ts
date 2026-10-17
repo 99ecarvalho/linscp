@@ -3476,6 +3476,10 @@ Location: %2</source>
         <source>Get &amp;more...</source>
         <translation>추가 정보(&amp;M)...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>다음 네트워크 드라이브에 끌어서 놓기 허용(&amp;N)</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -3477,6 +3477,10 @@ Location: %2</source>
         <source>Get &amp;more...</source>
         <translation>&amp;Още...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Разрешаване на пускане на файлове върху тези &amp;мрежови устройства:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -3477,6 +3477,10 @@ Localização: %2</translation>
         <source>Get &amp;more...</source>
         <translation>Adquirir &amp;mais...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Permite a eliminação de ficheiros para essas &amp;unidades de rede:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

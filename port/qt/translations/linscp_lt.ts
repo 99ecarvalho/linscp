@@ -3478,6 +3478,10 @@ Vieta: %2</translation>
         <source>Get &amp;more...</source>
         <translation>Gauti &amp;daugiau...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Leisti įkelti failus į šiuos &amp;tinklo diskus:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

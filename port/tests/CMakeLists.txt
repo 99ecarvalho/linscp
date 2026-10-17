@@ -308,6 +308,9 @@ if(TARGET linscp)
     COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_qt_gui)
   add_test(NAME qt_dialogs COMMAND test_qt_gui dialogs -platform offscreen)
   set_tests_properties(qt_dialogs PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
+  # E9: the fake file's drive monitors (Windows; skipped elsewhere).
+  add_test(NAME qt_gui_dragmonitor COMMAND test_qt_gui dragmonitor "${CMAKE_CURRENT_BINARY_DIR}/dragmonitor" -platform offscreen)
+  set_tests_properties(qt_gui_dragmonitor PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 60)
   # F1: the GUI's logging switches (the log file is only named, not written).
   add_test(NAME qt_gui_logswitches COMMAND test_qt_gui logswitches "${CMAKE_CURRENT_BINARY_DIR}/gui-switches.log" /ini=nul
            "/log=${CMAKE_CURRENT_BINARY_DIR}/gui-switches.log" /loglevel=2* /logsize=3*1M

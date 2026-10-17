@@ -377,6 +377,13 @@ TPreferences Preferences()
   Result.DDWarnLackOfTempSpace = Settings.DDWarnLackOfTempSpace;
   Result.DDWarnLackOfTempSpaceRatio = Settings.DDWarnLackOfTempSpaceRatio;
   Result.DDFakeFile = Settings.DDFakeFile;
+  {
+    std::unique_ptr<TStrings> Drives(CommaTextToStringList(Settings.DDDrives));
+    for (int Index = 0; Index < Drives->Count; Index++)
+    {
+      Result.DDDrives.push_back(Utf8(Drives->Strings[Index]));
+    }
+  }
   Result.ShowInaccesibleDirectories = Settings.ShowInaccesibleDirectories;
   Result.AutoReadDirectoryAfterOp = Configuration->AutoReadDirectoryAfterOp;
   Result.RefreshRemotePanel = Settings.RefreshRemotePanel;
@@ -724,6 +731,14 @@ void SetPreferences(const TPreferences & Preferences)
   Settings.DarkTheme = static_cast<int>(Preferences.DarkTheme);
   Settings.DDWarnLackOfTempSpace = Preferences.DDWarnLackOfTempSpace;
   Settings.DDFakeFile = Preferences.DDFakeFile;
+  {
+    std::unique_ptr<TStringList> Drives(new TStringList());
+    for (const std::string & Drive : Preferences.DDDrives)
+    {
+      Drives->Add(FromUtf8(Drive));
+    }
+    Settings.DDDrives = Drives->CommaText;
+  }
   Settings.ShowInaccesibleDirectories = Preferences.ShowInaccesibleDirectories;
   Settings.RefreshRemotePanel = Preferences.RefreshRemotePanel;
   Settings.RefreshRemotePanelInterval = Preferences.RefreshRemotePanelInterval;

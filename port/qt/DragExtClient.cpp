@@ -94,11 +94,180 @@ bool Broken()
 #endif
 }
 
+QStringList MonitorRoots(const std::vector<std::string> & DDDrives)
+{
+  QStringList Result;
+#if defined(Q_OS_WIN)
+  QString Excluded;
+  for (const std::string & Entry : DDDrives)
+  {
+    const QString Drive = QString::fromStdString(Entry).trimmed();
+    if (Drive.startsWith(QLatin1Char('-')))
+    {
+      const QString Letter = Drive.mid(1).trimmed();
+      if (!Letter.isEmpty())
+      {
+        Excluded += Letter.at(0).toUpper();
+      }
+    }
+    else if (!Drive.isEmpty() && Drive.at(0).isLetter())
+    {
+      Result.append(QString(Drive.at(0).toUpper()) + QStringLiteral(":\\"));
+    }
+  }
+  const DWORD Drives = GetLogicalDrives();
+  for (int Index = 0; Index < 26; Index++)
+  {
+    const QChar Letter(static_cast<char16_t>(u'A' + Index));
+    if (((Drives & (1u << Index)) == 0) || Excluded.contains(Letter))
+    {
+      continue;
+    }
+    const QString Root = QString(Letter) + QStringLiteral(":\\");
+    const UINT Type = GetDriveTypeW(reinterpret_cast<const wchar_t *>(Root.utf16()));
+    // As its drive checks: ready, not a CD, removable only from C: on.
+    if ((Type == DRIVE_FIXED) || (Type == DRIVE_RAMDISK) || ((Type == DRIVE_REMOVABLE) && (Index >= 2)))
+    {
+      if (!Result.contains(Root))
+      {
+        Result.append(Root);
+      }
+    }
+  }
+  for (const QChar & Letter : Excluded)
+  {
+    Result.removeAll(QString(Letter) + QStringLiteral(":\\"));
+  }
+#else
+  Q_UNUSED(DDDrives);
+#endif
+  return Result;
+}
+
+struct TCreationMonitor::TImpl
+{
+#if defined(Q_OS_WIN)
+  struct TWatch
+  {
+    QString Root;
+    HANDLE Directory = INVALID_HANDLE_VALUE;
+    OVERLAPPED Overlapped = {};
+    alignas(DWORD) char Buffer[32 * 1024];
+  };
+  std::vector<std::unique_ptr<TWatch>> Watches;
+
+  static bool Read(TWatch & Watch)
+  {
+    ResetEvent(Watch.Overlapped.hEvent);
+    return ReadDirectoryChangesW(Watch.Directory, Watch.Buffer, sizeof(Watch.Buffer), TRUE, FILE_NOTIFY_CHANGE_DIR_NAME,
+      nullptr, &Watch.Overlapped, nullptr);
+  }
+#endif
+};
+
+TCreationMonitor::TCreationMonitor(const QStringList & Roots) : F(new TImpl())
+{
+#if defined(Q_OS_WIN)
+  for (const QString & Root : Roots)
+  {
+    std::unique_ptr<TImpl::TWatch> Watch(new TImpl::TWatch());
+    Watch->Root = QDir::toNativeSeparators(Root);
+    if (!Watch->Root.endsWith(QLatin1Char('\\')))
+    {
+      Watch->Root += QLatin1Char('\\');
+    }
+    Watch->Directory = CreateFileW(reinterpret_cast<const wchar_t *>(Watch->Root.utf16()), FILE_LIST_DIRECTORY,
+      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING,
+      FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED, nullptr);
+    // Not-ready drives ignored, as upstream's.
+    if (Watch->Directory == INVALID_HANDLE_VALUE)
+    {
+      continue;
+    }
+    Watch->Overlapped.hEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+    if (TImpl::Read(*Watch))
+    {
+      F->Watches.push_back(std::move(Watch));
+    }
+    else
+    {
+      CloseHandle(Watch->Overlapped.hEvent);
+      CloseHandle(Watch->Directory);
+    }
+  }
+#else
+  Q_UNUSED(Roots);
+#endif
+}
+
+TCreationMonitor::~TCreationMonitor()
+{
+#if defined(Q_OS_WIN)
+  for (const std::unique_ptr<TImpl::TWatch> & Watch : F->Watches)
+  {
+    CancelIo(Watch->Directory);
+    DWORD Bytes = 0;
+    GetOverlappedResult(Watch->Directory, &Watch->Overlapped, &Bytes, TRUE);
+    CloseHandle(Watch->Overlapped.hEvent);
+    CloseHandle(Watch->Directory);
+  }
+#endif
+}
+
+int TCreationMonitor::Count() const
+{
+#if defined(Q_OS_WIN)
+  return static_cast<int>(F->Watches.size());
+#else
+  return 0;
+#endif
+}
+
+QString TCreationMonitor::Found(const QString & Name)
+{
+  QString Result;
+#if defined(Q_OS_WIN)
+  for (const std::unique_ptr<TImpl::TWatch> & Watch : F->Watches)
+  {
+    if (WaitForSingleObject(Watch->Overlapped.hEvent, 0) != WAIT_OBJECT_0)
+    {
+      continue;
+    }
+    DWORD Bytes = 0;
+    if (GetOverlappedResult(Watch->Directory, &Watch->Overlapped, &Bytes, FALSE) && (Bytes > 0))
+    {
+      const char * At = Watch->Buffer;
+      while (true)
+      {
+        const FILE_NOTIFY_INFORMATION * Info = reinterpret_cast<const FILE_NOTIFY_INFORMATION *>(At);
+        const QString Relative = QString::fromWCharArray(Info->FileName, static_cast<int>(Info->FileNameLength / sizeof(WCHAR)));
+        if (((Info->Action == FILE_ACTION_ADDED) || (Info->Action == FILE_ACTION_RENAMED_NEW_NAME)) && Result.isEmpty() &&
+            (QFileInfo(QDir::fromNativeSeparators(Relative)).fileName().compare(Name, Qt::CaseInsensitive) == 0))
+        {
+          Result = Watch->Root + Relative;
+        }
+        if (Info->NextEntryOffset == 0)
+        {
+          break;
+        }
+        At += Info->NextEntryOffset;
+      }
+    }
+    TImpl::Read(*Watch);
+  }
+#else
+  Q_UNUSED(Name);
+#endif
+  return Result;
+}
+
 struct TDrag::TImpl
 {
 #if defined(Q_OS_WIN)
   HANDLE Mapping = nullptr;
 #endif
+  QString FakeName;
+  std::unique_ptr<TCreationMonitor> Monitor;
 };
 
 TDrag::TDrag() : F(new TImpl())
@@ -119,6 +288,7 @@ TDrag::~TDrag()
 // drop destination to recognize.
 bool TDrag::Begin(const QString & FakeDirectory)
 {
+  F->FakeName = QFileInfo(FakeDirectory).fileName();
 #if defined(Q_OS_WIN)
   SetFileAttributesW(QDir::toNativeSeparators(FakeDirectory).toStdWString().c_str(), FILE_ATTRIBUTE_HIDDEN);
   F->Mapping = CreateFileMappingW(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, sizeof(TDragExtCommStruct), DRAG_EXT_MAPPING);
@@ -146,8 +316,14 @@ bool TDrag::Begin(const QString & FakeDirectory)
 #endif
 }
 
-// As DDGetTarget: the copy hook's answer, the folder the fake directory was
-// to be copied into.
+void TDrag::Monitor(const QStringList & Roots)
+{
+  F->Monitor.reset(new TCreationMonitor(Roots));
+}
+
+// As DDGetTarget: the monitors' find (DDFakeCreated: the copy removed,
+// its folder the target), else the copy hook's answer, the folder the fake
+// directory was to be copied into.
 QString TDrag::Target(int Timeout)
 {
 #if defined(Q_OS_WIN)
@@ -161,6 +337,15 @@ QString TDrag::Target(int Timeout)
   {
     QString Result;
     bool Done = false;
+    if (F->Monitor)
+    {
+      const QString Copy = F->Monitor->Found(F->FakeName);
+      if (!Copy.isEmpty())
+      {
+        QDir().rmdir(Copy);
+        return QDir::toNativeSeparators(QFileInfo(Copy).path());
+      }
+    }
     HANDLE Mutex = ProgramMutex();
     WaitForSingleObject(Mutex, 1000);
     TDragExtCommStruct * CommStruct = static_cast<TDragExtCommStruct *>(MapViewOfFile(F->Mapping, FILE_MAP_ALL_ACCESS, 0, 0, 0));

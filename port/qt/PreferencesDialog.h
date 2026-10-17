@@ -69,6 +69,7 @@ public:
   QCheckBox * SystemContextMenuCheck() const { return FSystemContextMenu; }
   QCheckBox * DDWarnLackOfTempSpaceCheck() const { return FDDWarnLackOfTempSpace; }
   QRadioButton * DDFakeFileButton() const { return FDDFakeFile; }
+  class QPlainTextEdit * DDDrivesEdit() const { return FDDDrives; }
   QLabel * DragExtStatusLabel() const { return FDragExtStatus; }
   QComboBox * UpdatesPeriodCombo() const { return FUpdatesPeriod; }
   QRadioButton * UpdatesProxyButton() const { return FUpdatesProxy; }
@@ -278,6 +279,8 @@ private:
   QCheckBox * FSystemContextMenu = nullptr;
   QCheckBox * FDDWarnLackOfTempSpace = nullptr;
   QRadioButton * FDDFakeFile = nullptr;
+  class QPlainTextEdit * FDDDrives = nullptr;
+  QLabel * FDDDrivesLabel = nullptr;
   QLabel * FDragExtStatus = nullptr;
   QComboBox * FUpdatesPeriod = nullptr;
   QCheckBox * FUpdatesShowOnStartup = nullptr;

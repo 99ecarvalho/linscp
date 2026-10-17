@@ -3478,6 +3478,10 @@ Atrašanās vieta: %2</translation>
         <source>Get &amp;more...</source>
         <translation>Iegūt &amp;vairāk...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Atļaut nomest failus šajos &amp;tīkla diskos:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

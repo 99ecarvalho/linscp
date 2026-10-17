@@ -3478,6 +3478,10 @@ Location: %2</source>
         <source>Get &amp;more...</source>
         <translation>Отримати більше...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Дозволити переміщення файлів в цих та мережевих дисках:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

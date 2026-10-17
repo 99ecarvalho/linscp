@@ -3481,6 +3481,10 @@ Location: %2</source>
         <source>Get &amp;more...</source>
         <translation>المزيد من اللغات</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>السماح بإفلات الملفات على &amp;محركات الشبكة هذه:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

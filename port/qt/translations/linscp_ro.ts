@@ -3478,6 +3478,10 @@ Cale: %2</translation>
         <source>Get &amp;more...</source>
         <translation>Mai &amp;multe...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Permite plasarea fișierelor în aceste u&amp;nități de rețea:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

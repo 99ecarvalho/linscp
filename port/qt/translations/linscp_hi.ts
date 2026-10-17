@@ -3477,6 +3477,10 @@ Location: %2</source>
         <source>Get &amp;more...</source>
         <translation>और प्राप्त करें(&amp;M)...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>इन नेटवर्क ड्राइव पर फ़ाइलें छोड़ने दें(&amp;N):</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

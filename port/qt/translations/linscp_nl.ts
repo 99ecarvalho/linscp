@@ -3477,6 +3477,10 @@ Locatie: %2</translation>
         <source>Get &amp;more...</source>
         <translation>&amp;Meer...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Toestaan bestanden plaatsen op &amp;netwerkschijven:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

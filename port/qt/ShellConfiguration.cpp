@@ -306,6 +306,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteBool(L"DDWarnLackOfTempSpace", FSettings.DDWarnLackOfTempSpace);
     Storage->WriteFloat(L"DDWarnLackOfTempSpaceRatio", FSettings.DDWarnLackOfTempSpaceRatio);
     Storage->WriteBool(L"DDFakeFile", FSettings.DDFakeFile);
+    Storage->WriteString(L"DDDrives", FSettings.DDDrives);
     Storage->WriteBool(L"DeleteToRecycleBin", FSettings.DeleteToRecycleBin);
     Storage->WriteBool(L"ShowInaccesibleDirectories", FSettings.ShowInaccesibleDirectories);
     Storage->WriteBool(L"RefreshRemotePanel", FSettings.RefreshRemotePanel);
@@ -917,6 +918,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.DDWarnLackOfTempSpaceRatio =
       Storage->ReadFloat(L"DDWarnLackOfTempSpaceRatio", FSettings.DDWarnLackOfTempSpaceRatio);
     FSettings.DDFakeFile = Storage->ReadBool(L"DDFakeFile", FSettings.DDFakeFile);
+    FSettings.DDDrives = Storage->ReadString(L"DDDrives", FSettings.DDDrives);
     FSettings.DeleteToRecycleBin = Storage->ReadBool(L"DeleteToRecycleBin", FSettings.DeleteToRecycleBin);
     FSettings.ShowInaccesibleDirectories =
       Storage->ReadBool(L"ShowInaccesibleDirectories", FSettings.ShowInaccesibleDirectories);

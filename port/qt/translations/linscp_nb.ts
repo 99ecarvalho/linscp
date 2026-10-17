@@ -3477,6 +3477,10 @@ Plassering: %2</translation>
         <source>Get &amp;more...</source>
         <translation>Hent &amp;flere...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Tillat å slippe filer til disse &amp;nettverksstasjonene:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

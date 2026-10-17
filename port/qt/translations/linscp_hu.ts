@@ -3476,6 +3476,10 @@ Hely: %2</translation>
         <source>Get &amp;more...</source>
         <translation>&amp;Továbbiak...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Engedélyezése ezekre a &amp;hálózati mappákra:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -3477,6 +3477,10 @@ Sijainti: %2</translation>
         <source>Get &amp;more...</source>
         <translation>Hae &amp;lisää...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Salli tiedosto&amp;jen pudotus seuraaviin verkkoasemiin:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

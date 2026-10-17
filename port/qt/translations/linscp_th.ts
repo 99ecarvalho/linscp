@@ -3476,6 +3476,10 @@ Location: %2</source>
         <source>Get &amp;more...</source>
         <translation>รับ&amp;เพิ่มเติม...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>อนุญาตให้วางไฟล์ลงใน&amp;ไดรฟ์เครือข่ายเหล่านี้:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

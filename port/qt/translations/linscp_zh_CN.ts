@@ -3476,6 +3476,10 @@ Location: %2</source>
         <source>Get &amp;more...</source>
         <translation>获取更多(&amp;M)...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>允许将文件放到这些网络驱动器(&amp;N)：</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

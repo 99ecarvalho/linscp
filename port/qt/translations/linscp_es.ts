@@ -3477,6 +3477,10 @@ Ruta: %2</translation>
         <source>Get &amp;more...</source>
         <translation>&amp;Más...</translation>
     </message>
+    <message>
+        <source>Allow dropping files to these &amp;network drives:</source>
+        <translation>Permitir arrastrar archivos a estas unidades de &amp;red:</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>
