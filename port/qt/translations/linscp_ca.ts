@@ -3496,6 +3496,14 @@ Ubicació: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Recorda la contrasenya durant aquesta sessió</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copia</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Obre enllaç</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Ubicació: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;No tornis a mostrar aquest bàner</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Utilitza un tipus de lletra fix</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copia</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Selecciona-ho tot</translation>
     </message>
 </context>
 <context>

@@ -3495,6 +3495,14 @@ Location: %2</source>
         <source>&amp;Remember password for this session</source>
         <translation>このセッションのパスワードを記憶する(&amp;R)</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>コピー(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>リンクを開く(&amp;O)</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3584,6 +3592,18 @@ Location: %2</source>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>このバナーを二度と表示しない(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>等幅フォントを使用する(&amp;M)</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>コピー(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>すべて選択(&amp;A)</translation>
     </message>
 </context>
 <context>

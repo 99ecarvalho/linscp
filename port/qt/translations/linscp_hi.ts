@@ -3496,6 +3496,14 @@ Location: %2</source>
         <source>&amp;Remember password for this session</source>
         <translation>इस सत्र के लिए पासवर्ड याद रखें(&amp;R)</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>कॉपी करें(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>लिंक खोलें(&amp;O)</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Location: %2</source>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>यह बैनर फिर कभी न दिखाएँ(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>मोनोस्पेस फ़ॉन्ट का उपयोग करें(&amp;M)</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>कॉपी करें(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>सभी का चयन करें(&amp;A)</translation>
     </message>
 </context>
 <context>

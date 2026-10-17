@@ -3495,6 +3495,14 @@ Location: %2</source>
         <source>&amp;Remember password for this session</source>
         <translation>이 세션 암호 저장(&amp;R)</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>복사(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>링크 열기(&amp;O)</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3584,6 +3592,18 @@ Location: %2</source>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>다음부터 이 창 표시 안함(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>모노스페이스 폰트 사용(&amp;M)</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>복사(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>모두 선택(&amp;A)</translation>
     </message>
 </context>
 <context>

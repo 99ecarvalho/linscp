@@ -3495,6 +3495,14 @@ Location: %2</source>
         <source>&amp;Remember password for this session</source>
         <translation>ဤ ကဏ္ဍ ၏ စကားဝှက် အား မှတ်သားပါ</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>ကူးယူပါ</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>လင့်ခ်ဖွင့်ပါ(&amp;O)</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3584,6 +3592,18 @@ Location: %2</source>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>ဤ ခေါင်းစည်းအား မည်သည့်အခါမှ မပြပါနှင့်</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>အကျယ်တူ ဖောင့် သုံးပါ(&amp;M)</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>ကူးယူပါ</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>အကုန်ရွေးပါ(&amp;A)</translation>
     </message>
 </context>
 <context>

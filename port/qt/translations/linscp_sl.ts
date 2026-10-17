@@ -3498,6 +3498,14 @@ Lokacija: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Zapomni si geslo za to sejo</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopiraj</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Odpri povezavo</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3587,6 +3595,18 @@ Lokacija: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Nikoli več ne prikaži tega sporočila</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Uporabi &amp;pisavo s stalno širino</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopiraj</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Izberi &amp;vse</translation>
     </message>
 </context>
 <context>

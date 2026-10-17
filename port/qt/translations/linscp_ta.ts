@@ -3496,6 +3496,14 @@ Location: %2</source>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;இந்த அமர்வுக்கான கடவுச்சொல்லை நினைவில் கொள்ளுங்கள்</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;நகல்</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;இணைப்பு திற</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Location: %2</source>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;இந்த பதாகையை மீண்டும் காட்ட வேண்டாம்</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>&amp;ஒற்றைஇடைவெளி எழுத்துரு பயன்படுத்து</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;நகல்</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>அனைத்தையும் தெரிவுசெய்</translation>
     </message>
 </context>
 <context>

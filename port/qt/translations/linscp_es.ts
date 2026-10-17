@@ -3496,6 +3496,14 @@ Ruta: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Recordar contraseña para esta sesión</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copiar</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>Abrir en&amp;lace</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Ruta: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;No ver este mensaje de nuevo</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Usar tipo de letra &amp;monoespaciado</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copiar</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Seleccionar &amp;todo</translation>
     </message>
 </context>
 <context>

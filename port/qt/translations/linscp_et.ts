@@ -3496,6 +3496,14 @@ Asukoht: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Jäta parool selleks seansiks meelde</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopeeri</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Ava link</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Asukoht: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>Ära &amp;enam näita</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Kasuta &amp;püsisammuga fonti</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopeeri</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>V&amp;ali kõik</translation>
     </message>
 </context>
 <context>

@@ -3496,6 +3496,14 @@ Sijainti: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>Muista tämän istunnon salasana</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>K&amp;opioi</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>Avaa &amp;linkki</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Sijainti: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>Älä näytä tätä viestiä enää &amp;koskaan</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Käytä &amp;tasavälistä fonttia</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>K&amp;opioi</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Valitse &amp;kaikki</translation>
     </message>
 </context>
 <context>

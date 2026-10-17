@@ -3495,6 +3495,14 @@ Hely: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>Emlékezzen a jelszóra ebben a munkamenetben</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Másolás</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>Link meg&amp;nyitása</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3584,6 +3592,18 @@ Hely: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>Soha többé &amp;ne mutassa</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Monospaced &amp;betűtípusok használata</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Másolás</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Összes kijelölése</translation>
     </message>
 </context>
 <context>

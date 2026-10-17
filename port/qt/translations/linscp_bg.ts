@@ -3496,6 +3496,14 @@ Location: %2</source>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Запомняне на паролата за тази сесия</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Запомняне</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Отваряне на връзката</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Location: %2</source>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Този пряпорец да не се показва повече</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Използване на &amp;равноширинен шрифт</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Запомняне</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Избиране на вси&amp;чко</translation>
     </message>
 </context>
 <context>

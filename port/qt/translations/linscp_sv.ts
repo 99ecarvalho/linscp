@@ -3496,6 +3496,14 @@ Plats: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Kom ihåg lösenordet för den här sessionen</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopiera</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Öppna länk</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Plats: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Visa aldrig det här meddelandet igen</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Använd typsnitt &amp;Monospaced</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopiera</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Markera alla</translation>
     </message>
 </context>
 <context>

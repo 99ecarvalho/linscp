@@ -1985,6 +1985,7 @@ std::string Text(TText Text)
     case TText::CleanTempConfirm: Ident = CLEANTEMP_CONFIRM2; break;
     case TText::LoginNotShowingAgain: Ident = LOGIN_NOT_SHOWING_AGAIN; break;
     case TText::NeverPopupDisconnect: Ident = NEVER_POPUP_DISCONNECT; break;
+    case TText::AuthenticationBanner: Ident = AUTHENTICATION_BANNER; break;
     case TText::OpenButton: Ident = OPEN_BUTTON; break;
     case TText::SynchronizeCompare: Ident = SYNCHRONIZE_PROGRESS_COMPARE; break;
     case TText::ExportConfigurationTitle: Ident = EXPORT_CONF_TITLE; break;

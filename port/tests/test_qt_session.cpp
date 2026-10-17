@@ -137,7 +137,7 @@ public:
     std::printf("  error shown: %s\n", Error.Message.c_str());
   }
 
-  void Banner(const std::string &, const std::string &, bool, bool &) override {}
+  void Banner(const std::string &, const std::string &, bool, bool &, bool &) override {}
   void Information(const std::string & Text) override { InformationLines += Text + "\n"; }
   void TransferStarted(bool Upload, int Count) override { Transfers++; LastUpload = Upload; LastCount = Count; Open = true; }
   bool TransferProgress(const CoreBridge::TTransferProgress & Progress) override

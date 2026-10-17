@@ -3497,6 +3497,14 @@ Cale: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>Memo&amp;rează parola pentru această sesiune</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copiere</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Deschidere Link</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3586,6 +3594,18 @@ Cale: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Nu mai reafișa această notificare</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Folosește Font &amp;Monospațiat</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copiere</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Selectare Tot&amp;ală</translation>
     </message>
 </context>
 <context>

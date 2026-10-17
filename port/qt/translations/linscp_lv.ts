@@ -3497,6 +3497,14 @@ Atrašanās vieta: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Atcerēties paroli šai sesijai</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopēt</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Atvērt saiti</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3586,6 +3594,18 @@ Atrašanās vieta: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Nekad vairs nerādīt šo paziņojumu</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Lietot &amp;vienplatuma fontu</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopēt</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Iezīmēt &amp;visu</translation>
     </message>
 </context>
 <context>

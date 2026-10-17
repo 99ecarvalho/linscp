@@ -3495,6 +3495,14 @@ Location: %2</source>
         <source>&amp;Remember password for this session</source>
         <translation>จำรหัสผ่านสำหรับเซสชันนี้</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>คัดลอก</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;เปิดลิงก์</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3584,6 +3592,18 @@ Location: %2</source>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>ไม่แสดงแบนเนอร์นี้อีกครั้ง</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>ใช้แบบอักษร&amp;ความกว้างคงที่</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>คัดลอก</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>เลือกทั้งหมด</translation>
     </message>
 </context>
 <context>

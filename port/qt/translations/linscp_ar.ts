@@ -3500,6 +3500,14 @@ Location: %2</source>
         <source>&amp;Remember password for this session</source>
         <translation>تذكر كلمة المرور لهذة الجلسة</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;نسخ</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;فتح الرابط</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3589,6 +3597,18 @@ Location: %2</source>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>عدم اظهار هذة النافذة مرة اخرى</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>استخدام خط ثابت ال&amp;عرض</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;نسخ</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;اختيار الكل</translation>
     </message>
 </context>
 <context>

@@ -218,10 +218,12 @@ struct TSession::TImpl
   }
 
   void __fastcall DisplayBanner(TTerminal * /*Terminal*/, UnicodeString SessionName,
-    const UnicodeString & Banner, bool & NeverShowAgain, int Options, unsigned int & /*Params*/)
+    const UnicodeString & Banner, bool & NeverShowAgain, int Options, unsigned int & Params)
   {
+    bool Monospaced = FLAGSET(Params, bpMonospacedFont);
     Frontend()->Banner(Utf8(SessionName), Utf8(Banner), !FLAGSET(Options, boDisableNeverShowAgain),
-      NeverShowAgain);
+      NeverShowAgain, Monospaced);
+    Params = (Params & ~bpMonospacedFont) | FLAGMASK(Monospaced, bpMonospacedFont);
   }
 
   void __fastcall ShowExtendedException(TTerminal * /*Terminal*/, Exception * E, void * /*Arg*/)

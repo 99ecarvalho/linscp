@@ -3496,6 +3496,14 @@ Location: %2</source>
         <source>&amp;Remember password for this session</source>
         <translation>პა&amp;როლის დამახსოვრება ამ სესიისთვის</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;კოპირება</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;ბმულის გახსნა</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Location: %2</source>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>აღასდროს მაჩვე&amp;ნო ეს ბანერი</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>&amp;Monospace ფონტის გამოყენება</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;კოპირება</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>ყველაფრის &amp;მონიშვნა</translation>
     </message>
 </context>
 <context>

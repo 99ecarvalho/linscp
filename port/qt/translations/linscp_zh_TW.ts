@@ -3495,6 +3495,14 @@ Location: %2</source>
         <source>&amp;Remember password for this session</source>
         <translation>針對這個工作階段記憶密碼(&amp;R)</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>複製(&amp;C)</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>開啟連結(&amp;O)</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3584,6 +3592,18 @@ Location: %2</source>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>不再顯示這個標題(&amp;N)</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>使用固定字距字型(&amp;M)</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>複製(&amp;C)</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>全選(&amp;A)</translation>
     </message>
 </context>
 <context>

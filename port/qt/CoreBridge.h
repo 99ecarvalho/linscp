@@ -164,8 +164,10 @@ public:
   virtual bool Prompt(TPrompt & Prompt) = 0;
   virtual void ShowError(const TError & Error) = 0;
   // The server's pre-authentication banner.
+  // MonospacedFont: as last chosen for it (core's bpMonospacedFont), and
+  // as chosen now.
   virtual void Banner(const std::string & SessionName, const std::string & Banner,
-    bool CanNeverShowAgain, bool & NeverShowAgain) = 0;
+    bool CanNeverShowAgain, bool & NeverShowAgain, bool & MonospacedFont) = 0;
   // A line of progress while connecting ("Authenticating...").
   virtual void Information(const std::string & Text) = 0;
 
@@ -1159,6 +1161,7 @@ enum class TText
   CleanTempConfirm,     // "**Do you want to delete past temporary folders?**...%d..." (unformatted)
   LoginNotShowingAgain, // "**Stop showing Login dialog automatically?**..." (unformatted)
   NeverPopupDisconnect, // "&Never popup disconnect messages"
+  AuthenticationBanner, // "Authentication Banner"
   OpenButton,           // "&Open"
   SynchronizeCompare,   // "Comparing"
   ExportConfigurationTitle, // "Select file to export configuration to"

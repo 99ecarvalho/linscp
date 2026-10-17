@@ -3496,6 +3496,14 @@ Ort: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>Passwort für diese Sitzung &amp;merken</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopieren</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Verweis öffnen</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Ort: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>Dieses Banner &amp;nicht mehr anzeigen</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Schriftart mit &amp;fester Breite verwenden</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopieren</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Alles markieren</translation>
     </message>
 </context>
 <context>

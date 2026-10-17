@@ -3497,6 +3497,14 @@ Location: %2</source>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Запам&apos;ятати пароль для цієї сесії</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>Копіювати</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>Відкрити посилання</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3586,6 +3594,18 @@ Location: %2</source>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Ніколи не показувати цей банер знову.</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Використовувати моноширинний шрифт</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>Копіювати</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Обрати все</translation>
     </message>
 </context>
 <context>

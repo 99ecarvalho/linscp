@@ -3496,6 +3496,14 @@ Location: %2</source>
         <source>&amp;Remember password for this session</source>
         <translation>Θυμίσου τον κωδικό γι αυτήν την συνεδρία</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>Αντιγραφή</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>Ά&amp;νοιγμα συνδέσμου</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Location: %2</source>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>Να μην το ξαναδείξεις</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Χρήση &amp;σταθερού πλάτους γραμματοσειράς</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>Αντιγραφή</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Επιλογή όλων</translation>
     </message>
 </context>
 <context>

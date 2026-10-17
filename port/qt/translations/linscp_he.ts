@@ -3496,6 +3496,14 @@ Location: %2</source>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;זכור סיסמא לשיחה זו</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>ה&amp;עתק</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;פתח קישור</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Location: %2</source>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;אל תציג באנר זה שוב</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>השתמש בגופן ב&amp;רוחב קבוע</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>ה&amp;עתק</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>בחר &amp;הכל</translation>
     </message>
 </context>
 <context>

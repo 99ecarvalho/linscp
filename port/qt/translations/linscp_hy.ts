@@ -3496,6 +3496,14 @@ Location: %2</source>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Հիշել գաղտնաբառն այս աշխատաշրջանի համար</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Պատճենել</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Բացել հղումը</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Location: %2</source>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Այլևս երբեք ցույց չտալ այս պաստառը</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Օգտագործել &amp;հավասարալայն տառատեսակ</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Պատճենել</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Ընտրել &amp;բոլորը</translation>
     </message>
 </context>
 <context>

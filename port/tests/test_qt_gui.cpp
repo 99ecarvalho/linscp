@@ -72,6 +72,7 @@
 #include <QPushButton>
 #include <QTimer>
 #include <QClipboard>
+#include <QFontInfo>
 #include <QStandardPaths>
 #include <QStatusBar>
 #include <QToolBar>
@@ -346,6 +347,58 @@ void Dialogs()
     Prompt.Fields.resize(1);
     PromptDialog Dialog(Prompt);
     Check(ExecWith(Dialog, [](PromptDialog & D) { D.reject(); }) == QDialog::Rejected, "Cancel cancels");
+  }
+  // B3: a link in the instructions: clicked or from its menu, opened.
+  {
+    CoreBridge::TPrompt Prompt;
+    Prompt.Instructions = "Approve the login at https://example.com/approve?id=7 then press Enter.";
+    Prompt.Fields.resize(1);
+    PromptDialog Dialog(Prompt);
+    QString Opened;
+    Dialog.OpenUrl = [&Opened](const QString & Url) { Opened = Url; };
+    Check((PromptDialog::UrlIn(QString::fromStdString(Prompt.Instructions)) == QStringLiteral("https://example.com/approve?id=7")) &&
+      PromptDialog::UrlIn(QStringLiteral("no link here")).isEmpty() && PromptDialog::UrlIn(QStringLiteral("https:// x")).isEmpty(),
+      "the instructions' link, up to a space");
+    QLabel * Instructions = Dialog.Labels().value(0);
+    QTest::mouseClick(Instructions, Qt::LeftButton);
+    Check(Opened == QStringLiteral("https://example.com/approve?id=7"), "a click opens it");
+    std::unique_ptr<QMenu> Menu(Dialog.LabelMenu(Instructions));
+    QStringList Texts;
+    for (QAction * Action : Menu->actions())
+    {
+      if (!Action->isSeparator())
+      {
+        Texts.append(Action->text());
+      }
+    }
+    Check(Texts == QStringList({ PromptDialog::tr("&Copy"), PromptDialog::tr("&Open Link") }), "its menu: Copy, Open Link");
+    Menu->actions().first()->trigger();
+    Check(QApplication::clipboard()->text() == QString::fromStdString(Prompt.Instructions), "Copy copies the label");
+  }
+  // B2: the banner's Use Monospaced Font, as chosen last, chosen again.
+  {
+    QtFrontend Frontend;
+    bool Never = false;
+    bool Monospaced = false;
+    QTimer::singleShot(0, []()
+    {
+      QDialog * Banner = qobject_cast<QDialog *>(QApplication::activeModalWidget());
+      QPlainTextEdit * Text = (Banner != nullptr) ? Banner->findChild<QPlainTextEdit *>(QStringLiteral("Banner")) : nullptr;
+      QAction * Action = (Banner != nullptr) ? Banner->findChild<QAction *>(QStringLiteral("BannerMonospacedFont")) : nullptr;
+      Check((Text != nullptr) && (Action != nullptr) && !Action->isChecked() &&
+        !QFontInfo(Text->font()).fixedPitch(), "the banner in the window's font, as last chosen");
+      if (Action != nullptr)
+      {
+        Action->trigger();
+        Check(QFontInfo(Text->font()).fixedPitch(), "Use Monospaced Font: a fixed one");
+      }
+      if (Banner != nullptr)
+      {
+        Banner->accept();
+      }
+    });
+    Frontend.Banner("Site", "Welcome\n  to the server", true, Never, Monospaced);
+    Check(Monospaced && !Never, "the choice back, for core to keep");
   }
 }
 

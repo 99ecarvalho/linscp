@@ -3495,6 +3495,14 @@ Konum: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>Bu bağlantının pa&amp;rolası hatırlansın</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>K&amp;opyala</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Bağlantıyı aç</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3584,6 +3592,18 @@ Konum: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Bu bant bir daha görüntülenmesin</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>&amp;Eş aralıklı yazı türü kullanılsın</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>K&amp;opyala</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Tümünü seç</translation>
     </message>
 </context>
 <context>

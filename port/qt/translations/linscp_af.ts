@@ -3496,6 +3496,14 @@ Ligging: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Onthou wagwoord vir hierdie sessie</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopieer</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Open skakel</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Ligging: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Moenie hierdie banier weer wys nie</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Gebruik &amp;vastewydte-lettertipe</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopieer</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Kies &amp;alles</translation>
     </message>
 </context>
 <context>

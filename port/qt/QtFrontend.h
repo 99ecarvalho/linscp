@@ -31,7 +31,7 @@ public:
   // offered and then gone through one by one.
   void ShowErrorList(const std::vector<CoreBridge::TError> & Errors);
   void Banner(const std::string & SessionName, const std::string & Banner,
-    bool CanNeverShowAgain, bool & NeverShowAgain) override;
+    bool CanNeverShowAgain, bool & NeverShowAgain, bool & MonospacedFont) override;
   void Information(const std::string & Text) override;
   void TransferStarted(bool Upload, int FileCount) override;
   bool TransferProgress(const CoreBridge::TTransferProgress & Progress) override;

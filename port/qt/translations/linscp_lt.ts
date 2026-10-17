@@ -3497,6 +3497,14 @@ Vieta: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Prisiminti slaptažodį tik šiam seansui</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopijuoti</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Atidaryti nuorodą</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3586,6 +3594,18 @@ Vieta: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Daugiau neberodyti šio lango</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Naudoti &amp;proporcingą šriftą</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopijuoti</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Pažymėti &amp;viską</translation>
     </message>
 </context>
 <context>

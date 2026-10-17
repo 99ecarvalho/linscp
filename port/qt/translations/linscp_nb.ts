@@ -3496,6 +3496,14 @@ Plassering: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>H&amp;usk passord for denne økten</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopier</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Åpne lenke</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Plassering: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Ikke vis dette banneret igjen</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Bruk skrifttype med &amp;fast tegnavstand</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopier</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Velg &amp;Alle</translation>
     </message>
 </context>
 <context>

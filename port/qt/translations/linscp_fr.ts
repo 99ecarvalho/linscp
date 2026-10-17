@@ -3496,6 +3496,14 @@ Emplacement : %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Enregistrer le mot de passe pour cette session</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copier</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Ouvrir lien</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Emplacement : %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Ne plus afficher cette boîte de dialogue</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Utiliser la &amp;police à espacement</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copier</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Tout sélectionner</translation>
     </message>
 </context>
 <context>

@@ -3495,6 +3495,14 @@ Lokasi: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Ingat password untuk sesi ini</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Salin</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Buka Tautan</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3584,6 +3592,18 @@ Lokasi: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Jangan tampilkan informasi ini lagi</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Gunakan Font &amp;Monospace</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Salin</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Pilih &amp;Semua</translation>
     </message>
 </context>
 <context>

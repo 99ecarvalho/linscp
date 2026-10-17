@@ -3496,6 +3496,14 @@ Staðsetning: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Muna aðgangsorð fyrir þessa lotu</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Afrita</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Opna tengil</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Staðsetning: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Aldrei sýna þennan borða aftur</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Nota &amp;einbila leturgerð</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Afrita</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Velja &amp;allt</translation>
     </message>
 </context>
 <context>

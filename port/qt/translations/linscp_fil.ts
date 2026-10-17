@@ -3496,6 +3496,14 @@ Lokasyon: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Tandaan ang password sa session na ito</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopyahin</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Buksan ang Link</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Lokasyon: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Huwag muling ipakita itong banner</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Gamitin ang &amp;Monospaced na Font</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopyahin</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Piliin &amp;Lahat</translation>
     </message>
 </context>
 <context>

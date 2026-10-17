@@ -12,13 +12,13 @@ Last updated: **2026-10-17**
 | Area | Done | Total |
 |---|---|---|
 | A. Site Manager | 15 | 17 |
-| B. Password prompt and banner | 1 | 3 |
+| B. Password prompt and banner | 3 | 3 |
 | C. Progress and synchronization dialogs | 3 | 4 |
 | D. Main window | 6 | 9 |
 | E. Preferences | 9 | 10 |
 | F. Command line | 2 | 3 |
 | G. Known before | 0 | 1 |
-| **Total** | **36** | **47** |
+| **Total** | **38** | **47** |
 
 ## Items
 
@@ -42,8 +42,8 @@ Last updated: **2026-10-17**
 | A16 | Host name URL parsing | Medium | done | 2026-10-17. On leaving the field and before Save and Login, `CoreBridge::HostNameIsUrl`; ctest `qt_gui_sites` |
 | A17 | Advanced drop-down: Global Preferences > Logging | Low | done | 2026-10-17. Through `OnPreferences`; ctest `qt_gui_sites` |
 | B1 | Prompt: change stored password, remember for this session | High | done | 2026-10-17. Offered as TAuthenticateForm::PromptUser offers them; ctest `qt_gui_sites` (a refused stored password replaced; remember offered with the global option off) |
-| B2 | Banner: Use Monospaced Font | Low | todo | |
-| B3 | Banner: clickable links, Open Link | Low | todo | |
+| B2 | Banner: Use Monospaced Font | Low | done | 2026-10-17. In the banner's menu (Copy, Select All, Use Monospaced Font), kept per banner by core (bpMonospacedFont); the window's font otherwise, as upstream's default; ctest `qt_dialogs` |
+| B3 | Banner: clickable links, Open Link | Low | done | 2026-10-17. Upstream's are the prompt's labels (ExternalLabel, LabelPopupMenu): a link opened by a click, Copy and Open Link; ctest `qt_dialogs` |
 | C1 | Transfer progress: times, Skip, Background, Once Finished, Minimize, speed limit | High | done | 2026-10-17. Proceed in Background for the panels' uploads and downloads (`TMoveToQueue`, Session.cpp), as upstream for its ExecuteFileOperation; ctest `qt_gui_transfer` (times, speed limit, skip, background, once finished), `qt_gui_progress` (the queue resumes and completes the part, OpenSSH) |
 | C2 | Synchronization progress: times, Minimize | Medium | done | 2026-10-17. With the progress bar and the percentage; the time left from upstream's directory statistics cache (`SyncCollect`'s `OnProgress`), kept only with a real storage; ctest `qt_gui_sync` |
 | C3 | Synchronization checklist context menu | Medium | done | 2026-10-17. `SynchronizeDialog::PopupMenu`; the remote directory's Explore waits for `/explore` (F2); ctest `qt_gui_sync` |

@@ -3495,6 +3495,14 @@ Location: %2</source>
         <source>&amp;Remember password for this session</source>
         <translation>به یادسپاری رمز برای این جلسه</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>رونوشت</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>بازکردن لینک</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3584,6 +3592,18 @@ Location: %2</source>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>این بنر را دوباره نشان نده</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>استفاده از مجموعه نویسه &amp;یکپارچه</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>رونوشت</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>انتخاب همه</translation>
     </message>
 </context>
 <context>

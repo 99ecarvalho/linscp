@@ -3496,6 +3496,14 @@ Localização: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Lembrar palavra-passe para esta sessão</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copiar</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>Abrir Ligaçã&amp;o</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Localização: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Não mostrar este banner novamente</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Usa fonte &amp;Monospaced</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Copiar</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Selecionar &amp;todos</translation>
     </message>
 </context>
 <context>

@@ -3496,6 +3496,14 @@ Locatie: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Onthoud wachtwoord voor deze sessie</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopieer</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Open Link</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3585,6 +3593,18 @@ Locatie: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Deze tekst niet meer weergeven</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Gebruik &amp;Monospace lettertype</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopieer</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>&amp;Alles selecteren</translation>
     </message>
 </context>
 <context>

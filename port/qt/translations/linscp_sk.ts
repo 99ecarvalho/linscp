@@ -3497,6 +3497,14 @@ Umiestnenie: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>Zapamätať si heslo pre túto reláciu</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopírovať</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Otvoriť odkaz</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3586,6 +3594,18 @@ Umiestnenie: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Nabudúce nezobrazovať daný pruh</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Použiť pís&amp;mo s pevnou šírkou znakov</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Kopírovať</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Vybr&amp;ať všetko</translation>
     </message>
 </context>
 <context>

@@ -6,6 +6,7 @@
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QFontDatabase>
+#include <QMenu>
 #include <QPlainTextEdit>
 #include <QProcess>
 #include <QVBoxLayout>
@@ -140,17 +141,46 @@ void QtFrontend::ShowErrorList(const std::vector<CoreBridge::TError> & Errors)
   }
 }
 
-// As upstream's forms/Banner.cpp: the text in a fixed font, as servers lay
-// banners out for a terminal.
+// As TAuthenticateForm::Banner: the text, in the window's font or (Use
+// Monospaced Font, as last chosen for the banner) a fixed one, as servers
+// often lay banners out for a terminal; its menu as BannerPopupMenu: Copy,
+// Select All, Use Monospaced Font.
 void QtFrontend::Banner(const std::string & SessionName, const std::string & Banner,
-  bool CanNeverShowAgain, bool & NeverShowAgain)
+  bool CanNeverShowAgain, bool & NeverShowAgain, bool & MonospacedFont)
 {
   QDialog Dialog(FWindow);
   Dialog.setWindowTitle(QString::fromStdString(SessionName));
   QVBoxLayout * Layout = new QVBoxLayout(&Dialog);
   QPlainTextEdit * Text = new QPlainTextEdit(QString::fromStdString(Banner), &Dialog);
+  Text->setObjectName(QStringLiteral("Banner"));
+  Text->setAccessibleName(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::AuthenticationBanner)));
   Text->setReadOnly(true);
-  Text->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+  const QFont Proportional = Text->font();
+  bool Monospaced = MonospacedFont;
+  auto ApplyFont = [Text, &Monospaced, Proportional]()
+  {
+    Text->setFont(Monospaced ? QFontDatabase::systemFont(QFontDatabase::FixedFont) : Proportional);
+  };
+  ApplyFont();
+  Text->setContextMenuPolicy(Qt::CustomContextMenu);
+  QAction * MonospacedAction = new QAction(QDialog::tr("Use &Monospaced Font"), &Dialog);
+  MonospacedAction->setObjectName(QStringLiteral("BannerMonospacedFont"));
+  MonospacedAction->setCheckable(true);
+  MonospacedAction->setChecked(Monospaced);
+  QObject::connect(MonospacedAction, &QAction::toggled, &Dialog, [&Monospaced, ApplyFont](bool On)
+  {
+    Monospaced = On;
+    ApplyFont();
+  });
+  QObject::connect(Text, &QWidget::customContextMenuRequested, &Dialog, [Text, MonospacedAction](const QPoint & Pos)
+  {
+    QMenu Menu;
+    Menu.addAction(QDialog::tr("&Copy"), QKeySequence::Copy, Text, &QPlainTextEdit::copy)->setEnabled(Text->textCursor().hasSelection());
+    Menu.addAction(QDialog::tr("Select &All"), QKeySequence::SelectAll, Text, &QPlainTextEdit::selectAll);
+    Menu.addSeparator();
+    Menu.addAction(MonospacedAction);
+    Menu.exec(Text->viewport()->mapToGlobal(Pos));
+  });
   Text->setMinimumSize(560, 300);
   Layout->addWidget(Text);
   QCheckBox * Never = nullptr;
@@ -164,6 +194,7 @@ void QtFrontend::Banner(const std::string & SessionName, const std::string & Ban
   Layout->addWidget(Box);
   Dialog.exec();
   NeverShowAgain = (Never != nullptr) && Never->isChecked();
+  MonospacedFont = Monospaced;
 }
 
 void QtFrontend::Information(const std::string & Text)

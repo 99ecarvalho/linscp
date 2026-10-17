@@ -3497,6 +3497,14 @@ Location: %2</source>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Запомни ја лозинката за оваа сесија</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Копирај</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Отвори линк</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3586,6 +3594,18 @@ Location: %2</source>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Не прикажувај го повторно ова известување</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Користи &amp;фиксен фонт</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Копирај</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Избери &amp;сѐ</translation>
     </message>
 </context>
 <context>

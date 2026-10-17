@@ -3495,6 +3495,14 @@ Vị trí: %2</translation>
         <source>&amp;Remember password for this session</source>
         <translation>&amp;Ghi nhớ mật khẩu cho phiên này</translation>
     </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Sao chép</translation>
+    </message>
+    <message>
+        <source>&amp;Open Link</source>
+        <translation>&amp;Mở liên kết</translation>
+    </message>
 </context>
 <context>
     <name>PropertiesDialog</name>
@@ -3584,6 +3592,18 @@ Vị trí: %2</translation>
     <message>
         <source>&amp;Never show this banner again</source>
         <translation>&amp;Không hiện lại thông báo này</translation>
+    </message>
+    <message>
+        <source>Use &amp;Monospaced Font</source>
+        <translation>Dùng phông &amp;Monospaced</translation>
+    </message>
+    <message>
+        <source>&amp;Copy</source>
+        <translation>&amp;Sao chép</translation>
+    </message>
+    <message>
+        <source>Select &amp;All</source>
+        <translation>Chọn &amp;Tất cả</translation>
     </message>
 </context>
 <context>
