@@ -4813,6 +4813,30 @@ Location: %2</source>
         <source>Telnet co&amp;mmand:</source>
         <translation>&amp;Εντολή Telnet:</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>Ρυθμίσεις τερματικού &amp;PuTTY:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>&amp;Επεξεργασία στο PuTTY...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>Εργαλεία</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>&amp;Δημιουργία νέου ζεύγους κλειδιών με το PuTTYgen...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>&amp;Εγκατάσταση δημόσιου κλειδιού στον διακομιστή...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

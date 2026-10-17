@@ -4814,6 +4814,30 @@ Lokacija: %2</translation>
         <source>Telnet co&amp;mmand:</source>
         <translation>Telnet &amp;naredba:</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>Podešavanja &amp;PuTTY terminala:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>Uredi u &amp;PuTTY...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Alatke</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>&amp;Generiši novi par ključeva pomoću PuTTYgen...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>&amp;Instaliraj javni ključ na server...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

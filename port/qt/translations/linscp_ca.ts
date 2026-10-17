@@ -4813,6 +4813,30 @@ Ubicació: %2</translation>
         <source>Telnet co&amp;mmand:</source>
         <translation>&amp;Ordre Telnet:</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>Paràmetres del terminal &amp;PuTTY:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>&amp;Edita en el PuTTY...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>E&amp;ines</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>&amp;Genera una parella nova de claus amb PuTTYgen...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>&amp;Instal·la una clau pública en el servidor...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

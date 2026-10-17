@@ -4812,6 +4812,30 @@ Hely: %2</translation>
         <source>Telnet co&amp;mmand:</source>
         <translation>Telnet &amp;parancs:</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>&amp;PuTTY terminál beállításai:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>&amp;Szerkesztés a PuTTY-ban...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Eszközök</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>Új kulcspárok &amp;generálása PuTTYgen-nel...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>Nyilvános kulcs &amp;telepítése a szerverre...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

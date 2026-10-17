@@ -4812,6 +4812,30 @@ Location: %2</source>
         <source>Telnet co&amp;mmand:</source>
         <translation>Telnet コマンド(&amp;M)</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>PuTTY 端末設定(&amp;P):</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>PuTTY で設定(&amp;E)...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>ツール(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>鍵ペアを PuTTYgen で生成(&amp;G)...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>サーバーに公開鍵をインストール(&amp;I)...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

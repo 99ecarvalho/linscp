@@ -4812,6 +4812,30 @@ Location: %2</source>
         <source>Telnet co&amp;mmand:</source>
         <translation>텔넷 명령(&amp;M):</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>Putty 터미널 설정(&amp;P):</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>PuTTY에서 수정(&amp;E)...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>도구(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>PuTTYgen을 통해 새 키 쌍 생성(&amp;G)...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>서버에 공개 키 설치(&amp;I)...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

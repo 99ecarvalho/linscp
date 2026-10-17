@@ -4813,6 +4813,30 @@ Asukoht: %2</translation>
         <source>Telnet co&amp;mmand:</source>
         <translation>&amp;Telneti-käsk ühenduse loomiseks:</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>&amp;PuTTY terminali sätted:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>&amp;Redigeeri PuTTY-s...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Tööriistad</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>&amp;Genereeri PuTTYgeniga uus võtmepaar...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>&amp;Paigalda avalik võti serverisse...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

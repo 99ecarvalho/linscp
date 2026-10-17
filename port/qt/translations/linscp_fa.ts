@@ -4812,6 +4812,30 @@ Location: %2</source>
         <source>Telnet co&amp;mmand:</source>
         <translation>دستور Telnet:</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>تنظیمات ترمینال پاتی:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>ویرایش در پاتی...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>اب&amp;زارها</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>&amp;آفریدن کلید تازه با استفاده از پاتی</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>&amp;نصب کلید عمومی در کارگزار...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

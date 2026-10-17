@@ -4812,6 +4812,30 @@ Location: %2</source>
         <source>Telnet co&amp;mmand:</source>
         <translation>Telnet命令(&amp;M)</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>PuTTY终端设置(&amp;P)：</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>在PuTTY中编辑(&amp;E)...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>工具(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>使用PuTTYgen生成新的密钥对(&amp;G)...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>向服务器安装公钥...(&amp;I)</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

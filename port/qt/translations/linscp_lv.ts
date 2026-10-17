@@ -4814,6 +4814,30 @@ Atrašanās vieta: %2</translation>
         <source>Telnet co&amp;mmand:</source>
         <translation>Telnet &amp;komanda:</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>&amp;PuTTY termināļa iestatījumi:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>&amp;Labot PuTTY...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Rīki</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>&amp;Ģenerēt jaunu atslēgu pāri ar PuTTYgen...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>&amp;Instalēt publisko atslēgu serverī...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

@@ -18,6 +18,8 @@
 #include <QMessageBox>
 #include <QNetworkProxyFactory>
 #include <QPlainTextEdit>
+#include <QProcess>
+#include <QTimer>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QSpinBox>
@@ -28,6 +30,8 @@
 #include <QVBoxLayout>
 
 #include "ColorMenu.h"
+#include "KeyVerify.h"
+#include "SiteManager.h"
 #include "QtFrontend.h"
 
 namespace
@@ -318,8 +322,66 @@ QWidget * SiteAdvanced::MakeEnvironmentPage()
   Dst->addWidget(FDstUnix);
   Dst->addWidget(FDstWindows);
   Layout->addWidget(FDstGroup);
+  // As PuttyGroup: the terminal settings given PuTTY, edited in PuTTY
+  // itself where it can be (Windows).
+  QGroupBox * Putty = new QGroupBox(tr("PuTTY"), Page);
+  QGridLayout * PuttyLayout = new QGridLayout(Putty);
+  FPuttySettings = new QLineEdit(Q(FSite.PuttySettings), Putty);
+  PuttyLayout->addWidget(Buddy(tr("&PuTTY terminal settings:"), FPuttySettings, Putty), 0, 0, 1, 2);
+  PuttyLayout->addWidget(FPuttySettings, 1, 0);
+  FEditInPutty = new QPushButton(tr("&Edit in PuTTY..."), Putty);
+  FEditInPutty->setVisible(CoreBridge::TPuttySettingsEdit::Supported());
+  connect(FEditInPutty, &QPushButton::clicked, this, &SiteAdvanced::EditInPutty);
+  PuttyLayout->addWidget(FEditInPutty, 1, 1);
+  // Typed in: PuTTY's no longer followed (PuttySettingsEdit->Modified).
+  connect(FPuttySettings, &QLineEdit::textEdited, this, [this]()
+  {
+    if (FPuttyTimer != nullptr)
+    {
+      FPuttyTimer->stop();
+    }
+  });
+  Layout->addWidget(Putty);
   Layout->addStretch(1);
   return Page;
+}
+
+// As PuttySettingsButtonClick: told first, then the temporary site in
+// PuTTY, its changes followed each second (PuttySettingsTimer).
+void SiteAdvanced::EditInPutty()
+{
+  FPuttyEdit.reset();
+  CoreBridge::TSite Site = this->Site();
+  Site.PuttySettings = FPuttySettings->text().toStdString();
+  ShowMessage(CoreBridge::TQueryType::Information, QString::fromStdString(CoreBridge::TPuttySettingsEdit::Instructions(Site)));
+  try
+  {
+    FPuttyEdit = std::make_unique<CoreBridge::TPuttySettingsEdit>(Site);
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return;
+  }
+  if (FPuttyTimer == nullptr)
+  {
+    FPuttyTimer = new QTimer(this);
+    FPuttyTimer->setInterval(1000);
+    connect(FPuttyTimer, &QTimer::timeout, this, [this]()
+    {
+      if (FPuttyEdit)
+      {
+        try
+        {
+          FPuttySettings->setText(QString::fromStdString(FPuttyEdit->Changed()));
+        }
+        catch (const CoreBridge::TCoreError &)
+        {
+        }
+      }
+    });
+  }
+  FPuttyTimer->start();
 }
 
 QWidget * SiteAdvanced::MakeDirectoriesPage()
@@ -1014,9 +1076,30 @@ QWidget * SiteAdvanced::MakeAuthenticationPage()
   Params->addWidget(Buddy(tr("Private &key file:"), FPrivateKeyFile, FAuthenticationParams));
   Params->addWidget(BrowseRow(FPrivateKeyFile, tr("Private key file"), false,
     tr("PuTTY Private Key Files (*.ppk);;All Private Key Files (*.ppk *.pem *.key id_*);;All Files (*)")));
+  // As PrivateKeyToolsButton (PrivateKeyMenu) and PrivateKeyViewButton.
+  FPrivateKeyTools = new QPushButton(tr("&Tools"), FAuthenticationParams);
+  QMenu * KeyTools = new QMenu(FPrivateKeyTools);
+  QAction * Generate = KeyTools->addAction(tr("&Generate New Key Pair with PuTTYgen..."), this, &SiteAdvanced::GenerateKeyPair);
+  QAction * Install = KeyTools->addAction(tr("&Install Public Key into Server..."), this, &SiteAdvanced::InstallPublicKey);
+  connect(KeyTools, &QMenu::aboutToShow, this, [this, Generate, Install]()
+  {
+    // PuTTYgen's window: Windows' (elsewhere it is a command-line tool).
+#if defined(Q_OS_WIN)
+    Generate->setEnabled(!SiteManager::FindTool(QStringLiteral("puttygen")).isEmpty());
+#else
+    Generate->setEnabled(false);
+#endif
+    const CoreBridge::TSite Site = this->Site();
+    Install->setEnabled(!Site.HostName.empty() && (Site.Protocol == CoreBridge::TSite::TProtocol::Sftp));
+  });
+  FPrivateKeyTools->setMenu(KeyTools);
   FShowPublicKey = new QPushButton(tr("&Display Public Key"), FAuthenticationParams);
   connect(FShowPublicKey, &QPushButton::clicked, this, &SiteAdvanced::ShowPublicKey);
-  Params->addWidget(FShowPublicKey, 0, Qt::AlignLeft);
+  QHBoxLayout * KeyButtons = new QHBoxLayout();
+  KeyButtons->addWidget(FPrivateKeyTools);
+  KeyButtons->addWidget(FShowPublicKey);
+  KeyButtons->addStretch(1);
+  Params->addLayout(KeyButtons);
   FDetachedCertificate = new QLineEdit(Q(FSite.DetachedCertificate), FAuthenticationParams);
   FDetachedCertificateLabel = Buddy(tr("Certificate to &use with the private key:"), FDetachedCertificate, FAuthenticationParams);
   Params->addWidget(FDetachedCertificateLabel);
@@ -1278,6 +1361,96 @@ void SiteAdvanced::SetColor(int Color)
 }
 
 // PrivateKeyViewButtonClick: the key's public line, to copy.
+// As PrivateKeyGenerateItemClick: PuTTYgen started, the drives watched for
+// the .ppk it saves, which becomes the key (PrivateKeyCreatedOrModified).
+void SiteAdvanced::GenerateKeyPair()
+{
+  const QString Puttygen = SiteManager::FindTool(QStringLiteral("puttygen"));
+  if (Puttygen.isEmpty() || !QProcess::startDetached(Puttygen, {}))
+  {
+    ShowMessage(CoreBridge::TQueryType::Error, QString::fromStdString(CoreBridge::Text(CoreBridge::TText::ExecuteAppError))
+      .replace(QStringLiteral("%s"), Puttygen.isEmpty() ? QStringLiteral("puttygen") : Puttygen));
+    return;
+  }
+  FKeyMonitor = std::make_unique<DragExt::TCreationMonitor>(DragExt::MonitorRoots(CoreBridge::Preferences().DDDrives), true);
+  if (FKeyTimer == nullptr)
+  {
+    FKeyTimer = new QTimer(this);
+    FKeyTimer->setInterval(500);
+    connect(FKeyTimer, &QTimer::timeout, this, [this]()
+    {
+      const QString Key = FKeyMonitor ? FKeyMonitor->FoundSuffix(QStringLiteral(".ppk")) : QString();
+      if (!Key.isEmpty())
+      {
+        FPrivateKeyFile->setText(Key);
+      }
+    });
+  }
+  FKeyTimer->start();
+}
+
+// As PrivateKeyUploadItemClick: the site, SFTP alone, at its home
+// directory, connected to install the key (converted first if needed).
+bool SiteAdvanced::InstallPublicKey()
+{
+  QString Key = FPrivateKeyFile->text().trimmed();
+  if (Key.isEmpty())
+  {
+    Key = QFileDialog::getOpenFileName(this, QString::fromStdString(CoreBridge::Text(CoreBridge::TText::PublicKeyTitle)), QString(),
+      tr("PuTTY Private Key Files (*.ppk);;All Private Key Files (*.ppk *.pem *.key id_*);;All Files (*)"));
+    if (Key.isEmpty())
+    {
+      return false;
+    }
+  }
+  if (!VerifyAndConvertKey(this, Key, false, [this](const QString & Suggested) { return ChooseConvertedKeyFile(this, Suggested); }))
+  {
+    return false;
+  }
+  CoreBridge::TSite Site = this->Site();
+  Site.RemoteDirectory.clear();
+  std::string Installed;
+  try
+  {
+    CoreBridge::TSession Session(Site);
+    Session.Open();
+    if (!Session.IsOpenSsh())
+    {
+      CoreBridge::TQuery Query;
+      Query.Type = CoreBridge::TQueryType::Confirmation;
+      Query.Message = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::NotOpenSsh))
+        .replace(QStringLiteral("%s"), QString::fromStdString(Session.SshImplementation())).toStdString();
+      CoreBridge::TQueryButton OK;
+      OK.Answer = CoreBridge::AnswerOK;
+      OK.Caption = "OK";
+      CoreBridge::TQueryButton Cancel;
+      Cancel.Answer = CoreBridge::AnswerCancel;
+      Cancel.Caption = "Cancel";
+      Query.Buttons = { OK, Cancel };
+      Query.CancelAnswer = CoreBridge::AnswerCancel;
+      QtFrontend Frontend;
+      Frontend.SetWindow(this);
+      if (Frontend.Query(Query).Answer != CoreBridge::AnswerOK)
+      {
+        return false;
+      }
+    }
+    Installed = Session.UploadPublicKey(QDir::toNativeSeparators(Key).toStdString());
+  }
+  catch (const CoreBridge::TCoreError & E)
+  {
+    ShowError(E);
+    return false;
+  }
+  FPrivateKeyFile->setText(Key);
+  FPrivateKeyFile->setFocus();
+  if (!Installed.empty())
+  {
+    ShowMessage(CoreBridge::TQueryType::Information, QString::fromStdString(Installed));
+  }
+  return true;
+}
+
 void SiteAdvanced::ShowPublicKey()
 {
   std::string Line;
@@ -1335,6 +1508,21 @@ bool SiteAdvanced::ValidEncryptKey()
     FEncryptKey->setFocus();
     return false;
   }
+}
+
+void SiteAdvanced::ShowMessage(CoreBridge::TQueryType Type, const QString & Message)
+{
+  CoreBridge::TQuery Query;
+  Query.Type = Type;
+  Query.Message = Message.toStdString();
+  CoreBridge::TQueryButton OK;
+  OK.Answer = CoreBridge::AnswerOK;
+  OK.Caption = "OK";
+  Query.Buttons = { OK };
+  Query.CancelAnswer = CoreBridge::AnswerOK;
+  QtFrontend Frontend;
+  Frontend.SetWindow(this);
+  Frontend.Query(Query);
 }
 
 void SiteAdvanced::ShowError(const CoreBridge::TCoreError & E)
@@ -1427,6 +1615,7 @@ CoreBridge::TSite SiteAdvanced::Site() const
   Site.TimeDifferenceMinutes = (FTimeDifferenceHours->value() * 60) + FTimeDifferenceMinutes->value();
   Site.TimeDifferenceAuto = FTimeDifferenceAuto->isChecked();
   Site.TrimVMSVersions = FTrimVMSVersions->isChecked();
+  Site.PuttySettings = FPuttySettings->text().toStdString();
   Site.VMSAllRevisions = FVMSAllRevisions->isChecked();
   // Environment > Recycle bin: the path kept only when used or changed.
   Site.DeleteToRecycleBin = FDeleteToRecycleBin->isChecked();

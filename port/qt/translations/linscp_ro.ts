@@ -4814,6 +4814,30 @@ Cale: %2</translation>
         <source>Telnet co&amp;mmand:</source>
         <translation>Co&amp;mandă telnet</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>Setări de terminal &amp;PuTTY:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>&amp;Editare în PuTTY...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>Unel&amp;te</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>&amp;Generează o Pereche Nouă de Chei cu PuTTYgen...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>&amp;Instalare Cheie Publică pe Server...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

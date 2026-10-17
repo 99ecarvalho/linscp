@@ -1157,6 +1157,35 @@ void Sites(const char * Port, const QString & Key, const QString & Directory)
       QMetaObject::invokeMethod(&Window, "Disconnect");
       SiteAdvanced Advanced(CoreBridge::LoadSite("Tests/rclone"), &Window);
       Check(!Advanced.UpdateDirectories()->isChecked(), "the advanced settings show it");
+      // G1: PuTTY's terminal settings kept with the site; Edit in PuTTY
+      // only where PuTTY's sessions are in the registry.
+      Advanced.PuttySettingsEdit()->setText(QStringLiteral("TermWidth=132 TermHeight=40"));
+      Check(Advanced.Site().PuttySettings == "TermWidth=132 TermHeight=40", "PuTTY terminal settings, the site's");
+#if defined(_WIN32)
+      Check(Advanced.EditInPuttyButton()->isVisibleTo(&Advanced), "Edit in PuTTY, with PuTTY's registry");
+#else
+      Check(!Advanced.EditInPuttyButton()->isVisibleTo(&Advanced), "no Edit in PuTTY: its sessions are files here");
+#endif
+      // The private key's Tools: Install Public Key into Server, the site
+      // connected for it.
+      QMenu * Tools = Advanced.PrivateKeyToolsButton()->menu();
+      emit Tools->aboutToShow();
+      Check((Tools->actions().size() == 2) && Tools->actions()[1]->isEnabled(), "Tools: Generate New Key Pair, Install Public Key");
+      if (!Key.isEmpty())
+      {
+        const QString Ppk = QDir(Directory).filePath(QStringLiteral("install-from-site.ppk"));
+        try
+        {
+          CoreBridge::ConvertKey(Key.toStdString(), Ppk.toStdString());
+        }
+        catch (const CoreBridge::TCoreError &)
+        {
+        }
+        Advanced.PrivateKeyFile()->setText(Ppk);
+        Check(Advanced.InstallPublicKey(), "Install Public Key into Server, from Site Advanced");
+        QFile Authorized(QDir(Directory).filePath(QStringLiteral("root/.ssh/authorized_keys")));
+        Check(Authorized.open(QIODevice::ReadOnly) && Authorized.readAll().contains("ssh-ed25519 "), "the key authorized");
+      }
     }
     // Edit Raw Settings: the site's settings as core's options.
     {

@@ -4813,6 +4813,30 @@ Location: %2</source>
         <source>Telnet co&amp;mmand:</source>
         <translation>Заповед за &amp;телнет:</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>Настройки на терминала на &amp;PuTTY:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>&amp;Обработка в PuTTY...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Пособия</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>&amp;Генериране на нова двойка ключове с PuTTYgen...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>&amp;Инсталиране на публичния ключ на сървъра...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

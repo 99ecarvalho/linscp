@@ -4817,6 +4817,30 @@ Location: %2</source>
         <source>Telnet co&amp;mmand:</source>
         <translation>أوا&amp;مر Telnet</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>إعدادات طرفية &amp;PuTTY:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>&amp;تحرير في PuTTY...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>الادوات</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>&amp;إنشاء زوج مفاتيح جديد باستخدام PuTTYgen...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>&amp;تثبيت المفتاح العام على الخادم...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

@@ -4814,6 +4814,30 @@ Vieta: %2</translation>
         <source>Telnet co&amp;mmand:</source>
         <translation>Telneto ko&amp;manda:</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>&amp;„PuTTY“ terminalo nustatymai:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>Redaguoti per „PuTTY“...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Įrankiai</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>&amp;Sukurti naują raktų porą su „PuTTYgen“...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>&amp;Įkelti viešąjį raktą į serverį...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

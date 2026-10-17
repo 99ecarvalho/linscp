@@ -4812,6 +4812,30 @@ Lokasi: %2</translation>
         <source>Telnet co&amp;mmand:</source>
         <translation>Pe&amp;rintah telnet</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>Pengaturan terminal &amp;PuTTY:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>&amp;Edit di PuTTY...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>Ala&amp;t</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>&amp;Buat Pasangan Kunci Baru dengan PuTTYgen...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>&amp;Pasang Kunci Publik ke Server...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

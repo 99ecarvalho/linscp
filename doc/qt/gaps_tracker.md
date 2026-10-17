@@ -17,8 +17,8 @@ Last updated: **2026-10-17**
 | D. Main window | 9 | 9 |
 | E. Preferences | 9 | 10 |
 | F. Command line | 2 | 3 |
-| G. Known before | 0 | 1 |
-| **Total** | **44** | **47** |
+| G. Known before | 1 | 1 |
+| **Total** | **45** | **47** |
 
 ## Items
 
@@ -70,4 +70,4 @@ Last updated: **2026-10-17**
 | F1 | GUI: /log, /xmllog, /loglevel, /logsize | Medium | done | 2026-10-17. linscp-cli's `ApplyLogSwitches`, moved to FrontendCommon, at the GUI's initialization; ctest `qt_gui_logswitches` |
 | F2 | GUI: /synchronize, /edit, /refresh, /explore, /workspace, /rawtransfersettings, /privatekey, /help | Medium | done | 2026-10-17. /synchronize, /edit (the window hidden), /refresh (to the running instance; a path as core reads it, "/dir/"), download URLs (downloaded, or focused with /explore or /browse), /workspace (before a site of the same name), /rawtransfersettings and /privatekey for the run, /help (linscp-cli's usage). /Console= and /DotNet= not applicable: they record the wrappers' versions for WinSCP's update service; ctest `qt_gui_uploadswitch`, `qt_gui_sessioncommands`, `qt_gui_tabs`, `qt_gui_logswitches` |
 | F3 | CLI: /info, /batchsettings, /copyid, /fingerprintscan, /dumpcallstack, /h | Low | todo | |
-| G1 | Site Advanced: Edit in PuTTY; private key Tools menu | Low | todo | From P3-27 |
+| G1 | Site Advanced: Edit in PuTTY; private key Tools menu | Low | done | From P3-27; Edit in PuTTY needs PuTTY's registry sessions, so Windows only |

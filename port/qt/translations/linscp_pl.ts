@@ -4814,6 +4814,30 @@ Lokalizacja: %2</translation>
         <source>Telnet co&amp;mmand:</source>
         <translation>Polecenie Te&amp;lnet</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>Ustawienia terminala &amp;PuTTY:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>&amp;Edytuj w PuTTY...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Narzędzia</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>Wy&amp;generuj nową parę kluczy z PuTTYgen...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>Za&amp;instaluj klucz publiczny na serwerze...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

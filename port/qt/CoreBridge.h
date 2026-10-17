@@ -1772,6 +1772,9 @@ struct TSite
   // PKSessID2, Rekey2, MaxPkt2, Ignore2, WinAdj.
   static constexpr int SshBugCount = 8;
   std::vector<TAutoSwitch> SshBugs = std::vector<TAutoSwitch>(SshBugCount, TAutoSwitch::Auto);
+  // Environment's PuTTY terminal settings (PuttySettings: "Name=Value"
+  // pairs, as StringsToParams has them), given PuTTY with the session.
+  std::string PuttySettings;
   // Note; the session color (a TColor, 0x00BBGGRR; 0 none).
   std::string Note;
   int Color = 0;
@@ -1957,6 +1960,25 @@ bool PasswordStoringDisabled();
 // Configuration's DefaultKeyFile: a site's key when it names none (the
 // command line's /privatekey).
 std::string DefaultKeyFile();
+// Site Advanced's Edit in PuTTY (TSiteAdvancedDialog::PuttySettingsButton):
+// the site exported to PuTTY's registry as a temporary site, PuTTY started;
+// Changed then the terminal settings that differ from what was exported;
+// the temporary site removed with it. Windows only (Supported): PuTTY
+// elsewhere keeps its sessions in files. Throws TCoreError.
+class TPuttySettingsEdit
+{
+public:
+  static bool Supported();
+  // The temporary site's name, and what the user is told first
+  // (PUTTY_SETTINGS_INSTRUCTIONS, unformatted).
+  static std::string Instructions(const TSite & Site);
+  explicit TPuttySettingsEdit(const TSite & Site);
+  ~TPuttySettingsEdit();
+  std::string Changed();
+private:
+  struct TImpl;
+  std::unique_ptr<TImpl> F;
+};
 // Core's time texts: a span (FormatDateTimeSpan, "0:00:05"), and now's
 // time (TDateTime::TimeString).
 std::string TimeSpanText(double Seconds);

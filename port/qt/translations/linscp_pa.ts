@@ -4813,6 +4813,30 @@ Location: %2</source>
         <source>Telnet co&amp;mmand:</source>
         <translation>Telnet ਕਮਾਂਡ(&amp;M):</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>PuTTY ਟਰਮੀਨਲ ਸੈਟਿੰਗਾਂ(&amp;P):</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>PuTTY ਵਿੱਚ ਸੰਪਾਦਨ ਕਰੋ(&amp;E)...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>ਟੂਲ(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>PuTTYgen ਨਾਲ ਨਵਾਂ ਕੁੰਜੀ ਜੋੜਾ ਬਣਾਓ(&amp;G)...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>ਪਬਲਿਕ ਕੁੰਜੀ ਸਰਵਰ ਵਿੱਚ ਇੰਸਟਾਲ ਕਰੋ(&amp;I)...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

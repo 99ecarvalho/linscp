@@ -4813,6 +4813,30 @@ Locatie: %2</translation>
         <source>Telnet co&amp;mmand:</source>
         <translation>Telnet-&amp;opdracht</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>&amp;PuTTY terminal instellingen:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>&amp;Bewerk in PuTTY...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Hulpmiddelen</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>&amp;Genereer Nieuw Sleutelpaar met PuTTYgen...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>&amp;Installeer Publieke Sleutel op Server...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

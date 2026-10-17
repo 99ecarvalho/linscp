@@ -4814,6 +4814,30 @@ Umístění: %2</translation>
         <source>Telnet co&amp;mmand:</source>
         <translation>Pří&amp;kaz pro telnet:</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>Nastavení terminálu &amp;PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>&amp;Editovat v PuTTY...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Nástroje</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>&amp;Generovat nový pár klíčů v programu PuTTYgen...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>Instalovat &amp;veřejný klíč na server...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

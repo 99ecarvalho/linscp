@@ -2,10 +2,12 @@
 // Login dialog uses it (forms/Login.cpp; saving as forms/Custom.cpp's
 // DoSaveSession).
 #include <vcl.h>
+#include <Registry.hpp>
 #pragma hdrstop
 
 #include "BridgeVcl.h"
 #include "ShellConfiguration.h"
+#include "PuttySlice.h"
 
 #include <CoreMain.h>
 #include <SessionData.h>
@@ -302,6 +304,7 @@ TSite SiteOf(const TSessionData * Data)
     Site.SshBugs[Index] = AutoSwitchOf(Data->Bug[SshBugs[Index]]);
   }
   Site.Note = Utf8(Data->Note);
+  Site.PuttySettings = Utf8(Data->PuttySettings);
   Site.Color = Data->Color;
   return Site;
 }
@@ -423,6 +426,7 @@ void ApplyAdvanced(TSessionData * Data, const TSite & Site)
     Data->Bug[SshBugs[Index]] = AutoSwitchOf(Site.SshBugs[Index]);
   }
   Data->Note = FromUtf8(Site.Note);
+  Data->PuttySettings = FromUtf8(Site.PuttySettings);
   Data->Color = Site.Color;
   if (!Site.PasswordsLocked || !Site.EncryptKey.empty())
   {
@@ -755,6 +759,145 @@ bool HostNameIsUrl(const std::string & HostName)
 std::string TimeSpanText(double Seconds)
 {
   return Utf8(FormatDateTimeSpan(TDateTime(Seconds / SecsPerDay)));
+}
+
+namespace
+{
+
+UnicodeString PuttySiteName(const TSite & Site)
+{
+  return FORMAT(L"(%s)", (FMTLOAD(PUTTY_SETTINGS_SITE_NAME, (FromUtf8(Site.Name.empty() ? std::string("New Site") : Site.Name)))));
+}
+
+#if defined(_WIN32)
+UnicodeString PuttySiteKey(const UnicodeString & SiteName)
+{
+  return OriginalPuttyRegistryStorageKey + L"\\" + Configuration->PuttySessionsSubKey + L"\\" + PuttyMungeStr(SiteName);
+}
+
+// As TSiteAdvancedDialog::SerializePuttyRegistry.
+void SerializePuttyRegistry(const UnicodeString & Key, TStrings * Values)
+{
+  std::unique_ptr<TRegistry> Registry(new TRegistry());
+  if (Registry->OpenKeyReadOnly(Key))
+  {
+    std::unique_ptr<TStrings> Names(new TStringList());
+    Registry->GetValueNames(Names.get());
+    for (int Index = 0; Index < Names->Count; Index++)
+    {
+      const UnicodeString Name = Names->Strings[Index];
+      UnicodeString Value;
+      if (Registry->GetDataType(Name) == rdString)
+      {
+        Value = UnicodeString(PuttyStr(Registry->ReadString(Name)));
+      }
+      else
+      {
+        Value = IntToStr(Registry->ReadInteger(Name));
+      }
+      SetStringValueEvenIfEmpty(Values, Name, Value);
+    }
+  }
+}
+#endif
+
+}  // namespace
+
+struct TPuttySettingsEdit::TImpl
+{
+  UnicodeString SiteName;
+  std::unique_ptr<TStringList> Exported;
+};
+
+bool TPuttySettingsEdit::Supported()
+{
+#if defined(_WIN32)
+  return true;
+#else
+  return false;
+#endif
+}
+
+std::string TPuttySettingsEdit::Instructions(const TSite & Site)
+{
+  const UnicodeString Name = PuttySiteName(Site);
+  return Utf8(FMTLOAD(PUTTY_SETTINGS_INSTRUCTIONS, (Name, Name)));
+}
+
+// As PuttySettingsButtonClick: the site exported without its terminal
+// settings (what is there then is what PuTTY's own defaults and the
+// session give), then with them, and PuTTY started.
+TPuttySettingsEdit::TPuttySettingsEdit(const TSite & Site) : F(new TImpl())
+{
+  try
+  {
+    F->SiteName = PuttySiteName(Site);
+    F->Exported.reset(new TStringList());
+#if defined(_WIN32)
+    std::unique_ptr<TSessionData> Data(SessionDataOf(Site, Site.Name));
+    const UnicodeString PuttySettings = Data->PuttySettings;
+    Data->PuttySettings = UnicodeString();
+    SavePuttyDefaults(F->SiteName);
+    ExportSessionToPutty(Data.get(), false, F->SiteName);
+    SerializePuttyRegistry(PuttySiteKey(F->SiteName), F->Exported.get());
+    std::unique_ptr<TStrings> AllOptions(TSessionData::GetAllOptionNames(true));
+    for (int Index = 0; Index < AllOptions->Count; Index++)
+    {
+      const int I = F->Exported->IndexOfName(AllOptions->Names[Index]);
+      if (I >= 0)
+      {
+        F->Exported->Delete(I);
+      }
+    }
+    Data->PuttySettings = PuttySettings;
+    ExportSessionToPutty(Data.get(), false, F->SiteName);
+    ExecuteShellChecked(FindPuttyPath(), L"");
+#else
+    throw Exception(L"PuTTY's sessions are files here: edit them in PuTTY itself.");
+#endif
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
+}
+
+TPuttySettingsEdit::~TPuttySettingsEdit()
+{
+#if defined(_WIN32)
+  // As ClosePuttySettings.
+  std::unique_ptr<TRegistry> Registry(new TRegistry());
+  Registry->DeleteKey(PuttySiteKey(F->SiteName));
+#endif
+}
+
+// As PuttySettingsTimer: the values changed from those exported (ones
+// unknown, as from PuTTY's later versions, ignored).
+std::string TPuttySettingsEdit::Changed()
+{
+  try
+  {
+    std::unique_ptr<TStrings> Now(new TStringList());
+#if defined(_WIN32)
+    SerializePuttyRegistry(PuttySiteKey(F->SiteName), Now.get());
+#endif
+    std::unique_ptr<TStrings> Settings(new TStringList());
+    for (int Index = 0; Index < Now->Count; Index++)
+    {
+      const UnicodeString Name = Now->Names[Index];
+      const UnicodeString Value = Now->ValueFromIndex[Index];
+      const int Was = F->Exported->IndexOfName(Name);
+      if ((Was >= 0) && (F->Exported->ValueFromIndex[Was] != Value))
+      {
+        SetStringValueEvenIfEmpty(Settings.get(), Name, Value);
+      }
+    }
+    return Utf8(StringsToParams(Settings.get()).TrimLeft());
+  }
+  catch (Exception & E)
+  {
+    throw CoreErrorOf(E);
+  }
 }
 
 std::string DefaultKeyFile()

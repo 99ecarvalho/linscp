@@ -4812,6 +4812,30 @@ Location: %2</source>
         <source>Telnet co&amp;mmand:</source>
         <translation>Telnet အမိန့်(&amp;M):</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>PuTTY တာမီနယ် ဆက်တင်များ(&amp;P):</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>PuTTY တွင် ပြင်ဆင်ပါ(&amp;E)...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>ကိရိယာများ(&amp;T)</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>PuTTYgen ဖြင့် ကီးအတွဲအသစ် ထုတ်ပါ(&amp;G)...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>အများသုံး ကီးကို ဆာဗာတွင် ထည့်သွင်းပါ(&amp;I)...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

@@ -4814,6 +4814,30 @@ Location: %2</source>
         <source>Telnet co&amp;mmand:</source>
         <translation>&amp;Команда telnet:</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>Настройки терминала &amp;PuTTY:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>&amp;Изменить в PuTTY...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Утилиты</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>&amp;Сгенерировать новую Ключевую Пару с помощью PuTTYgen...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>Установить публичный ключ на сервер…</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

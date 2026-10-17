@@ -4813,6 +4813,30 @@ Sijainti: %2</translation>
         <source>Telnet co&amp;mmand:</source>
         <translation>Telnet-k&amp;omento</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>&amp;PuTTY:n pääteasetukset</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>Muo&amp;kkaa PuTTY:ssä...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;Työkalut</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>&amp;Muodosta uusi avainpari PuTTYgenin avulla...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>Asenna julk&amp;inen avain palvelimelle</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

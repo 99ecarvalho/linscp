@@ -4813,6 +4813,30 @@ Location: %2</source>
         <source>Telnet co&amp;mmand:</source>
         <translation>ტელნეტის &amp;ბრძანება:</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>&amp;PuTTY ტერმინალის პარამეტრები:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>ჩასწორ&amp;ება PuTTY-ში...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;ხელსაწყოები</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>ახალი გასაღებების წყვილის &amp;გენერაცია PuTTYgen-ით...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>საჯარო გასაღებ&amp;ის დაყენება სერვერზე...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

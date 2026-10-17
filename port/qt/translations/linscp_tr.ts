@@ -4812,6 +4812,30 @@ Konum: %2</translation>
         <source>Telnet co&amp;mmand:</source>
         <translation>Telnet ko&amp;mutu:</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>&amp;PuTTY uç birim ayarları:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>&amp;PuTTY ile düzenle...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>A&amp;raçlar</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>PuTTY&amp;gen ile yeni anahtar çifti üret...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>&amp;Herkese açık anahtarı sunucuya kur...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

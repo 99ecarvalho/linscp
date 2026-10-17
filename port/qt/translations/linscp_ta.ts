@@ -4813,6 +4813,30 @@ Location: %2</source>
         <source>Telnet co&amp;mmand:</source>
         <translation>தொலைவலை கட்டளை:</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>&amp;புட்டி முனையம் அமைப்புகள்:</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>&amp;புட்டியில் திருத்து...</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>&amp;கருவிகள்</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>புட்டிஉருவாக்கி உடன் புதிய திறவுகோல் இணையை உருவாக்குங்கள்...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>&amp;பொது திறவுகோலை சேவையகத்தில் நிறுவவும்...</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

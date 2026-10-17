@@ -155,19 +155,55 @@ struct TCreationMonitor::TImpl
     alignas(DWORD) char Buffer[32 * 1024];
   };
   std::vector<std::unique_ptr<TWatch>> Watches;
+  DWORD Filter = FILE_NOTIFY_CHANGE_DIR_NAME;
 
-  static bool Read(TWatch & Watch)
+  bool Read(TWatch & Watch) const
   {
     ResetEvent(Watch.Overlapped.hEvent);
-    return ReadDirectoryChangesW(Watch.Directory, Watch.Buffer, sizeof(Watch.Buffer), TRUE, FILE_NOTIFY_CHANGE_DIR_NAME,
+    return ReadDirectoryChangesW(Watch.Directory, Watch.Buffer, sizeof(Watch.Buffer), TRUE, Filter,
       nullptr, &Watch.Overlapped, nullptr);
+  }
+  // The paths made (or, Modified, written) under the roots since.
+  QStringList Changes(bool Modified)
+  {
+    QStringList Result;
+    for (const std::unique_ptr<TWatch> & Watch : Watches)
+    {
+      if (WaitForSingleObject(Watch->Overlapped.hEvent, 0) != WAIT_OBJECT_0)
+      {
+        continue;
+      }
+      DWORD Bytes = 0;
+      if (GetOverlappedResult(Watch->Directory, &Watch->Overlapped, &Bytes, FALSE) && (Bytes > 0))
+      {
+        const char * At = Watch->Buffer;
+        while (true)
+        {
+          const FILE_NOTIFY_INFORMATION * Info = reinterpret_cast<const FILE_NOTIFY_INFORMATION *>(At);
+          if ((Info->Action == FILE_ACTION_ADDED) || (Info->Action == FILE_ACTION_RENAMED_NEW_NAME) ||
+              (Modified && (Info->Action == FILE_ACTION_MODIFIED)))
+          {
+            Result.append(Watch->Root + QString::fromWCharArray(Info->FileName, static_cast<int>(Info->FileNameLength / sizeof(WCHAR))));
+          }
+          if (Info->NextEntryOffset == 0)
+          {
+            break;
+          }
+          At += Info->NextEntryOffset;
+        }
+      }
+      Read(*Watch);
+    }
+    return Result;
   }
 #endif
 };
 
-TCreationMonitor::TCreationMonitor(const QStringList & Roots) : F(new TImpl())
+TCreationMonitor::TCreationMonitor(const QStringList & Roots, bool Files) : F(new TImpl())
 {
 #if defined(Q_OS_WIN)
+  // As PrivateKeyGenerateItemClick's filters, for files.
+  F->Filter = Files ? (FILE_NOTIFY_CHANGE_FILE_NAME | FILE_NOTIFY_CHANGE_LAST_WRITE) : FILE_NOTIFY_CHANGE_DIR_NAME;
   for (const QString & Root : Roots)
   {
     std::unique_ptr<TImpl::TWatch> Watch(new TImpl::TWatch());
@@ -185,7 +221,7 @@ TCreationMonitor::TCreationMonitor(const QStringList & Roots) : F(new TImpl())
       continue;
     }
     Watch->Overlapped.hEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
-    if (TImpl::Read(*Watch))
+    if (F->Read(*Watch))
     {
       F->Watches.push_back(std::move(Watch));
     }
@@ -197,6 +233,7 @@ TCreationMonitor::TCreationMonitor(const QStringList & Roots) : F(new TImpl())
   }
 #else
   Q_UNUSED(Roots);
+  Q_UNUSED(Files);
 #endif
 }
 
@@ -227,36 +264,32 @@ QString TCreationMonitor::Found(const QString & Name)
 {
   QString Result;
 #if defined(Q_OS_WIN)
-  for (const std::unique_ptr<TImpl::TWatch> & Watch : F->Watches)
+  for (const QString & Path : F->Changes(false))
   {
-    if (WaitForSingleObject(Watch->Overlapped.hEvent, 0) != WAIT_OBJECT_0)
+    if (Result.isEmpty() && (QFileInfo(QDir::fromNativeSeparators(Path)).fileName().compare(Name, Qt::CaseInsensitive) == 0))
     {
-      continue;
+      Result = Path;
     }
-    DWORD Bytes = 0;
-    if (GetOverlappedResult(Watch->Directory, &Watch->Overlapped, &Bytes, FALSE) && (Bytes > 0))
-    {
-      const char * At = Watch->Buffer;
-      while (true)
-      {
-        const FILE_NOTIFY_INFORMATION * Info = reinterpret_cast<const FILE_NOTIFY_INFORMATION *>(At);
-        const QString Relative = QString::fromWCharArray(Info->FileName, static_cast<int>(Info->FileNameLength / sizeof(WCHAR)));
-        if (((Info->Action == FILE_ACTION_ADDED) || (Info->Action == FILE_ACTION_RENAMED_NEW_NAME)) && Result.isEmpty() &&
-            (QFileInfo(QDir::fromNativeSeparators(Relative)).fileName().compare(Name, Qt::CaseInsensitive) == 0))
-        {
-          Result = Watch->Root + Relative;
-        }
-        if (Info->NextEntryOffset == 0)
-        {
-          break;
-        }
-        At += Info->NextEntryOffset;
-      }
-    }
-    TImpl::Read(*Watch);
   }
 #else
   Q_UNUSED(Name);
+#endif
+  return Result;
+}
+
+QString TCreationMonitor::FoundSuffix(const QString & Suffix)
+{
+  QString Result;
+#if defined(Q_OS_WIN)
+  for (const QString & Path : F->Changes(true))
+  {
+    if (Path.endsWith(Suffix, Qt::CaseInsensitive))
+    {
+      Result = Path;
+    }
+  }
+#else
+  Q_UNUSED(Suffix);
 #endif
   return Result;
 }

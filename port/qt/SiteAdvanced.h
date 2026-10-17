@@ -8,9 +8,11 @@
 
 #include <QDialog>
 
+#include <memory>
 #include <vector>
 
 #include "CoreBridge.h"
+#include "DragExtClient.h"
 
 class QCheckBox;
 class QComboBox;
@@ -31,6 +33,13 @@ class SiteAdvanced : public QDialog
   Q_OBJECT
 
 public:
+  // Environment's PuTTY terminal settings and Edit in PuTTY (Windows);
+  // the private key's Tools (Generate with PuTTYgen, Install Public Key
+  // into Server), for tests.
+  QLineEdit * PuttySettingsEdit() const { return FPuttySettings; }
+  QPushButton * EditInPuttyButton() const { return FEditInPutty; }
+  QPushButton * PrivateKeyToolsButton() const { return FPrivateKeyTools; }
+  bool InstallPublicKey();
   SiteAdvanced(const CoreBridge::TSite & Site, QWidget * Parent = nullptr);
   // After an accepted exec(): the site with the settings changed.
   CoreBridge::TSite Site() const;
@@ -144,6 +153,9 @@ private:
   void ProxyAutodetect();
   void FillColorMenu();
   void ShowPublicKey();
+  void EditInPutty();
+  void GenerateKeyPair();
+  void ShowMessage(CoreBridge::TQueryType Type, const QString & Message);
   void GenerateEncryptKey();
   bool ValidEncryptKey();
   void ShowError(const CoreBridge::TCoreError & E);
@@ -303,6 +315,13 @@ private:
   QCheckBox * FAgentForwarding = nullptr;
   QLineEdit * FPrivateKeyFile = nullptr;
   QPushButton * FShowPublicKey = nullptr;
+  QPushButton * FPrivateKeyTools = nullptr;
+  QLineEdit * FPuttySettings = nullptr;
+  QPushButton * FEditInPutty = nullptr;
+  class QTimer * FPuttyTimer = nullptr;
+  std::unique_ptr<CoreBridge::TPuttySettingsEdit> FPuttyEdit;
+  class QTimer * FKeyTimer = nullptr;
+  std::unique_ptr<DragExt::TCreationMonitor> FKeyMonitor;
   QLineEdit * FDetachedCertificate = nullptr;
   QWidget * FDetachedCertificateRow = nullptr;
   QLabel * FDetachedCertificateLabel = nullptr;

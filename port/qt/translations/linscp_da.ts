@@ -4813,6 +4813,30 @@ Placering: %2</translation>
         <source>Telnet co&amp;mmand:</source>
         <translation>Telnet-&amp;kommando</translation>
     </message>
+    <message>
+        <source>PuTTY</source>
+        <translation>PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;PuTTY terminal settings:</source>
+        <translation>PuTTY terminalindstillinger</translation>
+    </message>
+    <message>
+        <source>&amp;Edit in PuTTY...</source>
+        <translation>Rediger i PuTTY</translation>
+    </message>
+    <message>
+        <source>&amp;Tools</source>
+        <translation>Værktøjer</translation>
+    </message>
+    <message>
+        <source>&amp;Generate New Key Pair with PuTTYgen...</source>
+        <translation>&amp;Generer nyt nøglepar med PuTTYgen...</translation>
+    </message>
+    <message>
+        <source>&amp;Install Public Key into Server...</source>
+        <translation>Installer offentlig nøgle på serveren</translation>
+    </message>
 </context>
 <context>
     <name>SiteManager</name>

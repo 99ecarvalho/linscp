@@ -34,13 +34,16 @@ QStringList MonitorRoots(const std::vector<std::string> & DDDrives);
 class TCreationMonitor
 {
 public:
-  explicit TCreationMonitor(const QStringList & Roots);
+  // Files: files made or written (a key PuTTYgen saves), not directories.
+  explicit TCreationMonitor(const QStringList & Roots, bool Files = false);
   ~TCreationMonitor();
   // How many roots are watched.
   int Count() const;
   // A directory named Name made since (or since the last look), its full
   // path; empty for none.
   QString Found(const QString & Name);
+  // One whose name ends with Suffix (".ppk"), the last of those since.
+  QString FoundSuffix(const QString & Suffix);
 private:
   struct TImpl;
   std::unique_ptr<TImpl> F;
