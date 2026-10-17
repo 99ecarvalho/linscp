@@ -899,9 +899,21 @@ int LocalPanel::TreeHeight() const
   return FSplitter->sizes().value(0);
 }
 
+// As the Commander's TreeOnLeft: the tree beside the files.
+void LocalPanel::SetTreeBeside(bool Beside)
+{
+  FSplitter->setOrientation(Beside ? Qt::Horizontal : Qt::Vertical);
+  FSplitter->setStretchFactor(0, Beside ? 0 : 1);
+}
+
+bool LocalPanel::TreeBeside() const
+{
+  return FSplitter->orientation() == Qt::Horizontal;
+}
+
 void LocalPanel::SetTreeHeight(int Height)
 {
-  const int Total = std::max(FSplitter->height(), Height + 100);
+  const int Total = std::max(TreeBeside() ? FSplitter->width() : FSplitter->height(), Height + 100);
   FSplitter->setSizes({ Height, Total - Height });
 }
 

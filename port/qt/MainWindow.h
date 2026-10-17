@@ -56,6 +56,8 @@ public:
   // tab closes: the Login dialog, if the preferences say; then, unless the
   // window is to stay open, the window closed with no session.
   void NeedSession(bool Startup);
+  void ApplyTreeOnLeft(bool OnLeft, const CoreBridge::TLayout & Layout);
+  bool FLayoutRestored = false;
   // As ShowExtendedExceptionEx for an error while idle: a lost connection
   // quietly (SessionSilentDisconnect), else with "Never popup disconnect
   // messages"; any other error as it is.

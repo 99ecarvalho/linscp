@@ -3457,6 +3457,10 @@ Location: %2</source>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>নিষ্ক্রিয় সেশন বিচ্ছিন্ন হলে ত্রুটি বার্তা দেখাবেন না(&amp;O)</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>ফাইল তালিকার বামে ডিরেক্টরি ট্রি দেখান(&amp;D)</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

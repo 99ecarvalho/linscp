@@ -3458,6 +3458,10 @@ Location: %2</source>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>Не показувати повідомлення про помилку, коли &amp;неактивний сеанс від’єднано</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>Показати дерево тек ліворуч списку файлів</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

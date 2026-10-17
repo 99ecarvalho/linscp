@@ -375,6 +375,7 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     TCloseSubKeyPath Close(Storage);
     Storage->WriteBool(L"SwappedPanels", FSettings.SwappedPanels);
     Storage->WriteBool(L"ExplorerKeyboardShortcuts", FSettings.ExplorerKeyboardShortcuts);
+    Storage->WriteBool(L"TreeOnLeft", FSettings.TreeOnLeft);
     Storage->WriteBool(L"CompareByTime", FSettings.CompareByTime);
     Storage->WriteInteger(L"ExplorerStyleSelection", FSettings.NortonLikeMode);
     Storage->WriteBool(L"CompareBySize", FSettings.CompareBySize);
@@ -400,6 +401,8 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteInteger(L"ViewStyle", FSettings.LocalPanelViewStyle);
     Storage->WriteInteger(L"DriveViewHeight", FSettings.LocalDriveViewHeight);
     Storage->WriteInteger(L"DriveViewHeightPixelsPerInch", FSettings.LocalDriveViewHeightPixelsPerInch);
+    Storage->WriteInteger(L"DriveViewWidth", FSettings.LocalDriveViewWidth);
+    Storage->WriteInteger(L"DriveViewWidthPixelsPerInch", FSettings.LocalDriveViewWidthPixelsPerInch);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander\\RemotePanel", true))
   {
@@ -410,6 +413,8 @@ void __fastcall TShellConfiguration::SaveData(THierarchicalStorage * Storage, bo
     Storage->WriteInteger(L"ViewStyle", FSettings.RemotePanelViewStyle);
     Storage->WriteInteger(L"DriveViewHeight", FSettings.RemoteDriveViewHeight);
     Storage->WriteInteger(L"DriveViewHeightPixelsPerInch", FSettings.RemoteDriveViewHeightPixelsPerInch);
+    Storage->WriteInteger(L"DriveViewWidth", FSettings.RemoteDriveViewWidth);
+    Storage->WriteInteger(L"DriveViewWidthPixelsPerInch", FSettings.RemoteDriveViewWidthPixelsPerInch);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander\\OtherLocalPanel", true))
   {
@@ -974,6 +979,7 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.SwappedPanels = Storage->ReadBool(L"SwappedPanels", FSettings.SwappedPanels);
     FSettings.ExplorerKeyboardShortcuts =
       Storage->ReadBool(L"ExplorerKeyboardShortcuts", FSettings.ExplorerKeyboardShortcuts);
+    FSettings.TreeOnLeft = Storage->ReadBool(L"TreeOnLeft", FSettings.TreeOnLeft);
     FSettings.CompareByTime = Storage->ReadBool(L"CompareByTime", FSettings.CompareByTime);
     FSettings.NortonLikeMode = Storage->ReadInteger(L"ExplorerStyleSelection", FSettings.NortonLikeMode);
     FSettings.CompareBySize = Storage->ReadBool(L"CompareBySize", FSettings.CompareBySize);
@@ -997,6 +1003,9 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.LocalDriveViewHeight = Storage->ReadInteger(L"DriveViewHeight", FSettings.LocalDriveViewHeight);
     FSettings.LocalDriveViewHeightPixelsPerInch =
       Storage->ReadInteger(L"DriveViewHeightPixelsPerInch", FSettings.LocalDriveViewHeightPixelsPerInch);
+    FSettings.LocalDriveViewWidth = Storage->ReadInteger(L"DriveViewWidth", FSettings.LocalDriveViewWidth);
+    FSettings.LocalDriveViewWidthPixelsPerInch =
+      Storage->ReadInteger(L"DriveViewWidthPixelsPerInch", FSettings.LocalDriveViewWidthPixelsPerInch);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander\\RemotePanel", false))
   {
@@ -1008,6 +1017,9 @@ void __fastcall TShellConfiguration::LoadData(THierarchicalStorage * Storage)
     FSettings.RemoteDriveViewHeight = Storage->ReadInteger(L"DriveViewHeight", FSettings.RemoteDriveViewHeight);
     FSettings.RemoteDriveViewHeightPixelsPerInch =
       Storage->ReadInteger(L"DriveViewHeightPixelsPerInch", FSettings.RemoteDriveViewHeightPixelsPerInch);
+    FSettings.RemoteDriveViewWidth = Storage->ReadInteger(L"DriveViewWidth", FSettings.RemoteDriveViewWidth);
+    FSettings.RemoteDriveViewWidthPixelsPerInch =
+      Storage->ReadInteger(L"DriveViewWidthPixelsPerInch", FSettings.RemoteDriveViewWidthPixelsPerInch);
   }
   if (Storage->OpenSubKeyPath(L"Interface\\Commander\\OtherLocalPanel", false))
   {

@@ -3457,6 +3457,10 @@ Staðsetning: %2</translation>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>Ekki birta villuboð þegar óvirk &amp;seta aftengist</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>Sýna &amp;skráasafnstré vinstra megin við skráalista</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

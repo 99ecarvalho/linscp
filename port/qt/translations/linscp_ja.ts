@@ -3456,6 +3456,10 @@ Location: %2</source>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>アイドル状態のセッション切断はエラーメッセージを表示しない(&amp;O)</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>ファイル リストの左にディレクトリ ツリーを表示する(&amp;D)</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -3457,6 +3457,10 @@ Placering: %2</translation>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>Vis ikke fejlmeddelelsen, når inaktiv session er afbrudt</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>Vis bibliotekstræet til venstre for fillisten</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

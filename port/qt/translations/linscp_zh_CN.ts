@@ -3456,6 +3456,10 @@ Location: %2</source>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>当空闲会话断开连接时，不弹出错误消息（&amp;O）</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>将文件列表中的目录树显示在左侧(&amp;D)</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

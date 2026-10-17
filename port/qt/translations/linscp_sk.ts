@@ -3458,6 +3458,10 @@ Umiestnenie: %2</translation>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>Nezobrazovať vyskakovacie hlásenie o chybe pri odpojení relácie bez prebiehajúcej činnosti</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>Zobraziť strom prie&amp;činkov naľavo od zoznamu súborov</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

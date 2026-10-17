@@ -3456,6 +3456,10 @@ Location: %2</source>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>هنگام قطع شدن نشست بیکار، پیام خطا &amp;نشان داده نشود</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>نمایش درخت پوشه در سمت چپ فهرست پرونده</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

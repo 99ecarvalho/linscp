@@ -3457,6 +3457,10 @@ Ruta: %2</translation>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>No mostrar errores emergentes por sesión inactiva desconectada</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>Mostrar árbol de &amp;directorios a la izquierda de la lista de archivos</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

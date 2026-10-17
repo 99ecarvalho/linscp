@@ -3457,6 +3457,10 @@ Lokasyon: %2</translation>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>Huwag ipakita ang mensahe ng error kapag nadiskonekta ang &amp;idle na session</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>Ipakita ang &amp;directory tree sa kaliwa ng listahan ng file</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

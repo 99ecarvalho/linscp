@@ -3457,6 +3457,10 @@ Location: %2</source>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>Չցուցադրել սխալի հաղորդագրություն, երբ &amp;անգործուն աշխատաշրջանն անջատվում է</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>Ցուցադրել &amp;թղթապանակների ծառը ֆայլերի ցանկից ձախ</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

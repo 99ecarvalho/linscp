@@ -136,6 +136,7 @@ public:
   QCheckBox * KeepOpenCheck() const { return FKeepOpen; }
   QCheckBox * ShowLoginCheck() const { return FShowLogin; }
   QCheckBox * TabTruncationCheck() const { return FTabTruncation; }
+  QCheckBox * TreeOnLeftCheck() const { return FTreeOnLeft; }
   QCheckBox * SilentDisconnectCheck() const { return FSilentDisconnect; }
   QCheckBox * AutoSaveWorkspaceCheck() const { return FAutoSaveWorkspace; }
   QCheckBox * AutoSaveWorkspacePasswordsCheck() const { return FAutoSaveWorkspacePasswords; }
@@ -378,6 +379,7 @@ private:
   QCheckBox * FKeepOpen = nullptr;
   QCheckBox * FShowLogin = nullptr;
   QCheckBox * FTabTruncation = nullptr;
+  QCheckBox * FTreeOnLeft = nullptr;
   QCheckBox * FSilentDisconnect = nullptr;
   QCheckBox * FAutoSaveWorkspace = nullptr;
   QCheckBox * FAutoSaveWorkspacePasswords = nullptr;

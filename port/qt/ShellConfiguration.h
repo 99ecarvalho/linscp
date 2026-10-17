@@ -109,6 +109,8 @@ struct TShellSettings
   // Interface\Commander (TScpCommanderConfiguration).
   bool SwappedPanels = false;
   bool ExplorerKeyboardShortcuts = false;
+  // ScpCommander.TreeOnLeft: the panels' trees beside their files.
+  bool TreeOnLeft = false;
   // Compare Directories' criteria (ScpCommander.CompareByTime, CompareBySize).
   bool CompareByTime = true;
   bool CompareBySize = false;
@@ -129,6 +131,11 @@ struct TShellSettings
   int RemoteDriveViewHeight = 100;
   int LocalDriveViewHeightPixelsPerInch = 96;
   int RemoteDriveViewHeightPixelsPerInch = 96;
+  // The trees' widths when beside the files (DriveViewWidth).
+  int LocalDriveViewWidth = 100;
+  int RemoteDriveViewWidth = 100;
+  int LocalDriveViewWidthPixelsPerInch = 96;
+  int RemoteDriveViewWidthPixelsPerInch = 96;
   // Open directory's page: the shared bookmarks rather than the site's.
   bool UseSharedBookmarks = false;
   bool UseLocationProfiles = false;

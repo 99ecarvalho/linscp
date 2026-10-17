@@ -3458,6 +3458,10 @@ Location: %2</source>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>Не выводить всплывающее сообщение об ошибке при отключении неактивного сеанса</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>&amp;Открыть слева дерево каталогов</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

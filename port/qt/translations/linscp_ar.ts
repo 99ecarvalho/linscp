@@ -3461,6 +3461,10 @@ Location: %2</source>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>عدم إظهار رسالة الخطأ عند &amp;قطع اتصال جلسة خاملة</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>مشاهدة شجرة الدليل تبقى من قائمة ملف</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

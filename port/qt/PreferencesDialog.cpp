@@ -308,6 +308,9 @@ QWidget * PreferencesDialog::MakeCommanderPage(const TPreferences & Preferences)
   FSwappedPanels = new QCheckBox(tr("S&wap panels (local on right, remote on left)"), Panels);
   FSwappedPanels->setChecked(Preferences.SwappedPanels);
   PanelsLayout->addWidget(FSwappedPanels);
+  FTreeOnLeft = new QCheckBox(tr("Show &directory tree left of file list"), Panels);
+  FTreeOnLeft->setChecked(Preferences.TreeOnLeft);
+  PanelsLayout->addWidget(FTreeOnLeft);
   Layout->addWidget(Panels);
   QGroupBox * Misc = new QGroupBox(tr("Miscellaneous"), Page);
   QFormLayout * MiscLayout = new QFormLayout(Misc);
@@ -1309,6 +1312,7 @@ TPreferences PreferencesDialog::Preferences() const
   Result.SizeFormat = static_cast<TPreferences::TSizeFormat>(FSizeFormat->currentIndex());
   Result.SwappedPanels = FSwappedPanels->isChecked();
   Result.ExplorerKeyboardShortcuts = (FKeyboardShortcuts->currentIndex() == 1);
+  Result.TreeOnLeft = FTreeOnLeft->isChecked();
   Result.CompareByTime = FCompareByTime->isChecked();
   Result.CompareBySize = FCompareBySize->isChecked();
   Result.UseLocationProfiles = FUseLocationProfiles->isChecked();

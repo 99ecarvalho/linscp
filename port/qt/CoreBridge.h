@@ -602,6 +602,8 @@ struct TPreferences
   bool SwappedPanels = false;
   // Explorer's keys (F5 refresh, Ctrl+K copy) rather than the Commander's.
   bool ExplorerKeyboardShortcuts = false;
+  // Commander: the trees left of the file lists (ScpCommander.TreeOnLeft).
+  bool TreeOnLeft = false;
   // Compare Directories: a file is newer, or of another size.
   bool CompareByTime = true;
   bool CompareBySize = false;
@@ -783,6 +785,11 @@ struct TLayout
   int RemoteTreeHeight = 100;
   int LocalTreeHeightPixelsPerInch = 96;
   int RemoteTreeHeightPixelsPerInch = 96;
+  // Their widths when on the left (DriveViewWidth).
+  int LocalTreeWidth = 100;
+  int RemoteTreeWidth = 100;
+  int LocalTreeWidthPixelsPerInch = 96;
+  int RemoteTreeWidthPixelsPerInch = 96;
   int QueueViewHeight = 140;
   int QueueViewHeightPixelsPerInch = 96;
   // Options > Queue (QueueView.Show, TQueueViewShow's order) and Options >

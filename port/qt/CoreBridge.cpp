@@ -267,6 +267,7 @@ TPreferences Preferences()
   Result.DefaultDirIsHome = Settings.DefaultDirIsHome;
   Result.SwappedPanels = Settings.SwappedPanels;
   Result.ExplorerKeyboardShortcuts = Settings.ExplorerKeyboardShortcuts;
+  Result.TreeOnLeft = Settings.TreeOnLeft;
   Result.CompareByTime = Settings.CompareByTime;
   Result.CompareBySize = Settings.CompareBySize;
   Result.UseLocationProfiles = Settings.UseLocationProfiles;
@@ -681,6 +682,7 @@ void SetPreferences(const TPreferences & Preferences)
   Settings.DefaultDirIsHome = Preferences.DefaultDirIsHome;
   Settings.SwappedPanels = Preferences.SwappedPanels;
   Settings.ExplorerKeyboardShortcuts = Preferences.ExplorerKeyboardShortcuts;
+  Settings.TreeOnLeft = Preferences.TreeOnLeft;
   Settings.CompareByTime = Preferences.CompareByTime;
   Settings.CompareBySize = Preferences.CompareBySize;
   Settings.UseLocationProfiles = Preferences.UseLocationProfiles;
@@ -832,6 +834,10 @@ TLayout Layout()
   Result.RemoteTreeHeight = Settings.RemoteDriveViewHeight;
   Result.LocalTreeHeightPixelsPerInch = Settings.LocalDriveViewHeightPixelsPerInch;
   Result.RemoteTreeHeightPixelsPerInch = Settings.RemoteDriveViewHeightPixelsPerInch;
+  Result.LocalTreeWidth = Settings.LocalDriveViewWidth;
+  Result.RemoteTreeWidth = Settings.RemoteDriveViewWidth;
+  Result.LocalTreeWidthPixelsPerInch = Settings.LocalDriveViewWidthPixelsPerInch;
+  Result.RemoteTreeWidthPixelsPerInch = Settings.RemoteDriveViewWidthPixelsPerInch;
   Result.RemoteDirViewParams = Utf8(Settings.RemoteDirViewParams);
   Result.QueueViewHeight = Settings.QueueViewHeight;
   Result.QueueViewHeightPixelsPerInch = Settings.QueueViewHeightPixelsPerInch;
@@ -947,6 +953,10 @@ void SetLayout(const TLayout & Layout)
   Settings.RemoteDriveViewHeight = Layout.RemoteTreeHeight;
   Settings.LocalDriveViewHeightPixelsPerInch = Layout.LocalTreeHeightPixelsPerInch;
   Settings.RemoteDriveViewHeightPixelsPerInch = Layout.RemoteTreeHeightPixelsPerInch;
+  Settings.LocalDriveViewWidth = Layout.LocalTreeWidth;
+  Settings.RemoteDriveViewWidth = Layout.RemoteTreeWidth;
+  Settings.LocalDriveViewWidthPixelsPerInch = Layout.LocalTreeWidthPixelsPerInch;
+  Settings.RemoteDriveViewWidthPixelsPerInch = Layout.RemoteTreeWidthPixelsPerInch;
   Settings.RemoteDirViewParams = FromUtf8(Layout.RemoteDirViewParams);
   Settings.QueueViewHeight = Layout.QueueViewHeight;
   Settings.QueueViewHeightPixelsPerInch = Layout.QueueViewHeightPixelsPerInch;

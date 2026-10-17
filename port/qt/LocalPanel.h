@@ -140,6 +140,10 @@ public:
   bool TreeVisible() const;
   int TreeHeight() const;
   void SetTreeHeight(int Height);
+  // Preferences > Commander's "Show directory tree left of file list":
+  // the tree beside the files, not above them (TreeHeight its width then).
+  void SetTreeBeside(bool Beside);
+  bool TreeBeside() const;
   class LocalDirectoryTree * Tree() const { return FTree; }
 
 signals:

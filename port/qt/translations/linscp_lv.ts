@@ -3458,6 +3458,10 @@ Atrašanās vieta: %2</translation>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>Nerādīt kļūdas ziņojumu, kad &amp;dīkstāvē esoša sesija tiek atvienota</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>Rādīt &amp;mapju koku pa kreisi no failu saraksta</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

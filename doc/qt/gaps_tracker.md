@@ -15,10 +15,10 @@ Last updated: **2026-10-17**
 | B. Password prompt and banner | 1 | 3 |
 | C. Progress and synchronization dialogs | 3 | 4 |
 | D. Main window | 6 | 9 |
-| E. Preferences | 4 | 10 |
+| E. Preferences | 5 | 10 |
 | F. Command line | 1 | 3 |
 | G. Known before | 0 | 1 |
-| **Total** | **30** | **47** |
+| **Total** | **31** | **47** |
 
 ## Items
 
@@ -57,7 +57,7 @@ Last updated: **2026-10-17**
 | D7 | Go to Address (Ctrl+L), incremental search (Ctrl+F) | Medium | done | 2026-10-17. Ctrl+L and Alt+D: Open Directory in the Commander (as TScpCommanderForm::GoToAddress), the address bar in the Explorer; Ctrl+F: `FileView::StartSearch`, "(start typing)"; ctest `qt_gui_keys` |
 | D8 | Transfer Files in Clipboard | Low | todo | |
 | D9 | Editor Preferences: Use default system editor | Low | todo | |
-| E1 | Commander: tree left of file list | Medium | todo | Not stored yet |
+| E1 | Commander: tree left of file list | Medium | done | 2026-10-17. `ScpCommander.TreeOnLeft`; each panel's tree width kept apart (`DriveViewWidth`) from its height; ctest `qt_gui_trees` |
 | E2 | Explorer page: Show full path on address bar | Low | todo | Stored |
 | E3 | Storage: temporary directory options (5) | Medium | done | 2026-10-17. The editing already followed them; the start-up cleanup added (`MainWindow::TemporaryDirectoryCleanup`, as Setup.cpp's, not for a second instance), and core's recursive delete fixed for POSIX (`core-recursive-delete-delimiter.patch`); ctest `qt_gui_preferences` |
 | E4 | Window: Show Login dialog on startup / last session closed | Medium | done | 2026-10-17. `MainWindow::NeedSession` (as TCustomScpExplorerForm's) at start-up and once the last tab closes; the Site Manager's own "Show Login dialog..." check when shown by itself, unchecked after asking; ctest `qt_gui_preferences` |

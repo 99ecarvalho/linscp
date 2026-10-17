@@ -3456,6 +3456,10 @@ Location: %2</source>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>유휴 세션 연결이 끊어질 경우 오류 메시지를 표시안함(&amp;O)</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>파일 목록 왼쪽에 디렉터리 표시(&amp;D)</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -563,6 +563,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   CoreBridge::GuiStarted();
   ApplyPreferences();
   RestoreLayout();
+  FLayoutRestored = true;
   connect(FPanel, &RemotePanel::Changed, this, &MainWindow::UpdateTitle);
   // When the remote directory was last read (Terminal's DirectoryLoaded).
   FRemoteLoaded.start();
@@ -713,10 +714,7 @@ void MainWindow::RestoreLayout()
   }
   FLocal->SetColumnsParams(QString::fromStdString(Layout.LocalDirViewParams));
   FPanel->SetColumnsParams(QString::fromStdString(Layout.RemoteDirViewParams));
-  const int RemoteTreeHeight = Layout.RemoteTreeHeight * Dpi / std::max(1, Layout.RemoteTreeHeightPixelsPerInch);
-  FLocal->SetTreeHeight(Layout.LocalTreeHeight * Dpi / std::max(1, Layout.LocalTreeHeightPixelsPerInch));
-  FPanel->SetTreeHeight(RemoteTreeHeight);
-  FOtherLocal->SetTreeHeight(RemoteTreeHeight);
+  ApplyTreeOnLeft(CoreBridge::Preferences().TreeOnLeft, Layout);
   SetTreeVisible(true, Layout.LocalTree);
   SetTreeVisible(false, Layout.RemoteTree);
   SetPanelStatusBarVisible(true, Layout.LocalStatusBar);
@@ -776,15 +774,18 @@ void MainWindow::SaveLayout()
   Layout.RemoteDirViewParams = FPanel->ColumnsParams().toStdString();
   Layout.LocalTree = FLocal->TreeVisible();
   Layout.RemoteTree = FPanel->TreeVisible();
+  // As the Commander keeps them: a tree's height, or its width when on
+  // the left (TreeOnLeft).
+  const bool OnLeft = FLocal->TreeBeside();
   if (Layout.LocalTree)
   {
-    Layout.LocalTreeHeight = FLocal->TreeHeight();
-    Layout.LocalTreeHeightPixelsPerInch = Dpi;
+    (OnLeft ? Layout.LocalTreeWidth : Layout.LocalTreeHeight) = FLocal->TreeHeight();
+    (OnLeft ? Layout.LocalTreeWidthPixelsPerInch : Layout.LocalTreeHeightPixelsPerInch) = Dpi;
   }
   if (Layout.RemoteTree)
   {
-    Layout.RemoteTreeHeight = FPanel->TreeHeight();
-    Layout.RemoteTreeHeightPixelsPerInch = Dpi;
+    (OnLeft ? Layout.RemoteTreeWidth : Layout.RemoteTreeHeight) = FPanel->TreeHeight();
+    (OnLeft ? Layout.RemoteTreeWidthPixelsPerInch : Layout.RemoteTreeHeightPixelsPerInch) = Dpi;
   }
   Layout.QueueViewHeight = FVertical->sizes().value(1);
   Layout.QueueViewHeightPixelsPerInch = Dpi;
@@ -845,9 +846,36 @@ bool MainWindow::PreferencesDialog(const QString & Page)
 
 // What the preferences say of the window: the panels', their order, the
 // keys, Home of the local panel.
+// The Commander's panels' trees above their files or (OnLeft) beside them,
+// sized as Layout keeps them for that.
+void MainWindow::ApplyTreeOnLeft(bool OnLeft, const CoreBridge::TLayout & Layout)
+{
+  if (FExplorer)
+  {
+    return;
+  }
+  const int Dpi = logicalDpiX();
+  const int LocalSize = OnLeft ? (Layout.LocalTreeWidth * Dpi / std::max(1, Layout.LocalTreeWidthPixelsPerInch)) :
+    (Layout.LocalTreeHeight * Dpi / std::max(1, Layout.LocalTreeHeightPixelsPerInch));
+  const int RemoteSize = OnLeft ? (Layout.RemoteTreeWidth * Dpi / std::max(1, Layout.RemoteTreeWidthPixelsPerInch)) :
+    (Layout.RemoteTreeHeight * Dpi / std::max(1, Layout.RemoteTreeHeightPixelsPerInch));
+  FLocal->SetTreeBeside(OnLeft);
+  FPanel->SetTreeBeside(OnLeft);
+  FOtherLocal->SetTreeBeside(OnLeft);
+  FLocal->SetTreeHeight(LocalSize);
+  FPanel->SetTreeHeight(RemoteSize);
+  FOtherLocal->SetTreeHeight(RemoteSize);
+}
+
 void MainWindow::ApplyPreferences()
 {
   const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
+  // TreeOnLeft changed: the sizes kept for the old place first.
+  if (FLayoutRestored && !FExplorer && (FLocal->TreeBeside() != Preferences.TreeOnLeft))
+  {
+    SaveLayout();
+    ApplyTreeOnLeft(Preferences.TreeOnLeft, CoreBridge::Layout());
+  }
   // As SessionTabCaptionTruncation: the titles elided to fit, else
   // scrolled.
   if (FTabBar != nullptr)

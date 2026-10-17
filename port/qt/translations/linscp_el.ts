@@ -3457,6 +3457,10 @@ Location: %2</source>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>Να μην εμφανίζεται μήνυμα σφάλματος όταν αποσυνδέεται &amp;αδρανής συνεδρία</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>Εμφάνιση &amp; δέντρο καταλόγου αριστερά από λίστα αρχείων</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

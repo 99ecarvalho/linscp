@@ -3457,6 +3457,10 @@ Localização: %2</translation>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>Não apresentar mensagem de erro quando uma sessão inactiva f&amp;or desligada</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>Visualizar lista de diretórios à esquerda da lista de ficheiros</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

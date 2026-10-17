@@ -3456,6 +3456,10 @@ Location: %2</source>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>အလုပ်မလုပ်သော ဆက်ရှင် ချိတ်ဆက်မှုပြတ်သောအခါ အမှားစာ မပြပါနှင့်(&amp;O)</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>ဖိုင်စာရင်း၏ ဘယ်ဘက်တွင် လမ်းညွှန်သစ်ပင် ပြပါ(&amp;D)</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

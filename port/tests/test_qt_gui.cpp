@@ -7453,6 +7453,24 @@ void TreesTest(const char * Port, const QString & Directory)
     // Kept.
     Window.SaveLayout();
     Check(CoreBridge::Layout().LocalTree && CoreBridge::Layout().RemoteTree, "kept, as DriveView");
+    // E1: Preferences > Commander's "Show directory tree left of file
+    // list": beside the files, its width kept apart from its height.
+    {
+      Window.Local()->SetTreeHeight(120);
+      Window.SaveLayout();
+      const int Height = Window.Local()->TreeHeight();
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & Preferences) { Preferences.TreeOnLeft = true; });
+      Window.ApplyPreferences();
+      Check(Window.Local()->TreeBeside() && Window.Panel()->TreeBeside() && Window.OtherLocal()->TreeBeside(),
+        "the trees left of the file lists");
+      Window.Local()->SetTreeHeight(150);
+      Window.SaveLayout();
+      Check((CoreBridge::Layout().LocalTreeWidth == Window.Local()->TreeHeight()) &&
+        (std::abs(CoreBridge::Layout().LocalTreeHeight - Height) <= 1), "its width kept, the height as it was");
+      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & Preferences) { Preferences.TreeOnLeft = false; });
+      Window.ApplyPreferences();
+      Check(!Window.Local()->TreeBeside() && (std::abs(Window.Local()->TreeHeight() - Height) <= 2), "above again, at its height");
+    }
     Window.ActivatePanel(false);
     Window.SetTreeVisible(true, false);
     Window.SetTreeVisible(false, false);

@@ -898,7 +898,7 @@ int RemotePanel::TreeHeight() const
 
 void RemotePanel::SetTreeHeight(int Height)
 {
-  const int Total = std::max(FSplitter->height(), Height + 100);
+  const int Total = std::max(TreeBeside() ? FSplitter->width() : FSplitter->height(), Height + 100);
   FSplitter->setSizes({ Height, Total - Height });
 }
 
@@ -964,6 +964,11 @@ void RemotePanel::SetPathBarVisible(bool Visible)
 }
 
 // As the Explorer has its DriveView: beside the files, not above them.
+bool RemotePanel::TreeBeside() const
+{
+  return FSplitter->orientation() == Qt::Horizontal;
+}
+
 void RemotePanel::SetTreeBeside(bool Beside)
 {
   FSplitter->setOrientation(Beside ? Qt::Horizontal : Qt::Vertical);

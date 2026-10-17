@@ -3456,6 +3456,10 @@ Hely: %2</translation>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>&amp;Ne jelenjen meg felugró ablakban hibaüzenet a munkamenet szétkapcsolásakor</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>Bal oldalon mappa-&amp;fa megjelenítése</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

@@ -3458,6 +3458,10 @@ Lokacija: %2</translation>
         <source>Do not p&amp;opup error message when idle session is disconnected</source>
         <translation>Ne prikazuj is&amp;kačuću poruku o grešci kada se neaktivna sesija prekine</translation>
     </message>
+    <message>
+        <source>Show &amp;directory tree left of file list</source>
+        <translation>Prikaži &amp;stablo direktorijuma levo od liste datoteka</translation>
+    </message>
 </context>
 <context>
     <name>PromptDialog</name>

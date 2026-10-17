@@ -119,6 +119,7 @@ public:
   QListView * Icons() const { return FIcons; }
   // The tree beside the files (the Explorer's), else above them.
   void SetTreeBeside(bool Beside);
+  bool TreeBeside() const;
   // The path line above the files (the Explorer has its address bar).
   void SetPathBarVisible(bool Visible);
   ThumbnailView * Thumbs() const { return FThumbs; }
