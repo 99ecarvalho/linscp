@@ -3,7 +3,7 @@
 A Qt port of [WinSCP](https://winscp.net/), targeting **Linux and Windows from
 one codebase**.
 
-> **Status: pre-release (0.6.0).** WinSCP's core runs unmodified under a Qt 6
+> **Status: pre-release (0.6.1).** WinSCP's core runs unmodified under a Qt 6
 > shell on Linux and Windows: sites, the Commander layout, transfers and the
 > queue, synchronization, the editor, translations. See
 > [doc/qt/TRACKER.md](doc/qt/TRACKER.md) for what is done and what is left.

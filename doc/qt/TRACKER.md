@@ -312,6 +312,7 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-18 | Version 0.6.1 tagged and published as a GitHub pre-release, with the CI packages | Maintenance release after the 2026-10-18 fixes |
 | 2026-10-18 | Hardened the untrusted-URL attack surface (linscp-only): local custom commands shell-quote server-chosen file names for `/bin/sh` by quote context (`TShellLocalCustomCommand`), `/ini`, `/defaults` and the maintenance switches are gated by `CheckSafe`, and forwarded command lines are quoted so `CutToken` cannot split one argument into extra switches; ctest `qt_gui_command_injection` | A clicked `sftp://` link or a forwarded command line must not run code or replace the configuration |
 | 2026-10-17 | Version 0.6.0 tagged and published as a GitHub pre-release, with the CI packages: the audit's 47 gaps against WinSCP's functionality closed ([gaps_tracker.md](gaps_tracker.md)), linscp-cli's `/info`, `/batchsettings`, `/copyid`, `/fingerprintscan`, the POSIX local-path fixes (winscp/winscp#86, #87, #88) | The user's call |
 | 2026-10-16 | Site Advanced carries every TSessionData setting its pages show through `TSite` (typed fields, as LoadSession and SaveSession convert them), applied after a site's raw settings, so the dialog's edits win over earlier raw ones; a site's raw settings are taken through `ApplySiteRawSettings`, which sets the fields from them | Raw options would carry core's storage quirks (bug flags as 2 - value, the ping interval split); typed fields keep the dialog as upstream's |

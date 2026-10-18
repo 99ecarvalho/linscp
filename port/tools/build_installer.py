@@ -4,7 +4,7 @@ Build linscp's Windows installer: the deploy folder and the licenses,
 compiled with port/packaging/windows/linscp.iss by the pinned Inno Setup
 (fetch_innosetup.py), all under Wine. CMake's installer target runs it.
 
-  build_installer.py --script linscp.iss --version 0.6.0 --deploy build/deploy
+  build_installer.py --script linscp.iss --version 0.6.1 --deploy build/deploy
                      --work build/installer --tools build/tools --out build/packages
                      --license FILE|NAME ...
 
