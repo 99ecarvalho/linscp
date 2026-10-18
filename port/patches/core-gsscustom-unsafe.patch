@@ -1,0 +1,12 @@
+Do not take the custom GSSAPI library path from an unsafe session.
+
+A session opened from a URL is loaded with Unsafe set, which drops the other
+settings that could run code. GSSCustom names a library that is loaded on
+connect, so apply it only when the session is not unsafe, like GSSLibs beside
+it. Carried as one line to keep the hunk's line count.
+
+--- a/source/core/SessionData.cpp
++++ b/source/core/SessionData.cpp
+@@ -771,1 +771,1 @@
+-  GssLibCustom = Storage->ReadString(L"GSSCustom", GssLibCustom);
++  GssLibCustom = Unsafe ? GssLibCustom : Storage->ReadString(L"GSSCustom", GssLibCustom);

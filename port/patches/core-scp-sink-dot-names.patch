@@ -1,0 +1,12 @@
+Reject "." and ".." as SCP transfer names at any level.
+
+The SCP sink checks the requested name only at the top level; a "." or ".."
+or empty name deeper in a directory download would resolve outside the target
+directory. Reject them everywhere. Carried as one line to keep the hunk's
+line count.
+
+--- a/source/core/ScpFileSystem.cpp
++++ b/source/core/ScpFileSystem.cpp
+@@ -2575,1 +2575,1 @@
+-          if ((Level == 0) && (OnlyFileName != UnixExtractFileName(FileName)))
++          if (((Level == 0) && (OnlyFileName != UnixExtractFileName(FileName))) || OnlyFileName.IsEmpty() || (OnlyFileName == L".") || (OnlyFileName == L".."))

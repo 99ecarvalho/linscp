@@ -1,0 +1,11 @@
+Do not take PuTTY settings from an unsafe session.
+
+PuttySettings may carry PuTTY keys that run a command when the session is
+opened in PuTTY, so apply it only when the session is not unsafe, like the
+other such settings. Carried as one line to keep the hunk's line count.
+
+--- a/source/core/SessionData.cpp
++++ b/source/core/SessionData.cpp
+@@ -983,1 +983,1 @@
+-  PuttySettings = Storage->ReadString(L"PuttySettings", PuttySettings);
++  PuttySettings = Unsafe ? PuttySettings : Storage->ReadString(L"PuttySettings", PuttySettings);

@@ -21,3 +21,6 @@ core-s3-folder-tags.patch
 core-recursive-delete-delimiter.patch
 core-posix-local-path-delimiters.patch
 core-path-comparison-case.patch
+core-gsscustom-unsafe.patch
+core-puttysettings-unsafe.patch
+core-scp-sink-dot-names.patch
