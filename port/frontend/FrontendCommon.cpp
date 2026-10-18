@@ -98,26 +98,27 @@ TConfiguration * SetUpConfigurationStorage(TConfiguration * Result)
 {
   TProgramParams * Params = TProgramParams::Instance();
   UnicodeString IniFileName = Params->SwitchValue(IniSwitch);
-  if (!IniFileName.IsEmpty())
+  const bool Nul = !IniFileName.IsEmpty() && SameText(IniFileName, INI_NUL);
+  // As WinInterface.cpp's CheckSafe handling of /ini: an explicit INI file is
+  // honoured only for a safe (non-/Unsafe) invocation, so a session URL opened
+  // through the handler cannot point the whole configuration at an
+  // attacker-supplied file. The null store is always allowed; an /ini refused
+  // here falls through to the default storage below.
+  const bool ExplicitIni = !IniFileName.IsEmpty() && !Nul && CheckSafe(Params);
+  if (Nul)
   {
-    if (SameText(IniFileName, INI_NUL))
-    {
-      Result->SetNulStorage();
-    }
-    else
-    {
-      IniFileName = ExpandFileName(ExpandEnvironmentVariables(IniFileName));
-      Result->SetExplicitIniFileStorageName(IniFileName);
-    }
+    Result->SetNulStorage();
   }
+  else if (ExplicitIni)
+  {
+    IniFileName = ExpandFileName(ExpandEnvironmentVariables(IniFileName));
+    Result->SetExplicitIniFileStorageName(IniFileName);
+  }
+  else
+  {
 #if !defined(_WIN32)
-  else
-  {
     Result->SetExplicitIniFileStorageName(PosixIniFileName());
-  }
 #else
-  else
-  {
     // The portable package's (linscp.ini beside linscp.exe, as WinSCP's
     // automatic one): the other programs beside it share it, as
     // WinSCP.com shares WinSCP.exe's.
@@ -126,8 +127,8 @@ TConfiguration * SetUpConfigurationStorage(TConfiguration * Result)
     {
       Result->SetExplicitIniFileStorageName(Shared);
     }
-  }
 #endif
+  }
   if (!Params->FindSwitch(L"Unsafe"))
   {
     std::unique_ptr<TStrings> RawConfig(new TStringList());

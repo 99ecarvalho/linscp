@@ -10,6 +10,7 @@
 #include <CoreMain.h>
 #include <Exceptions.h>
 #include <RemoteFiles.h>
+#include <FrontendCommon.h>
 #include <SessionData.h>
 #include <Terminal.h>
 #include <FileSystems.h>
@@ -331,6 +332,12 @@ TSession::TSession() :
 namespace
 {
 
+// Quote an argument so CutToken reads it back as one token (doubled "").
+UnicodeString QuoteCommandLineArg(const UnicodeString & Arg)
+{
+  return L"\"" + ReplaceStr(Arg, L"\"", L"\"\"") + L"\"";
+}
+
 // The process's parameters, or ones given (as another instance's).
 TProgramParams * ProgramParamsOf(const std::vector<std::string> * Arguments, std::unique_ptr<TProgramParams> & Owner)
 {
@@ -338,10 +345,13 @@ TProgramParams * ProgramParamsOf(const std::vector<std::string> * Arguments, std
   {
     return TProgramParams::Instance();
   }
-  UnicodeString CommandLine = ShellQuoteStr(ParamStr(0));
+  // CVE fix (linscp): quote so CutToken reads each argument back as one token
+  // (doubled "" quoting, which CutToken honours), so a quote in a forwarded
+  // argument cannot split it into extra switches.
+  UnicodeString CommandLine = QuoteCommandLineArg(ParamStr(0));
   for (const std::string & Argument : *Arguments)
   {
-    CommandLine += L" " + ShellQuoteStr(FromUtf8(Argument));
+    CommandLine += L" " + QuoteCommandLineArg(FromUtf8(Argument));
   }
   Owner.reset(new TProgramParams(CommandLine));
   return Owner.get();
@@ -405,7 +415,7 @@ bool CommandLineConsole()
 bool CommandLineUseDefaults()
 {
   UnicodeString Value;
-  return TProgramParams::Instance()->FindSwitch(L"Defaults", Value);
+  return CheckSafe(TProgramParams::Instance()) && TProgramParams::Instance()->FindSwitch(L"Defaults", Value);
 }
 
 std::string TSession::CommandLineFolderOrWorkspace(const std::vector<std::string> * Arguments)
@@ -3201,6 +3211,63 @@ public:
   }
 };
 
+// CVE fix (linscp): a local custom command's final line is run through
+// /bin/sh -c (MainWindow::LocalRunner), so a server-chosen remote file name
+// substituted into it could inject shell syntax. Quote each substituted value
+// for the shell, honouring the quote context the command's author used, so the
+// command's own shell syntax keeps working but a value cannot break out of it.
+#if !defined(_WIN32)
+static UnicodeString ShellSingleQuote(const UnicodeString & S)
+{
+  return L"'" + ReplaceStr(S, L"'", L"'\\''") + L"'";
+}
+
+class TShellLocalCustomCommand : public TLocalCustomCommand
+{
+public:
+  TShellLocalCustomCommand(
+    const TCustomCommandData & Data, const UnicodeString & RemotePath, const UnicodeString & LocalPath) :
+    TLocalCustomCommand(Data, RemotePath, LocalPath) {}
+  TShellLocalCustomCommand(
+    const TCustomCommandData & Data, const UnicodeString & RemotePath, const UnicodeString & LocalPath,
+    const UnicodeString & FileName, const UnicodeString & LocalFileName, const UnicodeString & FileList) :
+    TLocalCustomCommand(Data, RemotePath, LocalPath, FileName, LocalFileName, FileList) {}
+protected:
+  virtual void __fastcall DelimitReplacement(UnicodeString & Replacement, wchar_t Quote)
+  {
+    if (Quote == L'\'')
+    {
+      Replacement = ReplaceStr(Replacement, L"'", L"'\\''");
+    }
+    else if (Quote == L'"')
+    {
+      Replacement = ReplaceStr(Replacement, L"\\", L"\\\\");
+      Replacement = ReplaceStr(Replacement, L"`", L"\\`");
+      Replacement = ReplaceStr(Replacement, L"$", L"\\$");
+      Replacement = ReplaceStr(Replacement, L"\"", L"\\\"");
+    }
+    else
+    {
+      Replacement = ShellSingleQuote(Replacement);
+    }
+  }
+};
+using TExecLocalCustomCommand = TShellLocalCustomCommand;
+
+static UnicodeString MakeExecFileList(TStrings * FileList)
+{
+  UnicodeString Result;
+  for (int Index = 0; Index < FileList->Count; Index++)
+  {
+    AddToList(Result, ShellSingleQuote(FileList->Strings[Index]), L" ");
+  }
+  return Result;
+}
+#else
+using TExecLocalCustomCommand = TLocalCustomCommand;
+static inline UnicodeString MakeExecFileList(TStrings * FileList) { return MakeFileList(FileList); }
+#endif
+
 // ExecuteProcessChecked and ExecuteProcessCheckedAndWait, through the
 // shell's runner: started (and waited for), or with Output, its output read
 // and a failure's exit code an error, as DoExecuteProcessAndReadOutput.
@@ -3319,7 +3386,7 @@ std::string TSession::RunLocalCustomCommand(TSession * Session, const TCustomCom
       CommandCommand = Listed->GetCommandWithExpandedOptions(WinConfiguration->CustomCommandOptions(),
         (Terminal != NULL) ? Terminal->SessionData->SessionKey : UnicodeString());
     }
-    TLocalCustomCommand LocalCustomCommand(Data, RemotePath, LocalPath);
+    TExecLocalCustomCommand LocalCustomCommand(Data, RemotePath, LocalPath);
     TBridgeInteractiveCustomCommand InteractiveCustomCommand(&LocalCustomCommand, FromUtf8(Definition.Name), Prompts);
     const UnicodeString Command = InteractiveCustomCommand.Complete(CommandCommand, false);
     const bool FileListCommand = LocalCustomCommand.IsFileListCommand(Command);
@@ -3441,9 +3508,9 @@ std::string TSession::RunLocalCustomCommand(TSession * Session, const TCustomCom
         if (FileListCommand)
         {
           // MakeFileList does not delimit filenames.
-          const UnicodeString List = MakeFileList(RemoteFileList);
+          const UnicodeString List = MakeExecFileList(RemoteFileList);
           const UnicodeString LocalFile = LocalFileCommand ? LocalFileList->Strings[0] : UnicodeString();
-          TLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, L"", LocalFile, List);
+          TExecLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, L"", LocalFile, List);
           ExecuteLocalCommand(Runner, CustomCommand.Complete(Command, true), !NonBlocking, Output);
         }
         else if (LocalFileCommand)
@@ -3452,7 +3519,7 @@ std::string TSession::RunLocalCustomCommand(TSession * Session, const TCustomCom
           {
             for (int Index = 0; Index < RemoteFileList->Count; Index++)
             {
-              TLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, RemoteFileList->Strings[Index],
+              TExecLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, RemoteFileList->Strings[Index],
                 LocalFileList->Strings[0], L"");
               ExecuteLocalCommand(Runner, CustomCommand.Complete(Command, true), true, Output);
             }
@@ -3461,7 +3528,7 @@ std::string TSession::RunLocalCustomCommand(TSession * Session, const TCustomCom
           {
             for (int Index = 0; Index < LocalFileList->Count; Index++)
             {
-              TLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, RemoteFileList->Strings[0],
+              TExecLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, RemoteFileList->Strings[0],
                 LocalFileList->Strings[Index], L"");
               ExecuteLocalCommand(Runner, CustomCommand.Complete(Command, true), true, Output);
             }
@@ -3474,7 +3541,7 @@ std::string TSession::RunLocalCustomCommand(TSession * Session, const TCustomCom
             }
             for (int Index = 0; Index < LocalFileList->Count; Index++)
             {
-              TLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, RemoteFileList->Strings[Index],
+              TExecLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, RemoteFileList->Strings[Index],
                 LocalFileList->Strings[Index], L"");
               ExecuteLocalCommand(Runner, CustomCommand.Complete(Command, true), true, Output);
             }
@@ -3484,7 +3551,7 @@ std::string TSession::RunLocalCustomCommand(TSession * Session, const TCustomCom
         {
           for (int Index = 0; Index < RemoteFileList->Count; Index++)
           {
-            TLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, RemoteFileList->Strings[Index], L"", L"");
+            TExecLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, RemoteFileList->Strings[Index], L"", L"");
             ExecuteLocalCommand(Runner, CustomCommand.Complete(Command, true), true, Output);
           }
         }
@@ -3574,14 +3641,14 @@ std::string TSession::RunLocalCustomCommand(TSession * Session, const TCustomCom
       }
       if (FileListCommand)
       {
-        TLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, L"", L"", MakeFileList(Files.get()));
+        TExecLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, L"", L"", MakeExecFileList(Files.get()));
         ExecuteLocalCommand(Runner, CustomCommand.Complete(Command, true), false, Output);
       }
       else
       {
         for (int Index = 0; Index < Files->Count; Index++)
         {
-          TLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, Files->Strings[Index], L"", L"");
+          TExecLocalCustomCommand CustomCommand(Data, RemotePath, LocalPath, Files->Strings[Index], L"", L"");
           ExecuteLocalCommand(Runner, CustomCommand.Complete(Command, true), true, Output);
         }
       }

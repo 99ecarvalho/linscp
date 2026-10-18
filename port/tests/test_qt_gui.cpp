@@ -8497,6 +8497,67 @@ void FailOnShellWarnings(QtMsgType Type, const QMessageLogContext & Context, con
   }
 }
 
+// CVE-002 and CVE-004 regression: a server-chosen file name must not inject
+// into the shell when a local custom command runs it, and a quote in a
+// forwarded command-line argument must not smuggle an extra switch.
+void LocalCommandInjectionTest()
+{
+#if defined(_WIN32)
+  // Windows runs local custom commands without a shell, and a quote cannot
+  // appear in a file name; not applicable.
+  std::printf("OK (not applicable on Windows)\n");
+#else
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  QTemporaryDir Dir;
+  // The marker is a bare name (no slashes, so it can sit inside a file name);
+  // the shell runs in Dir, so an injected command would create Dir/<marker>.
+  const QString Marker = Dir.filePath(QStringLiteral("CVE-002.pwned"));
+  const auto RunOn = [&](const QString & FileName, const QString & Template)
+  {
+    QFile::remove(Marker);
+    const QString Path = Dir.filePath(FileName);
+    { QFile F(Path); F.open(QIODevice::WriteOnly); F.write("x"); }
+    CoreBridge::TCustomCommandDefinition Cmd;
+    Cmd.Name = "Test";
+    Cmd.Command = Template.toStdString();
+    Cmd.Local = true;
+    bool Ran = false;
+    const QString WorkDir = Dir.path();
+    CoreBridge::TSession::TLocalRunner Runner;
+    Runner.Run = [&Ran, &WorkDir](const std::string & CommandLine, bool, std::string *, int & ExitCode)
+    {
+      Ran = true;
+      // As MainWindow::LocalRunner does on POSIX, run in the temp dir.
+      QProcess Process;
+      Process.setWorkingDirectory(WorkDir);
+      Process.start(QStringLiteral("/bin/sh"), { QStringLiteral("-c"), QString::fromStdString(CommandLine) });
+      Process.waitForFinished(10000);
+      ExitCode = Process.exitCode();
+      return true;
+    };
+    CoreBridge::TSession::RunLocalCustomCommand(nullptr, Cmd, {}, { Path.toStdString() }, true,
+      WorkDir.toStdString(), {}, Runner);
+    Check(Ran, "the local command ran (the path was exercised)");
+  };
+  // The program is the harmless 'true'; only an injected substitution would
+  // create CVE-002.pwned. Each case is a quote context a command author uses.
+  RunOn(QStringLiteral("a$(touch CVE-002.pwned).txt"), QStringLiteral("true \"!\""));
+  Check(!QFileInfo::exists(Marker), "CVE-002: $(...) in a file name, pattern in double quotes");
+  RunOn(QStringLiteral("b`touch CVE-002.pwned`.txt"), QStringLiteral("true !"));
+  Check(!QFileInfo::exists(Marker), "CVE-002: backticks in a file name, unquoted pattern");
+  RunOn(QStringLiteral("c$(touch CVE-002.pwned).txt"), QStringLiteral("true !&"));
+  Check(!QFileInfo::exists(Marker), "CVE-002: command substitution in the file list (!&)");
+  RunOn(QStringLiteral("d'$(touch CVE-002.pwned)'.txt"), QStringLiteral("true '!'"));
+  Check(!QFileInfo::exists(Marker), "CVE-002: a single quote in the name cannot break out of '!'");
+
+  if (Failures == 0)
+  {
+    std::printf("OK\n");
+  }
+#endif
+}
+
 int main(int argc, char ** argv)
 {
   GPreviousMessageHandler = qInstallMessageHandler(FailOnShellWarnings);
@@ -8549,6 +8610,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 3) && (std::strcmp(argv[1], "toolbars") == 0))
   {
     ToolbarsTest();
+  }
+  else if ((argc >= 2) && (std::strcmp(argv[1], "localcommand") == 0))
+  {
+    LocalCommandInjectionTest();
   }
   else if ((argc >= 5) && (std::strcmp(argv[1], "extensions") == 0))
   {

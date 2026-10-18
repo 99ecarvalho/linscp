@@ -1064,13 +1064,23 @@ void GuiStarted()
   Screen->FormCount = 1;
 }
 
+// CVE fix (linscp): rebuild the command line so TProgramParams' CutToken reads
+// each argument back as exactly one token. ShellQuoteStr escapes a quote as \"
+// which CutToken does not honour (it expects doubled ""), so an argument with a
+// quote could split into extra switches (e.g. a smuggled /ini). Quote with ""
+// doubling, matching CutToken.
+static UnicodeString QuoteCommandLineArg(const UnicodeString & Arg)
+{
+  return L"\"" + ReplaceStr(Arg, L"\"", L"\"\"") + L"\"";
+}
+
 void SetArguments(const std::vector<std::string> & Arguments)
 {
   // ParamStr(0) first, as TProgramParams skips it.
-  UnicodeString CommandLine = ShellQuoteStr(ParamStr(0));
+  UnicodeString CommandLine = QuoteCommandLineArg(ParamStr(0));
   for (const std::string & Argument : Arguments)
   {
-    CommandLine += L" " + ShellQuoteStr(FromUtf8(Argument));
+    CommandLine += L" " + QuoteCommandLineArg(FromUtf8(Argument));
   }
   SetProgramCommandLine(CommandLine.c_str());
 }
@@ -1079,6 +1089,13 @@ void SetArguments(const std::vector<std::string> & Arguments)
 bool CommandLineSetupTask()
 {
   TProgramParams * Params = TProgramParams::Instance();
+  // CVE fix (linscp): the maintenance switches register handlers and change the
+  // search path, so honour them only for a safe (non-/Unsafe) invocation, as
+  // upstream's WinMain does; an unsafe invocation falls through to normal start.
+  if (!CheckSafe(Params))
+  {
+    return false;
+  }
   const std::string Directory = Utf8(ExtractFilePath(ParamStr(0)));
   bool Result = true;
   if (Params->FindSwitch(L"RegisterForDefaultProtocols") ||
@@ -1431,9 +1448,10 @@ std::vector<std::string> CommandLineUpload(bool & UseDefaults)
         Result.push_back(Utf8(Files->Strings[Index]));
       }
       // As /defaults' value 0: no Copy dialog (WinSCP's other values time
-      // it out; here it is shown).
+      // it out; here it is shown). CVE fix (linscp): honoured only for a safe
+      // (non-/Unsafe) invocation, so a clicked link cannot upload silently.
       UnicodeString Value;
-      UseDefaults = Params->FindSwitch(L"Defaults", Value) && (StrToIntDef(Value, 0) == 0);
+      UseDefaults = CheckSafe(Params) && Params->FindSwitch(L"Defaults", Value) && (StrToIntDef(Value, 0) == 0);
     }
   }
   catch (Exception & E)
