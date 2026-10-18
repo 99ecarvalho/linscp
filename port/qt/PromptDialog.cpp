@@ -109,6 +109,10 @@ QString PromptDialog::UrlIn(const QString & Text)
 void PromptDialog::External(QLabel * Label)
 {
   FLabels.append(Label);
+  // Server-supplied prompt text is shown literally, never as rich text, so it
+  // cannot inject markup to spoof the dialog. Links are still offered through
+  // the context menu (UrlIn/LabelMenu), which reads the plain text.
+  Label->setTextFormat(Qt::PlainText);
   Label->setContextMenuPolicy(Qt::DefaultContextMenu);
   Label->installEventFilter(this);
   if (!UrlIn(Label->text()).isEmpty())

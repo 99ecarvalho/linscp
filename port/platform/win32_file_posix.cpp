@@ -364,6 +364,19 @@ DWORD GetTempPath(DWORD BufferLength, LPWSTR Buffer)
   {
     Dir += '/';
   }
+  // A per-user subdirectory, created 0700 and owned by us, so temporary files
+  // are not placed directly in a world-writable directory shared with other
+  // local users (predictable names there invite symlink and pre-creation
+  // races). If an entry already holds the name but is not our own private
+  // directory, fall back to the base rather than trust it.
+  const std::string Private = Dir + "linscp-" + std::to_string(getuid());
+  struct stat St;
+  if ((mkdir(Private.c_str(), 0700) == 0) ||
+      ((lstat(Private.c_str(), &St) == 0) && S_ISDIR(St.st_mode) &&
+       (St.st_uid == getuid()) && ((St.st_mode & 07777) == 0700)))
+  {
+    Dir = Private + '/';
+  }
   // UTF-8 to UTF-16; a path from the environment is not otherwise checked.
   std::u16string Wide;
   for (std::size_t I = 0; I < Dir.size();)
