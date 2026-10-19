@@ -1,4 +1,9 @@
-# WinSCP functionality linscp does not have yet
+# WinSCP functionality linscp did not have (now closed)
+
+> **Status: all 47 gaps below are implemented** as of 2026-10-18
+> ([gaps_tracker.md](gaps_tracker.md): 47/47 done). This file is kept as the
+> record of what each gap was and how it was closed; the descriptions are
+> written in the present tense of when they were open.
 
 Found 2026-10-16/17 at WinSCP 6.7.1 (`e19a9a3e`). Status per item is in
 [gaps_tracker.md](gaps_tracker.md); this file says what each gap is and how

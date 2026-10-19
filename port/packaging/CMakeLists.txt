@@ -40,6 +40,30 @@ if(NOT WIN32)
       file(MAKE_DIRECTORY \"\${_bin}\")
       file(CREATE_LINK \"../${_libdir}/${_program}\" \"\${_bin}/${_program}\" SYMBOLIC)")
   endforeach()
+
+  # WinSCP's .NET assembly (netstandard2.0), for WinSCP's PowerShell
+  # extensions, when the build host has a .NET SDK (port/tools/fetch_dotnet.py);
+  # <libdir>/dotnet/{WinSCPnet.dll, WinSCP.exe}, with WinSCP.exe the client the
+  # assembly starts (as the Windows deploy has it). %WINSCP_PATH% points here
+  # (port/qt/main.cpp, CliMain.cpp). Skipped, with a note, when no SDK.
+  set(LINSCP_HOST_DOTNET "${CMAKE_BINARY_DIR}/tools/dotnet/dotnet" CACHE FILEPATH
+      "the build host's .NET SDK, to build WinSCP's .NET assembly into the package")
+  if(EXISTS "${LINSCP_HOST_DOTNET}")
+    set(_winscpnet "${CMAKE_BINARY_DIR}/winscpnet/bin/WinSCPnet.dll")
+    add_custom_command(OUTPUT "${_winscpnet}"
+      COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/build_winscpnet.py"
+              --dotnet "${LINSCP_HOST_DOTNET}" --upstream "${CMAKE_SOURCE_DIR}/3rd-party/winscp"
+              --dest "${CMAKE_BINARY_DIR}/winscpnet" --framework netstandard2.0
+      DEPENDS "${CMAKE_SOURCE_DIR}/port/tools/build_winscpnet.py"
+      COMMENT "Building WinSCP's .NET assembly (netstandard2.0)" VERBATIM)
+    add_custom_target(winscpnet ALL DEPENDS "${_winscpnet}")
+    install(FILES "${_winscpnet}" DESTINATION "${_libdir}/dotnet")
+    install(CODE "
+      set(_dotnet \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${_libdir}/dotnet\")
+      file(CREATE_LINK \"../linscp-cli\" \"\${_dotnet}/WinSCP.exe\" SYMBOLIC)")
+  else()
+    message(STATUS "No .NET SDK at ${LINSCP_HOST_DOTNET}: the package goes without WinSCP's .NET assembly")
+  endif()
   set(_linux "${CMAKE_CURRENT_SOURCE_DIR}/linux")
   install(FILES "${_linux}/${LINSCP_APP_ID}.desktop" DESTINATION "${CMAKE_INSTALL_DATADIR}/applications")
   install(FILES "${_linux}/${LINSCP_APP_ID}.metainfo.xml" DESTINATION "${CMAKE_INSTALL_DATADIR}/metainfo")

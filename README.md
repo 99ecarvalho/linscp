@@ -9,6 +9,14 @@ one codebase**.
 > [doc/qt/TRACKER.md](doc/qt/TRACKER.md) for what is done and what is left.
 > Not affiliated with or endorsed by the WinSCP project.
 
+> [!WARNING]
+> **Back up your WinSCP configuration before running linscp.** linscp reads and
+> writes the same settings store as WinSCP — on Windows the same registry key
+> (`HKCU\Software\Martin Prikryl\WinSCP 2`), on Linux `WinSCP.ini` in the XDG
+> config directory — so your sites and settings are shared between the two
+> programs, and linscp may rewrite them. Export your sites (or copy the registry
+> key / `WinSCP.ini`) first. This is a pre-release.
+
 ## Screenshots
 
 The Commander interface: local files on the left, the remote server on the right.
@@ -19,9 +27,11 @@ The Explorer interface: only the remote panel, with the folder tree beside it.
 
 ![The Explorer interface](doc/screenshots/explorer.png)
 
-| The Site Manager | Preferences |
+| The Site Manager | Preferences, the Panels page |
 |---|---|
 | ![The Site Manager](doc/screenshots/site-manager.png) | ![Preferences, the Panels page](doc/screenshots/preferences.png) |
+| Preferences, the Transfer page | Generate session URL / code |
+| ![Preferences, the Transfer page](doc/screenshots/preferences-transfer.png) | ![Generate session URL and code](doc/screenshots/generate-url.png) |
 
 These were taken on Linux with the light theme. To retake them, run
 `port/tests/run_qt_session.py build/linux/port/tests/test_qt_gui screenshots /ini=nul {port} {tmp}/local $PWD/doc/screenshots -platform offscreen`.
