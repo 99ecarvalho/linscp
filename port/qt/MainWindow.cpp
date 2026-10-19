@@ -100,15 +100,16 @@
 namespace
 {
 
-// Help > Donate's page (DonatePageAction): linscp's GitHub Sponsors page
-// until linscp has a page of its own.
-const char DonateUrl[] = "https://github.com/sponsors/99ecarvalho";
+// Help > Donate's page (DonatePageAction): linscp's own donation page,
+// which links to GitHub Sponsors and the other options.
+const char DonateUrl[] = "https://linscp.org/donate/";
 // Help > Contents (F1): linscp's own manual.
-const char ManualUrl[] = "https://99ecarvalho.github.io/linscp-website/manual/";
+const char ManualUrl[] = "https://linscp.org/manual/";
 // Help > Product Homepage: linscp's website.
-const char HomepageUrl[] = "https://99ecarvalho.github.io/linscp-website/";
-// Help > Report a Security Issue: a private GitHub advisory (see SECURITY.md).
-const char SecurityUrl[] = "https://github.com/99ecarvalho/linscp/security/advisories/new";
+const char HomepageUrl[] = "https://linscp.org/";
+// Help > Report a Security Issue: linscp's security page, which links to the
+// private GitHub advisory and the security contact (see SECURITY.md).
+const char SecurityUrl[] = "https://linscp.org/security/";
 
 
 // ExtractShortName: a path's last part, the root as it is.

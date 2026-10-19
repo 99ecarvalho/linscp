@@ -33,7 +33,7 @@ QString IconSetsHtml()
   return Result;
 }
 
-const char WebSite[] = "https://99ecarvalho.github.io/linscp-website/";
+const char WebSite[] = "https://linscp.org/";
 const char WinScpWebSite[] = "https://winscp.net/";
 
 QString Link(const QString & Url)
