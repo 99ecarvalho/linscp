@@ -7298,10 +7298,10 @@ void OptionsHelpTest(const QString & Directory)
       }
     }
     Check((Opened.size() == 5) && Opened[4].toString().contains(QStringLiteral("sponsors")), "Donate: the project's donation page");
-    Check((Opened.size() == 5) && (Opened[0].host() == QStringLiteral("winscp.net")) &&
+    Check((Opened.size() == 5) && Opened[0].toString().contains(QStringLiteral("linscp-website/manual")) &&
       Opened[1].toString().endsWith(QStringLiteral("/linscp")) && Opened[2].toString().endsWith(QStringLiteral("/issues")) &&
       Opened[3].toString().endsWith(QStringLiteral("/releases")),
-      "the documentation WinSCP's, the rest linscp's own pages");
+      "Contents linscp's manual, the rest linscp's own pages");
     Check((MenuAction(Window, { "Help", "Contents" })->shortcut() == QKeySequence(Qt::Key_F1)), "Contents is F1");
 
     Check((MainWindow::CompareVersions(QStringLiteral("v0.10.0"), QStringLiteral("0.9.1")) > 0) &&
