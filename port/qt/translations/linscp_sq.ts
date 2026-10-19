@@ -881,6 +881,10 @@ Vendndodhja: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Kopjo në kujtesën e fragmenteve</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Skript shell</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

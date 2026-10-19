@@ -881,6 +881,10 @@ Ubicació: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Copia al porta-retalls</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Script de l'intèrpret d'ordres</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

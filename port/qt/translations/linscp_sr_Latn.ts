@@ -881,6 +881,10 @@ Lokacija: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Kopiraj u klipbord</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Skripta ljuske</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

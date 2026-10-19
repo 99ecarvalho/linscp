@@ -881,6 +881,10 @@ Lokasi: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Salin ke Clipboard</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Skrip shell</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

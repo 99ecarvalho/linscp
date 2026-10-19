@@ -881,6 +881,10 @@ Hely: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>Másolás &amp;vágólapra</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Parancsfájl</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

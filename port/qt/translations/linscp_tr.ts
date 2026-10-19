@@ -881,6 +881,10 @@ Konum: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Panoya kopyala</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Kabuk betiği</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

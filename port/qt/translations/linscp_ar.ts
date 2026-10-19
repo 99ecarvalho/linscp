@@ -881,6 +881,10 @@ Location: %2</source>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;نسخ الى الحافظة</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>برنامج نصي للصدفة</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

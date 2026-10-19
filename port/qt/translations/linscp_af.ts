@@ -881,6 +881,10 @@ Ligging: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Kopieer na knipbord</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Dopskrip</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

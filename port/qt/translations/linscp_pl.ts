@@ -881,6 +881,10 @@ Lokalizacja: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Kopiuj do schowka</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Skrypt powłoki</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

@@ -881,6 +881,10 @@ Ort: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>In die &amp;Zwischenablage kopieren</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Shell-Skript</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

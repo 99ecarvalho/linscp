@@ -881,6 +881,10 @@ Vieta: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>Kopijuoti į iškarpinę</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Apvalkalo scenarijus</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

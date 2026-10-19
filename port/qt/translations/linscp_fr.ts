@@ -881,6 +881,10 @@ Emplacement : %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>Copier dans le Presse-papier</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Script shell</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

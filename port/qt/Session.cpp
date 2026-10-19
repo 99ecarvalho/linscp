@@ -5119,6 +5119,11 @@ std::string TSession::UploadPublicKey(const std::string & FileName)
   }
 }
 
+bool TSession::SaveOnly() const
+{
+  return (F->Data != nullptr) && F->Data->SaveOnly;
+}
+
 TSession::TSaveAsSite TSession::SaveAsSiteDefaults() const
 {
   TSaveAsSite Result;

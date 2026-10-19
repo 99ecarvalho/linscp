@@ -881,6 +881,10 @@ Percorso: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Copia negli Appunti</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Script di shell</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

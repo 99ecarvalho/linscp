@@ -881,6 +881,10 @@ Cale: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>Copiere în memorie</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Script shell</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

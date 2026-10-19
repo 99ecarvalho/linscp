@@ -881,6 +881,10 @@ Location: %2</source>
         <source>&amp;Copy to Clipboard</source>
         <translation>မျက်ပြင်ကတ်ပြားသို့ ကူးယူပါ(&amp;C)</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>ရှဲလ် စခရစ်</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

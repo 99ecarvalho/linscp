@@ -881,6 +881,10 @@ Ruta: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Copiar al portapapeles</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Script de shell</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

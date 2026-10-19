@@ -881,6 +881,10 @@ Vị trí: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Sao chép vào clipboard</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Tập lệnh shell</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

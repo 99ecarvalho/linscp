@@ -881,6 +881,10 @@ Local: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Copiar para a área de transferência</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Script de shell</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

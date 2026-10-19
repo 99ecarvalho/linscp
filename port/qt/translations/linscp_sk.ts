@@ -881,6 +881,10 @@ Umiestnenie: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Kopírovať do schránky</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Skript shellu</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

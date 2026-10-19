@@ -881,6 +881,10 @@ Staðsetning: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Afrita á klippispjald</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Skeljaskrifta</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

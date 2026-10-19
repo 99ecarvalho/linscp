@@ -881,6 +881,10 @@ Location: %2</source>
         <source>&amp;Copy to Clipboard</source>
         <translation>رونوشت به حافظه موقت</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>اسکریپت پوسته</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

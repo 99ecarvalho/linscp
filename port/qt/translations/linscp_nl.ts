@@ -881,6 +881,10 @@ Locatie: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Kopieer naar klembord</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Shellscript</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

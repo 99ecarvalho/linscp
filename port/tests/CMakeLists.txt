@@ -323,6 +323,9 @@ if(TARGET linscp)
   # into a local custom command's shell.
   add_test(NAME qt_gui_command_injection COMMAND test_qt_gui localcommand -platform offscreen)
   set_tests_properties(qt_gui_command_injection PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
+  # A ";save" session URL is parsed save-only, not opened.
+  add_test(NAME qt_gui_saveonlyurl COMMAND test_qt_gui saveonlyurl -platform offscreen)
+  set_tests_properties(qt_gui_saveonlyurl PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
   # F1: the GUI's logging switches (the log file is only named, not written).
   add_test(NAME qt_gui_logswitches COMMAND test_qt_gui logswitches "${CMAKE_CURRENT_BINARY_DIR}/gui-switches.log" /ini=nul
            "/log=${CMAKE_CURRENT_BINARY_DIR}/gui-switches.log" /loglevel=2* /logsize=3*1M
@@ -410,6 +413,14 @@ if(TARGET linscp)
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
             masterpassword "/ini={tmp}/WinSCP.ini" -platform offscreen)
   set_tests_properties(qt_gui_masterpassword PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 300)
+  # linscp-cli opening a site the GUI locked with a master password.
+  add_test(NAME qt_gui_masterpasswordcli
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
+            --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"
+            masterpasswordcli "/ini={tmp}/WinSCP.ini" {port} "{tmp}/WinSCP.ini" "$<TARGET_FILE:linscp-cli>"
+            -platform offscreen)
+  set_tests_properties(qt_gui_masterpasswordcli PROPERTIES DEPENDS "qt_gui_build;cli_session_build"
+    SKIP_RETURN_CODE 77 TIMEOUT 300)
   add_test(NAME qt_gui_instance
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/run_qt_session.py"
             --emulator "${CMAKE_CROSSCOMPILING_EMULATOR}" "$<TARGET_FILE:test_qt_gui>"

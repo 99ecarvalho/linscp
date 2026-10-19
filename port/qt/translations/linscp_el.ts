@@ -881,6 +881,10 @@ Location: %2</source>
         <source>&amp;Copy to Clipboard</source>
         <translation>Αντιγραφή στο πρόχειρο</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Σενάριο κελύφους</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

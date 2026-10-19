@@ -881,6 +881,10 @@ Plats: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Kopiera till urklipp</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Skalskript</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

@@ -881,6 +881,10 @@ Location: %2</source>
         <source>&amp;Copy to Clipboard</source>
         <translation>இடைநிலைப் பலகைக்கு நகலெடு</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>ஷெல் ஸ்கிரிப்ட்</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

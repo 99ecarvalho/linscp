@@ -103,6 +103,8 @@ namespace
 // Help > Donate's page (DonatePageAction): linscp's GitHub Sponsors page
 // until linscp has a page of its own.
 const char DonateUrl[] = "https://github.com/sponsors/99ecarvalho";
+// Help > Contents (F1): linscp's own manual.
+const char ManualUrl[] = "https://99ecarvalho.github.io/linscp-website/manual/";
 
 
 // ExtractShortName: a path's last part, the root as it is.
@@ -143,7 +145,7 @@ MainWindow::MainWindow(const CoreBridge::TInfo & Info, QWidget * Parent) :
   // The actions, placed in WinSCP's menus by BuildMenus once the panels are
   // made; each the window's too, so its key works wherever it is shown.
   QMenu * FileMenu = new QMenu(this);
-  FSitesAction = FileMenu->addAction(tr("&Site Manager..."), this, &MainWindow::SiteManagerDialog);
+  FSitesAction = FileMenu->addAction(tr("&Site Manager..."), this, [this]() { SiteManagerDialog(); });
   // Ctrl+N: WinSCP's New Tab, the Login dialog.
   FSitesAction->setShortcut(QKeySequence::New);
   FOpenAction = FileMenu->addAction(tr("&Open URL..."), this, &MainWindow::OpenUrlDialog);
@@ -1520,6 +1522,23 @@ void MainWindow::StartUp()
   {
     return;
   }
+  // As GetLoginData: a URL with ";save" (the Generate URL dialog's "save
+  // extension") is saved as a site through the Save Session as Site dialog,
+  // not opened; then the Login dialog shows it. Refused: nothing more.
+  if (Session && Session->SaveOnly())
+  {
+    QString Saved;
+    if (!SaveSessionAsSite(*Session, nullptr, false, &Saved))
+    {
+      close();
+      return;
+    }
+    if (!SiteManagerDialog(false, Saved) && FTabs.empty() && !CoreBridge::Preferences().KeepOpenWhenNoSession)
+    {
+      close();
+    }
+    return;
+  }
   const QString DownloadFile = Session ? QString::fromStdString(Session->DownloadFile()) : QString();
   if (!Session || !CanOpen || !Open(std::move(Session)))
   {
@@ -1739,13 +1758,17 @@ void MainWindow::RefreshPanel(const QString & Site, const QString & Path)
   }
 }
 
-bool MainWindow::SiteManagerDialog(bool Automatic)
+bool MainWindow::SiteManagerDialog(bool Automatic, const QString & Select)
 {
   if (FBusy)
   {
     return false;
   }
   SiteManager Dialog(this);
+  if (!Select.isEmpty())
+  {
+    Dialog.SelectSite(Select);
+  }
   Dialog.ShowAgainCheck()->setVisible(Automatic);
   Dialog.OnPreferences = [this](const QString & Page) { PreferencesDialog(Page); };
   Dialog.OnCheckForUpdates = [this]() { CheckForUpdates(); };
@@ -5762,7 +5785,7 @@ void MainWindow::BuildMenus()
   // local browser.
   QMenu * NewTab = Tabs->addMenu(tr("&New Tab"));
   Iconize(NewTab->menuAction(), "new-tab");
-  QAction * RemoteTab = Iconize(NewTab->addAction(tr("&Remote Tab..."), this, &MainWindow::SiteManagerDialog), "sites");
+  QAction * RemoteTab = Iconize(NewTab->addAction(tr("&Remote Tab..."), this, [this]() { SiteManagerDialog(); }), "sites");
   RemoteTab->setShortcut(FSitesAction->shortcut());
   FSitesAction->setShortcut(QKeySequence());
   Iconize(NewTab->addAction(tr("&Local Tab"), this, [this]() { NewLocalTab(); }), "local-tab");
@@ -5951,11 +5974,11 @@ void MainWindow::BuildMenus()
   FRemoteMenu = PanelMenu(false);
 
   // As WinSCP's Help, its pages linscp's own (the project's GitHub pages),
-  // but the documentation, which is WinSCP's: linscp follows its interface.
+  // and the documentation, linscp's own manual.
   // Show Tips (WinSCP's tips, from winscp.net) is not offered.
   QMenu * Help = menuBar()->addMenu(tr("&Help"));
   QAction * Contents = Help->addAction(tr("&Contents"), this,
-    [this]() { OpenWebPage(QStringLiteral("https://winscp.net/eng/docs/start")); });
+    [this]() { OpenWebPage(QString::fromLatin1(ManualUrl)); });
   Contents->setShortcut(QKeySequence(Qt::Key_F1));
   Contents->setStatusTip(tr("Opens web browser and points it to documentation table of contents"));
   Help->addSeparator();
@@ -6268,7 +6291,12 @@ bool MainWindow::SaveSessionAsSite(const QString * Name, bool SavePassword)
   {
     return false;
   }
-  CoreBridge::TSession::TSaveAsSite Defaults = FSession->SaveAsSiteDefaults();
+  return SaveSessionAsSite(*FSession, Name, SavePassword);
+}
+
+bool MainWindow::SaveSessionAsSite(CoreBridge::TSession & Session, const QString * Name, bool SavePassword, QString * Saved)
+{
+  CoreBridge::TSession::TSaveAsSite Defaults = Session.SaveAsSiteDefaults();
   while (true)
   {
     QString AName;
@@ -6291,7 +6319,11 @@ bool MainWindow::SaveSessionAsSite(const QString * Name, bool SavePassword)
     }
     try
     {
-      FSession->SaveAsSite(AName.toStdString(), ASavePassword);
+      Session.SaveAsSite(AName.toStdString(), ASavePassword);
+      if (Saved != nullptr)
+      {
+        *Saved = AName;
+      }
       // As DoSaveSession: the site's desktop shortcut, with /desktop and
       // /UploadIfAny.
       if (CreateShortcut)

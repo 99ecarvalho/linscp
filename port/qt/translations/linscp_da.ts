@@ -881,6 +881,10 @@ Placering: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Kopier til udklipsholder</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Shell-script</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

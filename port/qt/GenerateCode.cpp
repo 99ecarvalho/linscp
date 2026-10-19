@@ -353,6 +353,50 @@ UnicodeString GenerateScript(TSessionData * Data, int ScriptFormat, const Unicod
       RtfPara +
       RtfKeyword(L"exit") + RtfText(L" $winscpResult") + RtfPara;
   }
+  else if (ScriptFormat == 4)
+  {
+    // linscp's: the batch file's counterpart for a POSIX shell, the
+    // commands single-quoted (a quote in one as '\''), so the shell expands
+    // nothing in them.
+    Result =
+      RtfScriptPlaceholder(L"#!/bin/sh") + RtfPara +
+      RtfPara +
+      RtfText(L"\"" + ComExeName + "\" \\") + RtfPara +
+      RtfText(L"  ") + LogParameter + L" " + IniParameter + RtfText(L" \\") + RtfPara +
+      RtfText(L"  ") + CommandParameter;
+
+    for (TCommands::const_iterator I = Commands.begin(); I != Commands.end(); I++)
+    {
+      UnicodeString Command = *I;
+      if (!Command.IsEmpty())
+      {
+        Result += RtfText(L" \\") + RtfPara + RtfText(L"    '");
+        if (Command[1] == L'#')
+        {
+          Command.Delete(1, 1);
+          Result += RtfScriptPlaceholder(Command.TrimLeft());
+        }
+        else
+        {
+          Result += ReplaceStr(Command, L"'", L"'\\\\''");
+        }
+        Result += L"'";
+      }
+    }
+
+    Result +=
+      RtfPara +
+      RtfPara +
+      RtfText(L"winscp_result=$?") + RtfPara +
+      RtfKeyword(L"if") + RtfText(L" [ $winscp_result -eq 0 ]") + RtfPara +
+      RtfKeyword(L"then") + RtfPara +
+      RtfText(L"  ") + RtfKeyword(L"echo") + RtfText(L" Success") + RtfPara +
+      RtfKeyword(L"else") + RtfPara +
+      RtfText(L"  ") + RtfKeyword(L"echo") + RtfText(L" Error") + RtfPara +
+      RtfKeyword(L"fi") + RtfPara +
+      RtfPara +
+      RtfKeyword(L"exit") + RtfText(L" $winscp_result") + RtfPara;
+  }
 
   return Result;
 }
@@ -544,7 +588,7 @@ CoreBridge::TGeneratedCode GenerateSessionCode(TSessionData * Data, const CoreBr
   }
   else if (Target == TTarget::Script)
   {
-    const int ScriptFormat = std::min(std::max(Options.ScriptFormat, 0), 3);
+    const int ScriptFormat = std::min(std::max(Options.ScriptFormat, 0), 4);
     Result.ResultCaption = Narrow(LoadStr(GENERATE_URL_SCRIPT));
     if (ScriptFormat == 2)
     {

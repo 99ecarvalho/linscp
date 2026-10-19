@@ -881,6 +881,10 @@ Location: %2</source>
         <source>&amp;Copy to Clipboard</source>
         <translation>क्लिपबोर्ड पर कॉपी करें(&amp;C)</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>शेल स्क्रिप्ट</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

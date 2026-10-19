@@ -4771,6 +4771,27 @@ void Tools(const char * Port, const QString & Directory)
         "its commands linked to WinSCP's documentation");
       Dialog.ScriptFormatCombo()->setCurrentIndex(2);
       Check(Dialog.Text().contains(QStringLiteral("/command")), "command-line arguments");
+#if defined(Q_OS_WIN)
+      Dialog.ScriptFormatCombo()->setCurrentIndex(1);
+      Check(Dialog.Text().startsWith(QStringLiteral("@echo off")), "a batch file, as WinSCP's");
+#else
+      // A shell script in the batch file's place, which sh accepts as it is.
+      Dialog.ScriptFormatCombo()->setCurrentIndex(1);
+      const QString Shell = Dialog.Text();
+      Check(Shell.startsWith(QStringLiteral("#!/bin/sh")) && Shell.contains(QStringLiteral("'open sftp://")) &&
+        Shell.contains(QStringLiteral("/command")) && Shell.contains(QStringLiteral("exit $winscp_result")),
+        "a shell script for the command-line client");
+      {
+        QTemporaryDir ShellDir;
+        QFile ShellFile(ShellDir.filePath(QStringLiteral("generated.sh")));
+        ShellFile.open(QIODevice::WriteOnly);
+        ShellFile.write(Shell.toUtf8());
+        ShellFile.close();
+        Check(QProcess::execute(QStringLiteral("/bin/sh"), { QStringLiteral("-n"), ShellFile.fileName() }) == 0,
+          "the shell script's syntax");
+      }
+#endif
+      Dialog.ScriptFormatCombo()->setCurrentIndex(2);
       Dialog.Pages()->setCurrentIndex(2);
       Dialog.LanguageCombo()->setCurrentIndex(0);
       Check(Dialog.Text().contains(QStringLiteral("SessionOptions")), ".NET code");
@@ -5835,6 +5856,19 @@ void Screenshots(const char * Port, const QString & Directory, const QString & O
         Dialog.show();
         Dialog.ShowPage(PreferencesDialog::tr("Panels"));
         Shot(&Dialog, QStringLiteral("preferences.png"));
+      }
+      {
+        PreferencesDialog Dialog(&Window);
+        Dialog.show();
+        Dialog.ShowPage(PreferencesDialog::tr("Transfer"));
+        Shot(&Dialog, QStringLiteral("preferences-transfer.png"));
+      }
+      if (Window.Session() != nullptr)
+      {
+        GenerateUrlDialog Dialog(Window.Session(), {}, &Window);
+        Dialog.resize(760, 560);
+        Dialog.show();
+        Shot(&Dialog, QStringLiteral("generate-url.png"));
       }
     }
     Window.close();
@@ -8350,6 +8384,51 @@ void MasterPasswordTest(const QString & Ini)
   CoreBridge::Finalize();
 }
 
+// linscp-cli opens a site whose password the GUI encrypted with a master
+// password, asking for it on the console as WinSCP.com does: once, again
+// after a wrong one, and failing without one.
+void MasterPasswordCliTest(const char * Port, const QString & Ini, const QString & Cli)
+{
+  {
+    QtFrontend Frontend;
+    CoreBridge::Initialize(&Frontend);
+    CoreBridge::TSite Site = CoreBridge::NewSite();
+    Site.Name = "Locked";
+    Site.HostName = "127.0.0.1";
+    Site.Port = QString::fromLatin1(Port).toInt();
+    Site.UserName = "linscp";
+    Site.Password = "secret";
+    CoreBridge::SaveSite(Site);
+    Check(CoreBridge::ChangeMasterPassword("Str0ng!Pass#1").empty() && CoreBridge::UseMasterPassword(), "master password set");
+    CoreBridge::Finalize();
+  }
+  const auto Run = [&Ini, &Cli](const QByteArray & Input, int & ExitCode)
+  {
+    QProcess Process;
+    Process.setProcessChannelMode(QProcess::MergedChannels);
+    Process.start(Cli, { QStringLiteral("/ini=") + Ini, QStringLiteral("/command"),
+      QStringLiteral("open Locked -hostkey=*"), QStringLiteral("ls"), QStringLiteral("exit") });
+    Process.waitForStarted();
+    Process.write(Input);
+    Process.closeWriteChannel();
+    Process.waitForFinished(60000);
+    ExitCode = Process.exitCode();
+    return QString::fromUtf8(Process.readAll());
+  };
+  int ExitCode = -1;
+  QString Output = Run("Str0ng!Pass#1\n", ExitCode);
+  Check((ExitCode == 0) && Output.contains(QStringLiteral("Master password")) && Output.contains(QStringLiteral("Session started")),
+    "asked once, the site opened");
+  Output = Run("wrong\nStr0ng!Pass#1\n", ExitCode);
+  Check((ExitCode == 0) && Output.contains(QStringLiteral("did not enter the correct")), "a wrong one: told, asked again");
+  Output = Run("", ExitCode);
+  Check(ExitCode == 1, "none given: the site does not open");
+  if (Failures == 0)
+  {
+    std::printf("OK\n");
+  }
+}
+
 void PanelPreferencesTest(const char * Port, const QString & Directory)
 {
   QtFrontend Frontend;
@@ -8497,6 +8576,28 @@ void FailOnShellWarnings(QtMsgType Type, const QMessageLogContext & Context, con
   }
 }
 
+// A session URL with ";save" is parsed as save-only (the Generate URL
+// dialog's "save extension"), not opened; an ordinary URL is not.
+void SaveOnlyUrlTest()
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    bool CanOpen = false;
+    CoreBridge::SetArguments({ std::string("sftp://u@example.com/;save") });
+    std::unique_ptr<CoreBridge::TSession> Save(CoreBridge::TSession::FromCommandLine(CanOpen));
+    Check((Save != nullptr) && Save->SaveOnly(), "a ;save URL is save-only");
+    CoreBridge::SetArguments({ std::string("sftp://u@example.com/") });
+    std::unique_ptr<CoreBridge::TSession> Open(CoreBridge::TSession::FromCommandLine(CanOpen));
+    Check((Open != nullptr) && !Open->SaveOnly(), "an ordinary URL is not");
+  }
+  CoreBridge::Finalize();
+  if (Failures == 0)
+  {
+    std::printf("OK\n");
+  }
+}
+
 // CVE-002 and CVE-004 regression: a server-chosen file name must not inject
 // into the shell when a local custom command runs it, and a quote in a
 // forwarded command-line argument must not smuggle an extra switch.
@@ -8610,6 +8711,14 @@ int main(int argc, char ** argv)
   else if ((argc >= 3) && (std::strcmp(argv[1], "toolbars") == 0))
   {
     ToolbarsTest();
+  }
+  else if ((argc >= 6) && (std::strcmp(argv[1], "masterpasswordcli") == 0))
+  {
+    MasterPasswordCliTest(argv[3], QString::fromLocal8Bit(argv[4]), QString::fromLocal8Bit(argv[5]));
+  }
+  else if ((argc >= 2) && (std::strcmp(argv[1], "saveonlyurl") == 0))
+  {
+    SaveOnlyUrlTest();
   }
   else if ((argc >= 2) && (std::strcmp(argv[1], "localcommand") == 0))
   {

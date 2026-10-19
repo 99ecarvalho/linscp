@@ -2288,6 +2288,9 @@ public:
   // Tabs > Save Session as Site (TCustomScpExplorerForm::SaveCurrentSession,
   // DoSaveSession): the session as it is now saved under Name; its
   // passwords only if SavePassword. Defaults: what the dialog starts with.
+  // The URL asked for the session to be saved, not opened (";save", as the
+  // Generate URL dialog offers): TSessionData::SaveOnly.
+  bool SaveOnly() const;
   struct TSaveAsSite
   {
     std::string Name;

@@ -881,6 +881,10 @@ Location: %2</source>
         <source>&amp;Copy to Clipboard</source>
         <translation>复制到剪贴板(&amp;C)</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Shell 脚本</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

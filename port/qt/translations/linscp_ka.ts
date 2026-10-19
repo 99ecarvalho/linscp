@@ -881,6 +881,10 @@ Location: %2</source>
         <source>&amp;Copy to Clipboard</source>
         <translation>ბუფერში კოპირება</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>გარსის სკრიპტი</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

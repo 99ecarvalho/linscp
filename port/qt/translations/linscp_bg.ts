@@ -881,6 +881,10 @@ Location: %2</source>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Запомняне в кошницата</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Команден скрипт</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

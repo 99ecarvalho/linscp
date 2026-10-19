@@ -881,6 +881,10 @@ Asukoht: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Kopeeri lõikelauale</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Kestaskript</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

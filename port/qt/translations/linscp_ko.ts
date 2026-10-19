@@ -881,6 +881,10 @@ Location: %2</source>
         <source>&amp;Copy to Clipboard</source>
         <translation>클립보드에 복사(&amp;C)</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>셸 스크립트</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

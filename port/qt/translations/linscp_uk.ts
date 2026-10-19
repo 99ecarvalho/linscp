@@ -881,6 +881,10 @@ Location: %2</source>
         <source>&amp;Copy to Clipboard</source>
         <translation>Скопіювати в буфер</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Сценарій оболонки</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

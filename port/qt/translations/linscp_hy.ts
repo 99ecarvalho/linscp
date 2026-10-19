@@ -881,6 +881,10 @@ Location: %2</source>
         <source>&amp;Copy to Clipboard</source>
         <translation>Պատճենել &amp;սեղմատախտակին</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Խեցու սկրիպտ</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

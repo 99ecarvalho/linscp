@@ -51,7 +51,8 @@ public:
   // File > Site Manager: false when it was closed without logging in.
   // Automatic: shown by itself (NeedSession), with its "Show Login dialog
   // on startup..." checkbox.
-  bool SiteManagerDialog(bool Automatic = false);
+  // Select: a site to show selected (as LastStoredSession has it upstream).
+  bool SiteManagerDialog(bool Automatic = false, const QString & Select = QString());
   // As TCustomScpExplorerForm::NeedSession, at start-up and once the last
   // tab closes: the Login dialog, if the preferences say; then, unless the
   // window is to stay open, the window closed with no session.
@@ -418,6 +419,10 @@ public:
   // file dialog), Clear Caches. False when nothing was done.
   bool ReconnectSession();
   bool SaveSessionAsSite(const QString * Name = nullptr, bool SavePassword = false);
+  // The same for a session not opened (a command line's ";save" URL), the
+  // name saved under in Saved.
+  bool SaveSessionAsSite(CoreBridge::TSession & Session, const QString * Name, bool SavePassword,
+    QString * Saved = nullptr);
   bool RenameTab(const QString * Name = nullptr);
   bool ChangePassword();
   bool InstallPublicKey(const QString * FileName = nullptr);

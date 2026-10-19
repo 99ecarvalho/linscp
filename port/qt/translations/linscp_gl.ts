@@ -881,6 +881,10 @@ Localización: %2</translation>
         <source>&amp;Copy to Clipboard</source>
         <translation>&amp;Copiar ao portapapeis</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>Script de intérprete de ordes</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>

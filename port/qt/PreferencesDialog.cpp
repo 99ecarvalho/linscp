@@ -2988,8 +2988,9 @@ QWidget * PreferencesDialog::MakeEnvironmentPage(const TPreferences & Preference
   return Page;
 }
 
-// Interface, as WinSCP's GeneralSheet: the Commander (linscp has no
-// Explorer interface, ADR 0012) and the theme, applied at once.
+// Interface, as WinSCP's GeneralSheet: the Commander or the Explorer
+// interface (the choice applies on the next start) and the theme, applied at
+// once.
 QWidget * PreferencesDialog::MakeInterfacePage(const TPreferences & Preferences)
 {
   QWidget * Page = new QWidget(this);

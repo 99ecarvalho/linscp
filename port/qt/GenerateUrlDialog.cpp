@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "GenerateUrlDialog.h"
 
 #include <QApplication>
@@ -62,8 +63,24 @@ GenerateUrlDialog::GenerateUrlDialog(CoreBridge::TSession * Session, const std::
     QWidget * Script = new QWidget(FPages);
     QFormLayout * ScriptLayout = new QFormLayout(Script);
     FScriptFormat = new QComboBox(Script);
-    FScriptFormat->addItems({ tr("Script file"), tr("Batch file"), tr("Command-line"), tr("PowerShell script") });
-    FScriptFormat->setCurrentIndex(qBound(0, Settings.ScriptFormat, 3));
+    // Each entry's format number (GenerateCode's): WinSCP's four on Windows;
+    // elsewhere a shell script in the batch file's place.
+    FScriptFormat->addItem(tr("Script file"), 0);
+#if defined(Q_OS_WIN)
+    FScriptFormat->addItem(tr("Batch file"), 1);
+#else
+    FScriptFormat->addItem(tr("Shell script"), 4);
+#endif
+    FScriptFormat->addItem(tr("Command-line"), 2);
+    FScriptFormat->addItem(tr("PowerShell script"), 3);
+    // A format kept from the other platform: its counterpart here.
+    int Format = Settings.ScriptFormat;
+#if defined(Q_OS_WIN)
+    Format = (Format == 4) ? 1 : Format;
+#else
+    Format = (Format == 1) ? 4 : Format;
+#endif
+    FScriptFormat->setCurrentIndex(std::max(FScriptFormat->findData(Format), 0));
     ScriptLayout->addRow(tr("&Format:"), FScriptFormat);
     FScriptDescription = new QLabel(Script);
     FScriptDescription->setWordWrap(true);
@@ -141,7 +158,7 @@ CoreBridge::TGenerateCodeOptions GenerateUrlDialog::Options() const
     }
   }
   Result.Target = static_cast<CoreBridge::TGenerateCodeOptions::TTarget>(FPages->currentIndex());
-  Result.ScriptFormat = (FScriptFormat != nullptr) ? FScriptFormat->currentIndex() : 0;
+  Result.ScriptFormat = (FScriptFormat != nullptr) ? FScriptFormat->currentData().toInt() : 0;
   Result.AssemblyLanguage = (FLanguage != nullptr) ? FLanguage->currentIndex() : 0;
   Result.Paths = FPaths;
   return Result;
@@ -165,7 +182,7 @@ void GenerateUrlDialog::Generate()
   }
   setWindowTitle(QString::fromStdString(Code.Title));
   FResultGroup->setTitle(FPages->currentIndex() == 1 ? FScriptFormat->currentText() : QString::fromStdString(Code.ResultCaption));
-  if ((FPages->currentIndex() == 1) && (FScriptFormat->currentIndex() == 2))
+  if ((FPages->currentIndex() == 1) && (FScriptFormat->currentData().toInt() == 2))
   {
     FResultGroup->setTitle(QString::fromStdString(Code.ResultCaption));
   }

@@ -881,6 +881,10 @@ Location: %2</source>
         <source>&amp;Copy to Clipboard</source>
         <translation>ה&amp;עתק ללוח הגזירים</translation>
     </message>
+    <message>
+        <source>Shell script</source>
+        <translation>סקריפט מעטפת</translation>
+    </message>
 </context>
 <context>
     <name>IconSet</name>
