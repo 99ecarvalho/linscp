@@ -245,6 +245,20 @@ int Advance(TSearchRec & F)
   }
 }
 
+// Advance's errno as the Win32 error FindFirstFile/FindNextFile give, set as
+// the thread's last error too: core reports a failed listing with
+// GetLastError (ListingSysErrorMessage, CHANGE_DIR_ERROR), so leaving it
+// unset showed whatever an earlier call had left (a probed DLL's 126).
+// Running out of entries is ERROR_NO_MORE_FILES for FindNext and, as
+// FindFirstFile has it, ERROR_FILE_NOT_FOUND for a first call that matches
+// nothing.
+int FindError(int Err, bool Next)
+{
+  const DWORD Code = (Err == ENOENT) ? (Next ? ERROR_NO_MORE_FILES : ERROR_FILE_NOT_FOUND) : Win32ErrorFromErrno(Err);
+  SetLastError(Code);
+  return static_cast<int>(Code);
+}
+
 }  // namespace
 
 int FindFirst(const UnicodeString & Path, int Attr, TSearchRec & F)
@@ -266,7 +280,7 @@ int FindFirst(const UnicodeString & Path, int Attr, TSearchRec & F)
   {
     const int Err = errno;
     delete State;
-    return Err != 0 ? Err : ENOENT;
+    return FindError(Err != 0 ? Err : ENOENT, false);
   }
 
   F.FindState = State;
@@ -276,13 +290,15 @@ int FindFirst(const UnicodeString & Path, int Attr, TSearchRec & F)
   if (R != 0)
   {
     FindClose(F);
+    return FindError(R, false);
   }
-  return R;
+  return 0;
 }
 
 int FindNext(TSearchRec & F)
 {
-  return Advance(F);
+  const int R = Advance(F);
+  return (R != 0) ? FindError(R, true) : 0;
 }
 
 void FindClose(TSearchRec & F)

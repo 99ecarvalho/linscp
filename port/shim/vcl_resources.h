@@ -41,6 +41,16 @@ extern const std::size_t ResourceStringCount;
 // Returns nullptr when the id is unknown.
 const wchar_t * FindResourceString(int Ident);
 
+// A program's rewrite of resource strings as they are loaded, after the
+// translation in use or the main table gave Text: the replacement, or
+// nullptr to keep Text. The replacement must outlive the program's use of
+// it (a cache of its own). For text that depends on the platform (the POSIX
+// client's help examples), so the generated table stays upstream's.
+using TResourceStringFilter = const wchar_t * (*)(unsigned Ident, const wchar_t * Text);
+void SetResourceStringFilter(TResourceStringFilter Filter);
+// Text, or what the filter makes of it.
+const wchar_t * FilterResourceString(unsigned Ident, const wchar_t * Text);
+
 }  // namespace linscp
 
 //---------------------------------------------------------------------------

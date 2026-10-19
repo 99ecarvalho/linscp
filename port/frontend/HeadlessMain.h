@@ -14,4 +14,13 @@ void HeadlessFinalize();
 // HeadlessInitialize.
 void SetProgramCommandLine(const wchar_t * CommandLine);
 
+class UnicodeString;
+// How the console client asks for the master password when a stored
+// password is encrypted with it, as WinSCP.com's MasterPasswordPrompt: the
+// password read into Password (Incorrect: the last one did not match, which
+// the prompt says first), false when none can be read. Without one such
+// passwords cannot be decrypted.
+typedef bool (*THeadlessMasterPasswordPrompt)(UnicodeString & Password, bool Incorrect);
+void SetHeadlessMasterPasswordPrompt(THeadlessMasterPasswordPrompt Prompt);
+
 #endif

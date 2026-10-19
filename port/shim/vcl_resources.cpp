@@ -13,6 +13,27 @@
 
 namespace linscp {
 
+namespace {
+TResourceStringFilter GResourceStringFilter = nullptr;
+}
+
+void SetResourceStringFilter(TResourceStringFilter Filter)
+{
+  GResourceStringFilter = Filter;
+}
+
+const wchar_t * FilterResourceString(unsigned Ident, const wchar_t * Text)
+{
+  if ((Text != nullptr) && (GResourceStringFilter != nullptr))
+  {
+    if (const wchar_t * Filtered = GResourceStringFilter(Ident, Text))
+    {
+      return Filtered;
+    }
+  }
+  return Text;
+}
+
 const wchar_t * FindResourceString(int Ident)
 {
   // The generated table is sorted by id, so a binary search is available and
@@ -165,6 +186,7 @@ int LoadString(void * Module, unsigned Ident, wchar_t * Buffer, int BufferMax)
   {
     Text = linscp::FindResourceString(static_cast<int>(Ident));
   }
+  Text = linscp::FilterResourceString(Ident, Text);
   if (Text == nullptr)
   {
     Buffer[0] = L'\0';

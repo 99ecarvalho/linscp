@@ -11,6 +11,11 @@
 #include <Exceptions.h>
 #include <Interface.h>
 #include <Configuration.h>
+#include <Cryptography.h>
+#include <HierarchicalStorage.h>
+#include <Security.h>
+#include <TextsWin.h>
+#include "HeadlessMain.h"
 
 #include "FrontendCommon.h"
 //---------------------------------------------------------------------------
@@ -65,6 +70,8 @@ namespace
 // TConfiguration leaves only TemporaryDir abstract; upstream's
 // TWinConfiguration adds the GUI's settings on top, which a program without
 // a GUI has none of.
+THeadlessMasterPasswordPrompt GMasterPasswordPrompt = nullptr;
+
 class THeadlessConfiguration : public TConfiguration
 {
 public:
@@ -76,11 +83,91 @@ public:
     Default();
   }
 
+  virtual __fastcall ~THeadlessConfiguration()
+  {
+    Shred(FMasterPassword);
+  }
+
   virtual UnicodeString TemporaryDir(bool Mask)
   {
     return DefaultTemporaryDir(Mask);
   }
+
+protected:
+  // TWinConfiguration's master password, read only: what the GUI set
+  // (Security\UseMasterPassword and its verifier), so the console client
+  // can open sites whose passwords it encrypted, as WinSCP.com can.
+  virtual void __fastcall LoadData(THierarchicalStorage * Storage)
+  {
+    TConfiguration::LoadData(Storage);
+    if (Storage->OpenSubKeyPath(L"Security", false))
+    {
+      FUseMasterPassword = Storage->ReadBool(L"UseMasterPassword", FUseMasterPassword);
+      FMasterPasswordVerifier = Storage->ReadString(L"MasterPasswordVerifier", FMasterPasswordVerifier);
+      Storage->CloseSubKeyPath();
+    }
+  }
+
+  // As TWinConfiguration::DecryptPassword: a password encrypted with the
+  // master password asks for it once (TConsoleRunner::MasterPasswordPrompt),
+  // checked against the verifier and asked again until it matches.
+  virtual UnicodeString __fastcall DecryptPassword(RawByteString Password, UnicodeString Key)
+  {
+    RawByteString Buf;
+    if (!GetExternalEncryptedPassword(Password, Buf))
+    {
+      return TConfiguration::DecryptPassword(Password, Key);
+    }
+    if (FMasterPassword.IsEmpty())
+    {
+      AskForMasterPassword();
+    }
+    UnicodeString Result;
+    if (!AES256DecryptWithMAC(Buf, FMasterPassword, Buf) || !UnscramblePassword(Buf, Result))
+    {
+      throw Exception(LoadStr(DECRYPT_PASSWORD_ERROR));
+    }
+    return Result;
+  }
+
+private:
+  void AskForMasterPassword()
+  {
+    if (GMasterPasswordPrompt == nullptr)
+    {
+      throw Exception(LoadStr(DECRYPT_PASSWORD_ERROR));
+    }
+    bool Incorrect = false;
+    for (;;)
+    {
+      UnicodeString Value;
+      if (!GMasterPasswordPrompt(Value, Incorrect))
+      {
+        Abort();
+      }
+      // Off (a stray encrypted password, as an imported site's): whatever is
+      // given is tried, as the GUI does.
+      if (!FUseMasterPassword || FMasterPasswordVerifier.IsEmpty() ||
+          AES256Verify(Value, HexToBytes(FMasterPasswordVerifier)))
+      {
+        FMasterPassword = Value;
+        Shred(Value);
+        return;
+      }
+      Shred(Value);
+      Incorrect = true;
+    }
+  }
+
+  bool FUseMasterPassword = false;
+  UnicodeString FMasterPasswordVerifier;
+  UnicodeString FMasterPassword;
 };
+}
+//---------------------------------------------------------------------------
+void SetHeadlessMasterPasswordPrompt(THeadlessMasterPasswordPrompt Prompt)
+{
+  GMasterPasswordPrompt = Prompt;
 }
 //---------------------------------------------------------------------------
 TConfiguration * __fastcall CreateConfiguration()

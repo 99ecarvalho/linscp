@@ -14,6 +14,8 @@ target_include_directories(linscp-frontend-common PUBLIC
 # no clipboard. The Qt shell has its own (port/qt/QtInterface.cpp).
 add_library(linscp-frontend-headless STATIC EXCLUDE_FROM_ALL HeadlessInterface.cpp)
 target_link_libraries(linscp-frontend-headless PUBLIC linscp-frontend-common)
+# TextsWin.h, for the master password's messages.
+target_include_directories(linscp-frontend-headless PRIVATE "${LINSCP_UPSTREAM}/source/resource")
 
 # Everything a program built on core links but its own Interface.h half:
 # core, the shared frontend, and the libraries core calls into. lld resolves
@@ -79,3 +81,5 @@ add_executable(linscp-cli EXCLUDE_FROM_ALL CliMain.cpp StdioConsole.cpp External
 target_include_directories(linscp-cli PRIVATE "${LINSCP_UPSTREAM}/source/resource"
   "${LINSCP_UPSTREAM}/source/console")
 target_link_libraries(linscp-cli PRIVATE linscp-runtime)
+# linscp's own version, for /help (core keeps WinSCP's).
+target_compile_definitions(linscp-cli PRIVATE LINSCP_VERSION="${PROJECT_VERSION}")

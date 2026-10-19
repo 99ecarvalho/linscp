@@ -29,7 +29,10 @@
 #include <TextsCore.h>
 #include <TextsWin.h>
 
+#include <map>
 #include <memory>
+#include <mutex>
+#include <utility>
 #include <vector>
 
 #include "FrontendCommon.h"
@@ -63,6 +66,73 @@ const unsigned int KeepUpToDateChangeDelay = 500;
 // Upstream waits this long for input in batch mode before giving up.
 const unsigned int BatchInputTimeout = 10000;
 const UnicodeString TimestampVarName(L"TIMESTAMP");
+
+// The console the master password is asked on (THeadlessConfiguration calls
+// back here), as TConsoleRunner::MasterPasswordPrompt asks it.
+TCliConsole * GMasterPasswordConsole = nullptr;
+
+bool ConsoleMasterPasswordPrompt(UnicodeString & Password, bool Incorrect)
+{
+  TCliConsole * Console = GMasterPasswordConsole;
+  if (Console == nullptr)
+  {
+    return false;
+  }
+  if (Incorrect)
+  {
+    Console->PrintLine(LoadStr(MASTER_PASSWORD_INCORRECT));
+  }
+  Console->Print(LoadStr(CONSOLE_MASTER_PASSWORD_PROMPT));
+  return Console->Input(Password, false, 0);
+}
+
+// As WinSCP.cpp: WINSCP_PATH, which scripts expand (%WINSCP_PATH%) and what
+// they run inherits. The .NET assembly's folder when the package has one
+// (dotnet/, beside the programs on Windows), else the program's own -- the
+// real executable's, not a symlink's -- as the GUI sets it (port/qt/main.cpp).
+void SetWinScpPath()
+{
+  const UnicodeString Dir = ExcludeTrailingBackslash(ExtractFilePath(ParamStr(0)));
+  const UnicodeString DotNet = IncludeTrailingBackslash(Dir) + L"dotnet";
+  SetEnvironmentVariable(L"WINSCP_PATH",
+    FileExists(ApiPath(IncludeTrailingBackslash(DotNet) + L"WinSCPnet.dll")) ? DotNet : Dir);
+}
+
+#if !defined(_WIN32)
+// The scripting help's examples and syntax are WinSCP's, in Windows paths
+// (lcd d:\, d:\www\, '.\', "must end with backslash"); on POSIX they read as
+// POSIX ones. Rewritten as loaded (a translation's too), so Windows keeps
+// upstream's text.
+const wchar_t * PosixHelpText(unsigned Ident, const wchar_t * Text)
+{
+  switch (Ident)
+  {
+    case SCRIPT_LCD_HELP:
+    case SCRIPT_LLS_HELP2:
+    case SCRIPT_GET_HELP8:
+    case SCRIPT_PUT_HELP8:
+    case SCRIPT_SYNCHRONIZE_HELP7:
+    case SCRIPT_KEEPUPTODATE_HELP5:
+      break;
+    default:
+      return nullptr;
+  }
+  static std::mutex Section;
+  static std::map<std::pair<unsigned, const wchar_t *>, UnicodeString> Cache;
+  std::lock_guard<std::mutex> Lock(Section);
+  UnicodeString & Result = Cache[std::make_pair(Ident, Text)];
+  if (Result.IsEmpty())
+  {
+    UnicodeString S = Text;
+    S = ReplaceStr(S, L"d:\\www", L"/home/user/www");
+    S = ReplaceStr(S, L"d:\\", L"/tmp");
+    S = ReplaceStr(S, L"\\", L"/");
+    S = ReplaceStr(S, L"must end with backslash", L"must end with slash");
+    Result = S;
+  }
+  return Result.c_str();
+}
+#endif
 
 // GUITools.cpp's ApplyTabs with spaces: "label<TAB>value" lines aligned.
 UnicodeString ApplyTabs(const UnicodeString & Text)
@@ -816,6 +886,27 @@ void TCliRunner::DoShowException(TTerminal * Terminal, Exception * E)
   {
     LoggingTerminal->ActionLog->AddFailure(E);
   }
+  else if (!Message.IsEmpty())
+  {
+    // As ShowExtendedExceptionEx: with no session (a failure before or
+    // without "open"), and for the .NET assembly's /nointeractiveinput, the
+    // failure still goes to the XML log, in one of its own.
+    try
+    {
+      TProgramParams * Params = TProgramParams::Instance();
+      UnicodeString XmlLog;
+      if (Params->FindSwitch(NoInteractiveInputSwitch) && Params->FindSwitch(L"XmlLog", XmlLog) &&
+          !XmlLog.IsEmpty() && CheckSafe(Params) && Configuration->LogActions)
+      {
+        std::unique_ptr<TActionLog> ActionLog(new TActionLog(Now(), Configuration));
+        ActionLog->AddFailure(E);
+      }
+    }
+    catch (Exception &)
+    {
+      // swallow, as upstream
+    }
+  }
 }
 //---------------------------------------------------------------------------
 void TCliRunner::UpdateTitle()
@@ -1316,7 +1407,7 @@ int Info(TCliConsole * Console)
 // The switches this client has, with upstream's descriptions.
 void Usage(TCliConsole * Console)
 {
-  Console->PrintLine(FORMAT(L"%s, %s", (AppNameString(), Configuration->VersionStr)));
+  Console->PrintLine(FORMAT(L"%s %s, based on WinSCP %s", (AppNameString(), LINSCP_VERSION, Configuration->Version)));
   Console->PrintLine(ReplaceText(LoadStr(WINSCP_COPYRIGHT), L"©", L"(c)"));
   Console->PrintLine();
   Console->PrintLine(LoadStr(USAGE_SYNTAX_LABEL));
@@ -1340,6 +1431,7 @@ void Usage(TCliConsole * Console)
     L"/batchsettings <site_mask> setting1=value1 setting2=value2 ...",
     L"/keygen keyfile [/output=<file>] [/changepassphrase] [/comment=<text>] [/certificate=<file>]",
     L"/copyid /identity=<file> mysession",
+    L"/fingerprintscan mysession",
     L"/info",
     L"/help",
   };
@@ -1348,7 +1440,9 @@ void Usage(TCliConsole * Console)
     Console->PrintLine(Exe + L" " + S);
   }
   Console->PrintLine();
-  const struct { const wchar_t * Name; int Desc; } Switches[] = {
+  // Desc, upstream's description; Text, linscp's own for the switches
+  // upstream's usage leaves out.
+  const struct { const wchar_t * Name; int Desc; const wchar_t * Text; } Switches[] = {
     { L"session", USAGE_SESSION }, { L"/privatekey=", USAGE_PRIVATEKEY }, { L"/hostkey=", USAGE_HOSTKEY },
     { L"/username", USAGE_USERNAME }, { L"/password", USAGE_PASSWORD },
     { L"/passwordsfromfiles", USAGE_PASSWORDSFROMFILES }, { L"/clientcert=", USAGE_CLIENTCERT },
@@ -1360,7 +1454,9 @@ void Usage(TCliConsole * Console)
     { L"/logsize=", USAGE_LOGSIZE }, { L"/xmllog=", USAGE_XMLLOG }, { L"/xmlgroups", USAGE_XMLGROUPS },
     { L"/nointeractiveinput", USAGE_INTERACTIVEINPUT }, { L"/ini=", USAGE_INI },
     { L"/rawconfig", USAGE_RAWCONFIG }, { L"/batchsettings", USAGE_BATCHSETTINGS },
-    { L"/copyid", USAGE_COPYID }, { L"/info", USAGE_INFO }, { L"/help", USAGE_HELP },
+    { L"/copyid", USAGE_COPYID }, { L"/identity=", 0, L"With /copyid, the key file whose public key is installed." },
+    { L"/fingerprintscan", 0, L"Prints the fingerprints of a server's SSH host key or TLS/SSL certificate, unverified." },
+    { L"/info", USAGE_INFO }, { L"/help", USAGE_HELP },
   };
   int Width = 0;
   for (const auto & S : Switches)
@@ -1374,7 +1470,7 @@ void Usage(TCliConsole * Console)
     {
       Name += L' ';
     }
-    const UnicodeString Desc = ReplaceText(LoadStr(S.Desc), L"%APP%", Exe);
+    const UnicodeString Desc = (S.Desc != 0) ? ReplaceText(LoadStr(S.Desc), L"%APP%", Exe) : UnicodeString(S.Text);
     Console->PrintLine(L"  " + Name + L"  " + Desc);
   }
 }
@@ -1445,6 +1541,10 @@ int RunScripting(TCliConsole * Console, TProgramParams * Params)
 int main()
 {
   int Result = ResultSuccess;
+  SetWinScpPath();
+#if !defined(_WIN32)
+  linscp::SetResourceStringFilter(PosixHelpText);
+#endif
   try
   {
     HeadlessInitialize();
@@ -1470,6 +1570,8 @@ int main()
       {
         Console.reset(new TStdioConsole(StdOut, StdIn, NoInteractiveInput));
       }
+      GMasterPasswordConsole = Console.get();
+      SetHeadlessMasterPasswordPrompt(ConsoleMasterPasswordPrompt);
       // In upstream's order (WinMain.cpp).
       if (Params->FindSwitch(L"help") || Params->FindSwitch(L"h") || Params->FindSwitch(L"?"))
       {

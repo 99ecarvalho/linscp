@@ -527,7 +527,14 @@ bool SetCurrentDir(const UnicodeString & Dir)
 #if defined(_WIN32)
   return SetCurrentDirectoryW(Dir.c_str()) != 0;
 #else
-  return chdir(Narrow(Dir).c_str()) == 0;
+  if (chdir(Narrow(Dir).c_str()) == 0)
+  {
+    return true;
+  }
+  // As SetCurrentDirectoryW: the reason in the thread's last error, which
+  // core's CHANGE_DIR_ERROR reports.
+  SetLastError(Win32ErrorFromErrno(errno));
+  return false;
 #endif
 }
 
