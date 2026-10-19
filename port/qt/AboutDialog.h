@@ -22,14 +22,12 @@ public:
   // Its texts, for tests.
   QLabel * NameLabel() const { return FName; }
   QLabel * VersionLabel() const { return FVersion; }
-  QLabel * WinScpLabel() const { return FWinScp; }
   QTextBrowser * ThirdParty() const { return FThirdParty; }
   QPushButton * LicenseButton() const { return FLicense; }
 
 private:
   QLabel * FName = nullptr;
   QLabel * FVersion = nullptr;
-  QLabel * FWinScp = nullptr;
   QTextBrowser * FThirdParty = nullptr;
   QPushButton * FLicense = nullptr;
 };

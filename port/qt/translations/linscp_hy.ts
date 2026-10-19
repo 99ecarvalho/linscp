@@ -20,16 +20,8 @@
         <translation>Օգտագործվում է: Qt %1 (վերնագրային ֆայլեր: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>Հիմնված է WinSCP %1-ի վրա: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>Կայքէջ: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1։</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>Լիցենզիա</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2302,6 +2298,14 @@ Location: %2</source>
     <message>
         <source>Change directory view style</source>
         <translation>Փոխել թղթապանակի դիտքի ոճը</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>Հաղորդել անվտանգության &amp;խնդրի մասին...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>Բացում է վեբ դիտարկիչը՝ անվտանգության խոցելիությունը գաղտնի հաղորդելու համար</translation>
     </message>
 </context>
 <context>

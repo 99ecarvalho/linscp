@@ -20,16 +20,8 @@
         <translation>Kasutusel: Qt %1 (päised: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>Põhineb WinSCP versioonil %1: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>Veebileht: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1.</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>Litsents</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2302,6 +2298,14 @@ Asukoht: %2</translation>
     <message>
         <source>Change directory view style</source>
         <translation>Muuda kataloogivaate stiili</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>Teata &amp;turbaprobleemist...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>Avab veebibrauseri turvanõrkusest privaatselt teatamiseks</translation>
     </message>
 </context>
 <context>

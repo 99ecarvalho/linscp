@@ -20,16 +20,8 @@
         <translation>Sử dụng: Qt %1 (headers: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>Dựa trên WinSCP %1: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>Trang web: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1.</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>Giấy phép</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2301,6 +2297,14 @@ Vị trí: %2</translation>
     <message>
         <source>Change directory view style</source>
         <translation>Thay đổi kiểu hiển thị thư mục</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>Báo cáo một &amp;vấn đề bảo mật...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>Mở trình duyệt web để báo cáo riêng tư một lỗ hổng bảo mật</translation>
     </message>
 </context>
 <context>

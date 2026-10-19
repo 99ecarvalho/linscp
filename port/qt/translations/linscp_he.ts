@@ -20,16 +20,8 @@
         <translation>משתמש ב: Qt %1 (כותרות: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>מבוסס על WinSCP %1: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>אתר אינטרנט: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1.</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>רשיון</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2302,6 +2298,14 @@ Location: %2</source>
     <message>
         <source>Change directory view style</source>
         <translation>שנה סגנון תצוגת תיקייה</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>&amp;דיווח על בעיית אבטחה...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>פותח דפדפן לדיווח פרטי על פגיעות אבטחה</translation>
     </message>
 </context>
 <context>

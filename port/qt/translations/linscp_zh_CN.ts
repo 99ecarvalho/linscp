@@ -20,16 +20,8 @@
         <translation>使用：Qt %1 (头文件：%2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>基于WinSCP %1：%2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>网站：%1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP：%1。</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>许可</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2301,6 +2297,14 @@ Location: %2</source>
     <message>
         <source>Change directory view style</source>
         <translation>更改目录视图样式</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>报告安全问题(&amp;I)...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>打开网页浏览器以私密报告安全漏洞</translation>
     </message>
 </context>
 <context>

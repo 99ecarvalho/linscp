@@ -2191,7 +2191,7 @@ std::string ThirdPartyHtml(const std::string & LanguageName)
       (!TranslatorUrl.IsEmpty() ? HtmlLink(TranslatorUrl) : EmptyStr));
   }
 
-  AddPara(ThirdParty, LoadStr(ABOUT_THIRDPARTY_HEADER));
+  AddPara(ThirdParty, ReplaceStr(LoadStr(ABOUT_THIRDPARTY_HEADER), L"programs (libraries)", L"programs and libraries"));
 
   AddPara(ThirdParty,
     FMTLOAD(PUTTY_BASED_ON, (GetPuTTYVersion())) + Br +

@@ -20,16 +20,8 @@
         <translation>Używa: Qt %1 (nagłówki: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>Na podstawie WinSCP %1: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>Strona internetowa: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1.</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>Licencja</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2303,6 +2299,14 @@ Lokalizacja: %2</translation>
     <message>
         <source>Change directory view style</source>
         <translation>Zmień styl widoku katalogu</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>Zgłoś &amp;problem z bezpieczeństwem...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>Otwiera przeglądarkę, aby prywatnie zgłosić lukę w zabezpieczeniach</translation>
     </message>
 </context>
 <context>

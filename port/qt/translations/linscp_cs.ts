@@ -20,16 +20,8 @@
         <translation>Používá: Qt %1 (hlavičky: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>Založeno na WinSCP %1: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>Webové stránky: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1.</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>Licence</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2303,6 +2299,14 @@ Umístění: %2</translation>
     <message>
         <source>Change directory view style</source>
         <translation>Změní režim zobrazení adresáře</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>Nahlásit bezpečnostní &amp;problém...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>Otevře webový prohlížeč pro soukromé nahlášení bezpečnostní zranitelnosti</translation>
     </message>
 </context>
 <context>

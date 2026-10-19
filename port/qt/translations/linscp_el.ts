@@ -20,16 +20,8 @@
         <translation>Χρησιμοποιεί: Qt %1 (κεφαλίδες: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>Βασισμένο στο WinSCP %1: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>Ιστότοπος: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1.</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>Δικαιώματα</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2302,6 +2298,14 @@ Location: %2</source>
     <message>
         <source>Change directory view style</source>
         <translation>Αλλαγή στυλ προβολής καταλόγου</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>Αναφορά &amp;ζητήματος ασφαλείας...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>Ανοίγει το πρόγραμμα περιήγησης για ιδιωτική αναφορά ευπάθειας ασφαλείας</translation>
     </message>
 </context>
 <context>

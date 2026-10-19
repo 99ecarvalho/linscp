@@ -20,16 +20,8 @@
         <translation>Folosește: Qt %1 (antete: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>Bazat pe WinSCP %1: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>Pagină web: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1.</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>Licență</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2303,6 +2299,14 @@ Cale: %2</translation>
     <message>
         <source>Change directory view style</source>
         <translation>Schimbare mod de vizualizare a directorului</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>Raportează o &amp;problemă de securitate...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>Deschide browserul web pentru a raporta în mod privat o vulnerabilitate de securitate</translation>
     </message>
 </context>
 <context>

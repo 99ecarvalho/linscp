@@ -20,16 +20,8 @@
         <translation>Gumagamit ng: Qt %1 (headers: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>Batay sa WinSCP %1: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>Website: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1.</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>Lisensya</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2302,6 +2298,14 @@ Lokasyon: %2</translation>
     <message>
         <source>Change directory view style</source>
         <translation>Baguhin ang istilo ng pagtingin sa direktoryo</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>Mag-ulat ng &amp;isyu sa seguridad...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>Nagbubukas ng web browser para pribadong iulat ang isang kahinaan sa seguridad</translation>
     </message>
 </context>
 <context>

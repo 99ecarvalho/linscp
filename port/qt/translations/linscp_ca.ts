@@ -20,16 +20,8 @@
         <translation>Utilitza: Qt %1 (capçaleres: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>Basat en WinSCP %1: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>Lloc web: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1.</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>Llicència</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -883,7 +879,7 @@ Ubicació: %2</translation>
     </message>
     <message>
         <source>Shell script</source>
-        <translation>Script de l'intèrpret d'ordres</translation>
+        <translation>Script de l&apos;intèrpret d&apos;ordres</translation>
     </message>
 </context>
 <context>
@@ -2302,6 +2298,14 @@ Ubicació: %2</translation>
     <message>
         <source>Change directory view style</source>
         <translation>Canvia l&apos;estil de visualització del directori</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>Informa d&apos;un &amp;problema de seguretat...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>Obre el navegador web per informar d&apos;una vulnerabilitat de seguretat de manera privada</translation>
     </message>
 </context>
 <context>

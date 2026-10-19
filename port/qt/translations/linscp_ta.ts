@@ -20,16 +20,8 @@
         <translation>பயன்படுத்துவது: Qt %1 (தலைப்புகள்: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>WinSCP %1 அடிப்படையில்: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>வலைத்தளம்: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1.</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>உரிமம்</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2302,6 +2298,14 @@ Location: %2</source>
     <message>
         <source>Change directory view style</source>
         <translation>கோப்பகக் காட்சி பாணியை மாற்று</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>ஒரு &amp;பாதுகாப்பு சிக்கலைப் புகாரளி...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>ஒரு பாதுகாப்பு பாதிப்பைத் தனிப்பட்ட முறையில் புகாரளிக்க வலை உலாவியைத் திறக்கிறது</translation>
     </message>
 </context>
 <context>

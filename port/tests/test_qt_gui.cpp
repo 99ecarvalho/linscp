@@ -5902,14 +5902,17 @@ void Session(const char * Port)
       Check(About.NameLabel()->text() == QString::fromStdString(Info.AppName), "About names the program");
       Check(About.VersionLabel()->text().contains(QString::fromStdString(Info.Version)), "its version");
 
-      Check(About.WinScpLabel()->text().contains(QStringLiteral("https://winscp.net/")) &&
-        About.WinScpLabel()->text().contains(QString::fromStdString(Info.WinScpVersion)) && (Info.WinScpVersion != Info.Version),
-        "and WinSCP's, with its site");
       Check(!QIcon(QStringLiteral(":/icons/linscp.ico")).pixmap(64, 64).isNull(), "with its icon");
       const QString ThirdParty = About.ThirdParty()->toPlainText();
       Check(ThirdParty.contains(QStringLiteral("PuTTY")) && ThirdParty.contains(QStringLiteral("OpenSSL")) &&
-        ThirdParty.contains(QStringLiteral("eXpat")) && ThirdParty.contains(QStringLiteral("Qt ")),
+        ThirdParty.contains(QStringLiteral("eXpat")) && ThirdParty.contains(QStringLiteral("Qt ")) &&
+        ThirdParty.contains(QStringLiteral("programs and libraries")),
         "WinSCP's third-party list, with Qt");
+      // WinSCP's own attribution now sits in the third-party list, below Qt.
+      Check(ThirdParty.contains(QStringLiteral("WinSCP ") + QString::fromStdString(Info.WinScpVersion)) &&
+        (Info.WinScpVersion != Info.Version) &&
+        About.ThirdParty()->toHtml().contains(QStringLiteral("https://winscp.net/")),
+        "and WinSCP's version and site, below Qt");
       Check(About.ThirdParty()->toHtml().contains(QString::fromLatin1(CoreBridge::ExpatLicenseUrl)), "Expat's license linked");
       Check(About.LicenseButton() != nullptr, "and a License button");
     }

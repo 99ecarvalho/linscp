@@ -20,16 +20,8 @@
         <translation>Koristi: Qt %1 (zaglavlja: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>Temeljeno na WinSCP %1: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>Web-stranica: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1.</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>Licenca</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2303,6 +2299,14 @@ Lokacija: %2</translation>
     <message>
         <source>Change directory view style</source>
         <translation>Promijeni stil prikaza mape</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>Prijavi sigurnosni &amp;problem...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>Otvara web preglednik za privatnu prijavu sigurnosne ranjivosti</translation>
     </message>
 </context>
 <context>

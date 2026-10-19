@@ -20,16 +20,8 @@
         <translation>ใช้: Qt %1 (headers: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>พัฒนาจาก WinSCP %1: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>เว็บไซต์: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1.</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>ใบอนุญาต</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2301,6 +2297,14 @@ Location: %2</source>
     <message>
         <source>Change directory view style</source>
         <translation>เปลี่ยนรูปแบบมุมมองไดเรกทอรี</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>รายงาน&amp;ปัญหาด้านความปลอดภัย...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>เปิดเว็บเบราว์เซอร์เพื่อรายงานช่องโหว่ด้านความปลอดภัยแบบส่วนตัว</translation>
     </message>
 </context>
 <context>

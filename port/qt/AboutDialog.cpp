@@ -85,14 +85,9 @@ AboutDialog::AboutDialog(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FVersion = TextLabel(tr("Version: <b>%1</b>").arg(Version.toHtmlEscaped()), this);
   Texts->addWidget(FVersion);
   Texts->addWidget(TextLabel(tr("Using: Qt %1 (headers: %2)").arg(QString::fromLatin1(qVersion()), QStringLiteral(QT_VERSION_STR)), this));
-  // Where it comes from: WinSCP, the version its core is.
-  FWinScp = TextLabel(tr("Based on WinSCP %1: %2").arg(QString::fromStdString(Info.WinScpVersion).toHtmlEscaped(), Link(QString::fromLatin1(WinScpWebSite))), this);
-  Texts->addWidget(FWinScp);
   Texts->addWidget(TextLabel(tr("Website: %1").arg(Link(QString::fromLatin1(WebSite))), this));
   QLabel * Copyright = TextLabel(
-    tr("Copyright © 2026 Eduardo Correia &lt;%1&gt;.").arg(QStringLiteral("ecorreia@apliant.com.br")) + QStringLiteral("<br>") +
-    tr("WinSCP: %1: %2.").arg(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::WinScpCopyright)).toHtmlEscaped(),
-      Link(QString::fromLatin1(WinScpWebSite))), this);
+    tr("Copyright © 2026 Eduardo Correia &lt;%1&gt;.").arg(QStringLiteral("ecorreia@apliant.com.br")), this);
   Texts->addWidget(Copyright);
   QLabel * Licence = TextLabel(
     tr("This program is free software; you can redistribute it and/or modify it under the terms of the "
@@ -105,8 +100,8 @@ AboutDialog::AboutDialog(const CoreBridge::TInfo & Info, QWidget * Parent) :
   Body->addLayout(Texts, 1);
   Layout->addLayout(Body);
 
-  // WinSCP's third-party list, core's (CoreBridge::ThirdPartyHtml), with Qt,
-  // which the shell is built on, after it.
+  // WinSCP's third-party list, core's (CoreBridge::ThirdPartyHtml), then Qt,
+  // which the shell is built on, then WinSCP itself, after it.
   FThirdParty = new QTextBrowser(this);
   FThirdParty->setAccessibleName(tr("Third party software"));
   FThirdParty->setOpenLinks(false);
@@ -114,7 +109,11 @@ AboutDialog::AboutDialog(const CoreBridge::TInfo & Info, QWidget * Parent) :
     QStringLiteral("<p>%1<br>%2<br>%3</p>").arg(
       tr("Qt %1").arg(QString::fromLatin1(qVersion())),
       tr("Copyright © The Qt Company Ltd. and other contributors"),
-      Link(QStringLiteral("https://www.qt.io/"))) + IconSetsHtml());
+      Link(QStringLiteral("https://www.qt.io/"))) +
+    QStringLiteral("<p>%1<br>%2<br>%3</p>").arg(
+      tr("WinSCP %1").arg(QString::fromStdString(Info.WinScpVersion).toHtmlEscaped()),
+      QString::fromStdString(CoreBridge::Text(CoreBridge::TText::WinScpCopyright)).toHtmlEscaped(),
+      Link(QString::fromLatin1(WinScpWebSite))) + IconSetsHtml());
   FThirdParty->setMinimumHeight(160);
   connect(FThirdParty, &QTextBrowser::anchorClicked, this, [this](const QUrl & Url)
   {

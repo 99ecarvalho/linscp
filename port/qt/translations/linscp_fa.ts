@@ -20,16 +20,8 @@
         <translation>با استفاده از: Qt %1 (سرآیندها: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>بر پایه WinSCP %1: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>وب‌سایت: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1.</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>مجوز</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2301,6 +2297,14 @@ Location: %2</source>
     <message>
         <source>Change directory view style</source>
         <translation>تغییر سبک نمایش پوشه</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>گزارش یک &amp;مشکل امنیتی...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>مرورگر وب را برای گزارش محرمانهٔ یک آسیب‌پذیری امنیتی باز می‌کند</translation>
     </message>
 </context>
 <context>

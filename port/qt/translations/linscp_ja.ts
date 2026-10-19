@@ -20,16 +20,8 @@
         <translation>使用: Qt %1 (ヘッダー: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>WinSCP %1 ベース: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>ウェブサイト: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1。</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>ライセンス</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2301,6 +2297,14 @@ Location: %2</source>
     <message>
         <source>Change directory view style</source>
         <translation>ディレクトリの表示を変更します</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>セキュリティ問題を報告(&amp;I)...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>セキュリティ脆弱性を非公開で報告するためにWebブラウザーを開きます</translation>
     </message>
 </context>
 <context>

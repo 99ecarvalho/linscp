@@ -20,16 +20,8 @@
         <translation>사용: Qt %1 (헤더: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>WinSCP %1 기반: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>웹사이트: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1.</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>저작권</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2301,6 +2297,14 @@ Location: %2</source>
     <message>
         <source>Change directory view style</source>
         <translation>디렉터리 보기 스타일을 변경합니다</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>보안 문제 신고(&amp;I)...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>보안 취약점을 비공개로 신고하기 위해 웹 브라우저를 엽니다</translation>
     </message>
 </context>
 <context>

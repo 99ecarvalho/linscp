@@ -20,16 +20,8 @@
         <translation>ব্যবহৃত: Qt %1 (হেডার: %2)</translation>
     </message>
     <message>
-        <source>Based on WinSCP %1: %2</source>
-        <translation>WinSCP %1 ভিত্তিক: %2</translation>
-    </message>
-    <message>
         <source>Website: %1</source>
         <translation>ওয়েবসাইট: %1</translation>
-    </message>
-    <message>
-        <source>WinSCP: %1.</source>
-        <translation>WinSCP: %1।</translation>
     </message>
     <message>
         <source>This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License version 3, as WinSCP.</source>
@@ -62,6 +54,10 @@
     <message>
         <source>License</source>
         <translation>লাইসেন্স</translation>
+    </message>
+    <message>
+        <source>WinSCP %1</source>
+        <translation>WinSCP %1</translation>
     </message>
 </context>
 <context>
@@ -2302,6 +2298,14 @@ Location: %2</source>
     <message>
         <source>Change directory view style</source>
         <translation>ডিরেক্টরি দেখার ধরন পরিবর্তন</translation>
+    </message>
+    <message>
+        <source>Report a Security &amp;Issue...</source>
+        <translation>একটি নিরাপত্তা &amp;সমস্যা রিপোর্ট করুন...</translation>
+    </message>
+    <message>
+        <source>Opens web browser to report a security vulnerability privately</source>
+        <translation>একটি নিরাপত্তা দুর্বলতা গোপনে রিপোর্ট করতে ওয়েব ব্রাউজার খোলে</translation>
     </message>
 </context>
 <context>
