@@ -56,13 +56,23 @@ if(NOT WIN32)
               --dest "${CMAKE_BINARY_DIR}/winscpnet" --framework netstandard2.0
       DEPENDS "${CMAKE_SOURCE_DIR}/port/tools/build_winscpnet.py"
       COMMENT "Building WinSCP's .NET assembly (netstandard2.0)" VERBATIM)
-    add_custom_target(winscpnet ALL DEPENDS "${_winscpnet}")
-    install(FILES "${_winscpnet}" DESTINATION "${_libdir}/dotnet")
+    add_custom_target(winscpnet DEPENDS "${_winscpnet}")
+    # The package targets build it first (below). The install tolerates its
+    # absence, so a plain `cmake --install` without it still succeeds.
     install(CODE "
-      set(_dotnet \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${_libdir}/dotnet\")
-      file(CREATE_LINK \"../linscp-cli\" \"\${_dotnet}/WinSCP.exe\" SYMBOLIC)")
+      if(EXISTS \"${_winscpnet}\")
+        set(_dotnet \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${_libdir}/dotnet\")
+        file(MAKE_DIRECTORY \"\${_dotnet}\")
+        file(COPY \"${_winscpnet}\" DESTINATION \"\${_dotnet}\")
+        file(REMOVE \"\${_dotnet}/WinSCP.exe\")
+        file(CREATE_LINK \"../linscp-cli\" \"\${_dotnet}/WinSCP.exe\" SYMBOLIC)
+      else()
+        message(STATUS \"no WinSCPnet.dll built; package without WinSCP's .NET assembly\")
+      endif()")
+    set(_winscpnet_dep winscpnet)
   else()
     message(STATUS "No .NET SDK at ${LINSCP_HOST_DOTNET}: the package goes without WinSCP's .NET assembly")
+    set(_winscpnet_dep)
   endif()
   set(_linux "${CMAKE_CURRENT_SOURCE_DIR}/linux")
   install(FILES "${_linux}/${LINSCP_APP_ID}.desktop" DESTINATION "${CMAKE_INSTALL_DATADIR}/applications")
@@ -102,7 +112,7 @@ if(NOT WIN32)
   include(CPack)
   add_custom_target(package-deb
     COMMAND "${CMAKE_CPACK_COMMAND}" -G DEB --config "${CMAKE_BINARY_DIR}/CPackConfig.cmake"
-    DEPENDS linscp linscp-cli core-translations
+    DEPENDS linscp linscp-cli core-translations ${_winscpnet_dep}
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
     COMMENT "Building the .deb in ${CMAKE_BINARY_DIR}/packages"
     VERBATIM)
@@ -110,7 +120,7 @@ if(NOT WIN32)
   # libraries and Qt's plugins bundled.
   add_custom_target(package-appimage
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/build_appimage.py" --build "${CMAKE_BINARY_DIR}"
-    DEPENDS linscp linscp-cli core-translations
+    DEPENDS linscp linscp-cli core-translations ${_winscpnet_dep}
     COMMENT "Building the AppImage in ${CMAKE_BINARY_DIR}/packages"
     VERBATIM)
 endif()
