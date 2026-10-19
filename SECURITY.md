@@ -18,8 +18,12 @@ security problem.**
   <https://github.com/99ecarvalho/linscp/security/advisories/new>
   ("Report a vulnerability"). This keeps the report and the fix private until a
   release is ready.
-- Or email **99ecarvalho@gmail.com** with the details and, if you can, a
-  proof of concept.
+- Or email **[security@linscp.org](mailto:security@linscp.org)** with the
+  details and, if you can, a proof of concept. Start the subject with
+  `[security]`. Email is not end-to-end encrypted: for very sensitive details,
+  first describe only the kind of problem and ask for a safer channel.
+
+A step-by-step guide to both channels is at <https://linscp.org/security/>.
 
 Please include the linscp version, the platform (Linux or Windows), steps to
 reproduce, and the impact as you see it.
