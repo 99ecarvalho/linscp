@@ -7299,9 +7299,16 @@ void OptionsHelpTest(const QString & Directory)
     }
     Check((Opened.size() == 5) && Opened[4].toString().contains(QStringLiteral("sponsors")), "Donate: the project's donation page");
     Check((Opened.size() == 5) && Opened[0].toString().contains(QStringLiteral("linscp-website/manual")) &&
-      Opened[1].toString().endsWith(QStringLiteral("/linscp")) && Opened[2].toString().endsWith(QStringLiteral("/issues")) &&
+      (Opened[1].host() == QStringLiteral("99ecarvalho.github.io")) && Opened[2].toString().endsWith(QStringLiteral("/issues")) &&
       Opened[3].toString().endsWith(QStringLiteral("/releases")),
-      "Contents linscp's manual, the rest linscp's own pages");
+      "Contents linscp's manual, Homepage linscp's website, the rest linscp's own pages");
+    QAction * Security = MenuAction(Window, { "Help", "Report a Security Issue" });
+    Check(Security != nullptr, "Help offers reporting a security issue");
+    if (Security != nullptr)
+    {
+      Security->trigger();
+      Check(Opened.last().toString().contains(QStringLiteral("/security/advisories")), "it opens a private GitHub advisory");
+    }
     Check((MenuAction(Window, { "Help", "Contents" })->shortcut() == QKeySequence(Qt::Key_F1)), "Contents is F1");
 
     Check((MainWindow::CompareVersions(QStringLiteral("v0.10.0"), QStringLiteral("0.9.1")) > 0) &&

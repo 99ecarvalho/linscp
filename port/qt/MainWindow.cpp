@@ -105,6 +105,10 @@ namespace
 const char DonateUrl[] = "https://github.com/sponsors/99ecarvalho";
 // Help > Contents (F1): linscp's own manual.
 const char ManualUrl[] = "https://99ecarvalho.github.io/linscp-website/manual/";
+// Help > Product Homepage: linscp's website.
+const char HomepageUrl[] = "https://99ecarvalho.github.io/linscp-website/";
+// Help > Report a Security Issue: a private GitHub advisory (see SECURITY.md).
+const char SecurityUrl[] = "https://github.com/99ecarvalho/linscp/security/advisories/new";
 
 
 // ExtractShortName: a path's last part, the root as it is.
@@ -5983,8 +5987,11 @@ void MainWindow::BuildMenus()
   Contents->setStatusTip(tr("Opens web browser and points it to documentation table of contents"));
   Help->addSeparator();
   Help->addAction(tr("Product &Homepage"), this,
-    [this]() { OpenWebPage(QStringLiteral("https://github.com/99ecarvalho/linscp")); })
+    [this]() { OpenWebPage(QString::fromLatin1(HomepageUrl)); })
     ->setStatusTip(tr("Opens web browser and points it to project homepage"));
+  Help->addAction(tr("Report a Security &Issue..."), this,
+    [this]() { OpenWebPage(QString::fromLatin1(SecurityUrl)); })
+    ->setStatusTip(tr("Opens web browser to report a security vulnerability privately"));
   Help->addAction(tr("&Support Forum"), this,
     [this]() { OpenWebPage(QStringLiteral("https://github.com/99ecarvalho/linscp/issues")); })
     ->setStatusTip(tr("Opens web browser and points it to support forum page"));
@@ -7728,7 +7735,7 @@ void MainWindow::BuildToolbars(QMenu * Options)
   UpdatesMenu->addAction(tr("&Check for Updates"), this, [this]() { CheckForUpdates(); });
   UpdatesMenu->addSeparator();
   UpdatesMenu->addAction(tr("Product &Homepage"), this,
-    [this]() { OpenWebPage(QStringLiteral("https://github.com/99ecarvalho/linscp")); });
+    [this]() { OpenWebPage(QString::fromLatin1(HomepageUrl)); });
   UpdatesMenu->addAction(tr("&Download"), this,
     [this]() { OpenWebPage(QStringLiteral("https://github.com/99ecarvalho/linscp/releases/latest")); });
   UpdatesMenu->addAction(tr("&Support Forum"), this,

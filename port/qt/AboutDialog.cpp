@@ -33,7 +33,7 @@ QString IconSetsHtml()
   return Result;
 }
 
-const char WebSite[] = "https://github.com/99ecarvalho/linscp";
+const char WebSite[] = "https://99ecarvalho.github.io/linscp-website/";
 const char WinScpWebSite[] = "https://winscp.net/";
 
 QString Link(const QString & Url)
@@ -91,7 +91,8 @@ AboutDialog::AboutDialog(const CoreBridge::TInfo & Info, QWidget * Parent) :
   Texts->addWidget(TextLabel(tr("Website: %1").arg(Link(QString::fromLatin1(WebSite))), this));
   QLabel * Copyright = TextLabel(
     tr("Copyright © 2026 Eduardo Correia &lt;%1&gt;.").arg(QStringLiteral("ecorreia@apliant.com.br")) + QStringLiteral("<br>") +
-    tr("WinSCP: %1.").arg(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::WinScpCopyright)).toHtmlEscaped()), this);
+    tr("WinSCP: %1: %2.").arg(QString::fromStdString(CoreBridge::Text(CoreBridge::TText::WinScpCopyright)).toHtmlEscaped(),
+      Link(QString::fromLatin1(WinScpWebSite))), this);
   Texts->addWidget(Copyright);
   QLabel * Licence = TextLabel(
     tr("This program is free software; you can redistribute it and/or modify it under the terms of the "
