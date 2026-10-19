@@ -9,3 +9,6 @@
 	path = 3rd-party/putty
 	url = https://git.tartarus.org/simon/putty.git
 	shallow = true
+[submodule "linscp-website"]
+	path = linscp-website
+	url = https://github.com/99ecarvalho/linscp-website.git
