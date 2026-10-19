@@ -14,7 +14,7 @@ both.
 Website and manual: **<https://linscp.org>** · Created and maintained by
 [Eduardo Correia](https://github.com/99ecarvalho)
 
-> **Pre-release (0.6.1).** Feedback and bug reports are very welcome.
+> **Version 0.7.0.** Feedback and bug reports are very welcome.
 
 ![The Commander interface: local files on the left, the server on the right](doc/screenshots/commander.png)
 
