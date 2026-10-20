@@ -15,3 +15,6 @@ port/tests/golden/expected/*/*.out
 
 # local-only website research: httrack mirrors, design references, notes
 /website/
+
+# project instructions, kept local only
+/CLAUDE.md
