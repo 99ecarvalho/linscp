@@ -33,6 +33,13 @@ jobs:
             configure: -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
             # The .NET SDK's runtime dependency.
             packages: libicu76
+          # The optimized configuration the packages are built with: tests
+          # that only fail once the optimizer runs show up here.
+          - name: linux-release
+            configure: >-
+              -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+              -DCMAKE_BUILD_TYPE=Release -DLINSCP_RELEASE=ON
+            packages: libicu76
           - name: windows-cross
             configure: -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-llvm-mingw.cmake
             packages: wine wine64 zstd
@@ -90,7 +97,7 @@ jobs:
       # The SDK ctest dotnet builds and runs WinSCP's assembly with; the
       # native build only, as the SDK does not run under Wine.
       - name: Fetch the .NET SDK
-        if: matrix.name == 'linux'
+        if: startsWith(matrix.name, 'linux')
         run: runuser -u ci -- python3 port/tools/fetch_dotnet.py --dest build/tools/dotnet
 
       # FileZilla's sockets and timers need windows, which Wine creates

@@ -35,6 +35,11 @@ field-backed class properties are references, and the rest as listed.
 
 - Correct code cannot tell a zeroed allocation apart; the cost is a `calloc`
   per allocation.
+- The optimizer must not know better: clang otherwise takes memory from the
+  global `operator new` as uninitialized and, at -O2 and up, deletes code that
+  reads a field no constructor set. Everything built against the shim gets
+  `-fno-assume-sane-operator-new` (port/shim/CMakeLists.txt), and
+  `object_exceptions` builds at -O2 in every build type to keep it so.
 - Each such semantic gets a test on both targets (`object_exceptions`,
   `unicodestring`, `sysutils`, ...).
 - The golden comparison (ADR 0007) is what finds the next one.

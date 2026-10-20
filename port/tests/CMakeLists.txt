@@ -98,6 +98,10 @@ add_executable(test_object test_object.cpp)
 target_link_libraries(test_object PRIVATE linscp-shim)
 find_package(Threads REQUIRED)
 target_link_libraries(test_object PRIVATE Threads::Threads)
+# Optimized in every build type: the zeroed-allocation checks only mean
+# something where the optimizer can see a new-expression and a read of a
+# field no constructor sets in one function (see port/shim/CMakeLists.txt).
+target_compile_options(test_object PRIVATE -O2)
 add_test(NAME object_exceptions COMMAND test_object)
 
 add_executable(test_thread test_thread.cpp)

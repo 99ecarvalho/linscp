@@ -78,5 +78,17 @@ target_compile_features(linscp-shim PUBLIC cxx_std_17)
 # so must everything built against it.
 linscp_upstream_defines(linscp-shim PUBLIC ScpCore.cbproj)
 target_compile_options(linscp-shim PUBLIC -fms-extensions -fshort-wchar)
+# Every allocation starts zeroed (vcl_exceptions.cpp's global operator new),
+# and upstream reads fields no constructor sets. Clang, though, treats memory
+# from the global operator new as uninitialized: once a new-expression and
+# such a read meet in one function (after inlining), it folds the read to
+# undef and deletes the path as unreachable -- at -O2 and up only, so a
+# Release build crashes where an unoptimized one works. Without the "sane"
+# assumption the memory is opaque and the read sees the zeroes calloc wrote.
+# The nothrow and aligned forms stay exposed: the standard library's <new>
+# declares them __malloc__, which no flag undoes. Core and FileZilla use
+# neither, and the aligned ones are not zeroed in the first place.
+target_compile_options(linscp-shim PUBLIC
+  $<$<COMPILE_LANGUAGE:CXX>:-fno-assume-sane-operator-new>)
 # Thrown objects start zeroed, as Delphi's instances do (vcl_exceptions.cpp).
 target_link_options(linscp-shim INTERFACE "LINKER:--wrap=__cxa_allocate_exception")

@@ -70,6 +70,49 @@ void TestInstancesStartZeroed()
   }
 }
 
+// Upstream's shape (TSessionData): the constructor calls a method that reads
+// a field before anything sets it. With the constructor inlined into the
+// new-expression, clang at -O2 takes that read as one of uninitialized memory
+// and drops the whole path unless the shim's -fno-assume-sane-operator-new is
+// in effect; a Release build then crashed in this very binary (double free).
+// This file builds at -O2 in every build type, so that cannot come back
+// unnoticed.
+class TReadsBeforeSet : public TObject
+{
+public:
+  TReadsBeforeSet() { Modify(); Owner = this; }
+  void Modify() { if (Settings != nullptr) { ++*Settings; } ++Modified; }
+  int * Settings;
+  int Modified;
+  TReadsBeforeSet * Owner;
+};
+
+void TestReadBeforeSetSurvivesOptimizer()
+{
+  for (int I = 0; I < 16; I++)
+  {
+    TReadsBeforeSet * R = new TReadsBeforeSet();
+    CHECK(R->Settings == nullptr);
+    CHECK(R->Modified == 1);
+    CHECK(R->Owner == R);
+    // Dirty it, so the next allocation must be zeroed again, not just reused.
+    std::memset(static_cast<void *>(&R->Modified), 0x5A, sizeof(R->Modified));
+    delete R;
+  }
+
+  int * Array = new int[8];
+  bool AllZero = true;
+  for (int I = 0; I < 8; I++)
+  {
+    AllZero = AllZero && (Array[I] == 0);
+  }
+  CHECK(AllZero);
+  delete[] Array;
+  // Not `new (std::nothrow)`: the standard library declares that form (and
+  // the aligned ones) __malloc__ itself, which the flag cannot take back.
+  // Core uses neither.
+}
+
 void TestExceptionIsATObject()
 {
   TObject * O = new EAbort(UnicodeString(L"abort"));
@@ -274,6 +317,7 @@ int main()
   TestExceptionHierarchy();
   TestExceptionIsATObject();
   TestInstancesStartZeroed();
+  TestReadBeforeSetSurvivesOptimizer();
   TestExceptionCopyKeepsEveryMember();
   TestObjectIsPolymorphic();
   TestCriticalSectionIsRecursive();
