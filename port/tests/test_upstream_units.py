@@ -33,18 +33,22 @@ check(len(s3) == 14, f'libs3: 14 units ({len(s3)})')
 check('libs/libs3/src/mingw_functions.c' in s3, 'libs3: mingw_functions.c')
 check('libs/libs3/src/s3.c' not in s3, 'libs3: s3.c, the command-line tool, is not built')
 
-# The MFC subset: bare `x.$(O)` objects, sources next to the make file.
-mfc = uu.project_units(os.path.join(WINSCP, 'libs/mfc/source/borland.mak'))
-check(mfc == ['libs/mfc/source/filecore.cpp', 'libs/mfc/source/strcore.cpp',
-              'libs/mfc/source/strex.cpp', 'libs/mfc/source/timecore.cpp'], f'mfc: {mfc}')
-
 # Defines: DEFINES plus Makefile.inc's unconditional CFLAG_OPENSSL, never
 # the WIN64 branch's _WIN64.
 nd = uu.make_defines(os.path.join(WINSCP, 'libs/neon/Makefile.bcb'))
 check('WINSCP' in nd and 'OPENSSL_NO_DEPRECATED' in nd, f'neon defines: {nd}')
 check('_WIN64' not in nd, 'neon defines: no _WIN64')
-check(uu.make_defines(os.path.join(WINSCP, 'libs/mfc/source/borland.mak')) ==
-      ['_UNICODE', 'UNICODE', 'WINSCP', '_WINDOWS'], 'mfc defines')
+
+# Bare `x.$(O)` objects with sources next to the make file, and DEFS as the
+# defines: a form no make file linscp builds uses any more, kept working.
+d = tempfile.mkdtemp()
+for n in ('one.cpp', 'two.cpp'):
+    open(os.path.join(d, n), 'w').write('')
+mak = os.path.join(d, 'b.mak')
+open(mak, 'w').write('DEFS = FOO;BAR\nOBJS = one.$(O) two.$(O)\n')
+bare = uu.make_units(mak, open(mak).read(), d, d)
+check(bare == ['one.cpp', 'two.cpp'], f'bare objects: {bare}')
+check(uu.make_defines(mak) == ['FOO', 'BAR'], 'DEFS defines')
 
 # A make file naming an object it has no source for fails, rather than
 # silently dropping the unit.

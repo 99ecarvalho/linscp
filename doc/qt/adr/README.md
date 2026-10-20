@@ -22,6 +22,7 @@ the decisions table in [TRACKER.md](../TRACKER.md).
 | [0014](0014-gui-configuration.md) | The shell's settings are upstream's `TGUIConfiguration`, compiled as it is; `TWinConfiguration`'s keys mirrored |
 | [0015](0015-editing.md) | Files are edited as WinSCP edits them: its internal editor, external editors later; core's local end of line is the platform's |
 | [0016](0016-full-fork.md) | Full fork (proposed, not scheduled): materialize the generated tree, Qt-only, clang-only, drop upstream tracking — plan in [doc/fork/PLAN.md](../../fork/PLAN.md) |
+| [0017](0017-mfc-compat.md) | FileZilla's MFC API (`CString`, `CTime`, `CFile`) is linscp's own `port/mfc-compat`, written clean-room; upstream's subset is not built (proposed) |
 
 Write one when a decision constrains later work or would be costly to undo;
 number in order, never renumber, and amend rather than rewrite an accepted

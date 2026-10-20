@@ -73,8 +73,9 @@
   inline DWORD ExpandEnvironmentStrings(LPCWSTR Source, LPWSTR Destination, DWORD Size)
     { return ExpandEnvironmentStringsW(Source, Destination, Size); }
 
-  // ...and those MFC and FileZilla call. DeleteFile(LPCWSTR) overloads the
-  // VCL DeleteFile(UnicodeString), as both exist side by side in C++Builder.
+  // ...and those FileZilla and its MFC layer call. DeleteFile(LPCWSTR)
+  // overloads the VCL DeleteFile(UnicodeString), as both exist side by side
+  // in C++Builder.
   inline BOOL CreateDirectory(LPCWSTR PathName, LPSECURITY_ATTRIBUTES Security)
     { return CreateDirectoryW(PathName, Security); }
   inline BOOL DeleteFile(LPCWSTR FileName)
@@ -107,10 +108,10 @@
   #define towlower linscp_TowLower
 
   // Deliberately not a forwarder: the shim's LoadString, which serves the
-  // string table generated from upstream's .rc files. MFC's CString::LoadString
-  // calls ::LoadString, and this build compiles no .res, so FileZilla's
-  // strings come from that table on both targets. Declared here as well as in
-  // vcl_resources.h so MFC units, which see only this header, reach it.
+  // string table generated from upstream's .rc files. This build compiles no
+  // .res, so FileZilla's strings (CString::Format with a resource id, in
+  // port/mfc-compat) come from that table on both targets. Declared here as
+  // well as in vcl_resources.h so units that see only this header reach it.
   int LoadString(void * Module, unsigned Ident, wchar_t * Buffer, int BufferMax);
 #endif
 

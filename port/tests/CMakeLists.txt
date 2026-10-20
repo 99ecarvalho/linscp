@@ -108,6 +108,20 @@ add_executable(test_json test_json.cpp)
 target_link_libraries(test_json PRIVATE linscp-shim)
 add_test(NAME json COMMAND test_json)
 
+# The MFC-compatible layer FileZilla is built against (port/mfc-compat,
+# ADR 0017), compiled as FileZilla is: the Win32 prelude forced first. TZ is
+# fixed so CTime's local-time getters have known answers.
+add_executable(test_mfc_compat test_mfc_compat.cpp)
+target_link_libraries(test_mfc_compat PRIVATE linscp-mfc-compat linscp-shim)
+target_compile_options(test_mfc_compat PRIVATE -include "${CMAKE_SOURCE_DIR}/port/shim/vcl_win32_prelude.h")
+add_test(NAME mfc_compat COMMAND test_mfc_compat)
+set_tests_properties(mfc_compat PROPERTIES ENVIRONMENT "TZ=UTC0")
+# And upstream's non-free MFC subset stays out: nothing compiled, generated or
+# patched from libs/mfc (paths only; cmake/no-mfc.cmake checks the targets).
+add_test(NAME no_mfc
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/check_no_mfc.py"
+          "${CMAKE_BINARY_DIR}" "${LINSCP_GEN}" "${LINSCP_UPSTREAM}")
+
 # Core, every library it uses and the headless frontend, linked into one
 # executable with every core object forced in: the link proves nothing is
 # undefined, and running it runs every static initialiser in them.
@@ -664,7 +678,7 @@ add_test(NAME lp64_long
 # functions. POSIX only; Windows' runtime has a 2-byte wchar_t of its own.
 if(NOT WIN32)
   set(_wide_archives)
-  foreach(_lib linscp-core linscp-putty linscp-puttyvs linscp-filezilla linscp-mfc linscp-libs3
+  foreach(_lib linscp-core linscp-putty linscp-puttyvs linscp-filezilla linscp-mfc-compat linscp-libs3
                linscp-neon linscp-shim linscp-frontend-headless)
     list(APPEND _wide_archives "$<TARGET_FILE:${_lib}>")
   endforeach()

@@ -163,7 +163,8 @@ changes came with the switch, all still valid under C++Builder:
   `const wchar_t *`, and these headers (like MSVC's) do. WinSCP's MFC
   `CString` kept the results in `wchar_t *`. They are now `const`; they are
   only compared and subtracted. Line-preserving, like every patch in the
-  series.
+  series. (Retired 2026-10-20 with the subset itself: FileZilla now builds
+  against linscp's own `port/mfc-compat`, ADR 0017.)
 - neon (`port/neon/CMakeLists.txt`): with `NE_LFS`, neon's `config.h`
   spells `stat64` as `__stat64` (that is, `_stat64`), and the newer headers
   declare a `struct stat64` of their own, which the macro turned into a

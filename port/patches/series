@@ -10,7 +10,6 @@ filezilla-in-addr-s-addr.patch
 filezilla-tools-unicodestring.patch
 core-storage-key-backslashes.patch
 core-neon-tls-init-closure.patch
-mfc-cstring-const-search.patch
 gui-configuration-property-subscript.patch
 core-log-file-name-delimiter.patch
 core-local-eol-platform.patch

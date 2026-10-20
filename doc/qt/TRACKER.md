@@ -312,6 +312,7 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-20 | The FTP engine's `CString`/`CFile`/`CTime` come from linscp's own clean-room `port/mfc-compat/` (ADR 0017); the vendored MFC subset is not compiled, guarded by a configure check and ctest `no_mfc`, covered by ctest `mfc_compat` | The vendored subset is not under a free licence; every distribution channel reviews licences |
 | 2026-10-20 | linscp proceeds as an independent project: publish across all channels first, clean up and rewrite the codebase afterward. Rollout in [RELEASE-PLAN.md](RELEASE-PLAN.md) | Can't wait for the rewrite before publishing; reach and demonstrated demand matter now |
 | 2026-10-20 | Version 0.7.1 tagged and released, with the CI packages | CI clean-up |
 | 2026-10-19 | Version 0.7.0 tagged and published as the first official (non-pre-release) GitHub release, with the CI packages | First release promoted out of pre-release |
@@ -842,7 +843,7 @@ Recorded deliberately, so they are findable when something behaves oddly.
 | P1-08 | Socket-event emulation | done | `ws2_32` module and `WSAEventSelect`/`WSAEnumNetworkEvents`; one test passes against real Winsock (Wine) and the emulation. `WSAAsyncSelect` (FileZilla) is P1-12's |
 | P1-09 | PuTTY unix backend re-import | done | As decided 2026-10-11: WinSCP's PuTTY with its Windows layer over the emulation, Linux services replaced per unit (`port/putty/linux`); SFTP/SCP sessions pass on Linux, proxied ones included |
 | P1-10 | PuTTY delta reconciliation | done | `doc/qt/putty-deltas.md`: every delta of WinSCP's PuTTY against stock 0.85 classified, Linux-relevant flags checked against the build; ctest `putty_deltas` fails when a bump changes any |
-| P1-11 | FileZilla MFC subset replacement | done | Not replaced: WinSCP's subset (`CString`/`CFile`/`CTime` over the shim) builds as is on both targets |
+| P1-11 | FileZilla MFC subset replacement | done | Replaced 2026-10-20 by linscp's own `port/mfc-compat/` (ADR 0017); the vendored subset is no longer compiled (`no_mfc`) |
 | P1-12 | FileZilla epoll rewrite | done | Not rewritten: FileZilla builds unmodified on Linux over an emulated user32 subset (windows, message queues, timers, `WSAAsyncSelect`, `WSAAsyncGetHostByName`); ctest `messages` passes against user32/ws2_32 (Wine) and the emulation. One patch (`in_addr`'s `s_addr`) |
 | P1-13 | System libs | done | PuTTY, puttyvs, neon, libs3 from the WinSCP submodule, OpenSSL 3.5.9 from its own, expat from its make file, on both targets; FileZilla + MFC on Windows (Linux is P1-12). neon on POSIX: `config-posix.h` from its `configure` |
 | P1-14 | Drop `puttyvs` | done | the MSVC build is replaced by clang building the same files with the same defines, from `PuTTYVS.vcxproj` |

@@ -808,12 +808,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--src', default='3rd-party/winscp')
     ap.add_argument('--out', default='build/gen')
-    # PuTTY, FileZilla, WinSCP's MFC subset, neon and libs3 are compiled from
+    # PuTTY, FileZilla, neon and libs3 are compiled from
     # the generated tree too: they need the include rule or the patch series.
     # A single file is an entry too: of WinSCP's GUI, the shell compiles only
     # the units it uses (ADR 0014).
     ap.add_argument('--subdirs', nargs='*',
-                    default=['source/core', 'source/putty', 'source/filezilla', 'libs/mfc',
+                    default=['source/core', 'source/putty', 'source/filezilla',
                              'libs/neon', 'libs/libs3',
                              'source/windows/GUIConfiguration.cpp', 'source/windows/GUIConfiguration.h',
                              # Their slices only (slices.json): the rest is the VCL GUI's.

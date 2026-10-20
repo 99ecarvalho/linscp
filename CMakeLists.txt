@@ -195,5 +195,9 @@ if(BUILD_TESTING)
   add_subdirectory(port/tests)
 endif()
 
+# Upstream's non-free MFC subset can never come back (ADR 0017).
+include(cmake/no-mfc.cmake)
+linscp_check_no_mfc(${_gen_files})
+
 message(STATUS "linscp: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} "
                "-> ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR}")

@@ -27,7 +27,7 @@ BANNED = [
                 r'towupper)\s*\('), 'libc wide function'),
 ]
 
-ROOTS = ['port/shim', 'port/platform', 'qt']
+ROOTS = ['port/shim', 'port/platform', 'port/mfc-compat', 'qt']
 EXTS = {'.h', '.hpp', '.c', '.cpp', '.cc'}
 
 def main():
