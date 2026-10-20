@@ -20,10 +20,14 @@ set(_licenses
   "${CMAKE_SOURCE_DIR}/3rd-party/putty/LICENCE|PuTTY-LICENCE"
   "${CMAKE_SOURCE_DIR}/3rd-party/openssl/LICENSE.txt|OpenSSL-LICENSE.txt"
   "${LINSCP_UPSTREAM}/libs/expat/COPYING|expat-COPYING"
-  # (WinSCP's trimmed neon keeps no COPYING: its README states the LGPL.)
+  # neon's licence text (src/COPYING.LIB) and its README, which lists the
+  # copyright holders.
+  "${LINSCP_UPSTREAM}/libs/neon/src/COPYING.LIB|neon-COPYING.LIB"
   "${LINSCP_UPSTREAM}/libs/neon/README.md|neon-README.md"
+  # libs3: LGPL-3.0-or-later or GPL-2.0-or-later, at the user's choice.
   "${LINSCP_UPSTREAM}/libs/libs3/LICENSE|libs3-LICENSE"
   "${LINSCP_UPSTREAM}/libs/libs3/COPYING-LGPLv3|libs3-COPYING-LGPLv3"
+  "${LINSCP_UPSTREAM}/libs/libs3/COPYING-GPLv2|libs3-COPYING-GPLv2"
   "${CMAKE_SOURCE_DIR}/assets/icons/lucide/LICENSE|icons-lucide-LICENSE"
   "${CMAKE_SOURCE_DIR}/assets/icons/tabler/LICENSE|icons-tabler-LICENSE"
   "${CMAKE_SOURCE_DIR}/assets/icons/fluent/LICENSE|icons-fluent-LICENSE"

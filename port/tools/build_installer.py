@@ -38,6 +38,9 @@ def main():
     for entry in a.license:
         source, name = entry.split('|')
         shutil.copyfile(source, os.path.join(licenses, name))
+    # The setup program itself is Inno Setup's: its licence goes with it.
+    shutil.copyfile(os.path.join(os.path.dirname(iscc), 'license.txt'),
+                    os.path.join(licenses, 'InnoSetup-license.txt'))
     out = os.path.abspath(a.out)
     os.makedirs(out, exist_ok=True)
     env = dict(os.environ, WINEDEBUG='-all')

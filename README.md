@@ -78,3 +78,9 @@ linscp is free software under the GNU GPL, version 3: see [LICENSE](LICENSE).
 Its transfer engine comes from WinSCP; linscp is an independent project, not
 affiliated with or endorsed by the WinSCP project. Credits for all the
 components linscp uses are at <https://linscp.org/manual/about/license-and-credits/>.
+
+linscp uses the [Qt](https://www.qt.io) toolkit under the
+[GNU Lesser General Public License, version 3](https://www.gnu.org/licenses/lgpl-3.0.html).
+Qt's source code is available from <https://download.qt.io/official_releases/qt/>;
+the Windows packages bundle Qt and other libraries, and carry their licence
+texts, a list of them and an offer of their source code in `licenses\`.
