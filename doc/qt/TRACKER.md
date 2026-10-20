@@ -312,6 +312,7 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-20 | linscp proceeds as an independent project: publish across all channels first, clean up and rewrite the codebase afterward. Rollout in [RELEASE-PLAN.md](RELEASE-PLAN.md) | Can't wait for the rewrite before publishing; reach and demonstrated demand matter now |
 | 2026-10-20 | Version 0.7.1 tagged and released, with the CI packages | CI clean-up |
 | 2026-10-19 | Version 0.7.0 tagged and published as the first official (non-pre-release) GitHub release, with the CI packages | First release promoted out of pre-release |
 | 2026-10-18 | Version 0.6.1 tagged and published as a GitHub pre-release, with the CI packages | Maintenance release after the 2026-10-18 fixes |
