@@ -1,0 +1,132 @@
+# Drafts a GitHub release when a version tag is pushed:
+#
+#   git tag -s v0.7.2 -m "linscp 0.7.2"    # annotated and signed
+#   git push origin v0.7.2
+#
+# It runs the whole CI (tests and packages) on the tag, checks that the tag
+# matches the version in CMakeLists.txt and that NEWS.md has a section for it,
+# builds the complete source tarball (port/tools/make_source_tarball.py), and
+# drafts the release with the packages, the tarball, SHA256SUMS and, when the
+# signing key is configured, OpenPGP signatures. The draft is reviewed and
+# published by hand; publishing it tells the website to rebuild (website job).
+#
+# Secrets (both optional):
+#   RELEASE_SIGNING_KEY         ASCII-armoured OpenPGP secret key of a signing
+#                               subkey (and RELEASE_SIGNING_PASSPHRASE if it has
+#                               one). Without it the draft carries no .asc files;
+#                               sign locally and upload them before publishing.
+#   WEBSITE_DISPATCH_TOKEN      A token allowed to send repository_dispatch to
+#                               99ecarvalho/linscp-website.
+name: release
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+*']
+  release:
+    types: [published]
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    if: github.event_name == 'push'
+    uses: ./.github/workflows/ci.yml
+
+  draft:
+    if: github.event_name == 'push'
+    needs: ci
+    # The runner image has git, gpg, gh, python3 and xz.
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      SIGNING_KEY: ${{ secrets.RELEASE_SIGNING_KEY }}
+      SIGNING_PASSPHRASE: ${{ secrets.RELEASE_SIGNING_PASSPHRASE }}
+    steps:
+      # Full history and tags: the tag object is checked, and the tarball's
+      # timestamps come from the tagged commit.
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Check the tag, the version and the news
+        run: |
+          version=$(sed -n 's/^project(linscp VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
+          case "$TAG" in
+            "v$version"|"v$version"-*) ;;
+            *) echo "::error::tag $TAG does not match the version $version in CMakeLists.txt"; exit 1 ;;
+          esac
+          if [ "$(git cat-file -t "refs/tags/$TAG")" != tag ]; then
+            echo "::error::$TAG is a lightweight tag: tag releases with git tag -s"; exit 1
+          fi
+          # The section of NEWS.md headed "## <version>", up to the next "## ".
+          awk -v v="$version" '
+            $0 ~ "^## " v "( |$)" { on = 1; next }
+            on && /^## / { exit }
+            on { print }' NEWS.md > notes.md
+          if ! grep -q '[^[:space:]]' notes.md; then
+            echo "::error::NEWS.md has no section for $version"; exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Build the source tarball
+        run: python3 port/tools/make_source_tarball.py --out dist
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: linscp-*
+          path: dist
+          merge-multiple: true
+
+      - name: Checksums and signatures
+        run: |
+          cd dist
+          rm -f ./*.sha256
+          sha256sum -- * > SHA256SUMS
+          cat SHA256SUMS
+          if [ -n "$SIGNING_KEY" ]; then
+            export GNUPGHOME="$(mktemp -d)"
+            printf '%s\n' "$SIGNING_KEY" | gpg --batch --import
+            sign() { gpg --batch --yes --pinentry-mode loopback --passphrase "$SIGNING_PASSPHRASE" \
+                       --armor --detach-sign "$1"; }
+            sign SHA256SUMS
+            sign "linscp-$VERSION.tar.xz"
+            gpgconf --kill all
+            rm -rf "$GNUPGHOME"
+          else
+            echo "::warning::RELEASE_SIGNING_KEY is not set: sign SHA256SUMS and the tarball locally"
+          fi
+
+      - name: Draft the release
+        run: |
+          prerelease=
+          case "$TAG" in *-*) prerelease=--prerelease ;; esac
+          gh release create "$TAG" --draft --verify-tag $prerelease \
+            --title "linscp $VERSION" --notes-file notes.md dist/*
+
+  # Publishing the reviewed draft: the website rebuilds its download page and
+  # release data now instead of at its daily run.
+  website:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    env:
+      WEBSITE_DISPATCH_TOKEN: ${{ secrets.WEBSITE_DISPATCH_TOKEN }}
+    steps:
+      - name: Tell the website
+        if: env.WEBSITE_DISPATCH_TOKEN != ''
+        run: >-
+          curl -fsS -X POST
+          -H "Authorization: Bearer $WEBSITE_DISPATCH_TOKEN"
+          -H "Accept: application/vnd.github+json"
+          https://api.github.com/repos/99ecarvalho/linscp-website/dispatches
+          -d '{"event_type":"linscp-release"}'

@@ -11,6 +11,9 @@ name: ci
 on:
   pull_request:
   workflow_dispatch:
+  # The release workflow (release.yml) runs the whole suite and the packages
+  # on the tag before it drafts a release from their artifacts.
+  workflow_call:
 
 concurrency:
   group: ci-${{ github.event.pull_request.number || github.ref }}

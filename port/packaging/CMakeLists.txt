@@ -16,6 +16,7 @@ set(LINSCP_APP_ID "io.github._99ecarvalho.linscp")
 set(_licenses
   "${CMAKE_SOURCE_DIR}/LICENSE|LICENSE"
   "${CMAKE_SOURCE_DIR}/README.md|README.md"
+  "${CMAKE_SOURCE_DIR}/NEWS.md|NEWS.md"
   "${LINSCP_UPSTREAM}/license.txt|WinSCP-license.txt"
   "${CMAKE_SOURCE_DIR}/3rd-party/putty/LICENCE|PuTTY-LICENCE"
   "${CMAKE_SOURCE_DIR}/3rd-party/openssl/LICENSE.txt|OpenSSL-LICENSE.txt"
