@@ -312,6 +312,7 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-20 | Version 0.7.1 tagged and released, with the CI packages | CI clean-up |
 | 2026-10-19 | Version 0.7.0 tagged and published as the first official (non-pre-release) GitHub release, with the CI packages | First release promoted out of pre-release |
 | 2026-10-18 | Version 0.6.1 tagged and published as a GitHub pre-release, with the CI packages | Maintenance release after the 2026-10-18 fixes |
 | 2026-10-18 | Hardened the untrusted-URL attack surface (linscp-only): local custom commands shell-quote server-chosen file names for `/bin/sh` by quote context (`TShellLocalCustomCommand`), `/ini`, `/defaults` and the maintenance switches are gated by `CheckSafe`, and forwarded command lines are quoted so `CutToken` cannot split one argument into extra switches; ctest `qt_gui_command_injection` | A clicked `sftp://` link or a forwarded command line must not run code or replace the configuration |
