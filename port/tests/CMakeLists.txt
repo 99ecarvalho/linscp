@@ -522,6 +522,9 @@ if(TARGET linscp)
             options /ini=nul {tmp} -platform offscreen)
   set_tests_properties(qt_gui_options PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 120)
   set_tests_properties(qt_gui_toolbars PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
+  # R0-23: no update checks with LINSCP_UPDATE_CHECK off or in a Flatpak.
+  add_test(NAME qt_gui_updatechecks COMMAND test_qt_gui updatechecks /ini=nul -platform offscreen)
+  set_tests_properties(qt_gui_updatechecks PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
   add_test(NAME qt_gui_icons
     COMMAND test_qt_gui icons /ini=nul -platform offscreen)
   set_tests_properties(qt_gui_icons PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)

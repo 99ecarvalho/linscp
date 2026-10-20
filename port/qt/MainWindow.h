@@ -96,7 +96,8 @@ public:
   // given there: the newest version (empty when not known), whether it is
   // newer, and an error. Automatic: the periodic check's, quiet unless
   // newer (shown, or with "Display information about update on startup"
-  // off, noted).
+  // off, noted). Nothing at all without Integration::UpdateChecksAllowed()
+  // (built with LINSCP_UPDATE_CHECK off, or a Flatpak).
   void CheckForUpdates(bool Automatic = false);
   // The periodic check, when Updates' period has passed since the last.
   bool CheckForUpdatesIfDue();

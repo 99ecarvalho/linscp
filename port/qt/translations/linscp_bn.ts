@@ -59,6 +59,10 @@
         <source>WinSCP %1</source>
         <translation>WinSCP %1</translation>
     </message>
+    <message>
+        <source>Licensed under the GNU LGPL version 3</source>
+        <translation>GNU LGPL সংস্করণ 3-এর অধীনে লাইসেন্সপ্রাপ্ত</translation>
+    </message>
 </context>
 <context>
     <name>CleanupDialog</name>

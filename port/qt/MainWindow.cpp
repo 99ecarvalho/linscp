@@ -1776,7 +1776,11 @@ bool MainWindow::SiteManagerDialog(bool Automatic, const QString & Select)
   }
   Dialog.ShowAgainCheck()->setVisible(Automatic);
   Dialog.OnPreferences = [this](const QString & Page) { PreferencesDialog(Page); };
-  Dialog.OnCheckForUpdates = [this]() { CheckForUpdates(); };
+  // Its Tools > Check for Updates only where linscp checks.
+  if (Integration::UpdateChecksAllowed())
+  {
+    Dialog.OnCheckForUpdates = [this]() { CheckForUpdates(); };
+  }
   Dialog.OnAbout = [this]() { About(); };
   const int Result = Dialog.exec();
   // As TLoginDialog::Execute: unchecked, not shown by itself again.
@@ -3351,7 +3355,7 @@ double MainWindow::NowAsDateTime()
 bool MainWindow::CheckForUpdatesIfDue()
 {
   const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
-  if ((Preferences.UpdatesPeriod <= 0) || FStandalone ||
+  if (!Integration::UpdateChecksAllowed() || (Preferences.UpdatesPeriod <= 0) || FStandalone ||
       (NowAsDateTime() - Preferences.UpdatesLastCheck < Preferences.UpdatesPeriod))
   {
     return false;
@@ -3362,6 +3366,11 @@ bool MainWindow::CheckForUpdatesIfDue()
 
 void MainWindow::CheckForUpdates(bool Automatic)
 {
+  // Built without update checks, or a Flatpak: nothing asked of GitHub.
+  if (!Integration::UpdateChecksAllowed())
+  {
+    return;
+  }
   const CoreBridge::TPreferences Preferences = CoreBridge::Preferences();
   const QString Current = QString::fromStdString(FInfo.Version);
   // Beta versions: GitHub's pre-releases. "latest" is the newest release
@@ -5999,9 +6008,12 @@ void MainWindow::BuildMenus()
   Help->addAction(tr("&Version History"), this,
     [this]() { OpenWebPage(QStringLiteral("https://github.com/99ecarvalho/linscp/releases")); })
     ->setStatusTip(tr("Opens web browser and points it to application history page"));
-  Help->addSeparator();
-  Help->addAction(tr("Check for &Updates"), this, [this]() { CheckForUpdates(); })
-    ->setStatusTip(tr("Queries application homepage for updates"));
+  if (Integration::UpdateChecksAllowed())
+  {
+    Help->addSeparator();
+    Help->addAction(tr("Check for &Updates"), this, [this]() { CheckForUpdates(); })
+      ->setStatusTip(tr("Queries application homepage for updates"));
+  }
   Help->addSeparator();
   Help->addAction(tr("&Donate"), this, [this]() { OpenWebPage(QString::fromLatin1(DonateUrl)); })
     ->setStatusTip(tr("Opens web browser and points it to project donation page"));
@@ -7728,13 +7740,26 @@ void MainWindow::BuildToolbars(QMenu * Options)
   UpdateCustomCommands();
 
   // As UpdatesToolbar: Check for Updates, its menu the project's pages.
+  // Without update checks (Integration::UpdateChecksAllowed) the button is
+  // the homepage's, its menu the pages alone.
+  const bool UpdateChecks = Integration::UpdateChecksAllowed();
   QToolBar * Updates = MainBand(QStringLiteral("Updates"), tr("Updates"));
-  QAction * UpdatesButton = new QAction(tr("&Check for Updates"), this);
-  Iconize(UpdatesButton, "download");
-  connect(UpdatesButton, &QAction::triggered, this, [this]() { CheckForUpdates(); });
+  QAction * UpdatesButton = new QAction(UpdateChecks ? tr("&Check for Updates") : tr("Product &Homepage"), this);
+  Iconize(UpdatesButton, UpdateChecks ? "download" : "about");
+  if (UpdateChecks)
+  {
+    connect(UpdatesButton, &QAction::triggered, this, [this]() { CheckForUpdates(); });
+  }
+  else
+  {
+    connect(UpdatesButton, &QAction::triggered, this, [this]() { OpenWebPage(QString::fromLatin1(HomepageUrl)); });
+  }
   QMenu * UpdatesMenu = new QMenu(this);
-  UpdatesMenu->addAction(tr("&Check for Updates"), this, [this]() { CheckForUpdates(); });
-  UpdatesMenu->addSeparator();
+  if (UpdateChecks)
+  {
+    UpdatesMenu->addAction(tr("&Check for Updates"), this, [this]() { CheckForUpdates(); });
+    UpdatesMenu->addSeparator();
+  }
   UpdatesMenu->addAction(tr("Product &Homepage"), this,
     [this]() { OpenWebPage(QString::fromLatin1(HomepageUrl)); });
   UpdatesMenu->addAction(tr("&Download"), this,

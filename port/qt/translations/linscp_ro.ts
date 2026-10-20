@@ -59,6 +59,10 @@
         <source>WinSCP %1</source>
         <translation>WinSCP %1</translation>
     </message>
+    <message>
+        <source>Licensed under the GNU LGPL version 3</source>
+        <translation>Licențiat sub GNU LGPL versiunea 3</translation>
+    </message>
 </context>
 <context>
     <name>CleanupDialog</name>

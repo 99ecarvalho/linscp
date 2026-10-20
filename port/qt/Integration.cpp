@@ -1003,4 +1003,21 @@ bool ShowSystemContextMenu(QWidget * Window, const QString & Directory, const QS
 #endif
 }
 
+bool UpdateChecksAllowed()
+{
+#if LINSCP_UPDATE_CHECK
+  if (!qEnvironmentVariableIsEmpty("FLATPAK_ID"))
+  {
+    return false;
+  }
+#if defined(Q_OS_WIN)
+  return true;
+#else
+  return !QFile::exists(QStringLiteral("/.flatpak-info"));
+#endif
+#else
+  return false;
+#endif
+}
+
 }  // namespace Integration

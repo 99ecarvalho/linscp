@@ -78,6 +78,14 @@ QString DesktopEntryPath();
 QString MimeAppsPath();
 QString SearchPathDirectory();
 
+// Whether linscp may check for updates (Help > Check for Updates, the
+// Updates button, Preferences > Updates' periodic check): built with
+// LINSCP_UPDATE_CHECK on (the default; distributions' packages turn it off,
+// their package manager updating linscp) and not running as a Flatpak
+// (FLATPAK_ID set, or /.flatpak-info there), whose updates come from its
+// remote.
+bool UpdateChecksAllowed();
+
 }  // namespace Integration
 
 #endif

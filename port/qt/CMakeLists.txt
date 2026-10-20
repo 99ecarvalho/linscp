@@ -15,6 +15,17 @@ add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp AboutDialog.cpp 
   CopyLocalDialog.cpp KeyVerify.cpp SaveSiteDialog.cpp IconSet.cpp PanelBands.cpp WindowParams.cpp HintButton.cpp SingleInstance.cpp MasterPasswordDialog.cpp SshHostCADialog.cpp DirectoryTree.cpp Theme.cpp ExtensionOptionsDialog.cpp DragExtClient.cpp ExplorerInterface.cpp CoreBridge.h)
 set_target_properties(linscp-qt-ui PROPERTIES AUTOMOC ON)
 target_link_libraries(linscp-qt-ui PUBLIC Qt6::Widgets Qt6::Svg Qt6::Network)
+# Update checks (Help > Check for Updates, the Updates button, the periodic
+# check against linscp's GitHub releases): on for linscp's own packages, off
+# for distributions' and Flathub's, whose package manager updates linscp.
+# Integration::UpdateChecksAllowed() also turns them off at run time in a
+# Flatpak. PUBLIC: the tests see which way the shell was built.
+option(LINSCP_UPDATE_CHECK "Check linscp's releases for updates (off in distribution and Flatpak builds)" ON)
+if(LINSCP_UPDATE_CHECK)
+  target_compile_definitions(linscp-qt-ui PUBLIC LINSCP_UPDATE_CHECK=1)
+else()
+  target_compile_definitions(linscp-qt-ui PUBLIC LINSCP_UPDATE_CHECK=0)
+endif()
 if(WIN32)
   # Integration's shortcuts (IShellLink), local files' properties (the shell's).
   target_link_libraries(linscp-qt-ui PUBLIC ole32 uuid shell32 advapi32 user32 propsys)

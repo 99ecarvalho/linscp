@@ -3066,9 +3066,10 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
         PreferencesDialog::tr("Drag & Drop"), PreferencesDialog::tr("Background"), PreferencesDialog::tr("Endurance"),
         PreferencesDialog::tr("Network"), PreferencesDialog::tr("Security"), PreferencesDialog::tr("Logging"),
         PreferencesDialog::tr("Integration"), PreferencesDialog::tr("Applications"), PreferencesDialog::tr("Commands"),
-        PreferencesDialog::tr("Storage"), PreferencesDialog::tr("Updates") }),
+        PreferencesDialog::tr("Storage") }) +
+        (Integration::UpdateChecksAllowed() ? QStringList({ PreferencesDialog::tr("Updates") }) : QStringList()),
         "the dialog's pages, in the order of WinSCP's tree");
-      Check((Dialog.Navigation()->topLevelItemCount() == 10) && (Dialog.Navigation()->topLevelItem(0)->childCount() == 5) &&
+      Check((Dialog.Navigation()->topLevelItemCount() == (Integration::UpdateChecksAllowed() ? 10 : 9)) && (Dialog.Navigation()->topLevelItem(0)->childCount() == 5) &&
         (Dialog.Navigation()->topLevelItem(3)->child(0)->text(0) == PreferencesDialog::tr("Drag & Drop")),
         "as its tree: each section with its subpages");
       // Environment, Interface, Remote, Local, Drag & Drop, Updates: WinSCP's
@@ -3089,7 +3090,9 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
         !Dialog.RefreshRemotePanelIntervalSpin()->isEnabled() && !Dialog.PreserveLocalDirectoryCheck()->isChecked() &&
         Dialog.DeleteToRecycleBinCheck()->isChecked() && Dialog.DDWarnLackOfTempSpaceCheck()->isChecked(),
         "the panels' and drag and drop's defaults");
-      Check(Dialog.ShowPage(PreferencesDialog::tr("Updates")) && !Dialog.ShowPage(QStringLiteral("No such page")),
+      Check(Dialog.ShowPage(PreferencesDialog::tr("Storage")) &&
+        (Dialog.ShowPage(PreferencesDialog::tr("Updates")) == Integration::UpdateChecksAllowed()) &&
+        !Dialog.ShowPage(QStringLiteral("No such page")),
         "pages shown by name, only those there are");
       Dialog.ConfirmDeletingCheck()->setChecked(false);
       Dialog.ConfirmDDTransferCheck()->setCheckState(Qt::Unchecked);
@@ -5914,6 +5917,12 @@ void Session(const char * Port)
         About.ThirdParty()->toHtml().contains(QStringLiteral("https://winscp.net/")),
         "and WinSCP's version and site, below Qt");
       Check(About.ThirdParty()->toHtml().contains(QString::fromLatin1(CoreBridge::ExpatLicenseUrl)), "Expat's license linked");
+      // LGPL-3.0 4(c): Qt's copyright with where its licence is, the packaged
+      // copy beside the program or GNU's.
+      Check(ThirdParty.contains(AboutDialog::tr("Licensed under the GNU LGPL version 3")) &&
+        (About.ThirdParty()->toHtml().contains(QStringLiteral("lgpl-3.0.html")) ||
+         About.ThirdParty()->toHtml().contains(QStringLiteral("qt6-base/LGPL-3.0-only.txt"))),
+        "Qt's licence named and linked");
       Check(About.LicenseButton() != nullptr, "and a License button");
     }
     {
@@ -7317,69 +7326,73 @@ void OptionsHelpTest(const QString & Directory)
     Check((MainWindow::CompareVersions(QStringLiteral("v0.10.0"), QStringLiteral("0.9.1")) > 0) &&
       (MainWindow::CompareVersions(QStringLiteral("0.2.0"), QStringLiteral("v0.2.0")) == 0) &&
       (MainWindow::CompareVersions(QStringLiteral("0.2"), QStringLiteral("0.2.1-rc1")) < 0), "versions compare by number");
-    // Check for Updates against a releases list of its own.
-    const auto Check4 = [&Window, &Directory](const QByteArray & Json, const QString & File)
+    // Check for Updates, where this build checks (qt_gui_updatechecks: where not).
+    if (Integration::UpdateChecksAllowed())
     {
-      const QString Path = QDir(Directory).filePath(File);
-      if (!Json.isNull())
+      // Check for Updates against a releases list of its own.
+      const auto Check4 = [&Window, &Directory](const QByteArray & Json, const QString & File)
       {
-        QFile Out(Path);
-        Out.open(QIODevice::WriteOnly);
-        Out.write(Json);
-      }
-      Window.UpdatesUrl = QUrl::fromLocalFile(Path);
-      bool Done = false;
-      QString Latest;
-      QString Error;
-      bool Newer = false;
-      Window.OnUpdatesChecked = [&](const QString & L, bool N, const QString & E) { Done = true; Latest = L; Newer = N; Error = E; };
-      Window.CheckForUpdates();
-      QElapsedTimer Timer;
-      Timer.start();
-      while (!Done && (Timer.elapsed() < 10000))
+        const QString Path = QDir(Directory).filePath(File);
+        if (!Json.isNull())
+        {
+          QFile Out(Path);
+          Out.open(QIODevice::WriteOnly);
+          Out.write(Json);
+        }
+        Window.UpdatesUrl = QUrl::fromLocalFile(Path);
+        bool Done = false;
+        QString Latest;
+        QString Error;
+        bool Newer = false;
+        Window.OnUpdatesChecked = [&](const QString & L, bool N, const QString & E) { Done = true; Latest = L; Newer = N; Error = E; };
+        Window.CheckForUpdates();
+        QElapsedTimer Timer;
+        Timer.start();
+        while (!Done && (Timer.elapsed() < 10000))
+        {
+          QApplication::processEvents(QEventLoop::AllEvents, 50);
+        }
+        return std::make_tuple(Done, Latest, Newer, Error);
+      };
       {
-        QApplication::processEvents(QEventLoop::AllEvents, 50);
+        const auto [Done, Latest, Newer, Error] =
+          Check4(R"([{"tag_name":"v99.0.0","html_url":"https://example/r"}])", QStringLiteral("newer.json"));
+        Check(Done && (Latest == QStringLiteral("v99.0.0")) && Newer && Error.isEmpty(), "a newer release is found");
       }
-      return std::make_tuple(Done, Latest, Newer, Error);
-    };
-    {
-      const auto [Done, Latest, Newer, Error] =
-        Check4(R"([{"tag_name":"v99.0.0","html_url":"https://example/r"}])", QStringLiteral("newer.json"));
-      Check(Done && (Latest == QStringLiteral("v99.0.0")) && Newer && Error.isEmpty(), "a newer release is found");
-    }
-    {
-      const auto [Done, Latest, Newer, Error] = Check4(R"([{"tag_name":"v0.0.1"}])", QStringLiteral("older.json"));
-      Check(Done && !Newer && Error.isEmpty(), "an older one is not newer");
-    }
-    {
-      const auto [Done, Latest, Newer, Error] = Check4(QByteArray(), QStringLiteral("missing.json"));
-      Check(Done && !Error.isEmpty(), "and a failure is an error");
-    }
-    // "latest"'s single release, as with beta versions off.
-    {
-      const auto [Done, Latest, Newer, Error] = Check4(R"({"tag_name":"v99.1.0"})", QStringLiteral("latest.json"));
-      Check(Done && (Latest == QStringLiteral("v99.1.0")) && Newer, "a single release read too");
-    }
-    // Updates' period: due when that long since the last check, which the
-    // check notes.
-    {
-      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.UpdatesPeriod = 0; });
-      Check(!Window.CheckForUpdatesIfDue(), "never, by default");
-      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.UpdatesPeriod = 7; P.UpdatesLastCheck = 0; });
-      bool Done = false;
-      Window.OnUpdatesChecked = [&Done](const QString &, bool, const QString &) { Done = true; };
-      Window.UpdatesUrl = QUrl::fromLocalFile(QDir(Directory).filePath(QStringLiteral("older.json")));
-      Check(Window.CheckForUpdatesIfDue(), "weekly, never checked: due");
-      QElapsedTimer Timer;
-      Timer.start();
-      while (!Done && (Timer.elapsed() < 10000))
       {
-        QApplication::processEvents(QEventLoop::AllEvents, 50);
+        const auto [Done, Latest, Newer, Error] = Check4(R"([{"tag_name":"v0.0.1"}])", QStringLiteral("older.json"));
+        Check(Done && !Newer && Error.isEmpty(), "an older one is not newer");
       }
-      Check(Done && (std::abs(CoreBridge::Preferences().UpdatesLastCheck - MainWindow::NowAsDateTime()) < 0.01),
-        "checked, and noted when");
-      Check(!Window.CheckForUpdatesIfDue(), "not due again within the week");
-      CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.UpdatesPeriod = 0; });
+      {
+        const auto [Done, Latest, Newer, Error] = Check4(QByteArray(), QStringLiteral("missing.json"));
+        Check(Done && !Error.isEmpty(), "and a failure is an error");
+      }
+      // "latest"'s single release, as with beta versions off.
+      {
+        const auto [Done, Latest, Newer, Error] = Check4(R"({"tag_name":"v99.1.0"})", QStringLiteral("latest.json"));
+        Check(Done && (Latest == QStringLiteral("v99.1.0")) && Newer, "a single release read too");
+      }
+      // Updates' period: due when that long since the last check, which the
+      // check notes.
+      {
+        CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.UpdatesPeriod = 0; });
+        Check(!Window.CheckForUpdatesIfDue(), "never, by default");
+        CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.UpdatesPeriod = 7; P.UpdatesLastCheck = 0; });
+        bool Done = false;
+        Window.OnUpdatesChecked = [&Done](const QString &, bool, const QString &) { Done = true; };
+        Window.UpdatesUrl = QUrl::fromLocalFile(QDir(Directory).filePath(QStringLiteral("older.json")));
+        Check(Window.CheckForUpdatesIfDue(), "weekly, never checked: due");
+        QElapsedTimer Timer;
+        Timer.start();
+        while (!Done && (Timer.elapsed() < 10000))
+        {
+          QApplication::processEvents(QEventLoop::AllEvents, 50);
+        }
+        Check(Done && (std::abs(CoreBridge::Preferences().UpdatesLastCheck - MainWindow::NowAsDateTime()) < 0.01),
+          "checked, and noted when");
+        Check(!Window.CheckForUpdatesIfDue(), "not due again within the week");
+        CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.UpdatesPeriod = 0; });
+      }
     }
     // Interface's theme: dark, light, and back to the system's.
     {
@@ -7392,7 +7405,7 @@ void OptionsHelpTest(const QString & Directory)
       Check(Theme::IsDark() == WasDark, "and the system's again");
     }
     // Over HTTPS for real, when asked (the network is not the suite's).
-    if (!qEnvironmentVariableIsEmpty("LINSCP_TEST_NETWORK"))
+    if (!qEnvironmentVariableIsEmpty("LINSCP_TEST_NETWORK") && Integration::UpdateChecksAllowed())
     {
       Window.UpdatesUrl = QUrl();
       bool Done = false;
@@ -7435,6 +7448,96 @@ void OptionsHelpTest(const QString & Directory)
     Check(MenuAction(Window, { "Options", "Queue", "Reset Columns Layout" }) != nullptr &&
       MenuAction(Window, { "Options", "Queue", "Customize" }) != nullptr, "Queue's Reset Columns Layout and Customize");
   }
+  CoreBridge::Finalize();
+}
+
+// R0-23: no update checks where the build turns them off
+// (LINSCP_UPDATE_CHECK=OFF, distributions' and Flathub's packages) or in a
+// Flatpak (FLATPAK_ID): Help > Check for Updates, the Updates button's and
+// menu's check and Preferences > Updates gone, the pages' links kept, and
+// nothing asked of the update server.
+void UpdateChecksMissing(const char * Why)
+{
+  const std::string Prefix = std::string(Why) + ": ";
+  auto Says = [&Prefix](const char * What) { return Prefix + What; };
+  Check(!Integration::UpdateChecksAllowed(), Says("update checks not allowed").c_str());
+  CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.UpdatesPeriod = 1; P.UpdatesLastCheck = 0; });
+  {
+    MainWindow Window(CoreBridge::Info());
+    Window.show();
+    QApplication::processEvents();
+    Check(MenuAction(Window, { "Help", "Check for Updates" }) == nullptr, Says("no Help > Check for Updates").c_str());
+    Check((MenuAction(Window, { "Help", "Product Homepage" }) != nullptr) &&
+      (MenuAction(Window, { "Help", "Donate" }) != nullptr) && (MenuAction(Window, { "Help", "About" }) != nullptr),
+      Says("Help's homepage, Donate and About kept").c_str());
+    QToolBar * Updates = Window.findChild<QToolBar *>(QStringLiteral("Updates"));
+    Check((Updates != nullptr) && (Updates->actions().size() == 1), Says("the Updates band, one button").c_str());
+    if ((Updates != nullptr) && !Updates->actions().isEmpty())
+    {
+      QAction * Button = Updates->actions().first();
+      QStringList Texts;
+      if (Button->menu() != nullptr)
+      {
+        for (QAction * Item : Button->menu()->actions())
+        {
+          Texts.append(QString(Item->text()).remove(QLatin1Char('&')));
+        }
+      }
+      Check(QString(Button->text()).remove(QLatin1Char('&')) == QStringLiteral("Product Homepage"),
+        Says("the button the homepage's").c_str());
+      Check(!Texts.contains(QStringLiteral("Check for Updates")) && Texts.contains(QStringLiteral("Product Homepage")) &&
+        Texts.contains(QStringLiteral("Donate")), Says("its menu without the check, the pages kept").c_str());
+      QList<QUrl> Opened;
+      Window.SetUrlOpener([&Opened](const QUrl & Url) { Opened.append(Url); return true; });
+      Button->trigger();
+      Check((Opened.size() == 1) && (Opened[0].host() == QStringLiteral("linscp.org")), Says("and it opens the homepage").c_str());
+    }
+    // Neither asked nor periodic: OnUpdatesChecked never called, the last
+    // check not noted, though a daily check is due.
+    bool Done = false;
+    Window.OnUpdatesChecked = [&Done](const QString &, bool, const QString &) { Done = true; };
+    Window.UpdatesUrl = QUrl::fromLocalFile(QStringLiteral("/nonexistent/releases.json"));
+    Check(!Window.CheckForUpdatesIfDue(), Says("the periodic check never due").c_str());
+    Window.CheckForUpdates();
+    QElapsedTimer Timer;
+    Timer.start();
+    while (Timer.elapsed() < 500)
+    {
+      QApplication::processEvents(QEventLoop::AllEvents, 50);
+    }
+    Check(!Done && (CoreBridge::Preferences().UpdatesLastCheck == 0), Says("nothing checked").c_str());
+    PreferencesDialog Dialog(&Window);
+    bool HasUpdates = false;
+    for (int Index = 0; Index < Dialog.PageCount(); Index++)
+    {
+      HasUpdates = HasUpdates || (Dialog.PageName(Index) == PreferencesDialog::tr("Updates"));
+    }
+    Check(!HasUpdates && !Dialog.ShowPage(PreferencesDialog::tr("Updates")) && !Dialog.UpdatesPeriodCombo()->isVisible(),
+      Says("no Preferences > Updates").c_str());
+    // Its settings kept as they were, though not shown.
+    Check(Dialog.Preferences().UpdatesPeriod == 1, Says("the period kept").c_str());
+  }
+  CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.UpdatesPeriod = 0; });
+}
+
+void UpdateChecksTest()
+{
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+#if LINSCP_UPDATE_CHECK
+  // Built with them: there, then gone in a Flatpak.
+  Check(Integration::UpdateChecksAllowed(), "built with LINSCP_UPDATE_CHECK: update checks allowed");
+  {
+    MainWindow Window(CoreBridge::Info());
+    Check(MenuAction(Window, { "Help", "Check for Updates" }) != nullptr, "Help > Check for Updates");
+  }
+  qputenv("FLATPAK_ID", "io.github._99ecarvalho.linscp");
+  UpdateChecksMissing("FLATPAK_ID set");
+  qunsetenv("FLATPAK_ID");
+  Check(Integration::UpdateChecksAllowed(), "and allowed again without it");
+#else
+  UpdateChecksMissing("built with LINSCP_UPDATE_CHECK off");
+#endif
   CoreBridge::Finalize();
 }
 
@@ -8737,6 +8840,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 5) && (std::strcmp(argv[1], "extensions") == 0))
   {
     ExtensionsTest(argv[3], QString::fromLocal8Bit(argv[4]));
+  }
+  else if ((argc >= 2) && (std::strcmp(argv[1], "updatechecks") == 0))
+  {
+    UpdateChecksTest();
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "options") == 0))
   {

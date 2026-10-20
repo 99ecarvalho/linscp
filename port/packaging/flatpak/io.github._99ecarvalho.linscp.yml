@@ -35,6 +35,7 @@ modules:
       - -DCMAKE_BUILD_TYPE=Release
       - -DLINSCP_RELEASE=ON
       - -DBUILD_TESTING=OFF
+      - -DLINSCP_UPDATE_CHECK=OFF
     build-commands: []
     make-args:
       - linscp

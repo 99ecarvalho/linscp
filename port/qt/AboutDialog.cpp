@@ -1,7 +1,10 @@
 #include "AboutDialog.h"
 
+#include <QCoreApplication>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
+#include <QDir>
+#include <QFileInfo>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QLabel>
@@ -39,6 +42,17 @@ const char WinScpWebSite[] = "https://winscp.net/";
 QString Link(const QString & Url)
 {
   return QStringLiteral("<a href=\"%1\">%1</a>").arg(Url);
+}
+
+// Qt's licence, as LGPL-3.0 4(c) asks of a work showing Qt's copyright: the
+// copy Windows packages ship beside the program (licenses/third-party/qt6-base,
+// with the GPL it builds on), else GNU's.
+QUrl QtLicenseUrl()
+{
+  const QFileInfo Local(QDir(QCoreApplication::applicationDirPath()).filePath(
+    QStringLiteral("licenses/third-party/qt6-base/LGPL-3.0-only.txt")));
+  return Local.isFile() ? QUrl::fromLocalFile(Local.absoluteFilePath()) :
+    QUrl(QStringLiteral("https://www.gnu.org/licenses/lgpl-3.0.html"));
 }
 
 QLabel * TextLabel(const QString & Text, QWidget * Parent)
@@ -106,9 +120,11 @@ AboutDialog::AboutDialog(const CoreBridge::TInfo & Info, QWidget * Parent) :
   FThirdParty->setAccessibleName(tr("Third party software"));
   FThirdParty->setOpenLinks(false);
   FThirdParty->setHtml(QString::fromStdString(CoreBridge::ThirdPartyHtml(QLocale().nativeLanguageName().toStdString())) +
-    QStringLiteral("<p>%1<br>%2<br>%3</p>").arg(
+    QStringLiteral("<p>%1<br>%2<br><a href=\"%3\">%4</a><br>%5</p>").arg(
       tr("Qt %1").arg(QString::fromLatin1(qVersion())),
       tr("Copyright © The Qt Company Ltd. and other contributors"),
+      QtLicenseUrl().toString(QUrl::FullyEncoded).toHtmlEscaped(),
+      tr("Licensed under the GNU LGPL version 3").toHtmlEscaped(),
       Link(QStringLiteral("https://www.qt.io/"))) +
     QStringLiteral("<p>%1<br>%2<br>%3</p>").arg(
       tr("WinSCP %1").arg(QString::fromStdString(Info.WinScpVersion).toHtmlEscaped()),

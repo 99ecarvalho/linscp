@@ -160,7 +160,17 @@ PreferencesDialog::PreferencesDialog(QWidget * Parent) :
   AddPage(tr("Applications"), MakeApplicationsPage(Preferences), true);
   AddPage(tr("Commands"), MakeCommandsPage(), true);
   AddPage(tr("Storage"), MakeStoragePage(Preferences));
-  AddPage(tr("Updates"), MakeUpdatesPage(Preferences));
+  // Updates only where linscp checks for them (Integration::UpdateChecksAllowed);
+  // otherwise its controls made, as they keep the settings, but not shown.
+  QWidget * UpdatesPage = MakeUpdatesPage(Preferences);
+  if (Integration::UpdateChecksAllowed())
+  {
+    AddPage(tr("Updates"), UpdatesPage);
+  }
+  else
+  {
+    UpdatesPage->hide();
+  }
   FNavigation->expandAll();
   // As wide as its names (subpages indented), with room for a scroll bar.
   int NamesWidth = 0;

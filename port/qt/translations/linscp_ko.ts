@@ -59,6 +59,10 @@
         <source>WinSCP %1</source>
         <translation>WinSCP %1</translation>
     </message>
+    <message>
+        <source>Licensed under the GNU LGPL version 3</source>
+        <translation>GNU LGPL 버전 3에 따라 라이선스됨</translation>
+    </message>
 </context>
 <context>
     <name>CleanupDialog</name>
