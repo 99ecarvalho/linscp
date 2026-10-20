@@ -17,6 +17,8 @@ EXTRA = {
     ('Files', 'Edit With'), ('Files', 'Copy'), ('Files', 'Move'),
     # The local panel's POSIX columns.
     ('Columns', 'Permissions'), ('Columns', 'Owner'), ('Columns', 'Group'), ('Columns', 'Link Target'),
+    # linscp's own security-report link (SECURITY.md).
+    ('Help', 'Report a Security Issue'),
 }
 # WinSCP's captions that linscp's shell gives otherwise.
 RENAMES = {'LocalX': 'Left', 'RemoteX': 'Right'}
