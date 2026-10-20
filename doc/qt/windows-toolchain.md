@@ -78,7 +78,10 @@ stood when that Qt was built:
    uploaded by the snapshot (`libwinpthread` was then named
    `libwinpthread-git`, so both names are looked up). Then it follows the
    `depend =` lines of each downloaded package's `.PKGINFO`, version
-   constraints stripped, until nothing new appears.
+   constraints stripped, until nothing new appears. Where the repository
+   has since deleted every file of a package uploaded by the snapshot, the
+   oldest file left stands in (the one nearest the snapshot), and the lock's
+   header names it.
 4. It skips what Qt does not link at run time: `vulkan-headers`; Python and
    what it brings (`python`, `python-packaging`, `mpdecimal`, `tcl`, `tk`,
    `tzdata`, `ncurses`, `readline`, `termcap`, `wineditline`), which glib2
@@ -87,16 +90,22 @@ stood when that Qt was built:
 5. It writes `port/qt/msys2-qt.lock`: one line per file, `<sha256>
    <file name>`.
 
-The resulting 27 packages, as locked:
+The resulting 29 packages, as locked:
 
 > brotli 1.1.0-4, bzip2 1.0.8-3, dbus 1.14.10-1, double-conversion 3.3.0-1,
 > expat 2.6.4-1, freetype 2.13.3-1, gettext-runtime 0.23.1-1, glib2 2.82.4-1,
 > graphite2 1.3.14-3, harfbuzz 10.2.0-2, icu 76.1-1, libb2 0.98.1-2,
 > **libc++ 19.1.7-1**, libffi 3.4.6-1, libiconv 1.18-1, libjpeg-turbo 3.1.0-1,
 > libpng 1.6.46-1, **libunwind 19.1.7-1**,
-> libwinpthread-git 12.0.0.r480.gea22a99cb-1, md4c 0.5.2-1, openssl 3.4.0-1,
-> pcre2 10.44-2, **qt6-base 6.8.2-1**, sqlite3 3.47.2-1,
-> vulkan-loader 1.4.304.0-1, zlib 1.3.1-1, zstd 1.5.6-2
+> libwinpthread-git 12.0.0.r487.g9e8f2a7b5-1, md4c 0.5.2-1, openssl 3.4.0-1,
+> pcre2 10.44-2, **qt6-base 6.8.2-1**, qt6-svg 6.8.2-1,
+> qt6-translations 6.8.2-1, sqlite3 3.47.2-1,
+> vulkan-loader 1.4.304.1-1, zlib 1.3.1-1, zstd 1.5.6-2
+
+Two of these are later than the snapshot: the repository no longer has the
+libwinpthread-git (12.0.0.r480.gea22a99cb-1) and vulkan-loader
+(1.4.304.0-1) of 2025-02-02, so the lock takes the next ones uploaded,
+on 2025-02-07 and 2025-02-08.
 
 `fetch_msys2_qt.py --dest DIR` (no `--resolve`) is what builds and CI run.
 It downloads exactly the locked files, fails on any SHA-256 mismatch,
@@ -104,8 +113,9 @@ unpacks each with `tar --zstd` into `DIR/clang64`, and records the lock it
 used (`DIR/msys2-qt.lock`), so a second run with the same lock does
 nothing. The result is about 363 MB unpacked.
 
-Resolving again is needed only to move to another Qt version. Nothing at
-build time depends on the repository's current state.
+Resolving again is needed to move to another Qt version, or when the
+repository deletes a locked file (the fetch then fails and says so).
+Nothing else at build time depends on the repository's current state.
 
 ## The catch: the C++ runtime, and why LLVM 19.1.7
 

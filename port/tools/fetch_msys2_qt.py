@@ -11,7 +11,9 @@ The Qt version is Debian's own, so that Debian's moc, uic and rcc serve as the
 cross-build's host tools (QT_HOST_PATH). MSYS2 keeps old package files but
 not old repository databases, so --resolve rebuilds the repository as it was
 when that Qt was built: each dependency at the newest version uploaded by
-then, followed recursively through the packages' .PKGINFO. The lock records
+then, followed recursively through the packages' .PKGINFO. Where every file
+of a package uploaded by then has since been deleted, the oldest one left
+stands in, and the lock's header names it. The lock records
 every file and its SHA-256; a download that does not match fails.
 Unpacks with `tar --zstd`; prints DIR/clang64. Beside it, DIR/msys2-qt.packages.json
 records each package's name, base, version, licences and files, from which
@@ -92,20 +94,29 @@ def resolve(qt):
     if not qt_files:
         sys.exit(f'qt6-base {qt} is not in the repository')
     snapshot = qt_files[0][1] + WINDOW
-    chosen, todo = {}, list(ROOTS)
+    chosen, todo, later = {}, list(ROOTS), []
     while todo:
         name = todo.pop()
         if name in chosen or name in SKIP:
             continue
-        versions = [p for p in packages.get(name, []) + packages.get(name + '-git', []) if p[1] <= snapshot]
+        candidates = packages.get(name, []) + packages.get(name + '-git', [])
+        versions = [p for p in candidates if p[1] <= snapshot]
         if name == 'qt6-base':
             versions = qt_files
         elif name.startswith('qt6-'):
             # Qt's other modules at Qt's own version, whenever uploaded.
             versions = [p for p in packages.get(name, []) if p[0] == qt]
-        if not versions:
-            sys.exit(f'{name}: no version uploaded by {snapshot}')
-        version, _, filename = max(versions, key=lambda p: p[1])
+            if not versions:
+                sys.exit(f'{name}: no {qt} in the repository')
+        if versions:
+            _, _, filename = max(versions, key=lambda p: p[1])
+        elif candidates:
+            # The repository has since deleted every file uploaded by then:
+            # the oldest one left, the nearest to that state.
+            _, uploaded, filename = min(candidates, key=lambda p: p[1])
+            later.append((name, uploaded, filename))
+        else:
+            sys.exit(f'{name}: not in the repository')
         data = get(REPO + urllib.parse.quote(filename))
         chosen[name] = (filename, hashlib.sha256(data).hexdigest())
         for dep in pkginfo(data):
@@ -115,6 +126,10 @@ def resolve(qt):
     with open(LOCK, 'w', newline='\n') as f:
         f.write(f'# MSYS2 clang64 packages for Qt {qt}, as the repository stood on {snapshot:%Y-%m-%d}:\n'
                 '# port/tools/fetch_msys2_qt.py --resolve. <sha256> <file>\n')
+        if later:
+            f.write('# No file uploaded by then remains of these; locked instead, the oldest left:\n')
+        for name, uploaded, filename in sorted(later):
+            f.write(f'#   {name}: {filename[len(PREFIX):]}, uploaded {uploaded:%Y-%m-%d}\n')
         for name in sorted(chosen):
             filename, digest = chosen[name]
             f.write(f'{digest} {filename}\n')

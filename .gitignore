@@ -18,3 +18,10 @@ port/tests/golden/expected/*/*.out
 
 # project instructions, kept local only
 /CLAUDE.md
+
+# Durable local copy of the third-party source archives offered with the
+# Windows packages (port/tools/fetch_msys2_qt.py --sources); never committed.
+/source-archive/
+
+# cmd cheatsheets, kept local only
+CMDs.txt
