@@ -52,6 +52,9 @@ if(NOT EXISTS "${LINSCP_UPSTREAM}/source/core/Common.cpp")
     "Upstream submodule missing. Run: git submodule update --init --recursive")
 endif()
 
+# Path-independent output dated by SOURCE_DATE_EPOCH, for every target below.
+include(cmake/reproducible.cmake)
+
 find_package(Python3 3.9 REQUIRED COMPONENTS Interpreter)
 
 # ---------------------------------------------------------------------------

@@ -708,6 +708,19 @@ add_test(NAME shim_no_wide_abi
 set_tests_properties(shim_no_wide_abi
   PROPERTIES WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
+# Reproducible builds (cmake/reproducible.cmake): the programs carry no
+# absolute source, build or generated-tree path.
+if(LINSCP_REPRODUCIBLE AND TARGET linscp AND TARGET linscp-cli)
+  add_test(NAME no_build_paths_build
+    COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target linscp linscp-cli)
+  add_test(NAME no_build_paths
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/check_build_paths.py"
+            --path "${CMAKE_SOURCE_DIR}" --path "${CMAKE_BINARY_DIR}"
+            --path "${LINSCP_GEN}" --path "${LINSCP_UPSTREAM}"
+            "$<TARGET_FILE:linscp>" "$<TARGET_FILE:linscp-cli>")
+  set_tests_properties(no_build_paths PROPERTIES DEPENDS no_build_paths_build)
+endif()
+
 # The *_build tests each run a build of this tree; two at once contend for
 # Ninja's lock and fail spuriously under ctest -j, so they take turns.
 get_property(_all_tests DIRECTORY PROPERTY TESTS)

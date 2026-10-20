@@ -63,6 +63,12 @@ cmake --build build/release --target package-deb        # linscp_<version>_amd64
 cmake --build build/release --target package-appimage   # linscp-<version>-x86_64.AppImage
 ```
 
+Release builds are reproducible ([cmake/reproducible.cmake](cmake/reproducible.cmake)):
+the same commit gives byte-identical programs, `.deb` and portable zip from
+any checkout path. They are dated by `SOURCE_DATE_EPOCH`, or else by the last
+commit (a source tarball's file dates); no absolute path is compiled in
+(ctest `no_build_paths`). `-DLINSCP_REPRODUCIBLE=OFF` turns it off.
+
 - **.deb**: built with CPack. Its dependencies are read from the binaries, so
   it targets the distribution it is built on. Needs `dpkg-dev`.
 - **AppImage**: linuxdeploy and appimagetool are fetched pinned
