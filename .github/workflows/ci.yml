@@ -65,7 +65,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/tools/msys2-qt
-          key: msys2-qt-${{ hashFiles('port/qt/msys2-qt.lock') }}
+          key: msys2-qt-${{ hashFiles('port/qt/msys2-qt.lock', 'port/tools/fetch_msys2_qt.py') }}
 
       - name: Hand the tree to the test user
         run: |
@@ -172,7 +172,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build/tools/msys2-qt
-          key: msys2-qt-${{ hashFiles('port/qt/msys2-qt.lock') }}
+          key: msys2-qt-${{ hashFiles('port/qt/msys2-qt.lock', 'port/tools/fetch_msys2_qt.py') }}
 
       - name: Fetch llvm-mingw
         run: python3 port/tools/fetch_llvm_mingw.py --dest build/tools

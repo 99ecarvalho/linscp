@@ -313,6 +313,7 @@ registry, tray or window messages.
 | Date | Decision | Rationale |
 |---|---|---|
 | 2026-10-20 | The FTP engine's `CString`/`CFile`/`CTime` come from linscp's own clean-room `port/mfc-compat/` (ADR 0017); the vendored MFC subset is not compiled, guarded by a configure check and ctest `no_mfc`, covered by ctest `mfc_compat` | The vendored subset is not under a free licence; every distribution channel reviews licences |
+| 2026-10-20 | Windows packages carry each bundled MSYS2 package's licence texts, `THIRD-PARTY-NOTICES.txt` and a three-year written source offer (`deploy_windows.py`, from `fetch_msys2_qt.py`'s package index) | LGPL/GPL obligations for redistributed Qt and its dependencies |
 | 2026-10-20 | linscp proceeds as an independent project: publish across all channels first, clean up and rewrite the codebase afterward. Rollout in [RELEASE-PLAN.md](RELEASE-PLAN.md) | Can't wait for the rewrite before publishing; reach and demonstrated demand matter now |
 | 2026-10-20 | Version 0.7.1 tagged and released, with the CI packages | CI clean-up |
 | 2026-10-19 | Version 0.7.0 tagged and published as the first official (non-pre-release) GitHub release, with the CI packages | First release promoted out of pre-release |

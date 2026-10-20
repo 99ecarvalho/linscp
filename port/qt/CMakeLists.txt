@@ -160,7 +160,8 @@ if(WIN32 AND LINSCP_QT_PREFIX)
   add_custom_target(deploy
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/deploy_windows.py"
             --objdump "${LINSCP_TARGET_OBJDUMP}" --qt-prefix "${LINSCP_QT_PREFIX}"
-            --dest "${CMAKE_BINARY_DIR}/deploy" --translations "${_translations_dir}"
+            --dest "${CMAKE_BINARY_DIR}/deploy" --version "${PROJECT_VERSION}"
+            --translations "${_translations_dir}"
             ${_deploy_winscpnet}
             --extra "$<TARGET_FILE:DragExt64>"
             "$<TARGET_FILE:linscp>" "$<TARGET_FILE:linscp-cli>"
