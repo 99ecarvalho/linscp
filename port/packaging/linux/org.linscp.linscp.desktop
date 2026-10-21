@@ -7,6 +7,6 @@ Exec=linscp /Unsafe %u
 Icon=org.linscp.linscp
 Terminal=false
 Categories=Network;FileTransfer;
-Keywords=sftp;scp;ftp;ftps;webdav;s3;ssh;winscp;
+Keywords=sftp;scp;ftp;ftps;webdav;s3;ssh;linscp;
 MimeType=x-scheme-handler/ftp;x-scheme-handler/ftps;x-scheme-handler/ftpes;x-scheme-handler/sftp;x-scheme-handler/scp;x-scheme-handler/ssh;x-scheme-handler/dav;x-scheme-handler/davs;x-scheme-handler/s3;x-scheme-handler/winscp-ftp;x-scheme-handler/winscp-ftps;x-scheme-handler/winscp-ftpes;x-scheme-handler/winscp-http;x-scheme-handler/winscp-https;x-scheme-handler/winscp-ssh;x-scheme-handler/winscp-sftp;x-scheme-handler/winscp-scp;
 StartupWMClass=linscp
