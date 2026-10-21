@@ -6,21 +6,37 @@ version are on [GitHub releases](https://github.com/99ecarvalho/linscp/releases)
 The release workflow publishes the section whose heading matches the tag, so
 each release needs a `## X.Y.Z — YYYY-MM-DD` heading here before it is tagged.
 
-## Unreleased
+## 0.7.2 — 2026-10-21
+linscp gets its permanent name on the Linux desktop, signed releases, and
+packages for more systems.
 
-- Releases are signed with linscp's OpenPGP release key (SECURITY.md says
-  how to verify a download).
-- The FTP and FTPS engine's string, file and time classes are now linscp's own
-  code, with their own unit tests.
-- The Windows packages and the AppImage carry the licence texts of every
-  bundled library and a list of them. Each release publishes the source code
-  of the copyleft ones beside the downloads.
-- A smaller AppImage, holding only the Qt plugins linscp uses.
-- Manual pages: `man linscp` and `man linscp-cli`.
-- Builds for distributions and Flatpak can turn off the update check
-  (`-DLINSCP_UPDATE_CHECK=OFF`); a Flatpak never checks for updates itself.
-- Complete, reproducible source tarballs with checksums, built by a
-  tag-triggered release workflow.
+- **A new application ID, `org.linscp.linscp`.** The desktop entry, icons and
+  Flatpak use it; on Wayland the window now matches its launcher and icon.
+  What an older version registered (menu entry, URL handlers, shortcuts) is
+  renamed or cleaned up on first start.
+- **Signed releases.** The source tarball and `SHA256SUMS` carry OpenPGP
+  signatures from linscp's release key; [SECURITY.md](https://github.com/99ecarvalho/linscp/blob/main/SECURITY.md#verifying-a-download) shows how
+  to check a download. Each release also publishes the source code of the
+  bundled open-source libraries that ask for it.
+- **FTP downloads on Linux** name the file, not its whole path, when asking
+  whether to overwrite it, and create the target folders first.
+- **Secure connections follow the system's crypto policy** when linscp is
+  built against the system OpenSSL (Fedora and others): the TLS versions
+  offered are the system's unless a site sets its own.
+- **A smaller AppImage,** with only the Qt plugins linscp uses; it and the
+  Windows packages carry the licence texts of every bundled library.
+- **Flatpak:** updates come from Flathub only (no update check of its own),
+  and "Sleep" and "Shut Down Computer" once the queue is empty are hidden,
+  as the sandbox cannot do them.
+- **Manual pages:** `man linscp` and `man linscp-cli`.
+- The interface, the command-line client and their messages name linscp
+  throughout.
+
+For packagers: options to build against the system OpenSSL and expat
+(`-DLINSCP_SYSTEM_OPENSSL=ON -DLINSCP_SYSTEM_EXPAT=ON`) and to turn off the
+update check (`-DLINSCP_UPDATE_CHECK=OFF`); recipes for Arch (AUR), Fedora
+and openSUSE, Debian and Ubuntu, and Nix are in `port/packaging/`, and every
+release has a complete, reproducible, signed source tarball.
 
 ## 0.7.1 — 2026-10-20
 

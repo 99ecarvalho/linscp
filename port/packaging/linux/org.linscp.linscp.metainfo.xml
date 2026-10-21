@@ -61,6 +61,11 @@
     <category>FileTransfer</category>
   </categories>
   <releases>
+    <release version="0.7.2" date="2026-10-21">
+      <description>
+        <p>linscp gets its permanent name on the Linux desktop, signed releases, and packages for more systems.</p>
+      </description>
+    </release>
     <release version="0.7.1" date="2026-10-20">
       <description>
         <p>A maintenance release that cleans up the continuous integration. It brings no new features.</p>

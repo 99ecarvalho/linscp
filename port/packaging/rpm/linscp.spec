@@ -19,7 +19,7 @@
 %{!?_metainfodir:%global _metainfodir %{_datadir}/metainfo}
 
 Name:           linscp
-Version:        0.7.1
+Version:        0.7.2
 Release:        1%{?dist}
 Summary:        SFTP, SCP, FTP, WebDAV and S3 file-transfer client
 
@@ -177,5 +177,8 @@ appstream-util validate-relax --nonet %{buildroot}%{_metainfodir}/org.linscp.lin
 %{_mandir}/man1/linscp-cli.1*
 
 %changelog
+* Wed Oct 21 2026 Eduardo Correia <ecorreia@apliant.com.br> - 0.7.2-1
+- Update to 0.7.2
+
 * Tue Oct 20 2026 Eduardo Correia <ecorreia@apliant.com.br> - 0.7.1-1
 - First RPM package

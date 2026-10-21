@@ -542,7 +542,7 @@ Not started: RW-05/RW-06 (code signing).
 | R2-12 | 2 | `port/packaging/debian/` (shared with Phase 3): builds on trixie, Ubuntu 26.04 and 26.10 in clean containers, lintian `-EvIL +pedantic` clean but for the ITP number and the missing signature check, autopkgtest smoke tests pass. A real sbuild not run | | done |
 | R2-13 | 2 | PPA job (`port/tools/ppa_source_packages.sh`, one source package per series from one orig): in `port/packaging/ci/release-jobs.yml`, signing and `dput --simulate` tested; needs R2-11 | | wip |
 | R3-01 | 3 | Debian ITP filed | M | todo |
-| R3-02 | 3 | `debian/copyright` (DEP-5) for every bundled tree; `Files-Excluded` (`+dfsg`) for 0.7.1, nothing to exclude from the next release's tarball (R0-33). ftpmasters' review still to come | | done |
+| R3-02 | 3 | `debian/copyright` (DEP-5) for every bundled tree; no `Files-Excluded` or `+dfsg` repack: release tarballs from 0.7.2 on carry nothing Debian could not ship (R0-33). ftpmasters' review still to come | | done |
 | R3-03 | 3 | Watch file v5 with `Pgp-Mode: auto` and `debian/upstream/signing-key.asc`, `debian/upstream/metadata`, autopkgtest (`debian/tests`). The AUR PKGBUILD (`validpgpkeys`), the RPM spec (`%gpgverify`) and OBS (`linscp.keyring`) check the signature too | | done |
 | R3-04 | 3 | Security-tracker embedded-copy entries (PuTTY, neon, libs3) | M | todo |
 | R3-05 | 3 | mentors.debian.net upload + RFS + sponsor + NEW queue | M | todo |
