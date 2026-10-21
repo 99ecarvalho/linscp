@@ -29,8 +29,10 @@ AppId={{6C1E36A4-5B9F-4B8C-9C2E-3F0A7D1E8B52}
 AppName={#AppName}
 AppVersion={#AppVersion}
 AppVerName={#AppName} {#AppVersion}
-AppPublisher={#AppName}
-AppPublisherURL=https://github.com/99ecarvalho/linscp
+; Add/Remove Programs' Publisher, which the winget, Scoop and Chocolatey
+; manifests (port/packaging/) name too.
+AppPublisher=Apliant
+AppPublisherURL=https://linscp.org
 AppSupportURL=https://github.com/99ecarvalho/linscp/issues
 AppUpdatesURL=https://github.com/99ecarvalho/linscp/releases
 VersionInfoVersion={#AppVersion}
