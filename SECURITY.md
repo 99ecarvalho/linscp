@@ -1,6 +1,6 @@
 # Security policy
 
-linscp is a Qt port of [WinSCP](https://winscp.net/). It runs WinSCP's core, so
+linscp is built on the core of [WinSCP](https://winscp.net/), so
 some vulnerabilities belong to WinSCP and some to linscp's own code (the Qt
 interface, the command-line client, and the POSIX/Win32 compatibility layer).
 
