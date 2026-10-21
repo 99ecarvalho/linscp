@@ -489,8 +489,10 @@ void SetBookmarks(const std::string & SessionKey, const std::vector<TBookmarkEnt
     if (Bookmarks.empty())
     {
       // Modified even when emptied, so the list is written, its removal
-      // with it (the flag is the list's own).
+      // with it (the flag is the list's own, and protected). Named, as the
+      // list asserts every bookmark is.
       TBookmark * Placeholder = new TBookmark();
+      Placeholder->Name = L"-";
       List->Add(Placeholder);
       List->Delete(Placeholder);
     }

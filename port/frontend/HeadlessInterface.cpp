@@ -94,6 +94,22 @@ public:
   }
 
 protected:
+  // Storage detection is the application configuration's, as
+  // TWinConfiguration's GetStorage: core's own fallback asserts that it is
+  // never reached. The same rule as that fallback (an existing INI file,
+  // else the registry); only Windows without /ini gets here.
+  virtual TStorage __fastcall GetStorage()
+  {
+    {
+      TGuard Guard(FCriticalSection);
+      if (FStorage == stDetect)
+      {
+        FStorage = FileExists(ApiPath(IniFileStorageNameForReading)) ? stIniFile : stRegistry;
+      }
+    }
+    return TConfiguration::GetStorage();
+  }
+
   // TWinConfiguration's master password, read only: what the GUI set
   // (Security\UseMasterPassword and its verifier), so the console client
   // can open sites whose passwords it encrypted, as WinSCP.com can.

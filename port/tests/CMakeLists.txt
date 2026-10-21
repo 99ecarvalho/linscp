@@ -34,6 +34,30 @@ add_executable(test_misc test_misc.cpp)
 target_link_libraries(test_misc PRIVATE linscp-shim)
 add_test(NAME misc COMMAND test_misc)
 
+# A failed debug assertion is reported and aborts; LINSCP_ASSERT=continue
+# reports it and carries on.
+add_executable(test_assert test_assert.cpp)
+target_link_libraries(test_assert PRIVATE linscp-shim)
+foreach(_mode wide c continue_wide continue_c)
+  string(REGEX REPLACE "^continue_" "" _api "${_mode}")
+  add_test(NAME assert_${_mode} COMMAND test_assert ${_api})
+  if(_mode MATCHES "^continue_")
+    # A modification, as ENVIRONMENT is replaced for the Wine tests below.
+    set_tests_properties(assert_${_mode} PROPERTIES
+      ENVIRONMENT_MODIFICATION LINSCP_ASSERT=set:continue)
+    set(_after "returned")
+  else()
+    set(_after "aborted")
+  endif()
+  if(_api STREQUAL "wide")
+    set(_report "Count == 2 é, file Global\\.cpp, line 42")
+  else()
+    set(_report "entry != NULL, file conf\\.c, line 7")
+  endif()
+  set_tests_properties(assert_${_mode} PROPERTIES
+    PASS_REGULAR_EXPRESSION "Assertion failed: ${_report}\r?\n${_after}")
+endforeach()
+
 add_executable(test_dynarray test_dynarray.cpp)
 target_link_libraries(test_dynarray PRIVATE linscp-shim)
 add_test(NAME dynarray COMMAND test_dynarray)

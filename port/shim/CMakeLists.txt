@@ -42,6 +42,7 @@ add_library(linscp-shim STATIC
   vcl_thread.cpp
   vcl_variant.cpp
   vcl_json.cpp
+  vcl_assert.cpp
   "${CMAKE_BINARY_DIR}/gen_resources.cpp"
 )
 

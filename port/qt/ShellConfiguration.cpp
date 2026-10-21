@@ -154,6 +154,21 @@ UnicodeString __fastcall TShellConfiguration::GetDefaultKeyFile()
   return !FDefaultKeyFile.IsEmpty() ? FDefaultKeyFile : TGUIConfiguration::GetDefaultKeyFile();
 }
 
+// Core's fallback rule (an existing INI file, else the registry), decided
+// here as TWinConfiguration decides it, so that fallback's assertion is not
+// reached. Only Windows without /ini starts undetected.
+TStorage __fastcall TShellConfiguration::GetStorage()
+{
+  {
+    TGuard Guard(FCriticalSection);
+    if (FStorage == stDetect)
+    {
+      FStorage = FileExists(ApiPath(IniFileStorageNameForReading)) ? stIniFile : stRegistry;
+    }
+  }
+  return TGUIConfiguration::GetStorage();
+}
+
 // As TWinConfiguration::TemporaryDir.
 UnicodeString TShellConfiguration::TemporaryDir(bool Mask)
 {

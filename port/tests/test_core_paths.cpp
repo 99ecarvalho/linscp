@@ -86,14 +86,18 @@ int main()
     std::unique_ptr<TStrings> Profiles(GetS3Profiles());
     CHECK(Profiles->IndexOf(L"linscp-profile") >= 0);
 
-    // FileZilla's sites, from ~/.config/filezilla.
-    UnicodeString Error;
-    std::unique_ptr<TStoredSessionList> FileZilla(Configuration->SelectFilezillaSessionsForImport(StoredSessions, Error));
-    CHECK(Error.IsEmpty());
-    CHECK((FileZilla->Count == 1) && (FileZilla->Sessions[0]->HostName == L"fz.example.com"));
-    if (!Error.IsEmpty())
+    // FileZilla's sites, from ~/.config/filezilla. The list goes before
+    // HeadlessFinalize: a session list must not outlive the configuration
+    // (TStoredSessionList's destructor asserts it).
     {
-      std::printf("FileZilla: %s\n", UTF8String(Error).c_str());
+      UnicodeString Error;
+      std::unique_ptr<TStoredSessionList> FileZilla(Configuration->SelectFilezillaSessionsForImport(StoredSessions, Error));
+      CHECK(Error.IsEmpty());
+      CHECK((FileZilla->Count == 1) && (FileZilla->Sessions[0]->HostName == L"fz.example.com"));
+      if (!Error.IsEmpty())
+      {
+        std::printf("FileZilla: %s\n", UTF8String(Error).c_str());
+      }
     }
 #endif
     HeadlessFinalize();

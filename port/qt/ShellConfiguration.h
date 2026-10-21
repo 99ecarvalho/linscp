@@ -349,6 +349,9 @@ public:
   virtual RawByteString __fastcall StronglyRecryptPassword(RawByteString Password, UnicodeString Key);
 
 protected:
+  // As TWinConfiguration's: storage detection is the application
+  // configuration's, as core's own fallback asserts.
+  virtual TStorage __fastcall GetStorage();
   virtual void __fastcall SaveData(THierarchicalStorage * Storage, bool All);
   virtual void __fastcall LoadData(THierarchicalStorage * Storage);
   virtual void __fastcall Saved();

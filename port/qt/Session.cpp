@@ -3794,7 +3794,9 @@ std::vector<std::string> TSession::KeepUpToDateInNewWindow(const TKeepUpToDatePa
     std::unique_ptr<TStringList> Options(new TStringList());
     {
       std::unique_ptr<TOptionsStorage> OptionsStorage(new TOptionsStorage(Options.get(), true));
-      const TGUICopyParamType CopyParam = TransferCopyParam(&Settings);
+      // Core's part only, as upstream serializes it: the GUI's queue options
+      // are not passed on, and TGUICopyParamType::Save takes no defaults.
+      const TCopyParamType CopyParam = TransferCopyParam(&Settings);
       CopyParam.Save(OptionsStorage.get(), &Defaults);
     }
     if (Options->Count > 0)
