@@ -28,7 +28,7 @@ jobs:
       GH_REPO: ${{ github.repository }}
       AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: env.AUR_SSH_PRIVATE_KEY != ''
         with:
           ref: ${{ github.event.release.tag_name }}
@@ -49,9 +49,9 @@ jobs:
           git diff -- PKGBUILD
       # Regenerates .SRCINFO and pushes PKGBUILD, .SRCINFO and LICENSE to
       # ssh://aur@aur.archlinux.org/linscp.git. No test build: the same
-      # sources passed CI on the tag. Pinned to v4.1.1's commit, as it is
+      # sources passed CI on the tag. Pinned to a commit (v4.2.0), as it is
       # handed the SSH key.
-      - uses: KSXGitHub/github-actions-deploy-aur@2ac5a4c1d7035885d46b10e3193393be8460b6f1
+      - uses: KSXGitHub/github-actions-deploy-aur@084b0d9b15415bf9cdb65d44dad1efe37a354050 # v4.2.0
         if: env.AUR_SSH_PRIVATE_KEY != ''
         with:
           pkgname: linscp
@@ -101,7 +101,7 @@ jobs:
     env:
       CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: env.CHOCOLATEY_API_KEY != ''
         with:
           sparse-checkout: port/packaging/chocolatey
@@ -155,7 +155,7 @@ jobs:
           apt-get update -q
           DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends \
             ca-certificates curl git debhelper devscripts dpkg-dev dput gnupg xz-utils
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: env.PPA_SIGNING_KEY != ''
         with:
           ref: ${{ github.event.release.tag_name }}
@@ -207,7 +207,7 @@ jobs:
       - name: Install rpm-build and copr-cli
         if: env.COPR_CONFIG != ''
         run: dnf -y install git-core rpm-build copr-cli
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         if: env.COPR_CONFIG != ''
         with:
           ref: ${{ github.event.release.tag_name }}

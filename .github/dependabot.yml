@@ -1,0 +1,19 @@
+# Updates for the GitHub Actions the workflows use, pinned to commit SHAs.
+# A release is proposed only once it is 14 days old (cooldown), so that a
+# compromised or broken release has time to be noticed and withdrawn first.
+# Each update is a pull request to review; nothing is merged on its own.
+# port/packaging/ci/release-jobs.yml is outside .github/workflows, so its pins
+# are updated by hand when a job moves into release.yml.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: ci
