@@ -77,8 +77,12 @@ UnicodeString PosixIniFileName()
       return Beside;
     }
   }
+  // A Flatpak's executable is in its read-only /app, never the user's to
+  // make portable: its configuration is always the sandbox's
+  // ($XDG_CONFIG_HOME, ~/.var/app/<id>/config), or /ini's.
+  const bool Flatpak = !GetEnvironmentVariable(L"FLATPAK_ID").IsEmpty();
   const UnicodeString Portable = IncludeTrailingBackslash(ExtractFilePath(ParamStr(0))) + FileName;
-  if (FileExists(ApiPath(Portable)))
+  if (!Flatpak && FileExists(ApiPath(Portable)))
   {
     return Portable;
   }

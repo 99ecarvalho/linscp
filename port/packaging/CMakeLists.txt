@@ -9,7 +9,7 @@
 #   <prefix>/bin/{linscp, linscp-cli}  symlinks to them;
 #   <prefix>/share/{applications, icons/hicolor, metainfo, doc/linscp}.
 
-set(LINSCP_APP_ID "io.github._99ecarvalho.linscp")
+set(LINSCP_APP_ID "org.linscp.linscp")
 
 # The licenses every package carries, as <file>|<name>: linscp's, WinSCP's,
 # and those of what it is built from.
@@ -114,14 +114,14 @@ if(NOT WIN32)
   set(CPACK_PACKAGE_VENDOR "linscp")
   set(CPACK_PACKAGE_CONTACT "Eduardo Correia <ecorreia@apliant.com.br>")
   set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "SFTP, SCP, FTP, WebDAV and S3 file-transfer client")
-  set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/99ecarvalho/linscp")
+  set(CPACK_PACKAGE_HOMEPAGE_URL "https://linscp.org")
   set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
   set(CPACK_DEBIAN_PACKAGE_SECTION "net")
   set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
   set(CPACK_STRIP_FILES ON)
   set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
   set(CPACK_DEBIAN_PACKAGE_DESCRIPTION
-    "linscp is a file manager for transferring files between your computer and\n remote servers. It offers a two-panel Commander interface, with the same\n sessions, settings and scripting on Linux and Windows, over SFTP, SCP, FTP\n (with TLS), WebDAV and Amazon S3.\n .\n A WinSCP equivalent for Linux.")
+    "linscp transfers files between your computer and remote servers over\n SFTP, SCP, FTP (with TLS), WebDAV and S3. Its two-panel interface shows\n local and remote files side by side, with the same sessions, settings and\n scripting on Linux and Windows.\n .\n It synchronizes and compares directories, keeps a remote directory up to\n date, edits remote files, and runs commands on the server.")
   set(CPACK_OUTPUT_FILE_PREFIX "${CMAKE_BINARY_DIR}/packages")
   include(CPack)
   add_custom_target(package-deb

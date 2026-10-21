@@ -165,8 +165,9 @@ CLI_FILES = [
     ('<program-directory>/WinSCP.ini',
      'When this file exists beside the program, it is used instead, which makes a portable copy. '
      'For an AppImage, the file goes beside the `.AppImage` file.'),
-    ('~/.var/app/io.github._99ecarvalho.linscp/config/linscp/WinSCP.ini',
-     'The configuration file of the Flatpak.'),
+    ('~/.var/app/org.linscp.linscp/config/linscp/WinSCP.ini',
+     'The configuration file of the Flatpak, which shares nothing with other installs and never '
+     'uses a file beside its program.'),
 ]
 
 COMMON_ENV = [

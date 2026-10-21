@@ -3643,7 +3643,7 @@ void Preferences(const QString & Ini, const QString & Translations, const QStrin
       Check(Entry.contains(QStringLiteral("x-scheme-handler/sftp;")) && Entry.contains(QStringLiteral("x-scheme-handler/winscp-sftp;")) &&
         Entry.contains(QStringLiteral("/Unsafe %u")), "a desktop entry for the protocols' URLs, with /Unsafe as upstream's");
       QString MimeApps = QString::fromUtf8(ReadAll(Integration::MimeAppsPath()));
-      Check(MimeApps.contains(QStringLiteral("x-scheme-handler/sftp=linscp.desktop")) &&
+      Check(MimeApps.contains(QStringLiteral("x-scheme-handler/sftp=org.linscp.linscp.desktop")) &&
         !MimeApps.contains(QStringLiteral("other.desktop")) && MimeApps.contains(QStringLiteral("text/plain=gedit.desktop")),
         "the default for them, the rest kept");
       Check(Integration::UnregisterUrlHandler(Error) && !QFileInfo::exists(Integration::DesktopEntryPath()), "unregistered");
@@ -7520,6 +7520,175 @@ void UpdateChecksMissing(const char * Why)
   CoreBridge::ChangePreferences([](CoreBridge::TPreferences & P) { P.UpdatesPeriod = 0; });
 }
 
+// R1-02, R1-19, R1-20: linscp's desktop identity, its application ID: Qt's
+// desktop file name (Wayland's app_id); the packaged desktop file, icon and
+// metainfo named after it (Packaging, port/packaging/linux); the URL handler,
+// desktop icon and shortcuts named after it, written as linscp's own only for
+// an AppImage or an archive (a package's and a Flatpak's installed already);
+// and what older versions wrote under linscp's own name cleaned up. In XDG
+// directories of the test's own under Directory.
+void DesktopIdentityTest(const QString & Packaging, const QString & Directory)
+{
+  const QString App = QString::fromLatin1(Integration::AppId);
+  Check(App == QStringLiteral("org.linscp.linscp"), "the application ID");
+  Integration::SetUpDesktopIdentity();
+  Check(QGuiApplication::desktopFileName() == App, "Qt's desktop file name the application ID's (Wayland's app_id)");
+#if defined(Q_OS_WIN)
+  // The rest is the XDG desktop's.
+  Q_UNUSED(Packaging);
+  Q_UNUSED(Directory);
+  Check(Integration::Install() == Integration::TInstall::Archive, "Windows: no package or Flatpak");
+#else
+  {
+    const QString Desktop = QString::fromUtf8(ReadAll(QDir(Packaging).filePath(App + QStringLiteral(".desktop"))));
+    const QString MetaInfo = QString::fromUtf8(ReadAll(QDir(Packaging).filePath(App + QStringLiteral(".metainfo.xml"))));
+    Check(Desktop.contains(QStringLiteral("\nIcon=") + App + QLatin1Char('\n')) && Desktop.contains(QStringLiteral("\nStartupWMClass=linscp")),
+      "the packaged desktop file named after it, its icon too, X11's WM_CLASS the program's");
+    Check(MetaInfo.contains(QStringLiteral("<id>") + App + QStringLiteral("</id>")) &&
+      MetaInfo.contains(QStringLiteral("<launchable type=\"desktop-id\">") + App + QStringLiteral(".desktop</launchable>")) &&
+      MetaInfo.contains(QStringLiteral("<developer id=\"br.com.apliant\">")), "and its metainfo");
+  }
+
+  QtFrontend Frontend;
+  CoreBridge::Initialize(&Frontend);
+  {
+    QDir(Directory).removeRecursively();
+    const QDir Dir(Directory);
+    const QString Data = Dir.filePath(QStringLiteral("data"));
+    const QString Config = Dir.filePath(QStringLiteral("config"));
+    const QString DesktopDir = Dir.filePath(QStringLiteral("Desktop"));
+    QDir().mkpath(Config);
+    QDir().mkpath(DesktopDir);
+    WriteAll(QDir(Config).filePath(QStringLiteral("user-dirs.dirs")), QStringLiteral("XDG_DESKTOP_DIR=\"%1\"\n").arg(DesktopDir).toUtf8());
+    qputenv("XDG_DATA_HOME", Data.toLocal8Bit());
+    qputenv("XDG_CONFIG_HOME", Config.toLocal8Bit());
+    qunsetenv("FLATPAK_ID");
+    qunsetenv("APPIMAGE");
+    const QString Applications = QDir(Data).filePath(QStringLiteral("applications"));
+    const QString Icon = QDir(Data).filePath(QStringLiteral("icons/hicolor/256x256/apps/") + App + QStringLiteral(".png"));
+    const QString OldIcon = QDir(Data).filePath(QStringLiteral("icons/hicolor/256x256/apps/linscp.png"));
+    Check(Integration::DesktopEntryPath() == QDir(Applications).filePath(App + QStringLiteral(".desktop")),
+      "the user's desktop entry named after it");
+
+    // How linscp is installed.
+    const QString Prefix = Dir.filePath(QStringLiteral("prefix"));
+    QDir().mkpath(QDir(Prefix).filePath(QStringLiteral("lib/linscp")));
+    QDir().mkpath(QDir(Prefix).filePath(QStringLiteral("share/applications")));
+    WriteAll(QDir(Prefix).filePath(QStringLiteral("share/applications/") + App + QStringLiteral(".desktop")), "[Desktop Entry]\n");
+    const QString Packaged = QDir(Prefix).filePath(QStringLiteral("lib/linscp/linscp"));
+    const QString Archive = Dir.filePath(QStringLiteral("archive/linscp"));
+    Check(Integration::Install() == Integration::TInstall::Archive, "this program: an archive's (a build's)");
+    Integration::SetProgramForTests(Packaged);
+    Check((Integration::Install() == Integration::TInstall::Package) && !Integration::SelfRegisters(),
+      "a package's: its desktop file installed beside it, not registering itself");
+    Integration::SetProgramForTests(QStringLiteral("/usr/lib/linscp/linscp"));
+    Check(Integration::Install() == Integration::TInstall::Package, "a package's: under /usr");
+    Integration::SetProgramForTests(Archive);
+    Check((Integration::Install() == Integration::TInstall::Archive) && Integration::SelfRegisters(), "an archive's, registering itself");
+    // (An AppImage's mounted tree has a package's layout.)
+    Integration::SetProgramForTests(Packaged);
+    qputenv("APPIMAGE", Dir.filePath(QStringLiteral("linscp.AppImage")).toLocal8Bit());
+    Check((Integration::Install() == Integration::TInstall::AppImage) && Integration::SelfRegisters(), "an AppImage's, registering itself");
+    qputenv("FLATPAK_ID", App.toLocal8Bit());
+    Check((Integration::Install() == Integration::TInstall::Flatpak) && !Integration::SelfRegisters(),
+      "a Flatpak's (FLATPAK_ID), not registering itself");
+    qunsetenv("FLATPAK_ID");
+    qunsetenv("APPIMAGE");
+
+    // An archive's, upgraded: what an older version registered (its menu
+    // entry, the URL handler's, its icon, its desktop icon and a site's
+    // shortcut, mimeapps.list's defaults) renamed or gone.
+    Integration::SetProgramForTests(Archive);
+    const QByteArray OldEntry = "[Desktop Entry]\nType=Application\nName=linscp\nExec=\"/old/linscp\" /Unsafe %u\nIcon=linscp\n"
+      "Terminal=false\nMimeType=x-scheme-handler/sftp;\n";
+    const QByteArray OldShortcut = "[Desktop Entry]\nType=Application\nName=Short Cut\nExec=\"/old/linscp\" \"sftp://x\"\nIcon=linscp\n";
+    QDir().mkpath(Applications);
+    QDir().mkpath(QFileInfo(OldIcon).path());
+    WriteAll(QDir(Applications).filePath(QStringLiteral("linscp.desktop")), OldEntry);
+    WriteAll(OldIcon, "png");
+    WriteAll(QDir(DesktopDir).filePath(QStringLiteral("linscp.desktop")), OldShortcut);
+    WriteAll(QDir(DesktopDir).filePath(QStringLiteral("Short Cut.desktop")), OldShortcut);
+    WriteAll(QDir(DesktopDir).filePath(QStringLiteral("other.desktop")), "[Desktop Entry]\nName=Other\nIcon=other\n");
+    WriteAll(Integration::MimeAppsPath(), "[Default Applications]\ntext/plain=gedit.desktop\nx-scheme-handler/sftp=linscp.desktop\n"
+      "\n[Added Associations]\nx-scheme-handler/ftp=other.desktop;linscp.desktop;\n");
+    Check(Integration::CleanUpOldRegistration(), "an older version's registration cleaned up");
+    Check(!QFileInfo::exists(QDir(Applications).filePath(QStringLiteral("linscp.desktop"))) && !QFileInfo::exists(OldIcon),
+      "its menu entry and icon gone");
+    const QString Entry = QString::fromUtf8(ReadAll(Integration::DesktopEntryPath()));
+    Check(Entry.contains(QStringLiteral("x-scheme-handler/sftp;")) && Entry.contains(QStringLiteral("\nIcon=") + App + QLatin1Char('\n')) &&
+      QFileInfo::exists(Icon), "the URL handler registered again under the application ID, its icon too");
+    Check(ReadAll(QDir(DesktopDir).filePath(QStringLiteral("Short Cut.desktop"))).contains("\nIcon=" + App.toUtf8() + "\n") &&
+      ReadAll(QDir(DesktopDir).filePath(QStringLiteral("linscp.desktop"))).contains("\nIcon=" + App.toUtf8() + "\n") &&
+      (ReadAll(QDir(DesktopDir).filePath(QStringLiteral("other.desktop"))) == "[Desktop Entry]\nName=Other\nIcon=other\n"),
+      "the desktop's shortcuts given the new icon, others' untouched");
+    QString MimeApps = QString::fromUtf8(ReadAll(Integration::MimeAppsPath()));
+    Check(MimeApps.contains(QStringLiteral("x-scheme-handler/sftp=") + App + QStringLiteral(".desktop;")) &&
+      MimeApps.contains(QStringLiteral("x-scheme-handler/ftp=other.desktop;") + App + QStringLiteral(".desktop;")) &&
+      MimeApps.contains(QStringLiteral("text/plain=gedit.desktop")) && !MimeApps.contains(QStringLiteral("=linscp.desktop")) &&
+      !MimeApps.contains(QStringLiteral(";linscp.desktop")), "mimeapps.list's defaults the new desktop file's, the rest kept");
+    Check(!Integration::CleanUpOldRegistration(), "and nothing more to clean up");
+
+    // Made again: under the application ID, the old names' files gone.
+    QString Error;
+    Check(Integration::CreateDesktopIcon(false, Error) && QFileInfo::exists(QDir(DesktopDir).filePath(App + QStringLiteral(".desktop"))) &&
+      !QFileInfo::exists(QDir(DesktopDir).filePath(QStringLiteral("linscp.desktop"))), "the desktop icon named after it, the old one gone");
+    QString Path;
+    const CoreBridge::TShortcut Shortcut = CoreBridge::AppShortcut("Short Cut", { "/Upload" });
+    Check(Integration::CreateShortcut(Shortcut, Integration::TShortcutFolder::Desktop, Path, Error) &&
+      (QFileInfo(Path).fileName() == App + QStringLiteral("-Short Cut.desktop")) &&
+      ReadAll(Path).contains("\nIcon=" + App.toUtf8() + "\n") &&
+      !QFileInfo::exists(QDir(DesktopDir).filePath(QStringLiteral("Short Cut.desktop"))),
+      "a shortcut <AppId>-<name>.desktop, the old one gone");
+    Check(Integration::UnregisterUrlHandler(Error) && !QFileInfo::exists(Integration::DesktopEntryPath()) &&
+      !ReadAll(Integration::MimeAppsPath()).contains(App.toUtf8()), "unregistered");
+
+    // A package's: the default made for its own desktop file, nothing of
+    // linscp's own written.
+    QFile::remove(Icon);
+    QFile::remove(Integration::MimeAppsPath());
+    Integration::SetProgramForTests(Packaged);
+    Check(Integration::RegisterUrlHandler(Error), "a package's registered to handle URL addresses");
+    MimeApps = QString::fromUtf8(ReadAll(Integration::MimeAppsPath()));
+    Check(!QFileInfo::exists(Integration::DesktopEntryPath()) && !QFileInfo::exists(Icon) &&
+      MimeApps.contains(QStringLiteral("x-scheme-handler/sftp=") + App + QStringLiteral(".desktop")),
+      "no desktop entry or icon of its own, the package's desktop file the default");
+    Check(Integration::CreateDesktopIcon(false, Error) && !QFileInfo::exists(Icon) &&
+      ReadAll(QDir(DesktopDir).filePath(App + QStringLiteral(".desktop"))).contains("\nIcon=" + App.toUtf8() + "\n"),
+      "its desktop icon the installed icon's");
+    Check(Integration::UnregisterUrlHandler(Error) && !ReadAll(Integration::MimeAppsPath()).contains(App.toUtf8()), "and unregistered");
+    // An old registration: its menu entry gone, not written again (the
+    // package's handles the URLs).
+    WriteAll(QDir(Applications).filePath(QStringLiteral("linscp.desktop")), OldEntry);
+    Check(Integration::CleanUpOldRegistration() && !QFileInfo::exists(QDir(Applications).filePath(QStringLiteral("linscp.desktop"))) &&
+      !QFileInfo::exists(Integration::DesktopEntryPath()), "a package's: an older registration gone, nothing written again");
+
+    // A Flatpak's: the host's mimeapps.list, not the sandbox's.
+    qputenv("FLATPAK_ID", App.toLocal8Bit());
+    const QString Host = Dir.filePath(QStringLiteral("host-config"));
+    qputenv("HOST_XDG_CONFIG_HOME", Host.toLocal8Bit());
+    Check(Integration::MimeAppsPath() == QDir(Host).filePath(QStringLiteral("mimeapps.list")), "a Flatpak's: the host's mimeapps.list");
+    Check(Integration::RegisterUrlHandler(Error) && !QFileInfo::exists(Integration::DesktopEntryPath()) &&
+      ReadAll(QDir(Host).filePath(QStringLiteral("mimeapps.list"))).contains("x-scheme-handler/sftp=" + App.toUtf8() + ".desktop"),
+      "registered: the Flatpak's desktop file the default, nothing of its own written");
+    Check(Integration::CreateShortcut(Shortcut, Integration::TShortcutFolder::Desktop, Path, Error) &&
+      ReadAll(Path).contains("Exec=flatpak run " + App.toUtf8() + " "), "its shortcuts start it through flatpak run");
+    Check(Integration::UnregisterUrlHandler(Error), "and unregistered");
+    qunsetenv("HOST_XDG_CONFIG_HOME");
+    qunsetenv("FLATPAK_ID");
+
+    // An AppImage's: its own, starting the .AppImage file.
+    qputenv("APPIMAGE", Dir.filePath(QStringLiteral("linscp.AppImage")).toLocal8Bit());
+    Check(Integration::RegisterUrlHandler(Error) && QFileInfo::exists(Icon) &&
+      ReadAll(Integration::DesktopEntryPath()).contains("Exec=\"" + Dir.filePath(QStringLiteral("linscp.AppImage")).toUtf8() + "\" /Unsafe %u"),
+      "an AppImage's: its own desktop entry and icon, starting the AppImage");
+    Check(Integration::UnregisterUrlHandler(Error) && !QFileInfo::exists(Integration::DesktopEntryPath()), "and unregistered");
+    qunsetenv("APPIMAGE");
+    Integration::SetProgramForTests(QString());
+  }
+  CoreBridge::Finalize();
+#endif
+}
+
 void UpdateChecksTest()
 {
   QtFrontend Frontend;
@@ -7531,7 +7700,7 @@ void UpdateChecksTest()
     MainWindow Window(CoreBridge::Info());
     Check(MenuAction(Window, { "Help", "Check for Updates" }) != nullptr, "Help > Check for Updates");
   }
-  qputenv("FLATPAK_ID", "io.github._99ecarvalho.linscp");
+  qputenv("FLATPAK_ID", "org.linscp.linscp");
   UpdateChecksMissing("FLATPAK_ID set");
   qunsetenv("FLATPAK_ID");
   Check(Integration::UpdateChecksAllowed(), "and allowed again without it");
@@ -8177,6 +8346,8 @@ void ShortcutsTest(const QString & Directory)
       Dirs.write(QStringLiteral("XDG_DESKTOP_DIR=\"%1\"\n").arg(Dir.filePath(QStringLiteral("Desktop"))).toUtf8());
     }
     qputenv("XDG_CONFIG_HOME", Dir.filePath(QStringLiteral("config")).toLocal8Bit());
+    // (The icon a shortcut needs, there too, not in the user's own.)
+    qputenv("XDG_DATA_HOME", Dir.filePath(QStringLiteral("data")).toLocal8Bit());
     const Integration::TShortcutFolder Folder = Integration::TShortcutFolder::Desktop;
     const QString Expected = Dir.filePath(QStringLiteral("Desktop"));
 #endif
@@ -8844,6 +9015,10 @@ int main(int argc, char ** argv)
   else if ((argc >= 2) && (std::strcmp(argv[1], "updatechecks") == 0))
   {
     UpdateChecksTest();
+  }
+  else if ((argc >= 4) && (std::strcmp(argv[1], "desktopidentity") == 0))
+  {
+    DesktopIdentityTest(QString::fromLocal8Bit(argv[2]), QString::fromLocal8Bit(argv[3]));
   }
   else if ((argc >= 4) && (std::strcmp(argv[1], "options") == 0))
   {

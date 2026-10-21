@@ -123,7 +123,9 @@ QString ShortPath(const QString & Path)
 
 }  // namespace
 
-// linscp's icon (port/qt/icons/linscp.ico), loaded once.
+// linscp's icon (port/qt/icons/linscp.ico, every size), loaded once. Docks
+// and task bars show the desktop file's Icon=<AppId> instead, matching the
+// windows to it by Integration::AppId (SetUpDesktopIdentity).
 const QIcon & MainWindow::AppIcon()
 {
   static const QIcon Icon(QStringLiteral(":/icons/linscp.ico"));

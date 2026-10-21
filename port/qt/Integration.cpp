@@ -1,7 +1,11 @@
 #include "Integration.h"
 
+#include <algorithm>
+
 #include <QCoreApplication>
 #include <QDir>
+#include <QDirIterator>
+#include <QGuiApplication>
 #include <QFile>
 #include <QFileInfo>
 #include <QHash>
@@ -9,6 +13,7 @@
 #include <QMimeDatabase>
 #include <QPixmap>
 #include <QProcess>
+#include <QRegularExpression>
 #include <QStandardPaths>
 #include <QTextStream>
 #include <QWidget>
@@ -36,9 +41,19 @@ namespace Integration
 namespace
 {
 
-const char DesktopFileName[] = "linscp.desktop";
+// The desktop entry's and icon's names: the application ID's; in older
+// versions linscp's own (cleaned up at start, CleanUpOldRegistration).
+QString DesktopFileName()
+{
+  return QString::fromLatin1(AppId) + QStringLiteral(".desktop");
+}
+// SetProgramForTests'.
+QString TestProgram;
 
 #if !defined(Q_OS_WIN)
+const char OldDesktopFileName[] = "linscp.desktop";
+const char OldIconName[] = "linscp";
+
 QString AppName()
 {
   return QString::fromStdString(CoreBridge::Info().AppName);
@@ -76,10 +91,10 @@ QString DesktopEntry(bool Handler)
     "Name=%1\n"
     "Comment=%2\n"
     "Exec=%3%4\n"
-    "Icon=linscp\n"
+    "Icon=%5\n"
     "Terminal=false\n"
     "Categories=Network;FileTransfer;\n").arg(AppName(), QCoreApplication::translate("Integration", "SFTP, SCP, FTP, WebDAV and S3 client"),
-      ProgramCommand(), Handler ? QStringLiteral(" /Unsafe %u") : QString());
+      ProgramCommand(), Handler ? QStringLiteral(" /Unsafe %u") : QString(), QString::fromLatin1(AppId));
   if (Handler)
   {
     Result += QStringLiteral("MimeType=%1;\n").arg(Types.join(QLatin1Char(';')));
@@ -99,18 +114,64 @@ bool WriteFile(const QString & Path, const QByteArray & Data, QString & Error)
   return true;
 }
 
-// The icon, where the desktop entry's Icon=linscp finds it.
+// The user's icon (hicolor, 256 px) named Name.
+QString IconPath(const QString & Name)
+{
+  return QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
+    QStringLiteral("/icons/hicolor/256x256/apps/") + Name + QStringLiteral(".png");
+}
+
+// The icon, where the desktop entry's Icon=<AppId> finds it: linscp's own
+// when it registers itself; a package's and a Flatpak's are installed.
 void InstallIcon()
 {
-  const QString Path = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) +
-    QStringLiteral("/icons/hicolor/256x256/apps/linscp.png");
+  if (!SelfRegisters())
+  {
+    return;
+  }
+  const QString Path = IconPath(QString::fromLatin1(AppId));
   QDir().mkpath(QFileInfo(Path).path());
   QIcon(QStringLiteral(":/icons/linscp.ico")).pixmap(256, 256).save(Path, "PNG");
 }
 
+// A desktop entry an older linscp wrote (Icon=linscp; with Renamed, one
+// whose icon CleanUpOldRegistration renamed too), Handler whether it was the
+// URL handler's (its MimeType=).
+bool IsOldEntry(const QString & Path, bool * Handler = nullptr, bool Renamed = false)
+{
+  QFile File(Path);
+  if (!File.open(QIODevice::ReadOnly | QIODevice::Text))
+  {
+    return false;
+  }
+  const QStringList Lines = QString::fromUtf8(File.readAll()).split(QLatin1Char('\n'));
+  const bool Result = Lines.contains(QStringLiteral("[Desktop Entry]")) &&
+    (Lines.contains(QStringLiteral("Icon=") + QString::fromLatin1(OldIconName)) ||
+     (Renamed && Lines.contains(QStringLiteral("Icon=") + QString::fromLatin1(AppId))));
+  if (Handler != nullptr)
+  {
+    *Handler = Result &&
+      std::any_of(Lines.begin(), Lines.end(), [](const QString & Line) { return Line.startsWith(QStringLiteral("MimeType=")); });
+  }
+  return Result;
+}
+
+// A shortcut's old file (named after it alone, as older versions had it) gone.
+void RemoveOldShortcut(const QString & Path)
+{
+  if (IsOldEntry(Path, nullptr, true))
+  {
+    QFile::remove(Path);
+  }
+}
+
+enum class TMimeApps { Set, Remove, Rename };
+
 // mimeapps.list's [Default Applications], each scheme's entry this desktop
-// file (Set), or the entries naming it removed; the rest kept as it is.
-bool UpdateMimeApps(bool Set, QString & Error)
+// file (Set), or the entries naming it removed (Remove); the rest kept as it
+// is. The old desktop file's entries renamed to this one first (Rename: only
+// that, and only when there are some).
+bool UpdateMimeApps(TMimeApps Change, QString & Error)
 {
   const QString Path = MimeAppsPath();
   QStringList Lines;
@@ -125,12 +186,15 @@ bool UpdateMimeApps(bool Set, QString & Error)
       }
     }
   }
+  const QStringList Original = Lines;
+  const bool Set = (Change == TMimeApps::Set);
   QStringList Types;
   for (const QString & Scheme : Schemes())
   {
     Types.append(QStringLiteral("x-scheme-handler/") + Scheme);
   }
-  const QString Desktop = QString::fromLatin1(DesktopFileName);
+  const QString Desktop = DesktopFileName();
+  const QString OldDesktop = QString::fromLatin1(OldDesktopFileName);
   QString Section;
   QStringList Result;
   int DefaultsEnd = -1;
@@ -153,13 +217,20 @@ bool UpdateMimeApps(bool Set, QString & Error)
     {
       if (Types.contains(Key))
       {
-        QStringList Handlers = Trimmed.mid(Equals + 1).split(QLatin1Char(';'), Qt::SkipEmptyParts);
-        Handlers.removeAll(Desktop);
+        const QStringList Before = Trimmed.mid(Equals + 1).split(QLatin1Char(';'), Qt::SkipEmptyParts);
+        QStringList Handlers = Before;
+        Handlers.replaceInStrings(QRegularExpression(QStringLiteral("^") + QRegularExpression::escape(OldDesktop) +
+          QStringLiteral("$")), Desktop);
+        Handlers.removeDuplicates();
+        if (Change != TMimeApps::Rename)
+        {
+          Handlers.removeAll(Desktop);
+        }
         if (Handlers.isEmpty() || (Set && (Section == QStringLiteral("[Default Applications]"))))
         {
           continue;  // dropped, or replaced below
         }
-        Result.append(Key + QLatin1Char('=') + Handlers.join(QLatin1Char(';')) + QLatin1Char(';'));
+        Result.append((Handlers == Before) ? Line : (Key + QLatin1Char('=') + Handlers.join(QLatin1Char(';')) + QLatin1Char(';')));
         continue;
       }
     }
@@ -190,13 +261,18 @@ bool UpdateMimeApps(bool Set, QString & Error)
       Result.insert(DefaultsEnd + Index, Entries[Index]);
     }
   }
+  if ((Change == TMimeApps::Rename) && (Result == Original))
+  {
+    return true;  // nothing of the old name's
+  }
   return WriteFile(Path, (Result.join(QLatin1Char('\n')) + QLatin1Char('\n')).toUtf8(), Error);
 }
 
 void UpdateDesktopDatabase()
 {
+  // Only the user's own directory, where linscp writes its entry.
   const QString Tool = QStandardPaths::findExecutable(QStringLiteral("update-desktop-database"));
-  if (!Tool.isEmpty())
+  if (!Tool.isEmpty() && SelfRegisters())
   {
     QProcess::execute(Tool, { QFileInfo(DesktopEntryPath()).path() });
   }
@@ -220,13 +296,145 @@ QStringList Schemes()
 
 QString DesktopEntryPath()
 {
-  return QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation) + QLatin1Char('/') +
-    QString::fromLatin1(DesktopFileName);
+  return QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation) + QLatin1Char('/') + DesktopFileName();
 }
 
 QString MimeAppsPath()
 {
+  // In a Flatpak, XDG_CONFIG_HOME is the sandbox's (~/.var/app/<id>/config),
+  // which the desktop never reads: the host's (Flatpak gives its location,
+  // else XDG's default).
+  if (Install() == TInstall::Flatpak)
+  {
+    const QString Host = qEnvironmentVariable("HOST_XDG_CONFIG_HOME");
+    return (Host.isEmpty() ? (QDir::homePath() + QStringLiteral("/.config")) : Host) + QStringLiteral("/mimeapps.list");
+  }
   return QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + QStringLiteral("/mimeapps.list");
+}
+
+void SetUpDesktopIdentity()
+{
+  QGuiApplication::setDesktopFileName(QString::fromLatin1(AppId));
+}
+
+void SetProgramForTests(const QString & Program)
+{
+  TestProgram = Program;
+}
+
+TInstall Install()
+{
+  if (!qEnvironmentVariableIsEmpty("FLATPAK_ID"))
+  {
+    return TInstall::Flatpak;
+  }
+#if defined(Q_OS_WIN)
+  return TInstall::Archive;
+#else
+  if (QFile::exists(QStringLiteral("/.flatpak-info")))
+  {
+    return TInstall::Flatpak;
+  }
+  // (An AppImage's own tree, mounted, has a package's layout.)
+  if (!qEnvironmentVariableIsEmpty("APPIMAGE"))
+  {
+    return TInstall::AppImage;
+  }
+  const QFileInfo Program(TestProgram.isEmpty() ? QCoreApplication::applicationFilePath() : TestProgram);
+  const QString Path = Program.absoluteFilePath();
+  if (Path.startsWith(QStringLiteral("/usr/")) ||
+      QFileInfo::exists(Program.dir().filePath(QStringLiteral("../../share/applications/") + DesktopFileName())))
+  {
+    return TInstall::Package;
+  }
+  return TInstall::Archive;
+#endif
+}
+
+bool SelfRegisters()
+{
+  const TInstall Kind = Install();
+  return (Kind == TInstall::AppImage) || (Kind == TInstall::Archive);
+}
+
+bool CleanUpOldRegistration()
+{
+#if defined(Q_OS_WIN)
+  return false;
+#else
+  bool Changed = false;
+  // The old menu entry, the URL handler registered again under the new name
+  // when it was one and linscp registers itself (a package's and a
+  // Flatpak's desktop file handles the URLs already).
+  const QString OldEntry = QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation) + QLatin1Char('/') +
+    QString::fromLatin1(OldDesktopFileName);
+  bool Handler = false;
+  if (IsOldEntry(OldEntry, &Handler))
+  {
+    QFile::remove(OldEntry);
+    Changed = true;
+    QString Error;
+    if (Handler && SelfRegisters() && !QFileInfo::exists(DesktopEntryPath()))
+    {
+      InstallIcon();
+      WriteFile(DesktopEntryPath(), DesktopEntry(true).toUtf8(), Error);
+    }
+  }
+  // The desktop's shortcuts linscp made: the new icon's name.
+  const QString Desktop = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+  bool Shortcuts = false;
+  if (!Desktop.isEmpty() && (QDir(Desktop) != QDir::home()))
+  {
+    QDirIterator Each(Desktop, { QStringLiteral("*.desktop") }, QDir::Files);
+    while (Each.hasNext())
+    {
+      const QString Path = Each.next();
+      if (IsOldEntry(Path))
+      {
+        QFile File(Path);
+        if (File.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
+          QStringList Lines = QString::fromUtf8(File.readAll()).split(QLatin1Char('\n'));
+          File.close();
+          Lines.replaceInStrings(QRegularExpression(QStringLiteral("^Icon=") + QString::fromLatin1(OldIconName) + QStringLiteral("$")),
+            QStringLiteral("Icon=") + QString::fromLatin1(AppId));
+          QString Error;
+          // (In place: the file keeps its permissions, and the desktop its
+          // trust in it.)
+          WriteFile(Path, Lines.join(QLatin1Char('\n')).toUtf8(), Error);
+          Shortcuts = true;
+        }
+      }
+    }
+  }
+  const QString OldIcon = IconPath(QString::fromLatin1(OldIconName));
+  if (QFile::exists(OldIcon))
+  {
+    QFile::remove(OldIcon);
+    Changed = true;
+  }
+  if (Shortcuts)
+  {
+    InstallIcon();
+    Changed = true;
+  }
+  // mimeapps.list's old entries: the new desktop file's.
+  QFile MimeApps(MimeAppsPath());
+  const QRegularExpression Old(QStringLiteral("[=;]") + QRegularExpression::escape(QString::fromLatin1(OldDesktopFileName)) +
+    QStringLiteral("(;|$)"), QRegularExpression::MultilineOption);
+  if (MimeApps.open(QIODevice::ReadOnly) && Old.match(QString::fromUtf8(MimeApps.readAll())).hasMatch())
+  {
+    MimeApps.close();
+    QString Error;
+    UpdateMimeApps(TMimeApps::Rename, Error);
+    Changed = true;
+  }
+  if (Changed)
+  {
+    UpdateDesktopDatabase();
+  }
+  return Changed;
+#endif
 }
 
 QString SearchPathDirectory()
@@ -248,8 +456,12 @@ bool RegisterUrlHandler(QString & Error)
     return false;
   }
 #else
+  // linscp's own desktop entry only where nothing installed one (a
+  // package's and a Flatpak's declare the URL schemes already): then only the
+  // default made, as asked.
   InstallIcon();
-  if (!WriteFile(DesktopEntryPath(), DesktopEntry(true).toUtf8(), Error) || !UpdateMimeApps(true, Error))
+  if ((SelfRegisters() && !WriteFile(DesktopEntryPath(), DesktopEntry(true).toUtf8(), Error)) ||
+      !UpdateMimeApps(TMimeApps::Set, Error))
   {
     Error = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::RegisterUrlError)) + QLatin1Char('\n') + Error;
     return false;
@@ -273,8 +485,11 @@ bool UnregisterUrlHandler(QString & Error)
     return false;
   }
 #else
-  QFile::remove(DesktopEntryPath());
-  if (!UpdateMimeApps(false, Error))
+  if (SelfRegisters())
+  {
+    QFile::remove(DesktopEntryPath());
+  }
+  if (!UpdateMimeApps(TMimeApps::Remove, Error))
   {
     return false;
   }
@@ -321,8 +536,9 @@ bool CreateDesktopIcon(bool AllUsers, QString & Error)
 #else
   Q_UNUSED(AllUsers);
   InstallIcon();
-  const QString Path = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + QLatin1Char('/') +
-    QString::fromLatin1(DesktopFileName);
+  const QString Folder = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + QLatin1Char('/');
+  const QString Path = Folder + DesktopFileName();
+  RemoveOldShortcut(Folder + QString::fromLatin1(OldDesktopFileName));
   if (!WriteFile(Path, DesktopEntry(false).toUtf8(), Error))
   {
     Error = QString::fromStdString(CoreBridge::Text(CoreBridge::TText::CreateShortcutError)) + QLatin1Char('\n') + Error;
@@ -479,16 +695,20 @@ bool CreateShortcut(const CoreBridge::TShortcut & Shortcut, TShortcutFolder Fold
     Exec.append(QLatin1Char('"') + Text.replace(QLatin1Char('%'), QStringLiteral("%%")) + QLatin1Char('"'));
   }
   InstallIcon();
-  Path = QDir(Directory).filePath(Name + QStringLiteral(".desktop"));
+  // <AppId>-<name>.desktop (its Name= what the desktop shows), the name's
+  // own file that older versions made gone.
+  const QString FileName = QString(Name).replace(QLatin1Char('/'), QLatin1Char('_'));
+  RemoveOldShortcut(QDir(Directory).filePath(FileName + QStringLiteral(".desktop")));
+  Path = QDir(Directory).filePath(QString::fromLatin1(AppId) + QLatin1Char('-') + FileName + QStringLiteral(".desktop"));
   const QString Entry = QStringLiteral(
     "[Desktop Entry]\n"
     "Type=Application\n"
     "Name=%1\n"
     "Comment=%2\n"
     "Exec=%3 %4\n"
-    "Icon=linscp\n"
+    "Icon=%5\n"
     "Terminal=false\n").arg(Name, QString(QString::fromStdString(Shortcut.Description)).replace(QLatin1Char('\n'), QLatin1Char(' ')),
-      ProgramCommand(), Exec.join(QLatin1Char(' ')));
+      ProgramCommand(), Exec.join(QLatin1Char(' ')), QString::fromLatin1(AppId));
   if (!WriteFile(Path, Entry.toUtf8(), Error))
   {
     Error = ShortcutError + QLatin1Char('\n') + Error;
@@ -1006,15 +1226,7 @@ bool ShowSystemContextMenu(QWidget * Window, const QString & Directory, const QS
 bool UpdateChecksAllowed()
 {
 #if LINSCP_UPDATE_CHECK
-  if (!qEnvironmentVariableIsEmpty("FLATPAK_ID"))
-  {
-    return false;
-  }
-#if defined(Q_OS_WIN)
-  return true;
-#else
-  return !QFile::exists(QStringLiteral("/.flatpak-info"));
-#endif
+  return (Install() != TInstall::Flatpak);
 #else
   return false;
 #endif

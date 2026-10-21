@@ -72,18 +72,49 @@ bool ShutDownComputer(QString & Error);
 // error shown. False when not made.
 bool AskAndCreateShortcut(QWidget * Parent, const QString & Question, const CoreBridge::TShortcut & Shortcut,
   TShortcutFolder Folder);
-// Where they go (POSIX): the desktop entry, the user's mimeapps.list, the
-// search path's directory.
+// Where they go (POSIX): the desktop entry, the user's mimeapps.list (in a
+// Flatpak the host's, $HOST_XDG_CONFIG_HOME or ~/.config, not the sandbox's),
+// the search path's directory.
 QString DesktopEntryPath();
 QString MimeAppsPath();
 QString SearchPathDirectory();
+
+// linscp's application ID: the name of its desktop file, icon and metainfo,
+// of everything it writes into the user's data directory, and its Wayland
+// app_id (port/packaging/CMakeLists.txt's LINSCP_APP_ID).
+inline constexpr char AppId[] = "org.linscp.linscp";
+// What the program starts with: Qt's desktop file name (the Wayland app_id,
+// X11's _GTK_APPLICATION_ID and _KDE_NET_WM_DESKTOP_FILE), so that docks and
+// task bars match its windows to the desktop file. Before any window.
+void SetUpDesktopIdentity();
+// How linscp is installed (POSIX; Windows always Archive): a Flatpak
+// (FLATPAK_ID, /.flatpak-info), an AppImage (APPIMAGE), a package (the
+// program under /usr, or the desktop file installed beside it,
+// <prefix>/share/applications/<AppId>.desktop for <prefix>/lib/linscp/linscp),
+// else an archive or build of its own.
+enum class TInstall { Archive, AppImage, Package, Flatpak };
+TInstall Install();
+// Tests: the program Install() looks at, instead of this one (empty: this).
+void SetProgramForTests(const QString & Program);
+// Whether linscp writes its own desktop entry and icon into the user's data
+// directory when it registers as the URL handler or makes a shortcut: only
+// an AppImage's and an archive's. A package and a Flatpak install their own,
+// which already declare the URL schemes; registering then only makes it the
+// default in mimeapps.list.
+bool SelfRegisters();
+// At start (POSIX): what older versions wrote under their names removed or
+// renamed -- the desktop entry linscp.desktop (written again as <AppId>.desktop
+// when it was the URL handler and linscp registers itself), the icon
+// linscp.png, mimeapps.list's linscp.desktop, the desktop's shortcuts' Icon=
+// -- so that an upgrade leaves no second launcher. True when it changed
+// anything.
+bool CleanUpOldRegistration();
 
 // Whether linscp may check for updates (Help > Check for Updates, the
 // Updates button, Preferences > Updates' periodic check): built with
 // LINSCP_UPDATE_CHECK on (the default; distributions' packages turn it off,
 // their package manager updating linscp) and not running as a Flatpak
-// (FLATPAK_ID set, or /.flatpak-info there), whose updates come from its
-// remote.
+// (Install()), whose updates come from its remote.
 bool UpdateChecksAllowed();
 
 }  // namespace Integration

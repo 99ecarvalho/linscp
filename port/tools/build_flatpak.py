@@ -12,7 +12,7 @@ exports a single-file bundle, linscp-<version>.flatpak, installable with
 import argparse, os, re, subprocess, sys
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
-APP_ID = 'io.github._99ecarvalho.linscp'
+APP_ID = 'org.linscp.linscp'
 MANIFEST = os.path.join(ROOT, 'port', 'packaging', 'flatpak', APP_ID + '.yml')
 
 

@@ -17,6 +17,7 @@
 #include <stdexcept>
 
 #include "CoreBridge.h"
+#include "Integration.h"
 #include "Language.h"
 #include "MainWindow.h"
 #include "QtFrontend.h"
@@ -30,6 +31,8 @@ int main(int argc, char ** argv)
     Smoke = Smoke || (std::strcmp(argv[Index], "--smoke") == 0);
   }
 
+  // The desktop file's name, before any window: Wayland's app_id.
+  Integration::SetUpDesktopIdentity();
   QApplication App(argc, argv);
   // As WinSCP.cpp: WINSCP_PATH for what custom commands run, where WinSCP's
   // PowerShell extensions load its .NET assembly from -- linscp's dotnet
@@ -121,6 +124,12 @@ int main(int argc, char ** argv)
   {
     CoreBridge::Finalize();
     return 0;
+  }
+
+  // What older versions registered under their own names, renamed or gone.
+  if (!Smoke)
+  {
+    Integration::CleanUpOldRegistration();
   }
 
   int Result;

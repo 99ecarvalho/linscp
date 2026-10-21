@@ -1,7 +1,7 @@
 # linscp's Flatpak: built from this checkout (port/tools/build_flatpak.py)
 # with clang, which linscp needs, from the freedesktop SDK's LLVM extension,
 # on KDE's runtime for Qt 6.
-id: io.github._99ecarvalho.linscp
+id: org.linscp.linscp
 runtime: org.kde.Platform
 runtime-version: '6.10'
 sdk: org.kde.Sdk

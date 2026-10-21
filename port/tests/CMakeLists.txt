@@ -553,6 +553,12 @@ if(TARGET linscp)
   # R0-23: no update checks with LINSCP_UPDATE_CHECK off or in a Flatpak.
   add_test(NAME qt_gui_updatechecks COMMAND test_qt_gui updatechecks /ini=nul -platform offscreen)
   set_tests_properties(qt_gui_updatechecks PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
+  # The application ID: Qt's desktop file name, the packaged files' names,
+  # the XDG registration's (skipped for a package or Flatpak), old names
+  # cleaned up.
+  add_test(NAME qt_gui_desktopidentity COMMAND test_qt_gui desktopidentity "${CMAKE_SOURCE_DIR}/port/packaging/linux"
+           "${CMAKE_CURRENT_BINARY_DIR}/desktopidentity" /ini=nul -platform offscreen)
+  set_tests_properties(qt_gui_desktopidentity PROPERTIES DEPENDS qt_gui_build SKIP_RETURN_CODE 77 TIMEOUT 120)
   add_test(NAME qt_gui_icons
     COMMAND test_qt_gui icons /ini=nul -platform offscreen)
   set_tests_properties(qt_gui_icons PROPERTIES DEPENDS qt_gui_build TIMEOUT 120)
