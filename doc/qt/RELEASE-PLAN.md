@@ -449,31 +449,35 @@ Status: `todo`, `wip`, `blocked`, `done`, `dropped`. Owner `M` = maintainer only
 | R0-07 | 0 | ADR recording the clean-room provenance | | done |
 | R0-08 | 0 | CI check: no image under `3rd-party/winscp` referenced by CMake or Qt resources | | dropped |
 | R0-09 | 0 | Windows package: licence texts of every bundled DLL in `licenses\` (`deploy_windows.py`: `third-party/<pkg>/`, `THIRD-PARTY-NOTICES.txt`) | | done |
-| R0-10 | 0 | Written source offer (`licenses\SOURCE-OFFER.txt`, three years) shipped in the installer and portable zip | | done |
-| R0-24 | 0 | Keep a durable copy of every offered source archive (`fetch_msys2_qt.py --sources`), per release — MSYS2 prunes old archives. Local copy in `source-archive/msys2/` (gitignored); an off-site backup is still needed | M | wip |
+| R0-10 | 0 | Source of the copyleft components named in `licenses\SOURCE-OFFER.txt` (Windows) and the AppImage's `SOURCE-OFFER.txt`; published with each release (R0-24) | | done |
+| R0-24 | 0 | Publish the copyleft components' source with each release: `linscp-X.Y.Z-third-party-sources.tar` (release workflow, `fetch_sources.py` from each package's `third-party.json`; `licences.py` decides what is copyleft, `port/packaging/appimage/licences.json` for the AppImage's Debian packages). Replaces keeping local copies; first run on the next tag | | wip |
 | R0-25 | 0 | Re-resolve the MSYS2 lock: two pinned packages are no longer published, so a cold CI cache cannot fetch the Windows toolchain | | done |
 | R0-26 | 0 | Release-only crash in ctest `object_exceptions` (double free); run the unit tests in a Release configuration in CI | | done |
-| R0-27 | 0 | `CMAKE_BUILD_TYPE=Debug` fails to link `linscp-cli` (undefined `DoAssert`/`DoAssertC`) | | todo |
+| R0-27 | 0 | `CMAKE_BUILD_TYPE=Debug` fails to link `linscp-cli` (undefined `DoAssert`/`DoAssertC`). Fixed in `port/shim/vcl_assert.cpp`: a failed assertion prints and aborts (`LINSCP_ASSERT=continue` goes on) | | done |
+| R0-28 | 0 | FileZilla splits local paths only on `\` (`FtpControlSocket.cpp`), so on Linux the whole path is the file name (Debug assertion in ctest `qt_session_ftp`): patch `filezilla-posix-local-path-delimiters` | | todo |
+| R0-29 | 0 | AppImage ships only the Qt plugins linscp uses (`build_appimage.py` `PLUGINS`) and the libraries they need; drops linuxdeploy's copyright copies | | done |
+| R0-30 | 0 | ctest `no_build_paths` fails in Debug when the build folder is outside the source tree (a uic include path climbs back to the source) | | todo |
+| R0-31 | 0 | AppImage against a Qt built without libproxy and GSSAPI: drops about 20 bundled source packages (curl, krb5, OpenLDAP, GnuTLS, librtmp…) and 6 of the copyleft ones. Proxy detection then reads `http_proxy` and the like, not the desktop's proxy settings | | todo |
 | R0-11 | 0 | About + README: Qt used under LGPL-3.0, with source link | | done |
-| R0-12 | 0 | AppImage: same licence-text and source audit | | todo |
+| R0-12 | 0 | AppImage: same licence-text and source audit | | done |
 | R0-13 | 0 | Ship neon `COPYING.LIB`, libs3 `COPYING-GPLv2`, Inno Setup licence; fix the neon comment | | done |
 | R0-14 | 0 | `make_source_tarball.py`: submodules, no `.git`, no `linscp-website`, Phase 0 exclusions, fails on MFC banner or excluded images; reproducible (byte-identical reruns), builds offline. Keeps the five `libs/openssl` files the OpenSSL-tree check compares and the three image-free `.dfm` menu layouts the menu tests read | | done |
-| R0-15 | 0 | OpenPGP release key, published in repo and on keys.openpgp.org | M | todo |
-| R0-16 | 0 | Annotated signed tags from the next release on | M | todo |
+| R0-15 | 0 | OpenPGP release key, published in repo and on keys.openpgp.org | M | blocked |
+| R0-16 | 0 | Annotated signed tags from the next release on (signatures deferred 2026-10-20; the release workflow requires annotated tags and signs nothing until a key is set) | M | blocked |
 | R0-17 | 0 | Tag-triggered release workflow: tarball, packages, `.asc`, signed `SHA256SUMS`, draft release, website dispatch | | done |
 | R0-18 | 0 | `NEWS.md` with an entry per release | | done |
-| R0-19 | 0 | CMake option for system OpenSSL, tested against 3.5 and 4.0 | | todo |
-| R0-20 | 0 | Options for system expat (and neon/libs3 where feasible) | | todo |
+| R0-19 | 0 | CMake option for system OpenSSL, tested against 3.5 and 4.0 | | done |
+| R0-20 | 0 | Options for system expat (and neon/libs3 where feasible) | | done |
 | R0-21 | 0 | Man pages `linscp.1`, `linscp-cli.1` (from `cli.yaml`), installed to `CMAKE_INSTALL_MANDIR` | | done |
 | R0-22 | 0 | Reproducible builds: `SOURCE_DATE_EPOCH`, no `__DATE__`/`__TIME__`, path-independent output. `cmake/reproducible.cmake`; Linux programs and `.deb`, Windows programs and portable zip byte-identical from two checkout paths; ctest `no_build_paths`. Installer and AppImage not checked | | done |
 | R0-23 | 0 | Update check off by default in distro/Flatpak builds; build-time switch | | done |
 | R1-01 | 1 | Decide the final app ID: `org.linscp.linscp` | M | done |
-| R1-02 | 1 | Rename the app ID everywhere (packaging, tools, icons, `setDesktopFileName`, website) | | todo |
-| R1-03 | 1 | MetaInfo: developer `br.com.apliant` (Apliant); homepage linscp.org; vcs-browser, contribute, bugtracker, donation, help URLs | | todo |
-| R1-18 | 1 | Package descriptions (deb, AppStream) rewritten to describe linscp only | | todo |
-| R1-19 | 1 | `QGuiApplication::setDesktopFileName("org.linscp.linscp")`; `StartupWMClass` consistent | | todo |
-| R1-20 | 1 | `Integration.cpp`: app-ID names for the desktop file, icon and shortcuts; skip self-registration in package and Flatpak builds | | todo |
-| R1-21 | 1 | Flatpak config location (`~/.var/app/…`) documented; `/ini` mode and config paths checked in the sandbox | | todo |
+| R1-02 | 1 | Rename the app ID everywhere (packaging, tools, icons, `setDesktopFileName`, website) | | done |
+| R1-03 | 1 | MetaInfo: developer `br.com.apliant` (Apliant); homepage linscp.org; vcs-browser, contribute, bugtracker, donation, help URLs | | done |
+| R1-18 | 1 | Package descriptions (deb, AppStream) rewritten to describe linscp only | | done |
+| R1-19 | 1 | `QGuiApplication::setDesktopFileName("org.linscp.linscp")`; `StartupWMClass` consistent | | done |
+| R1-20 | 1 | `Integration.cpp`: app-ID names for the desktop file, icon and shortcuts; skip self-registration in package and Flatpak builds | | done |
+| R1-21 | 1 | Flatpak config location (`~/.var/app/…`) documented; `/ini` mode and config paths checked in the sandbox | | done |
 | R1-04 | 1 | MetaInfo: 3–6 captioned screenshots ≤ 1000×700, pinned URLs, one default | | todo |
 | R1-05 | 1 | MetaInfo: light/dark branding colours | | todo |
 | R1-06 | 1 | MetaInfo: release notes for every entry; summary ≤ 35 chars; description not a file manager | | todo |
