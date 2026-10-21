@@ -29,17 +29,6 @@ Comment:
  They are to be listed in the security tracker's embedded-code-copies
  file. The changes are described in doc/qt/bundled-libraries.md and
  doc/qt/putty-deltas.md.
-Files-Excluded:
- 3rd-party/winscp/source/packages
- 3rd-party/winscp/source/components/*.dcr
-Comment-Files-Excluded:
- source/packages holds Delphi component packages that linscp does not build;
- some of them may not be redistributed in modified form (TBX) or at all
- (dragndrop/PIDL.pas), and several carry binary resources (*.dcr, *.res,
- a .chm) without source. The *.dcr files are component-palette bitmaps of
- the upstream application, whose images are licensed for that application
- only. Release tarballs from 0.7.2 on leave all of these out, and need no
- repack.
 
 Files: *
 Copyright: 2026 Eduardo Correia <ecorreia@apliant.com.br>

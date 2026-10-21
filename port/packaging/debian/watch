@@ -6,8 +6,6 @@ Version: 5
 Source: https://api.github.com/repos/99ecarvalho/linscp/releases?per_page=100
 Searchmode: plain
 Matching-Pattern: https://github\.com/99ecarvalho/linscp/releases/download/v\d[\d.]*/linscp-@ANY_VERSION@\.tar\.xz
-Repack-Suffix: +dfsg
-Dversion-Mangle: s/\+dfsg\d*$//
 
 # Each release carries linscp-X.Y.Z.tar.xz.asc, made with the key in
 # debian/upstream/signing-key.asc (A679B8C9915BB5ACDD45F91E207FB492B5B214A9).
