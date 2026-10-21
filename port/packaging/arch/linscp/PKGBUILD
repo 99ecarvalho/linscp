@@ -1,0 +1,68 @@
+# Maintainer: Eduardo Correia <ecorreia@apliant.com.br>
+
+pkgname=linscp
+pkgver=0.7.1
+pkgrel=1
+pkgdesc='Transfer files over SFTP, SCP, FTP, WebDAV and S3'
+arch=('x86_64')
+url='https://linscp.org'
+# linscp and its core: GPL-3.0-or-later. Compiled in: PuTTY (MIT), neon
+# (LGPL-2.0-or-later), libs3 (LGPL-3.0-or-later or GPL-2.0-or-later); the
+# icon sets: Lucide (ISC), Tabler and Fluent (MIT).
+license=('GPL-3.0-or-later' 'MIT' 'ISC' 'LGPL-2.0-or-later'
+         'LGPL-3.0-or-later OR GPL-2.0-or-later')
+depends=('expat' 'glibc' 'hicolor-icon-theme' 'libgcc' 'libstdc++' 'openssl'
+         'qt6-base' 'qt6-svg')
+makedepends=('clang' 'cmake' 'ninja' 'python' 'qt6-tools')
+# check(): sshd and ssh-keygen for the loopback SFTP/SCP sessions, rclone for
+# the FTP, WebDAV and S3 servers, qt6-declarative for Qt's lupdate.
+checkdepends=('openssh' 'qt6-declarative' 'rclone')
+optdepends=('qt6-wayland: native Wayland support')
+# makepkg's LTO flags are GCC's; with clang they would need lld as the linker.
+# Built without LTO for now.
+options=('!lto')
+# The release tarball carries every submodule the build needs (PuTTY, the
+# core), so the build is offline. Signatures: there is no release signing
+# key yet; validpgpkeys and the .asc source come with the first signed
+# release.
+source=("https://github.com/99ecarvalho/linscp/releases/download/v$pkgver/$pkgname-$pkgver.tar.xz")
+sha256sums=('1294a524f68b5b2febe5e2593c7800cfe8808495825a88b81c3db2fbb31844eb')
+
+build() {
+  # linscp needs clang: the core uses __declspec(property), which GCC lacks.
+  export CC=clang CXX=clang++
+  cmake -S "$pkgname-$pkgver" -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=None \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBUILD_TESTING=ON \
+    -DLINSCP_RELEASE=ON \
+    -DLINSCP_UPDATE_CHECK=OFF \
+    -DLINSCP_SYSTEM_OPENSSL=ON \
+    -DLINSCP_SYSTEM_EXPAT=ON
+  # The programs are not in ALL: name them, with the translations they load.
+  cmake --build build --target linscp linscp-cli core-translations
+}
+
+check() {
+  # The unit tests (ALL) and the suite: loopback SFTP/SCP, FTP, WebDAV and S3
+  # sessions against local servers, the GUI offscreen. What needs a container
+  # engine, the .NET SDK or the Windows cross-compiler skips itself;
+  # census_ratchet compares compile counts with the Windows target, a
+  # development check.
+  cmake --build build
+  ctest --test-dir build --output-on-failure -E '^census_ratchet$'
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+  # The licences are installed with the documentation; Arch looks for them
+  # under /usr/share/licenses.
+  install -d "$pkgdir/usr/share/licenses/$pkgname"
+  local file
+  for file in "$pkgdir"/usr/share/doc/$pkgname/*; do
+    case ${file##*/} in
+      README.md|NEWS.md) ;;
+      *) ln -s "../../doc/$pkgname/${file##*/}" "$pkgdir/usr/share/licenses/$pkgname/" ;;
+    esac
+  done
+}

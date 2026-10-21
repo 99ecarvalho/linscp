@@ -1,0 +1,90 @@
+# Maintainer: Eduardo Correia <ecorreia@apliant.com.br>
+
+pkgname=linscp-git
+_pkgname=linscp
+pkgver=0.7.1.r22.g2ca74e7
+pkgrel=1
+pkgdesc='Transfer files over SFTP, SCP, FTP, WebDAV and S3 (development version)'
+arch=('x86_64')
+url='https://linscp.org'
+# linscp and its core: GPL-3.0-or-later. Compiled in: PuTTY (MIT), neon
+# (LGPL-2.0-or-later), libs3 (LGPL-3.0-or-later or GPL-2.0-or-later); the
+# icon sets: Lucide (ISC), Tabler and Fluent (MIT).
+license=('GPL-3.0-or-later' 'MIT' 'ISC' 'LGPL-2.0-or-later'
+         'LGPL-3.0-or-later OR GPL-2.0-or-later')
+depends=('expat' 'glibc' 'hicolor-icon-theme' 'libgcc' 'libstdc++' 'openssl'
+         'qt6-base' 'qt6-svg')
+makedepends=('clang' 'cmake' 'git' 'ninja' 'python' 'qt6-tools')
+# check(): sshd and ssh-keygen for the loopback SFTP/SCP sessions, rclone for
+# the FTP, WebDAV and S3 servers, qt6-declarative for Qt's lupdate.
+checkdepends=('openssh' 'qt6-declarative' 'rclone')
+optdepends=('qt6-wayland: native Wayland support')
+provides=("$_pkgname")
+conflicts=("$_pkgname")
+# makepkg's LTO flags are GCC's; with clang they would need lld as the linker.
+# Built without LTO for now.
+options=('!lto')
+# The submodules the build needs, each its own source. 3rd-party/openssl is
+# left out (the system OpenSSL is used), and so is the website.
+source=("git+https://github.com/99ecarvalho/linscp.git"
+        "git+https://github.com/winscp/winscp.git"
+        "git+https://git.tartarus.org/simon/putty.git")
+sha256sums=('SKIP'
+            'SKIP'
+            'SKIP')
+
+pkgver() {
+  cd "$_pkgname"
+  git describe --long --tags --abbrev=7 | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+prepare() {
+  cd "$_pkgname"
+  # The submodules from makepkg's clones, at the commits linscp pins.
+  local module
+  for module in winscp putty; do
+    git submodule init "3rd-party/$module"
+    git config "submodule.3rd-party/$module.url" "$srcdir/$module"
+  done
+  git -c protocol.file.allow=always submodule update --no-recommend-shallow \
+    3rd-party/winscp 3rd-party/putty
+}
+
+build() {
+  # linscp needs clang: the core uses __declspec(property), which GCC lacks.
+  export CC=clang CXX=clang++
+  cmake -S "$_pkgname" -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=None \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DBUILD_TESTING=ON \
+    -DLINSCP_RELEASE=ON \
+    -DLINSCP_UPDATE_CHECK=OFF \
+    -DLINSCP_SYSTEM_OPENSSL=ON \
+    -DLINSCP_SYSTEM_EXPAT=ON
+  # The programs are not in ALL: name them, with the translations they load.
+  cmake --build build --target linscp linscp-cli core-translations
+}
+
+check() {
+  # The unit tests (ALL) and the suite: loopback SFTP/SCP, FTP, WebDAV and S3
+  # sessions against local servers, the GUI offscreen. What needs a container
+  # engine, the .NET SDK or the Windows cross-compiler skips itself;
+  # census_ratchet compares compile counts with the Windows target, a
+  # development check.
+  cmake --build build
+  ctest --test-dir build --output-on-failure -E '^census_ratchet$'
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+  # The licences are installed with the documentation; Arch looks for them
+  # under /usr/share/licenses.
+  install -d "$pkgdir/usr/share/licenses/$pkgname"
+  local file
+  for file in "$pkgdir"/usr/share/doc/$_pkgname/*; do
+    case ${file##*/} in
+      README.md|NEWS.md) ;;
+      *) ln -s "../../doc/$_pkgname/${file##*/}" "$pkgdir/usr/share/licenses/$pkgname/" ;;
+    esac
+  done
+}
