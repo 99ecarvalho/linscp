@@ -2,6 +2,7 @@
 # port/tools/fetch_msys2_qt.py --resolve. <sha256> <file>
 # No file uploaded by then remains of these; locked instead, the oldest left:
 #   libwinpthread: libwinpthread-git-12.0.0.r487.g9e8f2a7b5-1-any.pkg.tar.zst, uploaded 2025-02-07
+#   openssl: openssl-3.4.1-1-any.pkg.tar.zst, uploaded 2025-02-11
 #   vulkan-loader: vulkan-loader-1.4.304.1-1-any.pkg.tar.zst, uploaded 2025-02-08
 2f63bacf84a36f855e1470a9654a5ab65ef1ff163684f9dde88ea915bf7ca943 mingw-w64-clang-x86_64-brotli-1.1.0-4-any.pkg.tar.zst
 95babf857eaa0853f1099201b95aa3ea7e1f3c64b29afb75e447f630a7701fd9 mingw-w64-clang-x86_64-bzip2-1.0.8-3-any.pkg.tar.zst
@@ -23,7 +24,7 @@ dd08e7468612c5d8d1611d0eb00b43d4a2233e751ca576c861ed8adebb490438 mingw-w64-clang
 a5c58e21b5a910b4f2a839e590952dddd4929e5f3b19f8847fc9801ee1681d7a mingw-w64-clang-x86_64-libunwind-19.1.7-1-any.pkg.tar.zst
 0dbe3b4d999675a6d32b638fd1723dfacccfedfe50a347c8ee1b4ce3a34f4152 mingw-w64-clang-x86_64-libwinpthread-git-12.0.0.r487.g9e8f2a7b5-1-any.pkg.tar.zst
 3aab5ad9cc9cf342cec618e7895bddf3f984e76fa81194216461aa86a5d27ac6 mingw-w64-clang-x86_64-md4c-0.5.2-1-any.pkg.tar.zst
-629e29b6b52668c0abff9e59a76b3300fe8c6b23c37c8472da96dbf6aac4f131 mingw-w64-clang-x86_64-openssl-3.4.0-1-any.pkg.tar.zst
+9373caaebe3ae62383be52384b928a8b92afda4b8b02ddf1bb7d14b4e23db630 mingw-w64-clang-x86_64-openssl-3.4.1-1-any.pkg.tar.zst
 cca64486975d8eb238f7cb74a98e7dd0c94df563da6e28263d64ba2acea871b2 mingw-w64-clang-x86_64-pcre2-10.44-2-any.pkg.tar.zst
 0dd9322532c5b91c56b17051bbe6bd11ff3423a16512b2729531dd517caa5d89 mingw-w64-clang-x86_64-qt6-base-6.8.2-1-any.pkg.tar.zst
 2ec7124aebde41be6b430ef496ad1be2d8c3871c2bca0966836b498e1cafd1a6 mingw-w64-clang-x86_64-qt6-svg-6.8.2-1-any.pkg.tar.zst
