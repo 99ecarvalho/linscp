@@ -1,0 +1,46 @@
+<!--
+  linscp's OBS package (home:<user>/linscp): the spec from this repository,
+  the source from the release tarball. Copy this file into the OBS package
+  (osc add _service); it is the only file the package needs to hold.
+  Commit it with the files port/tools/gen_obs_debian.py writes here: obs_scm
+  fails when a file it extracts is missing.
+
+  1. obs_scm takes only port/packaging from the repository (no submodules)
+     and extracts the spec and the Debian recipe, so every build uses the
+     packaging of the revision below. The obscpio it also writes is not
+     a source of the package.
+  2. download_files fetches Source0 of that spec: the release tarball
+     (linscp-X.Y.Z.tar.xz), the one source every channel builds from. The
+     tarball, not obs_scm with submodules, because only the tarball has the
+     upstream tree's non-redistributable files pruned (make_source_tarball.py).
+
+  Once releases are signed, the spec gains Source1 (.asc) and the package a
+  linscp.keyring: OBS then checks the tarball's signature on every commit.
+  A fixed verify_file sha256 cannot be kept here for automatic updates: the
+  tarball is built from the tagged tree, so the tree cannot hold its hash.
+
+  Run it:     osc service remoterun home:<user> linscp
+  Automatic:  the release workflow, once the release is published (a
+              draft's tarball cannot be downloaded); .obs/workflows.yml
+              builds pull requests' packaging changes.
+-->
+<services>
+  <service name="obs_scm">
+    <param name="url">https://github.com/99ecarvalho/linscp.git</param>
+    <param name="scm">git</param>
+    <param name="revision">main</param>
+    <param name="submodules">disable</param>
+    <param name="subdir">port/packaging</param>
+    <param name="extract">rpm/linscp.spec</param>
+    <!-- Debian and Ubuntu: port/tools/gen_obs_debian.py writes these. -->
+    <param name="extract">obs/linscp.dsc</param>
+    <param name="extract">obs/debian.changelog</param>
+    <param name="extract">obs/debian.control</param>
+    <param name="extract">obs/debian.rules</param>
+    <param name="extract">obs/debian.copyright</param>
+    <param name="extract">obs/debian.linscp.lintian-overrides</param>
+    <param name="versionformat">@PARENT_TAG@</param>
+    <param name="versionrewrite-pattern">v(.*)</param>
+  </service>
+  <service name="download_files"/>
+</services>
