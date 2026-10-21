@@ -75,6 +75,20 @@ Notes for packagers:
   distribution crypto policy (Fedora's, for example), old FTPS/WebDAV servers
   that need TLS 1.0/1.1 or SHA-1 signatures may be refused where the bundled
   build would connect. This is the distribution's policy working as intended.
+- Built against the system OpenSSL, linscp follows that policy for TLS
+  (FTPS, WebDAV, S3): no code sets a cipher list, cipher suites, groups or
+  signature algorithms, and the configuration is loaded as OpenSSL's
+  initialisation does by default. A session's TLS version range (site
+  settings, Advanced, TLS/SSL) is applied only where it differs from the
+  default (minimum TLS 1.2, maximum TLS 1.3); a bound left at the default is
+  the policy's (`TLS_SYSTEM_POLICY`,
+  `port/patches/core-tls-system-policy-bounds.patch`). A minimum of TLS 1.0
+  or 1.1, chosen per session, also lowers that connection's security level
+  to 0, which OpenSSL 3 needs for those versions, as with the bundled build.
+  With the bundled OpenSSL and on Windows, both bounds are set as before.
+  SSH (SFTP, SCP) is PuTTY's own code and does not use OpenSSL for its
+  protocol, so the policy does not reach it; its ciphers, key exchange and
+  host-key algorithms are the session's own preference lists.
 - The version shown in About and `linscp-cli /info` is the one the headers
   had at build time (`OPENSSL_VERSION_TEXT`), not the one loaded at run time.
 - On a system whose other libraries still use OpenSSL 3 (Qt's TLS plugin,

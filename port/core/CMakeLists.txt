@@ -42,6 +42,12 @@ endif()
 # OpenSSL's headers come from the configured release (cmake/openssl.cmake),
 # not WinSCP's copy, whose configuration.h describes 32-bit Windows.
 target_link_libraries(linscp-core PUBLIC linscp-shim linscp-openssl)
+# With the system's OpenSSL, the system crypto policy (its openssl.cnf) sets
+# the default TLS version range; core sets a bound only when the session
+# changes it (port/patches/core-tls-system-policy-bounds.patch).
+if(LINSCP_SYSTEM_OPENSSL)
+  target_compile_definitions(linscp-core PRIVATE TLS_SYSTEM_POLICY)
+endif()
 
 set(_up "${LINSCP_UPSTREAM}/source")
 target_include_directories(linscp-core PUBLIC

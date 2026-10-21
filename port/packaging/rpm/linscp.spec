@@ -97,8 +97,15 @@ program runs the same transfers from scripts.
 # Once releases are signed:
 #%%{gpgverify} --keyring='%%{SOURCE2}' --signature='%%{SOURCE1}' --data='%%{SOURCE0}'
 %autosetup -p1
+# The package builds against the system OpenSSL and expat, so their bundled
+# copies are deleted before the build (Fedora's Packaging Guidelines,
+# "Bundling and Duplication of System Libraries"). The tarball has nothing
+# that may not be shipped as source, so it needs no repack.
+rm -r 3rd-party/openssl 3rd-party/winscp/libs/openssl 3rd-party/winscp/libs/expat
 
 %build
+# LINSCP_SYSTEM_OPENSSL=ON also leaves TLS to the system crypto policy: no
+# cipher list is set, and a TLS version bound only when a session changes it.
 # LINSCP_REPRODUCIBLE=OFF: its -ffile-prefix-map would hide the sources
 # from debugedit (an empty debugsource package); rpm does that part, and
 # clang dates __DATE__ by rpm's SOURCE_DATE_EPOCH itself.

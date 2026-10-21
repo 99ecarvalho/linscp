@@ -173,6 +173,18 @@ add_test(NAME core_paths_build
 add_test(NAME core_paths COMMAND test_core_paths /ini=nul)
 set_tests_properties(core_paths PROPERTIES DEPENDS core_paths_build)
 
+# The TLS version bounds core sets on a connection: with the system OpenSSL,
+# the defaults are left to the system crypto policy.
+add_executable(test_tls_bounds EXCLUDE_FROM_ALL test_tls_bounds.cpp)
+target_link_libraries(test_tls_bounds PRIVATE linscp-runtime)
+if(LINSCP_SYSTEM_OPENSSL)
+  target_compile_definitions(test_tls_bounds PRIVATE TLS_SYSTEM_POLICY)
+endif()
+add_test(NAME tls_bounds_build
+  COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test_tls_bounds)
+add_test(NAME tls_bounds COMMAND test_tls_bounds)
+set_tests_properties(tls_bounds PROPERTIES DEPENDS tls_bounds_build)
+
 # Sites in WinSCP's INI file, read through core's storage as CoreLoad does.
 add_executable(test_ini_sites EXCLUDE_FROM_ALL test_ini_sites.cpp)
 target_link_libraries(test_ini_sites PRIVATE linscp-runtime)
