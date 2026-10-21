@@ -241,6 +241,43 @@ jobs:
             -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" \
             debian:trixie bash port/tools/ci_real_servers.sh
 
+  # A rolling toolchain (Arch: the newest clang and libstdc++), so what a newer
+  # compiler or <new> assumes about operator new shows up here first, before a
+  # distribution's packager meets it. Not blocking: rolling breakage does not
+  # hold up pull requests.
+  linux-rolling:
+    name: linux-rolling
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    timeout-minutes: 120
+    continue-on-error: true
+    steps:
+      - name: Install the toolchain
+        run: >-
+          pacman -Syu --noconfirm --needed git clang lld llvm cmake ninja python
+          qt6-base qt6-svg qt6-tools qt6-declarative openssl expat
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Hand the tree to the test user
+        run: |
+          useradd --create-home ci
+          chown -R ci:ci "$GITHUB_WORKSPACE"
+      - name: Configure
+        run: >-
+          runuser -u ci -- cmake -S . -B build -G Ninja
+          -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++
+          -DCMAKE_BUILD_TYPE=Release
+          -DLINSCP_SYSTEM_OPENSSL=ON -DLINSCP_SYSTEM_EXPAT=ON
+      - name: Build
+        run: runuser -u ci -- cmake --build build
+      # census_ratchet needs the pinned llvm-mingw; the fixture servers are
+      # Debian's job.
+      - name: Test
+        run: >-
+          runuser -u ci -- ctest --test-dir build --output-on-failure
+          -LE real-servers -E '^census_ratchet$'
+
   # The Flatpak, in Flathub's builder image (flatpak-builder needs the
   # privileges to sandbox its builds).
   flatpak:
