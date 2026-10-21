@@ -122,7 +122,11 @@ void TestLoadStrMatchesTheWholeTable()
     const linscp::TResourceString & Row = linscp::ResourceStrings[I];
     const UnicodeString Expected(Row.Text);
     const UnicodeString Got = LoadStr(Row.Ident);
-    if (Expected.Length() <= 1023)
+    if (wcsstr(Row.Text, L"WinSCP") != nullptr)
+    {
+      // The program's name is replaced (TestProgramNamed).
+    }
+    else if (Expected.Length() <= 1023)
     {
       CHECK(Got == Expected);
     }
@@ -193,6 +197,43 @@ void TestOpenArrayMacro()
   CHECK(Msg.Pos(UnicodeString(L"return code 2")) > 0);
 }
 
+// Core's texts name the program "WinSCP"; LoadString gives linscp's name
+// instead, but not where the word begins a longer name or names the .NET
+// assembly.
+bool AsciiAlnum(wchar_t C)
+{
+  return ((C >= L'a') && (C <= L'z')) || ((C >= L'A') && (C <= L'Z')) || ((C >= L'0') && (C <= L'9')) || (C == L'_');
+}
+
+void TestProgramNamed()
+{
+  CHECK(LoadStr(HOSTKEY_DOESNT_MATCH) ==
+        UnicodeString(L"The host key does not match the one linscp has cached for this server:"));
+  CHECK(LoadStr(CODE_PS_ADD_TYPE) == UnicodeString(L"Load WinSCP .NET assembly"));
+  int Named = 0;
+  for (std::size_t I = 0; I < linscp::ResourceStringCount; ++I)
+  {
+    const linscp::TResourceString & Row = linscp::ResourceStrings[I];
+    if (wcsstr(Row.Text, L"WinSCP") == nullptr)
+    {
+      continue;
+    }
+    ++Named;
+    const UnicodeString Got = LoadStr(Row.Ident);
+    const wchar_t * Text = Got.c_str();
+    // What is left of the word: only the assembly's name, or a longer name.
+    for (const wchar_t * At = wcsstr(Text, L"WinSCP"); At != nullptr; At = wcsstr(At + 1, L"WinSCP"))
+    {
+      const wchar_t * After = At + 6;
+      const bool Kept = (wcsncmp(After, L" .NET", 5) == 0) || AsciiAlnum(After[0]) ||
+        ((After[0] == L'.') && AsciiAlnum(After[1]));
+      CHECK(Kept);
+    }
+    CHECK(wcsstr(Text, L"linscp") != nullptr || wcsstr(Text, L"WinSCP .NET") != nullptr);
+  }
+  CHECK(Named > 20);
+}
+
 }  // namespace
 
 int main()
@@ -203,6 +244,7 @@ int main()
   TestModuleListMatchesFindModule();
   TestLoadStrMatchesTheWholeTable();
   TestStripHotkeyOverLoadStr();
+  TestProgramNamed();
 
   TestOpenArrayMacro();
 

@@ -167,6 +167,64 @@ void * ChangeResourceModule(void * Module)
   return Result;
 }
 
+namespace {
+
+// Core's texts name the program "WinSCP" ("the key WinSCP has cached", "quit
+// other instances of WinSCP"); the program here is linscp. The word alone is
+// replaced, in every translation (a name, they keep it): not a longer name it
+// begins (WinSCPnet, WinSCP.ini), nor the .NET assembly, whose name it is.
+// Copies TEXT into BUFFER as LoadString does; returns the length copied.
+int CopyProgramNamed(const wchar_t * Text, wchar_t * Buffer, int BufferMax)
+{
+  static const wchar_t Word[] = L"WinSCP";
+  static const wchar_t Name[] = L"linscp";
+  static const wchar_t Assembly[] = L" .NET";
+  // ASCII only: a letter of another script next to the name (a CJK
+  // particle) does not make it part of a longer one. (<cwchar> is not for
+  // this -fshort-wchar code: hand-written comparisons.)
+  const auto Alnum = [](wchar_t C)
+  {
+    return ((C >= L'a') && (C <= L'z')) || ((C >= L'A') && (C <= L'Z')) || ((C >= L'0') && (C <= L'9')) || (C == L'_');
+  };
+  const auto StartsWith = [](const wchar_t * At, const wchar_t * Prefix)
+  {
+    for (; *Prefix != L'\0'; ++At, ++Prefix)
+    {
+      if (*At != *Prefix)
+      {
+        return false;
+      }
+    }
+    return true;
+  };
+  const int WordLength = static_cast<int>(sizeof(Word) / sizeof(Word[0])) - 1;
+  int Length = 0;
+  // Leave room for the terminator, as Win32 does: it truncates rather than
+  // overrunning, and reports the truncated length.
+  for (int I = 0; (Text[I] != L'\0') && (Length < BufferMax - 1);)
+  {
+    const wchar_t * After = Text + I + WordLength;
+    const bool Found = StartsWith(Text + I, Word) && ((I == 0) || !Alnum(Text[I - 1]));
+    const bool Longer = Found && (Alnum(After[0]) || ((After[0] == L'.') && Alnum(After[1])));
+    if (Found && !Longer && !StartsWith(After, Assembly))
+    {
+      for (const wchar_t * N = Name; (*N != L'\0') && (Length < BufferMax - 1); ++N)
+      {
+        Buffer[Length++] = *N;
+      }
+      I += WordLength;
+    }
+    else
+    {
+      Buffer[Length++] = Text[I++];
+    }
+  }
+  Buffer[Length] = L'\0';
+  return Length;
+}
+
+}  // namespace
+
 int LoadString(void * Module, unsigned Ident, wchar_t * Buffer, int BufferMax)
 {
   if (Buffer == nullptr || BufferMax <= 0)
@@ -192,16 +250,7 @@ int LoadString(void * Module, unsigned Ident, wchar_t * Buffer, int BufferMax)
     Buffer[0] = L'\0';
     return 0;   // Win32 also returns 0 for a missing id
   }
-  int Length = 0;
-  // Leave room for the terminator, as Win32 does: it truncates rather than
-  // overrunning, and reports the truncated length.
-  while (Text[Length] != L'\0' && Length < BufferMax - 1)
-  {
-    Buffer[Length] = Text[Length];
-    ++Length;
-  }
-  Buffer[Length] = L'\0';
-  return Length;
+  return CopyProgramNamed(Text, Buffer, BufferMax);
 }
 
 UnicodeString LoadStr(NativeUInt Ident)
