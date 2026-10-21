@@ -219,8 +219,8 @@ id; and the website pages that mention the ID.
   finishes" under Flatpak) or justify it.
 - **x-checker-data** on the main source (`is-main-source: true`, tag pattern
   `^v([\d.]+)$`) and on OpenSSL and PuTTY; never track commits.
-- **Architectures:** Flathub builds x86_64 and aarch64; test aarch64 or add
-  `flathub.json` with `only-arches`.
+- **Architectures:** Flathub builds x86_64 and aarch64 unless told otherwise;
+  linscp is x86_64 only (`port/packaging/flatpak/flathub.json`, `only-arches`).
 
 ### MetaInfo, desktop file, icon (the linter treats warnings as errors)
 
@@ -478,15 +478,15 @@ Status: `todo`, `wip`, `blocked`, `done`, `dropped`. Owner `M` = maintainer only
 | R1-19 | 1 | `QGuiApplication::setDesktopFileName("org.linscp.linscp")`; `StartupWMClass` consistent | | done |
 | R1-20 | 1 | `Integration.cpp`: app-ID names for the desktop file, icon and shortcuts; skip self-registration in package and Flatpak builds | | done |
 | R1-21 | 1 | Flatpak config location (`~/.var/app/…`) documented; `/ini` mode and config paths checked in the sandbox | | done |
-| R1-04 | 1 | MetaInfo: 3–6 captioned screenshots ≤ 1000×700, pinned URLs, one default | | todo |
-| R1-05 | 1 | MetaInfo: light/dark branding colours | | todo |
-| R1-06 | 1 | MetaInfo: release notes for every entry; summary ≤ 35 chars; description not a file manager | | todo |
-| R1-07 | 1 | Desktop file: drop `Qt` category, `Icon=<appid>`, `desktop-file-validate` clean | | todo |
-| R1-08 | 1 | Icon check: scalable SVG, square, no shadow, light and dark | | todo |
-| R1-09 | 1 | Flatpak build: disable update check and sandbox-incompatible features | | todo |
-| R1-10 | 1 | `appstreamcli validate`, `desktop-file-validate`, `flatpak-builder-lint` in CI | | todo |
-| R1-11 | 1 | Website: `public/.well-known/org.flathub.VerifiedApps.txt` path served (token added after acceptance) | | todo |
-| R1-12 | 1 | aarch64 build tested, or `flathub.json` `only-arches` | | todo |
+| R1-04 | 1 | MetaInfo: 5 captioned screenshots ≤ 1000×700 (`doc/screenshots`, from `test_qt_gui screenshots`), URLs pinned to the version's tag (configured at install), the Commander the default | | done |
+| R1-05 | 1 | MetaInfo: light/dark branding colours (the icon's blue) | | done |
+| R1-06 | 1 | MetaInfo: release notes for every entry, pre-releases typed `development`; summary ≤ 35 chars; description not a file manager. The release workflow fails on a tag without a metainfo release entry | | done |
+| R1-07 | 1 | Desktop file: drop `Qt` category, `Icon=<appid>`, `desktop-file-validate` clean | | done |
+| R1-08 | 1 | Icon check: scalable SVG, square, no shadow, light and dark | | done |
+| R1-09 | 1 | Flatpak build: update check off; Sleep/Shut Down Computer hidden under Flatpak (`Integration::PowerActionsAvailable`), so no `--system-talk-name=org.freedesktop.login1`; KDE 6.11 with llvm22 | | done |
+| R1-10 | 1 | `appstreamcli validate --strict`, `desktop-file-validate` (ctest `packaging_*`), `flatpak-builder-lint` manifest and repo in CI (`lint-exceptions.json`: home access, local screenshot mirroring) | | done |
+| R1-11 | 1 | Website: `public/.well-known/org.flathub.VerifiedApps.txt` path served (empty; the token goes in after acceptance) | | done |
+| R1-12 | 1 | x86_64 only: `port/packaging/flatpak/flathub.json` `only-arches` (Flathub does not require aarch64) | | done |
 | R1-13 | 1 | Submission manifest (KDE 6.11, llvm22, git tag+commit, cleanup, permissions, x-checker-data), hand-written | M | todo |
 | R1-14 | 1 | Written justification for `--filesystem=home` | M | todo |
 | R1-15 | 1 | Screen recording of the Flatpak running | M | todo |

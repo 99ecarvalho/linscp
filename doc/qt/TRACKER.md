@@ -312,6 +312,8 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-20 | The Flatpak is x86_64 only (`flathub.json` `only-arches`) | Flathub does not require aarch64; no aarch64 build is tested or supported |
+| 2026-10-20 | Each release publishes the copyleft components' source (`linscp-X.Y.Z-third-party-sources.tar`) instead of a three-year written offer; no sources are kept for the 0.x releases already out | The same place as the downloads satisfies every licence involved without local or off-site copies; before 1.0 the releases are experimental and may be removed |
 | 2026-10-20 | The FTP engine's `CString`/`CFile`/`CTime` come from linscp's own clean-room `port/mfc-compat/` (ADR 0017); the vendored MFC subset is not compiled, guarded by a configure check and ctest `no_mfc`, covered by ctest `mfc_compat` | The vendored subset is not under a free licence; every distribution channel reviews licences |
 | 2026-10-20 | Windows packages carry each bundled MSYS2 package's licence texts, `THIRD-PARTY-NOTICES.txt` and a three-year written source offer (`deploy_windows.py`, from `fetch_msys2_qt.py`'s package index) | LGPL/GPL obligations for redistributed Qt and its dependencies |
 | 2026-10-20 | linscp proceeds as an independent project: publish across all channels first, clean up and rewrite the codebase afterward. Rollout in [RELEASE-PLAN.md](RELEASE-PLAN.md) | Can't wait for the rewrite before publishing; reach and demonstrated demand matter now |
