@@ -1,4 +1,5 @@
 #include "TransferDialog.h"
+#include "Integration.h"
 
 #include <QAction>
 #include <QActionGroup>
@@ -108,6 +109,10 @@ TransferDialog::TransferDialog(bool Upload, int FileCount, QWidget * Parent) :
     OnceGroup->addAction(Action);
     const TOnceFinished Value = Item.second;
     connect(Action, &QAction::triggered, this, [this, Value]() { SetOnceFinished(Value); });
+    if ((Value == TOnceFinished::Suspend) || (Value == TOnceFinished::ShutDown))
+    {
+      Action->setVisible(Integration::PowerActionsAvailable());
+    }
   }
   FOnceFinishedButton->setMenu(OnceMenu);
   FSpeedLimit = new QComboBox(this);

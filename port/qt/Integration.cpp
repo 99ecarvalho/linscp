@@ -932,6 +932,11 @@ bool ShutDownComputer(QString & Error)
 #endif
 }
 
+bool PowerActionsAvailable()
+{
+  return (Install() != TInstall::Flatpak);
+}
+
 // As TWinConfiguration::UpdateEntryInJumpList and Setup.cpp's UpdateJumpList:
 // the recent workspaces and sites as the taskbar's categories, each a link
 // opening it (/JumpList; a site's /UploadIfAny takes files dropped on it),

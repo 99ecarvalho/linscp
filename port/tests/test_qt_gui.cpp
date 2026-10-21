@@ -7592,7 +7592,9 @@ void DesktopIdentityTest(const QString & Packaging, const QString & Directory)
     qputenv("FLATPAK_ID", App.toLocal8Bit());
     Check((Integration::Install() == Integration::TInstall::Flatpak) && !Integration::SelfRegisters(),
       "a Flatpak's (FLATPAK_ID), not registering itself");
+    Check(!Integration::PowerActionsAvailable(), "a Flatpak's: no Sleep or Shut Down Computer (no system bus)");
     qunsetenv("FLATPAK_ID");
+    Check(Integration::PowerActionsAvailable(), "others': Sleep and Shut Down Computer offered");
     qunsetenv("APPIMAGE");
 
     // An archive's, upgraded: what an older version registered (its menu

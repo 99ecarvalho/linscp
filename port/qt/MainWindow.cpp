@@ -5958,6 +5958,10 @@ void MainWindow::BuildMenus()
     const TOnceEmpty Operation = Choice.Operation;
     connect(Action, &QAction::triggered, this, [this, Operation]() { SetOnceEmpty(Operation); });
     FOnceEmptyActions[static_cast<int>(Operation)] = Action;
+    if ((Operation == TOnceEmpty::Suspend) || (Operation == TOnceEmpty::ShutDown))
+    {
+      Action->setVisible(Integration::PowerActionsAvailable());
+    }
   }
   FOnceEmptyActions[0]->setChecked(true);
   // As AllowQueueOperation(qoOnceEmpty): while anything is queued.

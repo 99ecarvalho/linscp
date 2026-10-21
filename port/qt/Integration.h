@@ -66,6 +66,9 @@ QString FileTypeName(const QString & Name, bool Directory);
 // may ask). False with Error set when refused.
 bool SuspendComputer(QString & Error);
 bool ShutDownComputer(QString & Error);
+// Whether those are offered: not in a Flatpak, whose sandbox is given no
+// access to the system bus, logind's.
+bool PowerActionsAvailable();
 
 // As the Login dialog's DesktopIconActionExecute and Preferences'
 // IconButtonClick: Question asked (empty: none), then the shortcut, its
