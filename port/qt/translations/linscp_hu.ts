@@ -8,10 +8,6 @@
         <translation>%1 névjegye</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>A WinSCP Qt-portja Linuxra és Windowsra</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Verzió: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>A GNU LGPL 3-as verziója alatt licencelve</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Hely: %2</translation>
         <translation>Kezdeti &amp;mappa</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>&amp;WinSCP-függő</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>&amp;linscp-függő</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4817,8 +4817,8 @@ Hely: %2</translation>
         <translation>SSH-2 ignoráló üzenetek elfojtása:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>WinSCP&apos;s SSH-2 &apos;winadj&apos; kérésekre elfojtása</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>linscp&apos;s SSH-2 &apos;winadj&apos; kérésekre elfojtása</translation>
     </message>
     <message>
         <source>Note</source>

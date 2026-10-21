@@ -8,10 +8,6 @@
         <translation>%1 정보</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Linux 및 Windows용 WinSCP의 Qt 포트</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>버전: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>GNU LGPL 버전 3에 따라 라이선스됨</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Location: %2</source>
         <translation>초기 디렉터리(&amp;D)</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>WinSCP 관련(&amp;W)</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>linscp 관련(&amp;W)</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4817,8 +4817,8 @@ Location: %2</source>
         <translation>SSH-2 무시 메시지 제한(&amp;2):</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>WinSCP의 SSH-2 &apos;winadj&apos; 요청 제한</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>linscp의 SSH-2 &apos;winadj&apos; 요청 제한</translation>
     </message>
     <message>
         <source>Note</source>

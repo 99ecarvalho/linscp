@@ -8,10 +8,6 @@
         <translation>Tietoja: %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>WinSCP:n Qt-versio Linuxille ja Windowsille</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Versio: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Lisensoitu GNU LGPL -lisenssin version 3 ehdoin</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Sijainti: %2</translation>
         <translation>Aloituskansio</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>WinSCP-&amp;kohtaiset</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>linscp-&amp;kohtaiset</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4818,8 +4818,8 @@ Sijainti: %2</translation>
         <translation>Jumiutuu SSH-&amp;2:n ignore-viesteihin</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Jumiutuu WinSCP:n SSH-2:n &apos;winadj&apos;-pyyntöihin</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Jumiutuu linscp:n SSH-2:n &apos;winadj&apos;-pyyntöihin</translation>
     </message>
     <message>
         <source>Note</source>

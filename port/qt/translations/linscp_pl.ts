@@ -8,10 +8,6 @@
         <translation>O %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Port WinSCP w Qt dla systemów Linux i Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Wersja: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Licencjonowane na warunkach GNU LGPL w wersji 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Lokalizacja: %2</translation>
         <translation>&amp;Katalog startowy</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>Specyficzne dla &amp;WinSCP</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>Specyficzne dla &amp;linscp</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4819,8 +4819,8 @@ Lokalizacja: %2</translation>
         <translation>Niepowodzenie komunikatów i&amp;gnorowania SSH-2:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Niepowodzenie żądań WinSCP SSH-2 &apos;&amp;winadj&apos;:</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Niepowodzenie żądań linscp SSH-2 &apos;&amp;winadj&apos;:</translation>
     </message>
     <message>
         <source>Note</source>

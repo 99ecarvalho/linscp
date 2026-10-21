@@ -8,10 +8,6 @@
         <translation>О программе %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Qt-порт WinSCP для Linux и Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Версия: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Распространяется по лицензии GNU LGPL версии 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Location: %2</source>
         <translation>&amp;Начальный каталог</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>П&amp;рефикс WinSCP</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>П&amp;рефикс linscp</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4819,7 +4819,7 @@ Location: %2</source>
         <translation>Не использовать игнорируемые сообщения с SSH-2:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
         <translation>Не использовать запросы winadj с SSH</translation>
     </message>
     <message>

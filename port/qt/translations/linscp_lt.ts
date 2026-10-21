@@ -8,10 +8,6 @@
         <translation>Apie %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>WinSCP perkėlimas į Qt, skirtas Linux ir Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Versija: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Licencijuota pagal GNU LGPL 3 versiją</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Vieta: %2</translation>
         <translation>Pradinis &amp;katalogas</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>&amp;WinSCP-konkretu</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>&amp;linscp-konkretu</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4819,8 +4819,8 @@ Vieta: %2</translation>
         <translation>Springimai SSH-&amp;2 ignoravimo žinutėse:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Springimai WinSCP&apos;s SSH-&amp;2 &apos;winadj&apos; užklausose</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Springimai linscp&apos;s SSH-&amp;2 &apos;winadj&apos; užklausose</translation>
     </message>
     <message>
         <source>Note</source>

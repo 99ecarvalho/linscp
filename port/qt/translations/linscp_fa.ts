@@ -8,10 +8,6 @@
         <translation>درباره %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>نسخه Qt از WinSCP برای لینوکس و ویندوز</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>نسخه: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>تحت مجوز GNU LGPL نسخه ۳</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Location: %2</source>
         <translation>مسیر ابتدایی</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>WinSCP مخصوص</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>linscp مخصوص</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4817,8 +4817,8 @@ Location: %2</source>
         <translation>انسداد در SSH- &amp; 2 نادیده گرفتن پیام ها:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>انسدادرخواستهای &apos;winadj&apos; SSH-2 WinSCP</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>انسدادرخواستهای &apos;winadj&apos; SSH-2 linscp</translation>
     </message>
     <message>
         <source>Note</source>

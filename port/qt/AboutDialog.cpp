@@ -91,7 +91,7 @@ AboutDialog::AboutDialog(const CoreBridge::TInfo & Info, QWidget * Parent) :
   NameFont.setBold(true);
   FName->setFont(NameFont);
   Texts->addWidget(FName);
-  QLabel * Description = TextLabel(tr("A Qt port of WinSCP for Linux and Windows"), this);
+  QLabel * Description = TextLabel(tr("Transfer files to and from servers, on Linux and Windows"), this);
   QFont DescriptionFont = Description->font();
   DescriptionFont.setPointSizeF(DescriptionFont.pointSizeF() * 1.2);
   Description->setFont(DescriptionFont);

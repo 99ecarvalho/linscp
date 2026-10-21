@@ -8,10 +8,6 @@
         <translation>%1 について</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Linux および Windows 用の WinSCP の Qt 移植版</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>バージョン: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>GNU LGPL バージョン 3 の下でライセンスされています</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Location: %2</source>
         <translation>初期ディレクトリ(&amp;D)</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>WinSCP 固有(&amp;W)</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>linscp 固有(&amp;W)</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4817,8 +4817,8 @@ Location: %2</source>
         <translation>SSH2 のメッセージ無視の拒否(&amp;2)</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>WinSCP の SSH2 で &apos;winadj&apos; 要求を拒否</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>linscp の SSH2 で &apos;winadj&apos; 要求を拒否</translation>
     </message>
     <message>
         <source>Note</source>

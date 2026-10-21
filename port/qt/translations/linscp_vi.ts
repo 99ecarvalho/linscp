@@ -8,10 +8,6 @@
         <translation>Giới thiệu %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Bản port Qt của WinSCP cho Linux và Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Phiên bản: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Được cấp phép theo GNU LGPL phiên bản 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Vị trí: %2</translation>
         <translation>&amp;Thư mục ban đầu</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>Dành riêng cho &amp;WinSCP</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>Dành riêng cho &amp;linscp</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4817,8 +4817,8 @@ Vị trí: %2</translation>
         <translation>Lỗi khi nhận tin &amp;ignore SSH:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Lỗi khi nhận yêu cầu SSH &apos;&amp;winadj&apos; của WinSCP</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Lỗi khi nhận yêu cầu SSH &apos;&amp;winadj&apos; của linscp</translation>
     </message>
     <message>
         <source>Note</source>

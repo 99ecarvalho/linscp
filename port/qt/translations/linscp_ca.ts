@@ -8,10 +8,6 @@
         <translation>Quant a %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Un port Qt del WinSCP per a Linux i Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Versió: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Llicenciat sota la GNU LGPL versió 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Ubicació: %2</translation>
         <translation>&amp;Directori d&apos;inici</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>Específic del &amp;WinSCP</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>Específic del &amp;linscp</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4818,8 +4818,8 @@ Ubicació: %2</translation>
         <translation>Es penja en missatges i&amp;gnorats SSH:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Es penja en peticions SSH &apos;winadj&apos; del WinSCP</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Es penja en peticions SSH &apos;winadj&apos; del linscp</translation>
     </message>
     <message>
         <source>Note</source>

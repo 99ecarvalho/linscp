@@ -8,10 +8,6 @@
         <translation>Tungkol sa %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Isang Qt port ng WinSCP para sa Linux at Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Bersyon: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Lisensyado sa ilalim ng GNU LGPL bersyon 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Lokasyon: %2</translation>
         <translation>Inisyal na &amp;direktoryo</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>&amp;WinSCP-specific</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>&amp;linscp-specific</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4818,8 +4818,8 @@ Lokasyon: %2</translation>
         <translation>Nabibigo sa mga SSH i&amp;gnore message:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Nabibigo sa mga SSH &apos;&amp;winadj&apos; request ng WinSCP</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Nabibigo sa mga SSH &apos;&amp;winadj&apos; request ng linscp</translation>
     </message>
     <message>
         <source>Note</source>

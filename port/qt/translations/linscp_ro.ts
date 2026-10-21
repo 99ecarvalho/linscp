@@ -8,10 +8,6 @@
         <translation>Despre %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Un port Qt al WinSCP pentru Linux și Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Versiune: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Licențiat sub GNU LGPL versiunea 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Cale: %2</translation>
         <translation>&amp;Director inițial</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>Specific &amp;WinSCP</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>Specific &amp;linscp</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4819,8 +4819,8 @@ Cale: %2</translation>
         <translation>Întreruperi în timpul mesajelor de ignorare:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Înreruperi în timpul cererilor SSH &apos;winadj&apos; făcute de WinSCP:</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Înreruperi în timpul cererilor SSH &apos;winadj&apos; făcute de linscp:</translation>
     </message>
     <message>
         <source>Note</source>

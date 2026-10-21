@@ -8,10 +8,6 @@
         <translation>Teave: %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>WinSCP-i Qt-port Linuxile ja Windowsile</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Versioon: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Litsentsitud GNU LGPL versiooni 3 alusel</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Asukoht: %2</translation>
         <translation>&amp;Algkataloog</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>&amp;WinSCP-spetsiifiline</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>&amp;linscp-spetsiifiline</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4818,8 +4818,8 @@ Asukoht: %2</translation>
         <translation>Takerdub SSH-&amp;2 eiramissõnumite tagajärjel:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Takerdub WinSCP SSH &apos;&amp;winadj&apos; päringute tagajärjel</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Takerdub linscp SSH &apos;&amp;winadj&apos; päringute tagajärjel</translation>
     </message>
     <message>
         <source>Note</source>

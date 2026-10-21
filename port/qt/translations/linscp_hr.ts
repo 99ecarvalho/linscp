@@ -8,10 +8,6 @@
         <translation>O programu %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Qt inačica WinSCP-a za Linux i Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Verzija: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Licencirano pod GNU LGPL verzijom 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Lokacija: %2</translation>
         <translation>Početna &amp;mapa</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>&amp;WinSCP-specifično</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>&amp;linscp-specifično</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4819,8 +4819,8 @@ Lokacija: %2</translation>
         <translation>Priguši SSH-&amp;2 poruke zanemarivanja:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Priguši WinSCP&apos;s SSH-2 &apos;winadj&apos; zahtjeve</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Priguši linscp&apos;s SSH-2 &apos;winadj&apos; zahtjeve</translation>
     </message>
     <message>
         <source>Note</source>

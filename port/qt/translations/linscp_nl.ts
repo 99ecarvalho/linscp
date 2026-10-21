@@ -8,10 +8,6 @@
         <translation>Over %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Een Qt-port van WinSCP voor Linux en Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Versie: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Gelicentieerd onder de GNU LGPL versie 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Locatie: %2</translation>
         <translation>Initiële &amp;map</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>&amp;WinSCP-specifiek</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>&amp;linscp-specifiek</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4818,8 +4818,8 @@ Locatie: %2</translation>
         <translation>Handelt ineffectief bij SSH-&amp;2 negeerberichten:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Handelt ineffectief bij &amp;WinSCP&apos;s SSH-2 &apos;winadj&apos; aanvragen</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Handelt ineffectief bij &amp;linscp&apos;s SSH-2 &apos;winadj&apos; aanvragen</translation>
     </message>
     <message>
         <source>Note</source>

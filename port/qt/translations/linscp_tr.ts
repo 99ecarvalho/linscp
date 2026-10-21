@@ -8,10 +8,6 @@
         <translation>%1 hakkında</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Linux ve Windows için bir Qt WinSCP uyarlaması</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Sürüm: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>GNU LGPL sürüm 3 altında lisanslanmıştır</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Konum: %2</translation>
         <translation>Başlangıç &amp;klasörü</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>&amp;WinSCP için özel</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>&amp;linscp için özel</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4817,8 +4817,8 @@ Konum: %2</translation>
         <translation>SSH-&amp;2 yok sayma ileti tıkanmaları:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>WinSCP SSH-2 &apos;winadj&apos; isteklerindeki tıkanmalar</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>linscp SSH-2 &apos;winadj&apos; isteklerindeki tıkanmalar</translation>
     </message>
     <message>
         <source>Note</source>

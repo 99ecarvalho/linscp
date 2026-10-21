@@ -8,10 +8,6 @@
         <translation>Σχετικά με το %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Μεταφορά του WinSCP σε Qt για Linux και Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Έκδοση: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Διατίθεται με άδεια GNU LGPL έκδοση 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Location: %2</source>
         <translation>Αρχικός &amp;κατάλογος</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>Ειδικά για &amp;WinSCP</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>Ειδικά για &amp;linscp</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4818,8 +4818,8 @@ Location: %2</source>
         <translation>Κολλάει με τα μηνύματα &amp;ignore του SSH:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Κολλάει με τις αιτήσεις &apos;&amp;winadj&apos; του SSH του WinSCP</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Κολλάει με τις αιτήσεις &apos;&amp;winadj&apos; του SSH του linscp</translation>
     </message>
     <message>
         <source>Note</source>

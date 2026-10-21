@@ -8,10 +8,6 @@
         <translation>حول %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>منفذ Qt من WinSCP لنظامي Linux وWindows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>الإصدار: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>مرخّص بموجب رخصة GNU LGPL الإصدار 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Location: %2</source>
         <translation>مجلد بدء التشغيل</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>&amp;WinSCP خاص لـ</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>&amp;linscp خاص لـ</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4822,8 +4822,8 @@ Location: %2</source>
         <translation>يتعطل عند رسائل ت&amp;جاهل SSH:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>يتعطل عند طلبات SSH &apos;&amp;winadj&apos; من WinSCP</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>يتعطل عند طلبات SSH &apos;&amp;winadj&apos; من linscp</translation>
     </message>
     <message>
         <source>Note</source>

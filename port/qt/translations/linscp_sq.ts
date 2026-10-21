@@ -8,10 +8,6 @@
         <translation>Rreth %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Një portim Qt i WinSCP për Linux dhe Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Versioni: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Licencuar sipas GNU LGPL versioni 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Vendndodhja: %2</translation>
         <translation>&amp;Direktoria fillestare</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>Specifike për &amp;WinSCP</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>Specifike për &amp;linscp</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4818,8 +4818,8 @@ Vendndodhja: %2</translation>
         <translation>Bllokohet nga mesazhet SSH &amp;ignore:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Bllokohet nga kërkesat SSH &apos;&amp;winadj&apos; të WinSCP</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Bllokohet nga kërkesat SSH &apos;&amp;winadj&apos; të linscp</translation>
     </message>
     <message>
         <source>Note</source>

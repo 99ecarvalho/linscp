@@ -8,10 +8,6 @@
         <translation>Acerca de %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Un port de WinSCP en Qt para Linux y Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Versión: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Con licencia GNU LGPL versión 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Ruta: %2</translation>
         <translation>&amp;Directorio de inicio</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>Específico para &amp;WinSCP</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>Específico para &amp;linscp</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4818,8 +4818,8 @@ Ruta: %2</translation>
         <translation>Conflictos con mensajes SSH i&amp;gnorados:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Conflictos con peticiones SSH de WinSCP «winadj»</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Conflictos con peticiones SSH de linscp «winadj»</translation>
     </message>
     <message>
         <source>Note</source>

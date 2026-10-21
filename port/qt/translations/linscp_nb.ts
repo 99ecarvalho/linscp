@@ -8,10 +8,6 @@
         <translation>Om %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>En Qt-port av WinSCP for Linux og Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Versjon: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Lisensiert under GNU LGPL versjon 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Plassering: %2</translation>
         <translation>Initiell &amp;katalog</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>&amp;WinSCP-spesifikk</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>&amp;linscp-spesifikk</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4818,8 +4818,8 @@ Plassering: %2</translation>
         <translation>Reagerer feil på SSH-2 &amp;ignore meldinger:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Reagerer feil på WinSCP&apos;s SSH-2 &apos;winadj&apos; forespørsler</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Reagerer feil på linscp&apos;s SSH-2 &apos;winadj&apos; forespørsler</translation>
     </message>
     <message>
         <source>Note</source>

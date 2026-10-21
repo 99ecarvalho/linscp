@@ -1131,7 +1131,7 @@ QWidget * SiteAdvanced::MakeBugsPage()
     tr("Miscomputes SSH H&MAC keys:"), tr("Miscomputes SSH &encryption keys:"),
     tr("Requires &padding on SSH RSA signatures:"), tr("Misuses the sessio&n ID in SSH PK auth:"),
     tr("Handles SSH &key re-exchange badly:"), tr("Ignores SSH ma&ximum packet size:"),
-    tr("Chokes on SSH i&gnore messages:"), tr("Chokes on WinSCP's SSH '&winadj' requests") };
+    tr("Chokes on SSH i&gnore messages:"), tr("Chokes on linscp's SSH '&winadj' requests") };
   for (int Index = 0; Index < TSite::SshBugCount; Index++)
   {
     FBugs[Index] = AutoSwitchCombo(Group,

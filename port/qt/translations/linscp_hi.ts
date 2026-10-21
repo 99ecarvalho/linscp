@@ -8,10 +8,6 @@
         <translation>%1 के बारे में</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Linux और Windows के लिए WinSCP का Qt पोर्ट</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>संस्करण: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>GNU LGPL संस्करण 3 के अंतर्गत लाइसेंसीकृत</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Location: %2</source>
         <translation>प्रारंभिक निर्देशिका(&amp;D)</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>WinSCP-विशिष्ट(&amp;W)</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>linscp-विशिष्ट(&amp;W)</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4818,8 +4818,8 @@ Location: %2</source>
         <translation>SSH ignore संदेशों पर अटक जाता है(&amp;G):</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>WinSCP के SSH &apos;winadj&apos; अनुरोधों पर अटक जाता है(&amp;W)</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>linscp के SSH &apos;winadj&apos; अनुरोधों पर अटक जाता है(&amp;W)</translation>
     </message>
     <message>
         <source>Note</source>

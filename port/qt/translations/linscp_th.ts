@@ -8,10 +8,6 @@
         <translation>เกี่ยวกับ %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>WinSCP ที่พอร์ตด้วย Qt สำหรับ Linux และ Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>เวอร์ชั่น: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>อนุญาตให้ใช้ภายใต้ GNU LGPL รุ่น 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Location: %2</source>
         <translation>&amp;ไดเรกทอรีเริ่มต้น</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>&amp;เฉพาะ WinSCP</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>&amp;เฉพาะ linscp</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4817,8 +4817,8 @@ Location: %2</source>
         <translation>ค้างเมื่อได้รับข้อความ i&amp;gnore ของ SSH:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>ค้างเมื่อได้รับคำขอ &apos;&amp;winadj&apos; ของ SSH จาก WinSCP</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>ค้างเมื่อได้รับคำขอ &apos;&amp;winadj&apos; ของ SSH จาก linscp</translation>
     </message>
     <message>
         <source>Note</source>

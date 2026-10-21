@@ -8,10 +8,6 @@
         <translation>O programe %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Qt port WinSCP pre Linux a Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Verzia: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Licencované podľa GNU LGPL verzie 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Umiestnenie: %2</translation>
         <translation>Počiatočný prie&amp;činok</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>Špecifické pre &amp;WinSCP</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>Špecifické pre &amp;linscp</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4819,8 +4819,8 @@ Umiestnenie: %2</translation>
         <translation>Zahltenie správami o i&amp;gnorovaní SSH:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Zahlteníe požiadavkami na WinSCP&apos; SSH &apos;winadj&apos;</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Zahlteníe požiadavkami na linscp&apos; SSH &apos;winadj&apos;</translation>
     </message>
     <message>
         <source>Note</source>

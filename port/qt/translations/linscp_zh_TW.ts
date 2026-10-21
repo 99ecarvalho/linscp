@@ -8,10 +8,6 @@
         <translation>關於 %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>WinSCP 的 Qt 移植版本，適用於 Linux 和 Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>版本: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>依據 GNU LGPL 第 3 版授權</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Location: %2</source>
         <translation>初始資料夾(&amp;D)</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>特定給 &amp;WinSCP 使用的</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>特定給 &amp;linscp 使用的</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4817,8 +4817,8 @@ Location: %2</source>
         <translation>在 SSH-2 忽略訊息時阻塞(&amp;2):</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>在 WinSCP&apos;s SSH-2 &apos;winadj&apos; 要求時阻塞:</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>在 linscp&apos;s SSH-2 &apos;winadj&apos; 要求時阻塞:</translation>
     </message>
     <message>
         <source>Note</source>

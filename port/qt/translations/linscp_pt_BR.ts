@@ -8,10 +8,6 @@
         <translation>Sobre o %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Uma versão em Qt do WinSCP para Linux e Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Versão: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Licenciado sob a GNU LGPL versão 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Local: %2</translation>
         <translation>Diretório Inicial</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>&amp;WinSCP-específico</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>&amp;linscp-específico</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4818,7 +4818,7 @@ Local: %2</translation>
         <translation>Paralisar em mensagens SSH-&amp;2 ignoradas:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
         <translation>Requisições &apos;s SSH-2 &apos;winadj&apos;</translation>
     </message>
     <message>

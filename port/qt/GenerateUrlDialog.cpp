@@ -45,7 +45,7 @@ GenerateUrlDialog::GenerateUrlDialog(CoreBridge::TSession * Session, const std::
   // WinSCP's checkboxes, in its order, with its tags.
   const std::pair<int, QString> Checks[] = {
     { 1, tr("&Username") }, { 2, tr("&Password") }, { 4, tr("SSH &host key") }, { 8, tr("Initial &directory") },
-    { 16, tr("&WinSCP-specific") }, { 32, tr("&Save extension") }, { 64, tr("&Advanced settings") } };
+    { 16, tr("&linscp-specific") }, { 32, tr("&Save extension") }, { 64, tr("&Advanced settings") } };
   int Row = 0;
   for (const auto & Check : Checks)
   {

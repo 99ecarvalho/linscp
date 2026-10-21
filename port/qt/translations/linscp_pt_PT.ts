@@ -8,10 +8,6 @@
         <translation>Sobre o %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Uma versão Qt do WinSCP para Linux e Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Versão: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Licenciado ao abrigo da GNU LGPL versão 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Localização: %2</translation>
         <translation>&amp;Directoria inicial</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>&amp;WinSCP-especifico</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>&amp;linscp-especifico</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4818,8 +4818,8 @@ Localização: %2</translation>
         <translation>Bloqueio no SSH-&amp;2, ignora mensagens:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Bloqueia com pedidos SSH &apos;&amp;winadj&apos; do WinSCP</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Bloqueia com pedidos SSH &apos;&amp;winadj&apos; do linscp</translation>
     </message>
     <message>
         <source>Note</source>

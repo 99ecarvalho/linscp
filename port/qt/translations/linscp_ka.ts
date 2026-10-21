@@ -8,10 +8,6 @@
         <translation>%1-ის შესახებ</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>WinSCP-ის Qt პორტი Linux-ისა და Windows-ისთვის</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>ვერსია: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>ლიცენზირებულია GNU LGPL ვერსია 3-ით</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Location: %2</source>
         <translation>საწყისი საქაღალ&amp;დე</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>&amp;WinSCP-ის სპეციფიკური</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>&amp;linscp-ის სპეციფიკური</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4818,8 +4818,8 @@ Location: %2</source>
         <translation>ვერ უმკლავდება SSH-ის &amp;იგნორირების შეტყობინებებს:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>ვერ უმკლავდება WinSCP-ის SSH &apos;&amp;winadj&apos; მოთხოვნებს</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>ვერ უმკლავდება linscp-ის SSH &apos;&amp;winadj&apos; მოთხოვნებს</translation>
     </message>
     <message>
         <source>Note</source>

@@ -8,10 +8,6 @@
         <translation>%1 பற்றி</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Linux மற்றும் Windows-க்கான WinSCP-இன் Qt வடிவம்</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>பதிப்பு: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>GNU LGPL பதிப்பு 3-இன் கீழ் உரிமம் பெற்றது</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,7 +818,7 @@ Location: %2</source>
         <translation>தொடக்க &amp;அடைவு</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
+        <source>&amp;linscp-specific</source>
         <translation>&amp;சாளரபாநகல்-குறிப்பிட்ட</translation>
     </message>
     <message>
@@ -4818,7 +4818,7 @@ Location: %2</source>
         <translation>பாஓடு இல் திணறல் செய்திகளை புறக்கணி:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
         <translation>சாளரபாநகல் இன் பாஓடு &apos;&amp;சாளரஏடிசே&apos; கோரிக்கைகளில் திணறல்</translation>
     </message>
     <message>

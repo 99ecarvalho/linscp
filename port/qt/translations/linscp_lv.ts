@@ -8,10 +8,6 @@
         <translation>Par %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>WinSCP Qt versija Linux un Windows sistēmām</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Versija: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Licencēts saskaņā ar GNU LGPL 3. versiju</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Atrašanās vieta: %2</translation>
         <translation>Sākuma &amp;mape</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>Specifisks &amp;WinSCP</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>Specifisks &amp;linscp</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4819,8 +4819,8 @@ Atrašanās vieta: %2</translation>
         <translation>Neapstrādā SSH &amp;ignore ziņojumus:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Neapstrādā WinSCP SSH &apos;&amp;winadj&apos; pieprasījumus</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Neapstrādā linscp SSH &apos;&amp;winadj&apos; pieprasījumus</translation>
     </message>
     <message>
         <source>Note</source>

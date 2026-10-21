@@ -8,10 +8,6 @@
         <translation>Про %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Qt-порт WinSCP для Linux і Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Версія: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Розповсюджується за ліцензією GNU LGPL версії 3</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Location: %2</source>
         <translation>Початкова тека</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>&amp;WinSCP-специфічно</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>&amp;linscp-специфічно</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4819,8 +4819,8 @@ Location: %2</source>
         <translation>Заповнювати при повідомленнях що ігноруються SSH-&amp;2:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Придушувати у протоколах SSH-2 запити &apos;winadj&apos; для WinSCP</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Придушувати у протоколах SSH-2 запити &apos;winadj&apos; для linscp</translation>
     </message>
     <message>
         <source>Note</source>

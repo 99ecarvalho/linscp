@@ -8,10 +8,6 @@
         <translation>Um %1</translation>
     </message>
     <message>
-        <source>A Qt port of WinSCP for Linux and Windows</source>
-        <translation>Qt-útgáfa af WinSCP fyrir Linux og Windows</translation>
-    </message>
-    <message>
         <source>Version: &lt;b&gt;%1&lt;/b&gt;</source>
         <translation>Útgáfa: &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
@@ -62,6 +58,10 @@
     <message>
         <source>Licensed under the GNU LGPL version 3</source>
         <translation>Gefið út með GNU LGPL útgáfu 3 leyfinu</translation>
+    </message>
+    <message>
+        <source>Transfer files to and from servers, on Linux and Windows</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -818,8 +818,8 @@ Staðsetning: %2</translation>
         <translation>Upphafs&amp;skráasafn</translation>
     </message>
     <message>
-        <source>&amp;WinSCP-specific</source>
-        <translation>&amp;WinSCP-sértækur</translation>
+        <source>&amp;linscp-specific</source>
+        <translation>&amp;linscp-sértækur</translation>
     </message>
     <message>
         <source>&amp;Save extension</source>
@@ -4818,8 +4818,8 @@ Staðsetning: %2</translation>
         <translation>Kafnar á &amp;hunsunarskilaboðum SSH-2:</translation>
     </message>
     <message>
-        <source>Chokes on WinSCP&apos;s SSH &apos;&amp;winadj&apos; requests</source>
-        <translation>Kafnar á SSH-2-‚winadj‘-beiðnum WinSCP</translation>
+        <source>Chokes on linscp&apos;s SSH &apos;&amp;winadj&apos; requests</source>
+        <translation>Kafnar á SSH-2-‚winadj‘-beiðnum linscp</translation>
     </message>
     <message>
         <source>Note</source>
