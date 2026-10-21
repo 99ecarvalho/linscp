@@ -442,12 +442,12 @@ Status: `todo`, `wip`, `blocked`, `done`, `dropped`. Owner `M` = maintainer only
 
 | Phase | done | wip | blocked | todo | dropped |
 |---|---|---|---|---|---|
-| 0 — Licence clean-up | 29 | 1 | 2 | 1 | 1 |
+| 0 — Licence clean-up | 29 | 1 | 2 | 0 | 2 |
 | 1 — Flathub | 16 | 0 | 0 | 5 | 0 |
 | 2 — Own repositories | 3 | 6 | 0 | 4 | 0 |
 | 3 — Official distributions | 1 | 1 | 1 | 7 | 0 |
-| W — Windows channels | 0 | 4 | 1 | 1 | 0 |
-| **All** | **49** | **12** | **4** | **18** | **1** |
+| W — Windows channels | 2 | 2 | 1 | 1 | 0 |
+| **All** | **51** | **10** | **4** | **17** | **2** |
 
 Everything that could be prepared without the maintainer's accounts or keys
 is done or waits only on them; the publishing jobs are ready in
@@ -463,13 +463,13 @@ unblocks the rest, in order of reach:
 3. **Accounts and secrets**, each then a job moved into the release
    workflow: AUR (R2-01 → R2-04), Copr (R2-05 → R2-07), OBS (R2-08 →
    R2-09, R2-10), Launchpad (R2-11 → R2-13), winget, Chocolatey and a Scoop
-   bucket (RW-01 to RW-04, which also need a Windows test run).
+   bucket (RW-01 to RW-04; winget installs unattended only once the setup is signed, RW-05/RW-06).
 4. **Flathub by hand** (R1-13 to R1-17): the submission manifest, the
    `--filesystem=home` justification, the screen recording and the PR.
 5. **Debian, Fedora, nixpkgs** (R3-01, R3-04 to R3-06, R3-08 to R3-10): ITP,
    sponsors and reviews, once Phase 2 has users.
 
-Not started: R0-31 (an AppImage Qt without libproxy and GSSAPI), R3-07
+Not started: R3-07
 (Fedora repack script and crypto-policy check), RW-05/RW-06 (code signing).
 
 | ID | Phase | Deliverable | Owner | Status |
@@ -491,7 +491,7 @@ Not started: R0-31 (an AppImage Qt without libproxy and GSSAPI), R3-07
 | R0-28 | 0 | FileZilla splits local paths only on `\` (`FtpControlSocket.cpp`), so on Linux the whole path is the file name (Debug assertion in ctest `qt_session_ftp`). Patch `filezilla-posix-local-path-delimiters` splits at `PathDelim`; `qt_session_ftp` passes in Debug | | done |
 | R0-29 | 0 | AppImage ships only the Qt plugins linscp uses (`build_appimage.py` `PLUGINS`) and the libraries they need; drops linuxdeploy's copyright copies | | done |
 | R0-30 | 0 | ctest `no_build_paths` fails in Debug when the build folder is outside the source tree (moc included its headers by a path climbing to `/`). `CMAKE_AUTOMOC_PATH_PREFIX` with `port/qt` an include directory | | done |
-| R0-31 | 0 | AppImage against a Qt built without libproxy and GSSAPI: drops about 20 bundled source packages (curl, krb5, OpenLDAP, GnuTLS, librtmp…) and 6 of the copyleft ones. Proxy detection then reads `http_proxy` and the like, not the desktop's proxy settings | | todo |
+| R0-31 | 0 | AppImage against a Qt built without libproxy and GSSAPI (about 20 fewer bundled source packages). Dropped 2026-10-21: without libproxy the AppImage would no longer find automatic proxy setups (PAC scripts, auto-discovery), common on company networks; the size and source-offer saving is not worth that | | dropped |
 | R0-32 | 0 | Zeroed allocations held on newer toolchains: GCC 16's `<new>` (`__malloc__` operator new) and clang 23 (removes new/delete pairs) broke `object_exceptions`. `-fno-builtin` (C++) on the shim's consumers and the FTP engine; `test_object` catches both; CI job `linux-rolling` (Arch, non-blocking) | | done |
 | R0-33 | 0 | Source tarball leaves out `source/packages/` (TBX, PIDL.pas and other Delphi packages under licences forbidding redistribution) and `.dcr`/`.res` image resources; its banner check no longer matches itself | | done |
 | R0-34 | 0 | Install rules work with absolute `CMAKE_INSTALL_*DIR` (Nix): the `bin/` links computed with `file(RELATIVE_PATH)`; openSUSE's `lupdate6`/`lrelease6` found; FileZilla's licence text shipped | | done |
@@ -552,10 +552,10 @@ Not started: R0-31 (an AppImage Qt without libproxy and GSSAPI), R3-07
 | R3-08 | 3 | EPEL 10 branch (once Qt ≥ 6.8 confirmed) | M | todo |
 | R3-09 | 3 | Arch [extra]: approach a Package Maintainer once there is AUR usage | M | todo |
 | R3-10 | 3 | `port/packaging/nix/package.nix`: built against nixos-unstable (Qt 6.12, system OpenSSL), SFTP transfer tested, nixfmt clean. Left: the published tarball's hash, a maintainer handle, the PR once there are users | | wip |
-| RW-01 | W | winget multi-file manifest (`port/packaging/winget/`, schema 1.12.0, inno per scope + portable zip): schema-valid; `winget validate`/install on Windows pending (test VM unreachable); CLA signed by the maintainer | | wip |
+| RW-01 | W | winget multi-file manifest (`port/packaging/winget/`, schema 1.12.0, inno per scope + portable zip): `winget validate` passes (winget 1.29); scopes, ProductCode and the Add/Remove Programs entries checked on Windows 11. `winget install` itself stops at SmartScreen's prompt for the unsigned setup (unattended installs need RW-05/RW-06); CLA signed by the maintainer | | wip |
 | RW-02 | W | winget, Chocolatey and Scoop jobs in `port/packaging/ci/release-jobs.yml`; need the secrets and the first submissions | | wip |
-| RW-03 | W | Scoop manifest `port/packaging/scoop/linscp.json` (schema-valid; `persist` of the portable INI); `scoop install` pending on Windows; own bucket to create (README there) | | wip |
-| RW-04 | W | Chocolatey package `port/packaging/chocolatey/` (nuspec, install script, chocolatey-au `update.ps1`): packs; `choco install`/uninstall pending on Windows; account and owner name to set | | wip |
+| RW-03 | W | Scoop manifest `port/packaging/scoop/linscp.json`: installs, shims `linscp-cli`, makes the shortcut and keeps the portable INI across runs and reinstalls (Scoop 0.6.0 on Windows 11). The bucket is the maintainer's to create (README there) | | done |
+| RW-04 | W | Chocolatey package `port/packaging/chocolatey/`: packs, installs silently in 19 s, the auto-uninstaller removes everything (Chocolatey 2.7.4 on Windows 11). The chocolatey.org account, `<owners>` and the first push are the maintainer's | | done |
 | RW-05 | W | Code signing: SignPath application after R0-02, or another option | M | todo |
 | RW-06 | W | Sign `setup.exe` and the executables in the portable zip (after RW-05) | | blocked |
 | RC-01 | — | Colour render path in `IconSet.cpp` (paint SVGs as-is, with a disabled-state treatment) | | todo |
