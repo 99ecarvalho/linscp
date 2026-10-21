@@ -52,7 +52,7 @@ jobs:
           apt-get update
           DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
             ca-certificates git clang lld llvm cmake ninja-build make perl python3 \
-            cpio curl unzip xz-utils libssl-dev zlib1g-dev shared-mime-info \
+            cpio curl unzip xz-utils libssl-dev zlib1g-dev shared-mime-info appstream desktop-file-utils \
             binutils-mingw-w64-x86-64 \
             openssh-client openssh-server rclone microsocks tinyproxy \
             python3-boto3 python3-flask-cors python3-moto python3-openssl \
@@ -247,7 +247,7 @@ jobs:
     name: packages-flatpak
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.10
+      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.11
       options: --privileged
     timeout-minutes: 120
     steps:
@@ -259,6 +259,18 @@ jobs:
         run: |
           flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
           python3 port/tools/build_flatpak.py --out build/packages --builder-arg=--disable-rofiles-fuse
+
+      # Flathub's linter on the manifest and the build, with the findings
+      # port/packaging/flatpak/lint-exceptions.json explains.
+      - name: Lint the Flatpak
+        run: |
+          flatpak install --user -y --noninteractive flathub org.flatpak.Builder
+          lint() {
+            flatpak run --command=flatpak-builder-lint --filesystem="$PWD" org.flatpak.Builder \
+              --exceptions --user-exceptions port/packaging/flatpak/lint-exceptions.json "$@"
+          }
+          lint manifest port/packaging/flatpak/org.linscp.linscp.yml
+          lint repo build/flatpak/repo
 
       - uses: actions/upload-artifact@v4
         with:

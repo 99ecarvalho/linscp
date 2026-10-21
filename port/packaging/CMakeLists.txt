@@ -87,7 +87,10 @@ if(NOT WIN32)
   endif()
   set(_linux "${CMAKE_CURRENT_SOURCE_DIR}/linux")
   install(FILES "${_linux}/${LINSCP_APP_ID}.desktop" DESTINATION "${CMAKE_INSTALL_DATADIR}/applications")
-  install(FILES "${_linux}/${LINSCP_APP_ID}.metainfo.xml" DESTINATION "${CMAKE_INSTALL_DATADIR}/metainfo")
+  # The screenshots' addresses: this version's tag.
+  set(PROJECT_VERSION "${CMAKE_PROJECT_VERSION}")
+  configure_file("${_linux}/${LINSCP_APP_ID}.metainfo.xml" "${CMAKE_CURRENT_BINARY_DIR}/${LINSCP_APP_ID}.metainfo.xml" @ONLY)
+  install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${LINSCP_APP_ID}.metainfo.xml" DESTINATION "${CMAKE_INSTALL_DATADIR}/metainfo")
   foreach(_size 16 24 32 48 64 128 256 512)
     install(FILES "${CMAKE_SOURCE_DIR}/assets/app/linscp-${_size}.png"
       DESTINATION "${CMAKE_INSTALL_DATADIR}/icons/hicolor/${_size}x${_size}/apps" RENAME "${LINSCP_APP_ID}.png")

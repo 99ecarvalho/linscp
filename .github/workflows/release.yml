@@ -4,7 +4,8 @@
 #   git push origin v0.7.2
 #
 # It runs the whole CI (tests and packages) on the tag, checks that the tag
-# matches the version in CMakeLists.txt and that NEWS.md has a section for it,
+# matches the version in CMakeLists.txt, that NEWS.md has a section for it and
+# the metainfo a release entry (with its notes),
 # builds the complete source tarball (port/tools/make_source_tarball.py) and
 # the third-party sources tar (the copyleft components the packages ship, as
 # their SOURCE-OFFER.txt says; port/tools/fetch_sources.py), and drafts the
@@ -78,6 +79,10 @@ jobs:
             on { print }' NEWS.md > notes.md
           if ! grep -q '[^[:space:]]' notes.md; then
             echo "::error::NEWS.md has no section for $version"; exit 1
+          fi
+          # Software centres show the metainfo's release notes.
+          if ! grep -q "<release version=\"$version\" date=" port/packaging/linux/org.linscp.linscp.metainfo.xml; then
+            echo "::error::the metainfo (port/packaging/linux) has no release entry for $version"; exit 1
           fi
           echo "VERSION=$version" >> "$GITHUB_ENV"
 

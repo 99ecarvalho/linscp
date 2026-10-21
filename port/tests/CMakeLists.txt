@@ -765,3 +765,20 @@ foreach(_t IN LISTS _all_tests)
   endif()
 endforeach()
 set_tests_properties(${_build_tests} PROPERTIES RESOURCE_LOCK linscp_build_tree)
+
+# The packaged desktop file and metainfo (as installed, configured), as
+# Flathub's linter takes them: any warning fails.
+if(NOT WIN32)
+  find_program(LINSCP_APPSTREAMCLI appstreamcli)
+  find_program(LINSCP_DESKTOP_FILE_VALIDATE desktop-file-validate)
+  if(LINSCP_APPSTREAMCLI)
+    add_test(NAME packaging_metainfo COMMAND "${LINSCP_APPSTREAMCLI}" validate --strict --pedantic --explain --no-net
+             "${CMAKE_BINARY_DIR}/port/packaging/org.linscp.linscp.metainfo.xml")
+  endif()
+  if(LINSCP_DESKTOP_FILE_VALIDATE)
+    add_test(NAME packaging_desktop COMMAND "${LINSCP_DESKTOP_FILE_VALIDATE}"
+             "${CMAKE_SOURCE_DIR}/port/packaging/linux/org.linscp.linscp.desktop")
+    # desktop-file-validate exits 0 on warnings: fail on any output.
+    set_tests_properties(packaging_desktop PROPERTIES FAIL_REGULAR_EXPRESSION ".")
+  endif()
+endif()

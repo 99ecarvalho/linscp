@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Installed configured (port/packaging/CMakeLists.txt): the screenshots'
+     addresses are those of this version's tag. -->
 <component type="desktop-application">
   <id>org.linscp.linscp</id>
   <name>linscp</name>
-  <summary>SFTP, SCP, FTP, WebDAV and S3 client</summary>
+  <summary>Transfer files to and from servers</summary>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
   <developer id="br.com.apliant">
@@ -27,19 +29,77 @@
   <url type="donation">https://linscp.org/donate/</url>
   <url type="contribute">https://linscp.org/manual/developers/contributing/</url>
   <url type="vcs-browser">https://github.com/99ecarvalho/linscp</url>
+  <screenshots>
+    <screenshot type="default">
+      <caption>Local and remote files side by side</caption>
+      <image>https://raw.githubusercontent.com/99ecarvalho/linscp/v@PROJECT_VERSION@/doc/screenshots/commander.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>A single panel with the remote folder tree</caption>
+      <image>https://raw.githubusercontent.com/99ecarvalho/linscp/v@PROJECT_VERSION@/doc/screenshots/explorer.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Saved sites, in folders</caption>
+      <image>https://raw.githubusercontent.com/99ecarvalho/linscp/v@PROJECT_VERSION@/doc/screenshots/site-manager.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Session addresses and script code for the current session</caption>
+      <image>https://raw.githubusercontent.com/99ecarvalho/linscp/v@PROJECT_VERSION@/doc/screenshots/generate-url.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Transfer settings and presets</caption>
+      <image>https://raw.githubusercontent.com/99ecarvalho/linscp/v@PROJECT_VERSION@/doc/screenshots/preferences-transfer.png</image>
+    </screenshot>
+  </screenshots>
+  <branding>
+    <color type="primary" scheme_preference="light">#a6cbf7</color>
+    <color type="primary" scheme_preference="dark">#123d80</color>
+  </branding>
   <content_rating type="oars-1.1"/>
   <categories>
     <category>Network</category>
     <category>FileTransfer</category>
   </categories>
   <releases>
-    <release version="0.7.1" date="2026-10-20"/>
-    <release version="0.7.0" date="2026-10-19"/>
-    <release version="0.6.1" date="2026-10-18"/>
-    <release version="0.6.0" date="2026-10-17"/>
-    <release version="0.5.0" date="2026-10-15"/>
-    <release version="0.4.0" date="2026-10-15"/>
-    <release version="0.3.0" date="2026-10-15"/>
-    <release version="0.2.0" date="2026-10-15"/>
+    <release version="0.7.1" date="2026-10-20">
+      <description>
+        <p>A maintenance release that cleans up the continuous integration. It brings no new features.</p>
+      </description>
+    </release>
+    <release version="0.7.0" date="2026-10-19">
+      <description>
+        <p>The first stable release. The About dialog and the links to the manual, the homepage, donations and security reports now go to linscp.org, and the Help menu can report a security issue.</p>
+      </description>
+    </release>
+    <release version="0.6.1" date="2026-10-18" type="development">
+      <description>
+        <p>A maintenance release with internal fixes. The interface is unchanged.</p>
+      </description>
+    </release>
+    <release version="0.6.0" date="2026-10-17" type="development">
+      <description>
+        <p>Completes the interface. The Site Manager gains its context menus, site search, colours, notes and every advanced page, and transfers show elapsed and remaining time, can be limited in speed or moved to the background. Preferences can be searched.</p>
+      </description>
+    </release>
+    <release version="0.5.0" date="2026-10-15" type="development">
+      <description>
+        <p>The menus and dialogs are translated into 53 languages. They follow the language chosen in Preferences, or the --lang option.</p>
+      </description>
+    </release>
+    <release version="0.4.0" date="2026-10-15" type="development">
+      <description>
+        <p>Adds the Explorer interface, with a single panel, a folder tree and an address bar. The remaining Preferences pages arrive, among them a light, dark or automatic theme.</p>
+      </description>
+    </release>
+    <release version="0.3.0" date="2026-10-15" type="development">
+      <description>
+        <p>Completes the Commander menus with thumbnails, the command line, queue commands, links and tab colours. Adds a portable mode and fixes the update check on Linux. Every protocol is now tested against real servers.</p>
+      </description>
+    </release>
+    <release version="0.2.0" date="2026-10-15" type="development">
+      <description>
+        <p>The first published version: SFTP, SCP, FTP and FTPS, WebDAV and S3, with saved sites, workspaces and session tabs. It has the two-panel interface, queued transfers, synchronization, an internal editor and linscp-cli for scripting.</p>
+      </description>
+    </release>
   </releases>
 </component>

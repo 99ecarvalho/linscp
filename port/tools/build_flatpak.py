@@ -9,7 +9,7 @@ and LLVM extension installed for the user from Flathub when missing), then
 exports a single-file bundle, linscp-<version>.flatpak, installable with
 `flatpak install --user <file>`.
 """
-import argparse, os, re, subprocess, sys
+import argparse, os, re, shutil, subprocess, sys
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 APP_ID = 'org.linscp.linscp'
@@ -31,7 +31,9 @@ def main():
     work = os.path.abspath(a.work)
     out = os.path.abspath(a.out or os.path.join(work, 'packages'))
     os.makedirs(out, exist_ok=True)
+    # A fresh repository: only this build in it, for the bundle and the linter.
     repo = os.path.join(work, 'repo')
+    shutil.rmtree(repo, ignore_errors=True)
     subprocess.run(['flatpak-builder', '--user', '--install-deps-from=flathub', '--force-clean'] + a.builder_arg + [
                     '--state-dir', os.path.join(work, 'state'), '--repo', repo,
                     os.path.join(work, 'app'), MANIFEST], check=True)
