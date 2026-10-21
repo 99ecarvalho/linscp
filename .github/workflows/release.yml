@@ -84,6 +84,11 @@ jobs:
           if ! grep -q "<release version=\"$version\" date=" port/packaging/linux/org.linscp.linscp.metainfo.xml; then
             echo "::error::the metainfo (port/packaging/linux) has no release entry for $version"; exit 1
           fi
+          # The distribution recipes build the tagged tree's tarball.
+          spec=$(sed -n 's/^Version:[[:space:]]*//p' port/packaging/rpm/linscp.spec)
+          if [ "$spec" != "$version" ]; then
+            echo "::error::port/packaging/rpm/linscp.spec has Version $spec, not $version"; exit 1
+          fi
           echo "VERSION=$version" >> "$GITHUB_ENV"
 
       - name: Build the source tarball

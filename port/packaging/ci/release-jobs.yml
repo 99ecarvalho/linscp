@@ -1,0 +1,248 @@
+# Release-workflow jobs that publish to package channels, not yet part of
+# .github/workflows/release.yml: each needs an account and a secret the
+# maintainer creates first (doc/qt/RELEASE-PLAN.md, Phase 2 and Windows
+# channels). Review, then add the ones whose secrets exist under `jobs:` in
+# release.yml. Each runs once the reviewed draft is published (its assets are
+# public then) and skips itself when its secret is not set.
+#
+#   WINGET_TOKEN         classic PAT with the repo scope, of the account that
+#                        forks microsoft/winget-pkgs and opens the pull request
+#   CHOCOLATEY_API_KEY   chocolatey.org API key of the package's owner
+#   SCOOP_BUCKET_TOKEN   fine-grained PAT, Actions: write on 99ecarvalho/scoop-bucket
+#   COPR_CONFIG, OBS_RUNSERVICE_TOKEN, PPA_SIGNING_KEY: at their jobs below
+#   AUR_SSH_PRIVATE_KEY  the private half of the AUR account's dedicated SSH key
+#                        (ed25519, no passphrase)
+
+jobs:
+  # The AUR package (port/packaging/arch/linscp) follows the release. Stable
+  # releases only: a pre-release tag (v0.8.0-rc1) is not a valid pkgver. The
+  # first version is pushed by hand, from the account of R2-01; linscp-git
+  # needs no automation (its pkgver comes from git).
+  aur:
+    if: github.event_name == 'release' && !github.event.release.prerelease
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TAG: ${{ github.event.release.tag_name }}
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      AUR_SSH_PRIVATE_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        if: env.AUR_SSH_PRIVATE_KEY != ''
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      # pkgver from the tag, pkgrel back to 1, the tarball's sha256 from the
+      # release's SHA256SUMS (the published asset, as the AUR fetches it).
+      - name: Update the PKGBUILD
+        if: env.AUR_SSH_PRIVATE_KEY != ''
+        run: |
+          version=${TAG#v}
+          gh release download "$TAG" --pattern SHA256SUMS --dir "$RUNNER_TEMP"
+          sum=$(awk -v f="linscp-$version.tar.xz" '$2 == f { print $1 }' "$RUNNER_TEMP/SHA256SUMS")
+          if [ -z "$sum" ]; then
+            echo "::error::SHA256SUMS of $TAG has no linscp-$version.tar.xz"; exit 1
+          fi
+          cd port/packaging/arch/linscp
+          sed -i -e "s/^pkgver=.*/pkgver=$version/" -e "s/^pkgrel=.*/pkgrel=1/" \
+                 -e "s/^sha256sums=.*/sha256sums=('$sum')/" PKGBUILD
+          git diff -- PKGBUILD
+      # Regenerates .SRCINFO and pushes PKGBUILD, .SRCINFO and LICENSE to
+      # ssh://aur@aur.archlinux.org/linscp.git. No test build: the same
+      # sources passed CI on the tag. Pinned to v4.1.1's commit, as it is
+      # handed the SSH key.
+      - uses: KSXGitHub/github-actions-deploy-aur@2ac5a4c1d7035885d46b10e3193393be8460b6f1
+        if: env.AUR_SSH_PRIVATE_KEY != ''
+        with:
+          pkgname: linscp
+          pkgbuild: port/packaging/arch/linscp/PKGBUILD
+          assets: port/packaging/arch/linscp/LICENSE
+          updpkgsums: false
+          test: false
+          commit_username: Eduardo Correia
+          commit_email: ecorreia@apliant.com.br
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: Update to ${{ github.event.release.tag_name }}
+          ssh_keyscan_types: ed25519
+
+  # winget: needs Apliant.linscp in winget-pkgs already (the first version is
+  # submitted by hand from port/packaging/winget/).
+  winget:
+    if: github.event_name == 'release' && !github.event.release.prerelease
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
+      # wingetcreate reads the token from here, so it is not on its command line.
+      WINGET_CREATE_GITHUB_TOKEN: ${{ secrets.WINGET_TOKEN }}
+      TAG: ${{ github.event.release.tag_name }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Submit the new version to winget-pkgs
+        if: env.WINGET_TOKEN != ''
+        shell: pwsh
+        run: |
+          $version = $env:TAG -replace '^v', ''
+          $base = "https://github.com/$env:REPO/releases/download/$env:TAG"
+          winget install --id Microsoft.WingetCreate --exact --source winget --accept-source-agreements --accept-package-agreements --disable-interactivity
+          # One URL per installer of the previous manifest: the setup for
+          # each scope, and the portable zip.
+          wingetcreate update Apliant.linscp --version $version `
+            --urls "$base/linscp-$version-setup.exe|x64|user" `
+                   "$base/linscp-$version-setup.exe|x64|machine" `
+                   "$base/linscp-$version-portable.zip|x64" `
+            --release-notes-url "https://github.com/$env:REPO/releases/tag/$env:TAG" `
+            --submit --no-open
+
+  chocolatey:
+    if: github.event_name == 'release' && !github.event.release.prerelease
+    runs-on: windows-latest   # has choco
+    timeout-minutes: 20
+    env:
+      CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        if: env.CHOCOLATEY_API_KEY != ''
+        with:
+          sparse-checkout: port/packaging/chocolatey
+      - name: Update, pack and push the package
+        if: env.CHOCOLATEY_API_KEY != ''
+        shell: pwsh
+        working-directory: port/packaging/chocolatey
+        run: |
+          Install-Module Chocolatey-AU -Force -Scope CurrentUser
+          # Moves the nuspec and install script to the latest release, with
+          # the checksum from its SHA256SUMS, and packs linscp.<version>.nupkg.
+          ./update.ps1
+          $package = Get-ChildItem linscp.*.nupkg | Select-Object -First 1
+          if (-not $package) { throw 'chocolatey-au made no package' }
+          choco push $package.FullName --source https://push.chocolatey.org/ --api-key $env:CHOCOLATEY_API_KEY
+
+  # Optional: the bucket's Excavator workflow updates linscp.json on its own
+  # schedule; this only makes it run now.
+  scoop:
+    if: github.event_name == 'release' && !github.event.release.prerelease
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.SCOOP_BUCKET_TOKEN }}
+    steps:
+      - name: Run the bucket's Excavator
+        if: env.GH_TOKEN != ''
+        run: gh workflow run excavator.yml -R 99ecarvalho/scoop-bucket
+
+  # One source package per Ubuntu series to the PPA, all from the published
+  # tarball (the same orig for each; port/tools/ppa_source_packages.sh).
+  # Secrets: PPA_SIGNING_KEY (armoured secret signing subkey of the OpenPGP
+  # key registered on Launchpad: gpg --armor --export-secret-subkeys
+  # <subkey-fpr>!), PPA_SIGNING_PASSPHRASE (optional). Variable: PPA (default
+  # ppa:99ecarvalho/linscp). dput uploads by anonymous FTP; if runners cannot
+  # reach it, switch to dput's sftp method (an SSH key secret more).
+  ppa:
+    if: github.event_name == 'release' && !github.event.release.prerelease
+    runs-on: ubuntu-latest
+    container: ubuntu:26.04
+    timeout-minutes: 30
+    env:
+      TAG: ${{ github.event.release.tag_name }}
+      PPA: ${{ vars.PPA || 'ppa:99ecarvalho/linscp' }}
+      SERIES: resolute:26.04 stonking:26.10
+      PPA_SIGNING_KEY: ${{ secrets.PPA_SIGNING_KEY }}
+      PPA_SIGNING_PASSPHRASE: ${{ secrets.PPA_SIGNING_PASSPHRASE }}
+    steps:
+      - name: Tools
+        if: env.PPA_SIGNING_KEY != ''
+        run: |
+          apt-get update -q
+          DEBIAN_FRONTEND=noninteractive apt-get install -y -q --no-install-recommends \
+            ca-certificates curl git debhelper devscripts dpkg-dev dput gnupg xz-utils
+      - uses: actions/checkout@v4
+        if: env.PPA_SIGNING_KEY != ''
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - name: Download the release tarball
+        if: env.PPA_SIGNING_KEY != ''
+        run: |
+          version=${TAG#v}
+          base="https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG"
+          mkdir dist
+          curl -fsSL -o "dist/linscp-$version.tar.xz" "$base/linscp-$version.tar.xz"
+          curl -fsSL -o dist/SHA256SUMS "$base/SHA256SUMS"
+          (cd dist && grep " linscp-$version.tar.xz\$" SHA256SUMS | sha256sum -c -)
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+      - name: Build the source packages
+        if: env.PPA_SIGNING_KEY != ''
+        run: port/tools/ppa_source_packages.sh "dist/linscp-$VERSION.tar.xz" ppa $SERIES
+      - name: Sign and upload
+        if: env.PPA_SIGNING_KEY != ''
+        run: |
+          export GNUPGHOME="$(mktemp -d)"
+          printf '%s\n' "$PPA_SIGNING_KEY" | gpg --batch --import
+          key=$(gpg --batch --with-colons --list-secret-keys |
+                awk -F: '$1=="ssb" && $12 ~ /s/ {s=1; next} s && $1=="fpr" {print $10; exit}')
+          [ -n "$key" ] || { echo "::error::no signing subkey in PPA_SIGNING_KEY"; exit 1; }
+          pass="$GNUPGHOME/passphrase"
+          printf '%s' "$PPA_SIGNING_PASSPHRASE" > "$pass"
+          for changes in ppa/*_source.changes; do
+            debsign -p"gpg --batch --pinentry-mode loopback --passphrase-file $pass" -k"$key!" "$changes"
+            dput "$PPA" "$changes"
+          done
+          gpgconf --kill all
+          rm -rf "$GNUPGHOME"
+
+  # Copr builds the RPMs from the published tarball
+  # (port/packaging/rpm/linscp.spec at the tag). The project's chroots are set
+  # on Copr (fedora-43, fedora-44, fedora-rawhide).
+  #   COPR_CONFIG    the contents of ~/.config/copr from
+  #                  https://copr.fedorainfracloud.org/api/ (the token expires:
+  #                  renew it there and update the secret)
+  copr:
+    if: github.event_name == 'release' && !github.event.release.prerelease
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    timeout-minutes: 120
+    env:
+      TAG: ${{ github.event.release.tag_name }}
+      COPR_CONFIG: ${{ secrets.COPR_CONFIG }}
+    steps:
+      - name: Install rpm-build and copr-cli
+        if: env.COPR_CONFIG != ''
+        run: dnf -y install git-core rpm-build copr-cli
+      - uses: actions/checkout@v4
+        if: env.COPR_CONFIG != ''
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          sparse-checkout: port/packaging/rpm
+      - name: Build the source RPM from the published tarball
+        if: env.COPR_CONFIG != ''
+        run: |
+          version=${TAG#v}
+          spec=port/packaging/rpm/linscp.spec
+          base=https://github.com/${{ github.repository }}/releases/download/$TAG
+          mkdir -p sources
+          curl -fsSL -o "sources/linscp-$version.tar.xz" "$base/linscp-$version.tar.xz"
+          curl -fsSL -o SHA256SUMS "$base/SHA256SUMS"
+          (cd sources && grep " linscp-$version.tar.xz\$" ../SHA256SUMS | sha256sum -c -)
+          rpmbuild -bs --nodeps --define "_sourcedir $PWD/sources" --define "_srcrpmdir $PWD/srpm" "$spec"
+      - name: Build in Copr
+        if: env.COPR_CONFIG != ''
+        run: |
+          mkdir -p ~/.config
+          printf '%s\n' "$COPR_CONFIG" > ~/.config/copr
+          copr-cli build linscp srpm/linscp-*.src.rpm
+
+  # OBS reruns the package's services (port/packaging/obs/_service: the
+  # packaging files from the repository and the published tarball) and
+  # rebuilds every target. Pull requests build there through .obs/workflows.yml.
+  #   OBS_RUNSERVICE_TOKEN   osc token --create --operation runservice home:99ecarvalho linscp
+  obs:
+    if: github.event_name == 'release' && !github.event.release.prerelease
+    runs-on: ubuntu-latest
+    env:
+      OBS_RUNSERVICE_TOKEN: ${{ secrets.OBS_RUNSERVICE_TOKEN }}
+    steps:
+      - name: Rerun the OBS package's services
+        if: env.OBS_RUNSERVICE_TOKEN != ''
+        run: >-
+          curl -fsS -X POST
+          -H "Authorization: Token $OBS_RUNSERVICE_TOKEN"
+          "https://api.opensuse.org/trigger/runservice?project=home:99ecarvalho&package=linscp"
