@@ -63,7 +63,8 @@ KEEP_DFM = frozenset({
     'source/forms/ScpCommander.dfm',
     'source/forms/ScpExplorer.dfm',
 })
-MFC_BANNER = b'microsoft foundation classes'   # compared lower-cased
+# Split, so that this file does not itself hold the banner it looks for.
+MFC_BANNER = b'microsoft ' + b'foundation classes'   # compared lower-cased
 OPENSSL_CHANGES = 'port/openssl/winscp-changes.txt'
 XZ_PRESET = 9 | lzma.PRESET_EXTREME
 
