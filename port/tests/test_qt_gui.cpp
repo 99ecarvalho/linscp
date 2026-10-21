@@ -5747,7 +5747,8 @@ void ExplorerTest(const char * Port, const QString & Directory)
 
 // The README's screenshots (doc/screenshots): the Commander and the
 // Explorer on a session with plausible files, the Site Manager, Preferences;
-// the light theme, at a fixed size. Not a ctest: run by hand,
+// the light theme, at a fixed size within Flathub's 1000x700 for the
+// metainfo's screenshots. Not a ctest: run by hand,
 //   run_qt_session.py test_qt_gui screenshots /ini=nul {port} {tmp}/local <out> [<locale> <core's translations>] -platform offscreen
 // With a locale, in that language (to look a translation over).
 void Screenshots(const char * Port, const QString & Directory, const QString & Out, const QString & Locale, const QString & Translations)
@@ -5829,7 +5830,7 @@ void Screenshots(const char * Port, const QString & Directory, const QString & O
     CoreBridge::ChangePreferences([Explorer](CoreBridge::TPreferences & P) { P.ExplorerInterface = Explorer; });
     MainWindow Window(CoreBridge::Info());
     Frontend.SetWindow(&Window);
-    Window.resize(1200, 760);
+    Window.resize(1000, 640);
     Window.show();
     TResponder Responder;
     Responder.Frontend = &Frontend;
@@ -5846,6 +5847,13 @@ void Screenshots(const char * Port, const QString & Directory, const QString & O
       Window.Local()->ChangeDirectory(Local.filePath(QStringLiteral("website")));
       Window.Panel()->Select({ QStringLiteral("about.html"), QStringLiteral("contact.php") });
       Window.ActivatePanel(false);
+      // Two panels in 1000 pixels: Columns > Size Automatically, the names in
+      // full.
+      QTest::qWait(400);
+      for (FileView * View : Window.findChildren<FileView *>())
+      {
+        View->SizeColumnsAutomatically();
+      }
       Shot(&Window, QStringLiteral("commander.png"));
       {
         SiteManager Sites(&Window);
