@@ -5,6 +5,7 @@
 // flattened, those handlers would stop matching and errors would escape as
 // unhandled rather than fail to compile.
 #include <cstring>
+#include <new>
 #include "vcl_object.h"
 #include "vcl_syncobjs.h"
 
@@ -73,10 +74,9 @@ void TestInstancesStartZeroed()
 // Upstream's shape (TSessionData): the constructor calls a method that reads
 // a field before anything sets it. With the constructor inlined into the
 // new-expression, clang at -O2 takes that read as one of uninitialized memory
-// and drops the whole path unless the shim's -fno-assume-sane-operator-new is
-// in effect; a Release build then crashed in this very binary (double free).
-// This file builds at -O2 in every build type, so that cannot come back
-// unnoticed.
+// and drops the whole path unless the shim's -fno-builtin is in effect; a
+// Release build then crashed in this very binary (double free). This file
+// builds at -O2 in every build type, so that cannot come back unnoticed.
 class TReadsBeforeSet : public TObject
 {
 public:
@@ -108,9 +108,35 @@ void TestReadBeforeSetSurvivesOptimizer()
   }
   CHECK(AllZero);
   delete[] Array;
-  // Not `new (std::nothrow)`: the standard library declares that form (and
-  // the aligned ones) __malloc__ itself, which the flag cannot take back.
-  // Core uses neither.
+
+  // The nothrow form too: <new> declares it __malloc__ in every libstdc++,
+  // so before -fno-builtin even clang 19 folded this to false.
+  int * NoThrow = new (std::nothrow) int[8];
+  bool NoThrowZero = true;
+  for (int I = 0; I < 8; I++)
+  {
+    NoThrowZero = NoThrowZero && (NoThrow[I] == 0);
+  }
+  CHECK(NoThrowZero);
+  delete[] NoThrow;
+}
+
+// The same object, but one that never leaves the function: new and delete
+// meet in one function, as with a local std::unique_ptr. The optimizer may
+// then remove the allocation altogether (LLVM 23 does, noalias or not),
+// and every read of a field no constructor set becomes undef -- here the
+// test of Settings, so the function would be unreachable.
+[[gnu::noinline]] int LocalReadBeforeSet()
+{
+  TReadsBeforeSet * R = new TReadsBeforeSet();
+  int Result = ((R->Settings == nullptr) ? 1 : 100) + R->Modified * 10;
+  delete R;
+  return Result;
+}
+
+void TestLocalReadBeforeSetSurvivesOptimizer()
+{
+  CHECK(LocalReadBeforeSet() == 11);
 }
 
 void TestExceptionIsATObject()
@@ -318,6 +344,7 @@ int main()
   TestExceptionIsATObject();
   TestInstancesStartZeroed();
   TestReadBeforeSetSurvivesOptimizer();
+  TestLocalReadBeforeSetSurvivesOptimizer();
   TestExceptionCopyKeepsEveryMember();
   TestObjectIsPolymorphic();
   TestCriticalSectionIsRecursive();

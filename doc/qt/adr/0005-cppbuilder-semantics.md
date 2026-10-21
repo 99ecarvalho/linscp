@@ -37,9 +37,13 @@ field-backed class properties are references, and the rest as listed.
   per allocation.
 - The optimizer must not know better: clang otherwise takes memory from the
   global `operator new` as uninitialized and, at -O2 and up, deletes code that
-  reads a field no constructor set. Everything built against the shim gets
-  `-fno-assume-sane-operator-new` (port/shim/CMakeLists.txt), and
-  `object_exceptions` builds at -O2 in every build type to keep it so.
+  reads a field no constructor set -- through a `noalias` result (which the
+  standard library's `__malloc__` declarations restore whatever clang is
+  told) or by removing a new/delete pair whose object does not escape. Both
+  come from LLVM's knowledge of `operator new` as a library function, so
+  everything built against the shim is compiled with `-fno-builtin` for C++
+  (port/shim/CMakeLists.txt), and `object_exceptions` builds at -O2 in every
+  build type, covering both paths and the nothrow form, to keep it so.
 - Each such semantic gets a test on both targets (`object_exceptions`,
   `unicodestring`, `sysutils`, ...).
 - The golden comparison (ADR 0007) is what finds the next one.

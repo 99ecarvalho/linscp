@@ -60,7 +60,7 @@ target_include_directories(linscp-filezilla PRIVATE
   ${_shim_includes})
 target_compile_options(linscp-filezilla PRIVATE -include "${_prelude}" -w)
 # It runs on the shim's zeroed operator new as core does, so it takes the
-# shim's -fno-assume-sane-operator-new too (see port/shim/CMakeLists.txt).
-target_compile_options(linscp-filezilla PRIVATE -fno-assume-sane-operator-new)
+# shim's -fno-builtin too (see port/shim/CMakeLists.txt).
+target_compile_options(linscp-filezilla PRIVATE -fno-builtin)
 # OpenSSL from the configured release, as for core.
 target_link_libraries(linscp-filezilla PUBLIC linscp-mfc-compat linscp-openssl)
