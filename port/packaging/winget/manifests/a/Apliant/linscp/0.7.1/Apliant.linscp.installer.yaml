@@ -52,6 +52,10 @@ Installers:
     PortableCommandAlias: linscp
   - RelativeFilePath: linscp-0.7.1\linscp-cli.exe
     PortableCommandAlias: linscp-cli
+  # The programs load Qt's and the C++ runtime's DLLs from their own folder:
+  # winget puts that folder on PATH instead of linking the programs from its
+  # Links folder, where they would not find them (STATUS_DLL_NOT_FOUND).
+  ArchiveBinariesDependOnPath: true
   InstallerUrl: https://github.com/99ecarvalho/linscp/releases/download/v0.7.1/linscp-0.7.1-portable.zip
   InstallerSha256: 55CEAC9E3C22F89595845626835C8B04919FE1943ACABD028ABEC3569E4555BF
 ManifestType: installer
