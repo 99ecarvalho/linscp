@@ -1,0 +1,8 @@
+{
+  "org.linscp.linscp": {
+    "finish-args-home-filesystem-access": "the two-panel local/remote browser works on the user's files; an exception to be requested in the submission",
+    "appstream-external-screenshot-url": "Flathub's build mirrors the screenshots; a local build does not",
+    "appstream-screenshots-not-mirrored-in-ostree": "Flathub's build mirrors the screenshots; a local build does not",
+    "appstream-missing-screenshots": "the metainfo's screenshots are the version's tag's, which does not exist before the release; the release (tag) run checks them"
+  }
+}

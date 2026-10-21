@@ -301,10 +301,16 @@ jobs:
       # port/packaging/flatpak/lint-exceptions.json explains. The builder
       # image has it installed (not sandboxed: org.flatpak.Builder's sandbox
       # cannot write its state directory in the container's checkout).
+      # Before the release, the screenshots' addresses (the version's tag)
+      # do not exist yet: only the tag's own run checks them.
       - name: Lint the Flatpak
         run: |
+          exceptions=port/packaging/flatpak/lint-exceptions.json
+          if [ "$GITHUB_REF_TYPE" != tag ]; then
+            exceptions=port/packaging/flatpak/lint-exceptions-untagged.json
+          fi
           lint() {
-            flatpak-builder-lint --exceptions --user-exceptions port/packaging/flatpak/lint-exceptions.json "$@"
+            flatpak-builder-lint --exceptions --user-exceptions "$exceptions" "$@"
           }
           lint manifest port/packaging/flatpak/org.linscp.linscp.yml
           lint repo build/flatpak/repo
