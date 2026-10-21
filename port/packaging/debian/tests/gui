@@ -1,0 +1,16 @@
+#!/bin/sh
+# The graphical program starts on Qt's offscreen platform and stays up until
+# it is stopped (exit status 124 from timeout).
+set -u
+cd "${AUTOPKGTEST_TMP:-$(mktemp -d)}"
+export QT_QPA_PLATFORM=offscreen
+export HOME="$PWD/home" XDG_RUNTIME_DIR="$PWD/run"
+mkdir -p "$HOME" "$XDG_RUNTIME_DIR"
+chmod 700 "$XDG_RUNTIME_DIR"
+status=0
+timeout 15 linscp /ini=nul || status=$?
+if [ "$status" -ne 124 ]; then
+    echo "gui: linscp exited with status $status before the timeout" >&2
+    exit 1
+fi
+echo 'gui: ok'

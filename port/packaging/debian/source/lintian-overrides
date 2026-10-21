@@ -1,0 +1,12 @@
+# Generated documentation whose sources are in the same tree: neon's HTML
+# manual from doc/manual.xml and doc/ref/*.xml (DocBook), and the planning
+# page from doc/qt/*.md (doc/qt/build-html.sh).
+source-is-missing [3rd-party/winscp/libs/neon/doc/html/*]
+source-is-missing [doc/qt/plan.html]
+# Long lines in generated files (configure scripts, SVG paths, HTML), in
+# translation strings and in test vectors (OpenSSL's long PEM lines), not in
+# code anyone edits by hand.
+very-long-line-length-in-source-file *
+# neon's autotools build is not used: neon is compiled by linscp's CMake
+# build (port/neon).
+autotools-pkg-config-macro-not-cross-compilation-safe AC_PATH_PROG [3rd-party/winscp/libs/neon/configure.ac:*]

@@ -1,0 +1,46 @@
+Source: linscp
+Section: net
+Maintainer: Eduardo Correia <ecorreia@apliant.com.br>
+# clang, not GCC: the core's VCL property shim needs __declspec(property)
+# (-fms-extensions), which GCC does not implement; CMakeLists.txt stops the
+# configure step with any other compiler. clang is used for C too, so that
+# every translation unit shares the same -fshort-wchar ABI.
+# The linker is the default one (GNU ld): lld is only used by the Windows
+# cross-build.
+# python3: the build transforms the upstream tree (port/tools/transform.py).
+# No perl: it is only for the bundled OpenSSL's Configure, and the package
+# uses the system OpenSSL and expat.
+Build-Depends:
+ clang,
+ cmake (>= 3.25),
+ debhelper-compat (= 13),
+ libexpat1-dev (>= 2.4),
+ libssl-dev (>= 3.0),
+ ninja-build,
+ python3,
+ qt6-base-dev (>= 6.8),
+ qt6-l10n-tools,
+ qt6-svg-dev,
+Standards-Version: 4.7.4
+Homepage: https://linscp.org
+Vcs-Browser: https://github.com/99ecarvalho/linscp
+Vcs-Git: https://github.com/99ecarvalho/linscp.git
+
+Package: linscp
+Architecture: any
+Depends:
+ qt6-svg-plugins,
+ ${misc:Depends},
+ ${shlibs:Depends},
+Recommends:
+ qt6-wayland,
+Description: SFTP, SCP, FTP, WebDAV and S3 file-transfer client
+ linscp transfers files between your computer and remote servers over
+ SFTP, SCP, FTP (with TLS), WebDAV and S3. Its two-panel interface shows
+ local and remote files side by side, with the same sessions, settings and
+ scripting on Linux and Windows.
+ .
+ It synchronizes and compares directories, keeps a remote directory up to
+ date, edits remote files, and runs commands on the server.
+ .
+ A WinSCP equivalent for Linux.

@@ -1,0 +1,9 @@
+# Offline smoke tests: the test suite proper needs SSH, FTP, WebDAV and S3
+# servers (upstream runs it in CI).
+Tests: cli
+Depends: @
+Restrictions: allow-stderr
+
+Tests: gui
+Depends: @
+Restrictions: allow-stderr

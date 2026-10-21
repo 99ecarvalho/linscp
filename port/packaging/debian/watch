@@ -1,0 +1,15 @@
+Version: 5
+
+# The release tarball (port/tools/make_source_tarball.py), attached to each
+# GitHub release as an asset. Not GitHub's generated archives: those lack the
+# submodules linscp builds from.
+Source: https://api.github.com/repos/99ecarvalho/linscp/releases?per_page=100
+Searchmode: plain
+Matching-Pattern: https://github\.com/99ecarvalho/linscp/releases/download/v\d[\d.]*/linscp-@ANY_VERSION@\.tar\.xz
+Repack-Suffix: +dfsg
+Dversion-Mangle: s/\+dfsg\d*$//
+
+# Signature checking is not possible yet: there is no release signing key
+# (R0-15). Once releases carry linscp-X.Y.Z.tar.xz.asc, add the key as
+# debian/upstream/signing-key.asc and enable:
+#Pgp-Mode: auto

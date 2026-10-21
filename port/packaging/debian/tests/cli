@@ -1,0 +1,26 @@
+#!/bin/sh
+# linscp-cli starts, reports its build, and runs a script without a network.
+set -eu
+cd "${AUTOPKGTEST_TMP:-$(mktemp -d)}"
+
+linscp-cli /help > help.txt
+grep -q '/script' help.txt
+
+linscp-cli /info > info.txt
+grep -qi 'ssh' info.txt
+grep -qi 'tls\|ssl' info.txt
+
+# A local script: no session, only commands that need none.
+mkdir -p local
+printf 'hello\n' > local/file.txt
+cat > script.txt <<SCRIPT
+option batch abort
+option confirm off
+lcd local
+lls
+help get
+exit
+SCRIPT
+linscp-cli /ini=nul /script=script.txt > out.txt
+grep -q 'file.txt' out.txt
+echo 'cli: ok'

@@ -781,4 +781,7 @@ if(NOT WIN32)
     # desktop-file-validate exits 0 on warnings: fail on any output.
     set_tests_properties(packaging_desktop PROPERTIES FAIL_REGULAR_EXPRESSION ".")
   endif()
+  # OBS's debian.* files, generated from port/packaging/debian, not drifted.
+  add_test(NAME packaging_obs_debian
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/gen_obs_debian.py" --check)
 endif()

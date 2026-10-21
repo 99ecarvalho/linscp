@@ -1,0 +1,7 @@
+# The programs live in a private directory, /usr/lib/<triplet>/linscp, with
+# the core's translations (Translations/) beside them: the core looks for its
+# translations next to the real executable. /usr/bin has symlinks to both.
+executable-in-usr-lib [usr/lib/*/linscp/linscp]
+executable-in-usr-lib [usr/lib/*/linscp/linscp-cli]
+# Not a word: a byte sequence in compiled data.
+spelling-error-in-binary jAve java *

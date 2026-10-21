@@ -1,0 +1,45 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all optimize=-lto
+
+# clang only: GCC has no __declspec(property), which the core's VCL property
+# shim needs (see debian/control).
+export CC = clang
+export CXX = clang++
+
+# The Qt programs and the core's translations are not in the ALL target, so
+# a plain build would skip them; they are built by name below.
+LINSCP_TARGETS = linscp linscp-cli core-translations
+
+%:
+	dh $@ --buildsystem=cmake+ninja
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+		-DLINSCP_RELEASE=ON \
+		-DLINSCP_SYSTEM_OPENSSL=ON \
+		-DLINSCP_SYSTEM_EXPAT=ON \
+		-DLINSCP_UPDATE_CHECK=OFF \
+		-DBUILD_TESTING=OFF
+
+override_dh_auto_build:
+	dh_auto_build -- $(LINSCP_TARGETS)
+
+# The test suite needs network servers (sshd, rclone, containers) and is
+# configured out with BUILD_TESTING=OFF; debian/tests has a smoke test.
+override_dh_auto_test:
+
+# Upstream installs the licence texts of the bundled components into the
+# documentation directory; debian/copyright carries them instead. NEWS.md
+# becomes the upstream changelog (below).
+override_dh_auto_install:
+	dh_auto_install
+	cd debian/linscp/usr/share/doc/linscp && \
+		rm -f LICENSE *-LICENSE *-LICENCE *-LICENSE.txt *-COPYING* \
+			WinSCP-license.txt FileZilla-license.txt neon-README.md icon-SOURCES.md NEWS.md
+
+# dwz does not understand clang's DWARF 5 (.debug_addr) and fails the build.
+override_dh_dwz:
+
+override_dh_installchangelogs:
+	dh_installchangelogs NEWS.md
