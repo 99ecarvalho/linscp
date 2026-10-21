@@ -5,8 +5,10 @@
 #
 # It runs the whole CI (tests and packages) on the tag, checks that the tag
 # matches the version in CMakeLists.txt and that NEWS.md has a section for it,
-# builds the complete source tarball (port/tools/make_source_tarball.py), and
-# drafts the release with the packages, the tarball, SHA256SUMS and, when the
+# builds the complete source tarball (port/tools/make_source_tarball.py) and
+# the third-party sources tar (the copyleft components the packages ship, as
+# their SOURCE-OFFER.txt says; port/tools/fetch_sources.py), and drafts the
+# release with the packages, the tarballs, SHA256SUMS and, when the
 # signing key is configured, OpenPGP signatures. The draft is reviewed and
 # published by hand; publishing it tells the website to rebuild (website job).
 #
@@ -87,6 +89,23 @@ jobs:
           pattern: linscp-*
           path: dist
           merge-multiple: true
+
+      # The source code of the copyleft third-party components the AppImage
+      # and the Windows build ship, which their SOURCE-OFFER.txt points to.
+      - name: Collect the third-party sources
+        run: |
+          work=$(mktemp -d)
+          (cd "$work" && "$GITHUB_WORKSPACE/dist/linscp-$VERSION-x86_64.AppImage" \
+             --appimage-extract usr/share/licenses/linscp/third-party.json >/dev/null)
+          unzip -q -j -d "$work/windows" "dist/linscp-$VERSION-portable.zip" \
+            "linscp-$VERSION/licenses/third-party.json"
+          python3 port/tools/fetch_sources.py --out "$work/sources" \
+            --from "$work/squashfs-root/usr/share/licenses/linscp/third-party.json" \
+            --from "$work/windows/third-party.json"
+          tar -C "$work" --sort=name --owner=0 --group=0 --numeric-owner \
+            -cf "dist/linscp-$VERSION-third-party-sources.tar" \
+            --transform "s|^sources|linscp-$VERSION-third-party-sources|" sources
+          rm -rf "$work"
 
       - name: Checksums and signatures
         run: |

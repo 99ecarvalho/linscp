@@ -195,9 +195,9 @@ def fetch(dest):
 
 
 def sources(dest, out):
-    """The source archive of every package in DEST's index, into OUT: what
-    linscp's source offer (deploy_windows.py) promises for three years, kept
-    by us because the repository drops old archives."""
+    """The source archive of every package in DEST's index, into OUT, while
+    the repository still has them (it drops old archives). The release
+    carries those of the copyleft packages a build ships (fetch_sources.py)."""
     entries = json.load(open(os.path.join(dest, INDEX), encoding='utf-8'))
     os.makedirs(out, exist_ok=True)
     missing = []

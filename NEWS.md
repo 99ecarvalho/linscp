@@ -10,8 +10,10 @@ each release needs a `## X.Y.Z — YYYY-MM-DD` heading here before it is tagged.
 
 - The FTP and FTPS engine's string, file and time classes are now linscp's own
   code, with their own unit tests.
-- Windows packages carry the licence texts of every bundled library, a list of
-  them and a written offer of their source code, in `licenses\`.
+- The Windows packages and the AppImage carry the licence texts of every
+  bundled library and a list of them. Each release publishes the source code
+  of the copyleft ones beside the downloads.
+- A smaller AppImage, holding only the Qt plugins linscp uses.
 - Manual pages: `man linscp` and `man linscp-cli`.
 - Builds for distributions and Flatpak can turn off the update check
   (`-DLINSCP_UPDATE_CHECK=OFF`); a Flatpak never checks for updates itself.

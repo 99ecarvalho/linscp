@@ -19,13 +19,16 @@ PowerShell extensions load from %WINSCP_PATH%, which the shell points there.
 
 licenses/third-party/ gets the licence texts of every MSYS2 package a deployed
 file comes from (fetch_msys2_qt.py's msys2-qt.packages.json, beside PREFIX),
-with THIRD-PARTY-NOTICES.txt listing them and SOURCE-OFFER.txt offering their
-source code, as the LGPL and GPL ask of whoever redistributes their binaries.
+with THIRD-PARTY-NOTICES.txt listing them. SOURCE-OFFER.txt names the copyleft
+ones (port/tools/licences.py), whose source code the release carries
+(linscp-<version>-third-party-sources.tar, which port/tools/fetch_sources.py
+collects from licenses/third-party.json).
 """
 import argparse, glob, json, os, re, shutil, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from check_dll_imports import table  # noqa: E402
+import licences  # noqa: E402
 
 PLUGINS = [
     'platforms/qwindows.dll',          # the window system
@@ -114,27 +117,30 @@ LICENCE_FILE = re.compile(r'^(licen[cs]e|copying|notice|copyright)', re.IGNORECA
 CONTACT = 'ecorreia@apliant.com.br'
 
 OFFER = """\
-Source code offer for the third-party components of linscp for Windows
+Source code of the third-party components of linscp for Windows
 
-linscp for Windows includes, in binary form, the third-party components listed
-below and in THIRD-PARTY-NOTICES.txt, built by the MSYS2 project. Some of them
-are licensed under the GNU Lesser General Public License or the GNU General
-Public License, which entitle you to their complete corresponding source code.
+linscp for Windows includes, in binary form, third-party components built by
+the MSYS2 project, all listed in THIRD-PARTY-NOTICES.txt. Those below are
+licensed under the GNU Lesser General Public License, the GNU General Public
+License or another licence that entitles you to their complete corresponding
+source code.
 
-For at least three years after we last distribute this version of linscp, we
-will give anyone who asks a copy of the complete corresponding source code of
-each component below, for no more than our reasonable cost of physically
-performing the distribution (or at no charge, as a download). Write to
-{contact}, naming linscp {version} and the components you want.
+That source code is published with this release of linscp, in the same place
+as the installer:
 
-Each component is listed below with the address where the MSYS2 project
-published its source archive (the upstream source and the build script,
-PKGBUILD, that produced the binaries included here). MSYS2 may remove older
-archives over time; this offer does not depend on them, as we keep a copy of
-every archive listed.
+  https://github.com/99ecarvalho/linscp/releases/tag/v{version}
+  linscp-{version}-third-party-sources.tar
+
+Each component is also listed below with the address where the MSYS2 project
+published its source archive: the upstream source and the build script
+(PKGBUILD) that produced the binaries included here. MSYS2 removes older
+archives over time; the copy published with the release stays. If you cannot
+get it from there, write to {contact}, naming linscp {version} and the
+components you want.
 
 linscp's own source code, for this exact version, is at
-https://github.com/99ecarvalho/linscp (tag v{version}).
+https://github.com/99ecarvalho/linscp (tag v{version}), and in
+linscp-{version}.tar.xz with the release.
 
 {components}
 """
@@ -188,7 +194,7 @@ def notices(qt_prefix, dest, version):
                         sys.exit(f'{shown}: comes from {origin}, which no package in {index_path} lists')
     third_party = os.path.join(dest, 'licenses', 'third-party')
     os.makedirs(third_party, exist_ok=True)
-    offer, listing = [], []
+    offer, listing, index = [], [], []
     for name in sorted(used):
         package, deployed = used[name]
         # Its own share/licenses/<dir>/, or a licence file kept elsewhere (ICU's).
@@ -200,16 +206,30 @@ def notices(qt_prefix, dest, version):
             target = os.path.join(third_party, name, os.path.basename(text))
             os.makedirs(os.path.dirname(target), exist_ok=True)
             shutil.copy2(os.path.join(root, text), target)
-        source = f'{SOURCES}{package["base"]}-{package["version"]}.src.tar.zst'
-        licence = ' AND '.join(package['licenses']) or 'see its licence texts'
+        archive = f'{package["base"]}-{package["version"]}.src.tar.zst'
+        source = SOURCES + archive
+        licence = ' AND '.join(f'({l})' if ' OR ' in l.upper() else l for l in package['licenses']) \
+            or 'see its licence texts'
         listing.append(f'{name} {package["version"]}\n'
                        f'  Licence: {licence}\n'
                        f'  Project: {package["url"]}\n'
                        f'  Licence texts: third-party/{name}/\n'
                        f'  Files: {", ".join(sorted(deployed))}\n'
                        f'  Source: {source}\n')
-        offer.append(f'{name} {package["version"]} ({licence})\n  {source}\n')
+        copyleft = licences.copyleft(package['licenses'])
+        if copyleft:
+            offer.append(f'{name} {package["version"]} ({licence})\n  {source}\n')
+        # One source archive can build several packages.
+        if not any(e['source'] == package['base'] for e in index):
+            index.append({'kind': 'archive', 'source': package['base'], 'version': package['version'],
+                          'licence': licence, 'copyleft': copyleft, 'files': [{'url': source, 'name': archive}]})
+        elif copyleft:
+            next(e for e in index if e['source'] == package['base'])['copyleft'] = True
     licenses = os.path.join(dest, 'licenses')
+    # For port/tools/fetch_sources.py.
+    with open(os.path.join(licenses, 'third-party.json'), 'w', encoding='utf-8', newline='\n') as f:
+        json.dump(index, f, indent=1, sort_keys=True)
+        f.write('\n')
     with open(os.path.join(licenses, 'THIRD-PARTY-NOTICES.txt'), 'w', encoding='utf-8', newline='\r\n') as f:
         f.write(NOTICES.format(components='\n'.join(listing)))
     with open(os.path.join(licenses, 'SOURCE-OFFER.txt'), 'w', encoding='utf-8', newline='\r\n') as f:

@@ -1,0 +1,30 @@
+{
+ "about": "The AppImage runtime (tools.lock: runtime-x86_64) is the small program at the start of every AppImage file that mounts and starts it. It is built by the AppImage project and statically linked with the components below; their licence texts are the files listed, taken from these exact versions.",
+ "release": "https://github.com/AppImage/type2-runtime/releases/tag/20251108",
+ "components": [
+  {"name": "type2-runtime", "version": "20251108", "licence": "MIT",
+   "project": "https://github.com/AppImage/type2-runtime", "texts": ["type2-runtime-LICENSE"],
+   "sources": [{"url": "https://github.com/AppImage/type2-runtime/archive/refs/tags/20251108.tar.gz",
+                "name": "type2-runtime-20251108.tar.gz",
+                "sha256": "4c4f6df4647c9f01f871d7edd3716d8aeeffda9d22ffbebe3fccd95a6ab52c95"}]},
+  {"name": "libfuse", "version": "3.15.0, with the runtime's patch (patches/libfuse/mount.c.diff in its source)",
+   "licence": "LGPL-2.1-only", "project": "https://github.com/libfuse/libfuse", "texts": ["libfuse-LGPL2.txt"],
+   "sources": [{"url": "https://github.com/libfuse/libfuse/releases/download/fuse-3.15.0/fuse-3.15.0.tar.xz",
+                "name": "fuse-3.15.0.tar.xz",
+                "sha256": "70589cfd5e1cff7ccd6ac91c86c01be340b227285c5e200baa284e401eea2ca0"},
+               {"url": "https://github.com/AppImage/type2-runtime/archive/refs/tags/20251108.tar.gz",
+                "name": "type2-runtime-20251108.tar.gz",
+                "sha256": "4c4f6df4647c9f01f871d7edd3716d8aeeffda9d22ffbebe3fccd95a6ab52c95"}]},
+  {"name": "squashfuse", "version": "0.5.2", "licence": "BSD-2-Clause",
+   "project": "https://github.com/vasi/squashfuse", "texts": ["squashfuse-LICENSE"],
+   "sources": [{"url": "https://github.com/vasi/squashfuse/archive/0.5.2.tar.gz",
+                "name": "squashfuse-0.5.2.tar.gz",
+                "sha256": "db0238c5981dabbd80ee09ae15387f390091668ca060a7bc38047912491443d3"}]},
+  {"name": "musl libc", "version": "as built by the runtime's Alpine Linux build", "licence": "MIT",
+   "project": "https://musl.libc.org", "texts": ["musl-COPYRIGHT"]},
+  {"name": "zstd", "version": "as built by the runtime's Alpine Linux build", "licence": "BSD-3-Clause",
+   "project": "https://github.com/facebook/zstd", "texts": ["zstd-LICENSE"]},
+  {"name": "zlib", "version": "as built by the runtime's Alpine Linux build", "licence": "Zlib",
+   "project": "https://zlib.net", "texts": ["zlib-LICENSE"]}
+ ]
+}
