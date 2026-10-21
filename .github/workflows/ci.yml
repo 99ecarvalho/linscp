@@ -298,13 +298,13 @@ jobs:
           python3 port/tools/build_flatpak.py --out build/packages --builder-arg=--disable-rofiles-fuse
 
       # Flathub's linter on the manifest and the build, with the findings
-      # port/packaging/flatpak/lint-exceptions.json explains.
+      # port/packaging/flatpak/lint-exceptions.json explains. The builder
+      # image has it installed (not sandboxed: org.flatpak.Builder's sandbox
+      # cannot write its state directory in the container's checkout).
       - name: Lint the Flatpak
         run: |
-          flatpak install --user -y --noninteractive flathub org.flatpak.Builder
           lint() {
-            flatpak run --command=flatpak-builder-lint --filesystem="$PWD" org.flatpak.Builder \
-              --exceptions --user-exceptions port/packaging/flatpak/lint-exceptions.json "$@"
+            flatpak-builder-lint --exceptions --user-exceptions port/packaging/flatpak/lint-exceptions.json "$@"
           }
           lint manifest port/packaging/flatpak/org.linscp.linscp.yml
           lint repo build/flatpak/repo
