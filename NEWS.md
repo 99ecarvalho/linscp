@@ -8,6 +8,8 @@ each release needs a `## X.Y.Z — YYYY-MM-DD` heading here before it is tagged.
 
 ## Unreleased
 
+- Releases are signed with linscp's OpenPGP release key (SECURITY.md says
+  how to verify a download).
 - The FTP and FTPS engine's string, file and time classes are now linscp's own
   code, with their own unit tests.
 - The Windows packages and the AppImage carry the licence texts of every

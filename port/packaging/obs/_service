@@ -14,8 +14,10 @@
      tarball, not obs_scm with submodules, because only the tarball has the
      upstream tree's non-redistributable files pruned (make_source_tarball.py).
 
-  Once releases are signed, the spec gains Source1 (.asc) and the package a
-  linscp.keyring: OBS then checks the tarball's signature on every commit.
+  Releases are signed: download_files also fetches Source1, the tarball's
+  .asc, and OBS checks it against the package's linscp.keyring (the
+  release-signing key, A679B8C9915BB5ACDD45F91E207FB492B5B214A9) on every
+  commit; Fedora targets also run the spec's %gpgverify.
   A fixed verify_file sha256 cannot be kept here for automatic updates: the
   tarball is built from the tagged tree, so the tree cannot hold its hash.
 
@@ -32,6 +34,8 @@
     <param name="submodules">disable</param>
     <param name="subdir">port/packaging</param>
     <param name="extract">rpm/linscp.spec</param>
+    <param name="extract">rpm/linscp-release-key.asc</param>
+    <param name="extract">obs/linscp.keyring</param>
     <!-- Debian and Ubuntu: port/tools/gen_obs_debian.py writes these. -->
     <param name="extract">obs/linscp.dsc</param>
     <param name="extract">obs/debian.changelog</param>

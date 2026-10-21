@@ -22,11 +22,12 @@ optdepends=('qt6-wayland: native Wayland support')
 # Built without LTO for now.
 options=('!lto')
 # The release tarball carries every submodule the build needs (PuTTY, the
-# core), so the build is offline. Signatures: there is no release signing
-# key yet; validpgpkeys and the .asc source come with the first signed
-# release.
-source=("https://github.com/99ecarvalho/linscp/releases/download/v$pkgver/$pkgname-$pkgver.tar.xz")
-sha256sums=('1294a524f68b5b2febe5e2593c7800cfe8808495825a88b81c3db2fbb31844eb')
+# core), so the build is offline. makepkg checks the tarball's signature
+# against the release-signing key (doc/release-signing-key.asc).
+source=("https://github.com/99ecarvalho/linscp/releases/download/v$pkgver/$pkgname-$pkgver.tar.xz"{,.asc})
+sha256sums=('1294a524f68b5b2febe5e2593c7800cfe8808495825a88b81c3db2fbb31844eb'
+            'SKIP')
+validpgpkeys=('A679B8C9915BB5ACDD45F91E207FB492B5B214A9') # Eduardo Correia (linscp release signing)
 
 build() {
   # linscp needs clang: the core uses __declspec(property), which GCC lacks.

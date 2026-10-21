@@ -34,9 +34,10 @@ Summary:        SFTP, SCP, FTP, WebDAV and S3 file-transfer client
 License:        GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-2.0-or-later AND (LGPL-3.0-or-later OR GPL-2.0-or-later) AND MIT AND ISC
 URL:            https://linscp.org
 Source0:        https://github.com/99ecarvalho/linscp/releases/download/v%{version}/%{name}-%{version}.tar.xz
-# Signature checking, once releases are signed (doc/qt/RELEASE-PLAN.md, 0.4):
-#Source1:        https://github.com/99ecarvalho/linscp/releases/download/v%%{version}/%%{name}-%%{version}.tar.xz.asc
-#Source2:        linscp-release-key.asc
+# The tarball's signature and the release-signing key
+# (A679B8C9915BB5ACDD45F91E207FB492B5B214A9, doc/release-signing-key.asc).
+Source1:        https://github.com/99ecarvalho/linscp/releases/download/v%{version}/%{name}-%{version}.tar.xz.asc
+Source2:        linscp-release-key.asc
 
 # Bundled because the core uses API only these modified copies have
 # (doc/qt/bundled-libraries.md); there is no system library to use instead.
@@ -48,6 +49,9 @@ Provides:       bundled(libs3) = 4.1
 Provides:       bundled(filezilla)
 
 BuildRequires:  clang
+%if 0%{?fedora} || 0%{?rhel}
+BuildRequires:  gnupg2
+%endif
 BuildRequires:  cmake >= 3.25
 BuildRequires:  python3 >= 3.9
 BuildRequires:  cmake(Qt6Widgets) >= 6.8
@@ -68,7 +72,6 @@ BuildRequires:  pkgconfig(openssl) >= 3.0
 BuildRequires:  ninja-build
 BuildRequires:  qt6-linguist
 BuildRequires:  libappstream-glib
-#BuildRequires:  gnupg2
 %endif
 
 # Kerberos (GSSAPI) is loaded at run time, not linked; Wayland comes
@@ -94,8 +97,11 @@ date, edits remote files, and runs commands on the server. A command-line
 program runs the same transfers from scripts.
 
 %prep
-# Once releases are signed:
-#%%{gpgverify} --keyring='%%{SOURCE2}' --signature='%%{SOURCE1}' --data='%%{SOURCE0}'
+# Fedora checks the tarball's signature here; openSUSE's OBS checks it with
+# the package's linscp.keyring instead (it has no %%{gpgverify}).
+%if 0%{?fedora} || 0%{?rhel}
+%{gpgverify} --keyring='%{SOURCE2}' --signature='%{SOURCE1}' --data='%{SOURCE0}'
+%endif
 %autosetup -p1
 # The package builds against the system OpenSSL and expat, so their bundled
 # copies are deleted before the build (Fedora's Packaging Guidelines,

@@ -9,6 +9,28 @@ interface, the command-line client, and the POSIX/Win32 compatibility layer).
 Only the latest release is supported. linscp is pre-release; please reproduce
 on the newest version before reporting.
 
+## Verifying a download
+
+From 0.7.2 on, each release carries `SHA256SUMS` and the source tarball with
+OpenPGP signatures (`.asc`), made with linscp's release-signing key:
+
+```text
+A679 B8C9 915B B5AC DD45  F91E 207F B492 B5B2 14A9
+Eduardo Correia (linscp release signing) <ecorreia@apliant.com.br>
+```
+
+The key is in this repository as
+[doc/release-signing-key.asc](doc/release-signing-key.asc) and on
+keys.openpgp.org. To check a download:
+
+```sh
+gpg --import doc/release-signing-key.asc     # or: gpg --recv-keys A679B8C9915BB5ACDD45F91E207FB492B5B214A9
+gpg --verify SHA256SUMS.asc SHA256SUMS
+sha256sum --check --ignore-missing SHA256SUMS
+```
+
+Release tags are signed with the same key (`git tag -v v0.7.2`).
+
 ## Reporting a vulnerability
 
 **Please report privately — do not open a public issue or pull request for a
