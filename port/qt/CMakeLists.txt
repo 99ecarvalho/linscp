@@ -14,6 +14,9 @@ add_library(linscp-qt-ui STATIC EXCLUDE_FROM_ALL MainWindow.cpp AboutDialog.cpp 
   RightsFrame.cpp PropertiesDialog.cpp CreateDirectoryDialog.cpp LinkDialog.cpp RemoteTransferDialog.cpp OpenDirectoryDialog.cpp LocationProfilesDialog.cpp FindFilesDialog.cpp EditMaskDialog.cpp ServerInfoDialog.cpp RtfText.cpp GenerateUrlDialog.cpp ConsoleDialog.cpp SiteRawDialog.cpp ImportSitesDialog.cpp CustomCommandDialog.cpp KeepUpToDateDialog.cpp LicenseDialog.cpp CleanupDialog.cpp TagDialog.cpp ShortCutDialog.cpp EditorPreferencesDialog.cpp Integration.cpp SaveWorkspaceDialog.cpp
   CopyLocalDialog.cpp KeyVerify.cpp SaveSiteDialog.cpp IconSet.cpp PanelBands.cpp WindowParams.cpp HintButton.cpp SingleInstance.cpp MasterPasswordDialog.cpp SshHostCADialog.cpp DirectoryTree.cpp Theme.cpp ExtensionOptionsDialog.cpp DragExtClient.cpp ExplorerInterface.cpp CoreBridge.h)
 set_target_properties(linscp-qt-ui PROPERTIES AUTOMOC ON)
+# Its own folder an include directory, so that moc includes the headers by
+# name (CMAKE_AUTOMOC_PATH_PREFIX, cmake/reproducible.cmake).
+target_include_directories(linscp-qt-ui PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(linscp-qt-ui PUBLIC Qt6::Widgets Qt6::Svg Qt6::Network)
 # Update checks (Help > Check for Updates, the Updates button, the periodic
 # check against linscp's GitHub releases): on for linscp's own packages, off
@@ -72,6 +75,7 @@ if(WIN32)
   target_sources(linscp PRIVATE linscp.rc)
 endif()
 set_target_properties(linscp PROPERTIES AUTOMOC ON)
+target_include_directories(linscp PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 if(NOT WIN32)
   target_compile_options(linscp PRIVATE -fno-short-wchar)
 endif()

@@ -47,6 +47,12 @@ foreach(_map IN LISTS _linscp_prefix_maps)
   add_compile_options("$<$<COMPILE_LANGUAGE:C,CXX>:-ffile-prefix-map=${_map}>")
 endforeach()
 set(CMAKE_BUILD_RPATH_USE_ORIGIN ON)
+# moc's output includes its header by the path from the autogen folder, which
+# for a build folder outside the source tree climbs to / and down again
+# ("../../../home/me/linscp/port/qt/X.h"): no prefix map rewrites that, and
+# debug information keeps it. With a path prefix, moc includes the header by
+# its path below an include directory instead.
+set(CMAKE_AUTOMOC_PATH_PREFIX ON)
 
 # --- PE/COFF link timestamp ------------------------------------------------
 if(WIN32 AND CMAKE_CXX_COMPILER_LINKER_ID MATCHES "^(LLD|GNU)$")
