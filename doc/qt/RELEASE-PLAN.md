@@ -442,12 +442,12 @@ Status: `todo`, `wip`, `blocked`, `done`, `dropped`. Owner `M` = maintainer only
 
 | Phase | done | wip | blocked | todo | dropped |
 |---|---|---|---|---|---|
-| 0 — Licence clean-up | 29 | 1 | 2 | 0 | 2 |
+| 0 — Licence clean-up | 30 | 2 | 0 | 0 | 2 |
 | 1 — Flathub | 16 | 0 | 0 | 5 | 0 |
 | 2 — Own repositories | 3 | 6 | 0 | 4 | 0 |
-| 3 — Official distributions | 1 | 1 | 1 | 7 | 0 |
-| W — Windows channels | 2 | 2 | 1 | 1 | 0 |
-| **All** | **51** | **10** | **4** | **17** | **2** |
+| 3 — Official distributions | 3 | 1 | 0 | 6 | 0 |
+| W — Windows channels | 3 | 1 | 1 | 1 | 0 |
+| **All** | **55** | **10** | **1** | **16** | **2** |
 
 Everything that could be prepared without the maintainer's accounts or keys
 is done or waits only on them; the publishing jobs are ready in
@@ -458,8 +458,8 @@ unblocks the rest, in order of reach:
    tarball, `SHA256SUMS` and the third-party sources (R0-24), which every
    distribution recipe needs (the v0.7.1 tag predates the app ID and the
    packaging).
-2. **The release key** (R0-15, R0-16): signature checks in the watch file,
-   the PKGBUILD, the spec and OBS (R3-03).
+2. **The release key** is done (R0-15); the first signed tag (R0-16) comes
+   with 0.7.2, and the recipes already check its signature.
 3. **Accounts and secrets**, each then a job moved into the release
    workflow: AUR (R2-01 → R2-04), Copr (R2-05 → R2-07), OBS (R2-08 →
    R2-09, R2-10), Launchpad (R2-11 → R2-13), winget, Chocolatey and a Scoop
@@ -469,8 +469,7 @@ unblocks the rest, in order of reach:
 5. **Debian, Fedora, nixpkgs** (R3-01, R3-04 to R3-06, R3-08 to R3-10): ITP,
    sponsors and reviews, once Phase 2 has users.
 
-Not started: R3-07
-(Fedora repack script and crypto-policy check), RW-05/RW-06 (code signing).
+Not started: RW-05/RW-06 (code signing).
 
 | ID | Phase | Deliverable | Owner | Status |
 |---|---|---|---|---|
@@ -499,8 +498,8 @@ Not started: R3-07
 | R0-12 | 0 | AppImage: same licence-text and source audit | | done |
 | R0-13 | 0 | Ship neon `COPYING.LIB`, libs3 `COPYING-GPLv2`, Inno Setup licence; fix the neon comment | | done |
 | R0-14 | 0 | `make_source_tarball.py`: submodules, no `.git`, no `linscp-website`, Phase 0 exclusions, fails on MFC banner or excluded images; reproducible (byte-identical reruns), builds offline. Keeps the five `libs/openssl` files the OpenSSL-tree check compares and the three image-free `.dfm` menu layouts the menu tests read | | done |
-| R0-15 | 0 | OpenPGP release key, published in repo and on keys.openpgp.org | M | blocked |
-| R0-16 | 0 | Annotated signed tags from the next release on (signatures deferred 2026-10-20; the release workflow requires annotated tags and signs nothing until a key is set) | M | blocked |
+| R0-15 | 0 | OpenPGP release key A679B8C9915BB5ACDD45F91E207FB492B5B214A9 (`ecorreia@apliant.com.br`, `eduardo@linscp.org`): in the repository (`doc/release-signing-key.asc`, SECURITY.md), on keys.openpgp.org (both addresses confirmed) and on GitHub; primary offline, signing and encryption subkeys on the maintainer's machine; CI secrets set (`local/keys.py`, not in git) | M | done |
+| R0-16 | 0 | Annotated signed tags from the next release on (`git tag -s`; this repository's `user.signingkey` is the signing subkey); the release workflow signs `SHA256SUMS` and the tarball with `RELEASE_SIGNING_KEY`. Done with the first signed tag (0.7.2) | M | wip |
 | R0-17 | 0 | Tag-triggered release workflow: tarball, packages, `.asc`, signed `SHA256SUMS`, draft release, website dispatch | | done |
 | R0-18 | 0 | `NEWS.md` with an entry per release | | done |
 | R0-19 | 0 | CMake option for system OpenSSL, tested against 3.5 and 4.0 | | done |
@@ -544,15 +543,15 @@ Not started: R3-07
 | R2-13 | 2 | PPA job (`port/tools/ppa_source_packages.sh`, one source package per series from one orig): in `port/packaging/ci/release-jobs.yml`, signing and `dput --simulate` tested; needs R2-11 | | wip |
 | R3-01 | 3 | Debian ITP filed | M | todo |
 | R3-02 | 3 | `debian/copyright` (DEP-5) for every bundled tree; `Files-Excluded` (`+dfsg`) for 0.7.1, nothing to exclude from the next release's tarball (R0-33). ftpmasters' review still to come | | done |
-| R3-03 | 3 | Watch file v5, `debian/upstream/metadata`, autopkgtest (`debian/tests`): written; the signature check and `debian/upstream/signing-key.asc` wait for the release key (R0-15) | | blocked |
+| R3-03 | 3 | Watch file v5 with `Pgp-Mode: auto` and `debian/upstream/signing-key.asc`, `debian/upstream/metadata`, autopkgtest (`debian/tests`). The AUR PKGBUILD (`validpgpkeys`), the RPM spec (`%gpgverify`) and OBS (`linscp.keyring`) check the signature too | | done |
 | R3-04 | 3 | Security-tracker embedded-copy entries (PuTTY, neon, libs3) | M | todo |
 | R3-05 | 3 | mentors.debian.net upload + RFS + sponsor + NEW queue | M | todo |
 | R3-06 | 3 | Fedora review request + sponsorship + `fedpkg request-repo` | M | todo |
-| R3-07 | 3 | Fedora repack script for prohibited content; crypto-policy compliance | | todo |
+| R3-07 | 3 | Fedora: no repack needed (the release tarball holds nothing Fedora forbids even as source; the spec deletes the bundled OpenSSL and expat in `%prep`). Crypto policy: no cipher list is set; with the system OpenSSL the default TLS version range is now the policy's (`core-tls-system-policy-bounds.patch`, ctest `tls_bounds`), checked by ClientHello under DEFAULT, FUTURE, LEGACY and a TLS 1.3-only policy on Fedora 44. Licence questions for the review: Q-15, Q-16; Q-17 open | | done |
 | R3-08 | 3 | EPEL 10 branch (once Qt ≥ 6.8 confirmed) | M | todo |
 | R3-09 | 3 | Arch [extra]: approach a Package Maintainer once there is AUR usage | M | todo |
 | R3-10 | 3 | `port/packaging/nix/package.nix`: built against nixos-unstable (Qt 6.12, system OpenSSL), SFTP transfer tested, nixfmt clean. Left: the published tarball's hash, a maintainer handle, the PR once there are users | | wip |
-| RW-01 | W | winget multi-file manifest (`port/packaging/winget/`, schema 1.12.0, inno per scope + portable zip): `winget validate` passes (winget 1.29); scopes, ProductCode and the Add/Remove Programs entries checked on Windows 11. `winget install` itself stops at SmartScreen's prompt for the unsigned setup (unattended installs need RW-05/RW-06); CLA signed by the maintainer | | wip |
+| RW-01 | W | winget multi-file manifest (`port/packaging/winget/`, schema 1.12.0, inno per scope + portable zip): `winget validate` passes; `winget install` works per user and portable (the zip puts its folder on PATH, `ArchiveBinariesDependOnPath`, as the programs load their DLLs from it) on Windows 11, once SmartScreen's prompt for the unsigned setup is accepted (unattended installs need RW-05/RW-06). First submission and the CLA are the maintainer's | | done |
 | RW-02 | W | winget, Chocolatey and Scoop jobs in `port/packaging/ci/release-jobs.yml`; need the secrets and the first submissions | | wip |
 | RW-03 | W | Scoop manifest `port/packaging/scoop/linscp.json`: installs, shims `linscp-cli`, makes the shortcut and keeps the portable INI across runs and reinstalls (Scoop 0.6.0 on Windows 11). The bucket is the maintainer's to create (README there) | | done |
 | RW-04 | W | Chocolatey package `port/packaging/chocolatey/`: packs, installs silently in 19 s, the auto-uninstaller removes everything (Chocolatey 2.7.4 on Windows 11). The chocolatey.org account, `<owners>` and the first push are the maintainer's | | done |
