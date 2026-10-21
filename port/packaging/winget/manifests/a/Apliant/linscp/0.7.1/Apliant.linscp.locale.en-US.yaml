@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.12.0.schema.json
+
+PackageIdentifier: Apliant.linscp
+PackageVersion: 0.7.1
+PackageLocale: en-US
+Publisher: Apliant
+PublisherSupportUrl: https://github.com/99ecarvalho/linscp/issues
+Author: Eduardo Correia
+PackageName: linscp
+PackageUrl: https://linscp.org
+License: GPL-3.0-or-later
+LicenseUrl: https://github.com/99ecarvalho/linscp/blob/v0.7.1/LICENSE
+Copyright: Copyright (c) 2026 Eduardo Correia
+ShortDescription: Transfer files to and from servers over SFTP, SCP, FTP/FTPS, WebDAV and S3.
+Description: |-
+  linscp transfers files between your computer and remote servers over SFTP, SCP, FTP (with TLS), WebDAV and S3. Its two-panel interface shows local and remote files side by side, with the same sessions, settings and scripting on Linux and Windows.
+  It synchronizes and compares directories, keeps a remote directory up to date, edits remote files, and runs commands on the server. linscp-cli runs the same transfers from scripts.
+Moniker: linscp
+Tags:
+- file-transfer
+- file-manager
+- ftp
+- ftps
+- s3
+- scp
+- sftp
+- ssh
+- webdav
+- sync
+ReleaseNotes: A maintenance release that cleans up the continuous integration. It brings no new features.
+ReleaseNotesUrl: https://github.com/99ecarvalho/linscp/releases/tag/v0.7.1
+Documentations:
+- DocumentLabel: Manual
+  DocumentUrl: https://linscp.org/manual/
+ManifestType: defaultLocale
+ManifestVersion: 1.12.0

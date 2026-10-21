@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.12.0.schema.json
+
+PackageIdentifier: Apliant.linscp
+PackageVersion: 0.7.1
+MinimumOSVersion: 10.0.0.0
+InstallerLocale: en-US
+ReleaseDate: 2026-10-20
+UpgradeBehavior: install
+InstallModes:
+- interactive
+- silent
+- silentWithProgress
+Installers:
+# The Inno Setup installer (port/packaging/windows/linscp.iss): for all users
+# by default, or only the current one with /CURRENTUSER
+# (PrivilegesRequiredOverridesAllowed). winget supplies Inno's silent switches.
+# 0.7.1's installer writes Publisher "linscp" in Add/Remove Programs; from
+# 0.7.2 on it writes "Apliant", and AppsAndFeaturesEntries can go.
+- Architecture: x64
+  InstallerType: inno
+  Scope: user
+  InstallerUrl: https://github.com/99ecarvalho/linscp/releases/download/v0.7.1/linscp-0.7.1-setup.exe
+  InstallerSha256: 27B7EA17014FC062DEFFC9D71DD73EB9688E5D625A2FED596C12A09F9D6CFDFC
+  InstallerSwitches:
+    Custom: /CURRENTUSER
+  ProductCode: '{6C1E36A4-5B9F-4B8C-9C2E-3F0A7D1E8B52}_is1'
+  AppsAndFeaturesEntries:
+  - DisplayName: linscp
+    Publisher: linscp
+    ProductCode: '{6C1E36A4-5B9F-4B8C-9C2E-3F0A7D1E8B52}_is1'
+- Architecture: x64
+  InstallerType: inno
+  Scope: machine
+  InstallerUrl: https://github.com/99ecarvalho/linscp/releases/download/v0.7.1/linscp-0.7.1-setup.exe
+  InstallerSha256: 27B7EA17014FC062DEFFC9D71DD73EB9688E5D625A2FED596C12A09F9D6CFDFC
+  InstallerSwitches:
+    Custom: /ALLUSERS
+  ElevationRequirement: elevatesSelf
+  ProductCode: '{6C1E36A4-5B9F-4B8C-9C2E-3F0A7D1E8B52}_is1'
+  AppsAndFeaturesEntries:
+  - DisplayName: linscp
+    Publisher: linscp
+    ProductCode: '{6C1E36A4-5B9F-4B8C-9C2E-3F0A7D1E8B52}_is1'
+# The portable package (port/tools/build_portable.py): its files in a
+# linscp-<version> folder, with an empty linscp.ini beside linscp.exe that
+# keeps the configuration there.
+- Architecture: x64
+  InstallerType: zip
+  NestedInstallerType: portable
+  NestedInstallerFiles:
+  - RelativeFilePath: linscp-0.7.1\linscp.exe
+    PortableCommandAlias: linscp
+  - RelativeFilePath: linscp-0.7.1\linscp-cli.exe
+    PortableCommandAlias: linscp-cli
+  InstallerUrl: https://github.com/99ecarvalho/linscp/releases/download/v0.7.1/linscp-0.7.1-portable.zip
+  InstallerSha256: 55CEAC9E3C22F89595845626835C8B04919FE1943ACABD028ABEC3569E4555BF
+ManifestType: installer
+ManifestVersion: 1.12.0
