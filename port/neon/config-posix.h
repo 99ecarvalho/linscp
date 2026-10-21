@@ -11,8 +11,9 @@
    WinSCP's, as its Win32 config.h makes them, so that both targets behave
    the same: no HAVE_OPENSSL11 (digest auth offers MD5/SHA-256 only), no
    HAVE_SSL_CIPHER_STANDARD_NAME (OpenSSL's cipher names), no
-   HAVE_ASN1_TIME_TO_TM, and HAVE_CRYPTO_SET_IDPTR_CALLBACK. HAVE_SSPI has
-   no POSIX counterpart; GSSAPI is not enabled. Makefile.bcb's defines
+   HAVE_ASN1_TIME_TO_TM (unless OpenSSL 4.0, below), and
+   HAVE_CRYPTO_SET_IDPTR_CALLBACK. HAVE_SSPI has no POSIX counterpart;
+   GSSAPI is not enabled. Makefile.bcb's defines
    (NE_HAVE_SSL, HAVE_OPENSSL, HAVE_EXPAT, NE_HAVE_DAV, NE_LFS, WINSCP, ...)
    come on the command line, as on Windows. */
 #ifndef LINSCP_NEON_CONFIG_POSIX_H
@@ -101,6 +102,14 @@
 
 /* WINSCP, as in its Win32 config.h. */
 #define HAVE_CRYPTO_SET_IDPTR_CALLBACK
+
+/* Except with a system OpenSSL 4.0 or later (LINSCP_SYSTEM_OPENSSL): its
+   ASN1_TIME is opaque, so the fallback that reads the structure no longer
+   compiles; ASN1_TIME_to_tm, which configure would find, is used instead. */
+#include <openssl/opensslv.h>
+#if OPENSSL_VERSION_MAJOR >= 4
+#define HAVE_ASN1_TIME_TO_TM 1
+#endif
 
 /* LP64: configure's sizes, checked below. NE_LFS (from the make file)
    makes ne_off_t glibc's off64_t, the same type as off_t here. */

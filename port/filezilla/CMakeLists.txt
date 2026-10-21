@@ -56,7 +56,7 @@ target_include_directories(linscp-filezilla PRIVATE
   "${_g}/source/filezilla/misc" "${_g}/source/filezilla" "${LINSCP_UPSTREAM}/source/resource"
   "${_g}/source/core" "${_mfc}/include"
   "${_g}/source/putty" "${_g}/source/putty/windows" "${LINSCP_GEN}/libs/neon/src"
-  "${LINSCP_UPSTREAM}/libs/expat/lib"
+  ${LINSCP_EXPAT_INCLUDE}
   ${_shim_includes})
 target_compile_options(linscp-filezilla PRIVATE -include "${_prelude}" -w)
 # It runs on the shim's zeroed operator new as core does, so it takes the

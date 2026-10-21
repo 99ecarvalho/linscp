@@ -19,8 +19,6 @@ set(_licenses
   "${CMAKE_SOURCE_DIR}/NEWS.md|NEWS.md"
   "${LINSCP_UPSTREAM}/license.txt|WinSCP-license.txt"
   "${CMAKE_SOURCE_DIR}/3rd-party/putty/LICENCE|PuTTY-LICENCE"
-  "${CMAKE_SOURCE_DIR}/3rd-party/openssl/LICENSE.txt|OpenSSL-LICENSE.txt"
-  "${LINSCP_UPSTREAM}/libs/expat/COPYING|expat-COPYING"
   # neon's licence text (src/COPYING.LIB) and its README, which lists the
   # copyright holders.
   "${LINSCP_UPSTREAM}/libs/neon/src/COPYING.LIB|neon-COPYING.LIB"
@@ -33,6 +31,14 @@ set(_licenses
   "${CMAKE_SOURCE_DIR}/assets/icons/tabler/LICENSE|icons-tabler-LICENSE"
   "${CMAKE_SOURCE_DIR}/assets/icons/fluent/LICENSE|icons-fluent-LICENSE"
   "${CMAKE_SOURCE_DIR}/assets/app/SOURCES.md|icon-SOURCES.md")
+# The bundled OpenSSL and expat, unless the system's are used (their licences
+# then come with the system's packages).
+if(NOT LINSCP_SYSTEM_OPENSSL)
+  list(APPEND _licenses "${CMAKE_SOURCE_DIR}/3rd-party/openssl/LICENSE.txt|OpenSSL-LICENSE.txt")
+endif()
+if(NOT LINSCP_SYSTEM_EXPAT)
+  list(APPEND _licenses "${LINSCP_UPSTREAM}/libs/expat/COPYING|expat-COPYING")
+endif()
 
 if(NOT WIN32)
   include(GNUInstallDirs)

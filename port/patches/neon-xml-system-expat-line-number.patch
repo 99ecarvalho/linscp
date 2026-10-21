@@ -1,0 +1,23 @@
+Let neon's XML layer build against an expat older than 2.9.0.
+
+Upstream moved ne_xml.c's two line-number calls to XML_GetCurrentLineNumber64,
+which expat 2.9.0 introduced (deprecating XML_GetCurrentLineNumber) and the
+bundled libs/expat has. A distribution's system expat is often older, which
+has only XML_GetCurrentLineNumber -- the same value in an XML_Size. Where the
+expat being compiled against predates 2.9.0, the new name is defined to the
+old one, beside the existing version test for BOM handling. With the bundled
+2.9.0 the condition is false and nothing changes. The two blank lines around
+that block make room, so line counts are unchanged.
+
+--- a/libs/neon/src/ne_xml.c
++++ b/libs/neon/src/ne_xml.c
+@@ -49,7 +49,7 @@
+-
+ #if !defined(XML_MAJOR_VERSION)
+ #define NEED_BOM_HANDLING
+ #elif XML_MAJOR_VERSION < 2 && XML_MINOR_VERSION == 95 && XML_MICRO_VERSION < 2
+ #define NEED_BOM_HANDLING
++#elif XML_MAJOR_VERSION == 2 && XML_MINOR_VERSION < 9 /* linscp: system expat */
++#define XML_GetCurrentLineNumber64 XML_GetCurrentLineNumber
+ #endif
+-

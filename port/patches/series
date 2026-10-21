@@ -23,3 +23,5 @@ core-path-comparison-case.patch
 core-gsscustom-unsafe.patch
 core-puttysettings-unsafe.patch
 core-scp-sink-dot-names.patch
+neon-xml-system-expat-line-number.patch
+filezilla-openssl4-const-opaque.patch

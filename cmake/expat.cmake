@@ -9,7 +9,26 @@
 # picked up without an edit. That list is Windows': its entropy source is
 # rand_s. WinSCP's expat_config.h also selects getentropy(3), which glibc has
 # had since 2.25, so Linux builds the same parser with that source instead.
+
+# The system expat (LINSCP_SYSTEM_EXPAT, POSIX only), for distributions. The
+# bundled copy is the 2.9.0 release with Windows-only changes (an entropy
+# source for C++Builder, its expat_config.h) and one bounds check in
+# xmltok_impl.c's position tracking (doc/qt/bundled-libraries.md); core,
+# neon and libs3 use only expat's public char API. neon's one 2.9.0 call is
+# mapped for older versions by port/patches/neon-xml-system-expat-line-number.patch.
+if(LINSCP_SYSTEM_EXPAT)
+  find_package(EXPAT 2.4 REQUIRED)
+  message(STATUS "expat: system ${EXPAT_VERSION_STRING} (${EXPAT_LIBRARIES})")
+  add_library(linscp-expat INTERFACE)
+  target_link_libraries(linscp-expat INTERFACE EXPAT::EXPAT)
+  # The targets that name expat's include directory themselves (core,
+  # FileZilla) take this one: none, the system's is on the default path.
+  set(LINSCP_EXPAT_INCLUDE)
+  return()
+endif()
+
 set(LINSCP_EXPAT_DIR "${LINSCP_UPSTREAM}/libs/expat")
+set(LINSCP_EXPAT_INCLUDE "${LINSCP_EXPAT_DIR}/lib")
 set(_expat_mak "${LINSCP_EXPAT_DIR}/bcb5/expat_static.mak")
 
 if(NOT EXISTS "${_expat_mak}")

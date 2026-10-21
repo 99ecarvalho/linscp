@@ -37,6 +37,25 @@ with locking) and Versity's S3 gateway. Without either, they are skipped.
 ctest --test-dir build/linux -L real-servers
 ```
 
+### System libraries (distributions)
+
+By default OpenSSL and expat are compiled from the bundled sources and linked
+statically. Distribution builds can link the system's instead (Linux only;
+Windows always uses the bundled copies):
+
+```sh
+cmake -S . -B build/linux -G Ninja -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+  -DLINSCP_SYSTEM_OPENSSL=ON -DLINSCP_SYSTEM_EXPAT=ON
+```
+
+- `LINSCP_SYSTEM_OPENSSL`: OpenSSL 3.0 or later, 4.0 included (`libssl-dev`);
+  `-DOPENSSL_ROOT_DIR=<prefix>` picks a non-default one.
+- `LINSCP_SYSTEM_EXPAT`: expat 2.4 or later (`libexpat1-dev`).
+
+neon and libs3 stay bundled: the core uses API that exists only in the
+modified copies. [doc/qt/bundled-libraries.md](doc/qt/bundled-libraries.md)
+lists every bundled component, its changes, and why.
+
 ## Windows (cross-compiled from Linux)
 
 The toolchain and Qt are fetched pinned

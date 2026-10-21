@@ -34,11 +34,24 @@ add_compile_options(-fms-extensions -fshort-wchar)
 #                  Windows' wcslen is 2-byte and stays a builtin.
 if(NOT WIN32)
   add_compile_options(-fno-builtin-wcslen)
-  # WinSCP's OpenSSL, linked statically, kept to the programs themselves: the
-  # system's libssl comes in too (Kerberos' libldap needs it, and Qt's TLS
+endif()
+
+# Distributions build against their own libraries (cmake/openssl.cmake,
+# cmake/expat.cmake, doc/qt/bundled-libraries.md). Windows always builds the
+# bundled copies: the mingw sysroot has neither.
+if(NOT WIN32)
+  option(LINSCP_SYSTEM_OPENSSL "Use the system OpenSSL instead of the bundled copy" OFF)
+  option(LINSCP_SYSTEM_EXPAT "Use the system expat instead of the bundled copy" OFF)
+else()
+  set(LINSCP_SYSTEM_OPENSSL OFF)
+  set(LINSCP_SYSTEM_EXPAT OFF)
+endif()
+if(NOT WIN32 AND NOT LINSCP_SYSTEM_OPENSSL)
+  # The bundled OpenSSL, linked statically, kept to the programs themselves:
+  # the system's libssl comes in too (Kerberos' libldap needs it, and Qt's TLS
   # backend loads it), and an executable exporting OpenSSL's symbols has the
   # system's resolve to ours, two OpenSSLs mixed (Help > Check for Updates
-  # crashed in SSL_CTX_new).
+  # crashed in SSL_CTX_new). With the system's there is only the one.
   add_link_options("LINKER:--exclude-libs,libssl.a:libcrypto.a")
 endif()
 

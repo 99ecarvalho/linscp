@@ -54,7 +54,7 @@ target_include_directories(linscp-core PUBLIC
   "${LINSCP_GEN}/source/putty/windows"
   "${_up}/components"
   "${LINSCP_GEN}/libs/neon/src"
-  "${LINSCP_UPSTREAM}/libs/expat/lib"
+  ${LINSCP_EXPAT_INCLUDE}
   "${LINSCP_GEN}/libs/libs3/inc")
 # The Win32 import libraries core calls into directly: sockets, CryptoAPI
 # certificate chains, shell path helpers, version resources, GetUserNameEx and

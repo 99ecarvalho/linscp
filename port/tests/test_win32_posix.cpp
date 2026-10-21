@@ -865,9 +865,12 @@ X509 * MakeCertificate(EVP_PKEY * Key, const char * Subject, X509 * Issuer, EVP_
   X509_gmtime_adj(X509_getm_notBefore(C), ValidFrom);
   X509_gmtime_adj(X509_getm_notAfter(C), ValidTo);
   X509_set_pubkey(C, Key);
-  X509_NAME * Name = X509_get_subject_name(C);
+  // Built apart and set: OpenSSL 4.0's X509_get_subject_name returns const.
+  X509_NAME * Name = X509_NAME_new();
   X509_NAME_add_entry_by_txt(Name, "CN", MBSTRING_ASC, (const unsigned char *)Subject, -1, -1, 0);
+  X509_set_subject_name(C, Name);
   X509_set_issuer_name(C, (Issuer != NULL) ? X509_get_subject_name(Issuer) : Name);
+  X509_NAME_free(Name);
   X509V3_CTX Ctx;
   X509V3_set_ctx_nodb(&Ctx);
   X509V3_set_ctx(&Ctx, (Issuer != NULL) ? Issuer : C, C, NULL, NULL, 0);

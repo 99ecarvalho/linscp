@@ -5,6 +5,25 @@
 # port builds the release of the same version, plus the WinSCP changes
 # port/openssl/winscp-changes.txt adopts; port/tools/openssl_tree.py
 # assembles that tree and fails if the list misses a difference.
+
+# The system OpenSSL (LINSCP_SYSTEM_OPENSSL, POSIX only), for distributions.
+# None of the bundled tree's changes to the release matter off Windows (they
+# are all C++Builder fixes, port/openssl/winscp-changes.txt), so the system's
+# 3.x builds the same core. The targets below keep their names, so nothing
+# that links them changes; linscp-openssl-build is then an empty target.
+if(LINSCP_SYSTEM_OPENSSL)
+  find_package(OpenSSL 3.0 REQUIRED)
+  message(STATUS "OpenSSL: system ${OPENSSL_VERSION} (${OPENSSL_SSL_LIBRARY})")
+  add_custom_target(linscp-openssl-build)
+  add_library(linscp-openssl-crypto INTERFACE)
+  target_link_libraries(linscp-openssl-crypto INTERFACE OpenSSL::Crypto)
+  add_library(linscp-openssl-ssl INTERFACE)
+  target_link_libraries(linscp-openssl-ssl INTERFACE OpenSSL::SSL linscp-openssl-crypto)
+  add_library(linscp-openssl INTERFACE)
+  target_link_libraries(linscp-openssl INTERFACE linscp-openssl-ssl)
+  return()
+endif()
+
 set(LINSCP_OPENSSL_RELEASE "${CMAKE_SOURCE_DIR}/3rd-party/openssl")
 if(NOT EXISTS "${LINSCP_OPENSSL_RELEASE}/Configure")
   message(FATAL_ERROR "OpenSSL release missing at ${LINSCP_OPENSSL_RELEASE}; "

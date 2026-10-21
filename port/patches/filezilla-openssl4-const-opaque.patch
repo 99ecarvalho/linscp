@@ -1,0 +1,61 @@
+Build FileZilla's TLS layer against OpenSSL 4.0's const and opaque types.
+
+OpenSSL 4.0 makes ASN1_STRING (so ASN1_TIME) opaque and returns const from
+X509_get_subject_name, X509_get_issuer_name, X509_NAME_get_entry,
+X509_NAME_ENTRY_get_object, X509_NAME_ENTRY_get_data and X509_get_ext.
+AsnTimeToValidTime reads the time through ASN1_STRING_length,
+ASN1_STRING_get0_data and ASN1_STRING_type, which OpenSSL has had since
+1.1.0, and takes a const ASN1_TIME; NameToContact and the locals take the
+const pointers, which every function they are passed to accepts in 3.x too.
+X509V3_EXT_print takes a const extension only from 4.0, so the extension is
+cast to the 3.x type, a no-op there. The bundled OpenSSL 3.5 build is
+unchanged in behaviour, and so is C++Builder's. Line counts are unchanged.
+
+--- a/source/filezilla/AsyncSslSocketLayer.cpp
++++ b/source/filezilla/AsyncSslSocketLayer.cpp
+@@ -1227,6 +1227,6 @@
+ 
+-static bool AsnTimeToValidTime(ASN1_TIME * AsnTime, t_SslCertData::t_validTime & ValidTime)
++static bool AsnTimeToValidTime(const ASN1_TIME * AsnTime, t_SslCertData::t_validTime & ValidTime)
+ {
+-  int i = AsnTime->length;
+-  const char * v = reinterpret_cast<const char *>(AsnTime->data);
++  int i = ASN1_STRING_length(AsnTime);
++  const char * v = reinterpret_cast<const char *>(ASN1_STRING_get0_data(AsnTime));
+ 
+@@ -1245,3 +1245,3 @@
+ 
+-  if (AsnTime->type == V_ASN1_UTCTIME)
++  if (ASN1_STRING_type(AsnTime) == V_ASN1_UTCTIME)
+   {
+@@ -1253,3 +1253,3 @@
+   }
+-  else if (AsnTime->type == V_ASN1_GENERALIZEDTIME)
++  else if (ASN1_STRING_type(AsnTime) == V_ASN1_GENERALIZEDTIME)
+   {
+@@ -1292,3 +1292,3 @@
+ 
+-static void NameToContact(X509_NAME *pX509Name, t_SslCertData::t_Contact & contact)
++static void NameToContact(const X509_NAME *pX509Name, t_SslCertData::t_Contact & contact)
+ {
+@@ -1299,7 +1299,7 @@
+     {
+-      X509_NAME_ENTRY *pX509NameEntry=X509_NAME_get_entry(pX509Name,i);
++      const X509_NAME_ENTRY *pX509NameEntry=X509_NAME_get_entry(pX509Name,i);
+       if (!pX509NameEntry)
+         continue;
+-      ASN1_OBJECT *pObject = X509_NAME_ENTRY_get_object(pX509NameEntry);
+-      ASN1_STRING *pString = X509_NAME_ENTRY_get_data(pX509NameEntry);
++      const ASN1_OBJECT *pObject = X509_NAME_ENTRY_get_object(pX509NameEntry);
++      const ASN1_STRING *pString = X509_NAME_ENTRY_get_data(pX509NameEntry);
+       CString str;
+@@ -1395,3 +1395,3 @@
+   //Set subject data fields
+-  X509_NAME *pX509Name=X509_get_subject_name(pX509);
++  const X509_NAME *pX509Name=X509_get_subject_name(pX509);
+   NameToContact(pX509Name, SslCertData.subject);
+@@ -1438,3 +1438,3 @@
+   {
+-    X509_EXTENSION * subjectAltNameExtension = X509_get_ext(pX509, subjectAltNamePos);
++    X509_EXTENSION * subjectAltNameExtension = const_cast<X509_EXTENSION *>(X509_get_ext(pX509, subjectAltNamePos));
+     BIO * subjectAltNameBio = BIO_new(BIO_s_mem());
