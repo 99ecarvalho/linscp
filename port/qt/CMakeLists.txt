@@ -110,8 +110,9 @@ set(LINSCP_TRANSLATIONS_DIR "${_translations_dir}" PARENT_SCOPE)
 # run them, the same for both targets: MSYS2 has Qt's Linguist CMake package
 # only in its qt6-tools. Run the update_translations target after changing
 # the shell's texts; ctest translations_current fails while a .ts lags behind.
-find_program(LINSCP_LUPDATE NAMES lupdate-qt6 lupdate HINTS /usr/lib/qt6/bin NO_CMAKE_FIND_ROOT_PATH REQUIRED)
-find_program(LINSCP_LRELEASE NAMES lrelease-qt6 lrelease HINTS /usr/lib/qt6/bin NO_CMAKE_FIND_ROOT_PATH REQUIRED)
+# The names: Fedora's (-qt6), openSUSE's (6), and Qt's own.
+find_program(LINSCP_LUPDATE NAMES lupdate-qt6 lupdate6 lupdate HINTS /usr/lib/qt6/bin NO_CMAKE_FIND_ROOT_PATH REQUIRED)
+find_program(LINSCP_LRELEASE NAMES lrelease-qt6 lrelease6 lrelease HINTS /usr/lib/qt6/bin NO_CMAKE_FIND_ROOT_PATH REQUIRED)
 file(GLOB _shell_ts CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/translations/linscp_*.ts")
 file(GLOB _shell_sources CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
 set(_shell_qm)

@@ -19,6 +19,8 @@ set(_licenses
   "${CMAKE_SOURCE_DIR}/NEWS.md|NEWS.md"
   "${LINSCP_UPSTREAM}/license.txt|WinSCP-license.txt"
   "${CMAKE_SOURCE_DIR}/3rd-party/putty/LICENCE|PuTTY-LICENCE"
+  # The FTP engine, from FileZilla: GPL-2.0-or-later.
+  "${LINSCP_UPSTREAM}/source/filezilla/license-filezilla.txt|FileZilla-license.txt"
   # neon's licence text (src/COPYING.LIB) and its README, which lists the
   # copyright holders.
   "${LINSCP_UPSTREAM}/libs/neon/src/COPYING.LIB|neon-COPYING.LIB"
@@ -45,11 +47,23 @@ if(NOT WIN32)
   set(_libdir "${CMAKE_INSTALL_LIBDIR}/linscp")
   install(TARGETS linscp linscp-cli RUNTIME DESTINATION "${_libdir}")
   install(DIRECTORY "${LINSCP_TRANSLATIONS_DIR}/" DESTINATION "${_libdir}/Translations")
+  # The install directories may be absolute (GNUInstallDirs allows it; Nix
+  # passes them so): resolved at install time, against the prefix then in
+  # effect (cmake --install --prefix), only when relative.
+  set(_install_dirs "
+    set(_libdir_abs \"${_libdir}\")
+    set(_bindir_abs \"${CMAKE_INSTALL_BINDIR}\")
+    foreach(_dir _libdir_abs _bindir_abs)
+      if(NOT IS_ABSOLUTE \"\${\${_dir}}\")
+        set(\${_dir} \"\${CMAKE_INSTALL_PREFIX}/\${\${_dir}}\")
+      endif()
+    endforeach()")
   foreach(_program linscp linscp-cli)
-    install(CODE "
-      set(_bin \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}\")
+    install(CODE "${_install_dirs}
+      set(_bin \"\$ENV{DESTDIR}\${_bindir_abs}\")
+      file(RELATIVE_PATH _target \"\${_bindir_abs}\" \"\${_libdir_abs}/${_program}\")
       file(MAKE_DIRECTORY \"\${_bin}\")
-      file(CREATE_LINK \"../${_libdir}/${_program}\" \"\${_bin}/${_program}\" SYMBOLIC)")
+      file(CREATE_LINK \"\${_target}\" \"\${_bin}/${_program}\" SYMBOLIC)")
   endforeach()
 
   # WinSCP's .NET assembly (netstandard2.0), for WinSCP's PowerShell
@@ -70,9 +84,9 @@ if(NOT WIN32)
     add_custom_target(winscpnet DEPENDS "${_winscpnet}")
     # The package targets build it first (below). The install tolerates its
     # absence, so a plain `cmake --install` without it still succeeds.
-    install(CODE "
+    install(CODE "${_install_dirs}
       if(EXISTS \"${_winscpnet}\")
-        set(_dotnet \"\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${_libdir}/dotnet\")
+        set(_dotnet \"\$ENV{DESTDIR}\${_libdir_abs}/dotnet\")
         file(MAKE_DIRECTORY \"\${_dotnet}\")
         file(COPY \"${_winscpnet}\" DESTINATION \"\${_dotnet}\")
         file(REMOVE \"\${_dotnet}/WinSCP.exe\")
