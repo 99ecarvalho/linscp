@@ -25,3 +25,9 @@ port/tests/golden/expected/*/*.out
 
 # cmd cheatsheets, kept local only
 CMDs.txt
+
+# OpenPGP secrets the key cheatsheet (CMDs.txt) can write here: never committed
+/linscp-revoke.asc
+/linscp-secret-backup.asc
+/subkeys.asc
+/release-signing-subkey.asc
