@@ -312,6 +312,9 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-21 | Code built against the shim is compiled with `-fno-builtin` (C++), replacing `-fno-assume-sane-operator-new` | GCC 16's `<new>` and clang 23 let the optimizer treat a new-expression's memory as uninitialized in ways no narrower flag turns off; the shim's zeroed allocations are what the C++Builder code relies on. About 0.3% larger code |
+| 2026-10-21 | The source tarball leaves out upstream's `source/packages/` and `.dcr`/`.res` resources | linscp builds none of them, and some (TBX, PIDL.pas) are under licences that forbid redistributing copies; the tarball is what every distribution republishes |
+| 2026-10-21 | Distribution and package-manager recipes live in `port/packaging/<channel>/`; their publishing jobs wait in `port/packaging/ci/release-jobs.yml` until the account and secret of each exist | A job that publishes with the maintainer's credentials goes into the release workflow only once reviewed and usable |
 | 2026-10-20 | The Flatpak is x86_64 only (`flathub.json` `only-arches`) | Flathub does not require aarch64; no aarch64 build is tested or supported |
 | 2026-10-20 | Each release publishes the copyleft components' source (`linscp-X.Y.Z-third-party-sources.tar`) instead of a three-year written offer; no sources are kept for the 0.x releases already out | The same place as the downloads satisfies every licence involved without local or off-site copies; before 1.0 the releases are experimental and may be removed |
 | 2026-10-20 | The FTP engine's `CString`/`CFile`/`CTime` come from linscp's own clean-room `port/mfc-compat/` (ADR 0017); the vendored MFC subset is not compiled, guarded by a configure check and ctest `no_mfc`, covered by ctest `mfc_compat` | The vendored subset is not under a free licence; every distribution channel reviews licences |

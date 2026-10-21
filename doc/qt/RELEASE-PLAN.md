@@ -438,6 +438,40 @@ the AUR packaging must be 0BSD-licensed and build against system libraries.
 Status: `todo`, `wip`, `blocked`, `done`, `dropped`. Owner `M` = maintainer only
 (cannot be delegated: hand-written submissions, accounts, keys, sponsorship).
 
+### State (2026-10-21)
+
+| Phase | done | wip | blocked | todo | dropped |
+|---|---|---|---|---|---|
+| 0 — Licence clean-up | 29 | 1 | 2 | 1 | 1 |
+| 1 — Flathub | 16 | 0 | 0 | 5 | 0 |
+| 2 — Own repositories | 3 | 6 | 0 | 4 | 0 |
+| 3 — Official distributions | 1 | 1 | 1 | 7 | 0 |
+| W — Windows channels | 0 | 4 | 1 | 1 | 0 |
+| **All** | **49** | **12** | **4** | **18** | **1** |
+
+Everything that could be prepared without the maintainer's accounts or keys
+is done or waits only on them; the publishing jobs are ready in
+`port/packaging/ci/release-jobs.yml`, not yet in the release workflow. What
+unblocks the rest, in order of reach:
+
+1. **The next release (0.7.2)**, tagged from `main`: the first with the source
+   tarball, `SHA256SUMS` and the third-party sources (R0-24), which every
+   distribution recipe needs (the v0.7.1 tag predates the app ID and the
+   packaging).
+2. **The release key** (R0-15, R0-16): signature checks in the watch file,
+   the PKGBUILD, the spec and OBS (R3-03).
+3. **Accounts and secrets**, each then a job moved into the release
+   workflow: AUR (R2-01 → R2-04), Copr (R2-05 → R2-07), OBS (R2-08 →
+   R2-09, R2-10), Launchpad (R2-11 → R2-13), winget, Chocolatey and a Scoop
+   bucket (RW-01 to RW-04, which also need a Windows test run).
+4. **Flathub by hand** (R1-13 to R1-17): the submission manifest, the
+   `--filesystem=home` justification, the screen recording and the PR.
+5. **Debian, Fedora, nixpkgs** (R3-01, R3-04 to R3-06, R3-08 to R3-10): ITP,
+   sponsors and reviews, once Phase 2 has users.
+
+Not started: R0-31 (an AppImage Qt without libproxy and GSSAPI), R3-07
+(Fedora repack script and crypto-policy check), RW-05/RW-06 (code signing).
+
 | ID | Phase | Deliverable | Owner | Status |
 |---|---|---|---|---|
 | R0-01 | 0 | Clean-room spec of the used `CString`/`CTime`/`CFile` API (from public docs) | | done |
@@ -454,10 +488,13 @@ Status: `todo`, `wip`, `blocked`, `done`, `dropped`. Owner `M` = maintainer only
 | R0-25 | 0 | Re-resolve the MSYS2 lock: two pinned packages are no longer published, so a cold CI cache cannot fetch the Windows toolchain | | done |
 | R0-26 | 0 | Release-only crash in ctest `object_exceptions` (double free); run the unit tests in a Release configuration in CI | | done |
 | R0-27 | 0 | `CMAKE_BUILD_TYPE=Debug` fails to link `linscp-cli` (undefined `DoAssert`/`DoAssertC`). Fixed in `port/shim/vcl_assert.cpp`: a failed assertion prints and aborts (`LINSCP_ASSERT=continue` goes on) | | done |
-| R0-28 | 0 | FileZilla splits local paths only on `\` (`FtpControlSocket.cpp`), so on Linux the whole path is the file name (Debug assertion in ctest `qt_session_ftp`): patch `filezilla-posix-local-path-delimiters` | | todo |
+| R0-28 | 0 | FileZilla splits local paths only on `\` (`FtpControlSocket.cpp`), so on Linux the whole path is the file name (Debug assertion in ctest `qt_session_ftp`). Patch `filezilla-posix-local-path-delimiters` splits at `PathDelim`; `qt_session_ftp` passes in Debug | | done |
 | R0-29 | 0 | AppImage ships only the Qt plugins linscp uses (`build_appimage.py` `PLUGINS`) and the libraries they need; drops linuxdeploy's copyright copies | | done |
-| R0-30 | 0 | ctest `no_build_paths` fails in Debug when the build folder is outside the source tree (a uic include path climbs back to the source) | | todo |
+| R0-30 | 0 | ctest `no_build_paths` fails in Debug when the build folder is outside the source tree (moc included its headers by a path climbing to `/`). `CMAKE_AUTOMOC_PATH_PREFIX` with `port/qt` an include directory | | done |
 | R0-31 | 0 | AppImage against a Qt built without libproxy and GSSAPI: drops about 20 bundled source packages (curl, krb5, OpenLDAP, GnuTLS, librtmp…) and 6 of the copyleft ones. Proxy detection then reads `http_proxy` and the like, not the desktop's proxy settings | | todo |
+| R0-32 | 0 | Zeroed allocations held on newer toolchains: GCC 16's `<new>` (`__malloc__` operator new) and clang 23 (removes new/delete pairs) broke `object_exceptions`. `-fno-builtin` (C++) on the shim's consumers and the FTP engine; `test_object` catches both; CI job `linux-rolling` (Arch, non-blocking) | | done |
+| R0-33 | 0 | Source tarball leaves out `source/packages/` (TBX, PIDL.pas and other Delphi packages under licences forbidding redistribution) and `.dcr`/`.res` image resources; its banner check no longer matches itself | | done |
+| R0-34 | 0 | Install rules work with absolute `CMAKE_INSTALL_*DIR` (Nix): the `bin/` links computed with `file(RELATIVE_PATH)`; openSUSE's `lupdate6`/`lrelease6` found; FileZilla's licence text shipped | | done |
 | R0-11 | 0 | About + README: Qt used under LGPL-3.0, with source link | | done |
 | R0-12 | 0 | AppImage: same licence-text and source audit | | done |
 | R0-13 | 0 | Ship neon `COPYING.LIB`, libs3 `COPYING-GPLv2`, Inno Setup licence; fix the neon comment | | done |
@@ -493,34 +530,34 @@ Status: `todo`, `wip`, `blocked`, `done`, `dropped`. Owner `M` = maintainer only
 | R1-16 | 1 | Disclosure statement and PR against `new-pr`, written and opened by the maintainer | M | todo |
 | R1-17 | 1 | After merge: 2FA, accept invite, domain verification in the Developer Portal | M | todo |
 | R2-01 | 2 | AUR account + SSH key | M | todo |
-| R2-02 | 2 | AUR `linscp` PKGBUILD + `.SRCINFO` + 0BSD LICENSE; namcap and clean-chroot build | | todo |
-| R2-03 | 2 | AUR `linscp-git` (optional) | | todo |
-| R2-04 | 2 | AUR deploy job in the release workflow | | todo |
+| R2-02 | 2 | AUR `linscp` PKGBUILD + `.SRCINFO` + 0BSD LICENSE (`port/packaging/arch/linscp`); namcap clean, built and 137 tests passed in a clean archlinux container (a stand-in for `pkgctl build`) | | done |
+| R2-03 | 2 | AUR `linscp-git` (`port/packaging/arch/linscp-git`): built and tested, namcap clean | | done |
+| R2-04 | 2 | AUR deploy job: written (`port/packaging/ci/release-jobs.yml`, action pinned to a commit), goes into the release workflow once R2-01's key is a secret | | wip |
 | R2-05 | 2 | Fedora account + Copr project + API token secret | M | todo |
-| R2-06 | 2 | `linscp.spec`; mock, rpmlint and fedora-review clean | | todo |
-| R2-07 | 2 | Copr build job in the release workflow | | todo |
+| R2-06 | 2 | `port/packaging/rpm/linscp.spec` (shared with openSUSE): builds on Fedora 43, 44, rawhide (mock), Tumbleweed and Leap 16.0; rpmlint leaves only licence-text FSF addresses and debug-package artefacts. Done once a Copr build of a release with a tarball passes (fedora-review optional) | | wip |
+| R2-07 | 2 | Copr job (`copr-cli` with `COPR_CONFIG`): written in `port/packaging/ci/release-jobs.yml`, SRPM step tested; needs R2-05 | | wip |
 | R2-08 | 2 | OBS account + `home:` project with targets | M | todo |
-| R2-09 | 2 | OBS `_service`, shared spec, `debian.*` files; `osc build` per target | | todo |
-| R2-10 | 2 | OBS workflow token + webhook + `.obs/workflows.yml` | | todo |
+| R2-09 | 2 | OBS `port/packaging/obs/_service` (obs_scm for the packaging files + download_files for the release tarball), the shared spec, `debian.*` and `linscp.dsc` generated by `port/tools/gen_obs_debian.py` (ctest `packaging_obs_debian`); `osc build` needs R2-08 and a release with a tarball | | wip |
+| R2-10 | 2 | `.obs/workflows.yml` (pull requests build in `home:99ecarvalho:linscp:CI`); releases rerun the services from the `obs` job in `port/packaging/ci/release-jobs.yml`. Needs the OBS token and the webhook | | wip |
 | R2-11 | 2 | Launchpad account, key, PPA activated | M | todo |
-| R2-12 | 2 | `debian/` packaging (shared with Phase 3); lintian and offline sbuild clean | | todo |
-| R2-13 | 2 | PPA upload job (26.04, 26.10) with a signing subkey | | todo |
+| R2-12 | 2 | `port/packaging/debian/` (shared with Phase 3): builds on trixie, Ubuntu 26.04 and 26.10 in clean containers, lintian `-EvIL +pedantic` clean but for the ITP number and the missing signature check, autopkgtest smoke tests pass. A real sbuild not run | | done |
+| R2-13 | 2 | PPA job (`port/tools/ppa_source_packages.sh`, one source package per series from one orig): in `port/packaging/ci/release-jobs.yml`, signing and `dput --simulate` tested; needs R2-11 | | wip |
 | R3-01 | 3 | Debian ITP filed | M | todo |
-| R3-02 | 3 | `debian/copyright` (DEP-5) for every bundled tree, `Files-Excluded`, `+dfsg` repack | | todo |
-| R3-03 | 3 | Watch file v5 + upstream signing key + `debian/upstream/metadata` + autopkgtest | | todo |
+| R3-02 | 3 | `debian/copyright` (DEP-5) for every bundled tree; `Files-Excluded` (`+dfsg`) for 0.7.1, nothing to exclude from the next release's tarball (R0-33). ftpmasters' review still to come | | done |
+| R3-03 | 3 | Watch file v5, `debian/upstream/metadata`, autopkgtest (`debian/tests`): written; the signature check and `debian/upstream/signing-key.asc` wait for the release key (R0-15) | | blocked |
 | R3-04 | 3 | Security-tracker embedded-copy entries (PuTTY, neon, libs3) | M | todo |
 | R3-05 | 3 | mentors.debian.net upload + RFS + sponsor + NEW queue | M | todo |
 | R3-06 | 3 | Fedora review request + sponsorship + `fedpkg request-repo` | M | todo |
 | R3-07 | 3 | Fedora repack script for prohibited content; crypto-policy compliance | | todo |
 | R3-08 | 3 | EPEL 10 branch (once Qt ≥ 6.8 confirmed) | M | todo |
 | R3-09 | 3 | Arch [extra]: approach a Package Maintainer once there is AUR usage | M | todo |
-| R3-10 | 3 | nixpkgs `package.nix` + maintainer entry + PR | | todo |
-| RW-01 | W | winget manifest (inno + portable) via `wingetcreate`; CLA signed | | todo |
-| RW-02 | W | `wingetcreate update --submit` in the release workflow | | todo |
-| RW-03 | W | Scoop: own bucket now; Extras request after ≈ 100 stars | | todo |
-| RW-04 | W | Chocolatey package + `chocolatey-au` | | todo |
+| R3-10 | 3 | `port/packaging/nix/package.nix`: built against nixos-unstable (Qt 6.12, system OpenSSL), SFTP transfer tested, nixfmt clean. Left: the published tarball's hash, a maintainer handle, the PR once there are users | | wip |
+| RW-01 | W | winget multi-file manifest (`port/packaging/winget/`, schema 1.12.0, inno per scope + portable zip): schema-valid; `winget validate`/install on Windows pending (test VM unreachable); CLA signed by the maintainer | | wip |
+| RW-02 | W | winget, Chocolatey and Scoop jobs in `port/packaging/ci/release-jobs.yml`; need the secrets and the first submissions | | wip |
+| RW-03 | W | Scoop manifest `port/packaging/scoop/linscp.json` (schema-valid; `persist` of the portable INI); `scoop install` pending on Windows; own bucket to create (README there) | | wip |
+| RW-04 | W | Chocolatey package `port/packaging/chocolatey/` (nuspec, install script, chocolatey-au `update.ps1`): packs; `choco install`/uninstall pending on Windows; account and owner name to set | | wip |
 | RW-05 | W | Code signing: SignPath application after R0-02, or another option | M | todo |
-| RW-06 | W | Sign `setup.exe` and the executables in the portable zip | | todo |
+| RW-06 | W | Sign `setup.exe` and the executables in the portable zip (after RW-05) | | blocked |
 | RC-01 | — | Colour render path in `IconSet.cpp` (paint SVGs as-is, with a disabled-state treatment) | | todo |
 | RC-02 | — | Add the Tango, icons8 Flat Color and Papirus sets (licences shipped, roles mapped in `import_icons.py`) | | todo |
 
