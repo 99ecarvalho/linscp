@@ -23,10 +23,11 @@ port/tests/golden/expected/*/*.out
 # Windows packages (port/tools/fetch_msys2_qt.py --sources); never committed.
 /source-archive/
 
-# cmd cheatsheets, kept local only
+# The maintainer's own files (cheatsheets, scripts), kept local only
+/local/
 CMDs.txt
 
-# OpenPGP secrets the key cheatsheet (CMDs.txt) can write here: never committed
+# OpenPGP secrets the key cheatsheet (local/CMDs.txt) can write here: never committed
 /linscp-revoke.asc
 /linscp-secret-backup.asc
 /subkeys.asc
