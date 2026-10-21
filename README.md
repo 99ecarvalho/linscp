@@ -3,8 +3,8 @@
 [![License: GPL v3](https://img.shields.io/badge/license-GPL--3.0-blue.svg)](LICENSE)
 [![Latest release](https://img.shields.io/github/v/release/99ecarvalho/linscp)](https://github.com/99ecarvalho/linscp/releases)
 
-**A free file manager for moving files between your computer and remote
-servers, with the same interface on Linux and Windows.**
+**A free app for moving files between your computer and remote servers,
+with the same interface on Linux and Windows.**
 
 linscp shows your local files and a server's files side by side, so you can
 copy, sync and edit them as easily as on your own disk. It runs on 64-bit Linux

@@ -26,8 +26,8 @@ A maintenance release: CI clean-up.
 
 ## 0.7.0 — 2026-10-19
 
-The first official release, out of pre-release: a fast, friendly file manager
-for moving files between your computer and remote servers, with the same
+The first official release, out of pre-release: a fast, friendly app for
+moving files between your computer and remote servers, with the same
 experience on Linux and Windows. The About dialog and the in-app links (manual,
 homepage, donations, security reports) now go to <https://linscp.org>, and the
 Help menu has a Report a Security Issue item.
