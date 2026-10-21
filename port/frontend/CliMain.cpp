@@ -1407,7 +1407,7 @@ int Info(TCliConsole * Console)
 // The switches this client has, with upstream's descriptions.
 void Usage(TCliConsole * Console)
 {
-  Console->PrintLine(FORMAT(L"%s %s, based on WinSCP %s", (AppNameString(), LINSCP_VERSION, Configuration->Version)));
+  Console->PrintLine(FORMAT(L"%s %s", (AppNameString(), LINSCP_VERSION)));
   Console->PrintLine(ReplaceText(LoadStr(WINSCP_COPYRIGHT), L"©", L"(c)"));
   Console->PrintLine();
   Console->PrintLine(LoadStr(USAGE_SYNTAX_LABEL));
