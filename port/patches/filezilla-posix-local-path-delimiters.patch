@@ -1,0 +1,40 @@
+Split local paths at the platform's delimiter in the FTP engine.
+
+The FTP engine finds a local file's name, and the folders to create for a
+download, by the last (or each) backslash in its local path. On POSIX that
+is not a path delimiter: nothing was split, so the whole path,
+"/tmp/down/up.bin", was taken as the file name. The overwrite question named
+the whole path where it names the file, the check for ':' in a downloaded
+file's name ran over the whole path, and a download's folders were not
+created first. Debug builds stopped on core's assertion that the overwrite
+question's file name is the target's (FtpFileSystem.cpp).
+
+Each is split at PathDelim, as core splits local paths: on Windows the same
+backslash as before, so upstream's behaviour is unchanged. Line counts are
+unchanged.
+
+--- a/source/filezilla/FtpControlSocket.cpp
++++ b/source/filezilla/FtpControlSocket.cpp
+@@ -2902,1 +2902,1 @@
+-    int pos=transferfile->localfile.ReverseFind(L'\\');
++    int pos=transferfile->localfile.ReverseFind(PathDelim);
+@@ -4437,1 +4437,1 @@
+-      if (path.ReverseFind(L'\\') != -1)
++      if (path.ReverseFind(PathDelim) != -1)
+@@ -4439,1 +4439,1 @@
+-        path = path.Left(path.ReverseFind(L'\\')+1);
++        path = path.Left(path.ReverseFind(PathDelim)+1);
+@@ -4443,2 +4443,2 @@
+-          path2 += path.Left(path.Find(L"\\") + 1);
+-          path = path.Mid(path.Find(L"\\") + 1);
++          path2 += path.Left(path.Find(PathDelim) + 1);
++          path = path.Mid(path.Find(PathDelim) + 1);
+@@ -4536,1 +4536,1 @@
+-          int pos = pData->transferfile.localfile.ReverseFind(L'\\');
++          int pos = pData->transferfile.localfile.ReverseFind(PathDelim);
+@@ -4547,1 +4547,1 @@
+-          int pos = pData->transferfile.localfile.ReverseFind(L'\\');
++          int pos = pData->transferfile.localfile.ReverseFind(PathDelim);
+@@ -4617,1 +4617,1 @@
+-        int pos = pTransferData->transferfile.localfile.ReverseFind(L'\\');
++        int pos = pTransferData->transferfile.localfile.ReverseFind(PathDelim);
