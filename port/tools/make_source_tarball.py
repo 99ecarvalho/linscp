@@ -29,8 +29,13 @@ build and may not redistribute (Phase 0 of the release plan):
                        openssl_tree.py compares with the release on every
                        build and fails without
   images               *.ico *.bmp *.png *.jpg *.gif *.cur *.ani *.svg *.tif,
+                       and the *.dcr *.res resources that embed them,
                        licensed for the upstream application only
   deployment/          the upstream installer, its icon and licence texts
+  source/packages/     the Delphi component packages (Toolbar2000, TBX, JCL,
+                       PngComponents, drag-and-drop, ...), which linscp does
+                       not build; some are under licences that forbid
+                       redistributing modified or any copies (TBX, PIDL.pas)
   source/**/*.dfm      form files, which embed the upstream images. Kept: the
                        few in KEEP_DFM, which hold no image data and which the
                        qt_gui_menus tests read for the menu layout
@@ -54,7 +59,8 @@ SUBMODULES = ('3rd-party/winscp', '3rd-party/putty', '3rd-party/openssl')
 OMITTED_SUBMODULES = ('linscp-website',)
 UPSTREAM = '3rd-party/winscp'
 
-IMAGE_EXTS = ('.ico', '.bmp', '.png', '.jpg', '.gif', '.cur', '.ani', '.svg', '.tif')
+# .dcr and .res: Delphi component and Windows resources, which hold images.
+IMAGE_EXTS = ('.ico', '.bmp', '.png', '.jpg', '.gif', '.cur', '.ani', '.svg', '.tif', '.dcr', '.res')
 # Form files the test suite reads (port/tests/check_menus.py: qt_gui_menus,
 # qt_gui_menus_explorer). They reference image lists by name and embed none;
 # check_kept_dfm() enforces that.
@@ -141,6 +147,8 @@ def upstream_excluded(path, keep_openssl):
         return 'libs/openssl'
     if path.startswith('deployment/'):
         return 'deployment'
+    if path.startswith('source/packages/'):
+        return 'packages'
     if low.endswith(IMAGE_EXTS):
         return 'image'
     if path.startswith('source/') and low.endswith('.dfm') and path not in KEEP_DFM:
