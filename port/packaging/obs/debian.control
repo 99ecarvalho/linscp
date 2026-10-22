@@ -27,7 +27,10 @@ Vcs-Browser: https://github.com/99ecarvalho/linscp
 Vcs-Git: https://github.com/99ecarvalho/linscp.git
 
 Package: linscp
-Architecture: any
+# amd64 only, as every linscp package: the bundled PuTTY's AES-NI code is
+# built for x86 alone, and the Windows-compatibility layer assumes a 64-bit
+# platform.
+Architecture: amd64
 Depends:
  qt6-svg-plugins,
  ${misc:Depends},

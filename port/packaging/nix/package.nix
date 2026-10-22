@@ -89,7 +89,9 @@ clangStdenv.mkDerivation (finalAttrs: {
       isc
     ];
     mainProgram = "linscp";
-    platforms = lib.platforms.linux;
+    # x86_64 only, as every linscp package (the bundled PuTTY's AES-NI code
+    # is built for x86 alone; the Windows-compatibility layer assumes 64-bit).
+    platforms = [ "x86_64-linux" ];
     # The maintainer entry is added in a separate `maintainers: add` commit.
     maintainers = [ ];
   };

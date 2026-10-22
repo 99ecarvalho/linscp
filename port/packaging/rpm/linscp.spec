@@ -33,6 +33,10 @@ Summary:        SFTP, SCP, FTP, WebDAV and S3 file-transfer client
 # OpenSSL and expat come from the system, so their licences are not listed.
 License:        GPL-3.0-or-later AND GPL-2.0-or-later AND LGPL-2.0-or-later AND (LGPL-3.0-or-later OR GPL-2.0-or-later) AND MIT AND ISC
 URL:            https://linscp.org
+# x86_64 only, as every linscp package: the bundled PuTTY's AES-NI code is
+# built for x86 alone, and the Windows-compatibility layer assumes a 64-bit
+# platform. Other architectures need porting work first.
+ExclusiveArch:  x86_64
 Source0:        https://github.com/99ecarvalho/linscp/releases/download/v%{version}/%{name}-%{version}.tar.xz
 # The tarball's signature and the release-signing key
 # (A679B8C9915BB5ACDD45F91E207FB492B5B214A9, doc/release-signing-key.asc).

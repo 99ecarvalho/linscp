@@ -1,7 +1,7 @@
 Format: 3.0 (quilt)
 Source: linscp
 Binary: linscp
-Architecture: any
+Architecture: amd64
 Version: 0.7.2-1
 Maintainer: Eduardo Correia <ecorreia@apliant.com.br>
 Homepage: https://linscp.org
