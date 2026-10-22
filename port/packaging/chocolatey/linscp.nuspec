@@ -6,7 +6,7 @@
   <metadata>
     <id>linscp</id>
     <version>0.7.2</version>
-    <title>linscp</title>
+    <title>linscp – file transfer over SFTP, SCP, FTP, WebDAV and S3</title>
     <authors>Eduardo Correia</authors>
     <!-- The chocolatey.org account that pushes the package. -->
     <owners>ercorreia</owners>
