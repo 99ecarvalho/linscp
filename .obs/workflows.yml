@@ -1,4 +1,4 @@
-# Open Build Service workflows for linscp (home:99ecarvalho/linscp, whose
+# Open Build Service workflows for linscp (home:ercorreia/linscp, whose
 # _service is port/packaging/obs/_service).
 #
 # The webhook: GitHub Settings > Webhooks, payload URL
@@ -10,9 +10,9 @@
 # and a draft's tarball cannot be downloaded yet, so download_files would
 # fail. The release workflow reruns the package's services when the release
 # is published, with an OBS runservice token. By hand:
-#   osc service remoterun home:99ecarvalho linscp
+#   osc service remoterun home:ercorreia linscp
 
-# Pull requests: OBS branches the package into home:99ecarvalho:linscp:CI,
+# Pull requests: OBS branches the package into home:ercorreia:linscp:CI,
 # where obs_scm takes the pull request's spec (its commit, from the
 # webhook). The spec builds against the published tarball of its Version, so
 # a pull request that changes the packaging is built on every target, and the
@@ -20,8 +20,8 @@
 packaging_ci:
   steps:
     - branch_package:
-        source_project: home:99ecarvalho
+        source_project: home:ercorreia
         source_package: linscp
-        target_project: home:99ecarvalho:linscp:CI
+        target_project: home:ercorreia:linscp:CI
   filters:
     event: pull_request

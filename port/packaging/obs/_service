@@ -1,5 +1,5 @@
 <!--
-  linscp's OBS package (home:<user>/linscp): the spec from this repository,
+  linscp's OBS package (home:ercorreia/linscp): the spec from this repository,
   the source from the release tarball. Copy this file into the OBS package
   (osc add _service); it is the only file the package needs to hold.
   Commit it with the files port/tools/gen_obs_debian.py writes here: obs_scm
@@ -21,7 +21,7 @@
   A fixed verify_file sha256 cannot be kept here for automatic updates: the
   tarball is built from the tagged tree, so the tree cannot hold its hash.
 
-  Run it:     osc service remoterun home:<user> linscp
+  Run it:     osc service remoterun home:ercorreia linscp
   Automatic:  the release workflow, once the release is published (a
               draft's tarball cannot be downloaded); .obs/workflows.yml
               builds pull requests' packaging changes.

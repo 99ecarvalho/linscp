@@ -27,6 +27,9 @@ on:
     tags: ['v[0-9]+.[0-9]+.[0-9]+*']
   release:
     types: [published]
+  # By hand: publish the latest release to the package channels again (a
+  # channel set up after the release, or a failed upload).
+  workflow_dispatch:
 
 concurrency:
   group: release-${{ github.ref }}
@@ -161,3 +164,69 @@ jobs:
           -H "Accept: application/vnd.github+json"
           https://api.github.com/repos/99ecarvalho/linscp-website/dispatches
           -d '{"event_type":"linscp-release"}'
+
+  # The package channels, once a release is published (or by hand). Each job
+  # skips itself while its secret is not set; the jobs still waiting for an
+  # account are in port/packaging/ci/release-jobs.yml.
+
+  # Chocolatey (community.chocolatey.org, owner ercorreia): packs
+  # port/packaging/chocolatey for the latest release and pushes it, unless
+  # that version is already there. New versions go through Chocolatey's
+  # moderation before they are listed.
+  #   CHOCOLATEY_API_KEY   the account's API key
+  chocolatey:
+    if: (github.event_name == 'release' && !github.event.release.prerelease) || github.event_name == 'workflow_dispatch'
+    runs-on: windows-latest   # has choco
+    timeout-minutes: 20
+    env:
+      CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        if: env.CHOCOLATEY_API_KEY != ''
+        with:
+          sparse-checkout: port/packaging/chocolatey
+      - name: Pack and push the package
+        if: env.CHOCOLATEY_API_KEY != ''
+        shell: pwsh
+        working-directory: port/packaging/chocolatey
+        run: |
+          $latest = (gh release view -R $env:GITHUB_REPOSITORY --json tagName --jq .tagName) -replace '^v', ''
+          [xml]$nuspec = Get-Content linscp.nuspec
+          $version = $nuspec.package.metadata.version
+          if ($version -ne $latest) {
+            # Behind the release: chocolatey-au moves the nuspec and the
+            # install script to it (checksum from SHA256SUMS) and packs.
+            Install-Module Chocolatey-AU -RequiredVersion 1.0.0 -Force -Scope CurrentUser
+            ./update.ps1
+            $version = $latest
+          } else {
+            choco pack linscp.nuspec
+          }
+          $package = Get-ChildItem "linscp.$version.nupkg" -ErrorAction SilentlyContinue
+          if (-not $package) { throw "no linscp.$version.nupkg was made" }
+          # A version already pushed (even if still in moderation) is not pushed again.
+          $listed = Invoke-WebRequest -SkipHttpErrorCheck -Uri "https://community.chocolatey.org/api/v2/Packages(Id='linscp',Version='$version')"
+          if ($listed.StatusCode -eq 200) {
+            Write-Output "linscp $version is already on Chocolatey"
+          } else {
+            choco push $package.FullName --source https://push.chocolatey.org/ --api-key $env:CHOCOLATEY_API_KEY
+          }
+
+  # openSUSE OBS (home:ercorreia/linscp): reruns the package's services
+  # (port/packaging/obs/_service: the packaging files from the repository and
+  # the published tarball), which rebuilds every target. Pull requests build
+  # there through .obs/workflows.yml.
+  #   OBS_RUNSERVICE_TOKEN   osc token --create --operation runservice home:ercorreia linscp
+  obs:
+    if: (github.event_name == 'release' && !github.event.release.prerelease) || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      OBS_RUNSERVICE_TOKEN: ${{ secrets.OBS_RUNSERVICE_TOKEN }}
+    steps:
+      - name: Rerun the OBS package's services
+        if: env.OBS_RUNSERVICE_TOKEN != ''
+        run: >-
+          curl -fsS -X POST
+          -H "Authorization: Token $OBS_RUNSERVICE_TOKEN"
+          "https://api.opensuse.org/trigger/runservice?project=home:ercorreia&package=linscp"

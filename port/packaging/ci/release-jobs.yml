@@ -7,9 +7,9 @@
 #
 #   WINGET_TOKEN         classic PAT with the repo scope, of the account that
 #                        forks microsoft/winget-pkgs and opens the pull request
-#   CHOCOLATEY_API_KEY   chocolatey.org API key of the package's owner
 #   SCOOP_BUCKET_TOKEN   fine-grained PAT, Actions: write on 99ecarvalho/scoop-bucket
-#   COPR_CONFIG, OBS_RUNSERVICE_TOKEN, PPA_SIGNING_KEY: at their jobs below
+#   COPR_CONFIG, PPA_SIGNING_KEY: at their jobs below (Chocolatey and OBS are in
+#   release.yml already)
 #   AUR_SSH_PRIVATE_KEY  the private half of the AUR account's dedicated SSH key
 #                        (ed25519, no passphrase)
 
@@ -93,30 +93,6 @@ jobs:
                    "$base/linscp-$version-portable.zip|x64" `
             --release-notes-url "https://github.com/$env:REPO/releases/tag/$env:TAG" `
             --submit --no-open
-
-  chocolatey:
-    if: github.event_name == 'release' && !github.event.release.prerelease
-    runs-on: windows-latest   # has choco
-    timeout-minutes: 20
-    env:
-      CHOCOLATEY_API_KEY: ${{ secrets.CHOCOLATEY_API_KEY }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        if: env.CHOCOLATEY_API_KEY != ''
-        with:
-          sparse-checkout: port/packaging/chocolatey
-      - name: Update, pack and push the package
-        if: env.CHOCOLATEY_API_KEY != ''
-        shell: pwsh
-        working-directory: port/packaging/chocolatey
-        run: |
-          Install-Module Chocolatey-AU -Force -Scope CurrentUser
-          # Moves the nuspec and install script to the latest release, with
-          # the checksum from its SHA256SUMS, and packs linscp.<version>.nupkg.
-          ./update.ps1
-          $package = Get-ChildItem linscp.*.nupkg | Select-Object -First 1
-          if (-not $package) { throw 'chocolatey-au made no package' }
-          choco push $package.FullName --source https://push.chocolatey.org/ --api-key $env:CHOCOLATEY_API_KEY
 
   # Optional: the bucket's Excavator workflow updates linscp.json on its own
   # schedule; this only makes it run now.
@@ -229,20 +205,3 @@ jobs:
           mkdir -p ~/.config
           printf '%s\n' "$COPR_CONFIG" > ~/.config/copr
           copr-cli build linscp srpm/linscp-*.src.rpm
-
-  # OBS reruns the package's services (port/packaging/obs/_service: the
-  # packaging files from the repository and the published tarball) and
-  # rebuilds every target. Pull requests build there through .obs/workflows.yml.
-  #   OBS_RUNSERVICE_TOKEN   osc token --create --operation runservice home:99ecarvalho linscp
-  obs:
-    if: github.event_name == 'release' && !github.event.release.prerelease
-    runs-on: ubuntu-latest
-    env:
-      OBS_RUNSERVICE_TOKEN: ${{ secrets.OBS_RUNSERVICE_TOKEN }}
-    steps:
-      - name: Rerun the OBS package's services
-        if: env.OBS_RUNSERVICE_TOKEN != ''
-        run: >-
-          curl -fsS -X POST
-          -H "Authorization: Token $OBS_RUNSERVICE_TOKEN"
-          "https://api.opensuse.org/trigger/runservice?project=home:99ecarvalho&package=linscp"

@@ -9,7 +9,7 @@
     <title>linscp</title>
     <authors>Eduardo Correia</authors>
     <!-- The chocolatey.org account that pushes the package. -->
-    <owners>Apliant</owners>
+    <owners>ercorreia</owners>
     <projectUrl>https://linscp.org</projectUrl>
     <projectSourceUrl>https://github.com/99ecarvalho/linscp</projectSourceUrl>
     <packageSourceUrl>https://github.com/99ecarvalho/linscp/tree/main/port/packaging/chocolatey</packageSourceUrl>
