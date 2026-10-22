@@ -16,22 +16,13 @@ port/tests/golden/expected/*/*.out
 # local-only website research: httrack mirrors, design references, notes
 /website/
 
-# project instructions, kept local only
+# local files
 /CLAUDE.md
 /.claude/
-# The maintainer's account names and API tokens (never committed)
 /.env
+/local/
+/*.asc
 
 # Durable local copy of the third-party source archives offered with the
 # Windows packages (port/tools/fetch_msys2_qt.py --sources); never committed.
 /source-archive/
-
-# The maintainer's own files (cheatsheets, scripts), kept local only
-/local/
-CMDs.txt
-
-# OpenPGP secrets the key cheatsheet (local/CMDs.txt) can write here: never committed
-/linscp-revoke.asc
-/linscp-secret-backup.asc
-/subkeys.asc
-/release-signing-subkey.asc

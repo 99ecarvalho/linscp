@@ -105,6 +105,8 @@ jobs:
       - name: Collect the third-party sources
         run: |
           work=$(mktemp -d)
+          # Artifacts lose the executable bit on their way between jobs.
+          chmod +x "dist/linscp-$VERSION-x86_64.AppImage"
           (cd "$work" && "$GITHUB_WORKSPACE/dist/linscp-$VERSION-x86_64.AppImage" \
              --appimage-extract usr/share/licenses/linscp/third-party.json >/dev/null)
           unzip -q -j -d "$work/windows" "dist/linscp-$VERSION-portable.zip" \
