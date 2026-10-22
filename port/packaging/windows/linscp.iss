@@ -136,6 +136,8 @@ Source: "{#LicensesDir}\*"; DestDir: "{app}\licenses"; Components: main; Flags: 
 [InstallDelete]
 ; Translations deselected on an upgrade.
 Type: filesandordirs; Name: "{app}\Translations"; Components: not transl
+; The client the .NET assembly starts, under its name before 0.7.3.
+Type: files; Name: "{app}\dotnet\WinSCP.exe"
 
 [Icons]
 Name: "{autoprograms}\{#AppName}"; Filename: "{app}\{#AppExe}"; Components: main

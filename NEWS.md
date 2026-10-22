@@ -6,6 +6,16 @@ version are on [GitHub releases](https://github.com/99ecarvalho/linscp/releases)
 The release workflow publishes the section whose heading matches the tag, so
 each release needs a `## X.Y.Z — YYYY-MM-DD` heading here before it is tagged.
 
+## Unreleased
+
+- **The Windows programs and the .NET assembly identify as linscp** (product
+  linscp, publisher Apliant) in their file properties.
+- **The .NET assembly starts `linscp-cli.exe`** from its `dotnet` folder,
+  which replaces `dotnet\WinSCP.exe`. A script that sets
+  `Session.ExecutablePath` to the old file should point it to
+  `dotnet\linscp-cli.exe`, or leave it unset: the assembly also finds
+  linscp's installation by itself.
+
 ## 0.7.2 — 2026-10-21
 linscp gets its permanent name on the Linux desktop, signed releases, and
 packages for more systems.

@@ -47,6 +47,7 @@ if(WIN32)
     OUTPUT  "${_verrc}"
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/gen_versioninfo.py"
             --project "${LINSCP_UPSTREAM}/source/WinSCP.cbproj" --out "${_verrc}"
+            --product-version "${PROJECT_VERSION}"
     DEPENDS "${CMAKE_SOURCE_DIR}/port/tools/gen_versioninfo.py"
             "${LINSCP_UPSTREAM}/source/WinSCP.cbproj"
     COMMENT "Generating VERSIONINFO from WinSCP.cbproj"
@@ -63,6 +64,7 @@ if(NOT WIN32)
     OUTPUT  "${_vercpp}"
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/gen_versioninfo.py"
             --project "${LINSCP_UPSTREAM}/source/WinSCP.cbproj" --out "${_vercpp}" --cxx
+            --product-version "${PROJECT_VERSION}"
             --platform "${CMAKE_SYSTEM_NAME}"
     DEPENDS "${CMAKE_SOURCE_DIR}/port/tools/gen_versioninfo.py"
             "${LINSCP_UPSTREAM}/source/WinSCP.cbproj"

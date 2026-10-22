@@ -164,6 +164,7 @@ if(WIN32 AND LINSCP_QT_PREFIX)
       COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/build_winscpnet.py"
               --dotnet "${LINSCP_HOST_DOTNET}" --upstream "${CMAKE_SOURCE_DIR}/3rd-party/winscp"
               --dest "${CMAKE_BINARY_DIR}/winscpnet-net40" --framework net40
+              --product-version "${PROJECT_VERSION}"
       DEPENDS "${CMAKE_SOURCE_DIR}/port/tools/build_winscpnet.py"
       COMMENT "Building WinSCP's .NET assembly (net40)"
       VERBATIM)

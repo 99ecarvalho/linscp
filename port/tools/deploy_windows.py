@@ -14,7 +14,7 @@ the folders beside the executable. DLLs not in PREFIX are the system's.
 Translations/ gets core's translations (--translations: gen_translations.py's
 output) and Qt's own (qtbase_*.qm from PREFIX), where the shell looks for both.
 With --winscpnet, dotnet/ gets WinSCP's .NET assembly (net40) and the client
-as the WinSCP.exe it starts, with the client's DLLs: what WinSCP's
+it starts (linscp-cli.exe, as build_winscpnet.py names it), with the client's DLLs: what WinSCP's
 PowerShell extensions load from %WINSCP_PATH%, which the shell points there.
 
 licenses/third-party/ gets the licence texts of every MSYS2 package a deployed
@@ -96,11 +96,11 @@ def main():
     for extra in a.extra:
         shutil.copy2(extra, a.dest)
     if a.winscpnet:
-        # The assembly looks for winscp.exe beside itself.
+        # The assembly looks for linscp-cli.exe beside itself.
         dotnet = os.path.join(a.dest, 'dotnet')
         os.makedirs(dotnet)
         shutil.copy2(a.winscpnet, dotnet)
-        shutil.copy2(a.cli, os.path.join(dotnet, 'WinSCP.exe'))
+        shutil.copy2(a.cli, os.path.join(dotnet, 'linscp-cli.exe'))
         _, imports = table(a.objdump, a.cli)
         for dll in imports:
             if dll in available:

@@ -258,7 +258,8 @@ if(NOT CMAKE_CROSSCOMPILING)
       "the .NET SDK's dotnet, for ctest dotnet (port/tools/fetch_dotnet.py)")
   add_test(NAME winscpnet_build
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/build_winscpnet.py"
-            --dotnet "${LINSCP_DOTNET}" --upstream "${LINSCP_UPSTREAM}" --dest "${CMAKE_BINARY_DIR}/winscpnet")
+            --dotnet "${LINSCP_DOTNET}" --upstream "${LINSCP_UPSTREAM}" --dest "${CMAKE_BINARY_DIR}/winscpnet"
+            --product-version "${PROJECT_VERSION}")
   set_tests_properties(winscpnet_build PROPERTIES SKIP_RETURN_CODE 77 TIMEOUT 600)
   add_test(NAME dotnet
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/dotnet/run_dotnet.py"
@@ -797,3 +798,9 @@ if(NOT WIN32)
   add_test(NAME packaging_obs_debian
     COMMAND "${Python3_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/port/tools/gen_obs_debian.py" --check)
 endif()
+
+# The executables' version resource presents linscp, not another program
+# (port/tools/gen_versioninfo.py).
+add_test(NAME versioninfo_identity
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/check_versioninfo.py"
+          --project "${LINSCP_UPSTREAM}/source/WinSCP.cbproj" --product-version "${PROJECT_VERSION}")
