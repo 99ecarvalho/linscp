@@ -438,28 +438,27 @@ the AUR packaging must be 0BSD-licensed and build against system libraries.
 Status: `todo`, `wip`, `blocked`, `done`, `dropped`. Owner `M` = maintainer only
 (cannot be delegated: hand-written submissions, accounts, keys, sponsorship).
 
-### State (2026-10-21)
+### State (2026-10-22)
 
 | Phase | done | wip | blocked | todo | dropped |
 |---|---|---|---|---|---|
-| 0 — Licence clean-up | 30 | 2 | 0 | 0 | 2 |
+| 0 — Licence clean-up | 32 | 0 | 0 | 0 | 2 |
 | 1 — Flathub | 16 | 0 | 0 | 5 | 0 |
 | 2 — Own repositories | 3 | 6 | 0 | 4 | 0 |
 | 3 — Official distributions | 3 | 1 | 0 | 6 | 0 |
 | W — Windows channels | 3 | 1 | 1 | 1 | 0 |
-| **All** | **55** | **10** | **1** | **16** | **2** |
+| **All** | **57** | **8** | **1** | **16** | **2** |
 
 Everything that could be prepared without the maintainer's accounts or keys
 is done or waits only on them; the publishing jobs are ready in
 `port/packaging/ci/release-jobs.yml`, not yet in the release workflow. What
 unblocks the rest, in order of reach:
 
-1. **The next release (0.7.2)**, tagged from `main`: the first with the source
-   tarball, `SHA256SUMS` and the third-party sources (R0-24), which every
-   distribution recipe needs (the v0.7.1 tag predates the app ID and the
-   packaging).
-2. **The release key** is done (R0-15); the first signed tag (R0-16) comes
-   with 0.7.2, and the recipes already check its signature.
+1. **0.7.2 is out** (2026-10-22): the first release with a signed tag, a
+   signed source tarball, `SHA256SUMS` and the third-party sources; every
+   distribution recipe points at it.
+2. **The release key** is in use (R0-15, R0-16); the recipes check its
+   signature.
 3. **Accounts and secrets**, each then a job moved into the release
    workflow: AUR (R2-01 → R2-04), Copr (R2-05 → R2-07), OBS (R2-08 →
    R2-09, R2-10), Launchpad (R2-11 → R2-13), winget, Chocolatey and a Scoop
@@ -483,7 +482,7 @@ Not started: RW-05/RW-06 (code signing).
 | R0-08 | 0 | CI check: no image under `3rd-party/winscp` referenced by CMake or Qt resources | | dropped |
 | R0-09 | 0 | Windows package: licence texts of every bundled DLL in `licenses\` (`deploy_windows.py`: `third-party/<pkg>/`, `THIRD-PARTY-NOTICES.txt`) | | done |
 | R0-10 | 0 | Source of the copyleft components named in `licenses\SOURCE-OFFER.txt` (Windows) and the AppImage's `SOURCE-OFFER.txt`; published with each release (R0-24) | | done |
-| R0-24 | 0 | Publish the copyleft components' source with each release: `linscp-X.Y.Z-third-party-sources.tar` (release workflow, `fetch_sources.py` from each package's `third-party.json`; `licences.py` decides what is copyleft, `port/packaging/appimage/licences.json` for the AppImage's Debian packages). Replaces keeping local copies; first run on the next tag | | wip |
+| R0-24 | 0 | Each release publishes the copyleft components' source: `linscp-X.Y.Z-third-party-sources.tar` (23 components, 174 MiB for 0.7.2), collected by the release workflow with `fetch_sources.py` from each package's `third-party.json`; no local or off-site copies | | done |
 | R0-25 | 0 | Re-resolve the MSYS2 lock: two pinned packages are no longer published, so a cold CI cache cannot fetch the Windows toolchain | | done |
 | R0-26 | 0 | Release-only crash in ctest `object_exceptions` (double free); run the unit tests in a Release configuration in CI | | done |
 | R0-27 | 0 | `CMAKE_BUILD_TYPE=Debug` fails to link `linscp-cli` (undefined `DoAssert`/`DoAssertC`). Fixed in `port/shim/vcl_assert.cpp`: a failed assertion prints and aborts (`LINSCP_ASSERT=continue` goes on) | | done |
@@ -499,7 +498,7 @@ Not started: RW-05/RW-06 (code signing).
 | R0-13 | 0 | Ship neon `COPYING.LIB`, libs3 `COPYING-GPLv2`, Inno Setup licence; fix the neon comment | | done |
 | R0-14 | 0 | `make_source_tarball.py`: submodules, no `.git`, no `linscp-website`, Phase 0 exclusions, fails on MFC banner or excluded images; reproducible (byte-identical reruns), builds offline. Keeps the five `libs/openssl` files the OpenSSL-tree check compares and the three image-free `.dfm` menu layouts the menu tests read | | done |
 | R0-15 | 0 | OpenPGP release key A679B8C9915BB5ACDD45F91E207FB492B5B214A9 (`ecorreia@apliant.com.br`, `eduardo@linscp.org`): in the repository (`doc/release-signing-key.asc`, SECURITY.md), on keys.openpgp.org (both addresses confirmed) and on GitHub; primary offline, signing and encryption subkeys on the maintainer's machine; CI secrets set (`local/keys.py`, not in git) | M | done |
-| R0-16 | 0 | Annotated signed tags from the next release on (`git tag -s`; this repository's `user.signingkey` is the signing subkey); the release workflow signs `SHA256SUMS` and the tarball with `RELEASE_SIGNING_KEY`. Done with the first signed tag (0.7.2) | M | wip |
+| R0-16 | 0 | Annotated, signed tags: v0.7.2 is the first (signing subkey of A679B8C9915BB5ACDD45F91E207FB492B5B214A9); the release workflow signs `SHA256SUMS` and the source tarball with `RELEASE_SIGNING_KEY` | M | done |
 | R0-17 | 0 | Tag-triggered release workflow: tarball, packages, `.asc`, signed `SHA256SUMS`, draft release, website dispatch | | done |
 | R0-18 | 0 | `NEWS.md` with an entry per release | | done |
 | R0-19 | 0 | CMake option for system OpenSSL, tested against 3.5 and 4.0 | | done |
@@ -550,7 +549,7 @@ Not started: RW-05/RW-06 (code signing).
 | R3-07 | 3 | Fedora: no repack needed (the release tarball holds nothing Fedora forbids even as source; the spec deletes the bundled OpenSSL and expat in `%prep`). Crypto policy: no cipher list is set; with the system OpenSSL the default TLS version range is now the policy's (`core-tls-system-policy-bounds.patch`, ctest `tls_bounds`), checked by ClientHello under DEFAULT, FUTURE, LEGACY and a TLS 1.3-only policy on Fedora 44. Licence questions for the review: Q-15, Q-16; Q-17 open | | done |
 | R3-08 | 3 | EPEL 10 branch (once Qt ≥ 6.8 confirmed) | M | todo |
 | R3-09 | 3 | Arch [extra]: approach a Package Maintainer once there is AUR usage | M | todo |
-| R3-10 | 3 | `port/packaging/nix/package.nix`: built against nixos-unstable (Qt 6.12, system OpenSSL), SFTP transfer tested, nixfmt clean. Left: the published tarball's hash, a maintainer handle, the PR once there are users | | wip |
+| R3-10 | 3 | `port/packaging/nix/package.nix` at 0.7.2 (the published tarball's hash; 0.7.1's install-rules patch dropped): built earlier against nixos-unstable (Qt 6.12, system OpenSSL), SFTP transfer tested, nixfmt clean. Left: a maintainer handle, the PR once there are users | | wip |
 | RW-01 | W | winget multi-file manifest (`port/packaging/winget/`, schema 1.12.0, inno per scope + portable zip): `winget validate` passes; `winget install` works per user and portable (the zip puts its folder on PATH, `ArchiveBinariesDependOnPath`, as the programs load their DLLs from it) on Windows 11, once SmartScreen's prompt for the unsigned setup is accepted (unattended installs need RW-05/RW-06). First submission and the CLA are the maintainer's | | done |
 | RW-02 | W | winget, Chocolatey and Scoop jobs in `port/packaging/ci/release-jobs.yml`; need the secrets and the first submissions | | wip |
 | RW-03 | W | Scoop manifest `port/packaging/scoop/linscp.json`: installs, shims `linscp-cli`, makes the shortcut and keeps the portable INI across runs and reinstalls (Scoop 0.6.0 on Windows 11). The bucket is the maintainer's to create (README there) | | done |

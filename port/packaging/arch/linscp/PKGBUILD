@@ -1,7 +1,7 @@
 # Maintainer: Eduardo Correia <ecorreia@apliant.com.br>
 
 pkgname=linscp
-pkgver=0.7.1
+pkgver=0.7.2
 pkgrel=1
 pkgdesc='Transfer files over SFTP, SCP, FTP, WebDAV and S3'
 arch=('x86_64')
@@ -25,7 +25,7 @@ options=('!lto')
 # core), so the build is offline. makepkg checks the tarball's signature
 # against the release-signing key (doc/release-signing-key.asc).
 source=("https://github.com/99ecarvalho/linscp/releases/download/v$pkgver/$pkgname-$pkgver.tar.xz"{,.asc})
-sha256sums=('1294a524f68b5b2febe5e2593c7800cfe8808495825a88b81c3db2fbb31844eb'
+sha256sums=('41fbc9ef7dfe8d877e2f0fa061568cd037e6a3302afeee54d2aeb658f20c0324'
             'SKIP')
 validpgpkeys=('A679B8C9915BB5ACDD45F91E207FB492B5B214A9') # Eduardo Correia (linscp release signing)
 

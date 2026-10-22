@@ -1,16 +1,16 @@
 {
-    "version": "0.7.1",
+    "version": "0.7.2",
     "description": "File-transfer client for SFTP, SCP, FTP/FTPS, WebDAV and S3, with a two-panel interface and a scripting command line.",
     "homepage": "https://linscp.org",
     "license": "GPL-3.0-or-later",
     "notes": "The configuration is kept in linscp.ini beside linscp.exe, persisted across updates.",
     "architecture": {
         "64bit": {
-            "url": "https://github.com/99ecarvalho/linscp/releases/download/v0.7.1/linscp-0.7.1-portable.zip",
-            "hash": "55ceac9e3c22f89595845626835c8b04919fe1943acabd028abec3569e4555bf"
+            "url": "https://github.com/99ecarvalho/linscp/releases/download/v0.7.2/linscp-0.7.2-portable.zip",
+            "hash": "957b0be41546b638c4c27f07a7ede718c53ed3a188e4b7440fd5d259403f12e7"
         }
     },
-    "extract_dir": "linscp-0.7.1",
+    "extract_dir": "linscp-0.7.2",
     "bin": "linscp-cli.exe",
     "shortcuts": [
         [

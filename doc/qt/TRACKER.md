@@ -312,6 +312,7 @@ registry, tray or window messages.
 
 | Date | Decision | Rationale |
 |---|---|---|
+| 2026-10-22 | Version 0.7.2 released: the first with a signed tag, a signed source tarball, `SHA256SUMS` and the third-party sources | Signed releases and the distribution recipes need a published tarball |
 | 2026-10-21 | The AppImage keeps Debian's Qt, with libproxy (R0-31 dropped) | A Qt without libproxy would cut about 20 bundled libraries, but the AppImage would stop finding automatic proxy setups (PAC scripts, auto-discovery); proxy detection matters more than the size |
 | 2026-10-21 | Code built against the shim is compiled with `-fno-builtin` (C++), replacing `-fno-assume-sane-operator-new` | GCC 16's `<new>` and clang 23 let the optimizer treat a new-expression's memory as uninitialized in ways no narrower flag turns off; the shim's zeroed allocations are what the C++Builder code relies on. About 0.3% larger code |
 | 2026-10-21 | The source tarball leaves out upstream's `source/packages/` and `.dcr`/`.res` resources | linscp builds none of them, and some (TBX, PIDL.pas) are under licences that forbid redistributing copies; the tarball is what every distribution republishes |

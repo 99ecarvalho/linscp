@@ -33,10 +33,6 @@ instead of downloading it:
 nix-store --add-fixed sha256 build/dist/linscp-X.Y.Z.tar.xz
 ```
 
-`install-absolute-dirs.patch` is the fix for the `bin/` symlinks when the
-install directories are absolute, as Nix passes them; 0.7.1 needs it, later
-releases include it, so it goes with the first version bump.
-
 The `hash` must be the published tarball's (`nix-prefetch-url` or the
 release's `SHA256SUMS`). Format the file with `nixfmt` (nixfmt-rfc-style)
 before submitting.

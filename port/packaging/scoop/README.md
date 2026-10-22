@@ -6,8 +6,7 @@
 persisted across updates in `~\scoop\persist\linscp\`.
 
 `checkver` follows the latest GitHub release; `autoupdate` takes the hash from
-the release's `SHA256SUMS`, which the release workflow publishes from 0.7.2 on
-(0.7.1 has none, so the hash in the manifest was computed from the download).
+the release's `SHA256SUMS`.
 
 ## Testing a change
 

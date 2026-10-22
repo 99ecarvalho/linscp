@@ -16,21 +16,15 @@
 # __declspec(property)), hence clangStdenv.
 clangStdenv.mkDerivation (finalAttrs: {
   pname = "linscp";
-  version = "0.7.1";
+  version = "0.7.2";
 
   # The release tarball carries the submodules linscp builds from (its core,
   # PuTTY, OpenSSL) and none of OpenSSL's own test-suite submodules, which
   # fetchFromGitHub's recursive fetchSubmodules would pull in.
   src = fetchurl {
     url = "https://github.com/99ecarvalho/linscp/releases/download/v${finalAttrs.version}/linscp-${finalAttrs.version}.tar.xz";
-    hash = "sha256-EpSlJPaLWy/r5eJZPHgAz+iAhJWCWoi4HD2y+7MYROs=";
+    hash = "sha256-QfvJ733+jYd+Lw+gYVaM0DfmozAq/u5U0q62WPIMAyQ=";
   };
-
-  patches = [
-    # The bin/ symlinks with absolute install directories (Nix's cmake hook
-    # passes them so). Fixed after 0.7.1: drop on the next release.
-    ./install-absolute-dirs.patch
-  ];
 
   strictDeps = true;
 

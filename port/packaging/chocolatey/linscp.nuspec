@@ -5,7 +5,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>linscp</id>
-    <version>0.7.1</version>
+    <version>0.7.2</version>
     <title>linscp</title>
     <authors>Eduardo Correia</authors>
     <!-- The chocolatey.org account that pushes the package. -->
@@ -15,8 +15,8 @@
     <packageSourceUrl>https://github.com/99ecarvalho/linscp/tree/main/port/packaging/chocolatey</packageSourceUrl>
     <docsUrl>https://linscp.org/manual/</docsUrl>
     <bugTrackerUrl>https://github.com/99ecarvalho/linscp/issues</bugTrackerUrl>
-    <iconUrl>https://cdn.jsdelivr.net/gh/99ecarvalho/linscp@v0.7.1/assets/app/linscp-256.png</iconUrl>
-    <licenseUrl>https://github.com/99ecarvalho/linscp/blob/v0.7.1/LICENSE</licenseUrl>
+    <iconUrl>https://cdn.jsdelivr.net/gh/99ecarvalho/linscp@v0.7.2/assets/app/linscp-256.png</iconUrl>
+    <licenseUrl>https://github.com/99ecarvalho/linscp/blob/v0.7.2/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>Copyright (c) 2026 Eduardo Correia</copyright>
     <tags>linscp sftp scp ftp ftps webdav s3 ssh file-transfer file-manager sync foss cross-platform</tags>
@@ -27,7 +27,7 @@ It synchronizes and compares directories, keeps a remote directory up to date, e
 
 The package installs linscp for all users with its own installer, silently, with the default tasks: the Explorer "Send to" upload shortcut and the handler for sftp://, scp://, ftp://, ftps://, dav:// and s3:// URLs.
 ]]></description>
-    <releaseNotes>https://github.com/99ecarvalho/linscp/releases/tag/v0.7.1</releaseNotes>
+    <releaseNotes>https://github.com/99ecarvalho/linscp/releases/tag/v0.7.2</releaseNotes>
   </metadata>
   <files>
     <file src="tools\**" target="tools" />
