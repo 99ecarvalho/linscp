@@ -21,6 +21,7 @@ port/tests/golden/expected/*/*.out
 /.claude/
 /.env
 /local/
+/3rd-party-port/
 /*.asc
 
 # Durable local copy of the third-party source archives offered with the
